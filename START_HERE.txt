@@ -1,0 +1,15 @@
+POUR CREER LE REPOSITORY CUBESHELF
+
+1. Extrais tout ce ZIP dans un nouveau dossier, par exemple :
+   C:\Users\BEAVSN\Documents\CubeShelf-Launcher
+
+2. Double-clique :
+   CREATE_GITHUB_REPO_AND_PUSH.bat
+
+3. Si GitHub demande une connexion, valide-la dans le navigateur.
+
+Le script va creer automatiquement :
+https://github.com/zeranemesis/CubeShelf-Launcher
+
+Puis il va pousser CubeShelf v0.6.7 et creer le tag v0.6.7.
+Ce tag declenchera le workflow GitHub Actions pour produire CubeShelf-win-x64.zip.

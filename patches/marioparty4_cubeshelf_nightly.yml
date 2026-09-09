@@ -1,0 +1,67 @@
+
+name: CubeShelf Windows Nightly
+
+on:
+  push:
+    branches: [audio-local]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-nightly:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+
+      - name: Override VCPKG_ROOT
+        run: echo "VCPKG_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
+
+      - uses: mozilla-actions/sccache-action@v0.0.10
+
+      - name: Install dependencies
+        run: |
+          choco install ninja
+          vcpkg install freetype:x64-windows-static zstd:x64-windows-static
+
+      - name: Configure
+        run: cmake --preset x-windows-ci-msvc
+
+      - name: Build
+        run: cmake --build --preset x-windows-ci-msvc
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "build/install/*" -DestinationPath "PartyBoard-win-x64.zip" -Force
+          $manifest = [ordered]@{
+            version = "nightly"
+            commit = "${{ github.sha }}"
+            platform = "win-x64"
+            supportedDiscs = @("GMPE01_00", "GMPE01_01")
+          } | ConvertTo-Json -Depth 5
+          Set-Content -Path "manifest.json" -Value $manifest -Encoding UTF8
+          $hash = (Get-FileHash "PartyBoard-win-x64.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  PartyBoard-win-x64.zip" | Out-File "checksums.txt" -Encoding ascii
+
+      - name: Publish moving nightly release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release delete cubeshelf-nightly --yes --cleanup-tag || true
+          git tag -f cubeshelf-nightly "$GITHUB_SHA"
+          git push origin -f cubeshelf-nightly
+          gh release create cubeshelf-nightly \
+            PartyBoard-win-x64.zip manifest.json checksums.txt \
+            --prerelease \
+            --title "CubeShelf Nightly" \
+            --notes "Automatic Windows build for CubeShelf. Commit: $GITHUB_SHA"

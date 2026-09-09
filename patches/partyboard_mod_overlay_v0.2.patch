@@ -1,0 +1,161 @@
+\
+--- a/src/port/dvd.c
++++ b/src/port/dvd.c
+@@
+ static char (*s_pathEntries)[PATH_MAX] = NULL;
+ static int s_pathEntriesCount = 0;
+ static char s_rootDir[PATH_MAX];
++#define MOD_MAX_ROOTS 128
++static char s_modRoots[MOD_MAX_ROOTS][PATH_MAX];
++static int s_modRootCount = 0;
++
++static void NormalizeSlashes(char *path)
++{
++#ifdef _WIN32
++    for (char *p = path; *p != '\0'; ++p) {
++        if (*p == '/')
++            *p = '\\';
++    }
++#else
++    for (char *p = path; *p != '\0'; ++p) {
++        if (*p == '\\')
++            *p = '/';
++    }
++#endif
++}
++
++static void TrimLine(char *line)
++{
++    size_t n = strlen(line);
++    while (n > 0 && (line[n - 1] == '\r' || line[n - 1] == '\n' ||
++                     line[n - 1] == ' ' || line[n - 1] == '\t')) {
++        line[--n] = '\0';
++    }
++}
++
++static void LoadModRoots(void)
++{
++    const char *listPath = getenv("PARTYBOARD_MOD_LIST");
++    FILE *list;
++    char line[PATH_MAX];
++
++    s_modRootCount = 0;
++    if (listPath == NULL || listPath[0] == '\0')
++        return;
++
++    list = fopen(listPath, "rt");
++    if (list == NULL) {
++        printf("CubeShelf: could not open mod list: %s\n", listPath);
++        return;
++    }
++
++    while (s_modRootCount < MOD_MAX_ROOTS &&
++           fgets(line, sizeof(line), list) != NULL) {
++        TrimLine(line);
++        if (line[0] == '\0' || line[0] == '#')
++            continue;
++
++        if (strlen(line) + 1 > PATH_MAX)
++            continue;
++
++        strcpy(s_modRoots[s_modRootCount], line);
++        NormalizeSlashes(s_modRoots[s_modRootCount]);
++        printf("CubeShelf: mod root %d = %s\n",
++               s_modRootCount, s_modRoots[s_modRootCount]);
++        s_modRootCount++;
++    }
++
++    fclose(list);
++}
++
++static BOOL GetVirtualRelativePath(const char *fileName, char *out, size_t outSize)
++{
++    char current[PATH_MAX];
++    const char *name = fileName;
++    const char *relativeDir = "";
++
++    if (fileName == NULL || fileName[0] == '\0')
++        return FALSE;
++
++    /* GameCube absolute DVD paths are virtual roots, not host absolute paths. */
++    while (*name == '/' || *name == '\\')
++        name++;
++
++    if (getcwd(current, sizeof(current)) != NULL) {
++        NormalizeSlashes(current);
++
++        if (strncmp(current, s_rootDir, strlen(s_rootDir)) == 0) {
++            relativeDir = current + strlen(s_rootDir);
++            while (*relativeDir == '/' || *relativeDir == '\\')
++                relativeDir++;
++        }
++    }
++
++    if (relativeDir[0] != '\0') {
++        if (snprintf(out, outSize, "%s/%s", relativeDir, name) >= (int)outSize)
++            return FALSE;
++    }
++    else {
++        if (snprintf(out, outSize, "%s", name) >= (int)outSize)
++            return FALSE;
++    }
++
++    NormalizeSlashes(out);
++    return TRUE;
++}
++
++static FILE *TryOpenModOverlay(const char *fileName)
++{
++    char relative[PATH_MAX];
++    char candidate[PATH_MAX];
++    int i;
++
++    if (s_modRootCount == 0)
++        return NULL;
++
++    if (!GetVirtualRelativePath(fileName, relative, sizeof(relative)))
++        return NULL;
++
++    /*
++     * Roots are already sorted by CubeShelf from highest to lowest priority.
++     * First matching file wins.
++     */
++    for (i = 0; i < s_modRootCount; i++) {
++        FILE *f;
++        if (snprintf(candidate, sizeof(candidate), "%s/%s",
++                     s_modRoots[i], relative) >= PATH_MAX)
++            continue;
++
++        NormalizeSlashes(candidate);
++        f = fopen(candidate, "rb");
++        if (f != NULL) {
++            printf("CubeShelf overlay: %s -> %s\n", fileName, candidate);
++            return f;
++        }
++    }
++
++    return NULL;
++}
+
+ void DVDInit(void)
+ {
+     chdir("GMPE01_00/files");
+     if (getcwd(s_rootDir, sizeof(s_rootDir)) == NULL)
+         exit(1);
++    NormalizeSlashes(s_rootDir);
++    LoadModRoots();
+ }
+@@
+ BOOL DVDOpen(const char *fileName, DVDFileInfo *fileInfo)
+ {
+     FILE *f;
+
+     printf("DVDOpen: %s\n", fileName);
+-    f = fopen(fileName, "rb");
++    f = TryOpenModOverlay(fileName);
++    if (f == NULL)
++        f = fopen(fileName, "rb");
+     if (f == NULL) {
+         puts("open failed\n");
+         return FALSE;
+     }

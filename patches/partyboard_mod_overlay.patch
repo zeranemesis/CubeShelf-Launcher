@@ -1,0 +1,36 @@
+--- a/src/port/dvd.c
++++ b/src/port/dvd.c
+@@
+ static char s_rootDir[PATH_MAX];
++static char s_modRoot[PATH_MAX];
++
++static FILE *TryOpenModOverlay(const char *fileName)
++{
++    const char *root = getenv("PARTYBOARD_MOD_ROOT");
++    if (root == NULL || root[0] == '\0')
++        return NULL;
++
++    /*
++     * v0.1 contract:
++     * CubeShelf stores each enabled mod in PARTYBOARD_MOD_ROOT/<mod-id>/.
++     * The next step is to pass an ordered enabled-mod list so conflicts can
++     * be resolved deterministically. For now this hook is intentionally a
++     * minimal integration point rather than destructive file replacement.
++     */
++    (void)fileName;
++    return NULL;
++}
+@@
+ BOOL DVDOpen(const char *fileName, DVDFileInfo *fileInfo)
+ {
+     FILE *f;
+
+     printf("DVDOpen: %s\n", fileName);
++    f = TryOpenModOverlay(fileName);
++    if (f != NULL) {
++        fileInfo->cb.addr = f;
++        fseek(f, 0, SEEK_END);
++        fileInfo->length = ftell(f);
++        return TRUE;
++    }
+     f = fopen(fileName, "rb");

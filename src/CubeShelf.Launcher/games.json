@@ -1,0 +1,40 @@
+[
+  {
+    "Id": "GMPE01_00",
+    "Title": "Mario Party 4",
+    "Year": 2002,
+    "Genre": "Party",
+    "Players": "1–4 joueurs",
+    "Region": "PAL / USA",
+    "Description": "Mario Party 4 recompilé pour PC via PartyBoard. Sélectionne d'abord le jeu, puis ouvre son gestionnaire de mods GameBanana.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 7096,
+    "Covers": [
+      {
+        "Label": "PAL Europe",
+        "Front": "Assets\\Covers\\MarioParty4\\pal_front.png",
+        "Back": "Assets\\Covers\\MarioParty4\\pal_back.png",
+        "Spine": "Assets\\Covers\\MarioParty4\\pal_spine.png"
+      },
+      {
+        "Label": "USA ESRB",
+        "Front": "Assets\\Covers\\MarioParty4\\us_front.png",
+        "Back": "Assets\\Covers\\MarioParty4\\us_back.png",
+        "Spine": "Assets\\Covers\\MarioParty4\\us_spine.png"
+      },
+      {
+        "Label": "PAL Variante",
+        "Front": "Assets\\Covers\\MarioParty4\\pal_alt_front.png",
+        "Back": "Assets\\Covers\\MarioParty4\\pal_alt_back.png",
+        "Spine": "Assets\\Covers\\MarioParty4\\pal_alt_spine.png"
+      }
+    ],
+    "GitHubOwner": "zeranemesis",
+    "GitHubRepo": "Marioparty4",
+    "GitHubBranch": "audio-local",
+    "GitHubReleaseAssetName": "PartyBoard-win-x64.zip",
+    "DiscImage": "",
+    "GitHubReleaseTag": "cubeshelf-nightly"
+  }
+]
