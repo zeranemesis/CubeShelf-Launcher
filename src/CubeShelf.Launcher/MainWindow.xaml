@@ -18,7 +18,7 @@
 <Button Content="{DynamicResource AppFavorites}" HorizontalContentAlignment="Left"/>
 <Button Content="{DynamicResource AppSettings}" HorizontalContentAlignment="Left" Click="SettingsNav_Click"/>
 </StackPanel>
-<StackPanel DockPanel.Dock="Bottom"><Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8"><StackPanel><TextBlock Text="{DynamicResource Queue}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold"/><TextBlock x:Name="QueueSidebarText" Text="—" Foreground="{DynamicResource Text}" FontSize="12" Margin="0,5,0,0"/></StackPanel></Border><TextBlock x:Name="SidebarSelectedGame" Text="CubeShelf" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="7,0,7,8"/><TextBlock Text="CubeShelf v0.6.9" Foreground="{DynamicResource Muted}" FontSize="11" Margin="7"/></StackPanel>
+<StackPanel DockPanel.Dock="Bottom"><Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8"><StackPanel><TextBlock Text="{DynamicResource Queue}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold"/><TextBlock x:Name="QueueSidebarText" Text="—" Foreground="{DynamicResource Text}" FontSize="12" Margin="0,5,0,0"/></StackPanel></Border><TextBlock x:Name="SidebarSelectedGame" Text="CubeShelf" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="7,0,7,8"/><TextBlock x:Name="LauncherVersionText" Text="CubeShelf" Foreground="{DynamicResource Muted}" FontSize="11" Margin="7"/></StackPanel>
 </DockPanel>
 </Border>
 

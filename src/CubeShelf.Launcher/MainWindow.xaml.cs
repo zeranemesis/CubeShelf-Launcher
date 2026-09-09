@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.Reflection;
 using Microsoft.Win32;
 using CubeShelf.Launcher.Services;
 
@@ -45,6 +46,9 @@ public partial class MainWindow : Window
         _preferencesService.ApplyLanguage(_preferences.Language);
 
         InitializeComponent();
+
+        LauncherVersionText.Text =
+            $"CubeShelf v{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?"}";
 
         _config = LauncherConfig.Load(
             Path.Combine(AppContext.BaseDirectory, "appsettings.json"));

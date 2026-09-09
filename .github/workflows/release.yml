@@ -3,11 +3,15 @@ name: Build Windows release
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "main"
 
 permissions:
   contents: write
+
+concurrency:
+  group: cubeshelf-release
+  cancel-in-progress: false
 
 jobs:
   windows:
@@ -15,32 +19,114 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
+      - name: Determine next release version
+        id: version
+        shell: pwsh
+        run: |
+          git fetch --tags --force
+          $tags = git tag --list "v*"
+
+          $versions = @()
+          foreach ($tag in $tags) {
+            if ($tag -match '^v(\d+)\.(\d+)\.(\d+)$') {
+              $versions += [PSCustomObject]@{
+                Tag = $tag
+                Major = [int]$Matches[1]
+                Minor = [int]$Matches[2]
+                Patch = [int]$Matches[3]
+              }
+            }
+          }
+
+          if ($versions.Count -eq 0) {
+            $major = 0
+            $minor = 6
+            $patch = 10
+          }
+          else {
+            $latest = $versions |
+              Sort-Object Major, Minor, Patch |
+              Select-Object -Last 1
+
+            $major = $latest.Major
+            $minor = $latest.Minor
+            $patch = $latest.Patch + 1
+          }
+
+          $version = "$major.$minor.$patch"
+          $tag = "v$version"
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Next CubeShelf release: $tag"
+
       - name: Restore
         run: dotnet restore CubeShelfLauncher.sln
 
       - name: Publish launcher
-        run: dotnet publish src/CubeShelf.Launcher/CubeShelf.Launcher.csproj -c Release -r win-x64 --self-contained true -o publish/CubeShelf
+        run: >
+          dotnet publish
+          src/CubeShelf.Launcher/CubeShelf.Launcher.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish/CubeShelf
 
       - name: Publish updater
-        run: dotnet publish src/CubeShelf.Updater/CubeShelf.Updater.csproj -c Release -r win-x64 --self-contained true -o publish/Updater
+        run: >
+          dotnet publish
+          src/CubeShelf.Updater/CubeShelf.Updater.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:PublishSingleFile=true
+          -o publish/Updater
 
       - name: Package release
         shell: pwsh
         run: |
-          Copy-Item publish/Updater/CubeShelf.Updater.exe publish/CubeShelf/
-          Compress-Archive -Path publish/CubeShelf/* -DestinationPath CubeShelf-win-x64.zip -Force
-          $hash = (Get-FileHash CubeShelf-win-x64.zip -Algorithm SHA256).Hash.ToLower()
-          "$hash  CubeShelf-win-x64.zip" | Out-File checksums.txt -Encoding ascii
+          Copy-Item `
+            publish/Updater/CubeShelf.Updater.exe `
+            publish/CubeShelf/CubeShelf.Updater.exe `
+            -Force
+
+          Compress-Archive `
+            -Path publish/CubeShelf/* `
+            -DestinationPath CubeShelf-win-x64.zip `
+            -Force
+
+          $hash = (
+            Get-FileHash `
+              CubeShelf-win-x64.zip `
+              -Algorithm SHA256
+          ).Hash.ToLower()
+
+          "$hash  CubeShelf-win-x64.zip" |
+            Out-File checksums.txt -Encoding ascii
+
+      - name: Tag this commit
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}" "${{ github.sha }}"
+          git push origin "refs/tags/${{ steps.version.outputs.tag }}"
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
           files: |
             CubeShelf-win-x64.zip
