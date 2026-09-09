@@ -209,16 +209,7 @@ internal sealed class UpdaterWindow : Window
 
             SetProgress(0.03);
 
-            try
-            {
-                var process =
-                    Process.GetProcessById(_pid);
-
-                await process.WaitForExitAsync();
-            }
-            catch
-            {
-            }
+            await StopAllCubeShelfProcessesAsync();
 
             SetStatus("Préparation des fichiers…");
             SetProgress(0.08);
@@ -394,6 +385,96 @@ internal sealed class UpdaterWindow : Window
 
             await Task.Yield();
         }
+    }
+
+    private async Task StopAllCubeShelfProcessesAsync()
+    {
+        SetStatus("Fermeture complète de CubeShelf…");
+        SetProgress(0.02);
+
+        try
+        {
+            using var parent = Process.GetProcessById(_pid);
+
+            var graceful = parent.WaitForExitAsync();
+            var timeout = Task.Delay(TimeSpan.FromSeconds(2));
+
+            if (await Task.WhenAny(graceful, timeout) != graceful &&
+                !parent.HasExited)
+            {
+                parent.Kill(entireProcessTree: true);
+                await parent.WaitForExitAsync();
+            }
+        }
+        catch
+        {
+        }
+
+        var installRoot =
+            Path.GetFullPath(_installDir)
+                .TrimEnd(Path.DirectorySeparatorChar) +
+            Path.DirectorySeparatorChar;
+
+        var names = new[]
+        {
+            "CubeShelf",
+            "CubeShelf.Launcher",
+            "CubeShelf.Updater"
+        };
+
+        var deadline = DateTime.UtcNow.AddSeconds(6);
+
+        while (DateTime.UtcNow < deadline)
+        {
+            var killedSomething = false;
+
+            foreach (var name in names)
+            {
+                foreach (var process in Process.GetProcessesByName(name))
+                {
+                    try
+                    {
+                        if (process.Id == Environment.ProcessId)
+                            continue;
+
+                        var path = process.MainModule?.FileName;
+                        if (string.IsNullOrWhiteSpace(path))
+                            continue;
+
+                        var fullPath = Path.GetFullPath(path);
+
+                        if (!fullPath.StartsWith(
+                                installRoot,
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        if (!process.HasExited)
+                        {
+                            process.Kill(entireProcessTree: true);
+                            await process.WaitForExitAsync();
+                            killedSomething = true;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    finally
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+
+            if (!killedSomething)
+                break;
+
+            await Task.Delay(150);
+        }
+
+        await Task.Delay(350);
+        SetProgress(0.06);
     }
 
     private void RestartButton_Click(

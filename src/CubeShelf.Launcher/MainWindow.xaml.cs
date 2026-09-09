@@ -1226,6 +1226,26 @@ private void ConfigureDiscImageButton_Click(
         _queue.RemoveTerminalByKey(key);
 
         var discName = Path.GetFileName(discPath);
+        var allowDolphinDownload = false;
+
+        if (Path.GetExtension(discPath).Equals(
+                ".rvz",
+                StringComparison.OrdinalIgnoreCase) &&
+            !_runtimeInstaller.IsDolphinToolAvailable())
+        {
+            var answer = MessageBox.Show(
+                IsEnglish
+                    ? "This RVZ needs DolphinTool to be converted.\n\nDownload the official Dolphin Windows tool automatically now?"
+                    : "Ce RVZ nécessite DolphinTool pour être converti.\n\nTélécharger automatiquement l'outil Windows officiel de Dolphin maintenant ?",
+                "CubeShelf • RVZ",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (answer != MessageBoxResult.Yes)
+                return;
+
+            allowDolphinDownload = true;
+        }
 
         var added = _queue.Enqueue(
             key,
@@ -1241,7 +1261,8 @@ private void ConfigureDiscImageButton_Click(
                     runtime,
                     progress,
                     cancellationToken,
-                    discImagePath: discPath);
+                    discImagePath: discPath,
+                    allowDolphinToolDownload: allowDolphinDownload);
             },
             () =>
             {

@@ -6,12 +6,12 @@ public static class DiscImageService
 {
     private static readonly Dictionary<string, string> Supported = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["GMPE01_00"] = "USA 1.0", ["GMPE01_01"] = "USA 1.1",
-        ["GMPP01_00"] = "PAL 1.0", ["GMPP01_01"] = "PAL 1.1", ["GMPP01_02"] = "PAL 1.2",
-        ["GMPJ01_00"] = "Japan 1.0"
+        ["GMPE01_00"] = "USA 1.0",
+        ["GMPE01_01"] = "USA 1.1"
     };
 
-    public static string SupportedSummary => "USA 1.0 (GMPE01_00), USA 1.1 (GMPE01_01), PAL 1.0 (GMPP01_00), PAL 1.1 (GMPP01_01), PAL 1.2 (GMPP01_02), Japan 1.0 (GMPJ01_00)";
+    public static string SupportedSummary =>
+        "Build PartyBoard actuel : USA 1.0 (GMPE01_00) et USA 1.1 (GMPE01_01).";
 
     public static DiscCompatibility Inspect(string path, bool english)
     {

@@ -211,7 +211,8 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         RuntimeState? runtime = null,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
-        string? discImagePath = null)
+        string? discImagePath = null,
+        bool allowDolphinToolDownload = false)
     {
         runtime ??= ReadState(game);
 
@@ -239,16 +240,19 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         {
             if(ext==".rvz")
             {
-                var dolphin=FindDolphinTool();
-                if(dolphin is null)
-                    throw new InvalidOperationException(
-                        $"Le fichier sélectionné est un RVZ ({Path.GetFileName(sourceDisc)}). " +
-                        "CubeShelf doit le convertir avant de préparer le jeu, mais DolphinTool.exe est introuvable. " +
-                        "Installe Dolphin, place DolphinTool.exe à côté de CubeShelf.exe, ou sélectionne un ISO.");
+                var dolphin = await EnsureDolphinToolAsync(
+                    allowDolphinToolDownload,
+                    progress,
+                    cancellationToken);
 
                 tempIso=Path.Combine(Path.GetTempPath(),$"cubeshelf-{game.Id}-{Guid.NewGuid():N}.iso");
 
-                var psi=new ProcessStartInfo(dolphin){UseShellExecute=false,CreateNoWindow=true};
+                var psi=new ProcessStartInfo(dolphin)
+                {
+                    UseShellExecute=false,
+                    CreateNoWindow=true,
+                    WorkingDirectory=Path.GetDirectoryName(dolphin)!
+                };
                 psi.ArgumentList.Add("convert");
                 psi.ArgumentList.Add("-f"); psi.ArgumentList.Add("iso");
                 psi.ArgumentList.Add("-i"); psi.ArgumentList.Add(sourceDisc);
@@ -269,14 +273,37 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                     throw new InvalidOperationException("La conversion RVZ → ISO a échoué.");
 
                 iso=tempIso;
-                progress?.Report(.18);
+                progress?.Report(.35);
+
+                var convertedCompatibility =
+                    DiscImageService.Inspect(iso, english: false);
+
+                if (!convertedCompatibility.Recognized ||
+                    !convertedCompatibility.Supported)
+                {
+                    throw new InvalidDataException(
+                        "Le RVZ converti n'est pas compatible avec le build PartyBoard actuel. " +
+                        convertedCompatibility.Message);
+                }
             }
             else if(ext!=".iso" && ext!=".gcm")
             {
                 throw new InvalidOperationException("Utilise ISO, GCM ou RVZ.");
             }
+            else
+            {
+                var compatibility =
+                    DiscImageService.Inspect(sourceDisc, english: false);
 
-            double b=ext==".rvz" ? .18 : 0, scale=ext==".rvz" ? .82 : 1;
+                if (!compatibility.Recognized || !compatibility.Supported)
+                {
+                    throw new InvalidDataException(
+                        "L'image sélectionnée n'est pas compatible avec le build PartyBoard actuel. " +
+                        compatibility.Message);
+                }
+            }
+
+            double b=ext==".rvz" ? .35 : 0, scale=ext==".rvz" ? .65 : 1;
             await GameCubeIsoExtractor.ExtractFilesAsync(
                 iso,targetFiles,new Progress<double>(p=>progress?.Report(b+p*scale)), cancellationToken);
 
@@ -488,13 +515,146 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         }
     }
 
+    public bool IsDolphinToolAvailable()
+        => FindDolphinTool() is not null;
+
+    private static string DolphinToolCacheRoot()
+        => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CubeShelf",
+            "Tools",
+            "Dolphin");
+
+    private async Task<string> EnsureDolphinToolAsync(
+        bool allowDownload,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        var existing = FindDolphinTool();
+        if (existing is not null)
+            return existing;
+
+        if (!allowDownload)
+        {
+            throw new InvalidOperationException(
+                "DolphinTool.exe est nécessaire pour un RVZ. " +
+                "Autorise son téléchargement automatique ou utilise un ISO.");
+        }
+
+        const string version = "2606a";
+        const string url =
+            "https://dl.dolphin-emu.org/releases/2606a/dolphin-2606a-x64.7z";
+
+        var toolsRoot = DolphinToolCacheRoot();
+        var staging = toolsRoot + ".staging-" + Guid.NewGuid().ToString("N");
+        var archivePath = Path.Combine(
+            Path.GetTempPath(),
+            $"cubeshelf-dolphin-{version}-{Guid.NewGuid():N}.7z");
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(toolsRoot)!);
+
+            progress?.Report(.01);
+
+            await DownloadAsync(
+                url,
+                archivePath,
+                p => progress?.Report(.01 + p * .14),
+                cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (Directory.Exists(staging))
+                Directory.Delete(staging, true);
+
+            Directory.CreateDirectory(staging);
+            progress?.Report(.16);
+
+            using (var archive = ArchiveFactory.OpenArchive(archivePath))
+            {
+                archive.WriteToDirectory(
+                    staging,
+                    new ExtractionOptions
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var found = Directory
+                .EnumerateFiles(
+                    staging,
+                    "DolphinTool.exe",
+                    SearchOption.AllDirectories)
+                .FirstOrDefault();
+
+            found ??= Directory
+                .EnumerateFiles(
+                    staging,
+                    "*dolphin*tool*.exe",
+                    SearchOption.AllDirectories)
+                .FirstOrDefault();
+
+            if (found is null)
+                throw new FileNotFoundException(
+                    "Le package officiel Dolphin ne contient pas DolphinTool.exe.");
+
+            var relative = Path.GetRelativePath(staging, found);
+
+            if (Directory.Exists(toolsRoot))
+                Directory.Delete(toolsRoot, true);
+
+            Directory.Move(staging, toolsRoot);
+
+            var installed = Path.Combine(toolsRoot, relative);
+
+            if (!File.Exists(installed))
+            {
+                installed = Directory
+                    .EnumerateFiles(
+                        toolsRoot,
+                        "DolphinTool.exe",
+                        SearchOption.AllDirectories)
+                    .FirstOrDefault()
+                    ?? "";
+            }
+
+            if (string.IsNullOrWhiteSpace(installed) || !File.Exists(installed))
+                throw new FileNotFoundException(
+                    "DolphinTool.exe n'a pas pu être installé dans le cache CubeShelf.");
+
+            progress?.Report(.20);
+            return installed;
+        }
+        finally
+        {
+            try
+            {
+                if (File.Exists(archivePath))
+                    File.Delete(archivePath);
+            }
+            catch { }
+
+            try
+            {
+                if (Directory.Exists(staging))
+                    Directory.Delete(staging, true);
+            }
+            catch { }
+        }
+    }
+
     private static string? FindDolphinTool()
     {
         var names = new[] { "DolphinTool.exe", "dolphin-tool.exe" };
 
         var candidateDirectories = new List<string>
         {
-            AppContext.BaseDirectory
+            AppContext.BaseDirectory,
+            DolphinToolCacheRoot()
         };
 
         void AddCandidateRoot(string root)
