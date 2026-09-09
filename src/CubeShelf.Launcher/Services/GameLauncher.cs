@@ -13,7 +13,7 @@ public sealed class GameLauncher
         _mods = mods;
     }
 
-    public void StartGame()
+    public Process StartGame()
     {
         var exe = _game.ExecutableFullPath;
 
@@ -52,6 +52,7 @@ public sealed class GameLauncher
                 _game.DiscImageFullPath;
         }
 
-        Process.Start(psi);
+        return Process.Start(psi) ??
+            throw new InvalidOperationException("Impossible de démarrer PartyBoard.");
     }
 }

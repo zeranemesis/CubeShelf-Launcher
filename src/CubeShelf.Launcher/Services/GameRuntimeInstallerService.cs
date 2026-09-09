@@ -154,17 +154,59 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         if(string.IsNullOrWhiteSpace(asset.Name))
             throw new InvalidOperationException($"La release ne contient pas {game.GitHubReleaseAssetName}.");
 
-        var temp=Path.Combine(Path.GetTempPath(),$"cubeshelf-runtime-{game.Id}-{Guid.NewGuid():N}.zip");
-        progress?.Report(.02);
-        await DownloadAsync(asset.Url,temp,p=>progress?.Report(.02+p*.62), cancellationToken);
+        var checksumAsset = release.Assets.FirstOrDefault(a =>
+            a.Name.Equals(
+                game.GitHubReleaseChecksumAssetName,
+                StringComparison.OrdinalIgnoreCase));
 
+        if (string.IsNullOrWhiteSpace(checksumAsset.Name))
+            throw new CryptographicException(
+                $"La release PartyBoard ne contient pas {game.GitHubReleaseChecksumAssetName}. " +
+                "CubeShelf refuse d'installer un runtime sans checksum SHA-256.");
+
+        var temp=Path.Combine(Path.GetTempPath(),$"cubeshelf-runtime-{game.Id}-{Guid.NewGuid():N}.zip");
+
+        try
+        {
+            progress?.Report(.02);
+            await DownloadAsync(asset.Url,temp,p=>progress?.Report(.02+p*.56), cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            progress?.Report(.60);
+
+            var checksumText = await _http.GetStringAsync(checksumAsset.Url, cancellationToken);
+            var expectedHash = ParseChecksum(checksumText, game.GitHubReleaseAssetName);
+
+            if (string.IsNullOrWhiteSpace(expectedHash))
+                throw new CryptographicException(
+                    $"{game.GitHubReleaseChecksumAssetName} ne contient pas le hash de {game.GitHubReleaseAssetName}.");
+
+            await using (var file = File.OpenRead(temp))
+            {
+                var actualHash = Convert
+                    .ToHexString(await SHA256.HashDataAsync(file, cancellationToken))
+                    .ToLowerInvariant();
+
+                if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    throw new CryptographicException(
+                        "Le SHA-256 du runtime PartyBoard est invalide. " +
+                        "Le téléchargement a été supprimé et n'a pas été installé.");
+            }
+
+            progress?.Report(.66);
+        }
+        catch
+        {
+            try { if (File.Exists(temp)) File.Delete(temp); } catch { }
+            throw;
+        }
         var staging=Path.Combine(Root(game),"staging-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
 
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(.67);
+            progress?.Report(.70);
             using(var archive=ArchiveFactory.OpenArchive(temp))
             {
                 archive.WriteToDirectory(staging,new ExtractionOptions{ExtractFullPath=true,Overwrite=true});
@@ -183,7 +225,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             cancellationToken.ThrowIfCancellationRequested();
             CopyContents(staging,current);
             cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(.82);
+            progress?.Report(.88);
 
             var exe=FindPartyBoardExecutable(current)
                 ?? throw new FileNotFoundException("Le package Windows ne contient aucun exécutable PartyBoard.");
@@ -410,6 +452,21 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             (c >= '0' && c <= '9') ||
             (c >= 'a' && c <= 'f') ||
             (c >= 'A' && c <= 'F'));
+    }
+
+    private static string ParseChecksum(string text, string fileName)
+    {
+        foreach (var rawLine in text.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = rawLine.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2)
+                continue;
+
+            if (parts[^1].TrimStart('*').Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                return parts[0].Trim();
+        }
+
+        return "";
     }
 
     private async Task DownloadAsync(string url,string destination,Action<double>? progress,CancellationToken cancellationToken)

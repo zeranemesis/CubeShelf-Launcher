@@ -33,8 +33,16 @@ public sealed class GameDefinition : INotifyPropertyChanged
     public string GitHubBranch { get; set; } = "main";
     public string GitHubReleaseTag { get; set; } = "cubeshelf-nightly";
     public string GitHubReleaseAssetName { get; set; } = "";
+    public string GitHubReleaseChecksumAssetName { get; set; } = "checksums.txt";
 
     public List<CoverVariant> Covers { get; set; } = new();
+
+    // User-owned library metadata. These values are intentionally persisted
+    // in %LOCALAPPDATA%\CubeShelf\games.json across launcher updates.
+    public bool IsFavorite { get; set; }
+    public int PlayCount { get; set; }
+    public long TotalPlaySeconds { get; set; }
+    public DateTimeOffset? LastPlayedAt { get; set; }
 
     [JsonIgnore] public string ExecutableFullPath { get; set; } = "";
     [JsonIgnore] public string GameRootFullPath { get; set; } = "";
@@ -54,6 +62,22 @@ public sealed class GameDefinition : INotifyPropertyChanged
 
     [JsonIgnore] public string LibraryCover =>
         Covers.FirstOrDefault()?.FrontFullPath ?? "";
+
+    [JsonIgnore] public string PlayTimeText
+    {
+        get
+        {
+            var total = TimeSpan.FromSeconds(Math.Max(0, TotalPlaySeconds));
+            if (total.TotalHours >= 1)
+                return $"{(int)total.TotalHours} h {total.Minutes:00} min";
+            return $"{total.Minutes} min";
+        }
+    }
+
+    [JsonIgnore] public string LastPlayedText =>
+        LastPlayedAt is null
+            ? "Jamais lancé"
+            : LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
 
     [JsonIgnore] public bool GitHubConfigured =>
         !string.IsNullOrWhiteSpace(GitHubOwner) &&

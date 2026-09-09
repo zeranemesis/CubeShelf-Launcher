@@ -28,4 +28,10 @@ public partial class MainWindow
         SelectGame(game);
         PlayButton_Click(this, new RoutedEventArgs());
     }
+
+    private void RetryDownload_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: DownloadQueueItem item })
+            _queue.Retry(item);
+    }
 }

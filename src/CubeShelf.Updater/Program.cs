@@ -57,6 +57,7 @@ internal sealed class UpdaterWindow : Window
     private readonly TextBlock _statusText;
     private readonly TextBlock _percentText;
     private readonly Button _restartButton;
+    private string? _backupDirectory;
 
     public int ExitCode { get; private set; } = 1;
 
@@ -249,6 +250,17 @@ internal sealed class UpdaterWindow : Window
                     "L’archive de mise à jour ne contient aucun fichier.");
             }
 
+            if (!File.Exists(Path.Combine(staging, "CubeShelf.exe")) ||
+                !File.Exists(Path.Combine(staging, "CubeShelf.Updater.exe")))
+            {
+                throw new InvalidDataException(
+                    "Le package de mise à jour ne contient pas les exécutables CubeShelf attendus.");
+            }
+
+            SetStatus("Sauvegarde de la version actuelle…");
+            SetProgress(0.46);
+            _backupDirectory = await CreateBackupAsync();
+
             for (var i = 0; i < files.Count; i++)
             {
                 var file = files[i];
@@ -275,9 +287,9 @@ internal sealed class UpdaterWindow : Window
                     true);
 
                 SetProgress(
-                    0.45 +
+                    0.52 +
                     ((i + 1d) / files.Count) *
-                    0.50);
+                    0.43);
 
                 await Task.Yield();
             }
@@ -305,12 +317,30 @@ internal sealed class UpdaterWindow : Window
         {
             ExitCode = 1;
 
-            SetStatus(
-                "Échec de la mise à jour.");
+            var rollbackMessage = "";
+            if (!string.IsNullOrWhiteSpace(_backupDirectory) &&
+                Directory.Exists(_backupDirectory))
+            {
+                try
+                {
+                    SetStatus("Échec • restauration de la version précédente…");
+                    await RestoreBackupAsync();
+                    rollbackMessage =
+                        "\n\nLa version précédente de CubeShelf a été restaurée automatiquement.";
+                }
+                catch (Exception rollbackEx)
+                {
+                    rollbackMessage =
+                        "\n\nLa restauration automatique a aussi échoué : " +
+                        rollbackEx.Message;
+                }
+            }
+
+            SetStatus("Échec de la mise à jour.");
 
             MessageBox.Show(
                 this,
-                ex.Message,
+                ex.Message + rollbackMessage,
                 "CubeShelf Updater",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -385,6 +415,91 @@ internal sealed class UpdaterWindow : Window
 
             await Task.Yield();
         }
+    }
+
+    private async Task<string> CreateBackupAsync()
+    {
+        var backupRoot = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CubeShelf",
+            "UpdaterBackups");
+
+        Directory.CreateDirectory(backupRoot);
+
+        // A new update starts only after the previous one has finished, so stale
+        // backups can be removed before creating the next transactional backup.
+        foreach (var old in Directory
+                     .EnumerateDirectories(backupRoot)
+                     .ToList())
+        {
+            try { Directory.Delete(old, true); } catch { }
+        }
+
+        var backup = Path.Combine(
+            backupRoot,
+            DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N"));
+
+        Directory.CreateDirectory(backup);
+        await CopyDirectoryAsync(_installDir, backup);
+        return backup;
+    }
+
+    private async Task RestoreBackupAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_backupDirectory) ||
+            !Directory.Exists(_backupDirectory))
+            return;
+
+        Directory.CreateDirectory(_installDir);
+
+        foreach (var entry in Directory.EnumerateFileSystemEntries(_installDir).ToList())
+        {
+            if (Directory.Exists(entry))
+                Directory.Delete(entry, true);
+            else
+                File.Delete(entry);
+        }
+
+        await CopyDirectoryAsync(_backupDirectory, _installDir);
+    }
+
+    private static async Task CopyDirectoryAsync(string source, string destination)
+    {
+        Directory.CreateDirectory(destination);
+
+        foreach (var directory in Directory.EnumerateDirectories(source, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(source, directory);
+            Directory.CreateDirectory(Path.Combine(destination, relative));
+        }
+
+        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(source, file);
+            var target = Path.Combine(destination, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+
+            await using var input = new FileStream(
+                file, FileMode.Open, FileAccess.Read, FileShare.Read, 1024 * 1024, true);
+            await using var output = new FileStream(
+                target, FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 1024, true);
+            await input.CopyToAsync(output);
+        }
+    }
+
+    private void DeleteBackup()
+    {
+        if (string.IsNullOrWhiteSpace(_backupDirectory))
+            return;
+
+        try
+        {
+            if (Directory.Exists(_backupDirectory))
+                Directory.Delete(_backupDirectory, true);
+        }
+        catch { }
+
+        _backupDirectory = null;
     }
 
     private async Task StopAllCubeShelfProcessesAsync()
@@ -477,7 +592,7 @@ internal sealed class UpdaterWindow : Window
         SetProgress(0.06);
     }
 
-    private void RestartButton_Click(
+    private async void RestartButton_Click(
         object sender,
         RoutedEventArgs e)
     {
@@ -490,24 +605,82 @@ internal sealed class UpdaterWindow : Window
         {
             MessageBox.Show(
                 this,
-                "CubeShelf.exe est introuvable. " +
-                "Relance le launcher manuellement.",
+                "CubeShelf.exe est introuvable. La version précédente va être restaurée.",
                 "CubeShelf Updater",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
+            await RestoreBackupAsync();
             return;
         }
 
-        Process.Start(
-            new ProcessStartInfo(launcher)
-            {
-                WorkingDirectory =
-                    _installDir,
-                UseShellExecute = true
-            });
+        _restartButton.IsEnabled = false;
+        SetStatus("Vérification du nouveau CubeShelf…");
 
-        Close();
+        Process? process = null;
+        try
+        {
+            process = Process.Start(
+                new ProcessStartInfo(launcher)
+                {
+                    WorkingDirectory = _installDir,
+                    UseShellExecute = true
+                });
+
+            if (process is null)
+                throw new InvalidOperationException("Impossible de relancer CubeShelf.");
+
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            if (process.HasExited)
+            {
+                var exitCode = process.ExitCode;
+                SetStatus("Le nouveau CubeShelf s'est fermé trop tôt • rollback…");
+                await RestoreBackupAsync();
+
+                MessageBox.Show(
+                    this,
+                    $"La nouvelle version n'est pas restée ouverte (code {exitCode}). " +
+                    "CubeShelf a restauré automatiquement la version précédente.",
+                    "Rollback CubeShelf",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                var restored = Path.Combine(_installDir, "CubeShelf.exe");
+                if (File.Exists(restored))
+                {
+                    Process.Start(new ProcessStartInfo(restored)
+                    {
+                        WorkingDirectory = _installDir,
+                        UseShellExecute = true
+                    });
+                }
+
+                Close();
+                return;
+            }
+
+            DeleteBackup();
+            SetStatus("Nouvelle version démarrée correctement.");
+            Close();
+        }
+        catch (Exception ex)
+        {
+            try { await RestoreBackupAsync(); } catch { }
+            _restartButton.IsEnabled = true;
+            SetStatus("Échec du redémarrage • version précédente restaurée.");
+
+            MessageBox.Show(
+                this,
+                ex.Message,
+                "CubeShelf Updater",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        finally
+        {
+            process?.Dispose();
+        }
     }
 
     private void SetProgress(double progress)

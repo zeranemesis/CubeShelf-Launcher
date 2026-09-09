@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Reflection;
@@ -34,6 +35,9 @@ public partial class MainWindow : Window
     private bool _settingsLoaded;
     private bool _gameUpdatePopupShown;
     private bool _refreshingGameUpdates;
+    private bool _showFavoritesOnly;
+    private readonly Dictionary<string, (Process Process, DateTimeOffset StartedAt)> _runningGames =
+        new(StringComparer.OrdinalIgnoreCase);
     private readonly DispatcherTimer _githubUpdateTimer = new()
     {
         Interval = TimeSpan.FromMinutes(10)
@@ -59,8 +63,10 @@ public partial class MainWindow : Window
         GameGrid.ItemsSource = _games;
         ModsList.ItemsSource = _visibleMods;
         DownloadsList.ItemsSource = _queue.Items;
+        LibrarySortCombo.SelectedIndex = 1;
 
         _queue.QueueChanged += (_, _) => UpdateQueueSummary();
+        UpdateQueueSummary();
         _githubUpdateTimer.Tick += async (_, _) =>
         {
             if (!_preferences.CheckGamesOnStartup)
@@ -107,6 +113,7 @@ public partial class MainWindow : Window
         }
 
         UpdateLibraryUpdateSummary();
+        RefreshLibraryItems();
     }
 
 
@@ -143,9 +150,53 @@ public partial class MainWindow : Window
 
     private void ShowLibrary()
     {
+        _showFavoritesOnly = false;
         SidebarSelectedGame.Text = IsEnglish ? "Library" : "Bibliothèque";
+        RefreshLibraryItems();
         ShowOnly(LibraryView);
     }
+
+    private void ShowFavorites()
+    {
+        _showFavoritesOnly = true;
+        SidebarSelectedGame.Text = IsEnglish ? "Favorites" : "Favoris";
+        RefreshLibraryItems();
+        ShowOnly(LibraryView);
+    }
+
+    private void RefreshLibraryItems()
+    {
+        IEnumerable<GameDefinition> query = _games;
+
+        if (_showFavoritesOnly)
+            query = query.Where(x => x.IsFavorite);
+
+        var search = LibrarySearchBox?.Text?.Trim() ?? "";
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(x =>
+                x.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                x.Id.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                x.Genre.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        query = (LibrarySortCombo?.SelectedIndex ?? 1) switch
+        {
+            0 => query.OrderBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase),
+            2 => query.OrderByDescending(x => x.TotalPlaySeconds)
+                      .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase),
+            _ => query.OrderByDescending(x => x.LastPlayedAt ?? DateTimeOffset.MinValue)
+                      .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
+        };
+
+        GameGrid.ItemsSource = query.ToList();
+    }
+
+    private void LibrarySearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        => RefreshLibraryItems();
+
+    private void LibrarySortCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        => RefreshLibraryItems();
 
     private void ShowGame()
         => ShowOnly(GameView);
@@ -316,6 +367,7 @@ public partial class MainWindow : Window
                 : game.ExecutableFullPath;
         DiscImagePathText.Text = game.DiscStatus;
         UpdateDiscCompatibility();
+        UpdateSelectedGamePlayUi();
 
         var palEuropeCover = game.Covers.FirstOrDefault(x =>
             x.Label.Equals("PAL Europe", StringComparison.OrdinalIgnoreCase))
@@ -425,6 +477,21 @@ private void UpdateSelectedGameGitHubPanel()
 
     private void LibraryNav_Click(object sender, RoutedEventArgs e)
         => ShowLibrary();
+
+    private void FavoritesNav_Click(object sender, RoutedEventArgs e)
+        => ShowFavorites();
+
+    private void ToggleFavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedGame is null)
+            return;
+
+        _selectedGame.IsFavorite = !_selectedGame.IsFavorite;
+        _selectedGame.Refresh();
+        _libraryService.Save(_games);
+        UpdateSelectedGamePlayUi();
+        RefreshLibraryItems();
+    }
 
     private async void ModsNav_Click(object sender, RoutedEventArgs e)
     {
@@ -1044,6 +1111,21 @@ private void PlayButton_Click(
 
     var game = _selectedGame;
 
+    if (_runningGames.TryGetValue(game.Id, out var running) &&
+        !running.Process.HasExited)
+    {
+        try
+        {
+            running.Process.Kill(entireProcessTree: true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "CubeShelf");
+        }
+
+        return;
+    }
+
     if (!game.IsInstalled)
     {
         if (_runtimeInstaller.ApplyInstalledRuntime(game))
@@ -1093,15 +1175,92 @@ private void PlayButton_Click(
         return;
     }
 
+    StartGameTracked(game);
+}
+
+private void StartGameTracked(GameDefinition game)
+{
     try
     {
-        _gameLauncher = new GameLauncher(game, _modManager);
-        _gameLauncher.StartGame();
+        if (_runningGames.TryGetValue(game.Id, out var existing) &&
+            !existing.Process.HasExited)
+            return;
+
+        var modsForGame = _selectedGame == game ? _modManager : null;
+        _gameLauncher = new GameLauncher(game, modsForGame);
+        var process = _gameLauncher.StartGame();
+        var startedAt = DateTimeOffset.Now;
+        _runningGames[game.Id] = (process, startedAt);
+
+        process.Exited += (_, _) =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (_runningGames.Remove(game.Id, out var tracked))
+                {
+                    var elapsed = DateTimeOffset.Now - tracked.StartedAt;
+                    if (elapsed > TimeSpan.Zero)
+                        game.TotalPlaySeconds += (long)Math.Round(elapsed.TotalSeconds);
+
+                    tracked.Process.Dispose();
+                }
+
+                game.Refresh();
+                _libraryService.Save(_games);
+                RefreshLibraryItems();
+
+                if (_selectedGame == game)
+                    UpdateSelectedGamePlayUi();
+            });
+        };
+
+        process.EnableRaisingEvents = true;
+
+        game.PlayCount++;
+        game.LastPlayedAt = startedAt;
+        game.Refresh();
+        _libraryService.Save(_games);
+        RefreshLibraryItems();
+        UpdateSelectedGamePlayUi();
     }
     catch (Exception ex)
     {
-        MessageBox.Show(ex.Message, "CubeShelf");
+        MessageBox.Show(
+            ex.Message,
+            "CubeShelf",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
     }
+}
+
+private void UpdateSelectedGamePlayUi()
+{
+    if (_selectedGame is null)
+        return;
+
+    var game = _selectedGame;
+    var running = _runningGames.TryGetValue(game.Id, out var item) &&
+                  !item.Process.HasExited;
+
+    PlayButton.Content = running
+        ? (IsEnglish ? "■ Stop" : "■ Arrêter")
+        : (IsEnglish ? "▶ Play" : "▶ Jouer");
+
+    PlayButton.Background = running
+        ? (Application.Current.TryFindResource("Danger") as Brush ?? Brushes.IndianRed)
+        : Brushes.White;
+
+    PlayButton.Foreground = running
+        ? Brushes.White
+        : new SolidColorBrush(Color.FromRgb(16, 20, 30));
+
+    FavoriteGameButton.Content = game.IsFavorite
+        ? (IsEnglish ? "★ Favorite" : "★ Favori")
+        : (IsEnglish ? "☆ Add favorite" : "☆ Ajouter aux favoris");
+
+    GameStatsText.Text = IsEnglish
+        ? $"{game.PlayCount} launches • {game.PlayTimeText} • Last: {game.LastPlayedText}"
+        : $"{game.PlayCount} lancements • {game.PlayTimeText} • Dernier : {game.LastPlayedText}";
 }
 
 private void ConfigureExecutableButton_Click(
@@ -1286,8 +1445,7 @@ private void ConfigureDiscImageButton_Click(
                 {
                     try
                     {
-                        _gameLauncher = new GameLauncher(game, _modManager);
-                        _gameLauncher.StartGame();
+                        StartGameTracked(game);
                     }
                     catch (Exception ex)
                     {
@@ -1356,6 +1514,7 @@ private void ConfigureDiscImageButton_Click(
 
         _games.Add(game);
         _libraryService.Save(_games);
+        RefreshLibraryItems();
     }
 
 
