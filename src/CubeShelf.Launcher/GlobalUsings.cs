@@ -9,6 +9,7 @@ global using System.Net;
 global using System.Net.Http;
 global using System.Runtime.CompilerServices;
 global using System.Security.Cryptography;
+global using CryptographicException = System.Security.Cryptography.CryptographicException;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
