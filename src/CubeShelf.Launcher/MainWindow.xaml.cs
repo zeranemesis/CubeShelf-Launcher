@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using CubeShelf.Launcher.Services;
 
@@ -31,6 +32,11 @@ public partial class MainWindow : Window
     private UserPreferences _preferences;
     private bool _settingsLoaded;
     private bool _gameUpdatePopupShown;
+    private bool _refreshingGameUpdates;
+    private readonly DispatcherTimer _githubUpdateTimer = new()
+    {
+        Interval = TimeSpan.FromMinutes(10)
+    };
 
     public MainWindow()
     {
@@ -51,6 +57,14 @@ public partial class MainWindow : Window
         DownloadsList.ItemsSource = _queue.Items;
 
         _queue.QueueChanged += (_, _) => UpdateQueueSummary();
+        _githubUpdateTimer.Tick += async (_, _) =>
+        {
+            if (!_preferences.CheckGamesOnStartup)
+                return;
+
+            await RefreshAllGameUpdateStatusesAsync();
+            MaybeShowGameUpdatePopup();
+        };
 
         LoadLibrary();
         LoadSettingsControls();
@@ -67,6 +81,7 @@ public partial class MainWindow : Window
             {
                 await RefreshAllGameUpdateStatusesAsync();
                 MaybeShowGameUpdatePopup();
+                _githubUpdateTimer.Start();
             }
         };
     }
@@ -142,26 +157,43 @@ public partial class MainWindow : Window
 
     private async Task RefreshAllGameUpdateStatusesAsync()
     {
-        var tasks = _games
-            .Where(x => x.GitHubConfigured)
-            .Select(RefreshGameUpdateStatusAsync)
-            .ToArray();
+        if (_refreshingGameUpdates)
+            return;
 
-        await Task.WhenAll(tasks);
-        UpdateLibraryUpdateSummary();
+        _refreshingGameUpdates = true;
+        try
+        {
+            var tasks = _games
+                .Where(x => x.GitHubConfigured)
+                .Select(RefreshGameUpdateStatusAsync)
+                .ToArray();
+
+            await Task.WhenAll(tasks);
+            UpdateLibraryUpdateSummary();
+        }
+        finally
+        {
+            _refreshingGameUpdates = false;
+        }
     }
 
     private async Task RefreshGameUpdateStatusAsync(GameDefinition game)
     {
         try
         {
-            var statusTask = _github.CheckAsync(game);
-            var releaseTask = _runtimeInstaller.IsPlayableReleaseAvailableAsync(game);
+            // Prefer the commit embedded in the installed PartyBoard runtime.
+            // This makes the update badge represent the actual playable build,
+            // not whether a source-code ZIP happens to exist locally.
+            var runtimeState = _runtimeInstaller.ReadState(game);
+            var status = await _github.CheckAsync(game, runtimeState?.Commit);
 
-            await Task.WhenAll(statusTask, releaseTask);
+            // Only advertise an installable Windows update once the nightly
+            // release has caught up with the latest commit on the game branch.
+            var releaseAvailable =
+                await _runtimeInstaller.IsPlayableReleaseAvailableAsync(
+                    game,
+                    status.LatestSha);
 
-            var status = await statusTask;
-            var releaseAvailable = await releaseTask;
             var local = _github.DetectLocalRepository(game);
 
             await Dispatcher.InvokeAsync(() =>
@@ -281,12 +313,12 @@ public partial class MainWindow : Window
         DiscImagePathText.Text = game.DiscStatus;
         UpdateDiscCompatibility();
 
-        CoverVariantCombo.ItemsSource = game.Covers;
-        CoverVariantCombo.SelectedIndex =
-            game.Covers.Count > 0 ? 0 : -1;
+        var palEuropeCover = game.Covers.FirstOrDefault(x =>
+            x.Label.Equals("PAL Europe", StringComparison.OrdinalIgnoreCase))
+            ?? game.Covers.FirstOrDefault();
 
-        if (game.Covers.Count > 0)
-            GameCase.SetCover(game.Covers[0]);
+        if (palEuropeCover is not null)
+            GameCase.SetCover(palEuropeCover);
 
         if (game.GameBananaGameId > 0)
         {
@@ -303,6 +335,10 @@ public partial class MainWindow : Window
 
         UpdateSelectedGameGitHubPanel();
         ShowGame();
+
+        // Opening a game page also refreshes its GitHub commit status so the
+        // user does not have to rely only on the periodic background check.
+        _ = RefreshGameUpdateStatusAsync(game);
     }
 
 
@@ -1216,14 +1252,6 @@ private void ConfigureDiscImageButton_Click(
         _selectedGame.Refresh();
     }
 
-    private void CoverVariantCombo_SelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e)
-    {
-        if (CoverVariantCombo.SelectedItem is CoverVariant cover)
-            GameCase.SetCover(cover);
-    }
-
     private void FlipCaseButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -1574,6 +1602,18 @@ private void RefreshSelectedLocalState()
         _preferences.ShowGameUpdatePopup = GameUpdatePopupBox.IsChecked == true;
         _preferences.RefreshModsOnOpen = RefreshModsOnOpenBox.IsChecked == true;
         _preferencesService.Save(_preferences);
+
+        if (_preferences.CheckGamesOnStartup)
+        {
+            if (!_githubUpdateTimer.IsEnabled)
+                _githubUpdateTimer.Start();
+
+            _ = RefreshAllGameUpdateStatusesAsync();
+        }
+        else
+        {
+            _githubUpdateTimer.Stop();
+        }
     }
 
     private void OpenDataFolder_Click(object sender, RoutedEventArgs e)

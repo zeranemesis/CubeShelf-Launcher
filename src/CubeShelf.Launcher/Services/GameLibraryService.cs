@@ -75,8 +75,10 @@ public sealed class GameLibraryService
             if (string.IsNullOrWhiteSpace(target.GitHubReleaseAssetName))
                 target.GitHubReleaseAssetName = source.GitHubReleaseAssetName;
 
-            if (target.Covers.Count == 0)
-                target.Covers = source.Covers;
+            // Covers are launcher-owned presentation metadata. Always refresh
+            // them from the shipped definition so obsolete cover selectors and
+            // region variants disappear after an update.
+            target.Covers = source.Covers;
         }
     }
 

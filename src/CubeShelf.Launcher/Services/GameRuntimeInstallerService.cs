@@ -122,15 +122,24 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
 
     public async Task<bool> IsPlayableReleaseAvailableAsync(
         GameDefinition game,
+        string? requiredCommit = null,
         CancellationToken cancellationToken = default)
     {
         var release = await GetReleaseAsync(game, cancellationToken);
 
-        return release is not null &&
-               release.Value.Assets.Any(a =>
-                   a.Name.Equals(
-                       game.GitHubReleaseAssetName,
-                       StringComparison.OrdinalIgnoreCase));
+        if (release is null ||
+            !release.Value.Assets.Any(a =>
+                a.Name.Equals(
+                    game.GitHubReleaseAssetName,
+                    StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(requiredCommit))
+            return true;
+
+        return SameCommit(release.Value.Commit, requiredCommit);
     }
 
     public async Task<RuntimeState> InstallLatestAsync(GameDefinition game, IProgress<double>? progress=null, CancellationToken cancellationToken = default)
@@ -185,12 +194,8 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             var state=new RuntimeState(release.Commit,release.Version,current,exe,ready);
             WriteState(game,state);
 
-            if(game.HasDiscImage && !ready)
-            {
-                await PrepareGameDataAsync(game,state,new Progress<double>(p=>progress?.Report(.82+p*.18)), cancellationToken);
-                state=ReadState(game)!;
-            }
-
+            // Runtime download and local disc preparation are intentionally separate.
+            // A previously selected ISO/RVZ must never make the GitHub runtime download fail.
             progress?.Report(1);
             return state;
         }
@@ -289,7 +294,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
 
         using var doc=JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         var r=doc.RootElement;
-        var commit=r.TryGetProperty("target_commitish",out var c)?c.GetString()??"":"";
+        var commit=await ResolveReleaseCommitAsync(game,r,cancellationToken);
         var version=r.TryGetProperty("name",out var n)?n.GetString()??game.GitHubReleaseTag:game.GitHubReleaseTag;
         var assets=new List<(string Name,string Url)>();
 
@@ -298,6 +303,75 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 assets.Add((item.GetProperty("name").GetString()??"",item.GetProperty("browser_download_url").GetString()??""));
 
         return (commit,version,assets);
+    }
+
+    private async Task<string> ResolveReleaseCommitAsync(
+        GameDefinition game,
+        JsonElement release,
+        CancellationToken cancellationToken)
+    {
+        var tag = release.TryGetProperty("tag_name", out var tagElement)
+            ? tagElement.GetString() ?? ""
+            : "";
+
+        foreach (var reference in new[]
+                 {
+                     tag,
+                     release.TryGetProperty("target_commitish", out var target)
+                         ? target.GetString() ?? ""
+                         : ""
+                 })
+        {
+            if (string.IsNullOrWhiteSpace(reference))
+                continue;
+
+            if (LooksLikeSha(reference))
+                return reference;
+
+            var url =
+                $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/commits/" +
+                Uri.EscapeDataString(reference);
+
+            using var response = await _http.GetAsync(url, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                continue;
+
+            using var doc = JsonDocument.Parse(
+                await response.Content.ReadAsStringAsync(cancellationToken));
+
+            if (doc.RootElement.TryGetProperty("sha", out var sha))
+            {
+                var value = sha.GetString() ?? "";
+                if (LooksLikeSha(value))
+                    return value;
+            }
+        }
+
+        return "";
+    }
+
+    private static bool SameCommit(string left, string right)
+    {
+        if (!LooksLikeSha(left) || !LooksLikeSha(right))
+            return false;
+
+        return left.StartsWith(right, StringComparison.OrdinalIgnoreCase) ||
+               right.StartsWith(left, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool LooksLikeSha(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value) ||
+            value.Length < 7 ||
+            value.Length > 40)
+        {
+            return false;
+        }
+
+        return value.All(c =>
+            (c >= '0' && c <= '9') ||
+            (c >= 'a' && c <= 'f') ||
+            (c >= 'A' && c <= 'F'));
     }
 
     private async Task DownloadAsync(string url,string destination,Action<double>? progress,CancellationToken cancellationToken)

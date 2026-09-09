@@ -19,6 +19,7 @@ public sealed class DownloadQueueItem : INotifyPropertyChanged
     public string Title { get; init; } = "";
     public string Kind { get; init; } = "";
     public string Changes { get; init; } = "";
+    public string CoverPath { get; init; } = "";
     public DateTimeOffset AddedAt { get; } = DateTimeOffset.Now;
 
     public double Progress
@@ -67,6 +68,11 @@ public sealed class DownloadQueueItem : INotifyPropertyChanged
     public bool IsTerminal => Completed || Failed || Cancelled;
     public bool CanCancel => !IsTerminal;
     public bool CanRemove => IsTerminal;
+    public bool CanShowStart =>
+        UniqueKey.StartsWith("runtime:", StringComparison.OrdinalIgnoreCase) ||
+        UniqueKey.StartsWith("gamedata:", StringComparison.OrdinalIgnoreCase);
+    public bool CanStart => Completed && CanShowStart;
+    public Visibility StartVisibility => CanShowStart ? Visibility.Visible : Visibility.Collapsed;
 
     internal Func<IProgress<double>, CancellationToken, Task>? Work { get; init; }
     internal Func<Task>? After { get; init; }
@@ -78,6 +84,8 @@ public sealed class DownloadQueueItem : INotifyPropertyChanged
         OnChanged(nameof(IsTerminal));
         OnChanged(nameof(CanCancel));
         OnChanged(nameof(CanRemove));
+        OnChanged(nameof(CanStart));
+        OnChanged(nameof(StartVisibility));
     }
 
     private void OnChanged([CallerMemberName] string? propertyName = null)
@@ -117,6 +125,7 @@ public sealed class DownloadQueueService
                 Title = title,
                 Kind = kind,
                 Changes = changes,
+                CoverPath = ResolveCoverPath(uniqueKey),
                 Work = work,
                 After = after
             });
@@ -184,6 +193,78 @@ public sealed class DownloadQueueService
 
             QueueChanged?.Invoke(this, EventArgs.Empty);
         });
+    }
+
+
+    private static string ResolveCoverPath(string uniqueKey)
+    {
+        var parts = uniqueKey.Split(':', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 2)
+            return "";
+
+        var gameId = parts[1];
+        var candidates = new[]
+        {
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "CubeShelf",
+                "games.json"),
+            Path.Combine(AppContext.BaseDirectory, "games.json")
+        };
+
+        foreach (var file in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            try
+            {
+                if (!File.Exists(file))
+                    continue;
+
+                using var doc = JsonDocument.Parse(File.ReadAllText(file));
+                if (doc.RootElement.ValueKind != JsonValueKind.Array)
+                    continue;
+
+                foreach (var game in doc.RootElement.EnumerateArray())
+                {
+                    if (!game.TryGetProperty("Id", out var idElement) ||
+                        !string.Equals(idElement.GetString(), gameId, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    if (!game.TryGetProperty("Covers", out var covers) ||
+                        covers.ValueKind != JsonValueKind.Array ||
+                        covers.GetArrayLength() == 0)
+                        break;
+
+                    var coverEnumerator = covers.EnumerateArray();
+                    if (!coverEnumerator.MoveNext())
+                        break;
+
+                    var first = coverEnumerator.Current;
+                    if (!first.TryGetProperty("Front", out var frontElement))
+                        break;
+
+                    var front = frontElement.GetString() ?? "";
+                    if (string.IsNullOrWhiteSpace(front))
+                        break;
+
+                    return Path.IsPathRooted(front)
+                        ? Path.GetFullPath(front)
+                        : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, front));
+                }
+            }
+            catch
+            {
+                // A missing/invalid cover must never block a download.
+            }
+        }
+
+        var placeholder = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "Covers",
+            "Common",
+            "placeholder.png");
+
+        return File.Exists(placeholder) ? placeholder : "";
     }
 
     private async Task ProcessLoopAsync()

@@ -310,7 +310,7 @@ public sealed class GitHubGameService
         => values.FirstOrDefault(
             value => !string.IsNullOrWhiteSpace(value)) ?? "";
 
-    public async Task<GitHubGameStatus> CheckAsync(GameDefinition game)
+    public async Task<GitHubGameStatus> CheckAsync(GameDefinition game, string? installedCommit = null)
     {
         if (!game.GitHubConfigured)
         {
@@ -322,7 +322,10 @@ public sealed class GitHubGameService
         var latest = await GetLatestCommitAsync(game);
         var local = DetectLocalRepository(game);
 
-        var localSha = local.Sha;
+        var installedSha = NormalizeCommitSha(installedCommit);
+        var localSha = !string.IsNullOrWhiteSpace(installedSha)
+            ? installedSha
+            : local.Sha;
         var localPath = local.Path;
 
         var latestPath = Path.Combine(
@@ -338,7 +341,9 @@ public sealed class GitHubGameService
                 latestPath,
                 latest.Sha);
 
-            localSha = latest.Sha;
+            if (string.IsNullOrWhiteSpace(installedSha))
+                localSha = latest.Sha;
+
             localPath = latestPath;
 
             WriteState(
@@ -354,8 +359,8 @@ public sealed class GitHubGameService
             latest.Sha);
 
         var downloaded =
-            local.Present &&
-            Directory.Exists(localPath);
+            !string.IsNullOrWhiteSpace(installedSha) ||
+            (local.Present && Directory.Exists(localPath));
 
         var sameCommit =
             !string.IsNullOrWhiteSpace(localSha) &&
@@ -380,6 +385,15 @@ public sealed class GitHubGameService
             latest.Date,
             localPath,
             changes);
+    }
+
+    private static string NormalizeCommitSha(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "";
+
+        var trimmed = value.Trim();
+        return LooksLikeSha(trimmed) ? trimmed : "";
     }
 
     private async Task<GitHubCommitInfo> GetLatestCommitAsync(GameDefinition game, CancellationToken cancellationToken = default)

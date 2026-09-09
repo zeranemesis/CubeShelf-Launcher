@@ -16,18 +16,6 @@
         "Front": "Assets\\Covers\\MarioParty4\\pal_front.png",
         "Back": "Assets\\Covers\\MarioParty4\\pal_back.png",
         "Spine": "Assets\\Covers\\MarioParty4\\pal_spine.png"
-      },
-      {
-        "Label": "USA ESRB",
-        "Front": "Assets\\Covers\\MarioParty4\\us_front.png",
-        "Back": "Assets\\Covers\\MarioParty4\\us_back.png",
-        "Spine": "Assets\\Covers\\MarioParty4\\us_spine.png"
-      },
-      {
-        "Label": "PAL Variante",
-        "Front": "Assets\\Covers\\MarioParty4\\pal_alt_front.png",
-        "Back": "Assets\\Covers\\MarioParty4\\pal_alt_back.png",
-        "Spine": "Assets\\Covers\\MarioParty4\\pal_alt_spine.png"
       }
     ],
     "GitHubOwner": "zeranemesis",
