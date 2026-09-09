@@ -206,14 +206,23 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         }
     }
 
-    public async Task PrepareGameDataAsync(GameDefinition game, RuntimeState? runtime=null, IProgress<double>? progress=null, CancellationToken cancellationToken = default)
+    public async Task PrepareGameDataAsync(
+        GameDefinition game,
+        RuntimeState? runtime = null,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default,
+        string? discImagePath = null)
     {
         runtime ??= ReadState(game);
 
         if(runtime is null || !File.Exists(runtime.ExecutablePath))
             throw new InvalidOperationException("PartyBoard doit être téléchargé avant de préparer l'ISO/RVZ.");
 
-        if(!game.HasDiscImage)
+        var sourceDisc = string.IsNullOrWhiteSpace(discImagePath)
+            ? game.DiscImageFullPath
+            : Path.GetFullPath(discImagePath);
+
+        if (string.IsNullOrWhiteSpace(sourceDisc) || !File.Exists(sourceDisc))
             throw new InvalidOperationException("Sélectionne d'abord ton ISO / RVZ.");
 
         var exeDir=Path.GetDirectoryName(runtime.ExecutablePath)!;
@@ -222,8 +231,8 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         if(Directory.Exists(targetFiles)) Directory.Delete(targetFiles,true);
         Directory.CreateDirectory(targetFiles);
 
-        var ext=Path.GetExtension(game.DiscImageFullPath).ToLowerInvariant();
-        string iso=game.DiscImageFullPath;
+        var ext=Path.GetExtension(sourceDisc).ToLowerInvariant();
+        string iso=sourceDisc;
         string? tempIso=null;
 
         try
@@ -233,14 +242,16 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 var dolphin=FindDolphinTool();
                 if(dolphin is null)
                     throw new InvalidOperationException(
-                        "RVZ : CubeShelf a besoin de DolphinTool.exe pour convertir automatiquement le fichier. Installe Dolphin ou utilise un ISO.");
+                        $"Le fichier sélectionné est un RVZ ({Path.GetFileName(sourceDisc)}). " +
+                        "CubeShelf doit le convertir avant de préparer le jeu, mais DolphinTool.exe est introuvable. " +
+                        "Installe Dolphin, place DolphinTool.exe à côté de CubeShelf.exe, ou sélectionne un ISO.");
 
                 tempIso=Path.Combine(Path.GetTempPath(),$"cubeshelf-{game.Id}-{Guid.NewGuid():N}.iso");
 
                 var psi=new ProcessStartInfo(dolphin){UseShellExecute=false,CreateNoWindow=true};
                 psi.ArgumentList.Add("convert");
                 psi.ArgumentList.Add("-f"); psi.ArgumentList.Add("iso");
-                psi.ArgumentList.Add("-i"); psi.ArgumentList.Add(game.DiscImageFullPath);
+                psi.ArgumentList.Add("-i"); psi.ArgumentList.Add(sourceDisc);
                 psi.ArgumentList.Add("-o"); psi.ArgumentList.Add(tempIso);
 
                 using var proc=Process.Start(psi) ?? throw new InvalidOperationException("Impossible de démarrer DolphinTool.");
@@ -479,23 +490,61 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
 
     private static string? FindDolphinTool()
     {
-        foreach(var name in new[]{"DolphinTool.exe","dolphin-tool.exe"})
+        var names = new[] { "DolphinTool.exe", "dolphin-tool.exe" };
+
+        var candidateDirectories = new List<string>
         {
-            var local=Path.Combine(AppContext.BaseDirectory,name);
-            if(File.Exists(local)) return local;
+            AppContext.BaseDirectory
+        };
+
+        void AddCandidateRoot(string root)
+        {
+            if (string.IsNullOrWhiteSpace(root))
+                return;
+
+            candidateDirectories.Add(Path.Combine(root, "Dolphin Emulator"));
+            candidateDirectories.Add(Path.Combine(root, "Dolphin"));
         }
 
-        foreach(var dir in (Environment.GetEnvironmentVariable("PATH")??"")
-                     .Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries))
+        AddCandidateRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+
+        AddCandidateRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
+
+        AddCandidateRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+        foreach (var dir in candidateDirectories
+                     .Where(x => !string.IsNullOrWhiteSpace(x))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
         {
-            foreach(var name in new[]{"DolphinTool.exe","dolphin-tool.exe"})
+            foreach (var name in names)
             {
                 try
                 {
-                    var p=Path.Combine(dir.Trim(),name);
-                    if(File.Exists(p)) return p;
+                    var path = Path.Combine(dir, name);
+                    if (File.Exists(path))
+                        return path;
                 }
-                catch{}
+                catch { }
+            }
+        }
+
+        foreach (var dir in (Environment.GetEnvironmentVariable("PATH") ?? "")
+                     .Split(
+                         Path.PathSeparator,
+                         StringSplitOptions.RemoveEmptyEntries))
+        {
+            foreach (var name in names)
+            {
+                try
+                {
+                    var path = Path.Combine(dir.Trim(), name);
+                    if (File.Exists(path))
+                        return path;
+                }
+                catch { }
             }
         }
 

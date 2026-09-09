@@ -181,6 +181,27 @@ public sealed class DownloadQueueService
         });
     }
 
+    public void RemoveTerminalByKey(string uniqueKey)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            foreach (var item in Items
+                         .Where(x =>
+                             x.IsTerminal &&
+                             string.Equals(
+                                 x.UniqueKey,
+                                 uniqueKey,
+                                 StringComparison.OrdinalIgnoreCase))
+                         .ToList())
+            {
+                item.Cancellation.Dispose();
+                Items.Remove(item);
+            }
+
+            QueueChanged?.Invoke(this, EventArgs.Empty);
+        });
+    }
+
     public void ClearFinished()
     {
         Application.Current.Dispatcher.Invoke(() =>

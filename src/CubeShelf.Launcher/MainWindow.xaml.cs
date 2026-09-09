@@ -1088,7 +1088,7 @@ private void PlayButton_Click(
 
     if (!ready)
     {
-        QueueGameDataPreparation(game);
+        QueueGameDataPreparation(game, launchWhenReady: true);
         ShowDownloads();
         return;
     }
@@ -1184,14 +1184,19 @@ private void ConfigureDiscImageButton_Click(
         UpdateDiscCompatibility();
         _selectedGame.Refresh();
 
+        // Selecting an ISO/RVZ only stores the user's choice.
+        // Data preparation starts when the user presses Play.
         if (_selectedGame.RuntimeInstalled)
         {
-            QueueGameDataPreparation(_selectedGame);
-            ShowDownloads();
+            SelectedInstallStatus.Text = IsEnglish
+                ? $"Disc selected: {Path.GetFileName(_selectedGame.DiscImageFullPath)} • press Play"
+                : $"Image sélectionnée : {Path.GetFileName(_selectedGame.DiscImageFullPath)} • clique sur Jouer";
         }
     }
 
-    private void QueueGameDataPreparation(GameDefinition game)
+    private void QueueGameDataPreparation(
+        GameDefinition game,
+        bool launchWhenReady = false)
     {
         var runtime = _runtimeInstaller.ReadState(game);
 
@@ -1201,20 +1206,42 @@ private void ConfigureDiscImageButton_Click(
             return;
         }
 
-        _queue.Enqueue(
-            $"gamedata:{game.Id}",
+        var discPath = game.DiscImageFullPath;
+
+        if (string.IsNullOrWhiteSpace(discPath) || !File.Exists(discPath))
+        {
+            MessageBox.Show(
+                IsEnglish
+                    ? "Select your ISO / RVZ before starting the game."
+                    : "Sélectionne ton ISO / RVZ avant de démarrer le jeu.",
+                "CubeShelf",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        var key = $"gamedata:{game.Id}";
+
+        // Remove a previous failed/completed preparation before retrying.
+        _queue.RemoveTerminalByKey(key);
+
+        var discName = Path.GetFileName(discPath);
+
+        var added = _queue.Enqueue(
+            key,
             game.Title,
             "GAME DATA",
             IsEnglish
-                ? "Preparing original GameCube data for PartyBoard."
-                : "Préparation automatique des données GameCube pour PartyBoard.",
+                ? $"Preparing {discName} for PartyBoard."
+                : $"Préparation de {discName} pour PartyBoard.",
             async (progress, cancellationToken) =>
             {
                 await _runtimeInstaller.PrepareGameDataAsync(
                     game,
                     runtime,
                     progress,
-                    cancellationToken);
+                    cancellationToken,
+                    discImagePath: discPath);
             },
             () =>
             {
@@ -1234,8 +1261,34 @@ private void ConfigureDiscImageButton_Click(
                     UpdateSelectedGameGitHubPanel();
                 }
 
+                if (launchWhenReady)
+                {
+                    try
+                    {
+                        _gameLauncher = new GameLauncher(game, _modManager);
+                        _gameLauncher.StartGame();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            ex.Message,
+                            "CubeShelf",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
+                }
+
                 return Task.CompletedTask;
             });
+
+        if (!added && launchWhenReady)
+        {
+            MessageBox.Show(
+                IsEnglish
+                    ? "Game data preparation is already running."
+                    : "La préparation des données du jeu est déjà en cours.",
+                "CubeShelf");
+        }
     }
 
     private void ClearDiscImageButton_Click(
