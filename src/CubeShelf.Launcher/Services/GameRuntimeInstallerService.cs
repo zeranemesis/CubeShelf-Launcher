@@ -104,7 +104,10 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             state = AdoptConfiguredExecutable(game);
 
             if (state is null)
+            {
+                MarkRuntimeMissing(game);
                 return false;
+            }
         }
     }
 
@@ -119,6 +122,37 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
 
     return true;
 }
+
+    private static void MarkRuntimeMissing(GameDefinition game)
+    {
+        game.RuntimeInstalled = false;
+        game.GameDataReady = false;
+        game.RuntimeStatusText = "Non installé";
+
+        // If the configured executable disappeared (for example because a
+        // CubeShelf-managed source repository containing it was deleted), clear
+        // that stale path so the UI immediately reflects reality.
+        if (string.IsNullOrWhiteSpace(game.ExecutableFullPath) ||
+            !File.Exists(game.ExecutableFullPath))
+        {
+            game.Executable = "";
+            game.ExecutableFullPath = "";
+            game.GameRoot = "";
+            game.GameRootFullPath = "";
+        }
+
+        try
+        {
+            var staleState = StatePath(game);
+            if (File.Exists(staleState))
+                File.Delete(staleState);
+        }
+        catch
+        {
+        }
+
+        game.Refresh();
+    }
 
     public async Task<bool> IsPlayableReleaseAvailableAsync(
         GameDefinition game,

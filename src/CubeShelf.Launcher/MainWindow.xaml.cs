@@ -36,6 +36,9 @@ public partial class MainWindow : Window
     private bool _gameUpdatePopupShown;
     private bool _refreshingGameUpdates;
     private bool _showFavoritesOnly;
+    private bool _launcherMinimizedForGame;
+    private bool _launcherUpdatePreparing;
+    private PreparedLauncherUpdate? _preparedLauncherUpdate;
     private readonly Dictionary<string, (Process Process, DateTimeOffset StartedAt)> _runningGames =
         new(StringComparer.OrdinalIgnoreCase);
     private readonly DispatcherTimer _githubUpdateTimer = new()
@@ -85,7 +88,7 @@ public partial class MainWindow : Window
             ShowLibrary();
 
             if (_config.AutoCheckLauncherUpdates)
-                await CheckLauncherUpdateAsync(false);
+                _ = CheckLauncherUpdateAsync(false);
 
             if (_preferences.CheckGamesOnStartup)
             {
@@ -1081,8 +1084,17 @@ private async void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e
         game,
         _github.DetectLocalRepository(game));
 
+    // A manually adopted PartyBoard executable may have lived inside the
+    // repository that was just deleted. Re-evaluate the actual files on disk
+    // immediately so "Jeu installé" can never remain stale.
+    _libraryService.Resolve(game);
+    _runtimeInstaller.ApplyInstalledRuntime(game);
+    _libraryService.Resolve(game);
+    _libraryService.Save(_games);
+    RefreshSelectedLocalState();
+
     await RefreshGameUpdateStatusAsync(game);
-    UpdateSelectedGameGitHubPanel();
+    UpdateLibraryUpdateSummary();
 }
 
     private async void CheckSelectedGameUpdateButton_Click(
@@ -1102,7 +1114,7 @@ private async void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e
     }
 
     
-private void PlayButton_Click(
+private async void PlayButton_Click(
     object sender,
     RoutedEventArgs e)
 {
@@ -1112,17 +1124,9 @@ private void PlayButton_Click(
     var game = _selectedGame;
 
     if (_runningGames.TryGetValue(game.Id, out var running) &&
-        !running.Process.HasExited)
+        IsProcessRunning(running.Process))
     {
-        try
-        {
-            running.Process.Kill(entireProcessTree: true);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "CubeShelf");
-        }
-
+        await StopRunningGameAsync(game, running.Process);
         return;
     }
 
@@ -1157,20 +1161,25 @@ private void PlayButton_Click(
             return;
     }
 
-    var state = _runtimeInstaller.ReadState(game) ??
-                _runtimeInstaller.AdoptConfiguredExecutable(game);
+    var state =
+        _runtimeInstaller.ReadState(game) ??
+        _runtimeInstaller.AdoptConfiguredExecutable(game);
 
     var ready =
         state is not null &&
         state.GameDataReady &&
-        Directory.Exists(Path.Combine(
-            Path.GetDirectoryName(state.ExecutablePath)!,
-            game.Id,
-            "files"));
+        Directory.Exists(
+            Path.Combine(
+                Path.GetDirectoryName(state.ExecutablePath)!,
+                game.Id,
+                "files"));
 
     if (!ready)
     {
-        QueueGameDataPreparation(game, launchWhenReady: true);
+        QueueGameDataPreparation(
+            game,
+            launchWhenReady: true);
+
         ShowDownloads();
         return;
     }
@@ -1178,40 +1187,130 @@ private void PlayButton_Click(
     StartGameTracked(game);
 }
 
+private static bool IsProcessRunning(Process process)
+{
+    try
+    {
+        return !process.HasExited;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+private async Task StopRunningGameAsync(
+    GameDefinition game,
+    Process process)
+{
+    PlayButton.IsEnabled = false;
+    PlayButton.Content =
+        IsEnglish ? "Stopping…" : "Arrêt…";
+
+    try
+    {
+        if (IsProcessRunning(process))
+        {
+            try
+            {
+                process.CloseMainWindow();
+            }
+            catch
+            {
+            }
+
+            var gracefulExit = process.WaitForExitAsync();
+            var timeout =
+                Task.Delay(TimeSpan.FromSeconds(2));
+
+            if (await Task.WhenAny(
+                    gracefulExit,
+                    timeout) != gracefulExit &&
+                IsProcessRunning(process))
+            {
+                // Killing only PartyBoard itself is much less aggressive than
+                // Kill(entireProcessTree: true) and avoids the Win32 resource
+                // error seen on some Windows machines.
+                process.Kill(
+                    entireProcessTree: false);
+
+                await process.WaitForExitAsync();
+            }
+        }
+    }
+    catch (InvalidOperationException)
+    {
+        // The process may already have exited between checks.
+    }
+    catch (System.ComponentModel.Win32Exception ex)
+    {
+        MessageBox.Show(
+            this,
+            IsEnglish
+                ? $"Windows could not stop the game cleanly.\n\n{ex.Message}"
+                : $"Windows n'a pas pu arrêter le jeu proprement.\n\n{ex.Message}",
+            "CubeShelf",
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+    }
+    finally
+    {
+        FinalizeTrackedGameSession(
+            game,
+            process);
+
+        PlayButton.IsEnabled = true;
+        UpdateSelectedGamePlayUi();
+    }
+}
+
 private void StartGameTracked(GameDefinition game)
 {
     try
     {
-        if (_runningGames.TryGetValue(game.Id, out var existing) &&
-            !existing.Process.HasExited)
+        if (_runningGames.TryGetValue(
+                game.Id,
+                out var existing) &&
+            IsProcessRunning(existing.Process))
+        {
             return;
+        }
 
-        var modsForGame = _selectedGame == game ? _modManager : null;
-        _gameLauncher = new GameLauncher(game, modsForGame);
-        var process = _gameLauncher.StartGame();
-        var startedAt = DateTimeOffset.Now;
-        _runningGames[game.Id] = (process, startedAt);
+        var modsForGame =
+            _selectedGame == game
+                ? _modManager
+                : null;
+
+        _gameLauncher =
+            new GameLauncher(
+                game,
+                modsForGame);
+
+        var process =
+            _gameLauncher.StartGame();
+
+        var startedAt =
+            DateTimeOffset.Now;
+
+        _runningGames[game.Id] =
+            (process, startedAt);
 
         process.Exited += (_, _) =>
         {
-            Dispatcher.Invoke(() =>
+            try
             {
-                if (_runningGames.Remove(game.Id, out var tracked))
-                {
-                    var elapsed = DateTimeOffset.Now - tracked.StartedAt;
-                    if (elapsed > TimeSpan.Zero)
-                        game.TotalPlaySeconds += (long)Math.Round(elapsed.TotalSeconds);
-
-                    tracked.Process.Dispose();
-                }
-
-                game.Refresh();
-                _libraryService.Save(_games);
-                RefreshLibraryItems();
-
-                if (_selectedGame == game)
-                    UpdateSelectedGamePlayUi();
-            });
+                Dispatcher.BeginInvoke(
+                    new Action(() =>
+                    {
+                        FinalizeTrackedGameSession(
+                            game,
+                            process);
+                    }));
+            }
+            catch
+            {
+                // CubeShelf may itself be closing.
+            }
         };
 
         process.EnableRaisingEvents = true;
@@ -1219,9 +1318,14 @@ private void StartGameTracked(GameDefinition game)
         game.PlayCount++;
         game.LastPlayedAt = startedAt;
         game.Refresh();
+
         _libraryService.Save(_games);
         RefreshLibraryItems();
         UpdateSelectedGamePlayUi();
+
+        _launcherMinimizedForGame = true;
+        WindowState =
+            WindowState.Minimized;
     }
     catch (Exception ex)
     {
@@ -1233,30 +1337,136 @@ private void StartGameTracked(GameDefinition game)
     }
 }
 
+private void FinalizeTrackedGameSession(
+    GameDefinition game,
+    Process process)
+{
+    if (_runningGames.TryGetValue(
+            game.Id,
+            out var tracked) &&
+        ReferenceEquals(
+            tracked.Process,
+            process))
+    {
+        _runningGames.Remove(game.Id);
+
+        var elapsed =
+            DateTimeOffset.Now -
+            tracked.StartedAt;
+
+        if (elapsed > TimeSpan.Zero)
+        {
+            game.TotalPlaySeconds +=
+                (long)Math.Round(
+                    elapsed.TotalSeconds);
+        }
+
+        _ = DisposeProcessLaterAsync(
+            tracked.Process);
+
+        game.Refresh();
+        _libraryService.Save(_games);
+        RefreshLibraryItems();
+    }
+
+    if (_selectedGame == game)
+        UpdateSelectedGamePlayUi();
+
+    RestoreLauncherAfterGameIfNeeded();
+}
+
+private static async Task DisposeProcessLaterAsync(
+    Process process)
+{
+    try
+    {
+        // Give any pending WaitForExitAsync continuation time to finish before
+        // releasing the native Process handle.
+        await Task.Delay(
+            TimeSpan.FromSeconds(2));
+
+        process.Dispose();
+    }
+    catch
+    {
+    }
+}
+
+private void RestoreLauncherAfterGameIfNeeded()
+{
+    if (!_launcherMinimizedForGame)
+        return;
+
+    var anyGameStillRunning =
+        _runningGames.Values.Any(
+            x => IsProcessRunning(x.Process));
+
+    if (anyGameStillRunning)
+        return;
+
+    _launcherMinimizedForGame = false;
+
+    try
+    {
+        if (WindowState ==
+            WindowState.Minimized)
+        {
+            WindowState =
+                WindowState.Normal;
+        }
+
+        Show();
+        Activate();
+    }
+    catch
+    {
+        // Restoring the launcher must never turn a game exit into a launcher crash.
+    }
+}
+
 private void UpdateSelectedGamePlayUi()
 {
     if (_selectedGame is null)
         return;
 
     var game = _selectedGame;
-    var running = _runningGames.TryGetValue(game.Id, out var item) &&
-                  !item.Process.HasExited;
+
+    var running =
+        _runningGames.TryGetValue(
+            game.Id,
+            out var item) &&
+        IsProcessRunning(item.Process);
 
     PlayButton.Content = running
-        ? (IsEnglish ? "■ Stop" : "■ Arrêter")
-        : (IsEnglish ? "▶ Play" : "▶ Jouer");
+        ? (IsEnglish
+            ? "■ Stop"
+            : "■ Arrêter")
+        : (IsEnglish
+            ? "▶ Play"
+            : "▶ Jouer");
 
     PlayButton.Background = running
-        ? (Application.Current.TryFindResource("Danger") as Brush ?? Brushes.IndianRed)
+        ? (Application.Current.TryFindResource(
+               "Danger") as Brush ??
+           Brushes.IndianRed)
         : Brushes.White;
 
     PlayButton.Foreground = running
         ? Brushes.White
-        : new SolidColorBrush(Color.FromRgb(16, 20, 30));
+        : new SolidColorBrush(
+            Color.FromRgb(
+                16,
+                20,
+                30));
 
-    FavoriteGameButton.Content = game.IsFavorite
-        ? (IsEnglish ? "★ Favorite" : "★ Favori")
-        : (IsEnglish ? "☆ Add favorite" : "☆ Ajouter aux favoris");
+    FavoriteGameButton.Content =
+        game.IsFavorite
+            ? (IsEnglish
+                ? "★ Favorite"
+                : "★ Favori")
+            : (IsEnglish
+                ? "☆ Add favorite"
+                : "☆ Ajouter aux favoris");
 
     GameStatsText.Text = IsEnglish
         ? $"{game.PlayCount} launches • {game.PlayTimeText} • Last: {game.LastPlayedText}"
@@ -1872,48 +2082,159 @@ private void RefreshSelectedLocalState()
     private async Task CheckLauncherUpdateAsync(
         bool showUpToDate)
     {
+        if (_launcherUpdatePreparing)
+            return;
+
+        _launcherUpdatePreparing = true;
+
         try
         {
-            var info = await _updates.CheckAsync();
+            var info =
+                await _updates.CheckAsync();
 
             if (!info.UpdateAvailable)
             {
                 if (showUpToDate)
                 {
-                    MessageBox.Show(
-                        info.Message,
-                        "CubeShelf Update",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                    LauncherUpdateReadyTitle.Text =
+                        IsEnglish
+                            ? "CubeShelf is up to date"
+                            : "CubeShelf est à jour";
+
+                    LauncherUpdateReadyText.Text =
+                        info.Message;
+
+                    LauncherUpdateRestartButton.Visibility =
+                        Visibility.Collapsed;
+
+                    LauncherUpdateReadyPopup.Visibility =
+                        Visibility.Visible;
                 }
 
                 return;
             }
 
-            var answer = MessageBox.Show(
-                $"CubeShelf {info.LatestVersion} est disponible.\n\n" +
-                $"Version actuelle : {info.CurrentVersion}\n\n" +
-                "Installer maintenant ?",
-                "Mise à jour CubeShelf",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Information);
+            // The update is downloaded and SHA-256 verified in the background.
+            // Nothing is replaced while CubeShelf is running.
+            var progress =
+                new Progress<double>(_ =>
+                {
+                    // Deliberately non-modal: the user can keep using CubeShelf.
+                });
 
-            if (answer == MessageBoxResult.Yes)
+            var prepared =
+                await _updates.PrepareUpdateAsync(
+                    info,
+                    progress);
+
+            _preparedLauncherUpdate =
+                prepared;
+
+            await Dispatcher.InvokeAsync(() =>
             {
-                await _updates.PrepareAndLaunchUpdateAsync(info);
-                Application.Current.Shutdown();
-            }
+                LauncherUpdateReadyTitle.Text =
+                    IsEnglish
+                        ? $"CubeShelf {info.LatestVersion} is ready"
+                        : $"CubeShelf {info.LatestVersion} est prêt";
+
+                LauncherUpdateReadyText.Text =
+                    IsEnglish
+                        ? $"The update was downloaded and verified in the background.\nCurrent version: {info.CurrentVersion}\n\nRestart CubeShelf when you are ready to install it."
+                        : $"La mise à jour a été téléchargée et vérifiée en arrière-plan.\nVersion actuelle : {info.CurrentVersion}\n\nRedémarre CubeShelf quand tu veux pour l'installer.";
+
+                LauncherUpdateRestartButton.Visibility =
+                    Visibility.Visible;
+
+                LauncherUpdateReadyPopup.Opacity = 0;
+                LauncherUpdateReadyPopup.Visibility =
+                    Visibility.Visible;
+
+                LauncherUpdateReadyPopup.BeginAnimation(
+                    OpacityProperty,
+                    new DoubleAnimation(
+                        0,
+                        1,
+                        TimeSpan.FromMilliseconds(180))
+                    {
+                        EasingFunction =
+                            new QuadraticEase
+                            {
+                                EasingMode =
+                                    EasingMode.EaseOut
+                            }
+                    });
+            });
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
             if (showUpToDate)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "CubeShelf Update",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    LauncherUpdateReadyTitle.Text =
+                        IsEnglish
+                            ? "Update unavailable"
+                            : "Mise à jour indisponible";
+
+                    LauncherUpdateReadyText.Text =
+                        ex.Message;
+
+                    LauncherUpdateRestartButton.Visibility =
+                        Visibility.Collapsed;
+
+                    LauncherUpdateReadyPopup.Visibility =
+                        Visibility.Visible;
+                });
             }
         }
+        finally
+        {
+            _launcherUpdatePreparing = false;
+        }
     }
+
+    private void LauncherUpdateLater_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        LauncherUpdateReadyPopup.Visibility =
+            Visibility.Collapsed;
+    }
+
+    private void LauncherUpdateRestart_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (_preparedLauncherUpdate is null)
+        {
+            LauncherUpdateReadyPopup.Visibility =
+                Visibility.Collapsed;
+            return;
+        }
+
+        try
+        {
+            LauncherUpdateRestartButton.IsEnabled =
+                false;
+
+            _updates.LaunchPreparedUpdate(
+                _preparedLauncherUpdate);
+
+            Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            LauncherUpdateRestartButton.IsEnabled =
+                true;
+
+            LauncherUpdateReadyText.Text =
+                IsEnglish
+                    ? $"Unable to restart for the update.\n\n{ex.Message}"
+                    : $"Impossible de redémarrer pour la mise à jour.\n\n{ex.Message}";
+        }
+    }
+
 }

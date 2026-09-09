@@ -12,12 +12,18 @@ public partial class App : Application
     }
 
     private static string CrashLogPath =>
-        Path.Combine(AppContext.BaseDirectory, "CubeShelf-crash.log");
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CubeShelf",
+            "Logs",
+            "CubeShelf-crash.log");
 
     private static void WriteCrashLog(Exception ex)
     {
         try
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(CrashLogPath)!);
+
             File.WriteAllText(
                 CrashLogPath,
                 $"CubeShelf crash - {DateTime.Now:yyyy-MM-dd HH:mm:ss}\r\n\r\n{ex}");
@@ -34,7 +40,7 @@ public partial class App : Application
         WriteCrashLog(e.Exception);
 
         MessageBox.Show(
-            $"CubeShelf a rencontré une erreur au démarrage.\n\n" +
+            $"CubeShelf a rencontré une erreur.\n\n" +
             $"Un journal a été créé ici :\n{CrashLogPath}\n\n" +
             $"{e.Exception.Message}",
             "CubeShelf",

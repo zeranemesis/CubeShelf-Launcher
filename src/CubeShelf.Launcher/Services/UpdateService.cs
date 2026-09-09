@@ -1,10 +1,4 @@
-using System.Diagnostics;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text.Json;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -17,6 +11,12 @@ public sealed record UpdateInfo(
     string ChecksumUrl,
     string Message);
 
+public sealed record PreparedLauncherUpdate(
+    string Version,
+    string ZipPath,
+    string UpdaterPath,
+    string UpdaterWorkingDirectory);
+
 public sealed class UpdateService
 {
     private readonly LauncherConfig _config;
@@ -25,16 +25,22 @@ public sealed class UpdateService
     public UpdateService(LauncherConfig config)
     {
         _config = config;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.10");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.14");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
-    public async Task<UpdateInfo> CheckAsync()
+    public async Task<UpdateInfo> CheckAsync(CancellationToken cancellationToken = default)
     {
-        var current = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
-        var api = $"https://api.github.com/repos/{_config.GitHubOwner}/{_config.GitHubRepo}/releases/latest";
+        var current =
+            Assembly.GetExecutingAssembly().GetName().Version ??
+            new Version(0, 0, 0);
 
-        using var response = await _http.GetAsync(api);
+        var api =
+            $"https://api.github.com/repos/{_config.GitHubOwner}/{_config.GitHubRepo}/releases/latest";
+
+        using var response =
+            await _http.GetAsync(api, cancellationToken);
+
         if (!response.IsSuccessStatusCode)
         {
             return new(
@@ -47,22 +53,44 @@ public sealed class UpdateService
                 $"Aucune release disponible ou GitHub a répondu {(int)response.StatusCode}.");
         }
 
-        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        var tag = doc.RootElement.GetProperty("tag_name").GetString() ?? "0.0.0";
-        Version.TryParse(tag.TrimStart('v', 'V'), out var latest);
+        using var doc = JsonDocument.Parse(
+            await response.Content.ReadAsStringAsync(cancellationToken));
+
+        var tag =
+            doc.RootElement.GetProperty("tag_name").GetString() ??
+            "0.0.0";
+
+        Version.TryParse(
+            tag.TrimStart('v', 'V'),
+            out var latest);
+
         latest ??= new Version(0, 0, 0);
 
-        string assetUrl = "", checksumUrl = "";
-        foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
+        string assetUrl = "";
+        string checksumUrl = "";
+
+        foreach (var asset in
+                 doc.RootElement.GetProperty("assets").EnumerateArray())
         {
-            var name = asset.GetProperty("name").GetString() ?? "";
-            var url = asset.GetProperty("browser_download_url").GetString() ?? "";
+            var name =
+                asset.GetProperty("name").GetString() ?? "";
 
-            if (name.Equals(_config.ReleaseAssetName, StringComparison.OrdinalIgnoreCase))
+            var url =
+                asset.GetProperty("browser_download_url").GetString() ?? "";
+
+            if (name.Equals(
+                    _config.ReleaseAssetName,
+                    StringComparison.OrdinalIgnoreCase))
+            {
                 assetUrl = url;
+            }
 
-            if (name.Equals(_config.ChecksumAssetName, StringComparison.OrdinalIgnoreCase))
+            if (name.Equals(
+                    _config.ChecksumAssetName,
+                    StringComparison.OrdinalIgnoreCase))
+            {
                 checksumUrl = url;
+            }
         }
 
         return new(
@@ -72,197 +100,251 @@ public sealed class UpdateService
             doc.RootElement.GetProperty("html_url").GetString() ?? "",
             assetUrl,
             checksumUrl,
-            latest > current ? "Nouvelle version disponible." : "CubeShelf est à jour.");
+            latest > current
+                ? "Nouvelle version disponible."
+                : "CubeShelf est à jour.");
     }
 
-    public async Task PrepareAndLaunchUpdateAsync(UpdateInfo info)
+    public async Task<PreparedLauncherUpdate> PrepareUpdateAsync(
+        UpdateInfo info,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        if (!info.UpdateAvailable || string.IsNullOrWhiteSpace(info.AssetUrl))
-            throw new InvalidOperationException("Aucune mise à jour installable.");
-
-        var progressWindow = new LauncherUpdateProgressWindow(info.LatestVersion);
-
-        if (Application.Current?.MainWindow is Window owner &&
-            !ReferenceEquals(owner, progressWindow))
+        if (!info.UpdateAvailable ||
+            string.IsNullOrWhiteSpace(info.AssetUrl))
         {
-            progressWindow.Owner = owner;
+            throw new InvalidOperationException(
+                "Aucune mise à jour installable.");
         }
 
-        progressWindow.Show();
-
-        try
+        if (string.IsNullOrWhiteSpace(info.ChecksumUrl))
         {
-            var safeVersion = string.Join(
-                "_",
-                info.LatestVersion.Split(
-                    Path.GetInvalidFileNameChars(),
-                    StringSplitOptions.RemoveEmptyEntries));
+            throw new CryptographicException(
+                "La release CubeShelf ne contient pas checksums.txt.");
+        }
 
-            var tempDir = Path.Combine(
-                Path.GetTempPath(),
-                "CubeShelf",
-                "Updates",
-                safeVersion);
+        var safeVersion = string.Join(
+            "_",
+            info.LatestVersion.Split(
+                Path.GetInvalidFileNameChars(),
+                StringSplitOptions.RemoveEmptyEntries));
 
-            Directory.CreateDirectory(tempDir);
+        var tempDir = Path.Combine(
+            Path.GetTempPath(),
+            "CubeShelf",
+            "Updates",
+            safeVersion);
 
-            var zip = Path.Combine(tempDir, _config.ReleaseAssetName);
+        Directory.CreateDirectory(tempDir);
 
-            progressWindow.SetStatus("Téléchargement de la mise à jour…");
-            progressWindow.SetProgress(0.02);
+        var zip =
+            Path.Combine(tempDir, _config.ReleaseAssetName);
+
+        var checksumText =
+            await _http.GetStringAsync(
+                info.ChecksumUrl,
+                cancellationToken);
+
+        var expected =
+            ParseChecksum(
+                checksumText,
+                _config.ReleaseAssetName);
+
+        if (expected.Length == 0)
+        {
+            throw new CryptographicException(
+                "checksums.txt ne contient pas le hash attendu.");
+        }
+
+        // Reuse a previously completed background download when possible.
+        var validCachedFile =
+            File.Exists(zip) &&
+            await VerifySha256Async(
+                zip,
+                expected,
+                cancellationToken);
+
+        if (!validCachedFile)
+        {
+            try
+            {
+                if (File.Exists(zip))
+                    File.Delete(zip);
+            }
+            catch
+            {
+            }
+
+            progress?.Report(0.01);
 
             await DownloadFileAsync(
                 info.AssetUrl,
                 zip,
-                p =>
-                {
-                    progressWindow.SetStatus(
-                        $"Téléchargement… {(int)Math.Round(p * 100)} %");
+                p => progress?.Report(0.01 + p * 0.89),
+                cancellationToken);
 
-                    progressWindow.SetProgress(0.02 + p * 0.78);
-                });
+            progress?.Report(0.92);
 
-            progressWindow.SetStatus("Vérification de l’intégrité SHA-256…");
-            progressWindow.SetProgress(0.84);
-
-            if (!string.IsNullOrWhiteSpace(info.ChecksumUrl))
+            if (!await VerifySha256Async(
+                    zip,
+                    expected,
+                    cancellationToken))
             {
-                var checksumText = await _http.GetStringAsync(info.ChecksumUrl);
-                var expected = ParseChecksum(
-                    checksumText,
-                    _config.ReleaseAssetName);
+                try { File.Delete(zip); } catch { }
 
-                if (expected.Length == 0)
-                {
-                    throw new CryptographicException(
-                        "Le fichier checksums.txt ne contient pas le hash attendu.");
-                }
-
-                await using var fs = File.OpenRead(zip);
-                var actual = Convert
-                    .ToHexString(await SHA256.HashDataAsync(fs))
-                    .ToLowerInvariant();
-
-                if (!actual.Equals(
-                        expected,
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new CryptographicException(
-                        "SHA-256 de la mise à jour invalide. " +
-                        "Le fichier téléchargé a été refusé.");
-                }
+                throw new CryptographicException(
+                    "SHA-256 de la mise à jour invalide. " +
+                    "Le téléchargement a été refusé.");
             }
-
-            progressWindow.SetProgress(0.96);
-            progressWindow.SetStatus("Mise à jour téléchargée et vérifiée.");
-
-            var updaterSource = Path.Combine(
-                AppContext.BaseDirectory,
-                "CubeShelf.Updater.exe");
-
-            if (!File.Exists(updaterSource))
-            {
-                throw new FileNotFoundException(
-                    "CubeShelf.Updater.exe est absent.",
-                    updaterSource);
-            }
-
-            var updaterTempDir = Path.Combine(
-                Path.GetTempPath(),
-                "CubeShelf",
-                "Updater",
-                Guid.NewGuid().ToString("N"));
-
-            Directory.CreateDirectory(updaterTempDir);
-
-            var updaterTemp = Path.Combine(
-                updaterTempDir,
-                "CubeShelf.Updater.exe");
-
-            File.Copy(updaterSource, updaterTemp, true);
-
-            progressWindow.SetProgress(1.0);
-            progressWindow.SetStatus(
-                "Mise à jour prête. Redémarrage requis.");
-
-            var answer = MessageBox.Show(
-                progressWindow,
-                $"CubeShelf {info.LatestVersion} a été téléchargé et vérifié.\n\n" +
-                "Redémarrer CubeShelf maintenant pour installer la mise à jour ?",
-                "Mise à jour CubeShelf prête",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (answer != MessageBoxResult.Yes)
-            {
-                progressWindow.Close();
-                throw new OperationCanceledException(
-                    "Redémarrage reporté par l’utilisateur.");
-            }
-
-            progressWindow.SetStatus(
-                "Fermeture de CubeShelf et lancement de l’installateur…");
-
-            var process = Process.Start(
-                new ProcessStartInfo(updaterTemp)
-                {
-                    WorkingDirectory = updaterTempDir,
-                    UseShellExecute = false,
-                    ArgumentList =
-                    {
-                        Environment.ProcessId.ToString(),
-                        zip,
-                        AppContext.BaseDirectory,
-                        info.LatestVersion
-                    }
-                });
-
-            if (process is null)
-            {
-                throw new InvalidOperationException(
-                    "Impossible de démarrer CubeShelf.Updater.");
-            }
-
-            progressWindow.Close();
         }
-        catch
+
+        cancellationToken.ThrowIfCancellationRequested();
+        progress?.Report(0.96);
+
+        var updaterSource = Path.Combine(
+            AppContext.BaseDirectory,
+            "CubeShelf.Updater.exe");
+
+        if (!File.Exists(updaterSource))
         {
-            if (progressWindow.IsVisible)
-                progressWindow.Close();
-
-            throw;
+            throw new FileNotFoundException(
+                "CubeShelf.Updater.exe est absent.",
+                updaterSource);
         }
+
+        var updaterTempDir = Path.Combine(
+            Path.GetTempPath(),
+            "CubeShelf",
+            "Updater",
+            Guid.NewGuid().ToString("N"));
+
+        Directory.CreateDirectory(updaterTempDir);
+
+        var updaterTemp = Path.Combine(
+            updaterTempDir,
+            "CubeShelf.Updater.exe");
+
+        File.Copy(
+            updaterSource,
+            updaterTemp,
+            true);
+
+        progress?.Report(1.0);
+
+        return new PreparedLauncherUpdate(
+            info.LatestVersion,
+            zip,
+            updaterTemp,
+            updaterTempDir);
+    }
+
+    public Process LaunchPreparedUpdate(
+        PreparedLauncherUpdate prepared)
+    {
+        if (!File.Exists(prepared.ZipPath))
+        {
+            throw new FileNotFoundException(
+                "Archive de mise à jour introuvable.",
+                prepared.ZipPath);
+        }
+
+        if (!File.Exists(prepared.UpdaterPath))
+        {
+            throw new FileNotFoundException(
+                "CubeShelf.Updater.exe est introuvable.",
+                prepared.UpdaterPath);
+        }
+
+        return Process.Start(
+                   new ProcessStartInfo(prepared.UpdaterPath)
+                   {
+                       WorkingDirectory =
+                           prepared.UpdaterWorkingDirectory,
+                       UseShellExecute = false,
+                       ArgumentList =
+                       {
+                           Environment.ProcessId.ToString(),
+                           prepared.ZipPath,
+                           AppContext.BaseDirectory,
+                           prepared.Version
+                       }
+                   }) ??
+               throw new InvalidOperationException(
+                   "Impossible de démarrer CubeShelf.Updater.");
+    }
+
+    private static async Task<bool> VerifySha256Async(
+        string file,
+        string expected,
+        CancellationToken cancellationToken)
+    {
+        await using var fs = new FileStream(
+            file,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            1024 * 1024,
+            useAsync: true);
+
+        var actual =
+            Convert
+                .ToHexString(
+                    await SHA256.HashDataAsync(
+                        fs,
+                        cancellationToken))
+                .ToLowerInvariant();
+
+        return actual.Equals(
+            expected,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task DownloadFileAsync(
         string url,
         string destination,
-        Action<double>? progress)
+        Action<double>? progress,
+        CancellationToken cancellationToken)
     {
         using var response = await _http.GetAsync(
             url,
-            HttpCompletionOption.ResponseHeadersRead);
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
-        var total = response.Content.Headers.ContentLength;
+        var total =
+            response.Content.Headers.ContentLength;
 
         await using var input =
-            await response.Content.ReadAsStreamAsync();
+            await response.Content.ReadAsStreamAsync(
+                cancellationToken);
 
-        await using var output = File.Create(destination);
+        await using var output =
+            new FileStream(
+                destination,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                256 * 1024,
+                useAsync: true);
 
         var buffer = new byte[256 * 1024];
         long done = 0;
 
         while (true)
         {
-            var read = await input.ReadAsync(buffer);
+            var read =
+                await input.ReadAsync(
+                    buffer.AsMemory(),
+                    cancellationToken);
 
             if (read <= 0)
                 break;
 
-            await output.WriteAsync(buffer.AsMemory(0, read));
+            await output.WriteAsync(
+                buffer.AsMemory(0, read),
+                cancellationToken);
+
             done += read;
 
             if (total is > 0)
@@ -303,138 +385,4 @@ public sealed class UpdateService
 
         return "";
     }
-}
-
-internal sealed class LauncherUpdateProgressWindow : Window
-{
-    private readonly ProgressBar _progressBar;
-    private readonly TextBlock _percentText;
-    private readonly TextBlock _statusText;
-
-    public LauncherUpdateProgressWindow(string version)
-    {
-        Title = "Mise à jour CubeShelf";
-        Width = 520;
-        Height = 245;
-        MinWidth = 480;
-        ResizeMode = ResizeMode.NoResize;
-        WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        ShowInTaskbar = false;
-
-        Background =
-            Application.Current?.TryFindResource("Bg") as Brush ??
-            new SolidColorBrush(Color.FromRgb(7, 9, 18));
-
-        var foreground =
-            Application.Current?.TryFindResource("Text") as Brush ??
-            Brushes.White;
-
-        var muted =
-            Application.Current?.TryFindResource("Muted") as Brush ??
-            new SolidColorBrush(Color.FromRgb(170, 183, 210));
-
-        var panel =
-            Application.Current?.TryFindResource("Panel") as Brush ??
-            new SolidColorBrush(Color.FromRgb(20, 27, 43));
-
-        var accent =
-            Application.Current?.TryFindResource("Accent") as Brush ??
-            new SolidColorBrush(Color.FromRgb(115, 87, 255));
-
-        var root = new Border
-        {
-            Padding = new Thickness(28),
-            Background = panel
-        };
-
-        var stack = new StackPanel();
-
-        stack.Children.Add(
-            new TextBlock
-            {
-                Text = "MISE À JOUR DU LAUNCHER",
-                Foreground = accent,
-                FontSize = 11,
-                FontWeight = FontWeights.Bold
-            });
-
-        stack.Children.Add(
-            new TextBlock
-            {
-                Text = $"CubeShelf {version}",
-                Foreground = foreground,
-                FontSize = 25,
-                FontWeight = FontWeights.Bold,
-                Margin = new Thickness(0, 8, 0, 18)
-            });
-
-        _progressBar = new ProgressBar
-        {
-            Minimum = 0,
-            Maximum = 100,
-            Height = 13,
-            Value = 0
-        };
-
-        stack.Children.Add(_progressBar);
-
-        var statusGrid = new Grid
-        {
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-
-        statusGrid.ColumnDefinitions.Add(
-            new ColumnDefinition());
-
-        statusGrid.ColumnDefinitions.Add(
-            new ColumnDefinition
-            {
-                Width = GridLength.Auto
-            });
-
-        _statusText = new TextBlock
-        {
-            Text = "Préparation…",
-            Foreground = muted,
-            FontSize = 12,
-            TextWrapping = TextWrapping.Wrap
-        };
-
-        _percentText = new TextBlock
-        {
-            Text = "0 %",
-            Foreground = foreground,
-            FontWeight = FontWeights.Bold,
-            FontSize = 12,
-            Margin = new Thickness(14, 0, 0, 0)
-        };
-
-        Grid.SetColumn(_percentText, 1);
-
-        statusGrid.Children.Add(_statusText);
-        statusGrid.Children.Add(_percentText);
-
-        stack.Children.Add(statusGrid);
-
-        root.Child = stack;
-        Content = root;
-    }
-
-    public void SetProgress(double progress)
-    {
-        var value =
-            Math.Clamp(progress, 0, 1) * 100;
-
-        Dispatcher.Invoke(
-            () =>
-            {
-                _progressBar.Value = value;
-                _percentText.Text =
-                    $"{(int)Math.Round(value)} %";
-            });
-    }
-
-    public void SetStatus(string status)
-        => Dispatcher.Invoke(
-            () => _statusText.Text = status);
 }

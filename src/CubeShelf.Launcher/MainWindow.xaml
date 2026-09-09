@@ -74,6 +74,69 @@
 <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="0,14,0,0"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="Diagnostic" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold"/><TextBlock Text="Version, runtime, commit GitHub, ISO/RVZ, DolphinTool et espace disque." Foreground="{DynamicResource Muted}" Margin="0,5,0,0" TextWrapping="Wrap"/></StackPanel><Button Grid.Column="1" Content="Ouvrir le diagnostic" Click="DiagnosticsButton_Click"/></Grid></Border>
 </StackPanel></ScrollViewer></Grid>
 
+<!-- LAUNCHER UPDATE READY POPUP -->
+<Grid x:Name="LauncherUpdateReadyPopup"
+      Panel.ZIndex="125"
+      Visibility="Collapsed"
+      Background="#66000000">
+    <Border Width="560"
+            Background="{DynamicResource Panel}"
+            BorderBrush="{DynamicResource Border}"
+            BorderThickness="1"
+            CornerRadius="22"
+            Padding="28"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="28"
+                              ShadowDepth="8"
+                              Opacity="0.32"/>
+        </Border.Effect>
+        <StackPanel>
+            <Border Width="48"
+                    Height="48"
+                    CornerRadius="15"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource AccentGradient}"
+                    Margin="0,0,0,18">
+                <TextBlock Text="↻"
+                           Foreground="White"
+                           FontSize="25"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="MISE À JOUR CUBESHELF"
+                       Foreground="{DynamicResource Accent}"
+                       FontSize="11"
+                       FontWeight="Bold"/>
+            <TextBlock x:Name="LauncherUpdateReadyTitle"
+                       Foreground="{DynamicResource Text}"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Margin="0,7,0,0"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="LauncherUpdateReadyText"
+                       Foreground="{DynamicResource Muted}"
+                       FontSize="13"
+                       LineHeight="21"
+                       Margin="0,10,0,0"
+                       TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,24,0,0">
+                <Button Content="Plus tard"
+                        Click="LauncherUpdateLater_Click"/>
+                <Button x:Name="LauncherUpdateRestartButton"
+                        Content="Redémarrer maintenant"
+                        Background="{DynamicResource Accent}"
+                        Foreground="White"
+                        Click="LauncherUpdateRestart_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Grid>
+
 <!-- GAME UPDATE POPUP -->
 <Grid x:Name="GameUpdatePopup" Panel.ZIndex="100" Visibility="Collapsed" Background="#99000000"><Border Width="620" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1" CornerRadius="20" Padding="26" HorizontalAlignment="Center" VerticalAlignment="Center"><StackPanel><TextBlock x:Name="GameUpdatePopupEyebrow" Text="{DynamicResource GameUpdateAvailable}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="Bold"/><TextBlock x:Name="GameUpdatePopupTitle" Foreground="{DynamicResource Text}" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/><TextBlock x:Name="GameUpdatePopupText" Foreground="{DynamicResource Text}" Opacity="0.82" TextWrapping="Wrap" LineHeight="21" Margin="0,10,0,0" MaxHeight="230"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0"><Button Content="{DynamicResource Later}" Click="UpdatePopupLater_Click"/><Button x:Name="GameUpdatePopupActionButton" Content="{DynamicResource UpdateNow}" Background="#2674D9" Click="UpdatePopupNow_Click"/></StackPanel></StackPanel></Border></Grid>
 <Border x:Name="ThemeTransitionOverlay" Panel.ZIndex="150" Background="{DynamicResource Bg}" Opacity="0" IsHitTestVisible="False"/>
