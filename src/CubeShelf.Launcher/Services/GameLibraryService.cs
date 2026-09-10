@@ -60,23 +60,16 @@ public sealed class GameLibraryService
             if (target.GameBananaGameId <= 0)
                 target.GameBananaGameId = source.GameBananaGameId;
 
-            if (string.IsNullOrWhiteSpace(target.GitHubOwner))
-                target.GitHubOwner = source.GitHubOwner;
-
-            if (string.IsNullOrWhiteSpace(target.GitHubRepo))
-                target.GitHubRepo = source.GitHubRepo;
-
-            if (string.IsNullOrWhiteSpace(target.GitHubBranch))
-                target.GitHubBranch = source.GitHubBranch;
-
-            if (string.IsNullOrWhiteSpace(target.GitHubReleaseTag))
-                target.GitHubReleaseTag = source.GitHubReleaseTag;
-
-            if (string.IsNullOrWhiteSpace(target.GitHubReleaseAssetName))
-                target.GitHubReleaseAssetName = source.GitHubReleaseAssetName;
-
-            if (string.IsNullOrWhiteSpace(target.GitHubReleaseChecksumAssetName))
-                target.GitHubReleaseChecksumAssetName = source.GitHubReleaseChecksumAssetName;
+            // GitHub distribution metadata for shipped games belongs to CubeShelf,
+            // not to user state. Always refresh it so an old games.json cannot
+            // remain stuck on an obsolete branch/tag (for example "main").
+            target.GitHubOwner = source.GitHubOwner;
+            target.GitHubRepo = source.GitHubRepo;
+            target.GitHubBranch = source.GitHubBranch;
+            target.GitHubReleaseTag = source.GitHubReleaseTag;
+            target.GitHubReleaseAssetName = source.GitHubReleaseAssetName;
+            target.GitHubReleaseChecksumAssetName =
+                source.GitHubReleaseChecksumAssetName;
 
             // Covers are launcher-owned presentation metadata. Always refresh
             // them from the shipped definition so obsolete cover selectors and

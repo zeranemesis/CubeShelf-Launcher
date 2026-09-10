@@ -95,6 +95,23 @@ public sealed class GameDefinition : INotifyPropertyChanged
     [JsonIgnore] public string RuntimeStatusText { get; set; } = "";
     [JsonIgnore] public bool RuntimeReleaseAvailable { get; set; }
     [JsonIgnore] public bool RuntimeDistributionChecked { get; set; }
+
+    // These statuses are intentionally separate:
+    // - the user's original ISO/RVZ,
+    // - the installed PartyBoard runtime,
+    // - the optional local GitHub source repository.
+    [JsonIgnore] public bool OriginalGameConfigured => HasDiscImage;
+    [JsonIgnore] public bool RuntimeUpdateAvailable =>
+        RuntimeInstalled &&
+        GitHubUpdateAvailable &&
+        RuntimeReleaseAvailable;
+
+    [JsonIgnore] public bool RuntimeUpdatePendingBuild =>
+        RuntimeInstalled &&
+        GitHubUpdateAvailable &&
+        RuntimeDistributionChecked &&
+        !RuntimeReleaseAvailable;
+
     [JsonIgnore] public bool GitHubSourceDownloaded =>
         !string.IsNullOrWhiteSpace(GitHubSourcePath) && Directory.Exists(GitHubSourcePath);
 

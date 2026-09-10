@@ -301,34 +301,50 @@ public partial class MainWindow : Window
 
         if (!status.Configured)
         {
-            game.GitHubStatusText = "GitHub non configuré";
+            game.GitHubStatusText =
+                IsEnglish ? "GitHub not configured" : "GitHub non configuré";
         }
-        else if (!status.Downloaded)
+        else if (!game.RuntimeInstalled)
         {
             game.GitHubStatusText =
-                $"Projet GitHub disponible • {ShortSha(status.LatestSha)}";
+                IsEnglish
+                    ? $"PartyBoard available • {ShortSha(status.LatestSha)}"
+                    : $"PartyBoard disponible • {ShortSha(status.LatestSha)}";
         }
-        else if (status.UpdateAvailable)
+        else if (status.UpdateAvailable && game.RuntimeReleaseAvailable)
         {
             game.GitHubStatusText =
-                $"Mise à jour disponible • {ShortSha(status.CurrentSha)} → " +
-                $"{ShortSha(status.LatestSha)}";
+                IsEnglish
+                    ? $"PartyBoard update available • {ShortSha(status.CurrentSha)} → {ShortSha(status.LatestSha)}"
+                    : $"Mise à jour PartyBoard disponible • {ShortSha(status.CurrentSha)} → {ShortSha(status.LatestSha)}";
+        }
+        else if (status.UpdateAvailable && game.RuntimeDistributionChecked)
+        {
+            game.GitHubStatusText =
+                IsEnglish
+                    ? $"New commit detected • Windows build pending • {ShortSha(status.LatestSha)}"
+                    : $"Nouveau commit détecté • build Windows en attente • {ShortSha(status.LatestSha)}";
         }
         else
         {
             game.GitHubStatusText =
-                $"À jour • {ShortSha(status.LatestSha)}";
+                IsEnglish
+                    ? $"PartyBoard up to date • {ShortSha(status.LatestSha)}"
+                    : $"PartyBoard à jour • {ShortSha(status.LatestSha)}";
         }
 
         game.Refresh();
 
         if (_selectedGame == game)
+        {
             UpdateSelectedGameGitHubPanel();
+            UpdateSelectedGameStateBadges();
+        }
     }
 
     private void UpdateLibraryUpdateSummary()
     {
-        var updates = _games.Count(x => x.GitHubUpdateAvailable);
+        var updates = _games.Count(x => x.RuntimeUpdateAvailable);
         LibraryUpdatesText.Text = IsEnglish
             ? updates == 0 ? "Everything is up to date"
               : updates == 1 ? "1 game update"
@@ -375,6 +391,7 @@ public partial class MainWindow : Window
         DiscImagePathText.Text = game.DiscStatus;
         UpdateDiscCompatibility();
         UpdateSelectedGamePlayUi();
+        UpdateSelectedGameStateBadges();
 
         var palEuropeCover = game.Covers.FirstOrDefault(x =>
             x.Label.Equals("PAL Europe", StringComparison.OrdinalIgnoreCase))
@@ -415,7 +432,7 @@ private void UpdateSelectedGameGitHubPanel()
     GitHubRepoText.Text =
         game.GitHubConfigured
             ? $"{game.GitHubOwner}/{game.GitHubRepo} • {game.GitHubBranch}"
-            : (IsEnglish ? "GitHub repository not configured" : "Dépôt GitHub non configuré");
+            : (IsEnglish ? "GitHub not configured" : "GitHub non configuré");
 
     GitHubStatusText.Text = game.GitHubStatusText;
 
@@ -423,38 +440,51 @@ private void UpdateSelectedGameGitHubPanel()
     {
         var localType =
             game.GitHubLocalRepositoryManaged
-                ? (IsEnglish ? "managed by CubeShelf" : "géré par CubeShelf")
-                : (IsEnglish ? "existing local repository" : "dépôt local existant");
+                ? (IsEnglish ? "managed by CubeShelf" : "gérées par CubeShelf")
+                : (IsEnglish ? "external/manual" : "externes / manuelles");
 
         GitHubLocalStatusText.Text =
             IsEnglish
-                ? $"✓ Local GitHub repository present ({localType})\n{game.GitHubLocalRepositoryPath}"
-                : $"✓ Dépôt GitHub présent ({localType})\n{game.GitHubLocalRepositoryPath}";
+                ? $"Source code: ✓ local copy present ({localType})\n{game.GitHubLocalRepositoryPath}"
+                : $"Sources : ✓ copie locale présente ({localType})\n{game.GitHubLocalRepositoryPath}";
     }
     else
     {
+        // A source checkout is not required to play. The playable Windows
+        // runtime is stored independently in %LOCALAPPDATA%\CubeShelf\Games\...
         GitHubLocalStatusText.Text =
             IsEnglish
-                ? "✕ No local GitHub repository detected"
-                : "✕ Aucun dépôt GitHub local détecté";
+                ? "Source code: not downloaded • optional • not required to play"
+                : "Sources : non téléchargées • optionnel • inutile pour jouer";
     }
 
     GitHubChangesText.Text = game.GitHubChangeLog;
 
     if (game.RuntimeInstalled)
     {
-        GitHubDownloadButton.Content =
-            game.GitHubUpdateAvailable && game.RuntimeReleaseAvailable
-                ? (IsEnglish ? "Update game" : "Mettre à jour le jeu")
-                : (IsEnglish ? "✓ Game installed" : "✓ Jeu installé");
-
-        GitHubDownloadButton.IsEnabled =
-            game.GitHubUpdateAvailable && game.RuntimeReleaseAvailable;
+        if (game.RuntimeUpdateAvailable)
+        {
+            GitHubDownloadButton.Content =
+                IsEnglish ? "Update PartyBoard" : "Mettre à jour PartyBoard";
+            GitHubDownloadButton.IsEnabled = true;
+        }
+        else if (game.RuntimeUpdatePendingBuild)
+        {
+            GitHubDownloadButton.Content =
+                IsEnglish ? "Windows build pending" : "Build Windows en préparation";
+            GitHubDownloadButton.IsEnabled = false;
+        }
+        else
+        {
+            GitHubDownloadButton.Content =
+                IsEnglish ? "✓ PartyBoard up to date" : "✓ PartyBoard à jour";
+            GitHubDownloadButton.IsEnabled = false;
+        }
     }
     else if (game.RuntimeReleaseAvailable)
     {
         GitHubDownloadButton.Content =
-            IsEnglish ? "⬇ Download game" : "⬇ Télécharger le jeu";
+            IsEnglish ? "⬇ Install PartyBoard" : "⬇ Installer PartyBoard";
         GitHubDownloadButton.IsEnabled = true;
     }
     else
@@ -467,13 +497,97 @@ private void UpdateSelectedGameGitHubPanel()
     GitHubSourceButton.Content =
         game.GitHubLocalRepositoryPresent
             ? game.GitHubUpdateAvailable
-                ? (IsEnglish ? "Update repository" : "Mettre à jour le dépôt")
-                : (IsEnglish ? "✓ Repository present" : "✓ Dépôt présent")
-            : (IsEnglish ? "Download repository" : "Télécharger le dépôt");
+                ? (IsEnglish ? "Update sources" : "Mettre à jour les sources")
+                : (IsEnglish ? "✓ Sources present" : "✓ Sources présentes")
+            : (IsEnglish
+                ? "Download sources (optional)"
+                : "Télécharger les sources (optionnel)");
 
     GitHubSourceButton.IsEnabled =
         game.GitHubConfigured &&
         (!game.GitHubLocalRepositoryPresent || game.GitHubUpdateAvailable);
+
+    DeleteRepositoryButton.Visibility =
+        game.GitHubLocalRepositoryPresent
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+}
+
+private void UpdateSelectedGameStateBadges()
+{
+    if (_selectedGame is null)
+        return;
+
+    var game = _selectedGame;
+    var runtime = _runtimeInstaller.ReadState(game);
+
+    OriginalGameStateText.Text =
+        game.HasDiscImage
+            ? (IsEnglish
+                ? $"✓ Original configured • {Path.GetExtension(game.DiscImageFullPath).TrimStart('.').ToUpperInvariant()}"
+                : $"✓ Jeu original configuré • {Path.GetExtension(game.DiscImageFullPath).TrimStart('.').ToUpperInvariant()}")
+            : (IsEnglish
+                ? "○ Original not configured"
+                : "○ Jeu original non configuré");
+
+    OriginalGameStateText.Foreground =
+        game.HasDiscImage
+            ? new SolidColorBrush(Color.FromRgb(34, 168, 97))
+            : Application.Current.TryFindResource("Muted") as Brush ?? Brushes.Gray;
+
+    RuntimeStateText.Text =
+        runtime is not null && game.RuntimeInstalled
+            ? (IsEnglish
+                ? $"✓ PartyBoard installed • {ShortSha(runtime.Commit)}"
+                : $"✓ PartyBoard installé • {ShortSha(runtime.Commit)}")
+            : (IsEnglish ? "○ PartyBoard not installed" : "○ PartyBoard non installé");
+
+    RuntimeStateText.Foreground =
+        game.RuntimeInstalled
+            ? new SolidColorBrush(Color.FromRgb(34, 168, 97))
+            : Application.Current.TryFindResource("Muted") as Brush ?? Brushes.Gray;
+
+    if (!game.RuntimeInstalled)
+    {
+        GameUpdateStateText.Text =
+            IsEnglish ? "Installation required" : "Installation requise";
+        GameUpdateStateText.Foreground =
+            Application.Current.TryFindResource("Muted") as Brush ?? Brushes.Gray;
+    }
+    else if (game.RuntimeUpdateAvailable)
+    {
+        GameUpdateStateText.Text =
+            IsEnglish
+                ? $"⚠ Update available • {ShortSha(game.GitHubLatestCommit)}"
+                : $"⚠ Mise à jour disponible • {ShortSha(game.GitHubLatestCommit)}";
+        GameUpdateStateText.Foreground =
+            new SolidColorBrush(Color.FromRgb(216, 138, 22));
+    }
+    else if (game.RuntimeUpdatePendingBuild)
+    {
+        GameUpdateStateText.Text =
+            IsEnglish
+                ? $"◷ New commit • Windows build pending"
+                : "◷ Nouveau commit • build Windows en attente";
+        GameUpdateStateText.Foreground =
+            new SolidColorBrush(Color.FromRgb(216, 138, 22));
+    }
+    else if (game.RuntimeDistributionChecked)
+    {
+        GameUpdateStateText.Text =
+            IsEnglish
+                ? $"✓ Up to date • {ShortSha(game.GitHubLatestCommit)}"
+                : $"✓ À jour • {ShortSha(game.GitHubLatestCommit)}";
+        GameUpdateStateText.Foreground =
+            new SolidColorBrush(Color.FromRgb(34, 168, 97));
+    }
+    else
+    {
+        GameUpdateStateText.Text =
+            IsEnglish ? "Checking updates…" : "Vérification des mises à jour…";
+        GameUpdateStateText.Foreground =
+            Application.Current.TryFindResource("Muted") as Brush ?? Brushes.Gray;
+    }
 }
 
     private void GameCard_Click(object sender, RoutedEventArgs e)
@@ -2006,6 +2120,7 @@ private void RefreshSelectedLocalState()
     DiscImagePathText.Text = game.DiscStatus;
     UpdateDiscCompatibility();
     UpdateSelectedGameGitHubPanel();
+    UpdateSelectedGameStateBadges();
     game.Refresh();
 }
 
