@@ -10,7 +10,9 @@ public partial class MainWindow
 {
     private void DiagnosticsButton_Click(object sender, RoutedEventArgs e)
     {
-        var window = new DiagnosticsWindow(BuildDiagnosticReport)
+        var window = new DiagnosticsWindow(
+            BuildDiagnosticReport,
+            BuildInstallationTestAsync)
         {
             Owner = this
         };
@@ -81,6 +83,104 @@ public partial class MainWindow
         return string.Join(Environment.NewLine, lines);
     }
 
+    private async Task<string> BuildInstallationTestAsync()
+    {
+        var lines = new List<string>();
+        void Add(bool ok, string text)
+            => lines.Add($"{(ok ? "✓" : "✕")} {text}");
+
+        lines.Add("CubeShelf • Test de l'installation");
+        lines.Add("================================");
+        lines.Add($"Date : {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
+        lines.Add("");
+
+        var dataDirectory = _preferencesService.DataDirectory;
+        var writeTest = Path.Combine(dataDirectory, $"write-test-{Guid.NewGuid():N}.tmp");
+        try
+        {
+            Directory.CreateDirectory(dataDirectory);
+            await File.WriteAllTextAsync(writeTest, "CubeShelf");
+            File.Delete(writeTest);
+            Add(true, "Écriture dans le dossier de données CubeShelf");
+        }
+        catch (Exception ex)
+        {
+            Add(false, $"Écriture dans le dossier de données : {ex.Message}");
+        }
+
+        try
+        {
+            var root = Path.GetPathRoot(AppContext.BaseDirectory);
+            var drive = string.IsNullOrWhiteSpace(root) ? null : new DriveInfo(root);
+            var enough = drive is not null && drive.AvailableFreeSpace >= 2L * 1024 * 1024 * 1024;
+            Add(enough, drive is null
+                ? "Espace disque indisponible"
+                : $"Espace libre : {FormatBytes(drive.AvailableFreeSpace)} (2 Go minimum recommandés)");
+        }
+        catch (Exception ex)
+        {
+            Add(false, $"Lecture de l'espace disque : {ex.Message}");
+        }
+
+        if (_selectedGame is null)
+        {
+            lines.Add("");
+            lines.Add("Sélectionne un jeu pour tester son installation.");
+            return string.Join(Environment.NewLine, lines);
+        }
+
+        var game = _selectedGame;
+        var runtimeHealth = _runtimeInstaller.InspectInstallation(game);
+
+        lines.Add("");
+        lines.Add($"Jeu : {game.Title} ({game.Id})");
+        Add(runtimeHealth.RuntimePresent, "PartyBoard.exe présent");
+        Add(runtimeHealth.ResourcesPresent, "Ressources PartyBoard (res) présentes");
+        Add(runtimeHealth.GameDataPresent, "Données de jeu préparées présentes");
+
+        Add(game.HasDiscImage, game.HasDiscImage
+            ? $"Image disque présente : {Path.GetFileName(game.DiscImageFullPath)}"
+            : "Aucune image ISO/RVZ sélectionnée");
+
+        if (game.HasDiscImage)
+        {
+            var compatibility = DiscImageService.Inspect(game.DiscImageFullPath, english: false);
+            Add(compatibility.Recognized && compatibility.Supported,
+                $"Compatibilité disque : {compatibility.Message}");
+
+            if (Path.GetExtension(game.DiscImageFullPath)
+                    .Equals(".rvz", StringComparison.OrdinalIgnoreCase))
+            {
+                Add(_runtimeInstaller.IsDolphinToolAvailable(),
+                    "DolphinTool disponible pour convertir le RVZ");
+            }
+        }
+
+        try
+        {
+            var releaseAvailable =
+                await _runtimeInstaller.IsPlayableReleaseAvailableAsync(game);
+            Add(releaseAvailable, "Release Windows PartyBoard disponible sur GitHub");
+        }
+        catch (Exception ex)
+        {
+            Add(false, $"Accès à la release GitHub : {ex.Message}");
+        }
+
+        lines.Add("");
+        lines.Add(runtimeHealth.Healthy
+            ? "Résultat : installation locale cohérente."
+            : "Résultat : une réparation est recommandée.");
+
+        if (!runtimeHealth.Healthy)
+        {
+            foreach (var issue in runtimeHealth.Issues)
+                lines.Add($"  • {issue}");
+        }
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
     private static string FormatBytes(long bytes)
     {
         string[] units = ["o", "Ko", "Mo", "Go", "To"];
@@ -100,11 +200,15 @@ public partial class MainWindow
 internal sealed class DiagnosticsWindow : Window
 {
     private readonly Func<string> _reportFactory;
+    private readonly Func<Task<string>> _testFactory;
     private readonly TextBox _text;
 
-    public DiagnosticsWindow(Func<string> reportFactory)
+    public DiagnosticsWindow(
+        Func<string> reportFactory,
+        Func<Task<string>> testFactory)
     {
         _reportFactory = reportFactory;
+        _testFactory = testFactory;
 
         Title = "CubeShelf • Diagnostic";
         Width = 760;
@@ -154,6 +258,25 @@ internal sealed class DiagnosticsWindow : Window
         var refresh = new Button { Content = "Actualiser" };
         refresh.Click += (_, _) => _text.Text = _reportFactory();
 
+        var test = new Button { Content = "Tester l'installation" };
+        test.Click += async (_, _) =>
+        {
+            test.IsEnabled = false;
+            _text.Text = "Test en cours…";
+            try
+            {
+                _text.Text = await _testFactory();
+            }
+            catch (Exception ex)
+            {
+                _text.Text = "Échec du test : " + ex;
+            }
+            finally
+            {
+                test.IsEnabled = true;
+            }
+        };
+
         var copy = new Button { Content = "Copier le diagnostic" };
         copy.Click += (_, _) => Clipboard.SetText(_text.Text);
 
@@ -161,6 +284,7 @@ internal sealed class DiagnosticsWindow : Window
         close.Click += (_, _) => Close();
 
         buttons.Children.Add(refresh);
+        buttons.Children.Add(test);
         buttons.Children.Add(copy);
         buttons.Children.Add(close);
         Grid.SetRow(buttons, 2);

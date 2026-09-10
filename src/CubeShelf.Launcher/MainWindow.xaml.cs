@@ -211,7 +211,10 @@ public partial class MainWindow : Window
         => ShowOnly(DownloadsView);
 
     private void ShowSettings()
-        => ShowOnly(SettingsView);
+    {
+        RefreshStorageSummary();
+        ShowOnly(SettingsView);
+    }
 
     private async Task RefreshAllGameUpdateStatusesAsync()
     {
@@ -1244,14 +1247,9 @@ private async Task StopRunningGameAsync(
     }
     catch (System.ComponentModel.Win32Exception ex)
     {
-        MessageBox.Show(
-            this,
-            IsEnglish
-                ? $"Windows could not stop the game cleanly.\n\n{ex.Message}"
-                : $"Windows n'a pas pu arrêter le jeu proprement.\n\n{ex.Message}",
-            "CubeShelf",
-            MessageBoxButton.OK,
-            MessageBoxImage.Warning);
+        ShowToast(
+            IsEnglish ? "Unable to stop the game" : "Impossible d'arrêter le jeu",
+            ex.Message);
     }
     finally
     {
@@ -1329,11 +1327,9 @@ private void StartGameTracked(GameDefinition game)
     }
     catch (Exception ex)
     {
-        MessageBox.Show(
-            ex.Message,
-            "CubeShelf",
-            MessageBoxButton.OK,
-            MessageBoxImage.Error);
+        ShowToast(
+            IsEnglish ? "Unable to start the game" : "Impossible de démarrer le jeu",
+            ex.Message);
     }
 }
 

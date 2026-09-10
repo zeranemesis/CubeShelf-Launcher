@@ -10,6 +10,13 @@ public sealed record RuntimeState(
     string ExecutablePath,
     bool GameDataReady);
 
+public sealed record RuntimeHealth(
+    bool Healthy,
+    bool RuntimePresent,
+    bool ResourcesPresent,
+    bool GameDataPresent,
+    IReadOnlyList<string> Issues);
+
 public sealed class GameRuntimeInstallerService
 {
     private readonly HttpClient _http = new();
@@ -154,6 +161,55 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         game.Refresh();
     }
 
+    public RuntimeHealth InspectInstallation(GameDefinition game)
+    {
+        var issues = new List<string>();
+        var state = ReadState(game);
+
+        var runtimePresent =
+            state is not null &&
+            !string.IsNullOrWhiteSpace(state.ExecutablePath) &&
+            File.Exists(state.ExecutablePath);
+
+        if (!runtimePresent)
+            issues.Add("PartyBoard.exe est absent");
+
+        var exeDirectory = runtimePresent
+            ? Path.GetDirectoryName(state!.ExecutablePath)!
+            : Current(game);
+
+        var resourcesPresent =
+            Directory.Exists(Path.Combine(exeDirectory, "res"));
+
+        if (runtimePresent && !resourcesPresent)
+            issues.Add("Le dossier res de PartyBoard est absent");
+
+        var gameDataPresent =
+            Directory.Exists(Path.Combine(exeDirectory, game.Id, "files"));
+
+        if (state?.GameDataReady == true && !gameDataPresent)
+            issues.Add("Les données de jeu préparées sont marquées prêtes mais sont absentes");
+
+        var healthy = runtimePresent && resourcesPresent &&
+                      (state?.GameDataReady != true || gameDataPresent);
+
+        if (healthy && issues.Count == 0)
+            issues.Add("Aucun problème détecté");
+
+        return new RuntimeHealth(
+            healthy,
+            runtimePresent,
+            resourcesPresent,
+            gameDataPresent,
+            issues);
+    }
+
+    public Task<RuntimeState> RepairLatestAsync(
+        GameDefinition game,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+        => InstallLatestAsync(game, progress, cancellationToken);
+
     public async Task<bool> IsPlayableReleaseAvailableAsync(
         GameDefinition game,
         string? requiredCommit = null,
@@ -198,42 +254,64 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 $"La release PartyBoard ne contient pas {game.GitHubReleaseChecksumAssetName}. " +
                 "CubeShelf refuse d'installer un runtime sans checksum SHA-256.");
 
-        var temp=Path.Combine(Path.GetTempPath(),$"cubeshelf-runtime-{game.Id}-{Guid.NewGuid():N}.zip");
+        var cacheDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CubeShelf",
+            "Cache",
+            "Downloads");
 
-        try
+        Directory.CreateDirectory(cacheDirectory);
+
+        var cacheKey = string.IsNullOrWhiteSpace(release.Commit)
+            ? SanitizeFileName(release.Version)
+            : release.Commit[..Math.Min(12, release.Commit.Length)];
+
+        var temp = Path.Combine(
+            cacheDirectory,
+            $"{game.Id}-{cacheKey}-{SanitizeFileName(game.GitHubReleaseAssetName)}");
+
+        var checksumText = await _http.GetStringAsync(checksumAsset.Url, cancellationToken);
+        var expectedHash = ParseChecksum(checksumText, game.GitHubReleaseAssetName);
+
+        if (string.IsNullOrWhiteSpace(expectedHash))
+            throw new CryptographicException(
+                $"{game.GitHubReleaseChecksumAssetName} ne contient pas le hash de {game.GitHubReleaseAssetName}.");
+
+        var validCachedDownload =
+            File.Exists(temp) &&
+            await VerifySha256Async(temp, expectedHash, cancellationToken);
+
+        if (!validCachedDownload)
         {
-            progress?.Report(.02);
-            await DownloadAsync(asset.Url,temp,p=>progress?.Report(.02+p*.56), cancellationToken);
-
-            cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(.60);
-
-            var checksumText = await _http.GetStringAsync(checksumAsset.Url, cancellationToken);
-            var expectedHash = ParseChecksum(checksumText, game.GitHubReleaseAssetName);
-
-            if (string.IsNullOrWhiteSpace(expectedHash))
-                throw new CryptographicException(
-                    $"{game.GitHubReleaseChecksumAssetName} ne contient pas le hash de {game.GitHubReleaseAssetName}.");
-
-            await using (var file = File.OpenRead(temp))
+            try
             {
-                var actualHash = Convert
-                    .ToHexString(await SHA256.HashDataAsync(file, cancellationToken))
-                    .ToLowerInvariant();
-
-                if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
-                    throw new CryptographicException(
-                        "Le SHA-256 du runtime PartyBoard est invalide. " +
-                        "Le téléchargement a été supprimé et n'a pas été installé.");
+                if (File.Exists(temp))
+                    File.Delete(temp);
             }
+            catch { }
 
-            progress?.Report(.66);
+            progress?.Report(.02);
+            await DownloadResumableAsync(
+                asset.Url,
+                temp,
+                p => progress?.Report(.02 + p * .56),
+                cancellationToken);
         }
-        catch
+
+        cancellationToken.ThrowIfCancellationRequested();
+        progress?.Report(.60);
+
+        if (!await VerifySha256Async(temp, expectedHash, cancellationToken))
         {
             try { if (File.Exists(temp)) File.Delete(temp); } catch { }
-            throw;
+            try { if (File.Exists(temp + ".part")) File.Delete(temp + ".part"); } catch { }
+
+            throw new CryptographicException(
+                "Le SHA-256 du runtime PartyBoard est invalide. " +
+                "Le téléchargement a été supprimé et n'a pas été installé.");
         }
+
+        progress?.Report(.66);
         var staging=Path.Combine(Root(game),"staging-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
 
@@ -277,7 +355,8 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         }
         finally
         {
-            try{File.Delete(temp);}catch{}
+            // Keep the verified package in CubeShelf cache so a repair can reuse it.
+            // Settings > Storage can remove this cache at any time.
             try{if(Directory.Exists(staging))Directory.Delete(staging,true);}catch{}
         }
     }
@@ -503,20 +582,120 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         return "";
     }
 
-    private async Task DownloadAsync(string url,string destination,Action<double>? progress,CancellationToken cancellationToken)
+    private static string SanitizeFileName(string value)
     {
-        using var response=await _http.GetAsync(url,HttpCompletionOption.ResponseHeadersRead,cancellationToken);
-        response.EnsureSuccessStatusCode();
-        var total=response.Content.Headers.ContentLength;
-        await using var input=await response.Content.ReadAsStreamAsync(cancellationToken);
-        await using var output=File.Create(destination);
-        var buffer=new byte[256*1024]; long done=0; int read;
-        while((read=await input.ReadAsync(buffer,cancellationToken))>0)
+        if (string.IsNullOrWhiteSpace(value))
+            return "download";
+
+        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        var chars = value.Select(c => invalid.Contains(c) ? '_' : c).ToArray();
+        return new string(chars);
+    }
+
+    private static async Task<bool> VerifySha256Async(
+        string file,
+        string expectedHash,
+        CancellationToken cancellationToken)
+    {
+        try
         {
-            await output.WriteAsync(buffer.AsMemory(0,read),cancellationToken);
-            done+=read;
-            if(total is >0) progress?.Invoke((double)done/total.Value);
+            await using var input = new FileStream(
+                file,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                1024 * 1024,
+                useAsync: true);
+
+            var actual = Convert
+                .ToHexString(await SHA256.HashDataAsync(input, cancellationToken))
+                .ToLowerInvariant();
+
+            return actual.Equals(
+                expectedHash,
+                StringComparison.OrdinalIgnoreCase);
         }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private Task DownloadAsync(
+        string url,
+        string destination,
+        Action<double>? progress,
+        CancellationToken cancellationToken)
+        => DownloadResumableAsync(url, destination, progress, cancellationToken);
+
+    private async Task DownloadResumableAsync(
+        string url,
+        string destination,
+        Action<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        var partial = destination + ".part";
+        var existing = File.Exists(partial)
+            ? new FileInfo(partial).Length
+            : 0L;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        if (existing > 0)
+            request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(existing, null);
+
+        using var response = await _http.SendAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        if (existing > 0 &&
+            response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+        {
+            File.Move(partial, destination, true);
+            progress?.Invoke(1);
+            return;
+        }
+
+        var append = existing > 0 && response.StatusCode == HttpStatusCode.PartialContent;
+        if (!append)
+            existing = 0;
+
+        response.EnsureSuccessStatusCode();
+
+        var responseLength = response.Content.Headers.ContentLength;
+        var total = response.Content.Headers.ContentRange?.Length ??
+                    (responseLength is > 0 ? existing + responseLength.Value : (long?)null);
+
+        var buffer = new byte[256 * 1024];
+        var done = existing;
+
+        await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken))
+        await using (var output = new FileStream(
+            partial,
+            append ? FileMode.Append : FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            256 * 1024,
+            useAsync: true))
+        {
+            while (true)
+            {
+                var read = await input.ReadAsync(buffer.AsMemory(), cancellationToken);
+                if (read <= 0)
+                    break;
+
+                await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                done += read;
+
+                if (total is > 0)
+                    progress?.Invoke(Math.Clamp((double)done / total.Value, 0, 1));
+            }
+
+            await output.FlushAsync(cancellationToken);
+        }
+
+        File.Move(partial, destination, true);
+        progress?.Invoke(1);
     }
 
     private void WriteState(GameDefinition game,RuntimeState state)
@@ -726,6 +905,8 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             {
                 if (File.Exists(archivePath))
                     File.Delete(archivePath);
+                if (File.Exists(archivePath + ".part"))
+                    File.Delete(archivePath + ".part");
             }
             catch { }
 

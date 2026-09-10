@@ -47,10 +47,10 @@
 </StackPanel><TextBlock Text="{DynamicResource Changes}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" Margin="0,14,0,5"/><TextBlock x:Name="GitHubChangesText" Foreground="{DynamicResource Text}" Opacity="0.82" FontSize="12" TextWrapping="Wrap" MaxHeight="150"/></StackPanel></Border>
 <Border Grid.Column="1" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="9,0,0,0"><StackPanel><TextBlock Text="{DynamicResource LocalInstall}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold"/><TextBlock x:Name="SelectedInstallStatus" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold" Margin="0,7,0,0"/><TextBlock Text="{DynamicResource Executable}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,12,0,3"/><TextBlock x:Name="ExecutablePathText" Foreground="{DynamicResource Text}" Opacity="0.75" TextWrapping="Wrap"/><Button Content="{DynamicResource PointExecutable}" HorizontalAlignment="Left" Click="ConfigureExecutableButton_Click" Margin="0,10,0,0"/><TextBlock Text="{DynamicResource DiscImage}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,14,0,3"/><TextBlock x:Name="DiscImagePathText" Foreground="{DynamicResource Text}" Opacity="0.75" TextWrapping="Wrap"/><StackPanel Orientation="Horizontal" Margin="0,9,0,0"><Button Content="{DynamicResource ChooseDisc}" Click="ConfigureDiscImageButton_Click"/><Button Content="{DynamicResource Clear}" Click="ClearDiscImageButton_Click"/></StackPanel><TextBlock Text="{DynamicResource SupportedDiscs}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" Margin="0,14,0,4"/><TextBlock x:Name="DiscCompatibilityText" Foreground="{DynamicResource Text}" Opacity="0.75" TextWrapping="Wrap"/>
 <WrapPanel Margin="0,14,0,0">
-<Button Content="{DynamicResource DeleteRuntime}" Click="DeleteRuntimeButton_Click"/>
-<Button Content="{DynamicResource DeleteGameData}" Click="DeleteGameDataButton_Click"/>
-<Button Content="{DynamicResource DeleteAllGameFiles}" Click="DeleteAllGameFilesButton_Click"/>
+<Button Content="Réparer l'installation" Background="{DynamicResource Accent}" Foreground="White" Click="RepairGameButton_Click"/>
+<Button Content="Désinstaller…" Click="UninstallGameButton_Click"/>
 </WrapPanel>
+<TextBlock Text="CubeShelf ne supprime jamais ton ISO/RVZ original." Foreground="{DynamicResource Muted}" FontSize="10" Margin="4,7,0,0"/>
 </StackPanel></Border>
 </Grid></StackPanel></ScrollViewer>
 </Grid>
@@ -71,6 +71,11 @@
 <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="0,0,0,14"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="260"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{DynamicResource Appearance}" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold"/><TextBlock Text="{DynamicResource AppearanceHelp}" Foreground="{DynamicResource Muted}" Margin="0,5,0,0"/></StackPanel><Border Grid.Column="1" Width="250" Height="48" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="13"><Grid ClipToBounds="True"><Border x:Name="ThemeIndicator" Width="121" Height="40" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource AccentGradient}" CornerRadius="10"><Border.RenderTransform><TranslateTransform x:Name="ThemeIndicatorTransform"/></Border.RenderTransform></Border><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><Button Content="{DynamicResource Dark}" Background="Transparent" BorderThickness="0" Click="DarkTheme_Click"/><Button Grid.Column="1" Content="{DynamicResource Light}" Background="Transparent" BorderThickness="0" Click="LightTheme_Click"/></Grid></Grid></Border></Grid></Border>
 <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="0,0,0,14"><StackPanel><TextBlock Text="{DynamicResource UpdateSettings}" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/><CheckBox x:Name="CheckGamesStartupBox" Content="{DynamicResource CheckGamesStartup}" Foreground="{DynamicResource Text}" Margin="0,6" Checked="PreferenceCheckBox_Changed" Unchecked="PreferenceCheckBox_Changed"/><CheckBox x:Name="GameUpdatePopupBox" Content="{DynamicResource GameUpdatePopup}" Foreground="{DynamicResource Text}" Margin="0,6" Checked="PreferenceCheckBox_Changed" Unchecked="PreferenceCheckBox_Changed"/><CheckBox x:Name="RefreshModsOnOpenBox" Content="{DynamicResource RefreshModsOnOpen}" Foreground="{DynamicResource Text}" Margin="0,6" Checked="PreferenceCheckBox_Changed" Unchecked="PreferenceCheckBox_Changed"/></StackPanel></Border>
 <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{DynamicResource DataFolder}" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold"/><TextBlock x:Name="DataFolderText" Foreground="{DynamicResource Muted}" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="{DynamicResource OpenDataFolder}" Click="OpenDataFolder_Click"/><Button Content="{DynamicResource ResetSettings}" Click="ResetSettings_Click"/></StackPanel></Grid></Border>
+<Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="0,14,0,0">
+<Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+<StackPanel><TextBlock Text="Stockage" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold"/><TextBlock x:Name="StorageSummaryText" Text="Calcul du stockage…" Foreground="{DynamicResource Muted}" Margin="0,5,0,0" TextWrapping="Wrap"/></StackPanel>
+<StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="Actualiser" Click="RefreshStorageButton_Click"/><Button Content="Nettoyer le cache" Click="CleanCacheButton_Click"/></StackPanel>
+</Grid></Border>
 <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20" Margin="0,14,0,0"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="Diagnostic" Foreground="{DynamicResource Text}" FontSize="18" FontWeight="Bold"/><TextBlock Text="Version, runtime, commit GitHub, ISO/RVZ, DolphinTool et espace disque." Foreground="{DynamicResource Muted}" Margin="0,5,0,0" TextWrapping="Wrap"/></StackPanel><Button Grid.Column="1" Content="Ouvrir le diagnostic" Click="DiagnosticsButton_Click"/></Grid></Border>
 </StackPanel></ScrollViewer></Grid>
 
@@ -139,6 +144,31 @@
 
 <!-- GAME UPDATE POPUP -->
 <Grid x:Name="GameUpdatePopup" Panel.ZIndex="100" Visibility="Collapsed" Background="#99000000"><Border Width="620" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1" CornerRadius="20" Padding="26" HorizontalAlignment="Center" VerticalAlignment="Center"><StackPanel><TextBlock x:Name="GameUpdatePopupEyebrow" Text="{DynamicResource GameUpdateAvailable}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="Bold"/><TextBlock x:Name="GameUpdatePopupTitle" Foreground="{DynamicResource Text}" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/><TextBlock x:Name="GameUpdatePopupText" Foreground="{DynamicResource Text}" Opacity="0.82" TextWrapping="Wrap" LineHeight="21" Margin="0,10,0,0" MaxHeight="230"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0"><Button Content="{DynamicResource Later}" Click="UpdatePopupLater_Click"/><Button x:Name="GameUpdatePopupActionButton" Content="{DynamicResource UpdateNow}" Background="#2674D9" Click="UpdatePopupNow_Click"/></StackPanel></StackPanel></Border></Grid>
+<Border x:Name="ToastHost"
+        Grid.ColumnSpan="2"
+        Panel.ZIndex="220"
+        Width="430"
+        MinHeight="92"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,24,24"
+        Padding="18"
+        Visibility="Collapsed"
+        Opacity="0"
+        Background="{DynamicResource Panel}"
+        BorderBrush="{DynamicResource Accent}"
+        BorderThickness="1"
+        CornerRadius="16">
+    <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel>
+            <TextBlock x:Name="ToastTitle" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="15"/>
+            <TextBlock x:Name="ToastText" Foreground="{DynamicResource Muted}" Margin="0,5,0,0" TextWrapping="Wrap" LineHeight="18"/>
+        </StackPanel>
+        <Button Grid.Column="1" Content="×" Width="38" Height="38" Padding="0" Margin="12,0,0,0" Click="ToastClose_Click"/>
+    </Grid>
+</Border>
+
 <Border x:Name="ThemeTransitionOverlay" Panel.ZIndex="150" Background="{DynamicResource Bg}" Opacity="0" IsHitTestVisible="False"/>
 </Grid>
 </Grid>

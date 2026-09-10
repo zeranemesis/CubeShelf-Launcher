@@ -25,7 +25,7 @@ public sealed class UpdateService
     public UpdateService(LauncherConfig config)
     {
         _config = config;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.14");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.15");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
@@ -177,7 +177,7 @@ public sealed class UpdateService
 
             progress?.Report(0.01);
 
-            await DownloadFileAsync(
+            await DownloadFileResumableAsync(
                 info.AssetUrl,
                 zip,
                 p => progress?.Report(0.01 + p * 0.89),
@@ -299,65 +299,76 @@ public sealed class UpdateService
             StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task DownloadFileAsync(
+    private async Task DownloadFileResumableAsync(
         string url,
         string destination,
         Action<double>? progress,
         CancellationToken cancellationToken)
     {
-        using var response = await _http.GetAsync(
-            url,
+        var partial = destination + ".part";
+        var existing = File.Exists(partial)
+            ? new FileInfo(partial).Length
+            : 0L;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        if (existing > 0)
+            request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(existing, null);
+
+        using var response = await _http.SendAsync(
+            request,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
-
-        var total =
-            response.Content.Headers.ContentLength;
-
-        await using var input =
-            await response.Content.ReadAsStreamAsync(
-                cancellationToken);
-
-        await using var output =
-            new FileStream(
-                destination,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                256 * 1024,
-                useAsync: true);
-
-        var buffer = new byte[256 * 1024];
-        long done = 0;
-
-        while (true)
+        if (existing > 0 &&
+            response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
         {
-            var read =
-                await input.ReadAsync(
-                    buffer.AsMemory(),
-                    cancellationToken);
-
-            if (read <= 0)
-                break;
-
-            await output.WriteAsync(
-                buffer.AsMemory(0, read),
-                cancellationToken);
-
-            done += read;
-
-            if (total is > 0)
-            {
-                progress?.Invoke(
-                    Math.Clamp(
-                        (double)done / total.Value,
-                        0,
-                        1));
-            }
+            File.Move(partial, destination, true);
+            progress?.Invoke(1);
+            return;
         }
 
-        progress?.Invoke(1.0);
+        var append = existing > 0 && response.StatusCode == HttpStatusCode.PartialContent;
+        if (!append)
+            existing = 0;
+
+        response.EnsureSuccessStatusCode();
+
+        var responseLength = response.Content.Headers.ContentLength;
+        var total = response.Content.Headers.ContentRange?.Length ??
+                    (responseLength is > 0
+                        ? existing + responseLength.Value
+                        : (long?)null);
+
+        var buffer = new byte[256 * 1024];
+        var done = existing;
+
+        await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken))
+        await using (var output = new FileStream(
+            partial,
+            append ? FileMode.Append : FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            256 * 1024,
+            useAsync: true))
+        {
+            while (true)
+            {
+                var read = await input.ReadAsync(buffer.AsMemory(), cancellationToken);
+                if (read <= 0)
+                    break;
+
+                await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                done += read;
+
+                if (total is > 0)
+                    progress?.Invoke(Math.Clamp((double)done / total.Value, 0, 1));
+            }
+
+            await output.FlushAsync(cancellationToken);
+        }
+
+        File.Move(partial, destination, true);
+        progress?.Invoke(1);
     }
 
     private static string ParseChecksum(
