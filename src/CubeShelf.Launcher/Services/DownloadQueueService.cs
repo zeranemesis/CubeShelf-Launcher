@@ -489,16 +489,54 @@ public sealed class DownloadQueueService
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     item.Running = true;
-                    item.Status = "Téléchargement…";
+                    item.Status = item.Kind.Contains(
+                            "GAME DATA",
+                            StringComparison.OrdinalIgnoreCase)
+                        ? "Préparation…"
+                        : "Téléchargement…";
                     NotifyQueueChanged();
                 });
 
+                var progressGate = new object();
+                var lastUiProgress = -1d;
+                var lastUiPush = DateTimeOffset.MinValue;
+
                 var progress = new Progress<double>(p =>
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    var normalized = Math.Clamp(p, 0, 1);
+                    var shouldPush = false;
+
+                    lock (progressGate)
                     {
-                        item.Progress = Math.Clamp(p, 0, 1);
-                    });
+                        var now = DateTimeOffset.UtcNow;
+                        var enoughTime =
+                            now - lastUiPush >=
+                            TimeSpan.FromMilliseconds(120);
+
+                        var enoughProgress =
+                            Math.Abs(normalized - lastUiProgress) >= 0.005;
+
+                        if (normalized >= 1 ||
+                            lastUiProgress < 0 ||
+                            enoughTime ||
+                            enoughProgress)
+                        {
+                            lastUiProgress = normalized;
+                            lastUiPush = now;
+                            shouldPush = true;
+                        }
+                    }
+
+                    if (!shouldPush)
+                        return;
+
+                    _ = Application.Current.Dispatcher.BeginInvoke(
+                        new Action(() =>
+                        {
+                            if (!item.IsTerminal)
+                                item.Progress = normalized;
+                        }),
+                        System.Windows.Threading.DispatcherPriority.Background);
                 });
 
                 await item.Work(progress, item.Cancellation.Token);

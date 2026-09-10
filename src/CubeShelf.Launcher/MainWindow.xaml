@@ -81,11 +81,63 @@
 </StackPanel></ScrollViewer></Grid>
 
 <!-- LAUNCHER UPDATE READY POPUP -->
-<Grid x:Name="LauncherUpdateReadyPopup"
-      Panel.ZIndex="125"
+<Border x:Name="LauncherUpdateReadyPopup"
+        Grid.ColumnSpan="2"
+        Panel.ZIndex="125"
+        Width="520"
+        Visibility="Collapsed"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,24,128"
+        Background="{DynamicResource Panel}"
+        BorderBrush="{DynamicResource Accent}"
+        BorderThickness="1"
+        CornerRadius="20"
+        Padding="22">
+    <Border.Effect>
+        <DropShadowEffect BlurRadius="24"
+                          ShadowDepth="6"
+                          Opacity="0.28"/>
+    </Border.Effect>
+    <StackPanel>
+        <TextBlock Text="MISE À JOUR CUBESHELF"
+                   Foreground="{DynamicResource Accent}"
+                   FontSize="11"
+                   FontWeight="Bold"/>
+        <TextBlock x:Name="LauncherUpdateReadyTitle"
+                   Foreground="{DynamicResource Text}"
+                   FontSize="21"
+                   FontWeight="Bold"
+                   Margin="0,6,0,0"
+                   TextWrapping="Wrap"/>
+        <TextBlock x:Name="LauncherUpdateReadyText"
+                   Foreground="{DynamicResource Muted}"
+                   FontSize="12"
+                   LineHeight="19"
+                   Margin="0,8,0,0"
+                   TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Content="Plus tard"
+                    Click="LauncherUpdateLater_Click"/>
+            <Button x:Name="LauncherUpdateRestartButton"
+                    Content="Redémarrer maintenant"
+                    Background="{DynamicResource Accent}"
+                    Foreground="White"
+                    Click="LauncherUpdateRestart_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Border>
+
+
+<!-- REPOSITORY DELETE CONFIRMATION -->
+<Grid x:Name="RepositoryDeletePopup"
+      Grid.ColumnSpan="2"
+      Panel.ZIndex="210"
       Visibility="Collapsed"
-      Background="#66000000">
-    <Border Width="560"
+      Background="#88000000">
+    <Border Width="620"
             Background="{DynamicResource Panel}"
             BorderBrush="{DynamicResource Border}"
             BorderThickness="1"
@@ -93,51 +145,57 @@
             Padding="28"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="28"
-                              ShadowDepth="8"
-                              Opacity="0.32"/>
-        </Border.Effect>
         <StackPanel>
-            <Border Width="48"
-                    Height="48"
-                    CornerRadius="15"
-                    HorizontalAlignment="Left"
-                    Background="{DynamicResource AccentGradient}"
-                    Margin="0,0,0,18">
-                <TextBlock Text="↻"
-                           Foreground="White"
-                           FontSize="25"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
-            </Border>
-            <TextBlock Text="MISE À JOUR CUBESHELF"
+            <TextBlock Text="DÉPÔT GITHUB LOCAL"
                        Foreground="{DynamicResource Accent}"
                        FontSize="11"
                        FontWeight="Bold"/>
-            <TextBlock x:Name="LauncherUpdateReadyTitle"
+            <TextBlock x:Name="RepositoryDeleteTitle"
                        Foreground="{DynamicResource Text}"
                        FontSize="28"
                        FontWeight="Bold"
                        Margin="0,7,0,0"
                        TextWrapping="Wrap"/>
-            <TextBlock x:Name="LauncherUpdateReadyText"
-                       Foreground="{DynamicResource Muted}"
+            <TextBlock x:Name="RepositoryDeleteText"
+                       Foreground="{DynamicResource Text}"
+                       Opacity="0.86"
                        FontSize="13"
                        LineHeight="21"
-                       Margin="0,10,0,0"
+                       Margin="0,12,0,0"
+                       TextWrapping="Wrap"/>
+            <Border Background="{DynamicResource Panel2}"
+                    BorderBrush="{DynamicResource Border}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="12"
+                    Margin="0,14,0,0">
+                <StackPanel>
+                    <TextBlock Text="Chemin concerné"
+                               Foreground="{DynamicResource Muted}"
+                               FontSize="10"
+                               FontWeight="Bold"/>
+                    <TextBlock x:Name="RepositoryDeletePath"
+                               Foreground="{DynamicResource Text}"
+                               Margin="0,5,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+            <TextBlock x:Name="RepositoryDeleteWarning"
+                       Foreground="{DynamicResource Danger}"
+                       FontWeight="SemiBold"
+                       Margin="0,14,0,0"
                        TextWrapping="Wrap"/>
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Margin="0,24,0,0">
-                <Button Content="Plus tard"
-                        Click="LauncherUpdateLater_Click"/>
-                <Button x:Name="LauncherUpdateRestartButton"
-                        Content="Redémarrer maintenant"
-                        Background="{DynamicResource Accent}"
+                        Margin="0,22,0,0">
+                <Button x:Name="RepositoryDeleteCancelButton"
+                        Content="Annuler"
+                        Click="CancelRepositoryDelete_Click"/>
+                <Button x:Name="RepositoryDeleteConfirmButton"
+                        Content="Supprimer le dépôt"
+                        Background="{DynamicResource Danger}"
                         Foreground="White"
-                        Click="LauncherUpdateRestart_Click"/>
+                        Click="ConfirmRepositoryDelete_Click"/>
             </StackPanel>
         </StackPanel>
     </Border>

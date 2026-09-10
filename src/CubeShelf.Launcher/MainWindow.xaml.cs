@@ -964,6 +964,12 @@ private void QueueGameUpdate(GameDefinition game)
 
             await RefreshGameUpdateStatusAsync(game);
             UpdateLibraryUpdateSummary();
+
+            ShowToast(
+                IsEnglish ? "Game update finished" : "Mise à jour du jeu terminée",
+                IsEnglish
+                    ? $"{game.Title} was updated. CubeShelf will never launch it automatically after an update."
+                    : $"{game.Title} a été mis à jour. CubeShelf ne le lancera jamais automatiquement après une mise à jour.");
         });
 
     if (!added)
@@ -1041,7 +1047,7 @@ private bool QueueRepositoryUpdate(
     return added;
 }
 
-private async void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e)
+private void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e)
 {
     if (_selectedGame is null)
         return;
@@ -1054,51 +1060,17 @@ private async void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e
 
     if (!game.GitHubLocalRepositoryPresent)
     {
+        ShowToast(
+            IsEnglish ? "No local repository" : "Aucun dépôt local",
+            IsEnglish
+                ? "CubeShelf did not find a local GitHub repository to delete."
+                : "CubeShelf n'a trouvé aucun dépôt GitHub local à supprimer.");
+
         UpdateSelectedGameGitHubPanel();
         return;
     }
 
-    if (!game.GitHubLocalRepositoryManaged)
-    {
-        MessageBox.Show(
-            IsEnglish
-                ? "This repository was not downloaded by CubeShelf. CubeShelf will not delete an external/manual repository."
-                : "Ce dépôt n'a pas été téléchargé par CubeShelf. CubeShelf ne supprimera pas un dépôt externe ou manuel.",
-            "CubeShelf",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
-        return;
-    }
-
-    var answer = MessageBox.Show(
-        IsEnglish
-            ? "Delete the repository downloaded by CubeShelf? Your ISO/RVZ and mods are kept."
-            : "Supprimer le dépôt téléchargé par CubeShelf ? Ton ISO/RVZ et tes mods seront conservés.",
-        "CubeShelf",
-        MessageBoxButton.YesNo,
-        MessageBoxImage.Question);
-
-    if (answer != MessageBoxResult.Yes)
-        return;
-
-    _github.DeleteDownloadedSource(game);
-    game.GitHubSourcePath = "";
-
-    ApplyLocalRepositoryStatus(
-        game,
-        _github.DetectLocalRepository(game));
-
-    // A manually adopted PartyBoard executable may have lived inside the
-    // repository that was just deleted. Re-evaluate the actual files on disk
-    // immediately so "Jeu installé" can never remain stale.
-    _libraryService.Resolve(game);
-    _runtimeInstaller.ApplyInstalledRuntime(game);
-    _libraryService.Resolve(game);
-    _libraryService.Save(_games);
-    RefreshSelectedLocalState();
-
-    await RefreshGameUpdateStatusAsync(game);
-    UpdateLibraryUpdateSummary();
+    ShowRepositoryDeleteConfirmation(game);
 }
 
     private async void CheckSelectedGameUpdateButton_Click(
@@ -1180,11 +1152,14 @@ private async void PlayButton_Click(
 
     if (!ready)
     {
-        QueueGameDataPreparation(
-            game,
-            launchWhenReady: true);
+        QueueGameDataPreparation(game);
 
         ShowDownloads();
+        ShowToast(
+            IsEnglish ? "Preparing the game" : "Préparation du jeu",
+            IsEnglish
+                ? "CubeShelf will prepare the data in the background. The game will not start automatically."
+                : "CubeShelf prépare les données en arrière-plan. Le jeu ne démarrera pas automatiquement.");
         return;
     }
 
@@ -1467,8 +1442,8 @@ private void UpdateSelectedGamePlayUi()
                         : "Choisir ISO / RVZ")
                     : !game.GameDataReady
                         ? (IsEnglish
-                            ? "Prepare & play"
-                            : "Préparer & jouer")
+                            ? "Prepare game"
+                            : "Préparer le jeu")
                         : (IsEnglish
                             ? "▶ Play"
                             : "▶ Jouer");
@@ -1603,8 +1578,7 @@ private void ConfigureDiscImageButton_Click(
     }
 
     private void QueueGameDataPreparation(
-        GameDefinition game,
-        bool launchWhenReady = false)
+        GameDefinition game)
     {
         var runtime = _runtimeInstaller.ReadState(game);
 
@@ -1691,32 +1665,22 @@ private void ConfigureDiscImageButton_Click(
                     UpdateSelectedGamePlayUi();
                 }
 
-                if (launchWhenReady)
-                {
-                    try
-                    {
-                        StartGameTracked(game);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(
-                            ex.Message,
-                            "CubeShelf",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                    }
-                }
+                ShowToast(
+                    IsEnglish ? "Game ready" : "Jeu prêt",
+                    IsEnglish
+                        ? $"{game.Title} is ready. Click Play when you want to start it."
+                        : $"{game.Title} est prêt. Clique sur Jouer quand tu souhaites le démarrer.");
 
                 return Task.CompletedTask;
             });
 
-        if (!added && launchWhenReady)
+        if (!added)
         {
-            MessageBox.Show(
+            ShowToast(
+                IsEnglish ? "Preparation already running" : "Préparation déjà en cours",
                 IsEnglish
-                    ? "Game data preparation is already running."
-                    : "La préparation des données du jeu est déjà en cours.",
-                "CubeShelf");
+                    ? "The game data is already being prepared."
+                    : "Les données du jeu sont déjà en cours de préparation.");
         }
     }
 
@@ -2164,18 +2128,14 @@ private void RefreshSelectedLocalState()
                 return;
             }
 
-            // The update is downloaded and SHA-256 verified in the background.
-            // Nothing is replaced while CubeShelf is running.
-            var progress =
-                new Progress<double>(_ =>
-                {
-                    // Deliberately non-modal: the user can keep using CubeShelf.
-                });
-
+            // Run the whole download/hash pipeline on a thread-pool thread.
+            // UpdateService performs many awaited reads while downloading large ZIPs;
+            // invoking it from the UI context made WPF sluggish on some PCs.
             var prepared =
-                await _updates.PrepareUpdateAsync(
-                    info,
-                    progress);
+                await Task.Run(
+                    () => _updates.PrepareUpdateAsync(
+                        info,
+                        progress: null));
 
             _preparedLauncherUpdate =
                 prepared;
