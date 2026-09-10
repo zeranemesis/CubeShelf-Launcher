@@ -478,69 +478,104 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         }
     }
 
-    private async Task<(string Commit,string Version,List<(string Name,string Url)> Assets)?> GetReleaseAsync(GameDefinition game, CancellationToken cancellationToken = default)
+    private async Task<
+        (string Commit, string Version, List<(string Name, string Url)> Assets)?>
+        GetReleaseAsync(
+            GameDefinition game,
+            CancellationToken cancellationToken = default)
     {
-        var url=$"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/releases/tags/{Uri.EscapeDataString(game.GitHubReleaseTag)}";
-        using var response=await _http.GetAsync(url, cancellationToken);
-        if(response.StatusCode==HttpStatusCode.NotFound) return null;
-        response.EnsureSuccessStatusCode();
+        var tag =
+            Uri.EscapeDataString(game.GitHubReleaseTag);
 
-        using var doc=JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
-        var r=doc.RootElement;
-        var commit=await ResolveReleaseCommitAsync(game,r,cancellationToken);
-        var version=r.TryGetProperty("name",out var n)?n.GetString()??game.GitHubReleaseTag:game.GitHubReleaseTag;
-        var assets=new List<(string Name,string Url)>();
+        var releaseRoot =
+            $"https://github.com/{game.GitHubOwner}/{game.GitHubRepo}" +
+            $"/releases/download/{tag}/";
 
-        if(r.TryGetProperty("assets",out var arr))
-            foreach(var item in arr.EnumerateArray())
-                assets.Add((item.GetProperty("name").GetString()??"",item.GetProperty("browser_download_url").GetString()??""));
+        var manifestUrl =
+            releaseRoot + "manifest.json";
 
-        return (commit,version,assets);
-    }
+        using var manifestResponse =
+            await _http.GetAsync(
+                manifestUrl,
+                HttpCompletionOption.ResponseContentRead,
+                cancellationToken);
 
-    private async Task<string> ResolveReleaseCommitAsync(
-        GameDefinition game,
-        JsonElement release,
-        CancellationToken cancellationToken)
-    {
-        var tag = release.TryGetProperty("tag_name", out var tagElement)
-            ? tagElement.GetString() ?? ""
-            : "";
+        if (manifestResponse.StatusCode == HttpStatusCode.NotFound)
+            return null;
 
-        foreach (var reference in new[]
-                 {
-                     tag,
-                     release.TryGetProperty("target_commitish", out var target)
-                         ? target.GetString() ?? ""
-                         : ""
-                 })
+        manifestResponse.EnsureSuccessStatusCode();
+
+        using var manifest =
+            JsonDocument.Parse(
+                await manifestResponse.Content.ReadAsStringAsync(
+                    cancellationToken));
+
+        var root = manifest.RootElement;
+
+        var commit =
+            root.TryGetProperty("commit", out var commitElement)
+                ? commitElement.GetString() ?? ""
+                : "";
+
+        var version =
+            root.TryGetProperty("version", out var versionElement)
+                ? versionElement.GetString() ?? game.GitHubReleaseTag
+                : game.GitHubReleaseTag;
+
+        var runtimeName =
+            game.GitHubReleaseAssetName;
+
+        var checksumName =
+            game.GitHubReleaseChecksumAssetName;
+
+        var runtimeUrl =
+            releaseRoot + Uri.EscapeDataString(runtimeName);
+
+        var checksumUrl =
+            releaseRoot + Uri.EscapeDataString(checksumName);
+
+        if (!await ReleaseAssetExistsAsync(
+                runtimeUrl,
+                cancellationToken))
         {
-            if (string.IsNullOrWhiteSpace(reference))
-                continue;
-
-            if (LooksLikeSha(reference))
-                return reference;
-
-            var url =
-                $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/commits/" +
-                Uri.EscapeDataString(reference);
-
-            using var response = await _http.GetAsync(url, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-                continue;
-
-            using var doc = JsonDocument.Parse(
-                await response.Content.ReadAsStringAsync(cancellationToken));
-
-            if (doc.RootElement.TryGetProperty("sha", out var sha))
-            {
-                var value = sha.GetString() ?? "";
-                if (LooksLikeSha(value))
-                    return value;
-            }
+            return null;
         }
 
-        return "";
+        if (!await ReleaseAssetExistsAsync(
+                checksumUrl,
+                cancellationToken))
+        {
+            return null;
+        }
+
+        return (
+            commit,
+            version,
+            new List<(string Name, string Url)>
+            {
+                (runtimeName, runtimeUrl),
+                (checksumName, checksumUrl)
+            });
+    }
+
+    private async Task<bool> ReleaseAssetExistsAsync(
+        string url,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var response =
+                await _http.GetAsync(
+                    url,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static bool SameCommit(string left, string right)

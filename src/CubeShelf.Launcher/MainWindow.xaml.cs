@@ -270,9 +270,23 @@ public partial class MainWindow : Window
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                game.GitHubUpdateAvailable = false;
-                game.GitHubStatusText = "GitHub : " + ex.Message;
+                game.RuntimeDistributionChecked = false;
+
+                game.GitHubStatusText =
+                    IsEnglish
+                        ? "GitHub temporarily unavailable • local installation state kept"
+                        : "GitHub temporairement indisponible • état local conservé";
+
+                game.GitHubChangeLog =
+                    ex.Message;
+
                 game.Refresh();
+
+                if (_selectedGame == game)
+                {
+                    UpdateSelectedGameGitHubPanel();
+                    UpdateSelectedGameStateBadges();
+                }
             });
         }
     }

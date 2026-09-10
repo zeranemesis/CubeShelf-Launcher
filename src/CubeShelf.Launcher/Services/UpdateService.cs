@@ -25,21 +25,26 @@ public sealed class UpdateService
     public UpdateService(LauncherConfig config)
     {
         _config = config;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.17");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.19");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
-    public async Task<UpdateInfo> CheckAsync(CancellationToken cancellationToken = default)
+    public async Task<UpdateInfo> CheckAsync(
+        CancellationToken cancellationToken = default)
     {
         var current =
             Assembly.GetExecutingAssembly().GetName().Version ??
             new Version(0, 0, 0);
 
-        var api =
-            $"https://api.github.com/repos/{_config.GitHubOwner}/{_config.GitHubRepo}/releases/latest";
+        var latestPage =
+            $"https://github.com/{_config.GitHubOwner}/" +
+            $"{_config.GitHubRepo}/releases/latest";
 
         using var response =
-            await _http.GetAsync(api, cancellationToken);
+            await _http.GetAsync(
+                latestPage,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -50,59 +55,91 @@ public sealed class UpdateService
                 "",
                 "",
                 "",
-                $"Aucune release disponible ou GitHub a répondu {(int)response.StatusCode}.");
+                $"GitHub releases a répondu {(int)response.StatusCode}.");
         }
 
-        using var doc = JsonDocument.Parse(
-            await response.Content.ReadAsStringAsync(cancellationToken));
-
         var tag =
-            doc.RootElement.GetProperty("tag_name").GetString() ??
-            "0.0.0";
+            ExtractReleaseTag(
+                response.RequestMessage?.RequestUri);
+
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            return new(
+                false,
+                current.ToString(),
+                "",
+                "",
+                "",
+                "",
+                "CubeShelf n'a pas pu déterminer la dernière version GitHub.");
+        }
 
         Version.TryParse(
             tag.TrimStart('v', 'V'),
             out var latest);
 
-        latest ??= new Version(0, 0, 0);
+        latest ??=
+            new Version(0, 0, 0);
 
-        string assetUrl = "";
-        string checksumUrl = "";
+        var encodedTag =
+            Uri.EscapeDataString(tag);
 
-        foreach (var asset in
-                 doc.RootElement.GetProperty("assets").EnumerateArray())
-        {
-            var name =
-                asset.GetProperty("name").GetString() ?? "";
+        var releaseRoot =
+            $"https://github.com/{_config.GitHubOwner}/" +
+            $"{_config.GitHubRepo}/releases/download/{encodedTag}/";
 
-            var url =
-                asset.GetProperty("browser_download_url").GetString() ?? "";
+        var assetUrl =
+            releaseRoot +
+            Uri.EscapeDataString(
+                _config.ReleaseAssetName);
 
-            if (name.Equals(
-                    _config.ReleaseAssetName,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                assetUrl = url;
-            }
+        var checksumUrl =
+            releaseRoot +
+            Uri.EscapeDataString(
+                _config.ChecksumAssetName);
 
-            if (name.Equals(
-                    _config.ChecksumAssetName,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                checksumUrl = url;
-            }
-        }
+        var releaseUrl =
+            $"https://github.com/{_config.GitHubOwner}/" +
+            $"{_config.GitHubRepo}/releases/tag/{encodedTag}";
 
         return new(
             latest > current,
             current.ToString(),
             latest.ToString(),
-            doc.RootElement.GetProperty("html_url").GetString() ?? "",
+            releaseUrl,
             assetUrl,
             checksumUrl,
             latest > current
                 ? "Nouvelle version disponible."
                 : "CubeShelf est à jour.");
+    }
+
+    private static string ExtractReleaseTag(
+        Uri? uri)
+    {
+        if (uri is null)
+            return "";
+
+        var segments =
+            uri.AbsolutePath
+                .Split(
+                    '/',
+                    StringSplitOptions.RemoveEmptyEntries);
+
+        for (var i = 0;
+             i < segments.Length - 1;
+             i++)
+        {
+            if (segments[i].Equals(
+                    "tag",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Uri.UnescapeDataString(
+                    segments[i + 1]);
+            }
+        }
+
+        return "";
     }
 
     public async Task<PreparedLauncherUpdate> PrepareUpdateAsync(

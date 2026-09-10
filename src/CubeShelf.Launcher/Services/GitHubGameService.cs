@@ -32,9 +32,15 @@ public sealed class GitHubGameService
     private readonly JsonSerializerOptions _json =
         new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
+    private readonly Dictionary<
+        string,
+        (DateTimeOffset Expires, IReadOnlyList<GitHubCommitInfo> Commits)>
+        _commitFeedCache =
+            new(StringComparer.OrdinalIgnoreCase);
+
     public GitHubGameService()
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.5");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.19");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
@@ -396,23 +402,22 @@ public sealed class GitHubGameService
         return LooksLikeSha(trimmed) ? trimmed : "";
     }
 
-    private async Task<GitHubCommitInfo> GetLatestCommitAsync(GameDefinition game, CancellationToken cancellationToken = default)
+    private async Task<GitHubCommitInfo> GetLatestCommitAsync(
+        GameDefinition game,
+        CancellationToken cancellationToken = default)
     {
-        var branch = Uri.EscapeDataString(game.GitHubBranch);
-        var url =
-            $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/commits" +
-            $"?sha={branch}&per_page=1";
+        var commits =
+            await GetCommitFeedAsync(
+                game,
+                cancellationToken);
 
-        using var response = await _http.GetAsync(url, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        if (commits.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "GitHub n'a retourné aucun commit pour la branche configurée.");
+        }
 
-        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
-        var first = doc.RootElement.EnumerateArray().FirstOrDefault();
-
-        if (first.ValueKind == JsonValueKind.Undefined)
-            throw new InvalidOperationException("Aucun commit GitHub trouvé.");
-
-        return ParseCommit(first);
+        return commits[0];
     }
 
     private async Task<IReadOnlyList<GitHubCommitInfo>> GetChangesAsync(
@@ -423,40 +428,233 @@ public sealed class GitHubGameService
         if (string.IsNullOrWhiteSpace(latestSha))
             return Array.Empty<GitHubCommitInfo>();
 
-        if (!string.IsNullOrWhiteSpace(currentSha) &&
-            !string.Equals(currentSha, latestSha, StringComparison.OrdinalIgnoreCase))
+        var commits = await GetCommitFeedAsync(game);
+
+        if (commits.Count == 0)
+            return Array.Empty<GitHubCommitInfo>();
+
+        if (!string.IsNullOrWhiteSpace(currentSha))
         {
-            var compareUrl =
-                $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/compare/" +
-                $"{currentSha}...{latestSha}";
+            var beforeCurrent = new List<GitHubCommitInfo>();
 
-            using var compare = await _http.GetAsync(compareUrl);
-            if (compare.IsSuccessStatusCode)
+            foreach (var commit in commits)
             {
-                using var doc = JsonDocument.Parse(await compare.Content.ReadAsStringAsync());
+                var same =
+                    commit.Sha.StartsWith(
+                        currentSha,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    currentSha.StartsWith(
+                        commit.Sha,
+                        StringComparison.OrdinalIgnoreCase);
 
-                if (doc.RootElement.TryGetProperty("commits", out var commits))
-                {
-                    return commits.EnumerateArray()
-                        .Select(ParseCommit)
-                        .TakeLast(15)
-                        .Reverse()
-                        .ToList();
-                }
+                if (same)
+                    break;
+
+                beforeCurrent.Add(commit);
+
+                if (beforeCurrent.Count >= 15)
+                    break;
+            }
+
+            if (beforeCurrent.Count > 0)
+                return beforeCurrent;
+        }
+
+        return commits.Take(8).ToList();
+    }
+
+    private async Task<IReadOnlyList<GitHubCommitInfo>> GetCommitFeedAsync(
+        GameDefinition game,
+        CancellationToken cancellationToken = default)
+    {
+        var key =
+            $"{game.GitHubOwner}/{game.GitHubRepo}:{game.GitHubBranch}";
+
+        lock (_commitFeedCache)
+        {
+            if (_commitFeedCache.TryGetValue(key, out var cached) &&
+                cached.Expires > DateTimeOffset.UtcNow)
+            {
+                return cached.Commits;
             }
         }
 
-        var branch = Uri.EscapeDataString(game.GitHubBranch);
-        var listUrl =
-            $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/commits" +
-            $"?sha={branch}&per_page=8";
+        IReadOnlyList<GitHubCommitInfo> commits;
 
-        using var response = await _http.GetAsync(listUrl);
+        try
+        {
+            commits =
+                await DownloadAtomCommitFeedAsync(
+                    game,
+                    cancellationToken);
+        }
+        catch
+        {
+            commits =
+                await DownloadRestCommitFeedAsync(
+                    game,
+                    cancellationToken);
+        }
+
+        lock (_commitFeedCache)
+        {
+            _commitFeedCache[key] =
+                (
+                    DateTimeOffset.UtcNow.AddMinutes(3),
+                    commits
+                );
+        }
+
+        return commits;
+    }
+
+    private async Task<IReadOnlyList<GitHubCommitInfo>>
+        DownloadAtomCommitFeedAsync(
+            GameDefinition game,
+            CancellationToken cancellationToken)
+    {
+        var branch =
+            string.Join(
+                "/",
+                game.GitHubBranch
+                    .Split(
+                        '/',
+                        StringSplitOptions.RemoveEmptyEntries)
+                    .Select(Uri.EscapeDataString));
+
+        var url =
+            $"https://github.com/{game.GitHubOwner}/{game.GitHubRepo}" +
+            $"/commits/{branch}.atom";
+
+        using var request =
+            new HttpRequestMessage(HttpMethod.Get, url);
+
+        request.Headers.Accept.Clear();
+        request.Headers.Accept.ParseAdd(
+            "application/atom+xml, application/xml;q=0.9");
+
+        using var response =
+            await _http.SendAsync(
+                request,
+                HttpCompletionOption.ResponseContentRead,
+                cancellationToken);
+
         response.EnsureSuccessStatusCode();
 
-        using var listDoc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var xml =
+            await response.Content.ReadAsStringAsync(
+                cancellationToken);
 
-        return listDoc.RootElement.EnumerateArray()
+        var document =
+            System.Xml.Linq.XDocument.Parse(xml);
+
+        System.Xml.Linq.XNamespace atom =
+            "http://www.w3.org/2005/Atom";
+
+        var result =
+            new List<GitHubCommitInfo>();
+
+        foreach (var entry in document.Descendants(atom + "entry"))
+        {
+            var link =
+                entry.Elements(atom + "link")
+                    .FirstOrDefault(element =>
+                        string.Equals(
+                            (string?)element.Attribute("rel"),
+                            "alternate",
+                            StringComparison.OrdinalIgnoreCase))
+                ?? entry.Elements(atom + "link").FirstOrDefault();
+
+            var href =
+                (string?)link?.Attribute("href") ?? "";
+
+            const string marker = "/commit/";
+            var markerIndex =
+                href.IndexOf(
+                    marker,
+                    StringComparison.OrdinalIgnoreCase);
+
+            if (markerIndex < 0)
+                continue;
+
+            var sha =
+                href[(markerIndex + marker.Length)..]
+                    .Split(
+                        new[] { '?', '#', '/' },
+                        StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault() ?? "";
+
+            if (!LooksLikeSha(sha))
+                continue;
+
+            var message =
+                (entry.Element(atom + "title")?.Value ?? "")
+                    .Trim();
+
+            if (string.IsNullOrWhiteSpace(message))
+                message = sha[..Math.Min(8, sha.Length)];
+
+            var updatedText =
+                entry.Element(atom + "updated")?.Value ?? "";
+
+            var date =
+                DateTimeOffset.TryParse(
+                    updatedText,
+                    out var parsed)
+                    ? parsed
+                    : DateTimeOffset.MinValue;
+
+            result.Add(
+                new GitHubCommitInfo(
+                    sha,
+                    message,
+                    date,
+                    href));
+        }
+
+        if (result.Count == 0)
+        {
+            throw new InvalidDataException(
+                "Le flux de commits GitHub est vide ou illisible.");
+        }
+
+        return result;
+    }
+
+    private async Task<IReadOnlyList<GitHubCommitInfo>>
+        DownloadRestCommitFeedAsync(
+            GameDefinition game,
+            CancellationToken cancellationToken)
+    {
+        var branch =
+            Uri.EscapeDataString(game.GitHubBranch);
+
+        var url =
+            $"https://api.github.com/repos/{game.GitHubOwner}/" +
+            $"{game.GitHubRepo}/commits?sha={branch}&per_page=15";
+
+        using var response =
+            await _http.GetAsync(
+                url,
+                cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.Forbidden ||
+            (int)response.StatusCode == 429)
+        {
+            throw new InvalidOperationException(
+                "GitHub limite temporairement les requêtes. " +
+                "CubeShelf réessaiera automatiquement plus tard.");
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        using var doc =
+            JsonDocument.Parse(
+                await response.Content.ReadAsStringAsync(
+                    cancellationToken));
+
+        return doc.RootElement
+            .EnumerateArray()
             .Select(ParseCommit)
             .ToList();
     }
