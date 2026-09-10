@@ -86,6 +86,7 @@ public partial class MainWindow : Window
         Loaded += async (_, _) =>
         {
             ShowLibrary();
+            RunFirstStartAssistantIfNeeded();
 
             if (_config.AutoCheckLauncherUpdates)
                 _ = CheckLauncherUpdateAsync(false);
@@ -1433,27 +1434,65 @@ private void UpdateSelectedGamePlayUi()
             out var item) &&
         IsProcessRunning(item.Process);
 
-    PlayButton.Content = running
-        ? (IsEnglish
-            ? "■ Stop"
-            : "■ Arrêter")
-        : (IsEnglish
-            ? "▶ Play"
-            : "▶ Jouer");
+    var runtimeReady =
+        game.RuntimeInstalled &&
+        File.Exists(
+            game.ExecutableFullPath);
 
-    PlayButton.Background = running
-        ? (Application.Current.TryFindResource(
-               "Danger") as Brush ??
-           Brushes.IndianRed)
-        : Brushes.White;
+    if (running)
+    {
+        PlayButton.Content =
+            IsEnglish
+                ? "■ Stop"
+                : "■ Arrêter";
 
-    PlayButton.Foreground = running
-        ? Brushes.White
-        : new SolidColorBrush(
-            Color.FromRgb(
-                16,
-                20,
-                30));
+        PlayButton.Background =
+            Application.Current.TryFindResource(
+                "Danger") as Brush ??
+            Brushes.IndianRed;
+
+        PlayButton.Foreground =
+            Brushes.White;
+    }
+    else
+    {
+        PlayButton.Content =
+            !runtimeReady
+                ? (IsEnglish
+                    ? "⬇ Install"
+                    : "⬇ Installer")
+                : !game.HasDiscImage
+                    ? (IsEnglish
+                        ? "Choose ISO / RVZ"
+                        : "Choisir ISO / RVZ")
+                    : !game.GameDataReady
+                        ? (IsEnglish
+                            ? "Prepare & play"
+                            : "Préparer & jouer")
+                        : (IsEnglish
+                            ? "▶ Play"
+                            : "▶ Jouer");
+
+        PlayButton.Background =
+            !runtimeReady ||
+            !game.HasDiscImage ||
+            !game.GameDataReady
+                ? (Application.Current.TryFindResource(
+                       "Accent") as Brush ??
+                   Brushes.MediumPurple)
+                : Brushes.White;
+
+        PlayButton.Foreground =
+            !runtimeReady ||
+            !game.HasDiscImage ||
+            !game.GameDataReady
+                ? Brushes.White
+                : new SolidColorBrush(
+                    Color.FromRgb(
+                        16,
+                        20,
+                        30));
+    }
 
     FavoriteGameButton.Content =
         game.IsFavorite
@@ -1464,9 +1503,12 @@ private void UpdateSelectedGamePlayUi()
                 ? "☆ Add favorite"
                 : "☆ Ajouter aux favoris");
 
-    GameStatsText.Text = IsEnglish
-        ? $"{game.PlayCount} launches • {game.PlayTimeText} • Last: {game.LastPlayedText}"
-        : $"{game.PlayCount} lancements • {game.PlayTimeText} • Dernier : {game.LastPlayedText}";
+    GameStatsText.Text =
+        IsEnglish
+            ? $"{game.PlayCount} launches • {game.PlayTimeText} • Last: {game.LastPlayedText}"
+            : $"{game.PlayCount} lancements • {game.PlayTimeText} • Dernier : {game.LastPlayedText}";
+
+    UpdateSetupProgress(game);
 }
 
 private void ConfigureExecutableButton_Click(
@@ -1548,6 +1590,7 @@ private void ConfigureDiscImageButton_Click(
         DiscImagePathText.Text = _selectedGame.DiscStatus;
         UpdateDiscCompatibility();
         _selectedGame.Refresh();
+        UpdateSelectedGamePlayUi();
 
         // Selecting an ISO/RVZ only stores the user's choice.
         // Data preparation starts when the user presses Play.
@@ -1645,6 +1688,7 @@ private void ConfigureDiscImageButton_Click(
                     ExecutablePathText.Text = game.ExecutableFullPath;
                     UpdateDiscCompatibility();
                     UpdateSelectedGameGitHubPanel();
+                    UpdateSelectedGamePlayUi();
                 }
 
                 if (launchWhenReady)
@@ -1692,6 +1736,7 @@ private void ConfigureDiscImageButton_Click(
         UpdateDiscCompatibility();
 
         _selectedGame.Refresh();
+        UpdateSelectedGamePlayUi();
     }
 
     private void FlipCaseButton_Click(
@@ -2009,6 +2054,14 @@ private void RefreshSelectedLocalState()
         UpdateLibraryUpdateSummary();
         UpdateQueueSummary();
         UpdateDiscCompatibility();
+
+        if (_selectedGame is not null)
+        {
+            SidebarSelectedGame.Text =
+                $"{_selectedGame.Title}\n{_selectedGame.Id}";
+
+            UpdateSelectedGamePlayUi();
+        }
     }
 
     private void DarkTheme_Click(object sender, RoutedEventArgs e) => ApplyTheme("dark");
@@ -2073,6 +2126,7 @@ private void RefreshSelectedLocalState()
         _preferencesService.ApplyLanguage(_preferences.Language);
         LoadSettingsControls();
         UpdateThemeIndicator(true);
+        ShowFirstStartAssistant();
     }
 
     private async Task CheckLauncherUpdateAsync(
