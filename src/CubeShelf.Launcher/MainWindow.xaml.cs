@@ -60,6 +60,7 @@ public partial class MainWindow : Window
         _preferencesService.ApplyLanguage(_preferences.Language);
 
         InitializeComponent();
+        InitializeAdaptiveWindow();
 
         LauncherVersionText.Text =
             $"CubeShelf v{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?"}";
@@ -1899,6 +1900,7 @@ private void ConfigureDiscImageButton_Click(
         CheckGamesStartupBox.IsChecked = _preferences.CheckGamesOnStartup;
         GameUpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsOnOpenBox.IsChecked = _preferences.RefreshModsOnOpen;
+        AutoFitWindowBox.IsChecked = _preferences.AutoFitWindowToScreen;
         DataFolderText.Text = _preferencesService.DataDirectory;
         _settingsLoaded = true;
     }
@@ -2153,7 +2155,11 @@ private void RefreshSelectedLocalState()
         _preferences.CheckGamesOnStartup = CheckGamesStartupBox.IsChecked == true;
         _preferences.ShowGameUpdatePopup = GameUpdatePopupBox.IsChecked == true;
         _preferences.RefreshModsOnOpen = RefreshModsOnOpenBox.IsChecked == true;
+        _preferences.AutoFitWindowToScreen = AutoFitWindowBox.IsChecked == true;
         _preferencesService.Save(_preferences);
+
+        if (_preferences.AutoFitWindowToScreen)
+            FitWindowToCurrentScreen(force: true);
 
         if (_preferences.CheckGamesOnStartup)
         {

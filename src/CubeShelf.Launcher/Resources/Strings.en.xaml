@@ -17,4 +17,9 @@
     <sys:String x:Key="DeleteRuntime">Delete PartyBoard</sys:String>
     <sys:String x:Key="DeleteGameData">Delete game data</sys:String>
     <sys:String x:Key="DeleteAllGameFiles">Delete all local files</sys:String>
+
+    <sys:String x:Key="WindowLayout">Window</sys:String>
+    <sys:String x:Key="WindowLayoutHelp">Fits CubeShelf to the current screen size and DPI. Your preferred size is remembered without exceeding the visible work area.</sys:String>
+    <sys:String x:Key="AutoFitWindow">Fit automatically</sys:String>
+    <sys:String x:Key="FitWindowNow">Fit now</sys:String>
 </ResourceDictionary>

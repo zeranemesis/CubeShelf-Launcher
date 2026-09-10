@@ -9,6 +9,9 @@ public sealed class UserPreferences
     public bool CheckGamesOnStartup { get; set; } = true;
     public bool ShowGameUpdatePopup { get; set; } = true;
     public bool RefreshModsOnOpen { get; set; } = true;
+    public bool AutoFitWindowToScreen { get; set; } = true;
+    public double WindowWidth { get; set; } = 1530;
+    public double WindowHeight { get; set; } = 930;
     public bool FirstRunCompleted { get; set; }
 }
 
