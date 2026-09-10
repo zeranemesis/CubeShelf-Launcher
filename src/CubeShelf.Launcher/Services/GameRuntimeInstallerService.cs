@@ -24,7 +24,7 @@ public sealed class GameRuntimeInstallerService
 
     public GameRuntimeInstallerService()
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.4");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.20");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
@@ -232,17 +232,23 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         return SameCommit(release.Value.Commit, requiredCommit);
     }
 
-    public async Task<RuntimeState> InstallLatestAsync(GameDefinition game, IProgress<double>? progress=null, CancellationToken cancellationToken = default)
+    public async Task<RuntimeState> InstallLatestAsync(
+        GameDefinition game,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var release=await GetReleaseAsync(game, cancellationToken)
+        var release = await GetReleaseAsync(game, cancellationToken)
             ?? throw new InvalidOperationException(
                 "Aucune release Windows CubeShelf n'est disponible. Le dépôt Marioparty4 doit publier PartyBoard-win-x64.zip.");
 
-        var asset=release.Assets.FirstOrDefault(a =>
-            a.Name.Equals(game.GitHubReleaseAssetName,StringComparison.OrdinalIgnoreCase));
+        var asset = release.Assets.FirstOrDefault(a =>
+            a.Name.Equals(
+                game.GitHubReleaseAssetName,
+                StringComparison.OrdinalIgnoreCase));
 
-        if(string.IsNullOrWhiteSpace(asset.Name))
-            throw new InvalidOperationException($"La release ne contient pas {game.GitHubReleaseAssetName}.");
+        if (string.IsNullOrWhiteSpace(asset.Name))
+            throw new InvalidOperationException(
+                $"La release ne contient pas {game.GitHubReleaseAssetName}.");
 
         var checksumAsset = release.Assets.FirstOrDefault(a =>
             a.Name.Equals(
@@ -266,98 +272,289 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             ? SanitizeFileName(release.Version)
             : release.Commit[..Math.Min(12, release.Commit.Length)];
 
-        var temp = Path.Combine(
+        var package = Path.Combine(
             cacheDirectory,
             $"{game.Id}-{cacheKey}-{SanitizeFileName(game.GitHubReleaseAssetName)}");
 
-        var checksumText = await _http.GetStringAsync(checksumAsset.Url, cancellationToken);
-        var expectedHash = ParseChecksum(checksumText, game.GitHubReleaseAssetName);
+        var checksumText = await _http.GetStringAsync(
+            checksumAsset.Url,
+            cancellationToken);
+
+        var expectedHash = ParseChecksum(
+            checksumText,
+            game.GitHubReleaseAssetName);
 
         if (string.IsNullOrWhiteSpace(expectedHash))
             throw new CryptographicException(
                 $"{game.GitHubReleaseChecksumAssetName} ne contient pas le hash de {game.GitHubReleaseAssetName}.");
 
         var validCachedDownload =
-            File.Exists(temp) &&
-            await VerifySha256Async(temp, expectedHash, cancellationToken);
+            File.Exists(package) &&
+            await VerifySha256Async(
+                package,
+                expectedHash,
+                cancellationToken);
 
         if (!validCachedDownload)
         {
             try
             {
-                if (File.Exists(temp))
-                    File.Delete(temp);
+                if (File.Exists(package))
+                    File.Delete(package);
             }
             catch { }
 
             progress?.Report(.02);
+
             await DownloadResumableAsync(
                 asset.Url,
-                temp,
-                p => progress?.Report(.02 + p * .56),
+                package,
+                p => progress?.Report(.02 + p * .54),
                 cancellationToken);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
-        progress?.Report(.60);
+        progress?.Report(.58);
 
-        if (!await VerifySha256Async(temp, expectedHash, cancellationToken))
+        if (!await VerifySha256Async(
+                package,
+                expectedHash,
+                cancellationToken))
         {
-            try { if (File.Exists(temp)) File.Delete(temp); } catch { }
-            try { if (File.Exists(temp + ".part")) File.Delete(temp + ".part"); } catch { }
+            try { if (File.Exists(package)) File.Delete(package); } catch { }
+            try { if (File.Exists(package + ".part")) File.Delete(package + ".part"); } catch { }
 
             throw new CryptographicException(
                 "Le SHA-256 du runtime PartyBoard est invalide. " +
                 "Le téléchargement a été supprimé et n'a pas été installé.");
         }
 
-        progress?.Report(.66);
-        var staging=Path.Combine(Root(game),"staging-"+Guid.NewGuid().ToString("N"));
+        var root = Root(game);
+        var current = Path.Combine(root, "current");
+        Directory.CreateDirectory(current);
+
+        var transactionId = Guid.NewGuid().ToString("N");
+        var staging = Path.Combine(root, "staging-" + transactionId);
+        var previous = Path.Combine(root, "previous-" + transactionId);
+        var heldGameData = Path.Combine(root, "game-data-" + transactionId);
+
         Directory.CreateDirectory(staging);
+
+        var oldState = ReadState(game);
+        var oldExeDirectory =
+            oldState is not null &&
+            !string.IsNullOrWhiteSpace(oldState.ExecutablePath)
+                ? Path.GetDirectoryName(oldState.ExecutablePath) ?? current
+                : current;
+
+        var oldGameData = Path.Combine(oldExeDirectory, game.Id);
+        var managedCurrentRoot =
+            Path.GetFullPath(current)
+                .TrimEnd(Path.DirectorySeparatorChar) +
+            Path.DirectorySeparatorChar;
+        var oldGameDataManaged =
+            Path.GetFullPath(oldGameData)
+                .StartsWith(
+                    managedCurrentRoot,
+                    StringComparison.OrdinalIgnoreCase);
+        var oldGameDataReady =
+            oldGameDataManaged &&
+            oldState?.GameDataReady == true &&
+            Directory.Exists(Path.Combine(oldGameData, "files"));
+
+        var gameDataHeld = false;
+        var previousMoved = false;
+        var newRuntimeMoved = false;
+        var gameDataAttachedToNewRuntime = false;
+        var newGameData = "";
+        var committed = false;
 
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(.70);
-            using(var archive=ArchiveFactory.OpenArchive(temp))
-            {
-                archive.WriteToDirectory(staging,new ExtractionOptions{ExtractFullPath=true,Overwrite=true});
-            }
+            progress?.Report(.62);
 
-            var current=Current(game);
-            var preserved=Path.Combine(current,game.Id);
-
-            foreach(var entry in Directory.EnumerateFileSystemEntries(current))
+            using (var archive = ArchiveFactory.OpenArchive(package))
             {
-                if(string.Equals(Path.GetFullPath(entry),Path.GetFullPath(preserved),StringComparison.OrdinalIgnoreCase))
-                    continue;
-                if(Directory.Exists(entry)) Directory.Delete(entry,true); else File.Delete(entry);
+                archive.WriteToDirectory(
+                    staging,
+                    new ExtractionOptions
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            CopyContents(staging,current);
+            progress?.Report(.72);
+
+            var stagedExe = FindPartyBoardExecutable(staging)
+                ?? throw new FileNotFoundException(
+                    "Le package Windows ne contient aucun exécutable PartyBoard.");
+
+            var stagedExeDirectory = Path.GetDirectoryName(stagedExe)!;
+            if (!Directory.Exists(Path.Combine(stagedExeDirectory, "res")))
+            {
+                throw new InvalidDataException(
+                    "Le package PartyBoard est incomplet : le dossier res est absent.");
+            }
+
+            var stagedExeRelativePath =
+                Path.GetRelativePath(staging, stagedExe);
+            var stagedExeDirectoryRelativePath =
+                Path.GetRelativePath(staging, stagedExeDirectory);
+
+            if (Directory.Exists(Path.Combine(stagedExeDirectory, game.Id)))
+            {
+                throw new InvalidDataException(
+                    "Le package PartyBoard contient un dossier de données de jeu inattendu. Installation refusée.");
+            }
+
+            if (oldGameDataManaged && Directory.Exists(oldGameData))
+            {
+                Directory.Move(oldGameData, heldGameData);
+                gameDataHeld = true;
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(.88);
+            progress?.Report(.78);
 
-            var exe=FindPartyBoardExecutable(current)
-                ?? throw new FileNotFoundException("Le package Windows ne contient aucun exécutable PartyBoard.");
+            // Rename whole directories on the same volume. The previous runtime
+            // remains intact until the replacement has been validated.
+            Directory.Move(current, previous);
+            previousMoved = true;
 
-            var old=ReadState(game);
-            var ready=old?.GameDataReady==true && Directory.Exists(Path.Combine(Path.GetDirectoryName(exe)!,game.Id,"files"));
+            Directory.Move(staging, current);
+            newRuntimeMoved = true;
 
-            var state=new RuntimeState(release.Commit,release.Version,current,exe,ready);
-            WriteState(game,state);
+            var installedExe = Path.Combine(
+                current,
+                stagedExeRelativePath);
 
-            // Runtime download and local disc preparation are intentionally separate.
-            // A previously selected ISO/RVZ must never make the GitHub runtime download fail.
+            if (!File.Exists(installedExe))
+            {
+                throw new FileNotFoundException(
+                    "PartyBoard.exe est introuvable après l'installation.",
+                    installedExe);
+            }
+
+            var installedExeDirectory = Path.Combine(
+                current,
+                stagedExeDirectoryRelativePath);
+
+            newGameData = Path.Combine(installedExeDirectory, game.Id);
+
+            if (gameDataHeld)
+            {
+                Directory.CreateDirectory(installedExeDirectory);
+                Directory.Move(heldGameData, newGameData);
+                gameDataAttachedToNewRuntime = true;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            progress?.Report(.90);
+
+            if (!Directory.Exists(Path.Combine(installedExeDirectory, "res")))
+            {
+                throw new InvalidDataException(
+                    "Le runtime installé est incomplet : le dossier res est absent.");
+            }
+
+            var ready =
+                oldGameDataReady &&
+                Directory.Exists(
+                    Path.Combine(installedExeDirectory, game.Id, "files"));
+
+            var state = new RuntimeState(
+                release.Commit,
+                release.Version,
+                current,
+                installedExe,
+                ready);
+
+            WriteState(game, state);
+            committed = true;
+            progress?.Report(.98);
+
+            try
+            {
+                if (Directory.Exists(previous))
+                    Directory.Delete(previous, true);
+            }
+            catch
+            {
+                // A stale rollback directory is harmless and may be cleaned later.
+            }
+
             progress?.Report(1);
             return state;
         }
+        catch (Exception installException)
+        {
+            if (!committed)
+            {
+                try
+                {
+                    if (gameDataAttachedToNewRuntime &&
+                        !string.IsNullOrWhiteSpace(newGameData) &&
+                        Directory.Exists(newGameData))
+                    {
+                        if (Directory.Exists(heldGameData))
+                            Directory.Delete(heldGameData, true);
+
+                        Directory.Move(newGameData, heldGameData);
+                        gameDataAttachedToNewRuntime = false;
+                        gameDataHeld = true;
+                    }
+
+                    if (newRuntimeMoved && Directory.Exists(current))
+                        Directory.Delete(current, true);
+
+                    if (previousMoved && Directory.Exists(previous))
+                    {
+                        Directory.Move(previous, current);
+                        previousMoved = false;
+                    }
+
+                    if (gameDataHeld && Directory.Exists(heldGameData))
+                    {
+                        Directory.CreateDirectory(oldExeDirectory);
+                        var restoreTarget = Path.Combine(oldExeDirectory, game.Id);
+
+                        if (Directory.Exists(restoreTarget))
+                            Directory.Delete(restoreTarget, true);
+
+                        Directory.Move(heldGameData, restoreTarget);
+                    }
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new InvalidOperationException(
+                        "La mise à jour PartyBoard a échoué et la restauration automatique du runtime précédent a également échoué.",
+                        new AggregateException(installException, rollbackException));
+                }
+            }
+
+            throw;
+        }
         finally
         {
-            // Keep the verified package in CubeShelf cache so a repair can reuse it.
-            // Settings > Storage can remove this cache at any time.
-            try{if(Directory.Exists(staging))Directory.Delete(staging,true);}catch{}
+            try
+            {
+                if (Directory.Exists(staging))
+                    Directory.Delete(staging, true);
+            }
+            catch { }
+
+            if (committed)
+            {
+                try
+                {
+                    if (Directory.Exists(heldGameData))
+                        Directory.Delete(heldGameData, true);
+                }
+                catch { }
+            }
         }
     }
 
@@ -371,63 +568,99 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
     {
         runtime ??= ReadState(game);
 
-        if(runtime is null || !File.Exists(runtime.ExecutablePath))
-            throw new InvalidOperationException("PartyBoard doit être téléchargé avant de préparer l'ISO/RVZ.");
+        if (runtime is null || !File.Exists(runtime.ExecutablePath))
+        {
+            throw new InvalidOperationException(
+                "PartyBoard doit être téléchargé avant de préparer l'ISO/RVZ.");
+        }
 
         var sourceDisc = string.IsNullOrWhiteSpace(discImagePath)
             ? game.DiscImageFullPath
             : Path.GetFullPath(discImagePath);
 
         if (string.IsNullOrWhiteSpace(sourceDisc) || !File.Exists(sourceDisc))
-            throw new InvalidOperationException("Sélectionne d'abord ton ISO / RVZ.");
+        {
+            throw new InvalidOperationException(
+                "Sélectionne d'abord ton ISO / RVZ.");
+        }
 
-        var exeDir=Path.GetDirectoryName(runtime.ExecutablePath)!;
-        var targetFiles=Path.Combine(exeDir,game.Id,"files");
+        var exeDir = Path.GetDirectoryName(runtime.ExecutablePath)!;
+        var gameDataRoot = Path.Combine(exeDir, game.Id);
+        Directory.CreateDirectory(gameDataRoot);
 
-        if(Directory.Exists(targetFiles)) Directory.Delete(targetFiles,true);
-        Directory.CreateDirectory(targetFiles);
+        var targetFiles = Path.Combine(gameDataRoot, "files");
+        var transactionId = Guid.NewGuid().ToString("N");
+        var stagingFiles = Path.Combine(
+            gameDataRoot,
+            "files.staging-" + transactionId);
+        var backupFiles = Path.Combine(
+            gameDataRoot,
+            "files.backup-" + transactionId);
 
-        var ext=Path.GetExtension(sourceDisc).ToLowerInvariant();
-        string iso=sourceDisc;
-        string? tempIso=null;
+        Directory.CreateDirectory(stagingFiles);
+
+        var ext = Path.GetExtension(sourceDisc).ToLowerInvariant();
+        string iso = sourceDisc;
+        string? tempIso = null;
+        var oldFilesMoved = false;
+        var newFilesMoved = false;
+        var committed = false;
 
         try
         {
-            if(ext==".rvz")
+            if (ext == ".rvz")
             {
                 var dolphin = await EnsureDolphinToolAsync(
                     allowDolphinToolDownload,
                     progress,
                     cancellationToken);
 
-                tempIso=Path.Combine(Path.GetTempPath(),$"cubeshelf-{game.Id}-{Guid.NewGuid():N}.iso");
+                tempIso = Path.Combine(
+                    Path.GetTempPath(),
+                    $"cubeshelf-{game.Id}-{Guid.NewGuid():N}.iso");
 
-                var psi=new ProcessStartInfo(dolphin)
+                var psi = new ProcessStartInfo(dolphin)
                 {
-                    UseShellExecute=false,
-                    CreateNoWindow=true,
-                    WorkingDirectory=Path.GetDirectoryName(dolphin)!
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(dolphin)!
                 };
-                psi.ArgumentList.Add("convert");
-                psi.ArgumentList.Add("-f"); psi.ArgumentList.Add("iso");
-                psi.ArgumentList.Add("-i"); psi.ArgumentList.Add(sourceDisc);
-                psi.ArgumentList.Add("-o"); psi.ArgumentList.Add(tempIso);
 
-                using var proc=Process.Start(psi) ?? throw new InvalidOperationException("Impossible de démarrer DolphinTool.");
+                psi.ArgumentList.Add("convert");
+                psi.ArgumentList.Add("-f");
+                psi.ArgumentList.Add("iso");
+                psi.ArgumentList.Add("-i");
+                psi.ArgumentList.Add(sourceDisc);
+                psi.ArgumentList.Add("-o");
+                psi.ArgumentList.Add(tempIso);
+
+                using var proc = Process.Start(psi)
+                    ?? throw new InvalidOperationException(
+                        "Impossible de démarrer DolphinTool.");
+
                 try
                 {
                     await proc.WaitForExitAsync(cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
-                    try { if (!proc.HasExited) proc.Kill(true); } catch { }
+                    try
+                    {
+                        if (!proc.HasExited)
+                            proc.Kill(true);
+                    }
+                    catch { }
+
                     throw;
                 }
 
-                if(proc.ExitCode!=0 || !File.Exists(tempIso))
-                    throw new InvalidOperationException("La conversion RVZ → ISO a échoué.");
+                if (proc.ExitCode != 0 || !File.Exists(tempIso))
+                {
+                    throw new InvalidOperationException(
+                        "La conversion RVZ → ISO a échoué.");
+                }
 
-                iso=tempIso;
+                iso = tempIso;
                 progress?.Report(.35);
 
                 var convertedCompatibility =
@@ -441,7 +674,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                         convertedCompatibility.Message);
                 }
             }
-            else if(ext!=".iso" && ext!=".gcm")
+            else if (ext != ".iso" && ext != ".gcm")
             {
                 throw new InvalidOperationException("Utilise ISO, GCM ou RVZ.");
             }
@@ -458,23 +691,107 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 }
             }
 
-            double b=ext==".rvz" ? .35 : 0, scale=ext==".rvz" ? .65 : 1;
-            await GameCubeIsoExtractor.ExtractFilesAsync(
-                iso,targetFiles,new Progress<double>(p=>progress?.Report(b+p*scale)), cancellationToken);
+            var baseProgress = ext == ".rvz" ? .35 : 0;
+            var extractionScale = ext == ".rvz" ? .60 : .95;
 
-            WriteState(game,runtime with { GameDataReady=true });
-            game.RuntimeInstalled=true;
-            game.GameDataReady=true;
-            game.RuntimeStatusText="Installé • prêt à jouer";
+            await GameCubeIsoExtractor.ExtractFilesAsync(
+                iso,
+                stagingFiles,
+                new Progress<double>(p =>
+                    progress?.Report(
+                        baseProgress + p * extractionScale)),
+                cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!Directory.EnumerateFileSystemEntries(stagingFiles).Any())
+            {
+                throw new InvalidDataException(
+                    "Aucune donnée de jeu n'a été extraite de l'image sélectionnée.");
+            }
+
+            progress?.Report(.96);
+
+            if (Directory.Exists(backupFiles))
+                Directory.Delete(backupFiles, true);
+
+            if (Directory.Exists(targetFiles))
+            {
+                Directory.Move(targetFiles, backupFiles);
+                oldFilesMoved = true;
+            }
+
+            Directory.Move(stagingFiles, targetFiles);
+            newFilesMoved = true;
+
+            // The state file is part of the transaction. If writing it fails,
+            // the previous working game data is restored below.
+            WriteState(
+                game,
+                runtime with { GameDataReady = true });
+
+            committed = true;
+
+            game.RuntimeInstalled = true;
+            game.GameDataReady = true;
+            game.RuntimeStatusText = "Installé • prêt à jouer";
+            progress?.Report(1);
+
+            if (oldFilesMoved)
+            {
+                try
+                {
+                    if (Directory.Exists(backupFiles))
+                        Directory.Delete(backupFiles, true);
+                }
+                catch { }
+            }
         }
-        catch
+        catch (Exception preparationException)
         {
-            try{if(Directory.Exists(targetFiles))Directory.Delete(targetFiles,true);}catch{}
+            if (!committed)
+            {
+                try
+                {
+                    if (newFilesMoved && Directory.Exists(targetFiles))
+                        Directory.Delete(targetFiles, true);
+
+                    if (oldFilesMoved && Directory.Exists(backupFiles))
+                        Directory.Move(backupFiles, targetFiles);
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new InvalidOperationException(
+                        "La préparation des données a échoué et CubeShelf n'a pas pu restaurer automatiquement les anciennes données.",
+                        new AggregateException(preparationException, rollbackException));
+                }
+            }
+
             throw;
         }
         finally
         {
-            if(tempIso is not null) try{File.Delete(tempIso);}catch{}
+            try
+            {
+                if (Directory.Exists(stagingFiles))
+                    Directory.Delete(stagingFiles, true);
+            }
+            catch { }
+
+            if (committed)
+            {
+                try
+                {
+                    if (Directory.Exists(backupFiles))
+                        Directory.Delete(backupFiles, true);
+                }
+                catch { }
+            }
+
+            if (tempIso is not null)
+            {
+                try { File.Delete(tempIso); } catch { }
+            }
         }
     }
 
@@ -733,8 +1050,31 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         progress?.Invoke(1);
     }
 
-    private void WriteState(GameDefinition game,RuntimeState state)
-        => File.WriteAllText(StatePath(game),JsonSerializer.Serialize(state,_json));
+    private void WriteState(
+        GameDefinition game,
+        RuntimeState state)
+    {
+        var path = StatePath(game);
+        var temp = path + ".tmp-" + Guid.NewGuid().ToString("N");
+
+        try
+        {
+            File.WriteAllText(
+                temp,
+                JsonSerializer.Serialize(state, _json));
+
+            File.Move(temp, path, true);
+        }
+        finally
+        {
+            try
+            {
+                if (File.Exists(temp))
+                    File.Delete(temp);
+            }
+            catch { }
+        }
+    }
 
     public void DeleteRuntime(GameDefinition game, bool keepPreparedGameData)
     {

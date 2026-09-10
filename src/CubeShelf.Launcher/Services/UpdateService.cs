@@ -25,7 +25,7 @@ public sealed class UpdateService
     public UpdateService(LauncherConfig config)
     {
         _config = config;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.19");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.20");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 

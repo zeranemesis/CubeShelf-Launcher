@@ -46,6 +46,13 @@ public partial class MainWindow : Window
         Interval = TimeSpan.FromMinutes(10)
     };
 
+    // CubeShelf self-updates must keep being checked while the launcher stays open.
+    // This timer is intentionally independent from the game-update timer above.
+    private readonly DispatcherTimer _launcherUpdateTimer = new()
+    {
+        Interval = TimeSpan.FromMinutes(5)
+    };
+
     public MainWindow()
     {
         _preferences = _preferencesService.Load();
@@ -79,6 +86,24 @@ public partial class MainWindow : Window
             MaybeShowGameUpdatePopup();
         };
 
+        _launcherUpdateTimer.Tick += async (_, _) =>
+        {
+            if (!_config.AutoCheckLauncherUpdates ||
+                _launcherUpdatePreparing ||
+                _preparedLauncherUpdate is not null)
+            {
+                return;
+            }
+
+            await CheckLauncherUpdateAsync(false);
+        };
+
+        Closed += (_, _) =>
+        {
+            _githubUpdateTimer.Stop();
+            _launcherUpdateTimer.Stop();
+        };
+
         LoadLibrary();
         LoadSettingsControls();
         UpdateThemeIndicator(false);
@@ -89,7 +114,10 @@ public partial class MainWindow : Window
             RunFirstStartAssistantIfNeeded();
 
             if (_config.AutoCheckLauncherUpdates)
+            {
                 _ = CheckLauncherUpdateAsync(false);
+                _launcherUpdateTimer.Start();
+            }
 
             if (_preferences.CheckGamesOnStartup)
             {
@@ -1093,6 +1121,9 @@ private void QueueGameUpdate(GameDefinition game)
             await RefreshGameUpdateStatusAsync(game);
             UpdateLibraryUpdateSummary();
 
+            if (!_games.Any(x => x.RuntimeUpdateAvailable))
+                _gameUpdatePopupShown = false;
+
             ShowToast(
                 IsEnglish ? "Game update finished" : "Mise à jour du jeu terminée",
                 IsEnglish
@@ -1210,7 +1241,7 @@ private void DeleteRepositoryButton_Click(object sender, RoutedEventArgs e)
 
         await RefreshGameUpdateStatusAsync(_selectedGame);
         UpdateLibraryUpdateSummary();
-        if (_selectedGame.GitHubUpdateAvailable && _preferences.ShowGameUpdatePopup)
+        if (_selectedGame.RuntimeUpdateAvailable && _preferences.ShowGameUpdatePopup)
         {
             _gameUpdatePopupShown = false;
             MaybeShowGameUpdatePopup();
@@ -1887,8 +1918,11 @@ private void ConfigureDiscImageButton_Click(
             return;
         }
 
+        // A source commit is not the same thing as an installable game update.
+        // Only notify the player once the Windows PartyBoard build for that
+        // commit is actually available. Source updates remain manual/optional.
         var updates = _games
-            .Where(x => x.GitHubUpdateAvailable)
+            .Where(x => x.RuntimeUpdateAvailable)
             .ToList();
 
         if (updates.Count == 0)
@@ -1896,89 +1930,32 @@ private void ConfigureDiscImageButton_Click(
 
         _gameUpdatePopupShown = true;
 
-        var runtimeUpdates = updates
-            .Where(x => x.RuntimeReleaseAvailable)
-            .ToList();
+        GameUpdatePopupEyebrow.Text =
+            IsEnglish
+                ? "GAME UPDATE AVAILABLE"
+                : "MISE À JOUR DU JEU DISPONIBLE";
 
-        var sourceOnlyUpdates = updates
-            .Where(x =>
-                !x.RuntimeReleaseAvailable &&
-                x.GitHubConfigured)
-            .ToList();
+        GameUpdatePopupTitle.Text =
+            updates.Count == 1
+                ? updates[0].Title
+                : IsEnglish
+                    ? $"{updates.Count} game updates available"
+                    : $"{updates.Count} jeux à mettre à jour";
 
-        if (runtimeUpdates.Count == 0 &&
-            sourceOnlyUpdates.Count > 0)
-        {
-            GameUpdatePopupEyebrow.Text =
-                IsEnglish
-                    ? "GITHUB REPOSITORY UPDATE AVAILABLE"
-                    : "MISE À JOUR DU DÉPÔT GITHUB DISPONIBLE";
-
-            GameUpdatePopupTitle.Text =
-                sourceOnlyUpdates.Count == 1
-                    ? sourceOnlyUpdates[0].Title
-                    : IsEnglish
-                        ? $"{sourceOnlyUpdates.Count} repository updates available"
-                        : $"{sourceOnlyUpdates.Count} dépôts à mettre à jour";
-
-            GameUpdatePopupActionButton.Content =
-                IsEnglish
-                    ? "Update repository"
-                    : "Mettre à jour le dépôt";
-        }
-        else if (sourceOnlyUpdates.Count == 0)
-        {
-            GameUpdatePopupEyebrow.Text =
-                IsEnglish
-                    ? "GAME UPDATE AVAILABLE"
-                    : "MISE À JOUR DE JEU DISPONIBLE";
-
-            GameUpdatePopupTitle.Text =
-                runtimeUpdates.Count == 1
-                    ? runtimeUpdates[0].Title
-                    : IsEnglish
-                        ? $"{runtimeUpdates.Count} game updates available"
-                        : $"{runtimeUpdates.Count} jeux à mettre à jour";
-
-            GameUpdatePopupActionButton.Content =
-                IsEnglish
-                    ? "Update now"
-                    : "Mettre à jour maintenant";
-        }
-        else
-        {
-            GameUpdatePopupEyebrow.Text =
-                IsEnglish
-                    ? "UPDATES AVAILABLE"
-                    : "MISES À JOUR DISPONIBLES";
-
-            GameUpdatePopupTitle.Text =
-                IsEnglish
-                    ? $"{updates.Count} updates available"
-                    : $"{updates.Count} mises à jour disponibles";
-
-            GameUpdatePopupActionButton.Content =
-                IsEnglish
-                    ? "Update all"
-                    : "Tout mettre à jour";
-        }
+        GameUpdatePopupActionButton.Content =
+            IsEnglish
+                ? (updates.Count == 1 ? "Update now" : "Update all")
+                : (updates.Count == 1 ? "Mettre à jour maintenant" : "Tout mettre à jour");
 
         GameUpdatePopupText.Text = string.Join(
             Environment.NewLine + Environment.NewLine,
             updates.Select(game =>
-            {
-                var updateType =
-                    game.RuntimeReleaseAvailable
-                        ? (IsEnglish ? "Windows game build" : "Build Windows du jeu")
-                        : (IsEnglish ? "GitHub repository" : "Dépôt GitHub");
-
-                return
-                    $"{game.Title} — {updateType}" +
-                    Environment.NewLine +
-                    game.GitHubStatusText +
-                    Environment.NewLine +
-                    game.GitHubChangeLog;
-            }));
+                $"{game.Title} — " +
+                (IsEnglish ? "Windows PartyBoard build" : "Build Windows PartyBoard") +
+                Environment.NewLine +
+                game.GitHubStatusText +
+                Environment.NewLine +
+                game.GitHubChangeLog));
 
         GameUpdatePopup.Visibility = Visibility.Visible;
         GameUpdatePopup.Opacity = 0;
@@ -2001,29 +1978,15 @@ private void ConfigureDiscImageButton_Click(
         RoutedEventArgs e)
     {
         var updates = _games
-            .Where(x => x.GitHubUpdateAvailable)
+            .Where(x => x.RuntimeUpdateAvailable)
             .ToList();
 
-        var queuedSomething = false;
-
         foreach (var game in updates)
-        {
-            if (game.RuntimeReleaseAvailable)
-            {
-                QueueGameUpdate(game);
-                queuedSomething = true;
-            }
-            else if (game.GitHubConfigured)
-            {
-                queuedSomething |= QueueRepositoryUpdate(
-                    game,
-                    showDuplicateMessage: false);
-            }
-        }
+            QueueGameUpdate(game);
 
         GameUpdatePopup.Visibility = Visibility.Collapsed;
 
-        if (queuedSomething)
+        if (updates.Count > 0)
             ShowDownloads();
     }
 
