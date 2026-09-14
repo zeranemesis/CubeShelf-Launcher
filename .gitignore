@@ -4,6 +4,6 @@
 publish/
 dist/
 .tools/
-Mods/
+/Mods/
 *.user
 *.suo
