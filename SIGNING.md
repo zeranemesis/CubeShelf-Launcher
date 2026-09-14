@@ -1,17 +1,10 @@
-# CubeShelf Windows code signing
+# Signature Windows
 
-CubeShelf can sign its Windows binaries automatically in GitHub Actions when a code-signing certificate is available.
+Le workflow `.github/workflows/release.yml` signe `CubeShelf.exe`, `CubeShelf.Updater.exe` et `CubeShelf-Setup-x64.exe` avec SHA-256 et un horodatage RFC 3161.
 
-Repository secrets expected by `.github/workflows/release.yml`:
+Secrets attendus :
 
-- `CUBESHELF_SIGN_PFX_BASE64`: Base64 content of the `.pfx` certificate.
-- `CUBESHELF_SIGN_PFX_PASSWORD`: password of the `.pfx` certificate.
+- `CUBESHELF_SIGN_PFX_BASE64` : certificat `.pfx` encodé en Base64 ;
+- `CUBESHELF_SIGN_PFX_PASSWORD` : mot de passe du certificat.
 
-If these secrets are absent, the workflow still builds and publishes the release, but the executables remain unsigned.
-
-The workflow signs both:
-
-- `CubeShelf.exe`
-- `CubeShelf.Updater.exe`
-
-with SHA-256 and an RFC3161 timestamp before creating `CubeShelf-win-x64.zip`.
+Une release stable déclenchée par tag échoue si le certificat est absent. Le déclenchement manuel permet une compilation non signée uniquement lorsque l’option de dérogation est activée explicitement. Les sommes SHA-256 de tous les artefacts sont publiées dans `checksums.txt`.

@@ -1,3 +1,5 @@
+using CubeShelf.Core.Platform;
+
 namespace CubeShelf.Launcher.Services;
 
 public sealed record StorageSummary(
@@ -17,20 +19,18 @@ public sealed record StorageSummary(
 
 public static class StorageService
 {
-    private static string LocalDataRoot =>
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf");
-
-    public static StorageSummary Measure(IEnumerable<GameDefinition> games)
+    public static StorageSummary Measure(
+        IEnumerable<GameDefinition> games,
+        IPlatformPaths? paths = null)
     {
+        var localDataRoot = (paths ?? new PlatformPaths()).DataDirectory;
         long runtime = 0;
         long gameData = 0;
 
         foreach (var game in games)
         {
             var current = Path.Combine(
-                LocalDataRoot,
+                localDataRoot,
                 "Games",
                 game.Id,
                 "Runtime",
@@ -45,13 +45,13 @@ public static class StorageService
         }
 
         var dolphin = DirectorySize(
-            Path.Combine(LocalDataRoot, "Tools", "Dolphin"));
+            Path.Combine(localDataRoot, "Tools", "Dolphin"));
 
         var cache = DirectorySize(
-            Path.Combine(LocalDataRoot, "Cache"));
+            Path.Combine(localDataRoot, "Cache"));
 
         var backups = DirectorySize(
-            Path.Combine(LocalDataRoot, "UpdaterBackups"));
+            Path.Combine(localDataRoot, "UpdaterBackups"));
 
         return new StorageSummary(
             runtime,
@@ -61,12 +61,13 @@ public static class StorageService
             backups);
     }
 
-    public static long CleanTransientCaches()
+    public static long CleanTransientCaches(IPlatformPaths? paths = null)
     {
+        var localDataRoot = (paths ?? new PlatformPaths()).DataDirectory;
         var targets = new[]
         {
-            Path.Combine(LocalDataRoot, "Cache"),
-            Path.Combine(LocalDataRoot, "UpdaterBackups")
+            Path.Combine(localDataRoot, "Cache"),
+            Path.Combine(localDataRoot, "UpdaterBackups")
         };
 
         var before = targets.Sum(DirectorySize);

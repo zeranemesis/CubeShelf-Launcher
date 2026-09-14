@@ -1,0 +1,206 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CubeShelf.Desktop.MainWindow"
+        Title="CubeShelf Preview"
+        Width="1180" Height="760" MinWidth="900" MinHeight="600"
+        Background="#090D16">
+  <Grid ColumnDefinitions="220,*">
+    <Border Background="#101725" Padding="22">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Spacing="6">
+          <TextBlock Text="CUBESHELF" FontSize="23" FontWeight="Bold" Foreground="#F2F6FF" />
+          <TextBlock Text="MULTIPLATFORM PREVIEW" FontSize="10" Foreground="#8EAEFF" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="0,38,0,0" Spacing="10">
+          <Button Content="Bibliothèque" HorizontalContentAlignment="Left" Click="ShowLibrary" />
+          <Button Content="Mods" HorizontalContentAlignment="Left" Click="ShowMods" />
+          <Button Content="Téléchargements" HorizontalContentAlignment="Left" Click="ShowDownloads" />
+          <Button Content="Paramètres" HorizontalContentAlignment="Left" Click="ShowSettings" />
+        </StackPanel>
+        <TextBlock Grid.Row="2" Text="v0.8.0 preview" Foreground="#6E7C96" />
+      </Grid>
+    </Border>
+
+    <ScrollViewer x:Name="LibraryView" Grid.Column="1">
+      <StackPanel Margin="42" Spacing="24">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Bibliothèque GameCube" FontSize="34" FontWeight="Bold" Foreground="#F5F7FC" />
+          <TextBlock Text="Socle Avalonia commun à Windows, Linux et Steam Deck" Foreground="#97A6C0" />
+        </StackPanel>
+
+        <Border Background="#151E30" CornerRadius="18" Padding="26">
+          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <StackPanel Spacing="8">
+              <TextBlock x:Name="GameTitle" Text="Bibliothèque vide" FontSize="23" FontWeight="SemiBold" Foreground="#F5F7FC" />
+              <TextBlock Text="Sélectionne ton image de jeu obtenue légalement et l’exécutable PartyBoard installé." Foreground="#A7B4CA" TextWrapping="Wrap" />
+              <TextBlock x:Name="PlatformStatus" Foreground="#82A8FF" />
+              <TextBlock x:Name="DataPath" Foreground="#76859E" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button x:Name="PlayButton" Grid.Column="1" Content="Jouer" IsEnabled="False" Padding="22,12" Click="PlayGame" />
+
+            <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#101725" CornerRadius="12" Padding="16" Margin="0,20,0,0">
+              <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="IMAGE DU JEU" FontSize="10" FontWeight="Bold" Foreground="#8EAEFF" />
+                  <TextBlock x:Name="DiscPathText" Text="Aucune image sélectionnée" Foreground="#F5F7FC" TextWrapping="Wrap" />
+                  <TextBlock x:Name="DiscCompatibilityText" Foreground="#97A6C0" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <Button Content="Choisir ISO / GCM / RVZ" Click="ChooseDisc" />
+                  <Button Content="Effacer" Click="ClearDisc" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Margin="0,16,0,0" Spacing="5">
+                  <TextBlock Text="RUNTIME" FontSize="10" FontWeight="Bold" Foreground="#8EAEFF" />
+                  <TextBlock x:Name="ExecutablePathText" Text="PartyBoard non configuré" Foreground="#F5F7FC" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,16,0,0" Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="InstallButton" Content="Installer PartyBoard" Click="InstallPartyBoard" />
+                  <Button x:Name="RepairButton" Content="Réparer" IsVisible="False" Click="RepairPartyBoard" />
+                  <Button x:Name="UninstallButton" Content="Désinstaller" IsVisible="False" Click="UninstallPartyBoard" />
+                  <Button x:Name="PrepareDataButton" Content="Préparer les données" Click="PrepareGameData" />
+                  <Button Content="Choisir manuellement" Click="ChooseExecutable" />
+                  <Button x:Name="CancelInstallButton" Content="Annuler" IsVisible="False" Click="CancelInstall" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,14,0,0" Spacing="7">
+              <ProgressBar x:Name="InstallProgress" Minimum="0" Maximum="100" IsVisible="False" />
+              <TextBlock x:Name="ActionStatus" Foreground="#82A8FF" TextWrapping="Wrap" />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <UniformGrid Columns="3" Rows="1">
+          <Border Background="#121A29" CornerRadius="14" Padding="20" Margin="0,0,10,0">
+            <StackPanel><TextBlock Text="WINDOWS" Foreground="#8EAEFF"/><TextBlock Text="Stable" FontSize="20" Foreground="White"/></StackPanel>
+          </Border>
+          <Border Background="#121A29" CornerRadius="14" Padding="20" Margin="5,0">
+            <StackPanel><TextBlock Text="LINUX" Foreground="#8EAEFF"/><TextBlock Text="Preview" FontSize="20" Foreground="White"/></StackPanel>
+          </Border>
+          <Border Background="#121A29" CornerRadius="14" Padding="20" Margin="10,0,0,0">
+            <StackPanel><TextBlock Text="STEAM DECK" Foreground="#8EAEFF"/><TextBlock Text="Préparation" FontSize="20" Foreground="White"/></StackPanel>
+          </Border>
+        </UniformGrid>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Grid x:Name="ModsView" Grid.Column="1" IsVisible="False" Margin="42" RowDefinitions="Auto,*">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel>
+          <TextBlock Text="Mods GameBanana" FontSize="34" FontWeight="Bold" Foreground="#F5F7FC" />
+          <TextBlock Text="Installation confinée, ordre de priorité et détection des conflits" Foreground="#97A6C0" />
+        </StackPanel>
+        <Button x:Name="RefreshModsButton" Grid.Column="1" Content="Actualiser GameBanana" Click="RefreshMods" />
+      </Grid>
+      <Grid Grid.Row="1" Margin="0,24,0,0" ColumnDefinitions="1.1*,1.4*">
+        <Border Background="#121A29" CornerRadius="14" Padding="12" Margin="0,0,10,0">
+          <ListBox x:Name="ModsList" SelectionChanged="SelectMod">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="8" Spacing="4">
+                  <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#F5F7FC" />
+                  <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#97A6C0" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+        <Border Grid.Column="1" Background="#151E30" CornerRadius="14" Padding="22" Margin="10,0,0,0">
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="ModTitle" Text="Sélectionne un mod" FontSize="25" FontWeight="Bold" Foreground="#F5F7FC" />
+            <Border Height="190" Background="#101725" CornerRadius="10">
+              <Image x:Name="ModPreview" Stretch="Uniform" />
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock x:Name="ModVersion" Foreground="#82A8FF" VerticalAlignment="Center" />
+              <Button x:Name="OpenModImageButton" Content="Voir l’image" IsEnabled="False" Click="OpenModImage" />
+              <Button x:Name="OpenModPageButton" Content="Page GameBanana" IsEnabled="False" Click="OpenModPage" />
+            </StackPanel>
+            <TextBlock x:Name="ModDescription" Foreground="#D7DEEA" TextWrapping="Wrap" MaxHeight="100" />
+            <TextBlock x:Name="ModInstructions" Foreground="#97A6C0" TextWrapping="Wrap" MaxHeight="70" />
+            <TextBlock x:Name="ModDetailStatus" Foreground="#97A6C0" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button x:Name="InstallModButton" Content="Installer" IsEnabled="False" Click="InstallMod" />
+              <Button x:Name="ToggleModButton" Content="Activer" IsEnabled="False" Click="ToggleMod" />
+              <Button x:Name="DeleteModButton" Content="Supprimer" IsEnabled="False" Click="DeleteMod" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Priorité" VerticalAlignment="Center" Foreground="#97A6C0" />
+              <TextBox x:Name="ModPriority" Width="90" Text="100" />
+              <Button Content="Appliquer" Click="ApplyModPriority" />
+            </StackPanel>
+            <ProgressBar x:Name="ModProgress" Minimum="0" Maximum="100" IsVisible="False" />
+            <TextBlock x:Name="ModsStatus" Foreground="#82A8FF" TextWrapping="Wrap" />
+            <TextBlock x:Name="ConflictsStatus" Foreground="#FFB86C" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Grid>
+
+    <Grid x:Name="DownloadsView" Grid.Column="1" IsVisible="False" Margin="42" RowDefinitions="Auto,*">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel>
+          <TextBlock Text="Téléchargements" FontSize="34" FontWeight="Bold" Foreground="#F5F7FC" />
+          <TextBlock Text="Historique persistant des runtimes et des mods" Foreground="#97A6C0" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button x:Name="ResumeDownloadButton" Content="Reprendre" IsEnabled="False" Click="ResumeDownload" />
+          <Button Content="Effacer les opérations terminées" Click="ClearDownloads" />
+        </StackPanel>
+      </Grid>
+      <Border Grid.Row="1" Margin="0,24,0,0" Background="#121A29" CornerRadius="14" Padding="14">
+        <ListBox x:Name="DownloadsList" SelectionChanged="SelectDownload">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="8" ColumnDefinitions="2*,*,3*" RowDefinitions="Auto,Auto">
+                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="#F5F7FC" />
+                <TextBlock Grid.Column="1" Text="{Binding State}" Foreground="#82A8FF" />
+                <TextBlock Grid.Column="2" Text="{Binding Message}" Foreground="#97A6C0" TextWrapping="Wrap" />
+                <ProgressBar Grid.Row="1" Grid.ColumnSpan="3" Margin="0,7,0,0" Minimum="0" Maximum="1" Value="{Binding Progress}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+    </Grid>
+
+    <ScrollViewer x:Name="SettingsView" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="42" Spacing="24">
+        <TextBlock Text="Paramètres" FontSize="34" FontWeight="Bold" Foreground="#F5F7FC" />
+        <Border Background="#151E30" CornerRadius="14" Padding="22">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Interface" FontSize="22" FontWeight="SemiBold" Foreground="#F5F7FC" />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="Langue" Width="130" VerticalAlignment="Center" Foreground="#97A6C0" />
+              <ComboBox x:Name="LanguagePicker" Width="180" SelectionChanged="SaveSettings">
+                <ComboBoxItem Content="Français" Tag="fr" />
+                <ComboBoxItem Content="English" Tag="en" />
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="Thème" Width="130" VerticalAlignment="Center" Foreground="#97A6C0" />
+              <ComboBox x:Name="ThemePicker" Width="180" SelectionChanged="SaveSettings">
+                <ComboBoxItem Content="Sombre" Tag="dark" />
+                <ComboBoxItem Content="Clair" Tag="light" />
+              </ComboBox>
+            </StackPanel>
+            <CheckBox x:Name="CheckUpdatesBox" Content="Vérifier les mises à jour des jeux au démarrage" Checked="SaveSettings" Unchecked="SaveSettings" />
+            <CheckBox x:Name="UpdatePopupBox" Content="Afficher une notification de mise à jour" Checked="SaveSettings" Unchecked="SaveSettings" />
+            <CheckBox x:Name="RefreshModsBox" Content="Actualiser GameBanana à l’ouverture des mods" Checked="SaveSettings" Unchecked="SaveSettings" />
+            <Button x:Name="CheckLauncherUpdateButton" Content="Vérifier les mises à jour de CubeShelf" HorizontalAlignment="Left" Click="CheckLauncherUpdate" />
+            <Separator />
+            <TextBlock Text="Stockage" FontSize="22" FontWeight="SemiBold" Foreground="#F5F7FC" />
+            <TextBlock x:Name="SettingsDataPath" Foreground="#97A6C0" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Content="Ouvrir les données" Click="OpenDataDirectory" />
+              <Button Content="Vider le cache des images" Click="ClearMediaCache" />
+              <Button Content="Réinitialiser les paramètres" Click="ResetSettings" />
+            </StackPanel>
+            <TextBlock x:Name="SettingsStatus" Foreground="#82A8FF" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Window>

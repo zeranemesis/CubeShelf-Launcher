@@ -1,0 +1,36 @@
+name: Build experimental macOS preview
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    strategy:
+      matrix:
+        rid: [osx-x64, osx-arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Test portable Core
+        run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Publish experimental launcher
+        run: >
+          dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained true
+          -p:Version=0.8.0-preview.2 -p:DebugType=None -p:DebugSymbols=false
+          -o publish/${{ matrix.rid }}
+      - name: Package archive
+        run: tar -C publish/${{ matrix.rid }} -czf CubeShelf-${{ matrix.rid }}-experimental.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeShelf-${{ matrix.rid }}-experimental
+          path: CubeShelf-${{ matrix.rid }}-experimental.tar.gz
+          retention-days: 14

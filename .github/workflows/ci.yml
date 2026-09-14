@@ -1,0 +1,66 @@
+name: Validate Windows build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cubeshelf-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-core:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Test portable core
+        run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore CubeShelfLauncher.sln
+
+      - name: Build
+        run: dotnet build CubeShelfLauncher.sln -c Release --no-restore
+
+      - name: Test archive and disc handling
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release -r win-x64
+
+      - name: Install Inno Setup
+        if: github.event_name == 'push'
+        run: choco install innosetup --no-progress -y
+
+      - name: Publish nightly installer
+        if: github.event_name == 'push'
+        run: pwsh ./BUILD_INSTALLER.ps1 -Version 0.8.0-preview.2
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: CubeShelf-nightly-win-x64
+          path: |
+            dist/CubeShelf-Setup-x64.exe
+            publish/CubeShelf/**
+          retention-days: 14

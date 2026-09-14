@@ -1,5 +1,5 @@
-using SharpCompress.Archives;
-using SharpCompress.Common;
+using CubeShelf.Core.Security;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -28,7 +28,11 @@ public sealed record LocalRepositoryStatus(
 
 public sealed class GitHubGameService
 {
+    private const long MaximumSourceArchiveBytes = 1024L * 1024 * 1024;
+    private static readonly ArchiveExtractionLimits SourceExtractionLimits =
+        new(100_000, 8L * 1024 * 1024 * 1024, 2L * 1024 * 1024 * 1024);
     private readonly HttpClient _http = new();
+    private readonly IPlatformPaths _paths;
     private readonly JsonSerializerOptions _json =
         new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
@@ -38,26 +42,26 @@ public sealed class GitHubGameService
         _commitFeedCache =
             new(StringComparer.OrdinalIgnoreCase);
 
-    public GitHubGameService()
+    public GitHubGameService(IPlatformPaths? paths = null)
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.19");
+        _paths = paths ?? new PlatformPaths();
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.7.0");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
-    private static string GameDataRoot(GameDefinition game)
+    private string GameDataRoot(GameDefinition game)
     {
         var root = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf", "Games", game.Id, "GitHub");
+            _paths.DataDirectory, "Games", game.Id, "GitHub");
 
         Directory.CreateDirectory(root);
         return root;
     }
 
-    private static string StateFile(GameDefinition game)
+    private string StateFile(GameDefinition game)
         => Path.Combine(GameDataRoot(game), "state.json");
 
-    private static string VersionsRoot(GameDefinition game)
+    private string VersionsRoot(GameDefinition game)
     {
         var path = Path.Combine(GameDataRoot(game), "versions");
         Directory.CreateDirectory(path);
@@ -290,7 +294,7 @@ public sealed class GitHubGameService
             (c >= 'A' && c <= 'F'));
     }
 
-    private static bool IsManagedPath(
+    private bool IsManagedPath(
         GameDefinition game,
         string path)
     {
@@ -712,6 +716,9 @@ public sealed class GitHubGameService
             response.EnsureSuccessStatusCode();
 
             var total = response.Content.Headers.ContentLength;
+            if (total > MaximumSourceArchiveBytes)
+                throw new InvalidDataException("L’archive source dépasse la taille autorisée.");
+
             await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
             await using var output = File.Create(zip);
 
@@ -723,6 +730,9 @@ public sealed class GitHubGameService
             {
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
                 done += read;
+
+                if (done > MaximumSourceArchiveBytes)
+                    throw new InvalidDataException("L’archive source dépasse la taille autorisée.");
 
                 if (total is > 0)
                     progress?.Report(Math.Min(.72, (double)done / total.Value * .72));
@@ -739,14 +749,7 @@ public sealed class GitHubGameService
 
         try
         {
-            using var archive = ArchiveFactory.OpenArchive(zip);
-            archive.WriteToDirectory(
-                staging,
-                new ExtractionOptions
-                {
-                    ExtractFullPath = true,
-                    Overwrite = true
-                });
+            SecureArchiveExtractor.Extract(zip, staging, SourceExtractionLimits);
         }
         finally
         {
@@ -852,7 +855,7 @@ public sealed class GitHubGameService
                 _json));
     }
 
-    private static void CleanupOldVersions(GameDefinition game, string currentPath)
+    private void CleanupOldVersions(GameDefinition game, string currentPath)
     {
         try
         {

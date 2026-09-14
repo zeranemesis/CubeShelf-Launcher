@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using System.Reflection;
 using Microsoft.Win32;
 using CubeShelf.Launcher.Services;
+using CubeShelf.Core.Library;
 
 namespace CubeShelf.Launcher;
 
@@ -721,6 +722,10 @@ private void UpdateSelectedGameStateBadges()
             var installed = _modManager
                 .GetInstalled()
                 .ToDictionary(x => x.Id);
+            var conflictCounts = _modManager.AnalyzeConflicts()
+                .SelectMany(conflict => conflict.ModIds)
+                .GroupBy(id => id)
+                .ToDictionary(group => group.Key, group => group.Count());
 
             _allMods = remote.Select(r =>
             {
@@ -740,6 +745,7 @@ private void UpdateSelectedGameStateBadges()
                     Enabled = local?.Enabled ?? false,
                     UpdateAvailable =
                         local is not null && r.Updated > local.Updated,
+                    ConflictCount = conflictCounts.GetValueOrDefault(r.Id),
                     Priority = local?.Priority ?? 100
                 };
             }).ToList();

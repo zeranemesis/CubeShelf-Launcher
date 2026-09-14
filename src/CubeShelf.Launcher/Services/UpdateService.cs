@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using CubeShelf.Core.Security;
+
 namespace CubeShelf.Launcher.Services;
 
 public sealed record UpdateInfo(
@@ -19,13 +21,14 @@ public sealed record PreparedLauncherUpdate(
 
 public sealed class UpdateService
 {
+    private const long MaximumLauncherPackageBytes = 1024L * 1024 * 1024;
     private readonly LauncherConfig _config;
     private readonly HttpClient _http = new();
 
     public UpdateService(LauncherConfig config)
     {
         _config = config;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.20");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.7.0");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
@@ -376,6 +379,9 @@ public sealed class UpdateService
                         ? existing + responseLength.Value
                         : (long?)null);
 
+        if (total > MaximumLauncherPackageBytes)
+            throw new InvalidDataException("La mise à jour CubeShelf dépasse la taille autorisée.");
+
         var buffer = new byte[256 * 1024];
         var done = existing;
 
@@ -396,6 +402,9 @@ public sealed class UpdateService
 
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
                 done += read;
+
+                if (done > MaximumLauncherPackageBytes)
+                    throw new InvalidDataException("La mise à jour CubeShelf dépasse la taille autorisée.");
 
                 if (total is > 0)
                     progress?.Invoke(Math.Clamp((double)done / total.Value, 0, 1));

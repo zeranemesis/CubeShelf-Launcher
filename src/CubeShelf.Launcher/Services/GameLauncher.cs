@@ -1,16 +1,21 @@
+using CubeShelf.Core.Platform;
+
 namespace CubeShelf.Launcher.Services;
 
 public sealed class GameLauncher
 {
     private readonly GameDefinition _game;
     private readonly ModManager? _mods;
+    private readonly IProcessLauncher _processLauncher;
 
     public GameLauncher(
         GameDefinition game,
-        ModManager? mods)
+        ModManager? mods,
+        IProcessLauncher? processLauncher = null)
     {
         _game = game;
         _mods = mods;
+        _processLauncher = processLauncher ?? new ProcessLauncher();
     }
 
     public Process StartGame()
@@ -24,35 +29,30 @@ public sealed class GameLauncher
                 exe);
         }
 
-        var psi = new ProcessStartInfo(exe)
-        {
-            WorkingDirectory = Path.GetDirectoryName(exe)!,
-            UseShellExecute = false
-        };
+        var environment = new Dictionary<string, string?>();
 
         if (_mods is not null)
         {
             var activeList = _mods.WriteActiveList();
 
-            psi.Environment["PARTYBOARD_MOD_LIST"] =
-                Path.GetFullPath(activeList);
+            environment["PARTYBOARD_MOD_LIST"] = Path.GetFullPath(activeList);
         }
 
         if (!string.IsNullOrWhiteSpace(_game.GameRootFullPath))
         {
-            psi.Environment["PARTYBOARD_GAME_ROOT"] =
-                _game.GameRootFullPath;
+            environment["PARTYBOARD_GAME_ROOT"] = _game.GameRootFullPath;
         }
 
         if (_game.HasDiscImage)
         {
             // PartyBoard can consume this variable once its file-selection path
             // is wired to CubeShelf. The launcher already persists ISO/RVZ.
-            psi.Environment["PARTYBOARD_DISC_IMAGE"] =
-                _game.DiscImageFullPath;
+            environment["PARTYBOARD_DISC_IMAGE"] = _game.DiscImageFullPath;
         }
 
-        return Process.Start(psi) ??
-            throw new InvalidOperationException("Impossible de démarrer PartyBoard.");
+        return _processLauncher.Start(
+            exe,
+            Path.GetDirectoryName(exe)!,
+            environment);
     }
 }

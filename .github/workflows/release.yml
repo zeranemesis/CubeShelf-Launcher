@@ -1,20 +1,73 @@
-name: Build Windows release
+name: Publish stable Windows and Linux release
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - "main"
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the v prefix"
+        required: true
+        default: "0.8.0"
+      allow_unsigned:
+        description: "Allow an unsigned manual release"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 concurrency:
-  group: cubeshelf-release
+  group: cubeshelf-stable-release
   cancel-in-progress: false
 
 jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then tag="$GITHUB_REF_NAME"; else tag="v${{ inputs.version }}"; fi
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release tag"; exit 1; }
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - name: Test portable Core
+        run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Publish Linux x64
+        run: >
+          dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
+          -c Release -r linux-x64 --self-contained true
+          -p:Version=${{ steps.version.outputs.version }} -p:DebugType=None -p:DebugSymbols=false
+          -o publish/linux-x64
+      - name: Build AppImage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p AppDir/usr/bin
+          cp -a publish/linux-x64/. AppDir/usr/bin/
+          cp packaging/linux/AppRun AppDir/AppRun
+          cp packaging/linux/cubeshelf.desktop AppDir/cubeshelf.desktop
+          cp src/CubeShelf.Launcher/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
+          cp AppDir/cubeshelf.png AppDir/.DirIcon
+          chmod +x AppDir/AppRun AppDir/usr/bin/CubeShelf
+          curl --fail --location --retry 3 https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage --output appimagetool
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  appimagetool" | sha256sum --check --strict
+          chmod +x appimagetool
+          APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 VERSION=${{ steps.version.outputs.version }} ./appimagetool AppDir CubeShelf-linux-x64.AppImage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stable-linux-x64
+          path: CubeShelf-linux-x64.AppImage
+
   windows:
+    needs: linux
     runs-on: windows-latest
 
     steps:
@@ -26,59 +79,46 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Determine next release version
+      - name: Resolve release version
         id: version
         shell: pwsh
         run: |
-          git fetch --tags --force
-          $tags = git tag --list "v*"
-
-          $versions = @()
-          foreach ($tag in $tags) {
-            if ($tag -match '^v(\d+)\.(\d+)\.(\d+)$') {
-              $versions += [PSCustomObject]@{
-                Tag = $tag
-                Major = [int]$Matches[1]
-                Minor = [int]$Matches[2]
-                Patch = [int]$Matches[3]
-              }
-            }
-          }
-
-          if ($versions.Count -eq 0) {
-            $major = 0
-            $minor = 6
-            $patch = 10
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+            $tag = $env:GITHUB_REF_NAME
           }
           else {
-            $latest = $versions |
-              Sort-Object Major, Minor, Patch |
-              Select-Object -Last 1
-
-            $major = $latest.Major
-            $minor = $latest.Minor
-            $patch = $latest.Patch + 1
+            $tag = "v${{ inputs.version }}"
           }
 
-          $version = "$major.$minor.$patch"
-          $tag = "v$version"
+          if ($tag -notmatch '^v(\d+)\.(\d+)\.(\d+)$') {
+            throw "Release tag must use vMAJOR.MINOR.PATCH."
+          }
 
-          "version=$version" >> $env:GITHUB_OUTPUT
           "tag=$tag" >> $env:GITHUB_OUTPUT
-
-          Write-Host "Next CubeShelf release: $tag"
+          "version=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
 
       - name: Restore
         run: dotnet restore CubeShelfLauncher.sln
 
+      - name: Build
+        run: dotnet build CubeShelfLauncher.sln -c Release --no-restore -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Run security and compatibility tests
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release -r win-x64 -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Run portable Core tests
+        run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release -p:Version=${{ steps.version.outputs.version }}
+
       - name: Publish launcher
         run: >
           dotnet publish
-          src/CubeShelf.Launcher/CubeShelf.Launcher.csproj
+          src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
           -c Release
           -r win-x64
           --self-contained true
           -p:Version=${{ steps.version.outputs.version }}
+          -p:DebugType=None
+          -p:DebugSymbols=false
           -o publish/CubeShelf
 
       - name: Publish updater
@@ -90,91 +130,132 @@ jobs:
           --self-contained true
           -p:Version=${{ steps.version.outputs.version }}
           -p:PublishSingleFile=true
+          -p:DebugType=None
+          -p:DebugSymbols=false
           -o publish/Updater
 
-      - name: Sign Windows executables (optional)
+      - name: Assemble application directory
+        shell: pwsh
+        run: Copy-Item publish/Updater/CubeShelf.Updater.exe publish/CubeShelf/CubeShelf.Updater.exe -Force
+
+      - name: Sign application binaries
+        shell: pwsh
+        env:
+          CUBESHELF_SIGN_PFX_BASE64: ${{ secrets.CUBESHELF_SIGN_PFX_BASE64 }}
+          CUBESHELF_SIGN_PFX_PASSWORD: ${{ secrets.CUBESHELF_SIGN_PFX_PASSWORD }}
+          ALLOW_UNSIGNED: ${{ inputs.allow_unsigned }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CUBESHELF_SIGN_PFX_BASE64)) {
+            if ($env:ALLOW_UNSIGNED -eq "true") {
+              Write-Warning "Publishing unsigned binaries was explicitly allowed for this manual run."
+              exit 0
+            }
+            throw "A stable CubeShelf release requires the CUBESHELF_SIGN_PFX_BASE64 signing secret."
+          }
+
+          $pfx = Join-Path $env:RUNNER_TEMP "cubeshelf-signing.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CUBESHELF_SIGN_PFX_BASE64))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object FullName -Descending | Select-Object -First 1
+
+          foreach ($target in @("publish/CubeShelf/CubeShelf.exe", "publish/CubeShelf/CubeShelf.Updater.exe")) {
+            & $signtool.FullName sign /f $pfx /p $env:CUBESHELF_SIGN_PFX_PASSWORD /fd SHA256 /tr https://timestamp.digicert.com /td SHA256 $target
+            if ($LASTEXITCODE -ne 0) { throw "Authenticode signing failed for $target" }
+          }
+
+          Remove-Item $pfx -Force
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build portable ZIP and installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Compress-Archive -Path publish/CubeShelf/* -DestinationPath dist/CubeShelf-win-x64.zip -Force
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DMyAppVersion=${{ steps.version.outputs.version }}" `
+            "/DMyAppNumericVersion=${{ steps.version.outputs.version }}" `
+            "/DPublishDirectory=$((Resolve-Path publish/CubeShelf).Path)" `
+            "/DInstallerOutputDirectory=$((Resolve-Path dist).Path)" `
+            installer/CubeShelf.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed." }
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: stable-linux-x64
+          path: dist
+
+      - name: Sign installer
         shell: pwsh
         env:
           CUBESHELF_SIGN_PFX_BASE64: ${{ secrets.CUBESHELF_SIGN_PFX_BASE64 }}
           CUBESHELF_SIGN_PFX_PASSWORD: ${{ secrets.CUBESHELF_SIGN_PFX_PASSWORD }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:CUBESHELF_SIGN_PFX_BASE64)) {
-            Write-Host "No signing certificate configured; publishing unsigned binaries."
+            Write-Warning "Installer left unsigned for this explicitly allowed manual release."
             exit 0
           }
 
-          $pfx = Join-Path $env:RUNNER_TEMP "cubeshelf-signing.pfx"
-          [IO.File]::WriteAllBytes(
-            $pfx,
-            [Convert]::FromBase64String($env:CUBESHELF_SIGN_PFX_BASE64))
-
-          $signtool = Get-ChildItem `
-            "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" `
-            -ErrorAction SilentlyContinue |
-            Sort-Object FullName -Descending |
-            Select-Object -First 1
-
-          if (-not $signtool) {
-            throw "signtool.exe was not found on the GitHub runner."
-          }
-
-          $targets = @(
-            "publish/CubeShelf/CubeShelf.exe",
-            "publish/Updater/CubeShelf.Updater.exe"
-          )
-
-          foreach ($target in $targets) {
-            & $signtool.FullName sign `
-              /f $pfx `
-              /p $env:CUBESHELF_SIGN_PFX_PASSWORD `
-              /fd SHA256 `
-              /tr http://timestamp.digicert.com `
-              /td SHA256 `
-              $target
-
-            if ($LASTEXITCODE -ne 0) {
-              throw "Authenticode signing failed for $target"
-            }
-          }
-
+          $pfx = Join-Path $env:RUNNER_TEMP "cubeshelf-installer-signing.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CUBESHELF_SIGN_PFX_BASE64))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /f $pfx /p $env:CUBESHELF_SIGN_PFX_PASSWORD /fd SHA256 /tr https://timestamp.digicert.com /td SHA256 dist/CubeShelf-Setup-x64.exe
+          if ($LASTEXITCODE -ne 0) { throw "Installer signing failed." }
           Remove-Item $pfx -Force
 
-      - name: Package release
+      - name: Generate checksums
         shell: pwsh
         run: |
-          Copy-Item `
-            publish/Updater/CubeShelf.Updater.exe `
-            publish/CubeShelf/CubeShelf.Updater.exe `
-            -Force
+          @("dist/CubeShelf-win-x64.zip", "dist/CubeShelf-Setup-x64.exe", "dist/CubeShelf-linux-x64.AppImage") | ForEach-Object {
+            $hash = (Get-FileHash $_ -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $([IO.Path]::GetFileName($_))"
+          } | Out-File dist/checksums.txt -Encoding ascii
 
-          Compress-Archive `
-            -Path publish/CubeShelf/* `
-            -DestinationPath CubeShelf-win-x64.zip `
-            -Force
-
-          $hash = (
-            Get-FileHash `
-              CubeShelf-win-x64.zip `
-              -Algorithm SHA256
-          ).Hash.ToLower()
-
-          "$hash  CubeShelf-win-x64.zip" |
-            Out-File checksums.txt -Encoding ascii
-
-      - name: Tag this commit
-        shell: bash
+      - name: Generate release manifest v2
+        shell: pwsh
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "${{ steps.version.outputs.tag }}" "${{ github.sha }}"
-          git push origin "refs/tags/${{ steps.version.outputs.tag }}"
+          $asset = Get-Item "dist/CubeShelf-win-x64.zip"
+          $linuxAsset = Get-Item "dist/CubeShelf-linux-x64.AppImage"
+          $downloadRoot = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/${{ steps.version.outputs.tag }}"
+          $manifest = [ordered]@{
+            schemaVersion = 2
+            version = "${{ steps.version.outputs.version }}"
+            signature = $null
+            artifacts = @(
+              [ordered]@{
+                os = "windows"
+                architecture = "x64"
+                type = "launcher"
+                url = "$downloadRoot/$($asset.Name)"
+                size = $asset.Length
+                sha256 = (Get-FileHash $asset.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                minimumOsVersion = "10.0.17763"
+              },
+              [ordered]@{
+                os = "linux"
+                architecture = "x64"
+                type = "launcher"
+                url = "$downloadRoot/$($linuxAsset.Name)"
+                size = $linuxAsset.Length
+                sha256 = (Get-FileHash $linuxAsset.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                minimumOsVersion = $null
+              }
+            )
+          }
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content dist/release-manifest-v2.json -Encoding utf8
 
-      - name: Publish GitHub Release
+      - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.tag }}
+          name: CubeShelf ${{ steps.version.outputs.tag }}
           generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
-            CubeShelf-win-x64.zip
-            checksums.txt
+            dist/CubeShelf-win-x64.zip
+            dist/CubeShelf-Setup-x64.exe
+            dist/CubeShelf-linux-x64.AppImage
+            dist/checksums.txt
+            dist/release-manifest-v2.json

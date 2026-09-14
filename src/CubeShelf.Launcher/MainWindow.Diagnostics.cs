@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CubeShelf.Launcher.Services;
+using CubeShelf.Core.Library;
 
 namespace CubeShelf.Launcher;
 

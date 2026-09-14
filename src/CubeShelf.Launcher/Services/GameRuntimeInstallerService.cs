@@ -1,5 +1,6 @@
-using SharpCompress.Archives;
-using SharpCompress.Common;
+using CubeShelf.Core.Security;
+using CubeShelf.Core.Platform;
+using CubeShelf.Core.Library;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -19,32 +20,46 @@ public sealed record RuntimeHealth(
 
 public sealed class GameRuntimeInstallerService
 {
+    private const long MaximumRuntimeDownloadBytes = 4L * 1024 * 1024 * 1024;
+    private const long MaximumDolphinDownloadBytes = 512L * 1024 * 1024;
+    private const string Dolphin2606aSha256 =
+        "4c58045f9821cb63913f4df08ea86ece3cdda9f9e646154516000fa1547e0c37";
+    private static readonly ArchiveExtractionLimits RuntimeExtractionLimits = new(
+        MaximumEntries: 100_000,
+        MaximumUncompressedBytes: 8L * 1024 * 1024 * 1024,
+        MaximumSingleFileBytes: 4L * 1024 * 1024 * 1024);
+    private static readonly ArchiveExtractionLimits DolphinExtractionLimits = new(
+        MaximumEntries: 30_000,
+        MaximumUncompressedBytes: 2L * 1024 * 1024 * 1024,
+        MaximumSingleFileBytes: 512L * 1024 * 1024);
+
     private readonly HttpClient _http = new();
+    private readonly IPlatformPaths _paths;
     private readonly JsonSerializerOptions _json = new() { WriteIndented = true, PropertyNameCaseInsensitive = true };
 
-    public GameRuntimeInstallerService()
+    public GameRuntimeInstallerService(IPlatformPaths? paths = null)
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.6.20");
+        _paths = paths ?? new PlatformPaths();
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.7.0");
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
-    private static string Root(GameDefinition game)
+    private string Root(GameDefinition game)
     {
         var root=Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf","Games",game.Id,"Runtime");
+            _paths.DataDirectory,"Games",game.Id,"Runtime");
         Directory.CreateDirectory(root);
         return root;
     }
 
-    private static string Current(GameDefinition game)
+    private string Current(GameDefinition game)
     {
         var p=Path.Combine(Root(game),"current");
         Directory.CreateDirectory(p);
         return p;
     }
 
-    private static string StatePath(GameDefinition game) => Path.Combine(Root(game),"runtime-state.json");
+    private string StatePath(GameDefinition game) => Path.Combine(Root(game),"runtime-state.json");
 
 
 public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
@@ -130,7 +145,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
     return true;
 }
 
-    private static void MarkRuntimeMissing(GameDefinition game)
+    private void MarkRuntimeMissing(GameDefinition game)
     {
         game.RuntimeInstalled = false;
         game.GameDataReady = false;
@@ -261,9 +276,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 "CubeShelf refuse d'installer un runtime sans checksum SHA-256.");
 
         var cacheDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf",
-            "Cache",
+            _paths.CacheDirectory,
             "Downloads");
 
         Directory.CreateDirectory(cacheDirectory);
@@ -374,16 +387,11 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report(.62);
 
-            using (var archive = ArchiveFactory.OpenArchive(package))
-            {
-                archive.WriteToDirectory(
-                    staging,
-                    new ExtractionOptions
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-            }
+            SecureArchiveExtractor.Extract(
+                package,
+                staging,
+                RuntimeExtractionLimits,
+                p => progress?.Report(.62 + p * .10));
 
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report(.72);
@@ -1018,6 +1026,9 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         var total = response.Content.Headers.ContentRange?.Length ??
                     (responseLength is > 0 ? existing + responseLength.Value : (long?)null);
 
+        if (total > MaximumRuntimeDownloadBytes)
+            throw new InvalidDataException("Le runtime PartyBoard dépasse la taille autorisée.");
+
         var buffer = new byte[256 * 1024];
         var done = existing;
 
@@ -1038,6 +1049,9 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
 
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
                 done += read;
+
+                if (done > MaximumRuntimeDownloadBytes)
+                    throw new InvalidDataException("Le runtime PartyBoard dépasse la taille autorisée.");
 
                 if (total is > 0)
                     progress?.Invoke(Math.Clamp((double)done / total.Value, 0, 1));
@@ -1143,8 +1157,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         var exes=Directory.EnumerateFiles(root,"*.exe",SearchOption.AllDirectories).ToList();
         return exes.FirstOrDefault(x=>Path.GetFileName(x).Equals("partyboard.exe",StringComparison.OrdinalIgnoreCase))
             ?? exes.FirstOrDefault(x=>Path.GetFileName(x).Contains("partyboard",StringComparison.OrdinalIgnoreCase)
-                                      && !Path.GetFileName(x).Contains("online",StringComparison.OrdinalIgnoreCase))
-            ?? exes.FirstOrDefault();
+                                      && !Path.GetFileName(x).Contains("online",StringComparison.OrdinalIgnoreCase));
     }
 
     private static void CopyContents(string source,string destination)
@@ -1163,10 +1176,9 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
     public bool IsDolphinToolAvailable()
         => FindDolphinTool() is not null;
 
-    private static string DolphinToolCacheRoot()
+    private string DolphinToolCacheRoot()
         => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf",
+            _paths.DataDirectory,
             "Tools",
             "Dolphin");
 
@@ -1178,6 +1190,10 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         var existing = FindDolphinTool();
         if (existing is not null)
             return existing;
+
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException(
+                "Installe DolphinTool avec le gestionnaire de paquets de ta distribution Linux.");
 
         if (!allowDownload)
         {
@@ -1208,6 +1224,16 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 p => progress?.Report(.01 + p * .14),
                 cancellationToken);
 
+            if (new FileInfo(archivePath).Length > MaximumDolphinDownloadBytes ||
+                !await VerifySha256Async(
+                    archivePath,
+                    Dolphin2606aSha256,
+                    cancellationToken))
+            {
+                throw new CryptographicException(
+                    "Le SHA-256 de Dolphin 2606a est invalide. Le téléchargement a été refusé.");
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
             if (Directory.Exists(staging))
@@ -1216,16 +1242,11 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             Directory.CreateDirectory(staging);
             progress?.Report(.16);
 
-            using (var archive = ArchiveFactory.OpenArchive(archivePath))
-            {
-                archive.WriteToDirectory(
-                    staging,
-                    new ExtractionOptions
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-            }
+            SecureArchiveExtractor.Extract(
+                archivePath,
+                staging,
+                DolphinExtractionLimits,
+                p => progress?.Report(.16 + p * .04));
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -1294,9 +1315,11 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
         }
     }
 
-    private static string? FindDolphinTool()
+    private string? FindDolphinTool()
     {
-        var names = new[] { "DolphinTool.exe", "dolphin-tool.exe" };
+        var names = OperatingSystem.IsWindows()
+            ? new[] { "DolphinTool.exe", "dolphin-tool.exe" }
+            : new[] { "DolphinTool", "dolphin-tool" };
 
         var candidateDirectories = new List<string>
         {
@@ -1313,14 +1336,18 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             candidateDirectories.Add(Path.Combine(root, "Dolphin"));
         }
 
-        AddCandidateRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
-
-        AddCandidateRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
-
-        AddCandidateRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+        if (OperatingSystem.IsWindows())
+        {
+            AddCandidateRoot(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+            AddCandidateRoot(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
+            AddCandidateRoot(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+        }
+        else
+        {
+            candidateDirectories.Add("/usr/bin");
+            candidateDirectories.Add("/usr/local/bin");
+            candidateDirectories.Add("/app/bin");
+        }
 
         foreach (var dir in candidateDirectories
                      .Where(x => !string.IsNullOrWhiteSpace(x))

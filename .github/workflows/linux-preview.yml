@@ -1,0 +1,68 @@
+name: Build Linux and Steam Deck preview
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore src/CubeShelf.Desktop/CubeShelf.Desktop.csproj --configfile NuGet.Config
+
+      - name: Test portable core
+        run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+
+      - name: Publish Linux x64
+        run: >
+          dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
+          -c Release -r linux-x64 --self-contained true
+          -p:DebugType=None -p:DebugSymbols=false
+          -o publish/linux-x64
+
+      - name: Assemble AppDir
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p AppDir/usr/bin
+          cp -a publish/linux-x64/. AppDir/usr/bin/
+          cp packaging/linux/AppRun AppDir/AppRun
+          cp packaging/linux/cubeshelf.desktop AppDir/cubeshelf.desktop
+          cp src/CubeShelf.Launcher/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
+          cp AppDir/cubeshelf.png AppDir/.DirIcon
+          chmod +x AppDir/AppRun AppDir/usr/bin/CubeShelf
+
+      - name: Build AppImage
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage \
+            --output appimagetool
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  appimagetool" | sha256sum --check --strict
+          chmod +x appimagetool
+          APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 VERSION=0.8.0-preview.2 \
+            ./appimagetool AppDir CubeShelf-linux-x64.AppImage
+          sha256sum CubeShelf-linux-x64.AppImage > checksums-linux.txt
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: CubeShelf-linux-x64-preview
+          path: |
+            CubeShelf-linux-x64.AppImage
+            checksums-linux.txt
+          retention-days: 14

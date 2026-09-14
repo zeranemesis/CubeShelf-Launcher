@@ -1,4 +1,5 @@
 using System.Windows;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -21,11 +22,9 @@ public sealed class UserPreferencesService
     private readonly string _file;
     private readonly JsonSerializerOptions _json = new() { WriteIndented = true };
 
-    public UserPreferencesService()
+    public UserPreferencesService(IPlatformPaths? paths = null)
     {
-        _dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf");
+        _dataDir = (paths ?? new PlatformPaths()).DataDirectory;
 
         Directory.CreateDirectory(_dataDir);
         _file = Path.Combine(_dataDir, "settings.json");

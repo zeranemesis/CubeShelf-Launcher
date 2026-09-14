@@ -8,7 +8,7 @@ public sealed class LauncherConfig
     public string ChecksumAssetName { get; set; } = "checksums.txt";
     public string ModsRoot { get; set; } = "Mods";
     public bool AutoCheckLauncherUpdates { get; set; } = true;
-    public bool AutoInstallLauncherUpdates { get; set; } = true;
+    public bool AutoInstallLauncherUpdates { get; set; } = false;
 
     public static LauncherConfig Load(string path)
     {

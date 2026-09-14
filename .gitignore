@@ -2,6 +2,8 @@
 **/obj/
 .vs/
 publish/
+dist/
+.tools/
 Mods/
 *.user
 *.suo

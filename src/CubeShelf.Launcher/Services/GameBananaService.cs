@@ -17,6 +17,7 @@ public sealed record GameBananaMod(
 
 public sealed class GameBananaService
 {
+    private const long MaximumModDownloadBytes = 2L * 1024 * 1024 * 1024;
     private readonly HttpClient _http = new();
     private readonly int _gameBananaGameId;
 
@@ -26,7 +27,9 @@ public sealed class GameBananaService
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.5");
     }
 
-    public async Task<IReadOnlyList<int>> GetLatestModIdsAsync(int pages = 3)
+    public async Task<IReadOnlyList<int>> GetLatestModIdsAsync(
+        int pages = 3,
+        CancellationToken cancellationToken = default)
     {
         if (_gameBananaGameId <= 0)
             return Array.Empty<int>();
@@ -40,7 +43,8 @@ public sealed class GameBananaService
                 $"&itemtype=Mod&gameid={_gameBananaGameId}" +
                 $"&include_updated=true&format=json_min";
 
-            using var doc = JsonDocument.Parse(await _http.GetStringAsync(url));
+            using var doc = JsonDocument.Parse(
+                await _http.GetStringAsync(url, cancellationToken));
 
             foreach (var row in doc.RootElement.EnumerateArray())
             {
@@ -61,24 +65,39 @@ public sealed class GameBananaService
         return ids.ToList();
     }
 
-    public async Task<IReadOnlyList<GameBananaMod>> GetLatestModsAsync()
+    public async Task<IReadOnlyList<GameBananaMod>> GetLatestModsAsync(
+        CancellationToken cancellationToken = default)
     {
-        var ids = await GetLatestModIdsAsync();
-        var result = new List<GameBananaMod>();
+        var ids = await GetLatestModIdsAsync(
+            cancellationToken: cancellationToken);
+        using var gate = new SemaphoreSlim(8);
 
-        foreach (var id in ids.Take(80))
+        var tasks = ids.Take(80).Select(async id =>
         {
+            await gate.WaitAsync(cancellationToken);
             try
             {
-                result.Add(await GetModAsync(id));
+                return await GetModAsync(id, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch
             {
                 // One withheld or malformed submission must not block the list.
+                return null;
             }
-        }
+            finally
+            {
+                gate.Release();
+            }
+        });
+
+        var result = await Task.WhenAll(tasks);
 
         return result
+            .OfType<GameBananaMod>()
             .OrderByDescending(x => x.Updated)
             .ToList();
     }
@@ -337,6 +356,8 @@ public sealed class GameBananaService
                 "Aucune archive GameBanana exploitable n'a été trouvée.");
         }
 
+        EnsureTrustedDownloadUrl(mod.ArchiveUrl);
+
         using var response = await _http.GetAsync(
             mod.ArchiveUrl,
             HttpCompletionOption.ResponseHeadersRead,
@@ -344,7 +365,11 @@ public sealed class GameBananaService
 
         response.EnsureSuccessStatusCode();
 
+        EnsureTrustedDownloadUrl(response.RequestMessage?.RequestUri?.ToString() ?? "");
+
         var total = response.Content.Headers.ContentLength;
+        if (total > MaximumModDownloadBytes)
+            throw new InvalidDataException("L'archive du mod dépasse la taille autorisée.");
         await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
         await using var output = File.Create(destination);
 
@@ -357,10 +382,25 @@ public sealed class GameBananaService
             await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
             done += read;
 
+            if (done > MaximumModDownloadBytes)
+                throw new InvalidDataException("L'archive du mod dépasse la taille autorisée.");
+
             if (total is > 0)
                 progress?.Report((double)done / total.Value);
         }
 
         return destination;
+    }
+
+    private static void EnsureTrustedDownloadUrl(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            !uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ||
+            !(uri.Host.Equals("gamebanana.com", StringComparison.OrdinalIgnoreCase) ||
+              uri.Host.EndsWith(".gamebanana.com", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidDataException(
+                "GameBanana a retourné une adresse de téléchargement non approuvée.");
+        }
     }
 }

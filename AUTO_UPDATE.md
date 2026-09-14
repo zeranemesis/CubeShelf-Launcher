@@ -1,24 +1,10 @@
-# CubeShelf automatic updates
+# Mises à jour de CubeShelf
 
-CubeShelf is hard-linked by default to:
+Dans l’interface Avalonia 0.8, CubeShelf consulte la dernière release stable de `zeranemesis/CubeShelf-Launcher` à la demande depuis la page Paramètres.
 
-`zeranemesis/CubeShelf-Launcher`
+Une mise à jour téléchargée suit ce parcours : lecture du manifeste v2, sélection stricte de la plateforme, contrôle de taille et SHA-256 du ZIP, lancement de `CubeShelf.Updater.exe`, remplacement transactionnel des fichiers puis redémarrage. Sous Linux, le bouton ouvre la release contenant la nouvelle AppImage.
 
-At application startup:
-
-1. CubeShelf calls GitHub's `releases/latest` endpoint.
-2. It compares the latest release tag (`vX.Y.Z`) with its own assembly version.
-3. If `AutoInstallLauncherUpdates=true`, the update is downloaded automatically.
-4. CubeShelf downloads:
-   - `CubeShelf-win-x64.zip`
-   - `checksums.txt`
-5. SHA-256 is verified.
-6. `CubeShelf.Updater.exe` is started.
-7. CubeShelf exits.
-8. The updater replaces the application files.
-9. The new CubeShelf.exe is launched.
-
-Configuration:
+L’installation automatique est désactivée : l’utilisateur confirme toujours l’application de la mise à jour.
 
 ```json
 {
@@ -28,9 +14,9 @@ Configuration:
     "ReleaseAssetName": "CubeShelf-win-x64.zip",
     "ChecksumAssetName": "checksums.txt",
     "AutoCheckLauncherUpdates": true,
-    "AutoInstallLauncherUpdates": true
+    "AutoInstallLauncherUpdates": false
   }
 }
 ```
 
-GitHub Actions creates the Windows ZIP and checksum when a `v*` tag is pushed.
+Le workflow de release ne publie une version stable que pour un tag `v*` ou un déclenchement manuel. La signature Authenticode est obligatoire pour une release stable ; une compilation non signée exige une dérogation manuelle explicite.

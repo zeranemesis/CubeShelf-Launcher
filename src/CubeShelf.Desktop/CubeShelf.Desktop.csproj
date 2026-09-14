@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CubeShelf</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\CubeShelf.Launcher\Assets\Brand\gamecube_logo.ico</ApplicationIcon>
+    <Version>0.8.0-preview.2</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
+    <PackageReference Include="Avalonia.BuildServices" Version="11.3.2" ExcludeAssets="all" PrivateAssets="all" />
+    <ProjectReference Include="..\CubeShelf.Core\CubeShelf.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\CubeShelf.Launcher\games.json" Link="games.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\CubeShelf.Launcher\Assets\Covers\**\*" Link="Assets\Covers\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

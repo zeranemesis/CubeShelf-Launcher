@@ -10,12 +10,12 @@
     <SelfContained>true</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <AssemblyName>CubeShelf</AssemblyName>
-    <Version>0.6.21</Version>
+    <Version>0.7.0</Version>
       <ApplicationIcon>Assets\Brand\gamecube_logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpCompress" Version="0.*" />
+    <ProjectReference Include="..\CubeShelf.Core\CubeShelf.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

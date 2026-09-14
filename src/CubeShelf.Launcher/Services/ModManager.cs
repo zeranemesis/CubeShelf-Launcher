@@ -1,6 +1,6 @@
-using SharpCompress.Archives;
-using SharpCompress.Common;
 using System.Security.Cryptography;
+
+using CubeShelf.Core.Security;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -24,8 +24,17 @@ public sealed record InstallResult(
     string ContentRoot,
     string Sha256);
 
+public sealed record ModFileConflict(
+    string RelativePath,
+    IReadOnlyList<int> ModIds);
+
 public sealed class ModManager
 {
+    private static readonly ArchiveExtractionLimits ExtractionLimits = new(
+        MaximumEntries: 20_000,
+        MaximumUncompressedBytes: 4L * 1024 * 1024 * 1024,
+        MaximumSingleFileBytes: 2L * 1024 * 1024 * 1024);
+
     private readonly GameDefinition _game;
     private readonly GameBananaService _gb;
     private readonly string _root;
@@ -101,14 +110,11 @@ public sealed class ModManager
 
         try
         {
-            using var archive = ArchiveFactory.OpenArchive(temp);
-            archive.WriteToDirectory(
+            SecureArchiveExtractor.Extract(
+                temp,
                 staging,
-                new ExtractionOptions
-                {
-                    ExtractFullPath = true,
-                    Overwrite = true
-                });
+                ExtractionLimits,
+                p => progress?.Invoke(new("extract", .72 + p * .14)));
         }
         catch
         {
@@ -211,6 +217,44 @@ public sealed class ModManager
 
         File.WriteAllLines(_activeListFile, lines);
         return _activeListFile;
+    }
+
+    public IReadOnlyList<ModFileConflict> AnalyzeConflicts()
+    {
+        var owners = new Dictionary<string, HashSet<int>>(
+            OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+        foreach (var mod in GetInstalled().Where(item => item.Enabled))
+        {
+            if (!Directory.Exists(mod.ContentRoot)) continue;
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(
+                             mod.ContentRoot, "*", SearchOption.AllDirectories))
+                {
+                    var relative = Path.GetRelativePath(mod.ContentRoot, file)
+                        .Replace(Path.DirectorySeparatorChar, '/');
+                    if (!owners.TryGetValue(relative, out var modIds))
+                    {
+                        modIds = new HashSet<int>();
+                        owners[relative] = modIds;
+                    }
+                    modIds.Add(mod.Id);
+                }
+            }
+            catch
+            {
+                // An unreadable mod is ignored; diagnostics can report it separately.
+            }
+        }
+
+        return owners
+            .Where(pair => pair.Value.Count > 1)
+            .Select(pair => new ModFileConflict(
+                pair.Key,
+                pair.Value.OrderBy(id => id).ToArray()))
+            .OrderBy(conflict => conflict.RelativePath, StringComparer.Ordinal)
+            .ToArray();
     }
 
     private string DetectContentRoot(string staging)

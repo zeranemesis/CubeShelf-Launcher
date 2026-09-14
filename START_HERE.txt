@@ -1,15 +1,9 @@
-POUR CREER LE REPOSITORY CUBESHELF
+CUBESHELF 0.8.0 PREVIEW 2 — DÉMARRAGE RAPIDE
 
-1. Extrais tout ce ZIP dans un nouveau dossier, par exemple :
-   C:\Users\BEAVSN\Documents\CubeShelf-Launcher
+Installation : lance dist\CubeShelf-Setup-x64.exe.
 
-2. Double-clique :
-   CREATE_GITHUB_REPO_AND_PUSH.bat
+Compilation locale :
+  .\BUILD_INSTALLER.ps1 -Version 0.8.0-preview.2
 
-3. Si GitHub demande une connexion, valide-la dans le navigateur.
-
-Le script va creer automatiquement :
-https://github.com/zeranemesis/CubeShelf-Launcher
-
-Puis il va pousser CubeShelf v0.6.7 et creer le tag v0.6.7.
-Ce tag declenchera le workflow GitHub Actions pour produire CubeShelf-win-x64.zip.
+Publication : pousse un tag vMAJEUR.MINEUR.CORRECTIF. Le workflow stable exige
+un certificat Authenticode configuré dans les secrets du dépôt.

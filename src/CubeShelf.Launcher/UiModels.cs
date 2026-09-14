@@ -16,6 +16,7 @@ public sealed class UiMod : INotifyPropertyChanged
     public bool Installed { get; set; }
     public bool Enabled { get; set; }
     public bool UpdateAvailable { get; set; }
+    public int ConflictCount { get; set; }
 
     public int Priority
     {
@@ -23,9 +24,17 @@ public sealed class UiMod : INotifyPropertyChanged
         set { _priority = value; OnChanged(); }
     }
 
-    public string StatusText =>
-        !Installed ? "Non installé" :
-        Enabled ? "Installé • activé" : "Installé • désactivé";
+    public string StatusText
+    {
+        get
+        {
+            var state = !Installed ? "Non installé" :
+                Enabled ? "Installé • activé" : "Installé • désactivé";
+            return ConflictCount > 0
+                ? $"{state} • ⚠ {ConflictCount} conflit(s)"
+                : state;
+        }
+    }
 
     public string InstallText =>
         !Installed ? "Installer" :
@@ -33,6 +42,9 @@ public sealed class UiMod : INotifyPropertyChanged
 
     public string ToggleText => Enabled ? "Désactiver" : "Activer";
     public string UpdateText => UpdateAvailable ? "Mise à jour disponible" : "";
+    public string ConflictText => ConflictCount > 0
+        ? $"⚠ {ConflictCount} conflit(s) de fichiers"
+        : "";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

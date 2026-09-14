@@ -1,3 +1,5 @@
+using CubeShelf.Core.Platform;
+
 namespace CubeShelf.Launcher.Services;
 
 public sealed class GameLibraryService
@@ -8,14 +10,12 @@ public sealed class GameLibraryService
     private readonly JsonSerializerOptions _json =
         new() { WriteIndented = true, PropertyNameCaseInsensitive = true };
 
-    public GameLibraryService()
+    public GameLibraryService(IPlatformPaths? paths = null)
     {
         _baseDirectory = AppContext.BaseDirectory;
         _shippedGamesFile = Path.Combine(_baseDirectory, "games.json");
 
-        var dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf");
+        var dataDir = (paths ?? new PlatformPaths()).DataDirectory;
 
         Directory.CreateDirectory(dataDir);
         _userGamesFile = Path.Combine(dataDir, "games.json");

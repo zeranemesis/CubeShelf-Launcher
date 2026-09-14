@@ -1,5 +1,6 @@
 
 using System.Windows;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Launcher.Services;
 
@@ -155,14 +156,13 @@ public sealed class DownloadQueueService
 
     public ObservableCollection<DownloadQueueItem> Items { get; } = new();
 
-    public DownloadQueueService()
+    public DownloadQueueService(IPlatformPaths? paths = null)
     {
-        var dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf");
+        var platformPaths = paths ?? new PlatformPaths();
+        var dataDir = platformPaths.DataDirectory;
 
         Directory.CreateDirectory(dataDir);
-        _historyPath = Path.Combine(dataDir, "download-history.json");
+        _historyPath = platformPaths.DownloadHistoryFile;
         LoadHistory();
     }
 

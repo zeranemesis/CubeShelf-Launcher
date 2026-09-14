@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=CubeShelf
+Comment=GameCube library and PartyBoard launcher
+Exec=CubeShelf
+Icon=cubeshelf
+Categories=Game;
+Terminal=false
