@@ -136,7 +136,8 @@ public sealed partial class MainWindow
 
         try
         {
-            var screen = Screens.ScreenFromWindow(this);
+            var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+            if (screen is null) return;
             var identity = $"{screen.DisplayName}|{screen.WorkingArea}|{screen.Scaling:0.###}";
             if (identity == _phase5LastScreen) return;
             _phase5LastScreen = identity;

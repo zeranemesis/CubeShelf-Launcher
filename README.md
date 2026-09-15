@@ -15,7 +15,7 @@ Le profil utilisateur reste dans `%LOCALAPPDATA%\CubeShelf` et est conservé lor
 Prérequis : SDK .NET 8 et Inno Setup 6.
 
 ```powershell
-.\BUILD_INSTALLER.ps1 -Version 0.8.0-preview.2
+.\BUILD_INSTALLER.ps1
 ```
 
 Le résultat est créé dans `dist\CubeShelf-Setup-x64.exe`.
@@ -52,4 +52,4 @@ dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj -c Release -r linu
 - `CubeShelf-Launcher` : interface, bibliothèque, installation, mises à jour et mods ;
 - `Marioparty4` / PartyBoard : runtime du jeu et artefact Windows `PartyBoard-win-x64.zip`.
 
-Compatibilité : Windows 10/11 x64 avec installateur, Linux x64/Steam Deck via AppImage, macOS x64/arm64 expérimental sans support PartyBoard garanti. Version actuelle : `0.8.0-preview.2`.
+Compatibilité : Windows 10/11 x64 avec installateur, Linux x64/Steam Deck via AppImage, macOS x64/arm64 expérimental sans support PartyBoard garanti. Version actuelle : voir le fichier `VERSION` à la racine du dépôt, qui pilote l’assembly, l’installateur, l’AppImage et les workflows.

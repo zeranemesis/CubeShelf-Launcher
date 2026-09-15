@@ -30,13 +30,11 @@ public sealed partial class MainWindow : Window
     private readonly GameSessionTracker _sessions;
     private UserPreferences _preferences;
     private bool _loadingSettings;
-    private CancellationTokenSource? _installationCancellation;
     private GameCatalogEntry? _selectedGame;
     private PortableModManager? _modManager;
     private readonly GameBananaClient _gameBanana = new();
     private IReadOnlyList<GameBananaMod> _remoteMods = Array.Empty<GameBananaMod>();
     private DesktopModItem? _selectedMod;
-    private DownloadActivity? _selectedDownload;
     private Bitmap? _modPreviewBitmap;
 
     public MainWindow()
@@ -225,22 +223,6 @@ public sealed partial class MainWindow : Window
         CancelActiveGameQueuePhase3();
         ActionStatus.Text = "Annulation demandée…";
     }
-    private void PrepareGameData(object? sender, RoutedEventArgs args)
-    {
-        EnqueueGameDataPreparationPhase3();
-    }
-    private void UninstallPartyBoard(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedGame is null || _installationCancellation is not null) return;
-        var managed = _installer.GetStatus(_selectedGame.Id);
-        _installer.Uninstall(_selectedGame.Id);
-        if (string.Equals(_selectedGame.Executable, managed.ExecutablePath,
-                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            _selectedGame.Executable = "";
-        PersistSelection();
-        RefreshGameState();
-        ActionStatus.Text = "PartyBoard a été désinstallé. L’image ISO/GCM/RVZ n’a pas été supprimée.";
-    }
 
     private void ClearDisc(object? sender, RoutedEventArgs args)
     {
@@ -413,7 +395,7 @@ public sealed partial class MainWindow : Window
             : $"⚠ {conflicts.Count} fichier(s) en conflit : " + string.Join(", ", conflicts.Take(5).Select(item => item.RelativePath));
     }
 
-    private async void SelectMod(object? sender, SelectionChangedEventArgs args)
+    private void SelectMod(object? sender, SelectionChangedEventArgs args)
     {
         _selectedMod = ModsList.SelectedItem as DesktopModItem;
         if (_selectedMod is null) return;
@@ -484,49 +466,10 @@ public sealed partial class MainWindow : Window
         RefreshDownloadItems();
     }
 
-    private void ClearDownloads(object? sender, RoutedEventArgs args)
-    {
-        _downloads.ClearFinished();
-        RefreshDownloadItems();
-    }
 
     private void RefreshDownloadItems() => RefreshPortableQueueView();
 
-    private void SelectDownload(object? sender, SelectionChangedEventArgs args)
-    {
-        _selectedDownload = DownloadsList.SelectedItem as DownloadActivity;
-        ResumeDownloadButton.IsEnabled = _selectedDownload is not null &&
-            _selectedDownload.State is DownloadActivityState.Interrupted or DownloadActivityState.Failed or DownloadActivityState.Cancelled;
-    }
 
-    private async void ResumeDownload(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedDownload is null) return;
-        if (_selectedDownload.Kind == "runtime")
-        {
-            ShowLibrary(sender, args);
-            await RunInstallationAsync(repair: false);
-            return;
-        }
-        if (_selectedDownload.Kind == "mod" && int.TryParse(_selectedDownload.ReferenceId, out var modId) &&
-            _modManager is not null)
-        {
-            try
-            {
-                var remote = _remoteMods.FirstOrDefault(item => item.Id == modId) ?? await _gameBanana.GetAsync(modId);
-                var installed = _modManager.GetInstalled().FirstOrDefault(item => item.Id == modId);
-                _selectedMod = new DesktopModItem(modId, remote.Name,
-                    installed is null ? "Non installé" : "Installation interrompue",
-                    installed?.Priority ?? 100, installed?.Enabled ?? false, installed is not null, remote);
-                ShowMods(sender, args);
-                await RunModInstallationAsync();
-            }
-            catch (Exception exception)
-            {
-                ModsStatus.Text = $"Reprise impossible : {exception.Message}";
-            }
-        }
-    }
 
     public sealed record DesktopModItem(int Id, string Name, string Status, int Priority, bool Enabled,
         bool Installed, GameBananaMod? Remote);
@@ -604,14 +547,6 @@ public sealed partial class MainWindow : Window
         Process.Start(new ProcessStartInfo(_paths.DataDirectory) { UseShellExecute = true });
     }
 
-    private void ClearMediaCache(object? sender, RoutedEventArgs args)
-    {
-        ModPreview.Source = null;
-        _modPreviewBitmap?.Dispose();
-        _modPreviewBitmap = null;
-        var bytes = _mediaCache.Clear();
-        SettingsStatus.Text = $"Cache vidé ({bytes / 1024d / 1024d:F1} Mio libérés).";
-    }
 
     private void ApplyPreferences()
     {

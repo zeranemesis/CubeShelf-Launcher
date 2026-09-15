@@ -336,7 +336,6 @@ public sealed partial class MainWindow
             SelectCatalogGame(game);
     }
 
-    private void RefreshStorageButtonParity(object? sender, RoutedEventArgs args) => RefreshStorageParity();
 
     private void RefreshStorageParity()
     {
@@ -346,58 +345,7 @@ public sealed partial class MainWindow
         StorageSummaryText.Text = UiLocalization.IsEnglish(_preferences.Language) ? $"CubeShelf data: {FormatBytes(data)} • Cache: {FormatBytes(cache)}" : $"Données CubeShelf : {FormatBytes(data)} • Cache : {FormatBytes(cache)}";
     }
 
-    private void CleanCacheParity(object? sender, RoutedEventArgs args)
-    {
-        ModPreview.Source = null;
-        _modPreviewBitmap?.Dispose();
-        _modPreviewBitmap = null;
-        var freed = _mediaCache.Clear();
-        RefreshStorageParity();
-        ShowToastParity(UiLocalization.IsEnglish(_preferences.Language) ? "Cache cleaned" : "Cache nettoyé", UiLocalization.IsEnglish(_preferences.Language) ? $"{FormatBytes(freed)} freed. ISO/RVZ and game data were not removed." : $"{FormatBytes(freed)} libérés. Les ISO/RVZ et données de jeu ne sont pas supprimés.");
-    }
 
-    private void OpenDiagnosticsParity(object? sender, RoutedEventArgs args)
-    {
-        var report = BuildDiagnosticsReport();
-        var text = new TextBox
-        {
-            Text = report,
-            IsReadOnly = true,
-            AcceptsReturn = true,
-            TextWrapping = TextWrapping.NoWrap,
-            FontFamily = new FontFamily("monospace")
-        };
-        ScrollViewer.SetVerticalScrollBarVisibility(text, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
-        ScrollViewer.SetHorizontalScrollBarVisibility(text, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
-        var dialog = new Window
-        {
-            Title = "CubeShelf • Diagnostic",
-            Width = 780,
-            Height = 620,
-            MinWidth = 640,
-            MinHeight = 480,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        };
-        var root = new Grid { Margin = new Thickness(20) };
-        root.RowDefinitions.Add(new RowDefinition(GridLength.Star));
-        root.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-        root.Children.Add(text);
-        var buttons = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, Spacing = 8, Margin = new Thickness(0, 12, 0, 0) };
-        Grid.SetRow(buttons, 1);
-        var copy = new Button { Content = "Copier" };
-        copy.Click += async (_, _) =>
-        {
-            if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
-                await clipboard.SetTextAsync(text.Text ?? "");
-        };
-        var close = new Button { Content = "Fermer" };
-        close.Click += (_, _) => dialog.Close();
-        buttons.Children.Add(copy);
-        buttons.Children.Add(close);
-        root.Children.Add(buttons);
-        dialog.Content = root;
-        _ = dialog.ShowDialog(this);
-    }
 
     private string BuildDiagnosticsReport()
     {

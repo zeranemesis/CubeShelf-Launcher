@@ -40,7 +40,7 @@ internal sealed class LinuxLauncherUpdateInstaller : ILauncherUpdateInstaller
     public UpdateInstallLaunchResult Launch(string downloadedArtifact, string version, int currentProcessId)
     {
         var currentAppImage = Environment.GetEnvironmentVariable("APPIMAGE");
-        if (!string.IsNullOrWhiteSpace(currentAppImage) && File.Exists(currentAppImage) &&
+        if (!OperatingSystem.IsWindows() && !string.IsNullOrWhiteSpace(currentAppImage) && File.Exists(currentAppImage) &&
             downloadedArtifact.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase))
         {
             var helper = Path.Combine(_paths.CacheDirectory, "Updates", "apply-appimage-update.sh");
