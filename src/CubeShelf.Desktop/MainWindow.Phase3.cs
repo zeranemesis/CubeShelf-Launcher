@@ -460,12 +460,15 @@ public sealed partial class MainWindow
         var release = snapshot.RuntimeRelease;
         var local = snapshot.LocalSource;
 
+        // The badge names the runtime this game actually uses: a Soulcalibur II page reporting
+        // on PartyBoard was the last place the single-game assumption was still visible.
+        var runtimeName = _selectedGame?.RuntimeName ?? "PartyBoard";
         GameUpdateStateText.Text = snapshot.RuntimeUpdateAvailable
-            ? P7("⬇ Mise à jour PartyBoard disponible", "⬇ PartyBoard update available")
+            ? P7($"⬇ Mise à jour {runtimeName} disponible", $"⬇ {runtimeName} update available")
             : snapshot.RuntimeUpdatePendingBuild
                 ? P7("◷ Nouveau code • build en attente", "◷ New source • build pending")
                 : release.Available
-                    ? P7("✓ PartyBoard à jour", "✓ PartyBoard up to date")
+                    ? P7($"✓ {runtimeName} à jour", $"✓ {runtimeName} up to date")
                     : P7("○ Aucun runtime public détecté", "○ No public runtime detected");
 
         var latestSha = ShortSha(source?.Sha);
