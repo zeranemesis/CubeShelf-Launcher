@@ -170,12 +170,13 @@ public sealed partial class MainWindow
         var runtime = _installer.GetStatus(game.Id);
         var disc = ResolveApplicationPath(game.DiscImage);
         var executable = runtime.IsInstalled ? runtime.ExecutablePath : ResolveApplicationPath(game.Executable);
-        var prepared = File.Exists(executable) && _gameData.IsPrepared(game.Id, executable);
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+        var prepared = !runtimeManagesDisc && File.Exists(executable) && _gameData.IsPrepared(game.Id, executable);
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var last = game.LastPlayedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (english ? "Never" : "Jamais");
         var update = _gameUpdateSnapshots.TryGetValue(game.Id, out var snapshot)
             ? snapshot.RuntimeUpdateAvailable
-                ? (english ? "⬇ PartyBoard update" : "⬇ Mise à jour PartyBoard")
+                ? (english ? $"⬇ {game.RuntimeName} update" : $"⬇ Mise à jour {game.RuntimeName}")
                 : snapshot.RuntimeUpdatePendingBuild
                     ? (english ? "◷ Build pending" : "◷ Build en attente")
                     : snapshot.SourceUpdateAvailable
@@ -187,8 +188,15 @@ public sealed partial class MainWindow
             LoadBitmap(coverPath),
             game.IsFavorite ? "★" : "",
             File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
-            runtime.IsInstalled || File.Exists(executable) ? "✓ PartyBoard" : "○ PartyBoard",
-            prepared ? (english ? "✓ Data" : "✓ Données") : (english ? "○ Data" : "○ Données"),
+            runtime.IsInstalled || File.Exists(executable)
+                ? $"✓ {game.RuntimeName}"
+                : $"○ {game.RuntimeName}",
+            // A runtime that prepares its own disc has no CubeShelf data step to report.
+            runtimeManagesDisc
+                ? (english ? "◆ Runtime-managed" : "◆ Géré par le runtime")
+                : prepared
+                    ? (english ? "✓ Data" : "✓ Données")
+                    : (english ? "○ Data" : "○ Données"),
             english
                 ? $"{game.PlayCount} launches • {FormatPlayTime(game.TotalPlaySeconds)} • {last}"
                 : $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • {last}",
