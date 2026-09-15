@@ -5,9 +5,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\CubeShelf.Launcher\Assets\Brand\gamecube_logo.ico</ApplicationIcon>
-    <Version>0.8.0-preview.2</Version>
+    <Version>0.8.0-preview.3</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
@@ -18,5 +19,6 @@
   <ItemGroup>
     <Content Include="..\CubeShelf.Launcher\games.json" Link="games.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\CubeShelf.Launcher\Assets\Covers\**\*" Link="Assets\Covers\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <AvaloniaResource Include="..\CubeShelf.Launcher\Assets\Brand\gamecube_logo.png" Link="Assets\Brand\gamecube_logo.png" />
   </ItemGroup>
 </Project>

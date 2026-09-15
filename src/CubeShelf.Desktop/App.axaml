@@ -2,7 +2,322 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CubeShelf.Desktop.App"
              RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="Bg">#050811</SolidColorBrush>
+          <SolidColorBrush x:Key="SidebarBg">#090E19</SolidColorBrush>
+          <SolidColorBrush x:Key="Panel">#111827</SolidColorBrush>
+          <SolidColorBrush x:Key="Panel2">#1A2538</SolidColorBrush>
+          <SolidColorBrush x:Key="Border">#3B4B69</SolidColorBrush>
+          <SolidColorBrush x:Key="Text">#F8FAFF</SolidColorBrush>
+          <SolidColorBrush x:Key="Muted">#B7C3DA</SolidColorBrush>
+          <SolidColorBrush x:Key="InputBg">#172235</SolidColorBrush>
+          <SolidColorBrush x:Key="HoverBg">#2A3852</SolidColorBrush>
+          <SolidColorBrush x:Key="Accent">#8A76FF</SolidColorBrush>
+          <SolidColorBrush x:Key="Accent2">#A895FF</SolidColorBrush>
+          <SolidColorBrush x:Key="Danger">#F05A78</SolidColorBrush>
+          <SolidColorBrush x:Key="Success">#5DE09A</SolidColorBrush>
+          <SolidColorBrush x:Key="Warning">#F2B45F</SolidColorBrush>
+          <SolidColorBrush x:Key="OverlayBrush">#CC050811</SolidColorBrush>
+          <LinearGradientBrush x:Key="HeroGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#1B2740" Offset="0"/>
+            <GradientStop Color="#0E1628" Offset="0.55"/>
+            <GradientStop Color="#21163B" Offset="1"/>
+          </LinearGradientBrush>
+          <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#8A76FF" Offset="0"/>
+            <GradientStop Color="#B783FF" Offset="1"/>
+          </LinearGradientBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="Bg">#F2F4F9</SolidColorBrush>
+          <SolidColorBrush x:Key="SidebarBg">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="Panel">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="Panel2">#F8F9FC</SolidColorBrush>
+          <SolidColorBrush x:Key="Border">#D8DEEA</SolidColorBrush>
+          <SolidColorBrush x:Key="Text">#151927</SolidColorBrush>
+          <SolidColorBrush x:Key="Muted">#66718B</SolidColorBrush>
+          <SolidColorBrush x:Key="InputBg">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="HoverBg">#E9EDFA</SolidColorBrush>
+          <SolidColorBrush x:Key="Accent">#6347EE</SolidColorBrush>
+          <SolidColorBrush x:Key="Accent2">#7359F0</SolidColorBrush>
+          <SolidColorBrush x:Key="Danger">#D33C5D</SolidColorBrush>
+          <SolidColorBrush x:Key="Success">#299E63</SolidColorBrush>
+          <SolidColorBrush x:Key="Warning">#B87416</SolidColorBrush>
+          <SolidColorBrush x:Key="OverlayBrush">#CCFFFFFF</SolidColorBrush>
+          <LinearGradientBrush x:Key="HeroGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FFFFFF" Offset="0"/>
+            <GradientStop Color="#F5F2FF" Offset="0.55"/>
+            <GradientStop Color="#EDF2FF" Offset="1"/>
+          </LinearGradientBrush>
+          <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#6347EE" Offset="0"/>
+            <GradientStop Color="#8A5AF6" Offset="1"/>
+          </LinearGradientBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- Default French resources. UiLocalization replaces these in place for English. -->
+      <x:String x:Key="AppLibrary">Bibliothèque</x:String>
+      <x:String x:Key="AppFavorites">Favoris</x:String>
+      <x:String x:Key="AppMods">Mods du jeu</x:String>
+      <x:String x:Key="AppDownloads">Téléchargements</x:String>
+      <x:String x:Key="AppSettings">Paramètres</x:String>
+      <x:String x:Key="LibraryEyebrow">BIBLIOTHÈQUE</x:String>
+      <x:String x:Key="LibraryTitle">Tes jeux GameCube</x:String>
+      <x:String x:Key="AddGame">+ Ajouter un jeu</x:String>
+      <x:String x:Key="LibrarySubtitle">Les mises à jour GitHub sont vérifiées automatiquement. Sélectionne un jeu pour continuer.</x:String>
+      <x:String x:Key="SearchGame">Rechercher un jeu…</x:String>
+      <x:String x:Key="SortName">Nom A-Z</x:String>
+      <x:String x:Key="SortRecent">Récemment joué</x:String>
+      <x:String x:Key="SortPlaytime">Temps de jeu</x:String>
+      <x:String x:Key="Queue">FILE D'ATTENTE</x:String>
+      <x:String x:Key="QueueEmpty">Aucune opération</x:String>
+      <x:String x:Key="BackLibrary">← Bibliothèque</x:String>
+      <x:String x:Key="FlipCase">↻ Retourner</x:String>
+      <x:String x:Key="SelectedGame">NINTENDO GAMECUBE • JEU SÉLECTIONNÉ</x:String>
+      <x:String x:Key="Mods">🧩 Mods</x:String>
+      <x:String x:Key="RefreshGameBanana">↻ Actualiser GameBanana</x:String>
+      <x:String x:Key="DownloadsEyebrow">TÉLÉCHARGEMENTS</x:String>
+      <x:String x:Key="DownloadsTitle">File d'attente</x:String>
+      <x:String x:Key="DownloadsSubtitle">Jeux, mods et mises à jour sont traités dans l'ordre avec progression et liste des changements.</x:String>
+      <x:String x:Key="SettingsEyebrow">PARAMÈTRES</x:String>
+      <x:String x:Key="SettingsTitle">Personnaliser CubeShelf</x:String>
+      <x:String x:Key="SettingsSubtitle">Langue, apparence, mises à jour et comportement de la bibliothèque.</x:String>
+      <x:String x:Key="Language">Langue</x:String>
+      <x:String x:Key="LanguageHelp">Change immédiatement la langue de l'interface.</x:String>
+      <x:String x:Key="Appearance">Apparence</x:String>
+      <x:String x:Key="AppearanceHelp">Le changement de thème est animé et mémorisé.</x:String>
+      <x:String x:Key="UpdateSettings">Mises à jour</x:String>
+      <x:String x:Key="WindowLayout">Fenêtre</x:String>
+      <x:String x:Key="WindowLayoutHelp">Adapte CubeShelf à la taille et au DPI de l’écran actuel.</x:String>
+      <x:String x:Key="AutoFitWindow">Adapter automatiquement</x:String>
+      <x:String x:Key="FitWindowNow">Adapter maintenant</x:String>
+      <x:String x:Key="Storage">Stockage</x:String>
+      <x:String x:Key="Diagnostics">Diagnostic</x:String>
+      <x:String x:Key="OpenDiagnostics">Ouvrir le diagnostic</x:String>
+      <x:String x:Key="FirstRunAssistant">Assistant de démarrage</x:String>
+      <x:String x:Key="RunAssistant">Relancer l’assistant</x:String>
+      <x:String x:Key="ResetSettings">Réinitialiser les paramètres</x:String>
+      <x:String x:Key="CheckLauncherUpdate">Vérifier les mises à jour de CubeShelf</x:String>
+      <x:String x:Key="DolphinToolTitle">DolphinTool / RVZ</x:String>
+      <x:String x:Key="DolphinDetect">Détecter</x:String>
+      <x:String x:Key="DolphinInstall">Installer automatiquement</x:String>
+      <x:String x:Key="OpenTools">Ouvrir les outils</x:String>
+      <x:String x:Key="OpenDataFolder">Ouvrir les données</x:String>
+      <x:String x:Key="Refresh">Actualiser</x:String>
+      <x:String x:Key="CleanCache">Nettoyer le cache</x:String>
+      <x:String x:Key="ClearFinished">Effacer les opérations terminées</x:String>
+      <x:String x:Key="CancelDownload">Annuler</x:String>
+      <x:String x:Key="ResumeDownload">Reprendre</x:String>
+      <x:String x:Key="RetryDownload">Réessayer</x:String>
+      <x:String x:Key="RemoveQueue">Retirer</x:String>
+      <x:String x:Key="NoLibraryMatch">Aucun jeu ne correspond à ce filtre.</x:String>
+      <x:String x:Key="BackGame">← Retour au jeu</x:String>
+      <x:String x:Key="GameUpdates">GITHUB / MISES À JOUR</x:String>
+      <x:String x:Key="Check">Vérifier</x:String>
+      <x:String x:Key="DownloadSource">Télécharger la source</x:String>
+      <x:String x:Key="DeleteSource">Supprimer la source</x:String>
+      <x:String x:Key="InstallPartyBoard">Installer PartyBoard</x:String>
+      <x:String x:Key="ChooseDisc">Choisir ISO / GCM / RVZ</x:String>
+      <x:String x:Key="Clear">Effacer</x:String>
+      <x:String x:Key="PrepareGameData">Préparer les données</x:String>
+      <x:String x:Key="ManualExecutable">Choisir manuellement</x:String>
+      <x:String x:Key="Repair">Réparer</x:String>
+      <x:String x:Key="Uninstall">Désinstaller</x:String>
+      <x:String x:Key="Play">▶ Jouer</x:String>
+      <x:String x:Key="Priority">Priorité</x:String>
+      <x:String x:Key="Apply">Appliquer</x:String>
+      <x:String x:Key="Install">Installer</x:String>
+      <x:String x:Key="Enable">Activer</x:String>
+      <x:String x:Key="Delete">Supprimer</x:String>
+      <x:String x:Key="ViewImage">Voir l’image</x:String>
+      <x:String x:Key="GameBanana">GameBanana</x:String>
+      <x:String x:Key="SelectMod">Sélectionne un mod</x:String>
+      <x:String x:Key="StartupAssistantHelp">Relance le guide langue, thème, stockage et configuration du jeu.</x:String>
+      <x:String x:Key="DiagnosticsHelp">Vérifie la plateforme, le runtime, l’ISO/RVZ, les données et les mods.</x:String>
+      <x:String x:Key="DolphinHelp">CubeShelf utilise DolphinTool uniquement pour convertir les images RVZ avant extraction.</x:String>
+      <x:String x:Key="UpdateAtStartup">Vérifier les mises à jour des jeux au démarrage</x:String>
+      <x:String x:Key="UpdatePopup">Afficher une notification de mise à jour</x:String>
+      <x:String x:Key="RefreshModsOnOpen">Actualiser GameBanana à l’ouverture des mods</x:String>
+      <x:String x:Key="ThemeDark">Sombre</x:String>
+      <x:String x:Key="ThemeLight">Clair</x:String>
+      <x:String x:Key="BrandSubtitle">Bibliothèque GameCube</x:String>
+      <x:String x:Key="LibraryCountLabel">BIBLIOTHÈQUE</x:String>
+      <x:String x:Key="GameUpdateUnknown">○ Mise à jour non vérifiée</x:String>
+      <x:String x:Key="GameDiscLabel">IMAGE DU JEU</x:String>
+      <x:String x:Key="NoDisc">Aucune image sélectionnée</x:String>
+      <x:String x:Key="PartyBoardLabel">PARTYBOARD</x:String>
+      <x:String x:Key="NoRuntime">PartyBoard non configuré</x:String>
+      <x:String x:Key="FavoriteAdd">☆ Ajouter aux favoris</x:String>
+      <x:String x:Key="FavoriteRemove">★ Retirer des favoris</x:String>
+      <x:String x:Key="ModsEyebrow">MODS</x:String>
+      <x:String x:Key="OfflineTitle">Mode local</x:String>
+      <x:String x:Key="OfflineRetry">Réessayer</x:String>
+      <x:String x:Key="Shortcuts">Raccourcis clavier</x:String>
+      <x:String x:Key="ShortcutsHelp">CubeShelf reste entièrement utilisable sans souris.</x:String>
+      <x:String x:Key="Retry">Réessayer</x:String>
+      <x:String x:Key="Close">Fermer</x:String>
+      <x:String x:Key="Cancel">Annuler</x:String>
+      <x:String x:Key="Later">Plus tard</x:String>
+      <x:String x:Key="Download">Télécharger</x:String>
+      <x:String x:Key="UpdateNow">Mettre à jour maintenant</x:String>
+    </ResourceDictionary>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme />
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource Bg}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="Padding" Value="14,9" />
+      <Setter Property="Margin" Value="4" />
+      <Setter Property="MinHeight" Value="40" />
+      <Setter Property="MinWidth" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Background" Value="{DynamicResource Panel2}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.14" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.14" />
+          <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.14" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="RenderTransform" Value="scale(1.035)" />
+    </Style>
+    <Style Selector="Button:pressed">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="RenderTransform" Value="scale(0.985)" />
+    </Style>
+    <Style Selector="Button:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="Button:focus-visible">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="Button:disabled">
+      <Setter Property="Opacity" Value="0.56" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Background" Value="{DynamicResource Danger}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Danger}" />
+    </Style>
+    <Style Selector="Button.nav">
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Margin" Value="0,2" />
+    </Style>
+    <Style Selector="Button.nav.selected">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Button.game-card:pointerover">
+      <Setter Property="Opacity" Value="0.92" />
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Background" Value="{DynamicResource InputBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="12,9" />
+      <Setter Property="MinHeight" Value="40" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="SelectionBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.14" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="TextBox:focus-visible">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <Style Selector="ComboBox">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Background" Value="{DynamicResource Panel2}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="MinHeight" Value="40" />
+    </Style>
+    <Style Selector="ComboBox:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+    </Style>
+
+    <Style Selector="CheckBox">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Padding" Value="9,7" />
+      <Setter Property="MinHeight" Value="38" />
+    </Style>
+    <Style Selector="CheckBox:pointerover">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+    </Style>
+
+    <Style Selector="ListBoxItem">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="2" />
+      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="CornerRadius" Value="14" />
+    </Style>
+    <Style Selector="ListBoxItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+    </Style>
+    <Style Selector="ListBoxItem:selected">
+      <Setter Property="Background" Value="{DynamicResource Panel2}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <Style Selector="ProgressBar">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+      <Setter Property="Background" Value="{DynamicResource InputBg}" />
+    </Style>
+    <Style Selector="ScrollBar:vertical">
+      <Setter Property="Width" Value="11" />
+    </Style>
+    <Style Selector="ScrollBar:horizontal">
+      <Setter Property="Height" Value="11" />
+    </Style>
   </Application.Styles>
 </Application>
