@@ -8,6 +8,7 @@ namespace CubeShelf.Core.Mods;
 public sealed record PortableInstalledMod(int Id, string Name, long Updated, bool Enabled, int Priority,
     string ContentRoot, string Sha256);
 public sealed record PortableModConflict(string RelativePath, IReadOnlyList<int> ModIds);
+public sealed record PortableModLayoutWarning(int Id, string Name, IReadOnlyList<string> TopLevelEntries);
 
 public sealed class PortableModManager
 {
@@ -266,6 +267,26 @@ public sealed class PortableModManager
             .Select(pair => new PortableModConflict(pair.Key, pair.Value.Order().ToArray())).OrderBy(item => item.RelativePath).ToArray();
     }
 
+    // PartyBoard overlays a mod's content root onto the root of the disc, so a
+    // pack whose root holds none of the disc's own folders replaces nothing: it
+    // installs, enables and does exactly nothing in game, with no other symptom.
+    // Dolphin-style texture packs land here, and so does an archive with one
+    // level too many. Reported, never blocked - the disc may gain new files, and
+    // only the player knows what they meant to install.
+    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout()
+    {
+        var warnings = new List<PortableModLayoutWarning>();
+        foreach (var mod in GetInstalled().Where(item => item.Enabled && Directory.Exists(item.ContentRoot)))
+        {
+            var entries = Directory.EnumerateFileSystemEntries(mod.ContentRoot)
+                .Select(Path.GetFileName).OfType<string>().ToArray();
+            if (entries.Any(entry => DiscRootEntries.Contains(entry))) continue;
+            warnings.Add(new PortableModLayoutWarning(mod.Id, mod.Name,
+                entries.Order(StringComparer.OrdinalIgnoreCase).Take(8).ToArray()));
+        }
+        return warnings;
+    }
+
     private void Update(int id, Func<PortableInstalledMod, PortableInstalledMod> update)
     {
         var items = GetInstalled().ToList();
@@ -289,6 +310,9 @@ public sealed class PortableModManager
     private void WriteActiveList() => File.WriteAllLines(_active, GetInstalled()
         .Where(item => item.Enabled && Directory.Exists(item.ContentRoot)).OrderByDescending(item => item.Priority)
         .ThenBy(item => item.Id).Select(item => Path.GetFullPath(item.ContentRoot)));
+
+    private static readonly HashSet<string> DiscRootEntries =
+        new(new[] { "data", "dll", "mess", "movie", "sound", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
 
     private static string DetectContentRoot(string staging)
     {

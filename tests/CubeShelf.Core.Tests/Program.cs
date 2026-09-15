@@ -17,6 +17,7 @@ Run("desktop profile persistence", TestProfilePersistence);
 Run("verified PartyBoard installation", TestPartyBoardInstallation);
 Run("portable mod lifecycle and conflicts", TestPortableMods);
 Run("mod load order handed to PartyBoard", TestModLoadOrder);
+Run("mod with no disc folder is flagged", TestModLayoutWarning);
 Run("persistent download activity", TestDownloadActivity);
 Run("HTTP range runtime resume", TestRuntimeResume);
 Run("transactional mod dependencies", TestModDependencies);
@@ -30,7 +31,7 @@ Run("verified launcher update", TestLauncherUpdate);
 
 if (failures.Count == 0)
 {
-    Console.WriteLine("20 CubeShelf.Core tests passed.");
+    Console.WriteLine("21 CubeShelf.Core tests passed.");
     return 0;
 }
 
@@ -171,6 +172,36 @@ void TestPartyBoardInstallation()
         Assert(installer.Uninstall("game"));
         Assert(!installer.GetStatus("game").IsInstalled);
         Assert(!File.Exists(repaired.ExecutablePath));
+    });
+}
+
+// A mod whose content root holds none of the disc's folders overlays nothing.
+// It installs and enables like any other, so without this the only symptom is
+// that the game looks untouched.
+void TestModLayoutWarning()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GAME");
+        using var good = new HttpClient(new StaticHttpHandler(_ =>
+            CreateZipBytes("files/data/board.bin", new byte[] { 1 })));
+        using var bad = new HttpClient(new StaticHttpHandler(_ =>
+            CreateZipBytes("files/textures/RGBA32_abc.png", new byte[] { 2 })));
+        manager.InstallAsync(new GameBananaMod(31, "Disc layout", 1, "https://files.gamebanana.com/a.zip", "a.zip"),
+            new GameBananaClient(good)).GetAwaiter().GetResult();
+        manager.InstallAsync(new GameBananaMod(32, "Texture pack", 2, "https://files.gamebanana.com/b.zip", "b.zip"),
+            new GameBananaClient(bad)).GetAwaiter().GetResult();
+
+        var flagged = manager.AnalyzeLayout();
+        Assert(flagged.Count == 1);
+        Assert(flagged[0].Id == 32);
+        Assert(flagged[0].TopLevelEntries.SequenceEqual(new[] { "textures" }));
+
+        // Disabling it removes it from what the game is told to load, so it is
+        // no longer something to warn about.
+        manager.SetEnabled(32, false);
+        Assert(manager.AnalyzeLayout().Count == 0);
     });
 }
 

@@ -48,9 +48,11 @@ The same overlay covers every disc entry point — `DVDOpen()`,
 the `sound/` audio banks), and the async reads — because it is installed in the
 FST itself rather than in a single open function.
 
-`PARTYBOARD_DISC_IMAGE` is still sent for convenience but is **not** consumed by
-the game yet: PartyBoard boots the image stored in its own `backend.isoPath`
-setting, chosen once through its pre-launch screen.
+`PARTYBOARD_DISC_IMAGE` names the copy of the game being started, and therefore
+the one the mods were installed against. PartyBoard now boots it in preference to
+its own remembered `backend.isoPath`, and skips its pre-launch picker, so a
+second disc cannot quietly play unmodded. An online session's disc still wins,
+and a path naming no readable file is ignored with a warning.
 
 ## Mod packaging
 
@@ -66,6 +68,13 @@ files/sound/mpgcsnd.msm
 
 `cubeshelf-mod.json` (see `schemas/cubeshelf-mod-v1.schema.json`) stays launcher
 metadata and is never exposed to the game.
+
+A pack whose content root holds none of the disc's own folders (`data`, `dll`,
+`mess`, `movie`, `sound`, `opening.bnr`) overlays nothing and would otherwise
+install, enable and do nothing in game with no other symptom - Dolphin-style
+texture packs behave exactly this way. `PortableModManager.AnalyzeLayout` reports
+those mods in the mods panel; it never blocks an installation, since a mod may
+legitimately add files the disc does not carry.
 
 ## Checks
 
