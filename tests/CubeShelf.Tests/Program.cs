@@ -17,7 +17,7 @@ Run("Disc USA 1.1 reconnu", () =>
     header[7] = 1;
     File.WriteAllBytes(path, header);
 
-    var result = DiscImageService.Inspect(path, english: false);
+    var result = DiscImageService.Inspect(path, DiscImageService.MarioParty4DiscIds, english: false);
     Assert(result.Recognized && result.Supported && result.VersionId == "GMPE01_01");
 });
 

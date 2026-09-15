@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Single source of truth for the CubeShelf version.
+
+    The version used to be repeated in the Desktop csproj, BUILD_INSTALLER.ps1,
+    installer/CubeShelf.iss, three workflows and the README. They drifted: the
+    assembly said 0.8.0-preview.3 while every packaging path still shipped
+    0.8.0-preview.2, so the installer and the binary it carried disagreed.
+    Everything now reads the VERSION file at the repository root.
+  -->
+  <PropertyGroup>
+    <CubeShelfVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</CubeShelfVersion>
+    <Version>$(CubeShelfVersion)</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <!-- The tree is warning-free; CI keeps it that way without nagging local builds. -->
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

@@ -170,12 +170,13 @@ public sealed partial class MainWindow
         var runtime = _installer.GetStatus(game.Id);
         var disc = ResolveApplicationPath(game.DiscImage);
         var executable = runtime.IsInstalled ? runtime.ExecutablePath : ResolveApplicationPath(game.Executable);
-        var prepared = File.Exists(executable) && _gameData.IsPrepared(game.Id, executable);
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+        var prepared = !runtimeManagesDisc && File.Exists(executable) && _gameData.IsPrepared(game.Id, executable);
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var last = game.LastPlayedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (english ? "Never" : "Jamais");
         var update = _gameUpdateSnapshots.TryGetValue(game.Id, out var snapshot)
             ? snapshot.RuntimeUpdateAvailable
-                ? (english ? "⬇ PartyBoard update" : "⬇ Mise à jour PartyBoard")
+                ? (english ? $"⬇ {game.RuntimeName} update" : $"⬇ Mise à jour {game.RuntimeName}")
                 : snapshot.RuntimeUpdatePendingBuild
                     ? (english ? "◷ Build pending" : "◷ Build en attente")
                     : snapshot.SourceUpdateAvailable
@@ -187,8 +188,15 @@ public sealed partial class MainWindow
             LoadBitmap(coverPath),
             game.IsFavorite ? "★" : "",
             File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
-            runtime.IsInstalled || File.Exists(executable) ? "✓ PartyBoard" : "○ PartyBoard",
-            prepared ? (english ? "✓ Data" : "✓ Données") : (english ? "○ Data" : "○ Données"),
+            runtime.IsInstalled || File.Exists(executable)
+                ? $"✓ {game.RuntimeName}"
+                : $"○ {game.RuntimeName}",
+            // A runtime that prepares its own disc has no CubeShelf data step to report.
+            runtimeManagesDisc
+                ? (english ? "◆ Runtime-managed" : "◆ Géré par le runtime")
+                : prepared
+                    ? (english ? "✓ Data" : "✓ Données")
+                    : (english ? "○ Data" : "○ Données"),
             english
                 ? $"{game.PlayCount} launches • {FormatPlayTime(game.TotalPlaySeconds)} • {last}"
                 : $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • {last}",
@@ -246,23 +254,31 @@ public sealed partial class MainWindow
         var runtime = _installer.GetStatus(game.Id);
         var discPath = ResolveApplicationPath(game.DiscImage);
         var executable = runtime.IsInstalled ? runtime.ExecutablePath : ResolveApplicationPath(game.Executable);
-        var hasDisc = File.Exists(discPath);
         var hasRuntime = runtime.IsInstalled || File.Exists(executable);
-        var prepared = hasRuntime && _gameData.IsPrepared(game.Id, executable);
+        var hasDisc = File.Exists(discPath);
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+        var prepared = !runtimeManagesDisc && hasRuntime && _gameData.IsPrepared(game.Id, executable);
 
         var english = UiLocalization.IsEnglish(_preferences.Language);
         OriginalGameStateText.Text = hasDisc
             ? (english ? "✓ Original game configured" : "✓ Jeu original configuré")
             : (english ? "○ Original game not configured" : "○ Jeu original non configuré");
         RuntimeStateText.Text = hasRuntime
-            ? $"✓ PartyBoard {(english ? "installed" : "installé")}{(string.IsNullOrWhiteSpace(runtime.Version) ? "" : " • " + runtime.Version)}"
-            : (english ? "○ PartyBoard not installed" : "○ PartyBoard non installé");
-        DataStateText.Text = prepared
-            ? (english ? "✓ Game data ready" : "✓ Données prêtes")
-            : (english ? "○ Game data to prepare" : "○ Données à préparer");
-        SetupProgressText.Text = english
-            ? $"{(hasRuntime ? "✓" : "○")} PartyBoard   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
-            : $"{(hasRuntime ? "✓" : "○")} PartyBoard   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
+            ? $"✓ {game.RuntimeName} {(english ? "installed" : "installé")}{(string.IsNullOrWhiteSpace(runtime.Version) ? "" : " • " + runtime.Version)}"
+            : $"○ {game.RuntimeName} {(english ? "not installed" : "non installé")}";
+
+        // A runtime that prepares the disc itself has no CubeShelf step to report, so the badge
+        // says who does it rather than claiming there is work pending that will never happen.
+        DataStateText.Text = runtimeManagesDisc
+            ? (english ? $"◆ Disc prepared by {game.RuntimeName}" : $"◆ Disque préparé par {game.RuntimeName}")
+            : prepared
+                ? (english ? "✓ Game data ready" : "✓ Données prêtes")
+                : (english ? "○ Game data to prepare" : "○ Données à préparer");
+        SetupProgressText.Text = runtimeManagesDisc
+            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ"
+            : english
+                ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
+                : $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
 
         FavoriteButton.Content = game.IsFavorite
             ? (english ? "★ Favorite" : "★ Favori")
@@ -336,7 +352,6 @@ public sealed partial class MainWindow
             SelectCatalogGame(game);
     }
 
-    private void RefreshStorageButtonParity(object? sender, RoutedEventArgs args) => RefreshStorageParity();
 
     private void RefreshStorageParity()
     {
@@ -346,58 +361,7 @@ public sealed partial class MainWindow
         StorageSummaryText.Text = UiLocalization.IsEnglish(_preferences.Language) ? $"CubeShelf data: {FormatBytes(data)} • Cache: {FormatBytes(cache)}" : $"Données CubeShelf : {FormatBytes(data)} • Cache : {FormatBytes(cache)}";
     }
 
-    private void CleanCacheParity(object? sender, RoutedEventArgs args)
-    {
-        ModPreview.Source = null;
-        _modPreviewBitmap?.Dispose();
-        _modPreviewBitmap = null;
-        var freed = _mediaCache.Clear();
-        RefreshStorageParity();
-        ShowToastParity(UiLocalization.IsEnglish(_preferences.Language) ? "Cache cleaned" : "Cache nettoyé", UiLocalization.IsEnglish(_preferences.Language) ? $"{FormatBytes(freed)} freed. ISO/RVZ and game data were not removed." : $"{FormatBytes(freed)} libérés. Les ISO/RVZ et données de jeu ne sont pas supprimés.");
-    }
 
-    private void OpenDiagnosticsParity(object? sender, RoutedEventArgs args)
-    {
-        var report = BuildDiagnosticsReport();
-        var text = new TextBox
-        {
-            Text = report,
-            IsReadOnly = true,
-            AcceptsReturn = true,
-            TextWrapping = TextWrapping.NoWrap,
-            FontFamily = new FontFamily("monospace")
-        };
-        ScrollViewer.SetVerticalScrollBarVisibility(text, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
-        ScrollViewer.SetHorizontalScrollBarVisibility(text, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
-        var dialog = new Window
-        {
-            Title = "CubeShelf • Diagnostic",
-            Width = 780,
-            Height = 620,
-            MinWidth = 640,
-            MinHeight = 480,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        };
-        var root = new Grid { Margin = new Thickness(20) };
-        root.RowDefinitions.Add(new RowDefinition(GridLength.Star));
-        root.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-        root.Children.Add(text);
-        var buttons = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, Spacing = 8, Margin = new Thickness(0, 12, 0, 0) };
-        Grid.SetRow(buttons, 1);
-        var copy = new Button { Content = "Copier" };
-        copy.Click += async (_, _) =>
-        {
-            if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
-                await clipboard.SetTextAsync(text.Text ?? "");
-        };
-        var close = new Button { Content = "Fermer" };
-        close.Click += (_, _) => dialog.Close();
-        buttons.Children.Add(copy);
-        buttons.Children.Add(close);
-        root.Children.Add(buttons);
-        dialog.Content = root;
-        _ = dialog.ShowDialog(this);
-    }
 
     private string BuildDiagnosticsReport()
     {
@@ -418,7 +382,7 @@ public sealed partial class MainWindow
 
         var game = _selectedGame;
         var runtime = _installer.GetStatus(game.Id);
-        var compatibility = DiscImageService.Inspect(game.DiscImage);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
         builder.AppendLine($"Jeu            : {game.Title} ({game.Id})");
         builder.AppendLine($"Favori         : {(game.IsFavorite ? "Oui" : "Non")}");
         builder.AppendLine($"Lancements     : {game.PlayCount}");
