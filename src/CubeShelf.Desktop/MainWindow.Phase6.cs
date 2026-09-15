@@ -226,7 +226,7 @@ public sealed partial class MainWindow
         var game = _selectedGame;
         HydrateGamePathsPhase3(game);
         var runtime = _installer.GetStatus(game.Id);
-        var compatibility = DiscImageService.Inspect(game.DiscImage, english);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds, english);
         lines.Add($"{L("Titre", "Title"),-16}: {game.Title}");
         lines.Add($"ID              : {game.Id}");
         lines.Add($"{L("Favori", "Favorite"),-16}: {(game.IsFavorite ? L("Oui", "Yes") : L("Non", "No"))}");
@@ -302,7 +302,7 @@ public sealed partial class MainWindow
             : P6("Aucune image ISO/GCM/RVZ sélectionnée", "No ISO/GCM/RVZ selected"));
         if (File.Exists(game.DiscImage))
         {
-            var compatibility = DiscImageService.Inspect(game.DiscImage);
+            var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
             Add(compatibility.Recognized && compatibility.Supported, P6("Compatibilité disque : ", "Disc compatibility: ") + compatibility.Message);
             if (Path.GetExtension(game.DiscImage).Equals(".rvz", StringComparison.OrdinalIgnoreCase))
                 Add(_dolphinToolService?.IsAvailable() == true, P6("DolphinTool disponible pour le RVZ", "DolphinTool available for RVZ"));

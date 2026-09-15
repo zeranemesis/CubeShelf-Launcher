@@ -366,7 +366,7 @@ public sealed partial class MainWindow
 
         var game = _selectedGame;
         var runtime = _installer.GetStatus(game.Id);
-        var compatibility = DiscImageService.Inspect(game.DiscImage);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
         builder.AppendLine($"Jeu            : {game.Title} ({game.Id})");
         builder.AppendLine($"Favori         : {(game.IsFavorite ? "Oui" : "Non")}");
         builder.AppendLine($"Lancements     : {game.PlayCount}");

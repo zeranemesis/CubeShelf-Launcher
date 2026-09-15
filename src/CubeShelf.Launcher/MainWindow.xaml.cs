@@ -1914,8 +1914,8 @@ private void ConfigureDiscImageButton_Click(
     private void UpdateDiscCompatibility()
     {
         if (_selectedGame is null) return;
-        var result = DiscImageService.Inspect(_selectedGame.DiscImageFullPath, IsEnglish);
-        DiscCompatibilityText.Text = result.Message + Environment.NewLine + DiscImageService.SupportedSummary;
+        var result = DiscImageService.Inspect(_selectedGame.DiscImageFullPath, DiscImageService.MarioParty4DiscIds, IsEnglish);
+        DiscCompatibilityText.Text = result.Message + Environment.NewLine + DiscImageService.DescribeSupported(DiscImageService.MarioParty4DiscIds, IsEnglish);
     }
 
     private void MaybeShowGameUpdatePopup()

@@ -122,19 +122,17 @@ public sealed partial class MainWindow
 
         var item = _portableQueue.Enqueue(
             $"runtime:{game.Id}",
-            $"PartyBoard — {game.Title}",
+            $"{game.RuntimeName} — {game.Title}",
             "RUNTIME",
             repair ? P7("Réparation vérifiée du runtime", "Verified runtime repair") : P7("Installation / mise à jour vérifiée du runtime", "Verified runtime installation / update"),
             async (progress, cancellationToken) =>
             {
                 release = await _gameUpdateService.GetRuntimeReleaseAsync(game, cancellationToken);
+                var source = CubeShelf.Core.Releases.GameRuntimeSource.FromCatalog(
+                    game, _preferences.AllowUnverifiedRuntimes);
                 result = repair
-                    ? await _installer.RepairLatestAsync(
-                        game.GitHubOwner, game.GitHubRepo, game.GitHubReleaseTag,
-                        game.Id, progress, cancellationToken)
-                    : await _installer.InstallLatestAsync(
-                        game.GitHubOwner, game.GitHubRepo, game.GitHubReleaseTag,
-                        game.Id, progress, cancellationToken);
+                    ? await _installer.RepairLatestAsync(source, game.Id, progress, cancellationToken)
+                    : await _installer.InstallLatestAsync(source, game.Id, progress, cancellationToken);
                 if (release.Available &&
                     string.Equals(release.Version, result.Version, StringComparison.OrdinalIgnoreCase))
                 {
@@ -160,7 +158,13 @@ public sealed partial class MainWindow
                         {
                             PersistSelection();
                             RefreshGameState();
-                            ShowToastParity(P7("PartyBoard prêt", "PartyBoard ready"), P7($"Version {result.Version} installée et vérifiée.", $"Version {result.Version} installed and verified."));
+                            ShowToastParity(
+                                P7($"{game.RuntimeName} prêt", $"{game.RuntimeName} ready"),
+                                result.Verified
+                                    ? P7($"Version {result.Version} installée et vérifiée.",
+                                         $"Version {result.Version} installed and verified.")
+                                    : P7($"Version {result.Version} installée sans vérification : l’éditeur ne publie aucun checksum.",
+                                         $"Version {result.Version} installed unverified: the publisher ships no checksum."));
                         }
                         _ = RefreshGameUpdatePhase3Async(game, forceUi: true);
                     }
@@ -171,7 +175,7 @@ public sealed partial class MainWindow
 
         if (item is null)
         {
-            ActionStatus.Text = P7("Cette opération PartyBoard est déjà dans la file.", "This PartyBoard operation is already queued.");
+            ActionStatus.Text = P7($"Cette opération {game.RuntimeName} est déjà dans la file.", $"This {game.RuntimeName} operation is already queued.");
             return null;
         }
 
@@ -198,7 +202,7 @@ public sealed partial class MainWindow
             "GAME DATA",
             P7("Préparation transactionnelle ISO/GCM/RVZ", "Transactional ISO/GCM/RVZ preparation"),
             (progress, cancellationToken) =>
-                _gameData.PrepareAsync(game.Id, executable, discImage, progress, cancellationToken),
+                _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress, cancellationToken),
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>

@@ -168,7 +168,7 @@ public sealed partial class MainWindow : Window
         var path = files.FirstOrDefault()?.TryGetLocalPath();
         if (string.IsNullOrWhiteSpace(path)) return;
 
-        var compatibility = DiscImageService.Inspect(path);
+        var compatibility = DiscImageService.Inspect(path, _selectedGame.SupportedDiscIds);
         if (!compatibility.Supported)
         {
             ActionStatus.Text = compatibility.Message;
@@ -285,48 +285,77 @@ public sealed partial class MainWindow : Window
     private void RefreshGameState()
     {
         if (_selectedGame is null) return;
-        DiscPathText.Text = File.Exists(_selectedGame.DiscImage)
-            ? _selectedGame.DiscImage
+        var game = _selectedGame;
+
+        // A runtime that recompiles the game from the disc itself owns that step. CubeShelf
+        // extracting the disc underneath it would be wrong, so none of the preparation UI
+        // applies to those games.
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+
+        DiscPathText.Text = File.Exists(game.DiscImage)
+            ? game.DiscImage
             : "Aucune image sélectionnée";
-        ExecutablePathText.Text = File.Exists(_selectedGame.Executable)
-            ? _selectedGame.Executable
-            : "PartyBoard non configuré";
-        var runtime = _installer.GetStatus(_selectedGame.Id);
-        InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : "Installer PartyBoard";
+        ExecutablePathText.Text = File.Exists(game.Executable)
+            ? game.Executable
+            : $"{game.RuntimeName} non configuré";
+
+        var runtime = _installer.GetStatus(game.Id);
+        InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : $"Installer {game.RuntimeName}";
         RepairButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         UninstallButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         if (runtime.IsInstalled)
+        {
             ExecutablePathText.Text = $"{runtime.ExecutablePath}\nVersion : {runtime.Version}";
+            if (!runtime.Verified)
+                ExecutablePathText.Text += "\n⚠ Installé sans vérification de checksum";
+        }
         else if (runtime.NeedsRepair)
+        {
             ExecutablePathText.Text = "Installation gérée incomplète — réparation nécessaire";
-        var compatibility = DiscImageService.Inspect(_selectedGame.DiscImage);
-        DiscCompatibilityText.Text = compatibility.Message;
-        var prepared = _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+        }
+
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
+        DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
+            DiscImageService.DescribeSupported(game.SupportedDiscIds);
+
+        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game.Id, game.Executable);
+        PrepareDataButton.IsVisible = !runtimeManagesDisc;
         PrepareDataButton.Content = prepared ? "Repréparer les données" : "Préparer les données";
-        PrepareDataButton.IsEnabled = File.Exists(_selectedGame.Executable) && compatibility.Supported;
-        if (prepared) ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
-        var running = _sessions.IsRunning(_selectedGame.Id);
+        PrepareDataButton.IsEnabled = !runtimeManagesDisc && File.Exists(game.Executable) && compatibility.Supported;
+        if (prepared)
+            ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
+        else if (runtimeManagesDisc && runtime.IsInstalled)
+            ExecutablePathText.Text += $"\n{game.RuntimeName} prépare le disque à son premier lancement.";
+
+        var running = _sessions.IsRunning(game.Id);
         PlayButton.IsEnabled = running || CanPlay();
         PlayButton.Content = running ? "■ Arrêter" : "▶ Jouer";
-        FavoriteButton.Content = _selectedGame.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
-        var lastPlayed = _selectedGame.LastPlayedAt is null
+        FavoriteButton.Content = game.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
+        var lastPlayed = game.LastPlayedAt is null
             ? "Jamais"
-            : _selectedGame.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
-        GameStatsText.Text = $"{_selectedGame.PlayCount} lancements • {FormatPlayTime(_selectedGame.TotalPlaySeconds)} • Dernier : {lastPlayed}";
+            : game.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+        GameStatsText.Text =
+            $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • Dernier : {lastPlayed}";
         ActionStatus.Text = running
-            ? "PartyBoard est en cours d’exécution."
+            ? $"{game.RuntimeName} est en cours d’exécution."
             : PlayButton.IsEnabled
                 ? "Configuration prête."
-                : "Sélectionne une image compatible et l’exécutable PartyBoard.";        RefreshParityGameDetails();
-        RefreshLibraryParity();
+                : $"Sélectionne une image compatible et l’exécutable {game.RuntimeName}.";
 
+        RefreshParityGameDetails();
+        RefreshLibraryParity();
     }
 
-    private bool CanPlay() =>
-        _selectedGame is not null &&
-        File.Exists(_selectedGame.Executable) &&
-        DiscImageService.Inspect(_selectedGame.DiscImage).Supported &&
-        _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+    private bool CanPlay()
+    {
+        if (_selectedGame is null || !File.Exists(_selectedGame.Executable)) return false;
+        if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame.SupportedDiscIds).Supported) return false;
+
+        // Ring Out extracts and recompiles the disc on its own first launch, so there is
+        // nothing for CubeShelf to prepare and nothing to wait for before enabling Play.
+        return _selectedGame.DataPreparation == GameDataPreparation.Runtime ||
+            _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+    }
 
     private static string ResolveApplicationPath(string path) =>
         string.IsNullOrWhiteSpace(path)
@@ -556,6 +585,7 @@ public sealed partial class MainWindow : Window
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
+        AllowUnverifiedBox.IsChecked = _preferences.AllowUnverifiedRuntimes;
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
         if (Avalonia.Application.Current is { } application)
@@ -574,7 +604,8 @@ public sealed partial class MainWindow : Window
             Theme = theme,
             CheckGamesOnStartup = CheckUpdatesBox.IsChecked == true,
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
-            RefreshModsOnOpen = RefreshModsBox.IsChecked == true
+            RefreshModsOnOpen = RefreshModsBox.IsChecked == true,
+            AllowUnverifiedRuntimes = AllowUnverifiedBox.IsChecked == true
         };
         _preferencesStore.Save(_preferences);
         if (Avalonia.Application.Current is { } application)

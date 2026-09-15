@@ -1,6 +1,6 @@
 # CubeShelf Launcher
 
-CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.8 utilise une interface Avalonia commune à Windows et Linux : elle installe et met à jour PartyBoard, prépare les images fournies légalement par l’utilisateur et gère les mods GameBanana.
+CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.8 utilise une interface Avalonia commune à Windows et Linux : elle installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II), prépare les images fournies légalement par l’utilisateur et gère les mods GameBanana.
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
@@ -19,6 +19,44 @@ Prérequis : SDK .NET 8 et Inno Setup 6.
 ```
 
 Le résultat est créé dans `dist\CubeShelf-Setup-x64.exe`.
+
+## Jeux pris en charge
+
+Le catalogue est piloté par les données : `src/CubeShelf.Launcher/games.json` décrit chaque jeu, son runtime, les révisions de disque acceptées et la façon dont le runtime est récupéré. Ajouter un jeu ne demande pas de code.
+
+| Jeu | Runtime | Disques acceptés | Acquisition | Préparation du disque |
+| --- | --- | --- | --- | --- |
+| Mario Party 4 | PartyBoard | `GMPE01_00`, `GMPE01_01` | manifeste CubeShelf | par CubeShelf |
+| Soulcalibur II | [Ring Out](https://github.com/jackpoison-prog/RingOut) | `GRSEAF`, `GRSPAF`, `GRSJAF`, `GRSEPS` | asset de release GitHub | par le runtime |
+
+Une entrée de `SupportedDiscIds` est soit un identifiant de révision complet (`GMPE01_00`, cette révision uniquement), soit un identifiant de disque sur six caractères (`GRSEAF`, toutes les révisions).
+
+### Deux modes d’acquisition du runtime
+
+`RuntimeSource` vaut `Manifest` ou `GitHubReleaseAsset`.
+
+En `Manifest`, l’éditeur publie un `manifest.json` à côté de ses assets, qui nomme l’artefact par plateforme avec sa taille et son SHA-256. C’est ce que fait PartyBoard, et c’est le mode à privilégier : le téléchargement est comparé à une valeur publiée par l’éditeur.
+
+En `GitHubReleaseAsset`, l’éditeur ne publie que des archives ordinaires. CubeShelf interroge l’API GitHub pour la dernière release et sélectionne l’asset via `RuntimeAssets`, dont le motif accepte un joker parce que la version figure dans le nom du fichier. `RuntimeLaunchPaths` indique l’exécutable à lancer dans l’archive, par plateforme, avec le jeton `{version}`.
+
+### Runtimes non vérifiables
+
+Ring Out ne publie ni `manifest.json` ni `checksums.txt`. CubeShelf n’a donc **rien à quoi comparer le téléchargement**. Deux issues :
+
+- renseigner `RuntimeSha256` dans le catalogue épingle une version précise, et l’installation redevient vérifiée ;
+- sinon, l’installation est refusée tant que **Paramètres → « Autoriser les runtimes non vérifiables »** n’est pas activé. L’option est désactivée par défaut. Un runtime installé ainsi est marqué comme tel dans la fiche du jeu.
+
+### Préparation du disque
+
+`DataPreparation` vaut `CubeShelf` ou `Runtime`.
+
+PartyBoard attend que CubeShelf extraie le disque (conversion RVZ via DolphinTool, puis l’arborescence). Ring Out fait l’inverse : il extrait et **recompile** le jeu depuis le disque à son premier lancement, ce que CubeShelf ne peut ni ne doit refaire. Pour ces jeux, le bouton « Préparer les données » n’est pas proposé et Jouer est disponible dès que le runtime est installé et le disque compatible.
+
+Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et environ 1,5 Go d’espace libre au premier lancement.
+
+### Jaquettes
+
+Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`. Celles de Soulcalibur II sont pour l’instant des placeholders : remplace `pal_front.png`, `pal_back.png` et `pal_spine.png` par tes propres scans, sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image.
 
 ## Aperçu Linux et Steam Deck
 
@@ -44,6 +82,7 @@ dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj -c Release -r linu
 - limites de taille avant et pendant les téléchargements ;
 - extraction d’archives confinée, avec refus des chemins absolus, traversées et doublons ;
 - mises à jour automatiques du launcher désactivées par défaut ;
+- installation refusée par défaut lorsqu’un éditeur ne publie ni manifeste ni checksum, sauf activation explicite dans les Paramètres ;
 - releases stables signées obligatoirement, sauf dérogation manuelle explicite.
 - téléchargement de l’outil AppImage épinglé et vérifié par SHA-256.
 

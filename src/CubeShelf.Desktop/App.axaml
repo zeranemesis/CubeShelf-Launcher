@@ -142,6 +142,8 @@
       <x:String x:Key="UpdateAtStartup">Vérifier les mises à jour des jeux au démarrage</x:String>
       <x:String x:Key="UpdatePopup">Afficher une notification de mise à jour</x:String>
       <x:String x:Key="RefreshModsOnOpen">Actualiser GameBanana à l’ouverture des mods</x:String>
+      <x:String x:Key="AllowUnverifiedRuntimes">Autoriser les runtimes non vérifiables</x:String>
+      <x:String x:Key="AllowUnverifiedHelp">Certains projets publient leurs archives sans manifeste ni checksum. CubeShelf ne peut alors comparer le téléchargement à rien. Requis pour installer Ring Out.</x:String>
       <x:String x:Key="ThemeDark">Sombre</x:String>
       <x:String x:Key="ThemeLight">Clair</x:String>
       <x:String x:Key="BrandSubtitle">Bibliothèque GameCube</x:String>

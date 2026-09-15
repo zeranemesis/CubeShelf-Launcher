@@ -11,7 +11,12 @@ public sealed record UserPreferences(
     bool AutoFitWindowToScreen = true,
     double WindowWidth = 1530,
     double WindowHeight = 930,
-    bool FirstRunCompleted = false);
+    bool FirstRunCompleted = false,
+    /// <summary>
+    /// Allows installing a runtime whose publisher ships no manifest and no checksum, so the
+    /// download cannot be verified against anything. Off by default, and deliberately so.
+    /// </summary>
+    bool AllowUnverifiedRuntimes = false);
 
 public sealed class UserPreferencesStore
 {
