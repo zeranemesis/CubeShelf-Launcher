@@ -151,7 +151,7 @@ void TestPartyBoardInstallation()
         }
 
         var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
-        var rid = OperatingSystem.IsWindows() ? "win-x64" : "linux-x64";
+        var rid = CurrentRid();
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schema = 2,
@@ -424,7 +424,7 @@ void TestLauncherUpdate()
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schemaVersion = 2, version = "9.0.0",
-            artifacts = new[] { new { os, architecture = "x64", type = "launcher", url = "https://downloads.example.test/update.zip", size = package.Length, sha256 = hash } }
+            artifacts = new[] { new { os, architecture = CurrentArchitecture(), type = "launcher", url = "https://downloads.example.test/update.zip", size = package.Length, sha256 = hash } }
         }));
         using var http = new HttpClient(new UpdateHttpHandler(manifest, package));
         var service = new LauncherUpdateService(new TestPaths(root), http, new Uri("https://updates.example.test/manifest.json"));
@@ -475,7 +475,7 @@ void TestRuntimeResume()
         var launch = OperatingSystem.IsWindows() ? "partyboard.exe" : "partyboard";
         var package = CreateZipBytes(launch, System.Text.Encoding.UTF8.GetBytes("resumed-runtime"));
         var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
-        var rid = OperatingSystem.IsWindows() ? "win-x64" : "linux-x64";
+        var rid = CurrentRid();
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schema = 2,
@@ -662,6 +662,16 @@ void TestShippedCatalogIsCoherent()
         if (Directory.Exists(data)) Directory.Delete(data, true);
     }
 }
+
+// GitHub's macos runners are Apple Silicon, so a fixture hardcoding x64 describes a platform
+// the test process is not running on: the product resolves osx-arm64 and finds no artifact.
+// Build the identifiers from the real architecture, as CurrentRuntimeId does in the product.
+string CurrentArchitecture() =>
+    System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture ==
+        System.Runtime.InteropServices.Architecture.Arm64 ? "arm64" : "x64";
+
+string CurrentRid() =>
+    (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
 
 string WriteDiscHeader(string root, string name, string discId, byte revision)
 {
