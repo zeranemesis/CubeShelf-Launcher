@@ -585,7 +585,6 @@ public sealed partial class MainWindow : Window
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
-        AllowUnverifiedBox.IsChecked = _preferences.AllowUnverifiedRuntimes;
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
         if (Avalonia.Application.Current is { } application)
@@ -604,8 +603,7 @@ public sealed partial class MainWindow : Window
             Theme = theme,
             CheckGamesOnStartup = CheckUpdatesBox.IsChecked == true,
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
-            RefreshModsOnOpen = RefreshModsBox.IsChecked == true,
-            AllowUnverifiedRuntimes = AllowUnverifiedBox.IsChecked == true
+            RefreshModsOnOpen = RefreshModsBox.IsChecked == true
         };
         _preferencesStore.Save(_preferences);
         if (Avalonia.Application.Current is { } application)

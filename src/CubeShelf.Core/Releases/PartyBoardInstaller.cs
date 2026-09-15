@@ -28,18 +28,16 @@ public sealed record GameRuntimeSource(
     RuntimeSourceKind Kind,
     IReadOnlyDictionary<string, string> AssetPatterns,
     IReadOnlyDictionary<string, string> LaunchPaths,
-    string PinnedSha256,
-    bool AllowUnverified)
+    string PinnedSha256)
 {
-    public static GameRuntimeSource FromCatalog(GameCatalogEntry game, bool allowUnverified = false) => new(
+    public static GameRuntimeSource FromCatalog(GameCatalogEntry game) => new(
         game.GitHubOwner,
         game.GitHubRepo,
         game.GitHubReleaseTag,
         game.RuntimeSource,
         game.RuntimeAssets,
         game.RuntimeLaunchPaths,
-        game.RuntimeSha256,
-        allowUnverified);
+        game.RuntimeSha256);
 }
 
 public sealed class PartyBoardInstaller
@@ -67,7 +65,7 @@ public sealed class PartyBoardInstaller
         bool force = false) =>
         InstallLatestAsync(
             new GameRuntimeSource(owner, repository, tag, RuntimeSourceKind.Manifest,
-                new Dictionary<string, string>(), new Dictionary<string, string>(), "", false),
+                new Dictionary<string, string>(), new Dictionary<string, string>(), ""),
             gameId, progress, cancellationToken, force);
 
     public async Task<PartyBoardInstallResult> InstallLatestAsync(
@@ -367,12 +365,10 @@ public sealed class PartyBoardInstaller
                 $"Le catalogue ne déclare pas de chemin de lancement {runtimeId} pour {source.Repository}.");
         var launch = declaredLaunch.Replace("{version}", version, StringComparison.OrdinalIgnoreCase);
 
+        // Ring Out publishes no checksum, so a download from it can only ever be recorded as
+        // unverified -- never blocked. The flag is carried through to runtime-state.json and
+        // shown on the game page, so what was and was not checked stays visible afterwards.
         var verified = !string.IsNullOrWhiteSpace(source.PinnedSha256);
-        if (!verified && !source.AllowUnverified)
-            throw new UnverifiedRuntimeException(
-                $"{source.Repository} ne publie ni manifeste ni checksum, et aucun SHA-256 n’est " +
-                "épinglé dans le catalogue. Active « Autoriser les runtimes non vérifiables » " +
-                "dans les Paramètres pour l’installer quand même.");
 
         return new ResolvedRuntime(
             version,
@@ -713,10 +709,4 @@ public sealed class PartyBoardInstaller
 }
 
 /// <summary>
-/// Raised when a runtime can only be installed unverified and the caller has not allowed that.
-/// Distinct from a download failure: nothing went wrong, the publisher simply ships no checksum.
 /// </summary>
-public sealed class UnverifiedRuntimeException : Exception
-{
-    public UnverifiedRuntimeException(string message) : base(message) { }
-}

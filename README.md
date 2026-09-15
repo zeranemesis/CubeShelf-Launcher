@@ -41,10 +41,9 @@ En `GitHubReleaseAsset`, l’éditeur ne publie que des archives ordinaires. Cub
 
 ### Runtimes non vérifiables
 
-Ring Out ne publie ni `manifest.json` ni `checksums.txt`. CubeShelf n’a donc **rien à quoi comparer le téléchargement**. Deux issues :
+Ring Out ne publie ni `manifest.json` ni `checksums.txt`. CubeShelf n’a donc **rien à quoi comparer le téléchargement**. L’archive reste contrôlée en taille et hachée pendant le transfert, mais aucune valeur publiée par l’éditeur ne permet de confirmer le résultat : l’installation se fait, et elle est enregistrée comme non vérifiée.
 
-- renseigner `RuntimeSha256` dans le catalogue épingle une version précise, et l’installation redevient vérifiée ;
-- sinon, l’installation est refusée tant que **Paramètres → « Autoriser les runtimes non vérifiables »** n’est pas activé. L’option est désactivée par défaut. Un runtime installé ainsi est marqué comme tel dans la fiche du jeu.
+Renseigner `RuntimeSha256` dans le catalogue épingle une version précise et rend l’installation vérifiée. Sans cette valeur, le runtime porte la mention « installé sans vérification » dans la fiche du jeu, et l’état est conservé dans `runtime-state.json` : l’information survit à l’installation qui l’a produite.
 
 ### Préparation du disque
 
@@ -82,7 +81,7 @@ dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj -c Release -r linu
 - limites de taille avant et pendant les téléchargements ;
 - extraction d’archives confinée, avec refus des chemins absolus, traversées et doublons ;
 - mises à jour automatiques du launcher désactivées par défaut ;
-- installation refusée par défaut lorsqu’un éditeur ne publie ni manifeste ni checksum, sauf activation explicite dans les Paramètres ;
+- installation issue d’un éditeur sans manifeste ni checksum marquée comme non vérifiée et tracée dans l’état du runtime ;
 - releases stables signées obligatoirement, sauf dérogation manuelle explicite.
 - téléchargement de l’outil AppImage épinglé et vérifié par SHA-256.
 

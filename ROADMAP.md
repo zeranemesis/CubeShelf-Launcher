@@ -66,7 +66,7 @@
 - [x] second mode d'acquisition : asset de release GitHub, sans manifeste éditeur
 - [x] sélection de l'asset par motif à joker, version dans le nom de fichier
 - [x] chemin de lancement déclaré par plateforme, avec repli par recherche du binaire
-- [x] refus par défaut d'une installation non vérifiable, consentement explicite en Paramètres
+- [x] installation non vérifiable autorisée sans blocage, mais enregistrée comme telle
 - [x] état « installé sans vérification » conservé et affiché dans la fiche du jeu
 - [x] préparation du disque déléguée au runtime quand il la fait lui-même
 - [x] détection de mise à jour via l'API releases pour les dépôts sans manifeste

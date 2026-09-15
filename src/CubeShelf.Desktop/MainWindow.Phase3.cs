@@ -128,8 +128,7 @@ public sealed partial class MainWindow
             async (progress, cancellationToken) =>
             {
                 release = await _gameUpdateService.GetRuntimeReleaseAsync(game, cancellationToken);
-                var source = CubeShelf.Core.Releases.GameRuntimeSource.FromCatalog(
-                    game, _preferences.AllowUnverifiedRuntimes);
+                var source = CubeShelf.Core.Releases.GameRuntimeSource.FromCatalog(game);
                 result = repair
                     ? await _installer.RepairLatestAsync(source, game.Id, progress, cancellationToken)
                     : await _installer.InstallLatestAsync(source, game.Id, progress, cancellationToken);
