@@ -16,6 +16,7 @@ Run("disc revision detection", TestDiscRevision);
 Run("desktop profile persistence", TestProfilePersistence);
 Run("verified PartyBoard installation", TestPartyBoardInstallation);
 Run("portable mod lifecycle and conflicts", TestPortableMods);
+Run("mod load order handed to PartyBoard", TestModLoadOrder);
 Run("persistent download activity", TestDownloadActivity);
 Run("HTTP range runtime resume", TestRuntimeResume);
 Run("transactional mod dependencies", TestModDependencies);
@@ -29,7 +30,7 @@ Run("verified launcher update", TestLauncherUpdate);
 
 if (failures.Count == 0)
 {
-    Console.WriteLine("19 CubeShelf.Core tests passed.");
+    Console.WriteLine("20 CubeShelf.Core tests passed.");
     return 0;
 }
 
@@ -170,6 +171,43 @@ void TestPartyBoardInstallation()
         Assert(installer.Uninstall("game"));
         Assert(!installer.GetStatus("game").IsInstalled);
         Assert(!File.Exists(repaired.ExecutablePath));
+    });
+}
+
+// PartyBoard reads active-mods.txt highest priority first and lets the first
+// root claiming a path win, so this order is the mod load order.
+void TestModLoadOrder()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GAME");
+        using var client = new HttpClient(new StaticHttpHandler(request =>
+            CreateZipBytes("files/data/board.bin", new byte[] { 7 })));
+        var banana = new GameBananaClient(client);
+        manager.InstallAsync(new GameBananaMod(11, "Low", 1, "https://files.gamebanana.com/low.zip", "low.zip"), banana)
+            .GetAwaiter().GetResult();
+        manager.InstallAsync(new GameBananaMod(22, "High", 2, "https://files.gamebanana.com/high.zip", "high.zip"), banana)
+            .GetAwaiter().GetResult();
+        manager.SetPriority(11, 10);
+        manager.SetPriority(22, 900);
+
+        var listFile = manager.PrepareActiveList();
+        Assert(listFile == manager.ActiveListFile);
+        var lines = File.ReadAllLines(listFile);
+        Assert(lines.Length == 2);
+        Assert(lines.All(Path.IsPathFullyQualified));
+        Assert(lines[0].EndsWith(Path.Combine("22", "files")));
+        Assert(lines[1].EndsWith(Path.Combine("11", "files")));
+
+        // A list corrupted outside the launcher must not survive the next launch.
+        File.WriteAllText(listFile, "garbage written by something else");
+        Assert(File.ReadAllLines(manager.PrepareActiveList()).SequenceEqual(lines));
+
+        // A disabled mod disappears from the list the game reads.
+        manager.SetEnabled(22, false);
+        var remaining = File.ReadAllLines(manager.PrepareActiveList());
+        Assert(remaining.Length == 1 && remaining[0].EndsWith(Path.Combine("11", "files")));
     });
 }
 

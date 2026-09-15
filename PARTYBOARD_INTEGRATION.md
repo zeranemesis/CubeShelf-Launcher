@@ -8,16 +8,13 @@ Target branch during current development:
 
 `audio-local`
 
-## Patch
+No patch is needed any more. PartyBoard reads the CubeShelf mod list natively
+since `src/port/mods.cpp`; see `docs/CUBESHELF_MODS.md` in that repository.
 
-Apply:
-
-```powershell
-git apply patches/partyboard_mod_overlay_v0.2.patch
-```
-
-The actual patch file lives in the CubeShelf repository, so either copy it into
-the MarioParty4 checkout or run `git apply` with its full path.
+> The `patches/partyboard_mod_overlay*.patch` files that used to live here
+> hooked `src/port/dvd.c`, which is excluded from the build (`files.cmake`).
+> The game uses Aurora's DVD layer, so those patches never had any effect and
+> have been removed.
 
 ## Runtime contract
 
@@ -25,27 +22,54 @@ CubeShelf starts PartyBoard with:
 
 ```text
 PARTYBOARD_MOD_LIST=<absolute path>/Mods/GMPE01_00/active-mods.txt
-PARTYBOARD_GAME_ROOT=<absolute path>/Marioparty4/GMPE01_00
 ```
 
-Each line of `active-mods.txt` is an absolute content root. The list is sorted
-highest priority first.
-
-Example:
+`active-mods.txt` is rewritten from the installed state at every launch
+(`PortableModManager.PrepareActiveList`). Each line is an absolute content root,
+sorted **highest priority first**:
 
 ```text
 C:\CubeShelf\Mods\GMPE01_00\546878\files
 C:\CubeShelf\Mods\GMPE01_00\407132\files
 ```
 
-When the game requests:
+A content root maps onto the root of the disc image. When the game requests:
 
 ```text
-data/texture/example.tpl
+/data/board.bin
 ```
 
-the patched `DVDOpen()` tries each enabled mod root first and finally falls back
-to the original current working directory under `GMPE01_00/files`.
+PartyBoard tries each enabled root in order and the first match wins; otherwise
+it falls back to the file stored in the disc image. Enabling, disabling and
+reordering mods therefore never rewrites the original game data.
 
-This means enable/disable and load-order changes require no rewriting of the
-original game files.
+The same overlay covers every disc entry point — `DVDOpen()`,
+`DVDConvertPathToEntrynum()` + `DVDFastOpen()` (used for `data/*.bin` and for
+the `sound/` audio banks), and the async reads — because it is installed in the
+FST itself rather than in a single open function.
+
+`PARTYBOARD_DISC_IMAGE` is still sent for convenience but is **not** consumed by
+the game yet: PartyBoard boots the image stored in its own `backend.isoPath`
+setting, chosen once through its pre-launch screen.
+
+## Mod packaging
+
+`PortableModManager` unpacks an archive and picks the content root: `files/` if
+present (directly or inside a single top-level folder), otherwise that single
+folder, otherwise the archive root. Everything below it is overlaid as-is, so a
+mod archive mirrors the disc layout:
+
+```text
+files/data/board.bin
+files/sound/mpgcsnd.msm
+```
+
+`cubeshelf-mod.json` (see `schemas/cubeshelf-mod-v1.schema.json`) stays launcher
+metadata and is never exposed to the game.
+
+## Checks
+
+```bash
+dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+partyboard --mods-self-test
+```

@@ -30,6 +30,17 @@ public sealed class PortableModManager
 
     public string ActiveListFile => _active;
 
+    /// <summary>
+    /// Rewrites active-mods.txt from the current state and returns its path.
+    /// Called right before launching so PartyBoard never reads a list left
+    /// stale by an interrupted install or an edit made outside the launcher.
+    /// </summary>
+    public string PrepareActiveList()
+    {
+        WriteActiveList();
+        return _active;
+    }
+
     public IReadOnlyList<PortableInstalledMod> GetInstalled()
     {
         if (!File.Exists(_state)) return Array.Empty<PortableInstalledMod>();
@@ -273,6 +284,8 @@ public sealed class PortableModManager
         File.Move(temporary, _state, true);
     }
 
+    // PartyBoard reads this list highest priority first and lets the first
+    // root claiming a path win, so the order here is the mod load order.
     private void WriteActiveList() => File.WriteAllLines(_active, GetInstalled()
         .Where(item => item.Enabled && Directory.Exists(item.ContentRoot)).OrderByDescending(item => item.Priority)
         .ThenBy(item => item.Id).Select(item => Path.GetFullPath(item.ContentRoot)));

@@ -139,7 +139,7 @@ public sealed partial class MainWindow : Window
                 new Dictionary<string, string?>
                 {
                     ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
-                    ["PARTYBOARD_MOD_LIST"] = _modManager?.ActiveListFile
+                    ["PARTYBOARD_MOD_LIST"] = _modManager?.PrepareActiveList()
                 });
 
             _selectedGame.PlayCount++;
