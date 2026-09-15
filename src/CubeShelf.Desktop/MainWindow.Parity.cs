@@ -246,23 +246,31 @@ public sealed partial class MainWindow
         var runtime = _installer.GetStatus(game.Id);
         var discPath = ResolveApplicationPath(game.DiscImage);
         var executable = runtime.IsInstalled ? runtime.ExecutablePath : ResolveApplicationPath(game.Executable);
-        var hasDisc = File.Exists(discPath);
         var hasRuntime = runtime.IsInstalled || File.Exists(executable);
-        var prepared = hasRuntime && _gameData.IsPrepared(game.Id, executable);
+        var hasDisc = File.Exists(discPath);
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+        var prepared = !runtimeManagesDisc && hasRuntime && _gameData.IsPrepared(game.Id, executable);
 
         var english = UiLocalization.IsEnglish(_preferences.Language);
         OriginalGameStateText.Text = hasDisc
             ? (english ? "✓ Original game configured" : "✓ Jeu original configuré")
             : (english ? "○ Original game not configured" : "○ Jeu original non configuré");
         RuntimeStateText.Text = hasRuntime
-            ? $"✓ PartyBoard {(english ? "installed" : "installé")}{(string.IsNullOrWhiteSpace(runtime.Version) ? "" : " • " + runtime.Version)}"
-            : (english ? "○ PartyBoard not installed" : "○ PartyBoard non installé");
-        DataStateText.Text = prepared
-            ? (english ? "✓ Game data ready" : "✓ Données prêtes")
-            : (english ? "○ Game data to prepare" : "○ Données à préparer");
-        SetupProgressText.Text = english
-            ? $"{(hasRuntime ? "✓" : "○")} PartyBoard   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
-            : $"{(hasRuntime ? "✓" : "○")} PartyBoard   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
+            ? $"✓ {game.RuntimeName} {(english ? "installed" : "installé")}{(string.IsNullOrWhiteSpace(runtime.Version) ? "" : " • " + runtime.Version)}"
+            : $"○ {game.RuntimeName} {(english ? "not installed" : "non installé")}";
+
+        // A runtime that prepares the disc itself has no CubeShelf step to report, so the badge
+        // says who does it rather than claiming there is work pending that will never happen.
+        DataStateText.Text = runtimeManagesDisc
+            ? (english ? $"◆ Disc prepared by {game.RuntimeName}" : $"◆ Disque préparé par {game.RuntimeName}")
+            : prepared
+                ? (english ? "✓ Game data ready" : "✓ Données prêtes")
+                : (english ? "○ Game data to prepare" : "○ Données à préparer");
+        SetupProgressText.Text = runtimeManagesDisc
+            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ"
+            : english
+                ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
+                : $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
 
         FavoriteButton.Content = game.IsFavorite
             ? (english ? "★ Favorite" : "★ Favori")
