@@ -22,7 +22,7 @@ public sealed class PartyBoardInstaller
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
         _http = httpClient ?? new HttpClient();
         if (!_http.DefaultRequestHeaders.UserAgent.Any())
-            _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.8-preview");
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.8-avalonia");
     }
 
     public async Task<PartyBoardInstallResult> InstallLatestAsync(
@@ -40,9 +40,12 @@ public sealed class PartyBoardInstaller
         ValidateIdentifier(gameId, nameof(gameId));
 
         var releaseRoot = new Uri($"https://github.com/{owner}/{repository}/releases/download/{tag}/");
-        var manifest = await DownloadManifestAsync(new Uri(releaseRoot, "manifest.json"), cancellationToken);
-        var artifact = SelectArtifact(manifest);
-        ValidateArtifact(artifact);
+        var manifest = await DownloadManifestAsync(new Uri(releaseRoot, "manifest.json"), cancellationToken)
+            .ConfigureAwait(false);
+        var artifact = manifest.Schema == 1
+            ? await ResolveSchema1ArtifactAsync(releaseRoot, manifest, cancellationToken).ConfigureAwait(false)
+            : SelectArtifact(manifest);
+        ValidateArtifact(artifact, requireSize: manifest.Schema != 1);
         progress?.Report(0.05);
 
         var safeVersion = SanitizeSegment(manifest.Version);
@@ -60,8 +63,11 @@ public sealed class PartyBoardInstaller
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "downloads");
         Directory.CreateDirectory(cacheDirectory);
         var package = Path.Combine(cacheDirectory, artifact.Name);
-        await DownloadVerifiedAsync(new Uri(releaseRoot, Uri.EscapeDataString(artifact.Name)), package,
-            artifact.Size, artifact.Sha256, progress, cancellationToken);
+        var packageUri = new Uri(releaseRoot, Uri.EscapeDataString(artifact.Name));
+        if (manifest.Schema == 1)
+            await DownloadLegacyVerifiedAsync(packageUri, package, artifact.Sha256, progress, cancellationToken).ConfigureAwait(false);
+        else
+            await DownloadVerifiedAsync(packageUri, package, artifact.Size, artifact.Sha256, progress, cancellationToken).ConfigureAwait(false);
 
         Directory.CreateDirectory(versionsRoot);
         var staging = Path.Combine(versionsRoot, ".staging-" + Guid.NewGuid().ToString("N"));
@@ -146,6 +152,57 @@ public sealed class PartyBoardInstaller
         return true;
     }
 
+    public async Task<bool> UninstallAsync(
+        string gameId,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateIdentifier(gameId, nameof(gameId));
+        var runtimeRoot = RuntimeRoot(gameId);
+        if (!Directory.Exists(runtimeRoot))
+        {
+            progress?.Report(1);
+            return false;
+        }
+
+        var files = Directory.EnumerateFiles(runtimeRoot, "*", SearchOption.AllDirectories).ToArray();
+        var directories = Directory.EnumerateDirectories(runtimeRoot, "*", SearchOption.AllDirectories)
+            .OrderByDescending(path => path.Length)
+            .ToArray();
+
+        progress?.Report(.03);
+        var fileCount = Math.Max(1, files.Length);
+        for (var index = 0; index < files.Length; index++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                var attributes = File.GetAttributes(files[index]);
+                if ((attributes & FileAttributes.ReadOnly) != 0)
+                    File.SetAttributes(files[index], attributes & ~FileAttributes.ReadOnly);
+            }
+            catch { }
+            File.Delete(files[index]);
+            progress?.Report(.03 + .82 * (index + 1d) / fileCount);
+            if ((index & 63) == 63) await Task.Yield();
+        }
+
+        var directoryCount = Math.Max(1, directories.Length);
+        for (var index = 0; index < directories.Length; index++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (Directory.Exists(directories[index]))
+                Directory.Delete(directories[index], false);
+            progress?.Report(.85 + .13 * (index + 1d) / directoryCount);
+            if ((index & 63) == 63) await Task.Yield();
+        }
+
+        if (Directory.Exists(runtimeRoot))
+            Directory.Delete(runtimeRoot, false);
+        progress?.Report(1);
+        return true;
+    }
+
     private string RuntimeRoot(string gameId) =>
         Path.Combine(Path.GetFullPath(_paths.DataDirectory), "Runtimes", gameId);
 
@@ -172,18 +229,62 @@ public sealed class PartyBoardInstaller
 
     private async Task<PartyBoardManifest> DownloadManifestAsync(Uri uri, CancellationToken cancellationToken)
     {
-        using var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         if (response.Content.Headers.ContentLength > 1024 * 1024)
             throw new InvalidDataException("Le manifeste PartyBoard est trop volumineux.");
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var manifest = await JsonSerializer.DeserializeAsync<PartyBoardManifest>(stream, _json, cancellationToken);
-        if (manifest is null || manifest.Schema != 2 || string.IsNullOrWhiteSpace(manifest.Version))
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var manifest = await JsonSerializer.DeserializeAsync<PartyBoardManifest>(stream, _json, cancellationToken)
+            .ConfigureAwait(false);
+        if (manifest is null || (manifest.Schema != 1 && manifest.Schema != 2) || string.IsNullOrWhiteSpace(manifest.Version))
             throw new InvalidDataException("Manifeste PartyBoard invalide ou non pris en charge.");
+        if (manifest.Schema == 1 &&
+            (string.IsNullOrWhiteSpace(manifest.Platform) || string.IsNullOrWhiteSpace(manifest.Executable)))
+            throw new InvalidDataException("Manifeste PartyBoard schema 1 incomplet.");
         return manifest;
     }
 
+    private async Task<PartyBoardArtifact> ResolveSchema1ArtifactAsync(
+        Uri releaseRoot,
+        PartyBoardManifest manifest,
+        CancellationToken cancellationToken)
+    {
+        var runtimeId = CurrentRuntimeId();
+        if (!manifest.Platform.Equals(runtimeId, StringComparison.OrdinalIgnoreCase))
+            throw new PlatformNotSupportedException(
+                $"Le runtime PartyBoard publié cible {manifest.Platform}, pas {runtimeId}.");
+
+        var name = $"PartyBoard-{runtimeId}.zip";
+        var checksumUri = new Uri(releaseRoot, "checksums.txt");
+        using var checksumResponse = await _http.GetAsync(
+            checksumUri, HttpCompletionOption.ResponseContentRead, cancellationToken).ConfigureAwait(false);
+        checksumResponse.EnsureSuccessStatusCode();
+        var checksums = await checksumResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var sha256 = ParseChecksum(checksums, name);
+        if (sha256.Length != 64 || sha256.Any(character => !Uri.IsHexDigit(character)))
+            throw new CryptographicException(
+                $"checksums.txt ne contient pas un SHA-256 valide pour {name}.");
+
+        return new PartyBoardArtifact
+        {
+            Name = name,
+            Kind = "zip",
+            Launch = manifest.Executable,
+            Sha256 = sha256,
+            Size = 0
+        };
+    }
+
     private static PartyBoardArtifact SelectArtifact(PartyBoardManifest manifest)
+    {
+        var rid = CurrentRuntimeId();
+        return manifest.Artifacts.TryGetValue(rid, out var artifact)
+            ? artifact
+            : throw new PlatformNotSupportedException($"Aucun runtime PartyBoard n’est publié pour {rid}.");
+    }
+
+    private static string CurrentRuntimeId()
     {
         var architecture = RuntimeInformation.ProcessArchitecture switch
         {
@@ -192,25 +293,76 @@ public sealed class PartyBoardInstaller
             _ => throw new PlatformNotSupportedException(
                 $"Architecture PartyBoard non prise en charge : {RuntimeInformation.ProcessArchitecture}.")
         };
-        var rid = OperatingSystem.IsWindows()
+        return OperatingSystem.IsWindows()
             ? $"win-{architecture}"
             : OperatingSystem.IsLinux()
                 ? $"linux-{architecture}"
-                : $"macos-{architecture}";
-        return manifest.Artifacts.TryGetValue(rid, out var artifact)
-            ? artifact
-            : throw new PlatformNotSupportedException($"Aucun runtime PartyBoard n’est publié pour {rid}.");
+                : $"osx-{architecture}";
     }
 
-    private static void ValidateArtifact(PartyBoardArtifact artifact)
+    private static void ValidateArtifact(PartyBoardArtifact artifact, bool requireSize = true)
     {
         if (string.IsNullOrWhiteSpace(artifact.Name) || artifact.Name != Path.GetFileName(artifact.Name))
             throw new InvalidDataException("Nom d’artefact PartyBoard invalide.");
-        if (artifact.Size is <= 0 or > MaximumPackageBytes)
+        if (requireSize && artifact.Size is <= 0 or > MaximumPackageBytes)
+            throw new InvalidDataException("Taille d’artefact PartyBoard invalide.");
+        if (!requireSize && artifact.Size > MaximumPackageBytes)
             throw new InvalidDataException("Taille d’artefact PartyBoard invalide.");
         if (artifact.Sha256.Length != 64 || artifact.Sha256.Any(character => !Uri.IsHexDigit(character)))
             throw new InvalidDataException("SHA-256 PartyBoard invalide.");
         _ = NormalizeRelativePath(artifact.Launch);
+    }
+
+    private async Task DownloadLegacyVerifiedAsync(
+        Uri uri,
+        string destination,
+        string expectedHash,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        var temporary = destination + ".part";
+        try { if (File.Exists(temporary)) File.Delete(temporary); } catch { }
+
+        using var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        var announcedLength = response.Content.Headers.ContentLength;
+        if (announcedLength > MaximumPackageBytes)
+            throw new InvalidDataException("Le paquet PartyBoard dépasse la taille autorisée.");
+
+        long total = 0;
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
+        await using (var output = new FileStream(temporary, FileMode.Create, FileAccess.Write,
+                         FileShare.None, 256 * 1024, true))
+        {
+            var buffer = new byte[256 * 1024];
+            while (true)
+            {
+                var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+                if (read == 0) break;
+                total += read;
+                if (total > MaximumPackageBytes)
+                    throw new InvalidDataException("Le paquet PartyBoard dépasse la taille autorisée.");
+                await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                hash.AppendData(buffer, 0, read);
+                if (announcedLength is > 0)
+                    progress?.Report(.05 + .75 * Math.Clamp((double)total / announcedLength.Value, 0, 1));
+            }
+            await output.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        if (total <= 0)
+            throw new InvalidDataException("Le paquet PartyBoard téléchargé est vide.");
+        if (announcedLength is > 0 && total != announcedLength.Value)
+            throw new InvalidDataException("Le téléchargement PartyBoard est incomplet.");
+
+        var actualHash = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
+        if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+            throw new CryptographicException("Le paquet PartyBoard téléchargé ne correspond pas au checksum publié.");
+
+        File.Move(temporary, destination, true);
+        progress?.Report(.8);
     }
 
     private async Task DownloadVerifiedAsync(Uri uri, string destination, long expectedSize, string expectedHash,
@@ -225,7 +377,7 @@ public sealed class PartyBoardInstaller
         }
         if (existing == expectedSize)
         {
-            var completedHash = await ComputeSha256Async(temporary, cancellationToken);
+            var completedHash = await ComputeSha256Async(temporary, cancellationToken).ConfigureAwait(false);
             if (completedHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
             {
                 File.Move(temporary, destination, true);
@@ -238,7 +390,8 @@ public sealed class PartyBoardInstaller
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
         if (existing > 0) request.Headers.Range = new RangeHeaderValue(existing, null);
-        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var append = existing > 0 && response.StatusCode == System.Net.HttpStatusCode.PartialContent &&
             response.Content.Headers.ContentRange?.From == existing;
@@ -259,27 +412,27 @@ public sealed class PartyBoardInstaller
                     var prior = new byte[256 * 1024];
                     while (true)
                     {
-                        var priorRead = await partial.ReadAsync(prior, cancellationToken);
+                        var priorRead = await partial.ReadAsync(prior, cancellationToken).ConfigureAwait(false);
                         if (priorRead == 0) break;
                         hash.AppendData(prior, 0, priorRead);
                     }
                 }
-                await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
+                await using var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                 await using var output = new FileStream(temporary, append ? FileMode.Append : FileMode.Create,
                     FileAccess.Write, FileShare.None, 256 * 1024, true);
                 var buffer = new byte[256 * 1024];
                 while (true)
                 {
-                    var read = await input.ReadAsync(buffer, cancellationToken);
+                    var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                     if (read == 0) break;
                     total += read;
                     if (total > expectedSize || total > MaximumPackageBytes)
                         throw new InvalidDataException("Le téléchargement PartyBoard dépasse la taille annoncée.");
-                    await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                    await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
                     hash.AppendData(buffer, 0, read);
                     progress?.Report(0.05 + 0.75 * total / expectedSize);
                 }
-                await output.FlushAsync(cancellationToken);
+                await output.FlushAsync(cancellationToken).ConfigureAwait(false);
                 actualHash = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
             }
             if (total != expectedSize || !actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
@@ -299,7 +452,20 @@ public sealed class PartyBoardInstaller
     private static async Task<string> ComputeSha256Async(string path, CancellationToken cancellationToken)
     {
         await using var stream = File.OpenRead(path);
-        return Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken)).ToLowerInvariant();
+        return Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken).ConfigureAwait(false))
+            .ToLowerInvariant();
+    }
+
+    private static string ParseChecksum(string text, string fileName)
+    {
+        foreach (var line in text.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2) continue;
+            if (parts[^1].TrimStart('*').Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                return parts[0].Trim();
+        }
+        return "";
     }
 
     private static string NormalizeRelativePath(string path)
@@ -330,6 +496,8 @@ public sealed class PartyBoardInstaller
     {
         public int Schema { get; set; }
         public string Version { get; set; } = "";
+        public string Platform { get; set; } = "";
+        public string Executable { get; set; } = "";
         public Dictionary<string, PartyBoardArtifact> Artifacts { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 

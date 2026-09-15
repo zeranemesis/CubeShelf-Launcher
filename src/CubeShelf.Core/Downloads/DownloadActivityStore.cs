@@ -24,6 +24,10 @@ public sealed record DownloadActivity(
     DateTimeOffset UpdatedAt,
     string ReferenceId = "");
 
+/// <summary>
+/// Durable history for the portable queue. Persistence is deliberately independent
+/// from any UI framework so interrupted work can be represented on every platform.
+/// </summary>
 public sealed class DownloadActivityStore
 {
     private readonly string _path;
@@ -39,18 +43,7 @@ public sealed class DownloadActivityStore
     public IReadOnlyList<DownloadActivity> Load()
     {
         lock (_gate)
-        {
-            if (!File.Exists(_path)) return Array.Empty<DownloadActivity>();
-            try
-            {
-                return (JsonSerializer.Deserialize<List<DownloadActivity>>(File.ReadAllText(_path), _json) ?? new())
-                    .OrderByDescending(item => item.UpdatedAt).ToArray();
-            }
-            catch (JsonException)
-            {
-                return Array.Empty<DownloadActivity>();
-            }
-        }
+            return LoadUnlocked().OrderByDescending(item => item.UpdatedAt).ToArray();
     }
 
     public DownloadActivity Create(string kind, string title, string referenceId = "")
@@ -82,6 +75,17 @@ public sealed class DownloadActivityStore
         }
     }
 
+    public bool Remove(string id)
+    {
+        lock (_gate)
+        {
+            var items = LoadUnlocked();
+            var removed = items.RemoveAll(item => item.Id == id) > 0;
+            if (removed) SaveUnlocked(items);
+            return removed;
+        }
+    }
+
     public int MarkInterruptedOperations()
     {
         lock (_gate)
@@ -89,16 +93,17 @@ public sealed class DownloadActivityStore
             var items = LoadUnlocked();
             var count = 0;
             for (var index = 0; index < items.Count; index++)
-                if (items[index].State is DownloadActivityState.Queued or DownloadActivityState.Running)
+            {
+                if (items[index].State is not (DownloadActivityState.Queued or DownloadActivityState.Running))
+                    continue;
+                items[index] = items[index] with
                 {
-                    items[index] = items[index] with
-                    {
-                        State = DownloadActivityState.Interrupted,
-                        Message = "Interrompu par la fermeture de CubeShelf",
-                        UpdatedAt = DateTimeOffset.UtcNow
-                    };
-                    count++;
-                }
+                    State = DownloadActivityState.Interrupted,
+                    Message = "Interrompu par la fermeture de CubeShelf",
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+                count++;
+            }
             if (count > 0) SaveUnlocked(items);
             return count;
         }
@@ -128,8 +133,14 @@ public sealed class DownloadActivityStore
     private List<DownloadActivity> LoadUnlocked()
     {
         if (!File.Exists(_path)) return new();
-        try { return JsonSerializer.Deserialize<List<DownloadActivity>>(File.ReadAllText(_path), _json) ?? new(); }
-        catch (JsonException) { return new(); }
+        try
+        {
+            return JsonSerializer.Deserialize<List<DownloadActivity>>(File.ReadAllText(_path), _json) ?? new();
+        }
+        catch (JsonException)
+        {
+            return new();
+        }
     }
 
     private void SaveUnlocked(IReadOnlyList<DownloadActivity> items)

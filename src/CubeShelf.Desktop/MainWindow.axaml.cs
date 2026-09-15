@@ -6,6 +6,8 @@ using Avalonia.Platform.Storage;
 using CubeShelf.Core.Releases;
 using CubeShelf.Core.Mods;
 using CubeShelf.Core.Downloads;
+using CubeShelf.Core.Games;
+using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics;
 using Avalonia.Styling;
@@ -23,6 +25,9 @@ public sealed partial class MainWindow : Window
     private readonly MediaCacheService _mediaCache;
     private readonly UserPreferencesStore _preferencesStore;
     private readonly LauncherUpdateService _launcherUpdates;
+    private readonly GameCatalogService _catalogService;
+    private readonly List<GameCatalogEntry> _catalogGames = new();
+    private readonly GameSessionTracker _sessions;
     private UserPreferences _preferences;
     private bool _loadingSettings;
     private CancellationTokenSource? _installationCancellation;
@@ -50,20 +55,28 @@ public sealed partial class MainWindow : Window
         _gameData = new GameDataPreparer(paths);
         _downloads = new DownloadActivityStore(paths);
         _downloads.MarkInterruptedOperations();
+        _sessions = new GameSessionTracker(_processLauncher);
+        _sessions.Ended += session => Dispatcher.UIThread.Post(() => OnGameSessionEnded(session));
+        InitializePhase3Parity();
+        InitializePhase4Parity();
+        InitializePhase5Polish();
+        InitializePhase6Parity();
+        InitializePhase7Finalization();
         PlatformStatus.Text = OperatingSystem.IsWindows()
             ? "Plateforme détectée : Windows"
             : OperatingSystem.IsLinux()
                 ? "Plateforme détectée : Linux"
-                : "Plateforme détectée : macOS (non supportée)";
+                : "Plateforme détectée : macOS (expérimental)";
         DataPath.Text = $"Profil : {paths.DataDirectory}";
         SettingsDataPath.Text = paths.DataDirectory;
         if (!migration.AlreadyCompleted && (migration.RuntimesCopied > 0 || migration.ModLibrariesCopied > 0))
             SettingsStatus.Text = $"Migration terminée : {migration.RuntimesCopied} runtime(s), {migration.ModLibrariesCopied} bibliothèque(s) de mods copiés. Sources conservées.";
 
-        var catalog = new GameCatalogService(
+        _catalogService = new GameCatalogService(
             Path.Combine(AppContext.BaseDirectory, "games.json"),
-            paths.DataDirectory).Load();
-        _selectedGame = catalog.FirstOrDefault();
+            paths.DataDirectory);
+        _catalogGames.AddRange(_catalogService.Load());
+        _selectedGame = _catalogGames.FirstOrDefault();
         if (_selectedGame is not null)
         {
             var saved = _profileStore.Load(_selectedGame.Id);
@@ -89,21 +102,57 @@ public sealed partial class MainWindow : Window
         {
             _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
             _preferencesStore.Save(_preferences);
+            _sessions.Dispose();
+            DisposePhase3Parity();
+            DisposePhase4Parity();
+            DisposePhase5Polish();
+            DisposePhase6Parity();
+            DisposePhase7Finalization();
+            GameCase.Dispose();
+            foreach (var card in _parityCards) card.Dispose();
+            _toastCancellation?.Cancel();
+            _toastCancellation?.Dispose();
         };
     }
 
-    private void PlayGame(object? sender, RoutedEventArgs args)
+    private async void PlayGame(object? sender, RoutedEventArgs args)
     {
-        if (_selectedGame is null || !CanPlay()) return;
-        _processLauncher.Start(
-            _selectedGame.Executable,
-            Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-            new Dictionary<string, string?>
-            {
-                ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
-                ["PARTYBOARD_MOD_LIST"] = _modManager?.ActiveListFile
-            });
-        ActionStatus.Text = "PartyBoard démarré avec l’image sélectionnée.";
+        if (_selectedGame is null) return;
+
+        if (_sessions.IsRunning(_selectedGame.Id))
+        {
+            PlayButton.IsEnabled = false;
+            PlayButton.Content = "Arrêt…";
+            try { await _sessions.StopAsync(_selectedGame.Id); }
+            finally { RefreshGameState(); }
+            return;
+        }
+
+        if (!CanPlay()) return;
+
+        try
+        {
+            _sessions.Start(
+                _selectedGame.Id,
+                _selectedGame.Executable,
+                Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
+                new Dictionary<string, string?>
+                {
+                    ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
+                    ["PARTYBOARD_MOD_LIST"] = _modManager?.ActiveListFile
+                });
+
+            _selectedGame.PlayCount++;
+            _selectedGame.LastPlayedAt = DateTimeOffset.Now;
+            PersistCatalog();
+            WindowState = WindowState.Minimized;
+            ActionStatus.Text = "PartyBoard démarré avec l’image sélectionnée.";
+            RefreshGameState();
+        }
+        catch (Exception exception)
+        {
+            ActionStatus.Text = $"Impossible de démarrer PartyBoard : {exception.Message}";
+        }
     }
 
     private async void ChooseDisc(object? sender, RoutedEventArgs args)
@@ -166,111 +215,20 @@ public sealed partial class MainWindow : Window
     private async void RepairPartyBoard(object? sender, RoutedEventArgs args)
         => await RunInstallationAsync(repair: true);
 
-    private async Task RunInstallationAsync(bool repair)
+    private Task RunInstallationAsync(bool repair)
     {
-        if (_selectedGame is null || _installationCancellation is not null) return;
-        var activity = _downloads.Create("runtime", $"PartyBoard — {_selectedGame.Title}", _selectedGame.Id);
-        _downloads.Update(activity.Id, DownloadActivityState.Running, 0, repair ? "Réparation" : "Installation");
-        RefreshDownloadItems();
-        _installationCancellation = new CancellationTokenSource();
-        InstallButton.IsEnabled = false;
-        RepairButton.IsEnabled = false;
-        UninstallButton.IsEnabled = false;
-        CancelInstallButton.IsVisible = true;
-        InstallProgress.IsVisible = true;
-        InstallProgress.Value = 0;
-        ActionStatus.Text = "Téléchargement du manifeste PartyBoard…";
-
-        var lastPersistedProgress = 0d;
-        var progress = new Progress<double>(value =>
-        {
-            InstallProgress.Value = Math.Clamp(value * 100, 0, 100);
-            ActionStatus.Text = value < 0.8
-                ? $"Téléchargement sécurisé… {value:P0}"
-                : "Vérification et installation…";
-            if (value >= 1 || value - lastPersistedProgress >= .02)
-            {
-                lastPersistedProgress = value;
-                _downloads.Update(activity.Id, DownloadActivityState.Running, value, ActionStatus.Text);
-                RefreshDownloadItems();
-            }
-        });
-
-        try
-        {
-            var result = repair
-                ? await _installer.RepairLatestAsync(
-                    _selectedGame.GitHubOwner, _selectedGame.GitHubRepo,
-                    _selectedGame.GitHubReleaseTag, _selectedGame.Id,
-                    progress, _installationCancellation.Token)
-                : await _installer.InstallLatestAsync(
-                    _selectedGame.GitHubOwner, _selectedGame.GitHubRepo,
-                    _selectedGame.GitHubReleaseTag, _selectedGame.Id,
-                    progress, _installationCancellation.Token);
-            _selectedGame.Executable = result.ExecutablePath;
-            PersistSelection();
-            RefreshGameState();
-            ActionStatus.Text = $"PartyBoard {result.Version} est installé et prêt.";
-            _downloads.Update(activity.Id, DownloadActivityState.Completed, 1, ActionStatus.Text);
-        }
-        catch (OperationCanceledException)
-        {
-            ActionStatus.Text = "Installation annulée. Aucun runtime incomplet n’a été activé.";
-            _downloads.Update(activity.Id, DownloadActivityState.Cancelled, InstallProgress.Value / 100, ActionStatus.Text);
-        }
-        catch (Exception exception)
-        {
-            ActionStatus.Text = $"Installation impossible : {exception.Message}";
-            _downloads.Update(activity.Id, DownloadActivityState.Failed, InstallProgress.Value / 100, exception.Message);
-        }
-        finally
-        {
-            _installationCancellation.Dispose();
-            _installationCancellation = null;
-            InstallButton.IsEnabled = true;
-            RepairButton.IsEnabled = true;
-            UninstallButton.IsEnabled = true;
-            CancelInstallButton.IsVisible = false;
-            InstallProgress.IsVisible = false;
-            RefreshDownloadItems();
-        }
+        EnqueueRuntimeInstallationPhase3(repair);
+        return Task.CompletedTask;
     }
-
-    private void CancelInstall(object? sender, RoutedEventArgs args) =>
-        _installationCancellation?.Cancel();
-
-    private async void PrepareGameData(object? sender, RoutedEventArgs args)
+    private void CancelInstall(object? sender, RoutedEventArgs args)
     {
-        if (_selectedGame is null || _installationCancellation is not null) return;
-        _installationCancellation = new CancellationTokenSource();
-        PrepareDataButton.IsEnabled = false;
-        CancelInstallButton.IsVisible = true;
-        InstallProgress.IsVisible = true;
-        InstallProgress.Value = 0;
-        try
-        {
-            var progress = new Progress<double>(value =>
-            {
-                InstallProgress.Value = value * 100;
-                ActionStatus.Text = $"Préparation des données du jeu… {value:P0}";
-            });
-            await _gameData.PrepareAsync(_selectedGame.Id, _selectedGame.Executable, _selectedGame.DiscImage,
-                progress, _installationCancellation.Token);
-            ActionStatus.Text = "Données du jeu préparées. L’image d’origine a été conservée.";
-        }
-        catch (OperationCanceledException) { ActionStatus.Text = "Préparation annulée; les anciennes données ont été conservées."; }
-        catch (Exception exception) { ActionStatus.Text = $"Préparation impossible : {exception.Message}"; }
-        finally
-        {
-            _installationCancellation.Dispose();
-            _installationCancellation = null;
-            PrepareDataButton.IsEnabled = true;
-            CancelInstallButton.IsVisible = false;
-            InstallProgress.IsVisible = false;
-            RefreshGameState();
-        }
+        CancelActiveGameQueuePhase3();
+        ActionStatus.Text = "Annulation demandée…";
     }
-
+    private void PrepareGameData(object? sender, RoutedEventArgs args)
+    {
+        EnqueueGameDataPreparationPhase3();
+    }
     private void UninstallPartyBoard(object? sender, RoutedEventArgs args)
     {
         if (_selectedGame is null || _installationCancellation is not null) return;
@@ -300,6 +258,46 @@ public sealed partial class MainWindow : Window
             _selectedGame.Id,
             _selectedGame.Executable,
             _selectedGame.DiscImage));
+        PersistCatalog();
+    }
+
+    private void PersistCatalog() => _catalogService.Save(_catalogGames);
+
+    private void ToggleFavorite(object? sender, RoutedEventArgs args)
+    {
+        if (_selectedGame is null) return;
+        _selectedGame.IsFavorite = !_selectedGame.IsFavorite;
+        PersistCatalog();
+        RefreshGameState();
+    }
+
+    private void OnGameSessionEnded(GameSessionEndedEventArgs session)
+    {
+        var game = _catalogGames.FirstOrDefault(item =>
+            item.Id.Equals(session.GameId, StringComparison.OrdinalIgnoreCase));
+        if (game is not null)
+        {
+            game.TotalPlaySeconds += Math.Max(0, (long)Math.Round(session.Duration.TotalSeconds));
+            PersistCatalog();
+        }
+
+        if (_selectedGame?.Id.Equals(session.GameId, StringComparison.OrdinalIgnoreCase) == true)
+            RefreshGameState();
+
+        if (_sessions.RunningGameIds.Count == 0)
+        {
+            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+            Show();
+            Activate();
+        }
+    }
+
+    private static string FormatPlayTime(long seconds)
+    {
+        var total = TimeSpan.FromSeconds(Math.Max(0, seconds));
+        return total.TotalHours >= 1
+            ? $"{(int)total.TotalHours} h {total.Minutes:00} min"
+            : $"{total.Minutes} min";
     }
 
     private void RefreshGameState()
@@ -325,10 +323,21 @@ public sealed partial class MainWindow : Window
         PrepareDataButton.Content = prepared ? "Repréparer les données" : "Préparer les données";
         PrepareDataButton.IsEnabled = File.Exists(_selectedGame.Executable) && compatibility.Supported;
         if (prepared) ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
-        PlayButton.IsEnabled = CanPlay();
-        ActionStatus.Text = PlayButton.IsEnabled
-            ? "Configuration prête."
-            : "Sélectionne une image compatible et l’exécutable PartyBoard.";
+        var running = _sessions.IsRunning(_selectedGame.Id);
+        PlayButton.IsEnabled = running || CanPlay();
+        PlayButton.Content = running ? "■ Arrêter" : "▶ Jouer";
+        FavoriteButton.Content = _selectedGame.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
+        var lastPlayed = _selectedGame.LastPlayedAt is null
+            ? "Jamais"
+            : _selectedGame.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+        GameStatsText.Text = $"{_selectedGame.PlayCount} lancements • {FormatPlayTime(_selectedGame.TotalPlaySeconds)} • Dernier : {lastPlayed}";
+        ActionStatus.Text = running
+            ? "PartyBoard est en cours d’exécution."
+            : PlayButton.IsEnabled
+                ? "Configuration prête."
+                : "Sélectionne une image compatible et l’exécutable PartyBoard.";        RefreshParityGameDetails();
+        RefreshLibraryParity();
+
     }
 
     private bool CanPlay() =>
@@ -346,6 +355,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowLibrary(object? sender, RoutedEventArgs args)
     {
+        GameView.IsVisible = false;
         LibraryView.IsVisible = true;
         ModsView.IsVisible = false;
         DownloadsView.IsVisible = false;
@@ -354,6 +364,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowMods(object? sender, RoutedEventArgs args)
     {
+        GameView.IsVisible = false;
         LibraryView.IsVisible = false;
         ModsView.IsVisible = true;
         DownloadsView.IsVisible = false;
@@ -423,19 +434,6 @@ public sealed partial class MainWindow : Window
         ModPreview.Source = null;
         _modPreviewBitmap?.Dispose();
         _modPreviewBitmap = null;
-        var selectedId = _selectedMod.Id;
-        var previewUrl = _selectedMod.Remote?.ThumbnailUrl;
-        if (!string.IsNullOrWhiteSpace(previewUrl))
-        {
-            try
-            {
-                var cached = await _mediaCache.GetAsync(previewUrl, true);
-                if (_selectedMod?.Id != selectedId) return;
-                _modPreviewBitmap = new Bitmap(cached);
-                ModPreview.Source = _modPreviewBitmap;
-            }
-            catch (Exception exception) { ModsStatus.Text = $"Aperçu indisponible : {exception.Message}"; }
-        }
     }
 
     private async void InstallMod(object? sender, RoutedEventArgs args)
@@ -443,51 +441,8 @@ public sealed partial class MainWindow : Window
 
     private async Task RunModInstallationAsync()
     {
-        if (_selectedMod?.Remote is null || _modManager is null) return;
-        var activity = _downloads.Create("mod", _selectedMod.Name, _selectedMod.Id.ToString());
-        _downloads.Update(activity.Id, DownloadActivityState.Running, 0, "Téléchargement du mod");
-        RefreshDownloadItems();
-        SetModActions(false);
-        ModProgress.IsVisible = true;
-        try
-        {
-            var lastPersistedProgress = 0d;
-            var progress = new Progress<double>(value =>
-            {
-                ModProgress.Value = value * 100;
-                if (value >= 1 || value - lastPersistedProgress >= .02)
-                {
-                    lastPersistedProgress = value;
-                    _downloads.Update(activity.Id, DownloadActivityState.Running, value, "Installation sécurisée du mod");
-                    RefreshDownloadItems();
-                }
-            });
-            ModsStatus.Text = "Analyse des dépendances…";
-            var plan = await _modManager.PlanInstallAsync(_selectedMod.Remote, _gameBanana, progress);
-            if (!await ConfirmModPlanAsync(plan))
-            {
-                ModsStatus.Text = "Installation annulée avant toute modification.";
-                _downloads.Update(activity.Id, DownloadActivityState.Cancelled, ModProgress.Value / 100, ModsStatus.Text);
-                return;
-            }
-            await _modManager.InstallPlanAsync(plan, allowIncompatible: true, progress);
-            ModsStatus.Text = $"{plan.Packages.Count} mod(s) installé(s) et activé(s).";
-            _downloads.Update(activity.Id, DownloadActivityState.Completed, 1, ModsStatus.Text);
-            RefreshModItems();
-        }
-        catch (OperationCanceledException)
-        {
-            ModsStatus.Text = "Installation du mod annulée.";
-            _downloads.Update(activity.Id, DownloadActivityState.Cancelled, ModProgress.Value / 100, ModsStatus.Text);
-        }
-        catch (Exception exception)
-        {
-            ModsStatus.Text = $"Installation impossible : {exception.Message}";
-            _downloads.Update(activity.Id, DownloadActivityState.Failed, ModProgress.Value / 100, exception.Message);
-        }
-        finally { ModProgress.IsVisible = false; SetModActions(true); RefreshDownloadItems(); }
+        await QueueModInstallationPhase3Async();
     }
-
     private void ToggleMod(object? sender, RoutedEventArgs args)
     {
         if (_selectedMod is null || _modManager is null) return;
@@ -521,6 +476,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowDownloads(object? sender, RoutedEventArgs args)
     {
+        GameView.IsVisible = false;
         LibraryView.IsVisible = false;
         ModsView.IsVisible = false;
         DownloadsView.IsVisible = true;
@@ -534,7 +490,7 @@ public sealed partial class MainWindow : Window
         RefreshDownloadItems();
     }
 
-    private void RefreshDownloadItems() => DownloadsList.ItemsSource = _downloads.Load();
+    private void RefreshDownloadItems() => RefreshPortableQueueView();
 
     private void SelectDownload(object? sender, SelectionChangedEventArgs args)
     {
@@ -637,6 +593,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowSettings(object? sender, RoutedEventArgs args)
     {
+        GameView.IsVisible = false;
         LibraryView.IsVisible = ModsView.IsVisible = DownloadsView.IsVisible = false;
         SettingsView.IsVisible = true;
     }

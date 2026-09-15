@@ -20,30 +20,45 @@ public sealed class PlatformPaths : IPlatformPaths
     public PlatformPaths(
         string applicationName = "CubeShelf",
         IReadOnlyDictionary<string, string?>? environment = null,
-        PlatformFamily? platform = null)
+        PlatformFamily? platform = null,
+        string? userProfile = null,
+        string? windowsLocalAppData = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(applicationName);
         environment ??= ReadEnvironment();
 
         var selectedPlatform = platform ?? DetectPlatform();
-        if (selectedPlatform == PlatformFamily.Windows)
+        var home = string.IsNullOrWhiteSpace(userProfile)
+            ? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+            : Path.GetFullPath(userProfile);
+
+        switch (selectedPlatform)
         {
-            var local = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData);
-            DataDirectory = Path.Combine(local, applicationName);
-            CacheDirectory = Path.Combine(DataDirectory, "Cache");
-            ConfigurationDirectory = DataDirectory;
-        }
-        else
-        {
-            var userProfile = Environment.GetFolderPath(
-                Environment.SpecialFolder.UserProfile);
-            DataDirectory = ResolveXdg(
-                environment, "XDG_DATA_HOME", userProfile, ".local", "share", applicationName);
-            CacheDirectory = ResolveXdg(
-                environment, "XDG_CACHE_HOME", userProfile, ".cache", applicationName);
-            ConfigurationDirectory = ResolveXdg(
-                environment, "XDG_CONFIG_HOME", userProfile, ".config", applicationName);
+            case PlatformFamily.Windows:
+            {
+                var local = string.IsNullOrWhiteSpace(windowsLocalAppData)
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                    : Path.GetFullPath(windowsLocalAppData);
+                DataDirectory = Path.Combine(local, applicationName);
+                CacheDirectory = Path.Combine(DataDirectory, "Cache");
+                ConfigurationDirectory = DataDirectory;
+                break;
+            }
+
+            case PlatformFamily.MacOS:
+                DataDirectory = Path.Combine(home, "Library", "Application Support", applicationName);
+                CacheDirectory = Path.Combine(home, "Library", "Caches", applicationName);
+                ConfigurationDirectory = Path.Combine(home, "Library", "Preferences", applicationName);
+                break;
+
+            default:
+                DataDirectory = ResolveXdg(
+                    environment, "XDG_DATA_HOME", home, ".local", "share", applicationName);
+                CacheDirectory = ResolveXdg(
+                    environment, "XDG_CACHE_HOME", home, ".cache", applicationName);
+                ConfigurationDirectory = ResolveXdg(
+                    environment, "XDG_CONFIG_HOME", home, ".config", applicationName);
+                break;
         }
 
         DownloadHistoryFile = Path.Combine(DataDirectory, "download-history.json");
