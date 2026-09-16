@@ -89,6 +89,13 @@ public sealed class GameCatalogEntry
     /// </summary>
     public string RuntimeSha256 { get; set; } = "";
 
+    /// <summary>
+    /// Name of a checksum file published in the same release, if the project ships one
+    /// (Strikers ships SHA256SUMS). Read in sha256sum format and preferred over
+    /// <see cref="RuntimeSha256"/>, because it moves with every release instead of going stale.
+    /// </summary>
+    public string RuntimeChecksumAsset { get; set; } = "";
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameDataPreparation DataPreparation { get; set; } = GameDataPreparation.CubeShelf;
 
@@ -228,6 +235,7 @@ public sealed class GameCatalogService
             target.RuntimeAssets = new Dictionary<string, string>(source.RuntimeAssets, StringComparer.OrdinalIgnoreCase);
             target.RuntimeLaunchPaths = new Dictionary<string, string>(source.RuntimeLaunchPaths, StringComparer.OrdinalIgnoreCase);
             target.RuntimeSha256 = source.RuntimeSha256;
+            target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
             target.HomepageUrl = source.HomepageUrl;
 
@@ -260,6 +268,7 @@ public sealed class GameCatalogService
         RuntimeAssets = new Dictionary<string, string>(source.RuntimeAssets, StringComparer.OrdinalIgnoreCase),
         RuntimeLaunchPaths = new Dictionary<string, string>(source.RuntimeLaunchPaths, StringComparer.OrdinalIgnoreCase),
         RuntimeSha256 = source.RuntimeSha256,
+        RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
         HomepageUrl = source.HomepageUrl,
         Covers = source.Covers.Select(Clone).ToList(),

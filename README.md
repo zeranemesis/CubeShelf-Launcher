@@ -28,6 +28,7 @@ Le catalogue est piloté par les données : `src/CubeShelf.Launcher/games.json` 
 | --- | --- | --- | --- | --- |
 | Mario Party 4 | PartyBoard | `GMPE01_00`, `GMPE01_01` | manifeste CubeShelf | par CubeShelf |
 | Soulcalibur II | [Ring Out](https://github.com/jackpoison-prog/RingOut) | `GRSEAF`, `GRSPAF`, `GRSJAF`, `GRSEPS` | asset de release GitHub | par le runtime |
+| Super Mario Strikers | [Strikers](https://github.com/new-coke/strikers) | `G4QE01`, `G4QP01`, `G4QJ01` | asset de release GitHub | par le runtime |
 
 Une entrée de `SupportedDiscIds` est soit un identifiant de révision complet (`GMPE01_00`, cette révision uniquement), soit un identifiant de disque sur six caractères (`GRSEAF`, toutes les révisions).
 
@@ -39,11 +40,15 @@ En `Manifest`, l’éditeur publie un `manifest.json` à côté de ses assets, q
 
 En `GitHubReleaseAsset`, l’éditeur ne publie que des archives ordinaires. CubeShelf interroge l’API GitHub pour la dernière release et sélectionne l’asset via `RuntimeAssets`, dont le motif accepte un joker parce que la version figure dans le nom du fichier. `RuntimeLaunchPaths` indique l’exécutable à lancer dans l’archive, par plateforme, avec le jeton `{version}`.
 
-### Runtimes non vérifiables
+### Vérification du téléchargement
 
-Ring Out ne publie ni `manifest.json` ni `checksums.txt`. CubeShelf n’a donc **rien à quoi comparer le téléchargement**. L’archive reste contrôlée en taille et hachée pendant le transfert, mais aucune valeur publiée par l’éditeur ne permet de confirmer le résultat : l’installation se fait, et elle est enregistrée comme non vérifiée.
+CubeShelf cherche de quoi contrôler l’archive, dans cet ordre :
 
-Renseigner `RuntimeSha256` dans le catalogue épingle une version précise et rend l’installation vérifiée. Sans cette valeur, le runtime porte la mention « installé sans vérification » dans la fiche du jeu, et l’état est conservé dans `runtime-state.json` : l’information survit à l’installation qui l’a produite.
+1. **Un fichier de checksums publié dans la même release**, nommé par `RuntimeChecksumAsset` et lu au format `sha256sum`. C’est la meilleure preuve disponible : elle vient de l’éditeur et suit chaque version. Strikers publie `SHA256SUMS` — ses installations sont donc vérifiées.
+2. **Un SHA-256 épinglé** dans `RuntimeSha256`, qui fige une version précise et devient obsolète à la release suivante.
+3. **Rien.** Ring Out ne publie ni manifeste ni checksum : l’archive reste plafonnée en taille et hachée pendant le transfert, mais aucune valeur de l’éditeur ne permet de confirmer le résultat.
+
+Dans ce dernier cas l’installation n’est pas bloquée, elle est **enregistrée comme non vérifiée** : le runtime porte la mention « installé sans vérification » dans la fiche du jeu, et l’état est conservé dans `runtime-state.json` — l’information survit à l’installation qui l’a produite.
 
 ### Préparation du disque
 

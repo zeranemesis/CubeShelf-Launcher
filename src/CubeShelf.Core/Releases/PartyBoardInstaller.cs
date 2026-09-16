@@ -28,7 +28,8 @@ public sealed record GameRuntimeSource(
     RuntimeSourceKind Kind,
     IReadOnlyDictionary<string, string> AssetPatterns,
     IReadOnlyDictionary<string, string> LaunchPaths,
-    string PinnedSha256)
+    string PinnedSha256,
+    string ChecksumAsset)
 {
     public static GameRuntimeSource FromCatalog(GameCatalogEntry game) => new(
         game.GitHubOwner,
@@ -37,7 +38,8 @@ public sealed record GameRuntimeSource(
         game.RuntimeSource,
         game.RuntimeAssets,
         game.RuntimeLaunchPaths,
-        game.RuntimeSha256);
+        game.RuntimeSha256,
+        game.RuntimeChecksumAsset);
 }
 
 public sealed class PartyBoardInstaller
@@ -65,7 +67,7 @@ public sealed class PartyBoardInstaller
         bool force = false) =>
         InstallLatestAsync(
             new GameRuntimeSource(owner, repository, tag, RuntimeSourceKind.Manifest,
-                new Dictionary<string, string>(), new Dictionary<string, string>(), ""),
+                new Dictionary<string, string>(), new Dictionary<string, string>(), "", ""),
             gameId, progress, cancellationToken, force);
 
     public async Task<PartyBoardInstallResult> InstallLatestAsync(
@@ -124,7 +126,8 @@ public sealed class PartyBoardInstaller
                     File.SetUnixFileMode(target, File.GetUnixFileMode(target) |
                         UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
             }
-            else if (artifact.Kind.Equals("zip", StringComparison.OrdinalIgnoreCase))
+            else if (artifact.Kind.Equals("zip", StringComparison.OrdinalIgnoreCase) ||
+                     artifact.Kind.Equals("archive", StringComparison.OrdinalIgnoreCase))
             {
                 SecureArchiveExtractor.Extract(package, staging,
                     new ArchiveExtractionLimits(20_000, MaximumPackageBytes * 3, MaximumPackageBytes));
@@ -325,9 +328,9 @@ public sealed class PartyBoardInstaller
 
     /// <summary>
     /// Resolves a runtime from a repository that publishes plain release assets and no CubeShelf
-    /// manifest. The publisher signs nothing here, so the download can only be verified against a
-    /// SHA-256 pinned in the catalog. Without that pin the install is unverified, and the caller
-    /// has to have said so explicitly.
+    /// manifest. Verification comes from whatever the publisher offers, in order: a checksum file
+    /// in the same release (Strikers ships SHA256SUMS), then a SHA-256 pinned in the catalog.
+    /// With neither, the install still runs but is recorded as unverified.
     /// </summary>
     private async Task<ResolvedRuntime> ResolveReleaseAssetAsync(
         GameRuntimeSource source,
@@ -365,26 +368,71 @@ public sealed class PartyBoardInstaller
                 $"Le catalogue ne déclare pas de chemin de lancement {runtimeId} pour {source.Repository}.");
         var launch = declaredLaunch.Replace("{version}", version, StringComparison.OrdinalIgnoreCase);
 
-        // Ring Out publishes no checksum, so a download from it can only ever be recorded as
-        // unverified -- never blocked. The flag is carried through to runtime-state.json and
-        // shown on the game page, so what was and was not checked stays visible afterwards.
-        var verified = !string.IsNullOrWhiteSpace(source.PinnedSha256);
+        // A checksum published in the same release is the best evidence available here: it comes
+        // from the publisher and moves with every version, unlike a hash pinned in the catalog
+        // which goes stale on the next release.
+        var sha256 = await ResolvePublishedChecksumAsync(source, release, asset.Name, cancellationToken)
+            .ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(sha256))
+            sha256 = source.PinnedSha256 ?? "";
 
         return new ResolvedRuntime(
             version,
             new PartyBoardArtifact
             {
                 Name = asset.Name,
-                Kind = "zip",
+                Kind = ArchiveKindFor(asset.Name),
                 Launch = launch,
-                Sha256 = source.PinnedSha256 ?? "",
+                Sha256 = sha256,
                 Size = asset.Size
             },
             new Uri(asset.BrowserDownloadUrl),
             LegacyDownload: false,
             RequireSize: true,
-            Verified: verified);
+            Verified: !string.IsNullOrWhiteSpace(sha256));
     }
+
+    /// <summary>
+    /// Reads the release's checksum file, when the catalog names one, and returns the SHA-256 it
+    /// lists for this artifact. A missing or unparsable file is not fatal: the install falls back
+    /// to the pinned hash, or to being recorded as unverified.
+    /// </summary>
+    private async Task<string> ResolvePublishedChecksumAsync(
+        GameRuntimeSource source,
+        GitHubRelease release,
+        string assetName,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(source.ChecksumAsset)) return "";
+
+        var checksumAsset = release.Assets.FirstOrDefault(candidate =>
+            candidate.Name.Equals(source.ChecksumAsset, StringComparison.OrdinalIgnoreCase));
+        if (checksumAsset is null || string.IsNullOrWhiteSpace(checksumAsset.BrowserDownloadUrl)) return "";
+
+        try
+        {
+            using var response = await _http.GetAsync(new Uri(checksumAsset.BrowserDownloadUrl),
+                HttpCompletionOption.ResponseContentRead, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) return "";
+            if (response.Content.Headers.ContentLength > 1024 * 1024) return "";
+
+            var text = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var parsed = ParseChecksum(text, assetName);
+            return parsed.Length == 64 && parsed.All(Uri.IsHexDigit) ? parsed.ToLowerInvariant() : "";
+        }
+        catch (HttpRequestException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Archive type from the asset's name. SharpCompress detects the container itself, so this
+    /// only has to separate an archive from a bare AppImage.
+    /// </summary>
+    private static string ArchiveKindFor(string assetName) =>
+        assetName.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase) ? "appimage" : "archive";
+
 
 
     private async Task<PartyBoardManifest> DownloadManifestAsync(Uri uri, CancellationToken cancellationToken)
