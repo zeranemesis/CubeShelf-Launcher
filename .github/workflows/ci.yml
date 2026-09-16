@@ -54,7 +54,7 @@ jobs:
 
       - name: Publish nightly installer
         if: github.event_name == 'push'
-        run: pwsh ./BUILD_INSTALLER.ps1 -Version 0.8.0-preview.2
+        run: pwsh ./BUILD_INSTALLER.ps1
 
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'push'

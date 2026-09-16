@@ -30,13 +30,11 @@ public sealed partial class MainWindow : Window
     private readonly GameSessionTracker _sessions;
     private UserPreferences _preferences;
     private bool _loadingSettings;
-    private CancellationTokenSource? _installationCancellation;
     private GameCatalogEntry? _selectedGame;
     private PortableModManager? _modManager;
     private readonly GameBananaClient _gameBanana = new();
     private IReadOnlyList<GameBananaMod> _remoteMods = Array.Empty<GameBananaMod>();
     private DesktopModItem? _selectedMod;
-    private DownloadActivity? _selectedDownload;
     private Bitmap? _modPreviewBitmap;
 
     public MainWindow()
@@ -170,7 +168,7 @@ public sealed partial class MainWindow : Window
         var path = files.FirstOrDefault()?.TryGetLocalPath();
         if (string.IsNullOrWhiteSpace(path)) return;
 
-        var compatibility = DiscImageService.Inspect(path);
+        var compatibility = DiscImageService.Inspect(path, _selectedGame.SupportedDiscIds);
         if (!compatibility.Supported)
         {
             ActionStatus.Text = compatibility.Message;
@@ -224,22 +222,6 @@ public sealed partial class MainWindow : Window
     {
         CancelActiveGameQueuePhase3();
         ActionStatus.Text = "Annulation demandée…";
-    }
-    private void PrepareGameData(object? sender, RoutedEventArgs args)
-    {
-        EnqueueGameDataPreparationPhase3();
-    }
-    private void UninstallPartyBoard(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedGame is null || _installationCancellation is not null) return;
-        var managed = _installer.GetStatus(_selectedGame.Id);
-        _installer.Uninstall(_selectedGame.Id);
-        if (string.Equals(_selectedGame.Executable, managed.ExecutablePath,
-                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            _selectedGame.Executable = "";
-        PersistSelection();
-        RefreshGameState();
-        ActionStatus.Text = "PartyBoard a été désinstallé. L’image ISO/GCM/RVZ n’a pas été supprimée.";
     }
 
     private void ClearDisc(object? sender, RoutedEventArgs args)
@@ -303,48 +285,77 @@ public sealed partial class MainWindow : Window
     private void RefreshGameState()
     {
         if (_selectedGame is null) return;
-        DiscPathText.Text = File.Exists(_selectedGame.DiscImage)
-            ? _selectedGame.DiscImage
+        var game = _selectedGame;
+
+        // A runtime that recompiles the game from the disc itself owns that step. CubeShelf
+        // extracting the disc underneath it would be wrong, so none of the preparation UI
+        // applies to those games.
+        var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
+
+        DiscPathText.Text = File.Exists(game.DiscImage)
+            ? game.DiscImage
             : "Aucune image sélectionnée";
-        ExecutablePathText.Text = File.Exists(_selectedGame.Executable)
-            ? _selectedGame.Executable
-            : "PartyBoard non configuré";
-        var runtime = _installer.GetStatus(_selectedGame.Id);
-        InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : "Installer PartyBoard";
+        ExecutablePathText.Text = File.Exists(game.Executable)
+            ? game.Executable
+            : $"{game.RuntimeName} non configuré";
+
+        var runtime = _installer.GetStatus(game.Id);
+        InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : $"Installer {game.RuntimeName}";
         RepairButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         UninstallButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         if (runtime.IsInstalled)
+        {
             ExecutablePathText.Text = $"{runtime.ExecutablePath}\nVersion : {runtime.Version}";
+            if (!runtime.Verified)
+                ExecutablePathText.Text += "\n⚠ Installé sans vérification de checksum";
+        }
         else if (runtime.NeedsRepair)
+        {
             ExecutablePathText.Text = "Installation gérée incomplète — réparation nécessaire";
-        var compatibility = DiscImageService.Inspect(_selectedGame.DiscImage);
-        DiscCompatibilityText.Text = compatibility.Message;
-        var prepared = _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+        }
+
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
+        DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
+            DiscImageService.DescribeSupported(game.SupportedDiscIds);
+
+        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game.Id, game.Executable);
+        PrepareDataButton.IsVisible = !runtimeManagesDisc;
         PrepareDataButton.Content = prepared ? "Repréparer les données" : "Préparer les données";
-        PrepareDataButton.IsEnabled = File.Exists(_selectedGame.Executable) && compatibility.Supported;
-        if (prepared) ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
-        var running = _sessions.IsRunning(_selectedGame.Id);
+        PrepareDataButton.IsEnabled = !runtimeManagesDisc && File.Exists(game.Executable) && compatibility.Supported;
+        if (prepared)
+            ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
+        else if (runtimeManagesDisc && runtime.IsInstalled)
+            ExecutablePathText.Text += $"\n{game.RuntimeName} prépare le disque à son premier lancement.";
+
+        var running = _sessions.IsRunning(game.Id);
         PlayButton.IsEnabled = running || CanPlay();
         PlayButton.Content = running ? "■ Arrêter" : "▶ Jouer";
-        FavoriteButton.Content = _selectedGame.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
-        var lastPlayed = _selectedGame.LastPlayedAt is null
+        FavoriteButton.Content = game.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
+        var lastPlayed = game.LastPlayedAt is null
             ? "Jamais"
-            : _selectedGame.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
-        GameStatsText.Text = $"{_selectedGame.PlayCount} lancements • {FormatPlayTime(_selectedGame.TotalPlaySeconds)} • Dernier : {lastPlayed}";
+            : game.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+        GameStatsText.Text =
+            $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • Dernier : {lastPlayed}";
         ActionStatus.Text = running
-            ? "PartyBoard est en cours d’exécution."
+            ? $"{game.RuntimeName} est en cours d’exécution."
             : PlayButton.IsEnabled
                 ? "Configuration prête."
-                : "Sélectionne une image compatible et l’exécutable PartyBoard.";        RefreshParityGameDetails();
-        RefreshLibraryParity();
+                : $"Sélectionne une image compatible et l’exécutable {game.RuntimeName}.";
 
+        RefreshParityGameDetails();
+        RefreshLibraryParity();
     }
 
-    private bool CanPlay() =>
-        _selectedGame is not null &&
-        File.Exists(_selectedGame.Executable) &&
-        DiscImageService.Inspect(_selectedGame.DiscImage).Supported &&
-        _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+    private bool CanPlay()
+    {
+        if (_selectedGame is null || !File.Exists(_selectedGame.Executable)) return false;
+        if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame.SupportedDiscIds).Supported) return false;
+
+        // Ring Out extracts and recompiles the disc on its own first launch, so there is
+        // nothing for CubeShelf to prepare and nothing to wait for before enabling Play.
+        return _selectedGame.DataPreparation == GameDataPreparation.Runtime ||
+            _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+    }
 
     private static string ResolveApplicationPath(string path) =>
         string.IsNullOrWhiteSpace(path)
@@ -422,7 +433,7 @@ public sealed partial class MainWindow : Window
         ConflictsStatus.Text = string.Join(Environment.NewLine, report);
     }
 
-    private async void SelectMod(object? sender, SelectionChangedEventArgs args)
+    private void SelectMod(object? sender, SelectionChangedEventArgs args)
     {
         _selectedMod = ModsList.SelectedItem as DesktopModItem;
         if (_selectedMod is null) return;
@@ -493,49 +504,10 @@ public sealed partial class MainWindow : Window
         RefreshDownloadItems();
     }
 
-    private void ClearDownloads(object? sender, RoutedEventArgs args)
-    {
-        _downloads.ClearFinished();
-        RefreshDownloadItems();
-    }
 
     private void RefreshDownloadItems() => RefreshPortableQueueView();
 
-    private void SelectDownload(object? sender, SelectionChangedEventArgs args)
-    {
-        _selectedDownload = DownloadsList.SelectedItem as DownloadActivity;
-        ResumeDownloadButton.IsEnabled = _selectedDownload is not null &&
-            _selectedDownload.State is DownloadActivityState.Interrupted or DownloadActivityState.Failed or DownloadActivityState.Cancelled;
-    }
 
-    private async void ResumeDownload(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedDownload is null) return;
-        if (_selectedDownload.Kind == "runtime")
-        {
-            ShowLibrary(sender, args);
-            await RunInstallationAsync(repair: false);
-            return;
-        }
-        if (_selectedDownload.Kind == "mod" && int.TryParse(_selectedDownload.ReferenceId, out var modId) &&
-            _modManager is not null)
-        {
-            try
-            {
-                var remote = _remoteMods.FirstOrDefault(item => item.Id == modId) ?? await _gameBanana.GetAsync(modId);
-                var installed = _modManager.GetInstalled().FirstOrDefault(item => item.Id == modId);
-                _selectedMod = new DesktopModItem(modId, remote.Name,
-                    installed is null ? "Non installé" : "Installation interrompue",
-                    installed?.Priority ?? 100, installed?.Enabled ?? false, installed is not null, remote);
-                ShowMods(sender, args);
-                await RunModInstallationAsync();
-            }
-            catch (Exception exception)
-            {
-                ModsStatus.Text = $"Reprise impossible : {exception.Message}";
-            }
-        }
-    }
 
     public sealed record DesktopModItem(int Id, string Name, string Status, int Priority, bool Enabled,
         bool Installed, GameBananaMod? Remote);
@@ -613,14 +585,6 @@ public sealed partial class MainWindow : Window
         Process.Start(new ProcessStartInfo(_paths.DataDirectory) { UseShellExecute = true });
     }
 
-    private void ClearMediaCache(object? sender, RoutedEventArgs args)
-    {
-        ModPreview.Source = null;
-        _modPreviewBitmap?.Dispose();
-        _modPreviewBitmap = null;
-        var bytes = _mediaCache.Clear();
-        SettingsStatus.Text = $"Cache vidé ({bytes / 1024d / 1024d:F1} Mio libérés).";
-    }
 
     private void ApplyPreferences()
     {

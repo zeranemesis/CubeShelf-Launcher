@@ -7,6 +7,7 @@ using CubeShelf.Core.Mods;
 using CubeShelf.Core.Downloads;
 
 var failures = new List<string>();
+var executed = 0;
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);
@@ -29,10 +30,14 @@ Run("preferences persistence", TestPreferences);
 Run("non-destructive WPF migration", TestLegacyMigration);
 Run("transactional GameCube preparation", TestGameDataPreparation);
 Run("verified launcher update", TestLauncherUpdate);
+Run("per-game disc compatibility", TestPerGameDiscCompatibility);
+Run("release asset pattern matching", TestReleaseAssetPattern);
+Run("catalog keeps runtime acquisition metadata", TestCatalogRuntimeMetadata);
+Run("shipped catalog is coherent", TestShippedCatalogIsCoherent);
 
 if (failures.Count == 0)
 {
-    Console.WriteLine("22 CubeShelf.Core tests passed.");
+    Console.WriteLine($"{executed} CubeShelf.Core tests passed.");
     return 0;
 }
 
@@ -41,6 +46,7 @@ return 1;
 
 void Run(string name, Action action)
 {
+    executed++;
     try { action(); Console.WriteLine($"OK  {name}"); }
     catch (Exception exception) { failures.Add($"FAIL {name}: {exception.Message}"); }
 }
@@ -112,7 +118,7 @@ void TestDiscRevision()
         System.Text.Encoding.ASCII.GetBytes("GMPE01").CopyTo(header, 0);
         header[7] = 1;
         File.WriteAllBytes(image, header);
-        var result = DiscImageService.Inspect(image);
+        var result = DiscImageService.Inspect(image, DiscImageService.MarioParty4DiscIds);
         Assert(result is { Recognized: true, Supported: true, VersionId: "GMPE01_01" });
     });
 }
@@ -147,7 +153,7 @@ void TestPartyBoardInstallation()
         }
 
         var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
-        var rid = OperatingSystem.IsWindows() ? "win-x64" : "linux-x64";
+        var rid = CurrentRid();
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schema = 2,
@@ -468,7 +474,7 @@ void TestGameDataPreparation()
         new byte[] { 4, 5, 6 }.CopyTo(bytes, 0x480);
         File.WriteAllBytes(iso, bytes);
         var preparer = new GameDataPreparer(paths);
-        var result = preparer.PrepareAsync("GAME", executable, iso).GetAwaiter().GetResult();
+        var result = preparer.PrepareAsync("GAME", executable, iso, DiscImageService.MarioParty4DiscIds).GetAwaiter().GetResult();
         Assert(File.ReadAllBytes(Path.Combine(result, "file.bin")).SequenceEqual(new byte[] { 4, 5, 6 }));
         Assert(preparer.IsPrepared("GAME", executable));
         Assert(File.Exists(iso));
@@ -485,7 +491,7 @@ void TestLauncherUpdate()
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schemaVersion = 2, version = "9.0.0",
-            artifacts = new[] { new { os, architecture = "x64", type = "launcher", url = "https://downloads.example.test/update.zip", size = package.Length, sha256 = hash } }
+            artifacts = new[] { new { os, architecture = CurrentArchitecture(), type = "launcher", url = "https://downloads.example.test/update.zip", size = package.Length, sha256 = hash } }
         }));
         using var http = new HttpClient(new UpdateHttpHandler(manifest, package));
         var service = new LauncherUpdateService(new TestPaths(root), http, new Uri("https://updates.example.test/manifest.json"));
@@ -536,7 +542,7 @@ void TestRuntimeResume()
         var launch = OperatingSystem.IsWindows() ? "partyboard.exe" : "partyboard";
         var package = CreateZipBytes(launch, System.Text.Encoding.UTF8.GetBytes("resumed-runtime"));
         var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
-        var rid = OperatingSystem.IsWindows() ? "win-x64" : "linux-x64";
+        var rid = CurrentRid();
         var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
         {
             schema = 2,
@@ -585,6 +591,177 @@ void AssertThrows<T>(Action action) where T : Exception
     try { action(); }
     catch (T) { return; }
     throw new InvalidOperationException($"Expected {typeof(T).Name}.");
+}
+
+// Mario Party 4 revisions used to be compiled into DiscImageService, so every game in the
+// catalog was judged against PartyBoard's list. These cover the per-entry replacement.
+void TestPerGameDiscCompatibility()
+{
+    WithTempRoot(root =>
+    {
+        var soulcalibur = WriteDiscHeader(root, "sc2.iso", "GRSPAF", revision: 0);
+        var marioParty = WriteDiscHeader(root, "mp4.iso", "GMPE01", revision: 1);
+
+        var ringOutDiscs = new[] { "GRSEAF", "GRSPAF", "GRSJAF", "GRSEPS" };
+
+        // A bare disc id accepts every revision of that disc.
+        var accepted = DiscImageService.Inspect(soulcalibur, ringOutDiscs);
+        Assert(accepted is { Recognized: true, Supported: true, VersionId: "GRSPAF_00" });
+
+        // The same disc must be refused by a runtime that does not claim it.
+        var refused = DiscImageService.Inspect(soulcalibur, DiscImageService.MarioParty4DiscIds);
+        Assert(refused is { Recognized: true, Supported: false });
+
+        // And the converse, so the two sets are genuinely independent.
+        Assert(!DiscImageService.Inspect(marioParty, ringOutDiscs).Supported);
+        Assert(DiscImageService.Inspect(marioParty, DiscImageService.MarioParty4DiscIds).Supported);
+
+        // A full version id stays exact: GMPE01_02 is not one of the two accepted revisions.
+        var otherRevision = WriteDiscHeader(root, "mp4-rev2.iso", "GMPE01", revision: 2);
+        Assert(!DiscImageService.Inspect(otherRevision, DiscImageService.MarioParty4DiscIds).Supported);
+
+        Assert(DiscImageService.DescribeSupported(ringOutDiscs).Contains("GRSEAF", StringComparison.Ordinal));
+    });
+}
+
+void TestReleaseAssetPattern()
+{
+    // Publishers put the version in the file name, which is the whole reason for the wildcard.
+    Assert(ReleaseAssetPattern.Matches("RingOut-1.6.1-windows-x64.zip", "RingOut-*-windows-x64.zip"));
+    Assert(ReleaseAssetPattern.Matches("RingOut-1.7-windows-x64.zip", "RingOut-*-windows-x64.zip"));
+
+    // A neighbouring artifact of the same release must not win.
+    Assert(!ReleaseAssetPattern.Matches("RingOut-1.6.1-linux-x86_64.zip", "RingOut-*-windows-x64.zip"));
+    Assert(!ReleaseAssetPattern.Matches("RingOut-1.6.1-windows-x64-setup.exe", "RingOut-*-windows-x64.zip"));
+
+    // Prefix and suffix must not overlap into a false match on a too-short name.
+    Assert(!ReleaseAssetPattern.Matches("RingOut-windows-x64.zip", "RingOut-*-windows-x64.zip"));
+
+    Assert(ReleaseAssetPattern.Matches("PartyBoard-win-x64.zip", "PartyBoard-win-x64.zip"));
+    Assert(!ReleaseAssetPattern.Matches("", "RingOut-*.zip"));
+}
+
+void TestCatalogRuntimeMetadata()
+{
+    WithTempRoot(root =>
+    {
+        var shipped = Path.Combine(root, "shipped.json");
+        File.WriteAllText(shipped, """
+        [
+          {
+            "Id": "GRSEAF",
+            "Title": "Soulcalibur II",
+            "RuntimeName": "Ring Out",
+            "SupportedDiscIds": [ "GRSEAF", "GRSPAF" ],
+            "RuntimeSource": "GitHubReleaseAsset",
+            "RuntimeAssets": { "win-x64": "RingOut-*-windows-x64.zip" },
+            "RuntimeLaunchPaths": { "win-x64": "RingOut-{version}/RingOut.exe" },
+            "DataPreparation": "Runtime"
+          }
+        ]
+        """);
+
+        var data = Path.Combine(root, "data");
+        Directory.CreateDirectory(data);
+        var service = new GameCatalogService(shipped, data);
+
+        var loaded = service.Load();
+        Assert(loaded.Count == 1);
+        var entry = loaded[0];
+        Assert(entry.RuntimeSource == RuntimeSourceKind.GitHubReleaseAsset);
+        Assert(entry.DataPreparation == GameDataPreparation.Runtime);
+        Assert(entry.RuntimeName == "Ring Out");
+        Assert(entry.SupportedDiscIds.Count == 2);
+        Assert(entry.RuntimeAssets["win-x64"] == "RingOut-*-windows-x64.zip");
+        Assert(entry.RuntimeLaunchPaths["win-x64"] == "RingOut-{version}/RingOut.exe");
+
+        // User-owned state survives a catalog refresh; acquisition metadata is re-applied from
+        // the shipped catalog, which is what lets an existing install pick these fields up.
+        entry.DiscImage = "/games/sc2.rvz";
+        entry.PlayCount = 7;
+        entry.RuntimeSource = RuntimeSourceKind.Manifest;
+        entry.SupportedDiscIds.Clear();
+        service.Save(loaded);
+
+        var reloaded = new GameCatalogService(shipped, data).Load()[0];
+        Assert(reloaded.DiscImage == "/games/sc2.rvz");
+        Assert(reloaded.PlayCount == 7);
+        Assert(reloaded.RuntimeSource == RuntimeSourceKind.GitHubReleaseAsset);
+        Assert(reloaded.SupportedDiscIds.Count == 2);
+    });
+}
+
+// The catalog CubeShelf actually ships is data, and a typo in it is invisible until a user
+// hits it. Check the invariants each entry has to satisfy for its runtime to install at all.
+void TestShippedCatalogIsCoherent()
+{
+    var catalog = FindRepositoryFile(Path.Combine("src", "CubeShelf.Launcher", "games.json"));
+    var data = Path.Combine(Path.GetTempPath(), "cubeshelf-catalog-" + Guid.NewGuid().ToString("N"));
+    Directory.CreateDirectory(data);
+    try
+    {
+        var games = new GameCatalogService(catalog, data).Load();
+        Assert(games.Count >= 2);
+
+        foreach (var game in games)
+        {
+            Assert(!string.IsNullOrWhiteSpace(game.Id));
+            Assert(!string.IsNullOrWhiteSpace(game.GitHubOwner));
+            Assert(!string.IsNullOrWhiteSpace(game.GitHubRepo));
+            Assert(game.SupportedDiscIds.Count > 0);
+
+            if (game.RuntimeSource != RuntimeSourceKind.GitHubReleaseAsset) continue;
+
+            // Every platform this entry declares an artifact for needs a launch path too,
+            // or the install resolves an archive it cannot then start.
+            Assert(game.RuntimeAssets.Count > 0);
+            foreach (var runtimeId in game.RuntimeAssets.Keys)
+                Assert(game.RuntimeLaunchPaths.ContainsKey(runtimeId));
+        }
+
+        var ringOut = games.Single(game => game.Id == "GRSEAF");
+        Assert(ringOut.DataPreparation == GameDataPreparation.Runtime);
+        Assert(ringOut.SupportedDiscIds.Contains("GRSEAF"));
+        Assert(ringOut.RuntimeAssets.ContainsKey("win-x64"));
+    }
+    finally
+    {
+        if (Directory.Exists(data)) Directory.Delete(data, true);
+    }
+}
+
+// GitHub's macos runners are Apple Silicon, so a fixture hardcoding x64 describes a platform
+// the test process is not running on: the product resolves osx-arm64 and finds no artifact.
+// Build the identifiers from the real architecture, as CurrentRuntimeId does in the product.
+string CurrentArchitecture() =>
+    System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture ==
+        System.Runtime.InteropServices.Architecture.Arm64 ? "arm64" : "x64";
+
+string CurrentRid() =>
+    (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
+
+string WriteDiscHeader(string root, string name, string discId, byte revision)
+{
+    var path = Path.Combine(root, name);
+    var header = new byte[8];
+    System.Text.Encoding.ASCII.GetBytes(discId).CopyTo(header, 0);
+    header[7] = revision;
+    File.WriteAllBytes(path, header);
+    return path;
+}
+
+// Walks up from the test binary to the repository root, identified by the VERSION file, so the
+// test does not depend on the working directory the runner happened to use.
+string FindRepositoryFile(string relativePath)
+{
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
+    while (directory is not null)
+    {
+        if (File.Exists(Path.Combine(directory.FullName, "VERSION")))
+            return Path.Combine(directory.FullName, relativePath);
+        directory = directory.Parent;
+    }
+    throw new DirectoryNotFoundException("Racine du dépôt introuvable depuis " + AppContext.BaseDirectory);
 }
 
 sealed class StaticHttpHandler(Func<Uri, byte[]> content) : HttpMessageHandler

@@ -1,9 +1,11 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Xml.Linq;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Platform;
+using CubeShelf.Core.Releases;
 using CubeShelf.Core.Security;
 
 namespace CubeShelf.Core.Updates;
@@ -162,6 +164,12 @@ public sealed class GitHubGameUpdateService : IDisposable
     {
         if (!IsConfigured(game))
             return new(false, "", "", "");
+
+        // A publisher without a CubeShelf manifest still has releases; the API knows the latest
+        // one. Without this, update detection for such a game would be permanently blind, since
+        // the manifest URL below simply 404s for it.
+        if (game.RuntimeSource == RuntimeSourceKind.GitHubReleaseAsset)
+            return await GetReleaseAssetSnapshotAsync(game, cancellationToken).ConfigureAwait(false);
 
         var tag = Uri.EscapeDataString(game.GitHubReleaseTag);
         var manifestUrl =
@@ -696,6 +704,49 @@ public sealed class GitHubGameUpdateService : IDisposable
         }
         catch { }
         return "";
+    }
+
+    /// <summary>
+    /// Latest release of a repository that publishes plain assets and no CubeShelf manifest.
+    /// Reports available only when this platform actually has a matching artifact, so the UI
+    /// never offers an update that could not be installed here.
+    /// </summary>
+    private async Task<PartyBoardReleaseSnapshot> GetReleaseAssetSnapshotAsync(
+        GameCatalogEntry game,
+        CancellationToken cancellationToken)
+    {
+        var runtimeId = CurrentRuntimeId();
+        if (!game.RuntimeAssets.TryGetValue(runtimeId, out var pattern) || string.IsNullOrWhiteSpace(pattern))
+            return new(false, "", "", runtimeId);
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"https://api.github.com/repos/{game.GitHubOwner}/{game.GitHubRepo}/releases/latest");
+        request.Headers.Accept.ParseAdd("application/vnd.github+json");
+
+        using var response = await _http
+            .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken)
+            .ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+            return new(false, "", "", runtimeId);
+
+        var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        using var document = JsonDocument.Parse(content);
+        var root = document.RootElement;
+
+        var tag = root.TryGetProperty("tag_name", out var tagElement) ? tagElement.GetString() ?? "" : "";
+        if (string.IsNullOrWhiteSpace(tag))
+            return new(false, "", "", runtimeId);
+
+        var hasAsset = root.TryGetProperty("assets", out var assets) &&
+            assets.ValueKind == JsonValueKind.Array &&
+            assets.EnumerateArray().Any(asset =>
+                asset.TryGetProperty("name", out var name) &&
+                ReleaseAssetPattern.Matches(name.GetString() ?? "", pattern));
+
+        // No commit is reported: these releases are not tied to a CubeShelf build, so the
+        // version alone drives update detection.
+        return new(hasAsset, "", tag.TrimStart('v', 'V'), runtimeId);
     }
 
     private static bool IsConfigured(GameCatalogEntry game) =>

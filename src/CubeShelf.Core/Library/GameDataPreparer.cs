@@ -25,6 +25,7 @@ public sealed class GameDataPreparer
         string gameId,
         string runtimeExecutable,
         string discImage,
+        IReadOnlyCollection<string> supportedDiscIds,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
         bool allowDolphinToolDownload = false)
@@ -57,7 +58,7 @@ public sealed class GameDataPreparer
                 throw new InvalidDataException("Utilise une image ISO, GCM ou RVZ.");
             }
 
-            var compatibility = DiscImageService.Inspect(source);
+            var compatibility = DiscImageService.Inspect(source, supportedDiscIds);
             if (!compatibility.Recognized || !compatibility.Supported)
                 throw new InvalidDataException("Image incompatible : " + compatibility.Message);
 

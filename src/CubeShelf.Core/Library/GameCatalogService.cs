@@ -1,6 +1,36 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CubeShelf.Core.Library;
+
+/// <summary>How CubeShelf obtains a game's runtime from its GitHub repository.</summary>
+public enum RuntimeSourceKind
+{
+    /// <summary>
+    /// The publisher ships a CubeShelf manifest (schema 1 or 2) beside the release assets,
+    /// naming the artifact per platform with its size and SHA-256. PartyBoard does this.
+    /// </summary>
+    Manifest = 0,
+
+    /// <summary>
+    /// The publisher ships ordinary release assets and no manifest. CubeShelf asks the GitHub
+    /// API for the latest release and matches an asset per platform. Ring Out does this.
+    /// </summary>
+    GitHubReleaseAsset = 1
+}
+
+/// <summary>Who turns the user's disc image into something the runtime can boot.</summary>
+public enum GameDataPreparation
+{
+    /// <summary>CubeShelf extracts the disc itself (Dolphin tooling for RVZ, then the file tree).</summary>
+    CubeShelf = 0,
+
+    /// <summary>
+    /// The runtime owns disc setup and CubeShelf must not touch it. Ring Out recompiles the
+    /// game from the disc on first launch, which CubeShelf cannot and should not replicate.
+    /// </summary>
+    Runtime = 1
+}
 
 public sealed class GameCatalogEntry
 {
@@ -24,6 +54,46 @@ public sealed class GameCatalogEntry
     public string GitHubReleaseTag { get; set; } = "cubeshelf-nightly";
     public string GitHubReleaseAssetName { get; set; } = "";
     public string GitHubReleaseChecksumAssetName { get; set; } = "checksums.txt";
+
+    /// <summary>Name of the runtime this game runs on, for UI labels ("Installer Ring Out").</summary>
+    public string RuntimeName { get; set; } = "PartyBoard";
+
+    /// <summary>
+    /// Disc revisions the runtime accepts. An entry is either a full version id
+    /// ("GMPE01_00" -- that revision only) or a bare disc id ("GRSEAF" -- any revision).
+    /// </summary>
+    public List<string> SupportedDiscIds { get; set; } = new();
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RuntimeSourceKind RuntimeSource { get; set; } = RuntimeSourceKind.Manifest;
+
+    /// <summary>
+    /// Runtime identifier ("win-x64", "linux-x64") to the release asset name that carries it.
+    /// The value may contain a single wildcard, because publishers put the version in the
+    /// file name: RingOut-*-windows-x64.zip. Only used by <see cref="RuntimeSourceKind.GitHubReleaseAsset"/>.
+    /// </summary>
+    public Dictionary<string, string> RuntimeAssets { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Runtime identifier to the executable to launch inside the extracted package, relative to
+    /// its root. The token {version} is replaced by the resolved release version, since packages
+    /// are usually rooted in a version-named folder: RingOut-{version}/RingOut.exe. Keyed per
+    /// platform because the same package ships RingOut.exe on Windows and RingOut on Linux.
+    /// </summary>
+    public Dictionary<string, string> RuntimeLaunchPaths { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Optional pinned SHA-256 of the release asset. When a publisher ships no checksum file
+    /// this is the only way to verify the download; leaving it empty makes the install an
+    /// explicitly unverified one, which the user has to allow.
+    /// </summary>
+    public string RuntimeSha256 { get; set; } = "";
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public GameDataPreparation DataPreparation { get; set; } = GameDataPreparation.CubeShelf;
+
+    /// <summary>Project page shown to the user, for runtimes CubeShelf cannot fully automate.</summary>
+    public string HomepageUrl { get; set; } = "";
 
     public List<GameCover> Covers { get; set; } = new();
 
@@ -149,6 +219,18 @@ public sealed class GameCatalogService
             target.GitHubReleaseAssetName = source.GitHubReleaseAssetName;
             target.GitHubReleaseChecksumAssetName = source.GitHubReleaseChecksumAssetName;
 
+            // How the runtime is acquired, and who prepares the disc, are CubeShelf's to decide.
+            // A user catalog written before these fields existed deserialises them as defaults,
+            // so they are overwritten from the shipped catalog rather than preserved.
+            target.RuntimeName = source.RuntimeName;
+            target.SupportedDiscIds = source.SupportedDiscIds.ToList();
+            target.RuntimeSource = source.RuntimeSource;
+            target.RuntimeAssets = new Dictionary<string, string>(source.RuntimeAssets, StringComparer.OrdinalIgnoreCase);
+            target.RuntimeLaunchPaths = new Dictionary<string, string>(source.RuntimeLaunchPaths, StringComparer.OrdinalIgnoreCase);
+            target.RuntimeSha256 = source.RuntimeSha256;
+            target.DataPreparation = source.DataPreparation;
+            target.HomepageUrl = source.HomepageUrl;
+
             // Executable/GameRoot/DiscImage and all play statistics are intentionally preserved.
         }
     }
@@ -172,6 +254,14 @@ public sealed class GameCatalogService
         GitHubReleaseTag = source.GitHubReleaseTag,
         GitHubReleaseAssetName = source.GitHubReleaseAssetName,
         GitHubReleaseChecksumAssetName = source.GitHubReleaseChecksumAssetName,
+        RuntimeName = source.RuntimeName,
+        SupportedDiscIds = source.SupportedDiscIds.ToList(),
+        RuntimeSource = source.RuntimeSource,
+        RuntimeAssets = new Dictionary<string, string>(source.RuntimeAssets, StringComparer.OrdinalIgnoreCase),
+        RuntimeLaunchPaths = new Dictionary<string, string>(source.RuntimeLaunchPaths, StringComparer.OrdinalIgnoreCase),
+        RuntimeSha256 = source.RuntimeSha256,
+        DataPreparation = source.DataPreparation,
+        HomepageUrl = source.HomepageUrl,
         Covers = source.Covers.Select(Clone).ToList(),
         IsFavorite = source.IsFavorite,
         PlayCount = source.PlayCount,

@@ -10,6 +10,14 @@
     "Executable": "",
     "GameRoot": "",
     "GameBananaGameId": 7096,
+    "RuntimeName": "PartyBoard",
+    "SupportedDiscIds": [
+      "GMPE01_00",
+      "GMPE01_01"
+    ],
+    "RuntimeSource": "Manifest",
+    "DataPreparation": "CubeShelf",
+    "HomepageUrl": "https://github.com/zeranemesis/Marioparty4",
     "Covers": [
       {
         "Label": "PAL Europe",
@@ -24,5 +32,50 @@
     "GitHubReleaseAssetName": "PartyBoard-win-x64.zip",
     "DiscImage": "",
     "GitHubReleaseTag": "cubeshelf-nightly"
+  },
+  {
+    "Id": "GRSEAF",
+    "Title": "Soulcalibur II",
+    "Year": 2003,
+    "Genre": "Combat",
+    "Players": "1–2 joueurs",
+    "Region": "USA / PAL / JPN",
+    "Description": "Soulcalibur II porté sur PC par Ring Out, par recompilation statique : l'exécutable PowerPC du disque est traduit en C puis compilé en natif x86-64. Ring Out extrait et recompile ton disque lui-même au premier lancement — prévois plusieurs minutes et environ 1,5 Go d'espace libre.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 0,
+    "RuntimeName": "Ring Out",
+    "SupportedDiscIds": [
+      "GRSEAF",
+      "GRSPAF",
+      "GRSJAF",
+      "GRSEPS"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "RingOut-*-windows-x64.zip",
+      "linux-x64": "RingOut-*-linux-x86_64.zip"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "RingOut-{version}\\RingOut.exe",
+      "linux-x64": "RingOut-{version}/RingOut"
+    },
+    "RuntimeSha256": "",
+    "DataPreparation": "Runtime",
+    "HomepageUrl": "https://github.com/jackpoison-prog/RingOut",
+    "Covers": [
+      {
+        "Label": "PAL Europe",
+        "Front": "Assets\\Covers\\SoulcaliburII\\pal_front.png",
+        "Back": "Assets\\Covers\\SoulcaliburII\\pal_back.png",
+        "Spine": "Assets\\Covers\\SoulcaliburII\\pal_spine.png"
+      }
+    ],
+    "GitHubOwner": "jackpoison-prog",
+    "GitHubRepo": "RingOut",
+    "GitHubBranch": "main",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
   }
 ]

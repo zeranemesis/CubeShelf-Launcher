@@ -58,6 +58,23 @@
 - [x] descriptions, galerie mise en cache et dépendances déclaratives des mods dans Avalonia
 - [x] confirmation du plan et rollback atomique d’installation des mods
 
+
+## v0.8 - catalogue multi-jeux
+
+- [x] révisions de disque déclarées par jeu au lieu d'être compilées pour Mario Party 4
+- [x] identifiant de disque nu accepté pour couvrir toutes les révisions
+- [x] second mode d'acquisition : asset de release GitHub, sans manifeste éditeur
+- [x] sélection de l'asset par motif à joker, version dans le nom de fichier
+- [x] chemin de lancement déclaré par plateforme, avec repli par recherche du binaire
+- [x] installation non vérifiable autorisée sans blocage, mais enregistrée comme telle
+- [x] état « installé sans vérification » conservé et affiché dans la fiche du jeu
+- [x] préparation du disque déléguée au runtime quand il la fait lui-même
+- [x] détection de mise à jour via l'API releases pour les dépôts sans manifeste
+- [x] Soulcalibur II / Ring Out ajouté au catalogue
+- [ ] SHA-256 épinglé pour Ring Out dès qu'un checksum est publié en amont
+- [ ] jaquettes Soulcalibur II définitives (placeholders actuellement)
+- [ ] mods GameBanana pour Soulcalibur II (identifiant de jeu à déterminer)
+
 ## v0.9 - Linux et Steam Deck
 
 - [x] publication autonome `linux-x64`

@@ -61,7 +61,7 @@ public partial class MainWindow
 
         var game = _selectedGame;
         var runtime = _runtimeInstaller.ReadState(game);
-        var compatibility = DiscImageService.Inspect(game.DiscImageFullPath, english: false);
+        var compatibility = DiscImageService.Inspect(game.DiscImageFullPath, DiscImageService.MarioParty4DiscIds, english: false);
 
         lines.Add($"Titre          : {game.Title}");
         lines.Add($"ID             : {game.Id}");
@@ -145,7 +145,7 @@ public partial class MainWindow
 
         if (game.HasDiscImage)
         {
-            var compatibility = DiscImageService.Inspect(game.DiscImageFullPath, english: false);
+            var compatibility = DiscImageService.Inspect(game.DiscImageFullPath, DiscImageService.MarioParty4DiscIds, english: false);
             Add(compatibility.Recognized && compatibility.Supported,
                 $"Compatibilité disque : {compatibility.Message}");
 

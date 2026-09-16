@@ -137,7 +137,7 @@ public sealed partial class MainWindow
             "GAME DATA",
             P7("Préparation transactionnelle ISO/GCM/RVZ", "Transactional ISO/GCM/RVZ preparation"),
             (progress, cancellationToken) =>
-                _gameData.PrepareAsync(game.Id, executable, discImage, progress, cancellationToken, allowDolphinDownload),
+                _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress, cancellationToken, allowDolphinDownload),
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>

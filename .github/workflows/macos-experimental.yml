@@ -25,7 +25,7 @@ jobs:
         run: >
           dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
           -c Release -r ${{ matrix.rid }} --self-contained true
-          -p:Version=0.8.0-preview.2 -p:DebugType=None -p:DebugSymbols=false
+          -p:DebugType=None -p:DebugSymbols=false
           -o publish/${{ matrix.rid }}
       - name: Package archive
         run: tar -C publish/${{ matrix.rid }} -czf CubeShelf-${{ matrix.rid }}-experimental.tar.gz .

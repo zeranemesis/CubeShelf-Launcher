@@ -672,7 +672,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
                 progress?.Report(.35);
 
                 var convertedCompatibility =
-                    DiscImageService.Inspect(iso, english: false);
+                    DiscImageService.Inspect(iso, DiscImageService.MarioParty4DiscIds, english: false);
 
                 if (!convertedCompatibility.Recognized ||
                     !convertedCompatibility.Supported)
@@ -689,7 +689,7 @@ public RuntimeState? AdoptConfiguredExecutable(GameDefinition game)
             else
             {
                 var compatibility =
-                    DiscImageService.Inspect(sourceDisc, english: false);
+                    DiscImageService.Inspect(sourceDisc, DiscImageService.MarioParty4DiscIds, english: false);
 
                 if (!compatibility.Recognized || !compatibility.Supported)
                 {

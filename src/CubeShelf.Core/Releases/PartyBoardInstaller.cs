@@ -2,13 +2,43 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Runtime.InteropServices;
+using CubeShelf.Core.Library;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Security;
 
 namespace CubeShelf.Core.Releases;
 
-public sealed record PartyBoardInstallResult(string Version, string ExecutablePath);
-public sealed record PartyBoardRuntimeStatus(bool IsInstalled, bool NeedsRepair, string Version, string ExecutablePath);
+public sealed record PartyBoardInstallResult(string Version, string ExecutablePath, bool Verified = true);
+
+public sealed record PartyBoardRuntimeStatus(
+    bool IsInstalled,
+    bool NeedsRepair,
+    string Version,
+    string ExecutablePath,
+    bool Verified = true);
+
+/// <summary>
+/// Where a game's runtime comes from and how far CubeShelf can verify it.
+/// Built from a <see cref="GameCatalogEntry"/> by <see cref="FromCatalog"/>.
+/// </summary>
+public sealed record GameRuntimeSource(
+    string Owner,
+    string Repository,
+    string Tag,
+    RuntimeSourceKind Kind,
+    IReadOnlyDictionary<string, string> AssetPatterns,
+    IReadOnlyDictionary<string, string> LaunchPaths,
+    string PinnedSha256)
+{
+    public static GameRuntimeSource FromCatalog(GameCatalogEntry game) => new(
+        game.GitHubOwner,
+        game.GitHubRepo,
+        game.GitHubReleaseTag,
+        game.RuntimeSource,
+        game.RuntimeAssets,
+        game.RuntimeLaunchPaths,
+        game.RuntimeSha256);
+}
 
 public sealed class PartyBoardInstaller
 {
@@ -25,49 +55,60 @@ public sealed class PartyBoardInstaller
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("CubeShelf/0.8-avalonia");
     }
 
-    public async Task<PartyBoardInstallResult> InstallLatestAsync(
+    public Task<PartyBoardInstallResult> InstallLatestAsync(
         string owner,
         string repository,
         string tag,
         string gameId,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
+        bool force = false) =>
+        InstallLatestAsync(
+            new GameRuntimeSource(owner, repository, tag, RuntimeSourceKind.Manifest,
+                new Dictionary<string, string>(), new Dictionary<string, string>(), ""),
+            gameId, progress, cancellationToken, force);
+
+    public async Task<PartyBoardInstallResult> InstallLatestAsync(
+        GameRuntimeSource source,
+        string gameId,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default,
         bool force = false)
     {
-        ValidateIdentifier(owner, nameof(owner));
-        ValidateIdentifier(repository, nameof(repository));
-        ValidateIdentifier(tag, nameof(tag));
+        ArgumentNullException.ThrowIfNull(source);
+        ValidateIdentifier(source.Owner, nameof(source.Owner));
+        ValidateIdentifier(source.Repository, nameof(source.Repository));
         ValidateIdentifier(gameId, nameof(gameId));
 
-        var releaseRoot = new Uri($"https://github.com/{owner}/{repository}/releases/download/{tag}/");
-        var manifest = await DownloadManifestAsync(new Uri(releaseRoot, "manifest.json"), cancellationToken)
-            .ConfigureAwait(false);
-        var artifact = manifest.Schema == 1
-            ? await ResolveSchema1ArtifactAsync(releaseRoot, manifest, cancellationToken).ConfigureAwait(false)
-            : SelectArtifact(manifest);
-        ValidateArtifact(artifact, requireSize: manifest.Schema != 1);
+        var resolved = source.Kind == RuntimeSourceKind.GitHubReleaseAsset
+            ? await ResolveReleaseAssetAsync(source, cancellationToken).ConfigureAwait(false)
+            : await ResolveManifestAsync(source, cancellationToken).ConfigureAwait(false);
+
+        var artifact = resolved.Artifact;
+        ValidateArtifact(artifact, resolved.RequireSize, resolved.Verified);
         progress?.Report(0.05);
 
-        var safeVersion = SanitizeSegment(manifest.Version);
+        var safeVersion = SanitizeSegment(resolved.Version);
         var runtimeRoot = RuntimeRoot(gameId);
         var versionsRoot = Path.Combine(runtimeRoot, "versions");
         var destination = Path.Combine(versionsRoot, safeVersion);
         var expectedExecutable = Path.Combine(destination, NormalizeRelativePath(artifact.Launch));
         if (!force && File.Exists(expectedExecutable))
         {
-            WriteState(runtimeRoot, manifest.Version, artifact.Launch);
+            WriteState(runtimeRoot, resolved.Version, artifact.Launch, resolved.Verified);
             progress?.Report(1);
-            return new(manifest.Version, expectedExecutable);
+            return new(resolved.Version, expectedExecutable, resolved.Verified);
         }
 
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "downloads");
         Directory.CreateDirectory(cacheDirectory);
         var package = Path.Combine(cacheDirectory, artifact.Name);
-        var packageUri = new Uri(releaseRoot, Uri.EscapeDataString(artifact.Name));
-        if (manifest.Schema == 1)
-            await DownloadLegacyVerifiedAsync(packageUri, package, artifact.Sha256, progress, cancellationToken).ConfigureAwait(false);
+        if (resolved.LegacyDownload)
+            await DownloadLegacyVerifiedAsync(resolved.DownloadUri, package, artifact.Sha256, progress, cancellationToken)
+                .ConfigureAwait(false);
         else
-            await DownloadVerifiedAsync(packageUri, package, artifact.Size, artifact.Sha256, progress, cancellationToken).ConfigureAwait(false);
+            await DownloadVerifiedAsync(resolved.DownloadUri, package, artifact.Size, artifact.Sha256,
+                progress, cancellationToken).ConfigureAwait(false);
 
         Directory.CreateDirectory(versionsRoot);
         var staging = Path.Combine(versionsRoot, ".staging-" + Guid.NewGuid().ToString("N"));
@@ -90,22 +131,21 @@ public sealed class PartyBoardInstaller
             }
             else
             {
-                throw new InvalidDataException($"Type de paquet PartyBoard non pris en charge : {artifact.Kind}.");
+                throw new InvalidDataException($"Type de paquet non pris en charge : {artifact.Kind}.");
             }
 
-            var stagedExecutable = Path.Combine(staging, NormalizeRelativePath(artifact.Launch));
-            if (!File.Exists(stagedExecutable))
-                throw new InvalidDataException("Le paquet PartyBoard ne contient pas l’exécutable annoncé.");
+            var relativeExecutable = ResolveStagedExecutable(staging, artifact.Launch);
+            var stagedExecutable = Path.Combine(staging, relativeExecutable);
             if (!OperatingSystem.IsWindows())
                 File.SetUnixFileMode(stagedExecutable, File.GetUnixFileMode(stagedExecutable) |
                     UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
 
             if (Directory.Exists(destination)) Directory.Delete(destination, true);
             Directory.Move(staging, destination);
-            WriteState(runtimeRoot, manifest.Version, artifact.Launch);
+            WriteState(runtimeRoot, resolved.Version, relativeExecutable, resolved.Verified);
             CleanupOtherVersions(versionsRoot, destination);
             progress?.Report(1);
-            return new(manifest.Version, expectedExecutable);
+            return new(resolved.Version, Path.Combine(destination, relativeExecutable), resolved.Verified);
         }
         finally
         {
@@ -122,6 +162,13 @@ public sealed class PartyBoardInstaller
         CancellationToken cancellationToken = default) =>
         InstallLatestAsync(owner, repository, tag, gameId, progress, cancellationToken, force: true);
 
+    public Task<PartyBoardInstallResult> RepairLatestAsync(
+        GameRuntimeSource source,
+        string gameId,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default) =>
+        InstallLatestAsync(source, gameId, progress, cancellationToken, force: true);
+
     public PartyBoardRuntimeStatus GetStatus(string gameId)
     {
         ValidateIdentifier(gameId, nameof(gameId));
@@ -135,7 +182,7 @@ public sealed class PartyBoardInstaller
                 return new(false, true, "", "");
             var executable = Path.Combine(runtimeRoot, "versions", SanitizeSegment(state.Version),
                 NormalizeRelativePath(state.RelativeExecutable));
-            return new(File.Exists(executable), !File.Exists(executable), state.Version, executable);
+            return new(File.Exists(executable), !File.Exists(executable), state.Version, executable, state.Verified);
         }
         catch (Exception exception) when (exception is JsonException or IOException or InvalidDataException)
         {
@@ -206,13 +253,18 @@ public sealed class PartyBoardInstaller
     private string RuntimeRoot(string gameId) =>
         Path.Combine(Path.GetFullPath(_paths.DataDirectory), "Runtimes", gameId);
 
-    private void WriteState(string runtimeRoot, string version, string relativeExecutable)
+    private void WriteState(string runtimeRoot, string version, string relativeExecutable, bool verified)
     {
         Directory.CreateDirectory(runtimeRoot);
         var path = Path.Combine(runtimeRoot, "runtime-state.json");
         var temporary = path + ".tmp";
         File.WriteAllText(temporary, JsonSerializer.Serialize(
-            new RuntimeStateFile { Version = version, RelativeExecutable = relativeExecutable }, _json));
+            new RuntimeStateFile
+            {
+                Version = version,
+                RelativeExecutable = relativeExecutable,
+                Verified = verified
+            }, _json));
         File.Move(temporary, path, true);
     }
 
@@ -226,6 +278,114 @@ public sealed class PartyBoardInstaller
             Directory.Delete(directory, true);
         }
     }
+
+    /// <summary>
+    /// The declared launch path wins. When it is absent -- a publisher renamed the root folder,
+    /// or moved the binary between releases -- fall back to the single file with that name in the
+    /// package, rather than failing an otherwise good download.
+    /// </summary>
+    private static string ResolveStagedExecutable(string staging, string declaredLaunch)
+    {
+        var declared = NormalizeRelativePath(declaredLaunch);
+        if (File.Exists(Path.Combine(staging, declared))) return declared;
+
+        var fileName = Path.GetFileName(declared);
+        var matches = Directory
+            .EnumerateFiles(staging, fileName, SearchOption.AllDirectories)
+            .Take(2)
+            .ToArray();
+        if (matches.Length != 1)
+            throw new InvalidDataException(
+                $"Le paquet ne contient pas l’exécutable annoncé ({declared}).");
+
+        return Path.GetRelativePath(staging, matches[0]);
+    }
+
+    private async Task<ResolvedRuntime> ResolveManifestAsync(
+        GameRuntimeSource source,
+        CancellationToken cancellationToken)
+    {
+        ValidateIdentifier(source.Tag, nameof(source.Tag));
+        var releaseRoot = new Uri(
+            $"https://github.com/{source.Owner}/{source.Repository}/releases/download/{source.Tag}/");
+        var manifest = await DownloadManifestAsync(new Uri(releaseRoot, "manifest.json"), cancellationToken)
+            .ConfigureAwait(false);
+        var artifact = manifest.Schema == 1
+            ? await ResolveSchema1ArtifactAsync(releaseRoot, manifest, cancellationToken).ConfigureAwait(false)
+            : SelectArtifact(manifest);
+
+        return new ResolvedRuntime(
+            manifest.Version,
+            artifact,
+            new Uri(releaseRoot, Uri.EscapeDataString(artifact.Name)),
+            LegacyDownload: manifest.Schema == 1,
+            RequireSize: manifest.Schema != 1,
+            Verified: true);
+    }
+
+    /// <summary>
+    /// Resolves a runtime from a repository that publishes plain release assets and no CubeShelf
+    /// manifest. The publisher signs nothing here, so the download can only be verified against a
+    /// SHA-256 pinned in the catalog. Without that pin the install is unverified, and the caller
+    /// has to have said so explicitly.
+    /// </summary>
+    private async Task<ResolvedRuntime> ResolveReleaseAssetAsync(
+        GameRuntimeSource source,
+        CancellationToken cancellationToken)
+    {
+        var runtimeId = CurrentRuntimeId();
+        if (!source.AssetPatterns.TryGetValue(runtimeId, out var pattern) || string.IsNullOrWhiteSpace(pattern))
+            throw new PlatformNotSupportedException(
+                $"{source.Repository} ne publie pas d’artefact pour {runtimeId}.");
+
+        var api = new Uri($"https://api.github.com/repos/{source.Owner}/{source.Repository}/releases/latest");
+        using var request = new HttpRequestMessage(HttpMethod.Get, api);
+        request.Headers.Accept.ParseAdd("application/vnd.github+json");
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        if (response.Content.Headers.ContentLength > 4 * 1024 * 1024)
+            throw new InvalidDataException("Réponse GitHub trop volumineuse.");
+
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var release = await JsonSerializer.DeserializeAsync<GitHubRelease>(stream, _json, cancellationToken)
+            .ConfigureAwait(false);
+        if (release is null || string.IsNullOrWhiteSpace(release.TagName))
+            throw new InvalidDataException($"Aucune release exploitable pour {source.Repository}.");
+
+        var asset = release.Assets.FirstOrDefault(candidate => ReleaseAssetPattern.Matches(candidate.Name, pattern))
+            ?? throw new InvalidDataException(
+                $"La release {release.TagName} ne contient aucun artefact correspondant à {pattern}.");
+        if (string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl))
+            throw new InvalidDataException("L’artefact publié n’a pas d’URL de téléchargement.");
+
+        var version = release.TagName.TrimStart('v', 'V');
+        if (!source.LaunchPaths.TryGetValue(runtimeId, out var declaredLaunch) || string.IsNullOrWhiteSpace(declaredLaunch))
+            throw new InvalidDataException(
+                $"Le catalogue ne déclare pas de chemin de lancement {runtimeId} pour {source.Repository}.");
+        var launch = declaredLaunch.Replace("{version}", version, StringComparison.OrdinalIgnoreCase);
+
+        // Ring Out publishes no checksum, so a download from it can only ever be recorded as
+        // unverified -- never blocked. The flag is carried through to runtime-state.json and
+        // shown on the game page, so what was and was not checked stays visible afterwards.
+        var verified = !string.IsNullOrWhiteSpace(source.PinnedSha256);
+
+        return new ResolvedRuntime(
+            version,
+            new PartyBoardArtifact
+            {
+                Name = asset.Name,
+                Kind = "zip",
+                Launch = launch,
+                Sha256 = source.PinnedSha256 ?? "",
+                Size = asset.Size
+            },
+            new Uri(asset.BrowserDownloadUrl),
+            LegacyDownload: false,
+            RequireSize: true,
+            Verified: verified);
+    }
+
 
     private async Task<PartyBoardManifest> DownloadManifestAsync(Uri uri, CancellationToken cancellationToken)
     {
@@ -300,16 +460,16 @@ public sealed class PartyBoardInstaller
                 : $"osx-{architecture}";
     }
 
-    private static void ValidateArtifact(PartyBoardArtifact artifact, bool requireSize = true)
+    private static void ValidateArtifact(PartyBoardArtifact artifact, bool requireSize = true, bool requireHash = true)
     {
         if (string.IsNullOrWhiteSpace(artifact.Name) || artifact.Name != Path.GetFileName(artifact.Name))
-            throw new InvalidDataException("Nom d’artefact PartyBoard invalide.");
+            throw new InvalidDataException("Nom d’artefact invalide.");
         if (requireSize && artifact.Size is <= 0 or > MaximumPackageBytes)
-            throw new InvalidDataException("Taille d’artefact PartyBoard invalide.");
+            throw new InvalidDataException("Taille d’artefact invalide.");
         if (!requireSize && artifact.Size > MaximumPackageBytes)
-            throw new InvalidDataException("Taille d’artefact PartyBoard invalide.");
-        if (artifact.Sha256.Length != 64 || artifact.Sha256.Any(character => !Uri.IsHexDigit(character)))
-            throw new InvalidDataException("SHA-256 PartyBoard invalide.");
+            throw new InvalidDataException("Taille d’artefact invalide.");
+        if (requireHash && (artifact.Sha256.Length != 64 || artifact.Sha256.Any(character => !Uri.IsHexDigit(character))))
+            throw new InvalidDataException("SHA-256 invalide.");
         _ = NormalizeRelativePath(artifact.Launch);
     }
 
@@ -365,9 +525,15 @@ public sealed class PartyBoardInstaller
         progress?.Report(.8);
     }
 
+    /// <summary>
+    /// Downloads with HTTP Range resume. An empty <paramref name="expectedHash"/> means the
+    /// publisher offers nothing to check against: the bytes are still hashed and size-checked,
+    /// but the result cannot be called verified.
+    /// </summary>
     private async Task DownloadVerifiedAsync(Uri uri, string destination, long expectedSize, string expectedHash,
         IProgress<double>? progress, CancellationToken cancellationToken)
     {
+        var comparing = !string.IsNullOrWhiteSpace(expectedHash);
         var temporary = destination + ".part";
         var existing = File.Exists(temporary) ? new FileInfo(temporary).Length : 0L;
         if (existing > expectedSize)
@@ -378,7 +544,7 @@ public sealed class PartyBoardInstaller
         if (existing == expectedSize)
         {
             var completedHash = await ComputeSha256Async(temporary, cancellationToken).ConfigureAwait(false);
-            if (completedHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+            if (!comparing || completedHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
             {
                 File.Move(temporary, destination, true);
                 progress?.Report(.8);
@@ -398,7 +564,7 @@ public sealed class PartyBoardInstaller
         if (!append) existing = 0;
         var expectedResponseBytes = expectedSize - existing;
         if (response.Content.Headers.ContentLength is long length && length != expectedResponseBytes)
-            throw new InvalidDataException("La taille téléchargée ne correspond pas au manifeste.");
+            throw new InvalidDataException("La taille téléchargée ne correspond pas à celle annoncée.");
 
         try
         {
@@ -427,7 +593,7 @@ public sealed class PartyBoardInstaller
                     if (read == 0) break;
                     total += read;
                     if (total > expectedSize || total > MaximumPackageBytes)
-                        throw new InvalidDataException("Le téléchargement PartyBoard dépasse la taille annoncée.");
+                        throw new InvalidDataException("Le téléchargement dépasse la taille annoncée.");
                     await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
                     hash.AppendData(buffer, 0, read);
                     progress?.Report(0.05 + 0.75 * total / expectedSize);
@@ -435,10 +601,10 @@ public sealed class PartyBoardInstaller
                 await output.FlushAsync(cancellationToken).ConfigureAwait(false);
                 actualHash = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
             }
-            if (total != expectedSize || !actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+            if (total != expectedSize || (comparing && !actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase)))
             {
                 File.Delete(temporary);
-                throw new CryptographicException("Le paquet PartyBoard téléchargé ne correspond pas au manifeste.");
+                throw new CryptographicException("Le paquet téléchargé ne correspond pas à ce qui était annoncé.");
             }
             File.Move(temporary, destination, true);
         }
@@ -471,10 +637,10 @@ public sealed class PartyBoardInstaller
     private static string NormalizeRelativePath(string path)
     {
         if (string.IsNullOrWhiteSpace(path) || Path.IsPathRooted(path))
-            throw new InvalidDataException("Chemin de lancement PartyBoard invalide.");
+            throw new InvalidDataException("Chemin de lancement invalide.");
         var normalized = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         if (normalized.Split(Path.DirectorySeparatorChar).Any(part => part is "" or "." or ".."))
-            throw new InvalidDataException("Chemin de lancement PartyBoard non sûr.");
+            throw new InvalidDataException("Chemin de lancement non sûr.");
         return normalized;
     }
 
@@ -491,6 +657,14 @@ public sealed class PartyBoardInstaller
             char.IsAsciiLetterOrDigit(character) || character is '-' or '_' or '.' ? character : '_').ToArray());
         return string.IsNullOrWhiteSpace(sanitized) ? "unknown" : sanitized;
     }
+
+    private sealed record ResolvedRuntime(
+        string Version,
+        PartyBoardArtifact Artifact,
+        Uri DownloadUri,
+        bool LegacyDownload,
+        bool RequireSize,
+        bool Verified);
 
     private sealed class PartyBoardManifest
     {
@@ -510,9 +684,29 @@ public sealed class PartyBoardInstaller
         public long Size { get; set; }
     }
 
+    private sealed class GitHubRelease
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("tag_name")]
+        public string TagName { get; set; } = "";
+        public List<GitHubReleaseAsset> Assets { get; set; } = new();
+    }
+
+    private sealed class GitHubReleaseAsset
+    {
+        public string Name { get; set; } = "";
+        public long Size { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("browser_download_url")]
+        public string BrowserDownloadUrl { get; set; } = "";
+    }
+
     private sealed class RuntimeStateFile
     {
         public string Version { get; set; } = "";
         public string RelativeExecutable { get; set; } = "";
+        public bool Verified { get; set; } = true;
     }
 }
+
+/// <summary>
+/// </summary>

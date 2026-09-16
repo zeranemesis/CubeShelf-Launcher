@@ -1,10 +1,15 @@
 param(
-    [string]$Version = "0.8.0-preview.2",
+    [string]$Version = "",
     [string]$Configuration = "Release"
 )
 
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $Version) {
+    # VERSION at the repository root is the single source of truth (see Directory.Build.props).
+    $Version = (Get-Content -LiteralPath (Join-Path $repo "VERSION") -Raw).Trim()
+}
+if (-not $Version) { throw "VERSION est vide ou introuvable." }
 $publish = Join-Path $repo "publish\CubeShelf"
 $updater = Join-Path $repo "publish\Updater"
 $dist = Join-Path $repo "dist"
