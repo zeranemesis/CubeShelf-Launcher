@@ -34,6 +34,8 @@ Run("per-game disc compatibility", TestPerGameDiscCompatibility);
 Run("release asset pattern matching", TestReleaseAssetPattern);
 Run("catalog keeps runtime acquisition metadata", TestCatalogRuntimeMetadata);
 Run("shipped catalog is coherent", TestShippedCatalogIsCoherent);
+Run("release checksum file verifies the install", TestReleaseAssetChecksum);
+Run("no checksum means unverified, not blocked", TestReleaseAssetWithoutChecksum);
 
 if (failures.Count == 0)
 {
@@ -749,6 +751,88 @@ void TestShippedCatalogIsCoherent()
     {
         if (Directory.Exists(data)) Directory.Delete(data, true);
     }
+}
+
+// Strikers publishes SHA256SUMS beside its assets. Preferring it over a catalog-pinned hash is
+// what makes such an install verified without the pin going stale at the next release.
+void TestReleaseAssetChecksum()
+{
+    WithTempRoot(root =>
+    {
+        var launch = OperatingSystem.IsWindows() ? "strikers.exe" : "strikers";
+        var package = CreateZipBytes(launch, System.Text.Encoding.UTF8.GetBytes("native-port"));
+        var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
+        const string assetName = "strikers-package.zip";
+        var sums = System.Text.Encoding.UTF8.GetBytes(
+            $"0000000000000000000000000000000000000000000000000000000000000000  other.tar.gz\n{sha}  {assetName}\n");
+
+        var release = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            tag_name = "v2.3.4",
+            assets = new object[]
+            {
+                new { name = assetName, size = package.Length, browser_download_url = "https://dl.example.test/pkg.zip" },
+                new { name = "SHA256SUMS", size = sums.Length, browser_download_url = "https://dl.example.test/SHA256SUMS" }
+            }
+        }));
+
+        var handler = new StaticHttpHandler(uri =>
+            uri.AbsolutePath.EndsWith("releases/latest", StringComparison.Ordinal) ? release
+            : uri.AbsolutePath.EndsWith("SHA256SUMS", StringComparison.Ordinal) ? sums
+            : package);
+        using var client = new HttpClient(handler);
+        var installer = new PartyBoardInstaller(new TestPaths(root), client);
+
+        var source = new GameRuntimeSource(
+            "owner", "repo", "latest", RuntimeSourceKind.GitHubReleaseAsset,
+            new Dictionary<string, string> { [CurrentRid()] = "strikers-*.zip" },
+            new Dictionary<string, string> { [CurrentRid()] = launch },
+            PinnedSha256: "",
+            ChecksumAsset: "SHA256SUMS");
+
+        var result = installer.InstallLatestAsync(source, "G4QE01").GetAwaiter().GetResult();
+        Assert(result.Verified);
+        Assert(result.Version == "2.3.4");
+        Assert(File.Exists(result.ExecutablePath));
+
+        // The state on disk has to remember it was verified, since the game page reads it back.
+        Assert(installer.GetStatus("G4QE01") is { IsInstalled: true, Verified: true });
+    });
+}
+
+// Without a checksum file and without a pinned hash there is nothing to compare against. The
+// install still runs -- it is simply recorded as unverified.
+void TestReleaseAssetWithoutChecksum()
+{
+    WithTempRoot(root =>
+    {
+        var launch = OperatingSystem.IsWindows() ? "game.exe" : "game";
+        var package = CreateZipBytes(launch, System.Text.Encoding.UTF8.GetBytes("unverified"));
+        var release = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            tag_name = "v1.0",
+            assets = new object[]
+            {
+                new { name = "game-win.zip", size = package.Length, browser_download_url = "https://dl.example.test/g.zip" }
+            }
+        }));
+        var handler = new StaticHttpHandler(uri =>
+            uri.AbsolutePath.EndsWith("releases/latest", StringComparison.Ordinal) ? release : package);
+        using var client = new HttpClient(handler);
+        var installer = new PartyBoardInstaller(new TestPaths(root), client);
+
+        var source = new GameRuntimeSource(
+            "owner", "repo", "latest", RuntimeSourceKind.GitHubReleaseAsset,
+            new Dictionary<string, string> { [CurrentRid()] = "game-*.zip" },
+            new Dictionary<string, string> { [CurrentRid()] = launch },
+            PinnedSha256: "",
+            ChecksumAsset: "SHA256SUMS");
+
+        var result = installer.InstallLatestAsync(source, "NOSUMS").GetAwaiter().GetResult();
+        Assert(!result.Verified);
+        Assert(File.Exists(result.ExecutablePath));
+        Assert(installer.GetStatus("NOSUMS") is { IsInstalled: true, Verified: false });
+    });
 }
 
 // GitHub's macos runners are Apple Silicon, so a fixture hardcoding x64 describes a platform

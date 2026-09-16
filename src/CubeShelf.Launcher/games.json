@@ -77,5 +77,54 @@
     "GitHubReleaseAssetName": "",
     "DiscImage": "",
     "GitHubReleaseTag": "latest"
+  },
+  {
+    "Id": "G4QE01",
+    "Title": "Super Mario Strikers",
+    "Year": 2005,
+    "Genre": "Sport",
+    "Players": "1–4 joueurs",
+    "Region": "USA / PAL / JPN",
+    "Description": "Super Mario Strikers — « Mario Smash Football » en PAL — porté nativement sur PC par Strikers, à partir du code décompilé (portage, pas recompilation). Rendu Vulkan/D3D12/Metal, 16:9 et ultra-large, framerate élevé, résolution interne ajustable. Strikers lit directement ton image ISO/GCM/CISO/GCZ ou un dossier extrait, et gère lui-même l'emplacement des données via son application de réglages.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 0,
+    "RuntimeName": "Strikers",
+    "SupportedDiscIds": [
+      "G4QE01",
+      "G4QP01",
+      "G4QJ01"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "strikers-windows-x86_64.zip",
+      "linux-x64": "strikers-linux-x86_64.tar.gz",
+      "linux-arm64": "strikers-linux-arm64.tar.gz",
+      "osx-arm64": "strikers-macos-arm64.tar.gz"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "strikers.exe",
+      "linux-x64": "strikers",
+      "linux-arm64": "strikers",
+      "osx-arm64": "strikers"
+    },
+    "RuntimeChecksumAsset": "SHA256SUMS",
+    "RuntimeSha256": "",
+    "DataPreparation": "Runtime",
+    "HomepageUrl": "https://github.com/new-coke/strikers",
+    "Covers": [
+      {
+        "Label": "PAL Europe",
+        "Front": "Assets\\Covers\\SuperMarioStrikers\\pal_front.png",
+        "Back": "Assets\\Covers\\SuperMarioStrikers\\pal_back.png",
+        "Spine": "Assets\\Covers\\SuperMarioStrikers\\pal_spine.png"
+      }
+    ],
+    "GitHubOwner": "new-coke",
+    "GitHubRepo": "strikers",
+    "GitHubBranch": "main",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
   }
 ]
