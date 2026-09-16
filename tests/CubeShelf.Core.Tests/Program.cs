@@ -18,6 +18,7 @@ Run("verified PartyBoard installation", TestPartyBoardInstallation);
 Run("portable mod lifecycle and conflicts", TestPortableMods);
 Run("mod load order handed to PartyBoard", TestModLoadOrder);
 Run("mod with no disc folder is flagged", TestModLayoutWarning);
+Run("disc root found however deep it is buried", TestModContentRootDepth);
 Run("persistent download activity", TestDownloadActivity);
 Run("HTTP range runtime resume", TestRuntimeResume);
 Run("transactional mod dependencies", TestModDependencies);
@@ -31,7 +32,7 @@ Run("verified launcher update", TestLauncherUpdate);
 
 if (failures.Count == 0)
 {
-    Console.WriteLine("21 CubeShelf.Core tests passed.");
+    Console.WriteLine("22 CubeShelf.Core tests passed.");
     return 0;
 }
 
@@ -173,6 +174,41 @@ void TestPartyBoardInstallation()
         Assert(!installer.GetStatus("game").IsInstalled);
         Assert(!File.Exists(repaired.ExecutablePath));
     });
+}
+
+// The five shapes real GameBanana packs for this game actually ship. Only the
+// first was handled before, so the rest installed with their own folder names
+// standing in for disc paths and changed nothing in game.
+void TestModContentRootDepth()
+{
+    var shapes = new (string Label, string Entry, string Expected)[]
+    {
+        ("files at the top",      "files/data/board.bin",                          "files"),
+        ("one folder deep",       "Pack/files/data/board.bin",                     "Pack/files"),
+        ("two folders deep",      "Toad Mod/MP4 DX Toad/files/data/board.bin",     "Toad Mod/MP4 DX Toad/files"),
+        ("beside a sys folder",   "UI Mod/store/files/mess/board_e.dat",           "UI Mod/store/files"),
+        ("disc folder unwrapped", "Pack/mess/board_e.dat",                         "Pack"),
+    };
+
+    foreach (var shape in shapes)
+        WithTempRoot(root =>
+        {
+            var paths = new TestPaths(root);
+            var manager = new PortableModManager(paths, "GAME");
+            using var client = new HttpClient(new StaticHttpHandler(_ => CreateZipBytes(shape.Entry, new byte[] { 9 })));
+            var installed = manager.InstallAsync(
+                new GameBananaMod(41, shape.Label, 1, "https://files.gamebanana.com/m.zip", "m.zip"),
+                new GameBananaClient(client)).GetAwaiter().GetResult();
+
+            var expected = Path.Combine(paths.DataDirectory, "Mods", "GAME", "41",
+                shape.Expected.Replace('/', Path.DirectorySeparatorChar));
+            Assert(installed.ContentRoot == expected);
+            // Whatever the wrapping, the disc sees the same path.
+            var file = Directory.EnumerateFiles(installed.ContentRoot, "*", SearchOption.AllDirectories).Single();
+            var virtualPath = "/" + Path.GetRelativePath(installed.ContentRoot, file).Replace(Path.DirectorySeparatorChar, '/');
+            Assert(virtualPath is "/data/board.bin" or "/mess/board_e.dat");
+            Assert(manager.AnalyzeLayout().Count == 0);
+        });
 }
 
 // A mod whose content root holds none of the disc's folders overlays nothing.

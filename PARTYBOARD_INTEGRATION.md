@@ -56,10 +56,13 @@ and a path naming no readable file is ignored with a warning.
 
 ## Mod packaging
 
-`PortableModManager` unpacks an archive and picks the content root: `files/` if
-present (directly or inside a single top-level folder), otherwise that single
-folder, otherwise the archive root. Everything below it is overlaid as-is, so a
-mod archive mirrors the disc layout:
+`PortableModManager` unpacks an archive and searches it breadth-first for the
+shallowest directory that looks like the disc's file partition: a folder named
+`files`, or one already holding a disc entry (`data`, `dll`, `mess`, `movie`,
+`sound`, `opening.bnr`). Real packs bury it anywhere from zero to three levels
+deep, sometimes beside a `sys/` folder that must not be overlaid, and only the
+top-level case used to be found. Everything below the root is overlaid as-is, so
+what the game sees mirrors the disc layout:
 
 ```text
 files/data/board.bin

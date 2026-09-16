@@ -314,13 +314,54 @@ public sealed class PortableModManager
     private static readonly HashSet<string> DiscRootEntries =
         new(new[] { "data", "dll", "mess", "movie", "sound", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
 
+    // Mod archives bury the disc root under whatever folder names the author
+    // felt like: seen in the wild are "files/" at the top, "<mod>/<variant>/files/"
+    // two deep, and "<mod>/store/files/" beside a sys/ folder that must never be
+    // overlaid. Only the first shape used to be found, so most packs installed
+    // with their own folder names as disc paths and changed nothing in game.
+    // Search breadth-first for the shallowest directory that looks like the root
+    // of the disc's file partition.
     private static string DetectContentRoot(string staging)
     {
-        var direct = Path.Combine(staging, "files");
-        if (Directory.Exists(direct)) return direct;
+        var found = FindDiscRoot(staging);
+        if (found is not null) return found;
+
+        // Nothing recognisable. Keep unwrapping a lone folder as before so a mod
+        // that only adds files still installs; AnalyzeLayout reports the rest.
         var directories = Directory.GetDirectories(staging);
-        return directories.Length == 1 && Directory.GetFiles(staging).Length == 0
-            ? Directory.Exists(Path.Combine(directories[0], "files")) ? Path.Combine(directories[0], "files") : directories[0]
-            : staging;
+        return directories.Length == 1 && Directory.GetFiles(staging).Length == 0 ? directories[0] : staging;
     }
+
+    private static string? FindDiscRoot(string staging)
+    {
+        const int maximumDepth = 6;
+        const int maximumDirectories = 4096;
+        var queue = new Queue<(string Path, int Depth)>();
+        queue.Enqueue((staging, 0));
+        var visited = 0;
+        while (queue.Count > 0 && visited++ < maximumDirectories)
+        {
+            var (current, depth) = queue.Dequeue();
+            string[] children;
+            try { children = Directory.GetDirectories(current); }
+            catch (IOException) { continue; }
+            catch (UnauthorizedAccessException) { continue; }
+
+            // A "files" folder is the disc partition by name, so it wins over a
+            // folder that merely happens to hold one of the disc's own entries.
+            var files = children.FirstOrDefault(child =>
+                Path.GetFileName(child).Equals("files", StringComparison.OrdinalIgnoreCase));
+            if (files is not null) return files;
+
+            if (HoldsDiscEntry(current)) return current;
+
+            if (depth < maximumDepth)
+                foreach (var child in children) queue.Enqueue((child, depth + 1));
+        }
+        return null;
+    }
+
+    private static bool HoldsDiscEntry(string directory) =>
+        Directory.EnumerateFileSystemEntries(directory)
+            .Select(Path.GetFileName).OfType<string>().Any(DiscRootEntries.Contains);
 }
