@@ -412,11 +412,14 @@ public sealed partial class MainWindow : Window
         var conflictedIds = conflicts.SelectMany(item => item.ModIds).ToHashSet();
         var layout = _modManager.AnalyzeLayout();
         var layoutIds = layout.Select(item => item.Id).ToHashSet();
+        var playerDisabled = _modManager.GetPlayerDisabled().ToHashSet();
         var items = ids.Select(id =>
         {
             var remote = _remoteMods.FirstOrDefault(item => item.Id == id);
             installed.TryGetValue(id, out var local);
-            var status = local is null ? "Non installé" : local.Enabled ? "Installé • activé" : "Installé • désactivé";
+            var status = local is null ? "Non installé"
+                : playerDisabled.Contains(id) ? "Installé • coupé dans PartyBoard"
+                : local.Enabled ? "Installé • activé" : "Installé • désactivé";
             if (conflictedIds.Contains(id)) status += " • conflit";
             if (layoutIds.Contains(id)) status += " • arborescence inattendue";
             return new DesktopModItem(id, remote?.Name ?? local?.Name ?? $"Mod {id}", status,

@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text.Json;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Releases;
 using CubeShelf.Core.Security;
@@ -19,6 +20,7 @@ Run("verified PartyBoard installation", TestPartyBoardInstallation);
 Run("portable mod lifecycle and conflicts", TestPortableMods);
 Run("catalog can follow the newest release", TestLatestReleaseTag);
 Run("mod load order handed to PartyBoard", TestModLoadOrder);
+Run("in-game switch agrees with the launcher", TestPlayerDisabledMods);
 Run("mod with no disc folder is flagged", TestModLayoutWarning);
 Run("disc root found however deep it is buried", TestModContentRootDepth);
 Run("persistent download activity", TestDownloadActivity);
@@ -322,6 +324,45 @@ void TestModLayoutWarning()
         manager.InstallAsync(new GameBananaMod(60, "Disc layout", 1, "https://files.gamebanana.com/d.zip", "d.zip"),
             new GameBananaClient(client)).GetAwaiter().GetResult();
         Assert(manager.AnalyzeLayout().Count == 0);
+    });
+}
+
+// PartyBoard can switch a mod off from inside the game, and the launcher has to
+// agree: the panel must not claim a mod is on while the game ignores it, and
+// turning it back on in the launcher has to actually win.
+void TestPlayerDisabledMods()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GAME");
+        using var client = new HttpClient(new StaticHttpHandler(_ =>
+            CreateZipBytes("files/data/board.bin", new byte[] { 5 })));
+        var banana = new GameBananaClient(client);
+        foreach (var id in new[] { 71, 72 })
+            manager.InstallAsync(new GameBananaMod(id, $"Mod {id}", 1, "https://files.gamebanana.com/m.zip", "m.zip"), banana)
+                .GetAwaiter().GetResult();
+
+        var details = Path.Combine(paths.DataDirectory, "Mods", "GAME", "active-mods.json");
+        var disabled = Path.Combine(paths.DataDirectory, "Mods", "GAME", "player-disabled.json");
+
+        // The game is handed identity, not just paths, so it can name a mod.
+        Assert(File.Exists(details));
+        Assert(JsonSerializer.Deserialize<List<PortableActiveMod>>(File.ReadAllText(details))!
+            .Select(item => item.Id).OrderBy(id => id).SequenceEqual(new[] { 71, 72 }));
+
+        // PartyBoard writes this file; the launcher only reads it.
+        File.WriteAllText(disabled, "[72]");
+        Assert(manager.PrepareActiveList() is not null);
+        Assert(File.ReadAllLines(manager.ActiveListFile).Length == 1);
+        Assert(manager.GetPlayerDisabled().SequenceEqual(new[] { 72 }));
+        Assert(JsonSerializer.Deserialize<List<PortableActiveMod>>(File.ReadAllText(details))!.Single().Id == 71);
+
+        // Turning it back on in the launcher clears the in-game switch, or the
+        // panel would show it enabled while the game went on ignoring it.
+        manager.SetEnabled(72, true);
+        Assert(manager.GetPlayerDisabled().Count == 0);
+        Assert(File.ReadAllLines(manager.ActiveListFile).Length == 2);
     });
 }
 
