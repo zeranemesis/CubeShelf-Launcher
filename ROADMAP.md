@@ -75,7 +75,7 @@
 - [x] checksums publiés par l'éditeur (`SHA256SUMS`) lus et appliqués
 - [x] archives `.tar.gz` acceptées en plus des `.zip`
 - [ ] SHA-256 épinglé pour Ring Out dès qu'un checksum est publié en amont
-- [ ] jaquettes Super Mario Strikers définitives (placeholders actuellement)
+- [x] jaquettes Super Mario Strikers (jaquette PAL Mario Smash Football, GameTDB)
 - [ ] mods GameBanana pour Soulcalibur II (identifiant de jeu à déterminer)
 
 ## v0.9 - Linux et Steam Deck

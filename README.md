@@ -60,7 +60,7 @@ Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et enviro
 
 ### Jaquettes
 
-Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`. Celles de Soulcalibur II sont pour l’instant des placeholders : remplace `pal_front.png`, `pal_back.png` et `pal_spine.png` par tes propres scans, sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image.
+Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`, en trois fichiers : `pal_front.png`, `pal_back.png` et `pal_spine.png`. Pour en remplacer une, écrase ces fichiers sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image. Les jaquettes complètes (dos + tranche + face) se découpent aux proportions GameCube standard : dos 900, tranche 120, face 900 sur 1920.
 
 ## Aperçu Linux et Steam Deck
 
