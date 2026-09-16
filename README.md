@@ -10,6 +10,21 @@ L’artefact recommandé est `CubeShelf-Setup-x64.exe`. L’installation est eff
 
 Le profil utilisateur reste dans `%LOCALAPPDATA%\CubeShelf` et est conservé lors d’une mise à jour ou d’une désinstallation.
 
+
+## Artefacts publiés
+
+Chaque release stable publie :
+
+| Plateforme | Artefact |
+| --- | --- |
+| Windows x64 | `CubeShelf-Setup-x64.exe` (installateur) et `CubeShelf-win-x64.zip` (portable) |
+| Linux x64 | `CubeShelf-linux-x64.AppImage` |
+| macOS x64 | `CubeShelf-osx-x64.tar.gz` |
+| macOS arm64 | `CubeShelf-osx-arm64.tar.gz` |
+
+Plus `checksums.txt` et `release-manifest-v2.json`, que CubeShelf utilise pour ses propres mises à jour.
+
+Les binaires ne sont **pas encore signés** : aucun certificat Authenticode n'est configuré, et les archives macOS ne sont ni signées ni notarisées. Windows affichera un avertissement SmartScreen, et macOS bloquera l'application tant que la quarantaine n'est pas levée (`xattr -d com.apple.quarantine CubeShelf`). C'est suivi dans la ROADMAP.
 ## Compiler et créer l’installateur
 
 Prérequis : SDK .NET 8 et Inno Setup 6.

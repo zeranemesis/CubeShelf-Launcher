@@ -93,6 +93,7 @@
 - [ ] signatures Ed25519 des manifestes de mise à jour
 - [ ] rotation et révocation documentées des clés
 - [ ] Windows signé par certificat de confiance
+- [ ] signature et notarisation des archives macOS publiées
 - [ ] promotion Linux stable après tests matériels
 - [x] compilation macOS expérimentale
-- [ ] signature/notarisation macOS et validation PartyBoard
+- [x] macOS x64 et arm64 dans le train de release
