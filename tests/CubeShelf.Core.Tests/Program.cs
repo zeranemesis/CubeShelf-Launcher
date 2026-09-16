@@ -17,6 +17,7 @@ Run("disc revision detection", TestDiscRevision);
 Run("desktop profile persistence", TestProfilePersistence);
 Run("verified PartyBoard installation", TestPartyBoardInstallation);
 Run("portable mod lifecycle and conflicts", TestPortableMods);
+Run("catalog can follow the newest release", TestLatestReleaseTag);
 Run("mod load order handed to PartyBoard", TestModLoadOrder);
 Run("mod with no disc folder is flagged", TestModLayoutWarning);
 Run("disc root found however deep it is buried", TestModContentRootDepth);
@@ -181,6 +182,60 @@ void TestPartyBoardInstallation()
         Assert(installer.Uninstall("game"));
         Assert(!installer.GetStatus("game").IsInstalled);
         Assert(!File.Exists(repaired.ExecutablePath));
+    });
+}
+
+// A catalog that names a fixed tag depends on the publisher keeping that one
+// release pointing at the newest build. PartyBoard stopped doing that and the
+// launcher went on reinstalling a months-old build over anything newer, so a
+// catalog can now say "latest" and be told by GitHub which tag that is.
+void TestLatestReleaseTag()
+{
+    WithTempRoot(root =>
+    {
+        var launch = OperatingSystem.IsWindows() ? "partyboard.exe" : "partyboard";
+        byte[] package;
+        using (var memory = new MemoryStream())
+        {
+            using (var archive = new ZipArchive(memory, ZipArchiveMode.Create, true))
+            {
+                var entry = archive.CreateEntry(launch);
+                using var writer = new StreamWriter(entry.Open());
+                writer.Write("runtime");
+            }
+            package = memory.ToArray();
+        }
+
+        var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
+        var rid = CurrentRid();
+        var manifest = System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            schema = 2,
+            version = "v9.9.9",
+            artifacts = new Dictionary<string, object>
+            {
+                [rid] = new { name = "partyboard.zip", kind = "zip", launch, sha256 = sha, size = package.Length }
+            }
+        }));
+        var releases = System.Text.Encoding.UTF8.GetBytes("""[{"tag_name":"v9.9.9"}]""");
+
+        var asked = new List<string>();
+        using var client = new HttpClient(new StaticHttpHandler(uri =>
+        {
+            asked.Add(uri.AbsoluteUri);
+            if (uri.Host == "api.github.com") return releases;
+            return uri.AbsolutePath.EndsWith("manifest.json", StringComparison.Ordinal) ? manifest : package;
+        }));
+
+        var installer = new PartyBoardInstaller(new TestPaths(root), client);
+        var result = installer.InstallLatestAsync("owner", "repo", "latest", "game").GetAwaiter().GetResult();
+
+        // The tag GitHub named is the one the download URLs use, not "latest".
+        Assert(asked.Any(url => url.Contains("api.github.com") && url.Contains("/releases")));
+        Assert(asked.Any(url => url.Contains("/releases/download/v9.9.9/manifest.json")));
+        Assert(!asked.Any(url => url.Contains("/releases/download/latest/")));
+        Assert(File.Exists(result.ExecutablePath));
+        Assert(installer.GetStatus("game") is { IsInstalled: true, Version: "v9.9.9" });
     });
 }
 
