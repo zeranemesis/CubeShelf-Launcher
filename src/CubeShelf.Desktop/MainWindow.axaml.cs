@@ -286,6 +286,7 @@ public sealed partial class MainWindow : Window
     {
         if (_selectedGame is null) return;
         var game = _selectedGame;
+        RefreshGameModsPanel();
 
         // A runtime that recompiles the game from the disc itself owns that step. CubeShelf
         // extracting the disc underneath it would be wrong, so none of the preparation UI
@@ -522,6 +523,66 @@ public sealed partial class MainWindow : Window
 
     public sealed record DesktopModItem(int Id, string Name, string Status, int Priority, bool Enabled,
         bool Installed, GameBananaMod? Remote);
+
+    /// <summary>One row of the game page's mod list: what it is, and the one thing to do with it.</summary>
+    public sealed record GameModRow(int Id, string Name, string Detail, string Action);
+
+    /// <summary>
+    /// The installed mods, on the game's own page. Reaching them used to mean
+    /// leaving for the mod manager, which is where you go to find and install a
+    /// mod - not to decide what this launch will load.
+    /// </summary>
+    private void RefreshGameModsPanel()
+    {
+        if (_modManager is null)
+        {
+            GameModsList.ItemsSource = null;
+            GameModsEmpty.IsVisible = true;
+            GameModsWarning.IsVisible = false;
+            return;
+        }
+
+        var playerDisabled = _modManager.GetPlayerDisabled().ToHashSet();
+        var unreachable = _modManager.AnalyzeLayout().Select(item => item.Id).ToHashSet();
+
+        var rows = _modManager.GetInstalled()
+            .OrderByDescending(item => item.Priority).ThenBy(item => item.Name)
+            .Select(item =>
+            {
+                var off = playerDisabled.Contains(item.Id);
+                var detail = off ? P7("Coupé dans PartyBoard", "Switched off in PartyBoard")
+                    : item.Enabled ? P7($"Actif • priorité {item.Priority}", $"Active • priority {item.Priority}")
+                    : P7("Désactivé", "Disabled");
+                if (unreachable.Contains(item.Id))
+                    detail += P7(" • n’atteint pas le jeu", " • cannot reach the game");
+                return new GameModRow(item.Id, item.Name, detail,
+                    item.Enabled && !off ? P7("Désactiver", "Disable") : P7("Activer", "Enable"));
+            }).ToArray();
+
+        GameModsList.ItemsSource = rows;
+        GameModsEmpty.IsVisible = rows.Length == 0;
+
+        var conflicts = _modManager.AnalyzeConflicts();
+        GameModsWarning.IsVisible = conflicts.Count > 0;
+        if (conflicts.Count > 0)
+            GameModsWarning.Text = P7(
+                $"⚠ {conflicts.Count} fichier(s) revendiqué(s) par plusieurs mods actifs : le plus prioritaire gagne.",
+                $"⚠ {conflicts.Count} file(s) claimed by more than one active mod: the highest priority wins.");
+    }
+
+    // One button, one meaning: a mod switched off in game is off, whichever of
+    // the two switches did it, and this puts it back on.
+    private void ToggleModFromGamePage(object? sender, RoutedEventArgs args)
+    {
+        if (_modManager is null || (sender as Control)?.Tag is not int id) return;
+        var mod = _modManager.GetInstalled().FirstOrDefault(item => item.Id == id);
+        if (mod is null) return;
+
+        var running = mod.Enabled && !_modManager.GetPlayerDisabled().Contains(id);
+        _modManager.SetEnabled(id, !running);
+        RefreshGameModsPanel();
+        RefreshModItems();
+    }
 
     private async Task<bool> ConfirmModPlanAsync(ModInstallPlan plan)
     {

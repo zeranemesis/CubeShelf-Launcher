@@ -181,6 +181,33 @@
               </Border>
             </Grid>
             <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="{DynamicResource InstalledMods}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Content="{DynamicResource ManageMods}" Click="ParityOpenMods" />
+                </Grid>
+                <TextBlock x:Name="GameModsEmpty" Text="{DynamicResource NoModsInstalled}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                <ItemsControl x:Name="GameModsList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="10" Padding="12,9" Margin="0,0,0,7">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <StackPanel Spacing="3">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                          </StackPanel>
+                          <Button Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0"
+                                  Content="{Binding Action}" Tag="{Binding Id}" Click="ToggleModFromGamePage" />
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock x:Name="GameModsWarning" Foreground="{DynamicResource Warning}" FontSize="11" TextWrapping="Wrap" IsVisible="False" />
+              </StackPanel>
+            </Border>
+
+            <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="7">
                   <TextBlock Text="{DynamicResource GameUpdates}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" />
