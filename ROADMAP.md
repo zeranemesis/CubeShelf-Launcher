@@ -71,8 +71,11 @@
 - [x] préparation du disque déléguée au runtime quand il la fait lui-même
 - [x] détection de mise à jour via l'API releases pour les dépôts sans manifeste
 - [x] Soulcalibur II / Ring Out ajouté au catalogue
+- [x] Super Mario Strikers / Strikers ajouté au catalogue
+- [x] checksums publiés par l'éditeur (`SHA256SUMS`) lus et appliqués
+- [x] archives `.tar.gz` acceptées en plus des `.zip`
 - [ ] SHA-256 épinglé pour Ring Out dès qu'un checksum est publié en amont
-- [ ] jaquettes Soulcalibur II définitives (placeholders actuellement)
+- [x] jaquettes Super Mario Strikers (jaquette PAL Mario Smash Football, GameTDB)
 - [ ] mods GameBanana pour Soulcalibur II (identifiant de jeu à déterminer)
 
 ## v0.9 - Linux et Steam Deck
@@ -90,6 +93,7 @@
 - [ ] signatures Ed25519 des manifestes de mise à jour
 - [ ] rotation et révocation documentées des clés
 - [ ] Windows signé par certificat de confiance
+- [ ] signature et notarisation des archives macOS publiées
 - [ ] promotion Linux stable après tests matériels
 - [x] compilation macOS expérimentale
-- [ ] signature/notarisation macOS et validation PartyBoard
+- [x] macOS x64 et arm64 dans le train de release

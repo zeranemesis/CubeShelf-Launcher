@@ -300,6 +300,7 @@ public sealed partial class MainWindow : Window
             : $"{game.RuntimeName} non configuré";
 
         var runtime = _installer.GetStatus(game.Id);
+        RuntimeSectionLabel.Text = game.RuntimeName.ToUpperInvariant();
         InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : $"Installer {game.RuntimeName}";
         RepairButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         UninstallButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;

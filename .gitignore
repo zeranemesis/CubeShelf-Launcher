@@ -7,3 +7,8 @@ dist/
 /Mods/
 *.user
 *.suo
+
+# Local tooling scratch (a js-yaml install used to lint workflows), never part of the build.
+node_modules/
+package-lock.json
+package.json

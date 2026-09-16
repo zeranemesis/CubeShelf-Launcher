@@ -10,6 +10,21 @@ L’artefact recommandé est `CubeShelf-Setup-x64.exe`. L’installation est eff
 
 Le profil utilisateur reste dans `%LOCALAPPDATA%\CubeShelf` et est conservé lors d’une mise à jour ou d’une désinstallation.
 
+
+## Artefacts publiés
+
+Chaque release stable publie :
+
+| Plateforme | Artefact |
+| --- | --- |
+| Windows x64 | `CubeShelf-Setup-x64.exe` (installateur) et `CubeShelf-win-x64.zip` (portable) |
+| Linux x64 | `CubeShelf-linux-x64.AppImage` |
+| macOS x64 | `CubeShelf-osx-x64.tar.gz` |
+| macOS arm64 | `CubeShelf-osx-arm64.tar.gz` |
+
+Plus `checksums.txt` et `release-manifest-v2.json`, que CubeShelf utilise pour ses propres mises à jour.
+
+Les binaires ne sont **pas encore signés** : aucun certificat Authenticode n'est configuré, et les archives macOS ne sont ni signées ni notarisées. Windows affichera un avertissement SmartScreen, et macOS bloquera l'application tant que la quarantaine n'est pas levée (`xattr -d com.apple.quarantine CubeShelf`). C'est suivi dans la ROADMAP.
 ## Compiler et créer l’installateur
 
 Prérequis : SDK .NET 8 et Inno Setup 6.
@@ -28,6 +43,7 @@ Le catalogue est piloté par les données : `src/CubeShelf.Launcher/games.json` 
 | --- | --- | --- | --- | --- |
 | Mario Party 4 | PartyBoard | `GMPE01_00`, `GMPE01_01` | manifeste CubeShelf | par CubeShelf |
 | Soulcalibur II | [Ring Out](https://github.com/jackpoison-prog/RingOut) | `GRSEAF`, `GRSPAF`, `GRSJAF`, `GRSEPS` | asset de release GitHub | par le runtime |
+| Super Mario Strikers | [Strikers](https://github.com/new-coke/strikers) | `G4QE01`, `G4QP01`, `G4QJ01` | asset de release GitHub | par le runtime |
 
 Une entrée de `SupportedDiscIds` est soit un identifiant de révision complet (`GMPE01_00`, cette révision uniquement), soit un identifiant de disque sur six caractères (`GRSEAF`, toutes les révisions).
 
@@ -39,11 +55,15 @@ En `Manifest`, l’éditeur publie un `manifest.json` à côté de ses assets, q
 
 En `GitHubReleaseAsset`, l’éditeur ne publie que des archives ordinaires. CubeShelf interroge l’API GitHub pour la dernière release et sélectionne l’asset via `RuntimeAssets`, dont le motif accepte un joker parce que la version figure dans le nom du fichier. `RuntimeLaunchPaths` indique l’exécutable à lancer dans l’archive, par plateforme, avec le jeton `{version}`.
 
-### Runtimes non vérifiables
+### Vérification du téléchargement
 
-Ring Out ne publie ni `manifest.json` ni `checksums.txt`. CubeShelf n’a donc **rien à quoi comparer le téléchargement**. L’archive reste contrôlée en taille et hachée pendant le transfert, mais aucune valeur publiée par l’éditeur ne permet de confirmer le résultat : l’installation se fait, et elle est enregistrée comme non vérifiée.
+CubeShelf cherche de quoi contrôler l’archive, dans cet ordre :
 
-Renseigner `RuntimeSha256` dans le catalogue épingle une version précise et rend l’installation vérifiée. Sans cette valeur, le runtime porte la mention « installé sans vérification » dans la fiche du jeu, et l’état est conservé dans `runtime-state.json` : l’information survit à l’installation qui l’a produite.
+1. **Un fichier de checksums publié dans la même release**, nommé par `RuntimeChecksumAsset` et lu au format `sha256sum`. C’est la meilleure preuve disponible : elle vient de l’éditeur et suit chaque version. Strikers publie `SHA256SUMS` — ses installations sont donc vérifiées.
+2. **Un SHA-256 épinglé** dans `RuntimeSha256`, qui fige une version précise et devient obsolète à la release suivante.
+3. **Rien.** Ring Out ne publie ni manifeste ni checksum : l’archive reste plafonnée en taille et hachée pendant le transfert, mais aucune valeur de l’éditeur ne permet de confirmer le résultat.
+
+Dans ce dernier cas l’installation n’est pas bloquée, elle est **enregistrée comme non vérifiée** : le runtime porte la mention « installé sans vérification » dans la fiche du jeu, et l’état est conservé dans `runtime-state.json` — l’information survit à l’installation qui l’a produite.
 
 ### Préparation du disque
 
@@ -55,7 +75,7 @@ Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et enviro
 
 ### Jaquettes
 
-Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`. Celles de Soulcalibur II sont pour l’instant des placeholders : remplace `pal_front.png`, `pal_back.png` et `pal_spine.png` par tes propres scans, sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image.
+Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`, en trois fichiers : `pal_front.png`, `pal_back.png` et `pal_spine.png`. Pour en remplacer une, écrase ces fichiers sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image. Les jaquettes complètes (dos + tranche + face) se découpent aux proportions GameCube standard : dos 900, tranche 120, face 900 sur 1920.
 
 ## Aperçu Linux et Steam Deck
 

@@ -22,6 +22,16 @@ public sealed class GameCaseControl : Control, IDisposable
     private const double MaxHoverYaw = 19;
     private const double MaxHoverPitch = 8;
 
+    /// <summary>How much the case grows under the pointer, so it reads as lifting off the page.</summary>
+    private const double HoverLift = .04;
+
+    /// <summary>
+    /// Each mesh cell is clipped to its own triangle, and two clips that share an edge leave a
+    /// hairline of background between them -- a visible grid over the artwork. Growing the clip
+    /// (not the texture transform) makes neighbours overlap by well under a pixel instead.
+    /// </summary>
+    private const double CellClipBleed = .75;
+
     private static readonly IBrush ShellFrontBrush = new SolidColorBrush(Color.Parse("#151B28"));
     private static readonly IBrush ShellSideBrush = new SolidColorBrush(Color.Parse("#0D121D"));
     private static readonly IBrush ShellEdgeBrush = new SolidColorBrush(Color.Parse("#26334A"));
@@ -41,6 +51,11 @@ public sealed class GameCaseControl : Control, IDisposable
     private double _pitch;
     private double _targetYaw;
     private double _targetPitch;
+    private Point _pointerPosition;
+    private double _glare;
+    private double _targetGlare;
+    private double _lift;
+    private double _targetLift;
     private bool _disposed;
 
     public GameCaseControl()
@@ -66,6 +81,7 @@ public sealed class GameCaseControl : Control, IDisposable
             UpdateAnimationTarget();
         };
         PointerPressed += (_, _) => Flip();
+        DetachedFromVisualTree += (_, _) => _animationTimer.Stop();
     }
 
     public void SetCover(string? front, string? back, string? spine)
@@ -83,6 +99,10 @@ public sealed class GameCaseControl : Control, IDisposable
         _pitch = 0;
         _targetYaw = 0;
         _targetPitch = 0;
+        _glare = 0;
+        _targetGlare = 0;
+        _lift = 0;
+        _targetLift = 0;
         _animationTimer.Stop();
         InvalidateVisual();
     }
@@ -117,11 +137,11 @@ public sealed class GameCaseControl : Control, IDisposable
         var shadowBounds = ComputeBounds(vertices.Select(v => v.Screen));
         var yawRadians = _yaw * Math.PI / 180.0;
         var shadowOffset = new Vector(9 + Math.Sin(yawRadians) * 5, 14 + Math.Abs(_pitch) * .20);
-        var shadow = shadowBounds.Translate(shadowOffset).Inflate(5);
+        var shadow = shadowBounds.Translate(shadowOffset).Inflate(5 + 6 * _lift);
         context.DrawRectangle(ShadowBrush, null, shadow, 20, 20);
 
         foreach (var face in faces)
-            DrawFace(context, face);
+            DrawFace(context, face, _pointerPosition, _glare);
     }
 
     private ProjectedVertex[] BuildProjectedVertices()
@@ -147,7 +167,7 @@ public sealed class GameCaseControl : Control, IDisposable
         var focal = 1.0 / Math.Tan(fovRadians / 2.0);
         var fitScale = Math.Min(Bounds.Width / 2.67, Bounds.Height / 3.48);
         var perspective = focal / Math.Max(0.28, CameraDistance - rotated.Z);
-        var scale = fitScale * perspective * 1.72;
+        var scale = fitScale * perspective * 1.72 * (1 + HoverLift * _lift);
         var center = new Point(Bounds.Width / 2, Bounds.Height / 2);
         return new ProjectedVertex(
             rotated,
@@ -188,11 +208,11 @@ public sealed class GameCaseControl : Control, IDisposable
             fallback);
     }
 
-    private static void DrawFace(DrawingContext context, Face face)
+    private static void DrawFace(DrawingContext context, Face face, Point pointer, double glare)
     {
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
         var outline = BuildGeometry(quad);
-        context.DrawGeometry(face.Fallback, EdgePen, outline);
+        context.DrawGeometry(face.Fallback, null, outline);
 
         if (face.Texture is not null)
         {
@@ -217,7 +237,54 @@ public sealed class GameCaseControl : Control, IDisposable
                 new GradientStop(Color.FromArgb(18, 120, 145, 205), 1)
             }
         };
-        context.DrawGeometry(sheen, EdgePen, outline);
+        context.DrawGeometry(sheen, null, outline);
+
+        DrawPointerGlare(context, outline, quad, pointer, glare);
+
+        // One stroke, after every fill: drawing the outline under the texture and again over it
+        // doubled the edge and made it look heavier than a case edge should.
+        context.DrawGeometry(null, EdgePen, outline);
+    }
+
+    /// <summary>
+    /// The specular highlight that follows the pointer. It is what turns a tilting box into
+    /// something that reads as a glossy card: the tilt alone gives shape, the moving highlight
+    /// gives the surface.
+    /// </summary>
+    private static void DrawPointerGlare(
+        DrawingContext context,
+        Geometry outline,
+        IReadOnlyList<Point> quad,
+        Point pointer,
+        double glare)
+    {
+        if (glare <= .01) return;
+
+        var bounds = ComputeBounds(quad);
+        if (bounds.Width <= 1 || bounds.Height <= 1) return;
+
+        // The brush is relative to the geometry it fills, so the pointer has to be expressed in
+        // that same space. Letting it travel outside 0..1 keeps the highlight sliding off the
+        // edge naturally instead of sticking to the border.
+        var centerX = Math.Clamp((pointer.X - bounds.X) / bounds.Width, -.35, 1.35);
+        var centerY = Math.Clamp((pointer.Y - bounds.Y) / bounds.Height, -.35, 1.35);
+        var center = new RelativePoint(centerX, centerY, RelativeUnit.Relative);
+        var peak = (byte)Math.Clamp(96 * glare, 0, 255);
+
+        var highlight = new RadialGradientBrush
+        {
+            Center = center,
+            GradientOrigin = center,
+            RadiusX = new RelativeScalar(.62, RelativeUnit.Relative),
+            RadiusY = new RelativeScalar(.62, RelativeUnit.Relative),
+            GradientStops = new GradientStops
+            {
+                new GradientStop(Color.FromArgb(peak, 255, 255, 255), 0),
+                new GradientStop(Color.FromArgb((byte)(peak * .35), 214, 230, 255), .45),
+                new GradientStop(Color.FromArgb(0, 255, 255, 255), 1)
+            }
+        };
+        context.DrawGeometry(highlight, null, outline);
     }
 
     private static void DrawTexturedQuadMesh(
@@ -278,7 +345,11 @@ public sealed class GameCaseControl : Control, IDisposable
         var transform = AffineFromTriangles(
             source0, source1, source2,
             destination0, destination1, destination2);
-        var clip = BuildGeometry(new[] { destination0, destination1, destination2 });
+
+        // The transform stays on the exact triangle; only the clip grows, so neighbouring cells
+        // overlap instead of leaving a hairline seam. The sub-pixel overlap is redrawn by the
+        // later cell with its own correct texture, which is invisible at this scale.
+        var clip = BuildGeometry(Expand(destination0, destination1, destination2, CellClipBleed));
         using (context.PushGeometryClip(clip))
         using (context.PushTransform(transform))
         {
@@ -312,6 +383,22 @@ public sealed class GameCaseControl : Control, IDisposable
         return new Matrix(m11, m12, m21, m22, offsetX, offsetY);
     }
 
+    /// <summary>Pushes each corner away from the triangle's centroid by <paramref name="amount"/> pixels.</summary>
+    private static Point[] Expand(Point a, Point b, Point c, double amount)
+    {
+        var centroid = new Point((a.X + b.X + c.X) / 3, (a.Y + b.Y + c.Y) / 3);
+        return new[] { Push(a), Push(b), Push(c) };
+
+        Point Push(Point point)
+        {
+            var dx = point.X - centroid.X;
+            var dy = point.Y - centroid.Y;
+            var length = Math.Sqrt(dx * dx + dy * dy);
+            if (length < .0001) return point;
+            return new Point(point.X + dx / length * amount, point.Y + dy / length * amount);
+        }
+    }
+
     private static StreamGeometry BuildGeometry(IReadOnlyList<Point> points)
     {
         var geometry = new StreamGeometry();
@@ -339,9 +426,9 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
         _pointerInside = true;
-        var p = e.GetPosition(this);
-        var nx = Math.Clamp((p.X / Bounds.Width - .5) * 2, -1, 1);
-        var ny = Math.Clamp((p.Y / Bounds.Height - .5) * 2, -1, 1);
+        _pointerPosition = e.GetPosition(this);
+        var nx = Math.Clamp((_pointerPosition.X / Bounds.Width - .5) * 2, -1, 1);
+        var ny = Math.Clamp((_pointerPosition.Y / Bounds.Height - .5) * 2, -1, 1);
         _hoverYaw = nx * MaxHoverYaw;
         _hoverPitch = -ny * MaxHoverPitch;
         UpdateAnimationTarget();
@@ -351,6 +438,8 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         _targetYaw = _baseYaw + (_pointerInside ? _hoverYaw : 0);
         _targetPitch = _pointerInside ? _hoverPitch : 0;
+        _targetGlare = _pointerInside ? 1 : 0;
+        _targetLift = _pointerInside ? 1 : 0;
         if (!_animationTimer.IsEnabled)
             _animationTimer.Start();
     }
@@ -359,16 +448,27 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         const double positionResponse = .17;
         const double pitchResponse = .20;
+        const double surfaceResponse = .12;
 
         var yawDelta = _targetYaw - _yaw;
         var pitchDelta = _targetPitch - _pitch;
+        var glareDelta = _targetGlare - _glare;
+        var liftDelta = _targetLift - _lift;
+
         _yaw += yawDelta * positionResponse;
         _pitch += pitchDelta * pitchResponse;
+        _glare += glareDelta * surfaceResponse;
+        _lift += liftDelta * surfaceResponse;
 
-        if (Math.Abs(yawDelta) < .025 && Math.Abs(pitchDelta) < .025)
+        // The highlight and the lift settle more slowly than the rotation, so stopping on the
+        // rotation alone used to freeze them mid-fade. Every channel has to be at rest.
+        if (Math.Abs(yawDelta) < .025 && Math.Abs(pitchDelta) < .025 &&
+            Math.Abs(glareDelta) < .004 && Math.Abs(liftDelta) < .004)
         {
             _yaw = _targetYaw;
             _pitch = _targetPitch;
+            _glare = _targetGlare;
+            _lift = _targetLift;
             _animationTimer.Stop();
         }
         InvalidateVisual();
