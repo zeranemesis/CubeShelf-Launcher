@@ -33,6 +33,17 @@ C:\CubeShelf\Mods\GMPE01_00\546878\files
 C:\CubeShelf\Mods\GMPE01_00\407132\files
 ```
 
+`active-mods.json` sits next to it, same order, carrying the identity the game
+cannot get from a path - id, name, priority, content root. The game names mods on
+screen from it, and the plain text file remains the contract for anything that
+only needs the roots.
+
+`player-disabled.json` goes the other way: PartyBoard writes the ids the player
+switched off from inside the game, and the launcher only reads them. **A mod runs
+when the launcher has it enabled and the player has not switched it off.**
+Enabling a mod in the launcher clears its in-game switch, so the panel can never
+claim a mod is on while the game ignores it.
+
 A content root maps onto the root of the disc image. When the game requests:
 
 ```text

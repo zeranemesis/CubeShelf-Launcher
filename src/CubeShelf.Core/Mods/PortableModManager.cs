@@ -8,6 +8,8 @@ namespace CubeShelf.Core.Mods;
 public sealed record PortableInstalledMod(int Id, string Name, long Updated, bool Enabled, int Priority,
     string ContentRoot, string Sha256);
 public sealed record PortableModConflict(string RelativePath, IReadOnlyList<int> ModIds);
+/// <summary>One line of active-mods.json: what the game needs to name a mod and report it back.</summary>
+public sealed record PortableActiveMod(int Id, string Name, int Priority, string ContentRoot);
 public enum PortableModLayoutKind { Unknown, DolphinTextures, LooseFiles, SeveralVariants }
 public sealed record PortableModLayoutWarning(int Id, string Name, PortableModLayoutKind Kind,
     IReadOnlyList<string> TopLevelEntries);
@@ -18,6 +20,8 @@ public sealed class PortableModManager
     private readonly string _root;
     private readonly string _state;
     private readonly string _active;
+    private readonly string _activeDetails;
+    private readonly string _playerDisabled;
 
     public PortableModManager(IPlatformPaths paths, string gameId)
     {
@@ -27,11 +31,36 @@ public sealed class PortableModManager
         _root = Path.Combine(Path.GetFullPath(paths.DataDirectory), "Mods", gameId);
         _state = Path.Combine(_root, "installed.json");
         _active = Path.Combine(_root, "active-mods.txt");
+        _activeDetails = Path.Combine(_root, "active-mods.json");
+        _playerDisabled = Path.Combine(_root, "player-disabled.json");
         Directory.CreateDirectory(_root);
         WriteActiveList();
     }
 
     public string ActiveListFile => _active;
+
+    /// <summary>
+    /// Mods the player switched off from inside PartyBoard. The game writes this
+    /// file; the launcher only reads it, so the two never disagree about what is
+    /// loaded. A mod runs when it is enabled here and not in there.
+    /// </summary>
+    public IReadOnlyCollection<int> GetPlayerDisabled()
+    {
+        if (!File.Exists(_playerDisabled)) return Array.Empty<int>();
+        try { return JsonSerializer.Deserialize<HashSet<int>>(File.ReadAllText(_playerDisabled)) ?? new HashSet<int>(); }
+        catch (JsonException) { return Array.Empty<int>(); }
+    }
+
+    /// <summary>
+    /// Clears the in-game switch for one mod, so enabling it in the launcher
+    /// actually turns it back on rather than being silently overruled.
+    /// </summary>
+    public void ClearPlayerDisabled(int id)
+    {
+        var disabled = GetPlayerDisabled().ToHashSet();
+        if (!disabled.Remove(id)) return;
+        File.WriteAllText(_playerDisabled, JsonSerializer.Serialize(disabled.Order()));
+    }
 
     /// <summary>
     /// Rewrites active-mods.txt from the current state and returns its path.
@@ -240,7 +269,16 @@ public sealed class PortableModManager
             throw new InvalidDataException("Le manifeste CubeShelf contient des dépendances en double.");
     }
 
-    public void SetEnabled(int id, bool enabled) => Update(id, item => item with { Enabled = enabled });
+    /// <summary>
+    /// Turning a mod on here also clears the in-game switch, otherwise the
+    /// launcher would show it enabled while the game went on ignoring it.
+    /// </summary>
+    public void SetEnabled(int id, bool enabled)
+    {
+        if (enabled) ClearPlayerDisabled(id);
+        Update(id, item => item with { Enabled = enabled });
+    }
+
     public void SetPriority(int id, int priority) => Update(id, item => item with { Priority = priority });
 
     public void Uninstall(int id)
@@ -329,9 +367,25 @@ public sealed class PortableModManager
 
     // PartyBoard reads this list highest priority first and lets the first
     // root claiming a path win, so the order here is the mod load order.
-    private void WriteActiveList() => File.WriteAllLines(_active, GetInstalled()
-        .Where(item => item.Enabled && Directory.Exists(item.ContentRoot)).OrderByDescending(item => item.Priority)
-        .ThenBy(item => item.Id).Select(item => Path.GetFullPath(item.ContentRoot)));
+    //
+    // Two files, one order. The .txt is the plain contract the game has always
+    // read; the .json adds the identity the game needs to name a mod on screen
+    // and to say which one the player switched off. A mod runs when the
+    // launcher has it enabled and the player has not turned it off in game.
+    private void WriteActiveList()
+    {
+        var playerDisabled = GetPlayerDisabled();
+        var active = GetInstalled()
+            .Where(item => item.Enabled && !playerDisabled.Contains(item.Id) && Directory.Exists(item.ContentRoot))
+            .OrderByDescending(item => item.Priority).ThenBy(item => item.Id)
+            .Select(item => item with { ContentRoot = Path.GetFullPath(item.ContentRoot) })
+            .ToArray();
+
+        File.WriteAllLines(_active, active.Select(item => item.ContentRoot));
+        File.WriteAllText(_activeDetails, JsonSerializer.Serialize(
+            active.Select(item => new PortableActiveMod(item.Id, item.Name, item.Priority, item.ContentRoot)),
+            new JsonSerializerOptions { WriteIndented = true }));
+    }
 
     private static readonly HashSet<string> DiscRootEntries =
         new(new[] { "data", "dll", "mess", "movie", "sound", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
