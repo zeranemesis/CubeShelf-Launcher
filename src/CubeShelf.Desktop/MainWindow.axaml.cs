@@ -423,10 +423,17 @@ public sealed partial class MainWindow : Window
         }).OrderBy(item => item.Name).ToArray();
         ModsList.ItemsSource = items;
         var report = new List<string>();
-        if (layout.Count > 0)
-            report.Add($"⚠ {layout.Count} mod(s) sans dossier du disque à leur racine, donc sans effet en jeu : "
-                + string.Join(", ", layout.Take(3).Select(item =>
-                    $"{item.Name} (contient {string.Join(", ", item.TopLevelEntries.Take(3))})")));
+        foreach (var item in layout.Take(4))
+            report.Add("⚠ " + item.Name + " : " + item.Kind switch
+            {
+                PortableModLayoutKind.DolphinTextures =>
+                    "pack de textures Dolphin. PartyBoard remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
+                PortableModLayoutKind.LooseFiles =>
+                    "fichiers livrés sans chemin. PartyBoard les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                PortableModLayoutKind.SeveralVariants =>
+                    $"plusieurs variantes côte à côte ({string.Join(", ", item.TopLevelEntries.Take(3))}). Garde-en une seule à la racine du mod.",
+                _ => $"aucun dossier du disque à sa racine ({string.Join(", ", item.TopLevelEntries.Take(3))}), donc sans effet en jeu.",
+            });
         report.Add(conflicts.Count == 0
             ? "Aucun conflit entre les mods actifs."
             : $"⚠ {conflicts.Count} fichier(s) en conflit : " + string.Join(", ", conflicts.Take(5).Select(item => item.RelativePath)));

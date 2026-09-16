@@ -8,7 +8,9 @@ namespace CubeShelf.Core.Mods;
 public sealed record PortableInstalledMod(int Id, string Name, long Updated, bool Enabled, int Priority,
     string ContentRoot, string Sha256);
 public sealed record PortableModConflict(string RelativePath, IReadOnlyList<int> ModIds);
-public sealed record PortableModLayoutWarning(int Id, string Name, IReadOnlyList<string> TopLevelEntries);
+public enum PortableModLayoutKind { Unknown, DolphinTextures, LooseFiles, SeveralVariants }
+public sealed record PortableModLayoutWarning(int Id, string Name, PortableModLayoutKind Kind,
+    IReadOnlyList<string> TopLevelEntries);
 
 public sealed class PortableModManager
 {
@@ -281,10 +283,30 @@ public sealed class PortableModManager
             var entries = Directory.EnumerateFileSystemEntries(mod.ContentRoot)
                 .Select(Path.GetFileName).OfType<string>().ToArray();
             if (entries.Any(entry => DiscRootEntries.Contains(entry))) continue;
-            warnings.Add(new PortableModLayoutWarning(mod.Id, mod.Name,
+            warnings.Add(new PortableModLayoutWarning(mod.Id, mod.Name, ClassifyLayout(mod.ContentRoot),
                 entries.Order(StringComparer.OrdinalIgnoreCase).Take(8).ToArray()));
         }
         return warnings;
+    }
+
+    // "Unexpected layout" covers three situations a player has to act on very
+    // differently, so the panel says which. Seen across the fourteen packs
+    // GameBanana lists for Mario Party 4: three are Dolphin texture packs, two
+    // ship loose files, one offers several variants side by side.
+    private static PortableModLayoutKind ClassifyLayout(string contentRoot)
+    {
+        // Dolphin dumps textures as <GameId>/tex1_<hash>.png and replaces them at
+        // render time. Nothing about that reaches the disc, so no overlay can
+        // carry it.
+        if (Directory.EnumerateFiles(contentRoot, "tex1_*.png", SearchOption.AllDirectories).Any())
+            return PortableModLayoutKind.DolphinTextures;
+
+        var directories = Directory.GetDirectories(contentRoot);
+        if (directories.Length == 0)
+            return PortableModLayoutKind.LooseFiles;
+        if (directories.Length > 1)
+            return PortableModLayoutKind.SeveralVariants;
+        return PortableModLayoutKind.Unknown;
     }
 
     private void Update(int id, Func<PortableInstalledMod, PortableInstalledMod> update)

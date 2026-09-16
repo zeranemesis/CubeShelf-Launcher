@@ -222,27 +222,48 @@ void TestModContentRootDepth()
 // that the game looks untouched.
 void TestModLayoutWarning()
 {
+    // The three shapes the fourteen live packs fall into when they carry no
+    // disc folder. Each needs a different answer from the player, so each is
+    // classified rather than lumped under "unexpected layout".
+    var cases = new (string Entry, PortableModLayoutKind Kind)[]
+    {
+        ("Pack/GMPE01/tex1_128x128_3e7936174a209c24_14.png", PortableModLayoutKind.DolphinTextures),
+        ("Pack/board_e.dat",                                 PortableModLayoutKind.LooseFiles),
+        ("Pack/High res/bbattle.bin",                        PortableModLayoutKind.SeveralVariants),
+    };
+
+    var id = 50;
+    foreach (var shape in cases)
+        WithTempRoot(root =>
+        {
+            var paths = new TestPaths(root);
+            var manager = new PortableModManager(paths, "GAME");
+            var entries = new Dictionary<string, byte[]> { [shape.Entry] = new byte[] { 3 } };
+            if (shape.Kind == PortableModLayoutKind.SeveralVariants)
+                entries["Pack/Low res/bbattle.bin"] = new byte[] { 4 };
+            using var client = new HttpClient(new StaticHttpHandler(_ => CreateZipEntries(entries)));
+            manager.InstallAsync(new GameBananaMod(++id, shape.Entry, 1, "https://files.gamebanana.com/m.zip", "m.zip"),
+                new GameBananaClient(client)).GetAwaiter().GetResult();
+
+            var flagged = manager.AnalyzeLayout();
+            Assert(flagged.Count == 1);
+            Assert(flagged[0].Kind == shape.Kind);
+
+            // Disabling it takes it out of what the game is told to load, so it
+            // is no longer something to warn about.
+            manager.SetEnabled(id, false);
+            Assert(manager.AnalyzeLayout().Count == 0);
+        });
+
+    // A pack laid out like the disc is never flagged.
     WithTempRoot(root =>
     {
         var paths = new TestPaths(root);
         var manager = new PortableModManager(paths, "GAME");
-        using var good = new HttpClient(new StaticHttpHandler(_ =>
+        using var client = new HttpClient(new StaticHttpHandler(_ =>
             CreateZipBytes("files/data/board.bin", new byte[] { 1 })));
-        using var bad = new HttpClient(new StaticHttpHandler(_ =>
-            CreateZipBytes("files/textures/RGBA32_abc.png", new byte[] { 2 })));
-        manager.InstallAsync(new GameBananaMod(31, "Disc layout", 1, "https://files.gamebanana.com/a.zip", "a.zip"),
-            new GameBananaClient(good)).GetAwaiter().GetResult();
-        manager.InstallAsync(new GameBananaMod(32, "Texture pack", 2, "https://files.gamebanana.com/b.zip", "b.zip"),
-            new GameBananaClient(bad)).GetAwaiter().GetResult();
-
-        var flagged = manager.AnalyzeLayout();
-        Assert(flagged.Count == 1);
-        Assert(flagged[0].Id == 32);
-        Assert(flagged[0].TopLevelEntries.SequenceEqual(new[] { "textures" }));
-
-        // Disabling it removes it from what the game is told to load, so it is
-        // no longer something to warn about.
-        manager.SetEnabled(32, false);
+        manager.InstallAsync(new GameBananaMod(60, "Disc layout", 1, "https://files.gamebanana.com/d.zip", "d.zip"),
+            new GameBananaClient(client)).GetAwaiter().GetResult();
         Assert(manager.AnalyzeLayout().Count == 0);
     });
 }

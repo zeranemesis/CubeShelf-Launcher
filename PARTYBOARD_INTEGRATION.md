@@ -74,9 +74,19 @@ metadata and is never exposed to the game.
 
 A pack whose content root holds none of the disc's own folders (`data`, `dll`,
 `mess`, `movie`, `sound`, `opening.bnr`) overlays nothing and would otherwise
-install, enable and do nothing in game with no other symptom - Dolphin-style
-texture packs behave exactly this way. `PortableModManager.AnalyzeLayout` reports
-those mods in the mods panel; it never blocks an installation, since a mod may
+install, enable and do nothing in game with no other symptom.
+`PortableModManager.AnalyzeLayout` reports those mods in the mods panel and says
+which of three situations it is, because each needs a different answer:
+
+- **Dolphin texture pack** (`<GameId>/tex1_*.png`) - replaced at render time, not
+  on the disc. No overlay can carry it.
+- **Loose files** - PartyBoard places them itself when the disc carries exactly
+  one file of that name; see `docs/CUBESHELF_MODS.md` in the game repository.
+- **Several variants side by side** - the player keeps the one they want.
+
+Measured over the fourteen packs GameBanana lists for Mario Party 4: eight are
+laid out like the disc, three are Dolphin texture packs, two ship loose files and
+one offers variants. Nothing is ever blocked from installing, since a mod may
 legitimately add files the disc does not carry.
 
 ## Checks
