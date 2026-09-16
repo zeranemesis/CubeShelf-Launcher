@@ -410,19 +410,35 @@ public sealed partial class MainWindow : Window
         var ids = _remoteMods.Select(item => item.Id).Concat(installed.Keys).Distinct().ToArray();
         var conflicts = _modManager.AnalyzeConflicts();
         var conflictedIds = conflicts.SelectMany(item => item.ModIds).ToHashSet();
+        var layout = _modManager.AnalyzeLayout();
+        var layoutIds = layout.Select(item => item.Id).ToHashSet();
         var items = ids.Select(id =>
         {
             var remote = _remoteMods.FirstOrDefault(item => item.Id == id);
             installed.TryGetValue(id, out var local);
             var status = local is null ? "Non installé" : local.Enabled ? "Installé • activé" : "Installé • désactivé";
             if (conflictedIds.Contains(id)) status += " • conflit";
+            if (layoutIds.Contains(id)) status += " • arborescence inattendue";
             return new DesktopModItem(id, remote?.Name ?? local?.Name ?? $"Mod {id}", status,
                 local?.Priority ?? 100, local?.Enabled ?? false, local is not null, remote);
         }).OrderBy(item => item.Name).ToArray();
         ModsList.ItemsSource = items;
-        ConflictsStatus.Text = conflicts.Count == 0
+        var report = new List<string>();
+        foreach (var item in layout.Take(4))
+            report.Add("⚠ " + item.Name + " : " + item.Kind switch
+            {
+                PortableModLayoutKind.DolphinTextures =>
+                    "pack de textures Dolphin. PartyBoard remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
+                PortableModLayoutKind.LooseFiles =>
+                    "fichiers livrés sans chemin. PartyBoard les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                PortableModLayoutKind.SeveralVariants =>
+                    $"plusieurs variantes côte à côte ({string.Join(", ", item.TopLevelEntries.Take(3))}). Garde-en une seule à la racine du mod.",
+                _ => $"aucun dossier du disque à sa racine ({string.Join(", ", item.TopLevelEntries.Take(3))}), donc sans effet en jeu.",
+            });
+        report.Add(conflicts.Count == 0
             ? "Aucun conflit entre les mods actifs."
-            : $"⚠ {conflicts.Count} fichier(s) en conflit : " + string.Join(", ", conflicts.Take(5).Select(item => item.RelativePath));
+            : $"⚠ {conflicts.Count} fichier(s) en conflit : " + string.Join(", ", conflicts.Take(5).Select(item => item.RelativePath)));
+        ConflictsStatus.Text = string.Join(Environment.NewLine, report);
     }
 
     private void SelectMod(object? sender, SelectionChangedEventArgs args)

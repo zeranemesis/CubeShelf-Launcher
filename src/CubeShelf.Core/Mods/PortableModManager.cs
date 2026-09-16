@@ -8,6 +8,9 @@ namespace CubeShelf.Core.Mods;
 public sealed record PortableInstalledMod(int Id, string Name, long Updated, bool Enabled, int Priority,
     string ContentRoot, string Sha256);
 public sealed record PortableModConflict(string RelativePath, IReadOnlyList<int> ModIds);
+public enum PortableModLayoutKind { Unknown, DolphinTextures, LooseFiles, SeveralVariants }
+public sealed record PortableModLayoutWarning(int Id, string Name, PortableModLayoutKind Kind,
+    IReadOnlyList<string> TopLevelEntries);
 
 public sealed class PortableModManager
 {
@@ -266,6 +269,46 @@ public sealed class PortableModManager
             .Select(pair => new PortableModConflict(pair.Key, pair.Value.Order().ToArray())).OrderBy(item => item.RelativePath).ToArray();
     }
 
+    // PartyBoard overlays a mod's content root onto the root of the disc, so a
+    // pack whose root holds none of the disc's own folders replaces nothing: it
+    // installs, enables and does exactly nothing in game, with no other symptom.
+    // Dolphin-style texture packs land here, and so does an archive with one
+    // level too many. Reported, never blocked - the disc may gain new files, and
+    // only the player knows what they meant to install.
+    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout()
+    {
+        var warnings = new List<PortableModLayoutWarning>();
+        foreach (var mod in GetInstalled().Where(item => item.Enabled && Directory.Exists(item.ContentRoot)))
+        {
+            var entries = Directory.EnumerateFileSystemEntries(mod.ContentRoot)
+                .Select(Path.GetFileName).OfType<string>().ToArray();
+            if (entries.Any(entry => DiscRootEntries.Contains(entry))) continue;
+            warnings.Add(new PortableModLayoutWarning(mod.Id, mod.Name, ClassifyLayout(mod.ContentRoot),
+                entries.Order(StringComparer.OrdinalIgnoreCase).Take(8).ToArray()));
+        }
+        return warnings;
+    }
+
+    // "Unexpected layout" covers three situations a player has to act on very
+    // differently, so the panel says which. Seen across the fourteen packs
+    // GameBanana lists for Mario Party 4: three are Dolphin texture packs, two
+    // ship loose files, one offers several variants side by side.
+    private static PortableModLayoutKind ClassifyLayout(string contentRoot)
+    {
+        // Dolphin dumps textures as <GameId>/tex1_<hash>.png and replaces them at
+        // render time. Nothing about that reaches the disc, so no overlay can
+        // carry it.
+        if (Directory.EnumerateFiles(contentRoot, "tex1_*.png", SearchOption.AllDirectories).Any())
+            return PortableModLayoutKind.DolphinTextures;
+
+        var directories = Directory.GetDirectories(contentRoot);
+        if (directories.Length == 0)
+            return PortableModLayoutKind.LooseFiles;
+        if (directories.Length > 1)
+            return PortableModLayoutKind.SeveralVariants;
+        return PortableModLayoutKind.Unknown;
+    }
+
     private void Update(int id, Func<PortableInstalledMod, PortableInstalledMod> update)
     {
         var items = GetInstalled().ToList();
@@ -290,13 +333,57 @@ public sealed class PortableModManager
         .Where(item => item.Enabled && Directory.Exists(item.ContentRoot)).OrderByDescending(item => item.Priority)
         .ThenBy(item => item.Id).Select(item => Path.GetFullPath(item.ContentRoot)));
 
+    private static readonly HashSet<string> DiscRootEntries =
+        new(new[] { "data", "dll", "mess", "movie", "sound", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
+
+    // Mod archives bury the disc root under whatever folder names the author
+    // felt like: seen in the wild are "files/" at the top, "<mod>/<variant>/files/"
+    // two deep, and "<mod>/store/files/" beside a sys/ folder that must never be
+    // overlaid. Only the first shape used to be found, so most packs installed
+    // with their own folder names as disc paths and changed nothing in game.
+    // Search breadth-first for the shallowest directory that looks like the root
+    // of the disc's file partition.
     private static string DetectContentRoot(string staging)
     {
-        var direct = Path.Combine(staging, "files");
-        if (Directory.Exists(direct)) return direct;
+        var found = FindDiscRoot(staging);
+        if (found is not null) return found;
+
+        // Nothing recognisable. Keep unwrapping a lone folder as before so a mod
+        // that only adds files still installs; AnalyzeLayout reports the rest.
         var directories = Directory.GetDirectories(staging);
-        return directories.Length == 1 && Directory.GetFiles(staging).Length == 0
-            ? Directory.Exists(Path.Combine(directories[0], "files")) ? Path.Combine(directories[0], "files") : directories[0]
-            : staging;
+        return directories.Length == 1 && Directory.GetFiles(staging).Length == 0 ? directories[0] : staging;
     }
+
+    private static string? FindDiscRoot(string staging)
+    {
+        const int maximumDepth = 6;
+        const int maximumDirectories = 4096;
+        var queue = new Queue<(string Path, int Depth)>();
+        queue.Enqueue((staging, 0));
+        var visited = 0;
+        while (queue.Count > 0 && visited++ < maximumDirectories)
+        {
+            var (current, depth) = queue.Dequeue();
+            string[] children;
+            try { children = Directory.GetDirectories(current); }
+            catch (IOException) { continue; }
+            catch (UnauthorizedAccessException) { continue; }
+
+            // A "files" folder is the disc partition by name, so it wins over a
+            // folder that merely happens to hold one of the disc's own entries.
+            var files = children.FirstOrDefault(child =>
+                Path.GetFileName(child).Equals("files", StringComparison.OrdinalIgnoreCase));
+            if (files is not null) return files;
+
+            if (HoldsDiscEntry(current)) return current;
+
+            if (depth < maximumDepth)
+                foreach (var child in children) queue.Enqueue((child, depth + 1));
+        }
+        return null;
+    }
+
+    private static bool HoldsDiscEntry(string directory) =>
+        Directory.EnumerateFileSystemEntries(directory)
+            .Select(Path.GetFileName).OfType<string>().Any(DiscRootEntries.Contains);
 }

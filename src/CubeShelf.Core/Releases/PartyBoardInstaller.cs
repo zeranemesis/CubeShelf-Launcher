@@ -308,9 +308,17 @@ public sealed class PartyBoardInstaller
         GameRuntimeSource source,
         CancellationToken cancellationToken)
     {
-        ValidateIdentifier(source.Tag, nameof(source.Tag));
+        // A fixed tag is one URL that a publisher has to keep pointing at the
+        // newest build forever. PartyBoard moved to a release per tag and the
+        // launcher went on asking for the old rolling one, so it reinstalled a
+        // months-old build over anything newer, every startup check. A catalog
+        // can now say "latest" and be told by GitHub which tag that is.
+        var tag = source.Tag.Equals("latest", StringComparison.OrdinalIgnoreCase)
+            ? await ResolveLatestTagAsync(source, cancellationToken).ConfigureAwait(false)
+            : source.Tag;
+        ValidateIdentifier(tag, nameof(source.Tag));
         var releaseRoot = new Uri(
-            $"https://github.com/{source.Owner}/{source.Repository}/releases/download/{source.Tag}/");
+            $"https://github.com/{source.Owner}/{source.Repository}/releases/download/{tag}/");
         var manifest = await DownloadManifestAsync(new Uri(releaseRoot, "manifest.json"), cancellationToken)
             .ConfigureAwait(false);
         var artifact = manifest.Schema == 1
@@ -324,6 +332,36 @@ public sealed class PartyBoardInstaller
             LegacyDownload: manifest.Schema == 1,
             RequireSize: manifest.Schema != 1,
             Verified: true);
+    }
+
+    /// <summary>
+    /// The tag of the most recent release, for a catalog that says "latest" rather than naming
+    /// one. Draft and pre-release builds are what PartyBoard publishes, and /releases/latest
+    /// skips both, so this reads the release list and takes the first entry GitHub returns.
+    /// </summary>
+    private async Task<string> ResolveLatestTagAsync(
+        GameRuntimeSource source,
+        CancellationToken cancellationToken)
+    {
+        ValidateIdentifier(source.Owner, nameof(source.Owner));
+        ValidateIdentifier(source.Repository, nameof(source.Repository));
+        var api = new Uri(
+            $"https://api.github.com/repos/{source.Owner}/{source.Repository}/releases?per_page=1");
+        using var request = new HttpRequestMessage(HttpMethod.Get, api);
+        request.Headers.Accept.ParseAdd("application/vnd.github+json");
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        if (response.Content.Headers.ContentLength > 4 * 1024 * 1024)
+            throw new InvalidDataException("Réponse GitHub trop volumineuse.");
+
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var releases = await JsonSerializer.DeserializeAsync<List<GitHubRelease>>(stream, _json, cancellationToken)
+            .ConfigureAwait(false);
+        var tag = releases?.FirstOrDefault()?.TagName;
+        if (string.IsNullOrWhiteSpace(tag))
+            throw new InvalidDataException($"{source.Repository} ne publie aucune release exploitable.");
+        return tag;
     }
 
     /// <summary>
