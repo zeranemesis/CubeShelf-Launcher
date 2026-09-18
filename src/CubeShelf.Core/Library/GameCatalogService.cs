@@ -26,8 +26,12 @@ public enum GameDataPreparation
     CubeShelf = 0,
 
     /// <summary>
-    /// The runtime owns disc setup and CubeShelf must not touch it. Ring Out recompiles the
-    /// game from the disc on first launch, which CubeShelf cannot and should not replicate.
+    /// The runtime owns the disc and CubeShelf must not touch it. Two kinds of runtime land
+    /// here. Ring Out recompiles the game from the disc on first launch, which CubeShelf
+    /// cannot and should not replicate. PartyBoard simply opens the image and reads it -- it
+    /// takes the path in PARTYBOARD_DISC_IMAGE, mounts it through nod, and accepts iso, gcm,
+    /// ciso, gcz, nfs, rvz, wbfs, wia and tgc, so there is nothing to convert and nothing to
+    /// extract. Either way the answer to "what does CubeShelf prepare" is: nothing.
     /// </summary>
     Runtime = 1
 }

@@ -191,7 +191,7 @@ public sealed partial class MainWindow
             runtime.IsInstalled || File.Exists(executable)
                 ? $"✓ {game.RuntimeName}"
                 : $"○ {game.RuntimeName}",
-            // A runtime that prepares its own disc has no CubeShelf data step to report.
+            // A runtime that owns its disc has no CubeShelf data step to report.
             runtimeManagesDisc
                 ? (english ? "◆ Runtime-managed" : "◆ Géré par le runtime")
                 : prepared
@@ -267,10 +267,11 @@ public sealed partial class MainWindow
             ? $"✓ {game.RuntimeName} {(english ? "installed" : "installé")}{(string.IsNullOrWhiteSpace(runtime.Version) ? "" : " • " + runtime.Version)}"
             : $"○ {game.RuntimeName} {(english ? "not installed" : "non installé")}";
 
-        // A runtime that prepares the disc itself has no CubeShelf step to report, so the badge
-        // says who does it rather than claiming there is work pending that will never happen.
+        // A runtime that owns the disc has no CubeShelf step to report, so the badge says who
+        // handles it rather than claiming there is work pending that will never happen. It says
+        // "handled", not "prepared": PartyBoard reads the image as it is and prepares nothing.
         DataStateText.Text = runtimeManagesDisc
-            ? (english ? $"◆ Disc prepared by {game.RuntimeName}" : $"◆ Disque préparé par {game.RuntimeName}")
+            ? (english ? $"◆ Disc handled by {game.RuntimeName}" : $"◆ Disque géré par {game.RuntimeName}")
             : prepared
                 ? (english ? "✓ Game data ready" : "✓ Données prêtes")
                 : (english ? "○ Game data to prepare" : "○ Données à préparer");

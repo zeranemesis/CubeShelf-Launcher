@@ -327,7 +327,7 @@ public sealed partial class MainWindow : Window
         if (prepared)
             ExecutablePathText.Text += "\nDonnées du jeu : prêtes";
         else if (runtimeManagesDisc && runtime.IsInstalled)
-            ExecutablePathText.Text += $"\n{game.RuntimeName} prépare le disque à son premier lancement.";
+            ExecutablePathText.Text += $"\n{game.RuntimeName} se charge du disque lui-même ; CubeShelf n’a rien à préparer.";
 
         var running = _sessions.IsRunning(game.Id);
         PlayButton.IsEnabled = running || CanPlay();
@@ -353,8 +353,9 @@ public sealed partial class MainWindow : Window
         if (_selectedGame is null || !File.Exists(_selectedGame.Executable)) return false;
         if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame.SupportedDiscIds).Supported) return false;
 
-        // Ring Out extracts and recompiles the disc on its own first launch, so there is
-        // nothing for CubeShelf to prepare and nothing to wait for before enabling Play.
+        // A runtime-managed disc has nothing for CubeShelf to prepare and nothing to wait for
+        // before enabling Play: Ring Out extracts and recompiles on its own first launch, and
+        // PartyBoard opens the image directly from PARTYBOARD_DISC_IMAGE.
         return _selectedGame.DataPreparation == GameDataPreparation.Runtime ||
             _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
     }

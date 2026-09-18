@@ -842,6 +842,14 @@ void TestShippedCatalogIsCoherent()
         Assert(ringOut.DataPreparation == GameDataPreparation.Runtime);
         Assert(ringOut.SupportedDiscIds.Contains("GRSEAF"));
         Assert(ringOut.RuntimeAssets.ContainsKey("win-x64"));
+
+        // PartyBoard reads the disc image itself, so CubeShelf must not extract it. Flipping
+        // this back to CubeShelf costs the user a DolphinTool download, an RVZ to ISO
+        // conversion and roughly 900 MB of duplicated disc, and the only visible symptom is
+        // a long wait before a Play button that would have worked immediately. Nothing else
+        // would report it, so this does.
+        var partyBoard = games.Single(game => game.Id == "GMPE01_00");
+        Assert(partyBoard.DataPreparation == GameDataPreparation.Runtime);
     }
     finally
     {
