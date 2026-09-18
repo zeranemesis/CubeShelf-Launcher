@@ -16,7 +16,7 @@
       "GMPE01_01"
     ],
     "RuntimeSource": "Manifest",
-    "DataPreparation": "CubeShelf",
+    "DataPreparation": "Runtime",
     "HomepageUrl": "https://github.com/zeranemesis/Marioparty4",
     "Covers": [
       {
