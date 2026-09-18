@@ -107,6 +107,31 @@ public sealed class LauncherUpdateService
         }
     }
 
+    /// <summary>
+    /// Deletes the updater image a previous update displaced. The updater renames its own
+    /// executable aside before writing the new one -- Windows will not let a process
+    /// overwrite the image it is running from -- and cannot delete that copy afterwards,
+    /// because it is still running from it. The application can, and it is the first thing
+    /// to run after an update, so it reclaims the space (the updater is ~160 MB) rather
+    /// than leaving it until the next update happens to come along.
+    /// </summary>
+    public static void RemoveDisplacedUpdaterImages()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        try
+        {
+            // Narrow on purpose: CubeShelf's own executables, and only the suffix the
+            // updater writes, so this can never reach a file the application needs.
+            foreach (var stale in Directory.EnumerateFiles(AppContext.BaseDirectory, "CubeShelf*.exe*.old"))
+            {
+                try { File.Delete(stale); } catch { }
+            }
+        }
+        catch { }
+    }
+
     public Process LaunchWindowsUpdater(string archive, string version)
     {
         if (!OperatingSystem.IsWindows())

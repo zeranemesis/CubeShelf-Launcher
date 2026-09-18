@@ -37,6 +37,8 @@ Run("per-game disc compatibility", TestPerGameDiscCompatibility);
 Run("release asset pattern matching", TestReleaseAssetPattern);
 Run("catalog keeps runtime acquisition metadata", TestCatalogRuntimeMetadata);
 Run("shipped catalog is coherent", TestShippedCatalogIsCoherent);
+Run("displaced updater images are reclaimed, nothing else", TestDisplacedUpdaterCleanup);
+Run("a running image resists overwrite but not rename", TestRunningImageCanOnlyBeRenamed);
 Run("release checksum file verifies the install", TestReleaseAssetChecksum);
 Run("no checksum means unverified, not blocked", TestReleaseAssetWithoutChecksum);
 
@@ -812,6 +814,72 @@ void TestCatalogRuntimeMetadata()
 
 // The catalog CubeShelf actually ships is data, and a typo in it is invisible until a user
 // hits it. Check the invariants each entry has to satisfy for its runtime to install at all.
+// The cleanup deletes files from the directory the application runs out of, so the thing
+// worth proving is not that it deletes -- it is that it stops. A pattern one character too
+// wide here removes part of the install.
+void TestDisplacedUpdaterCleanup()
+{
+    if (!OperatingSystem.IsWindows()) return;
+
+    var dir = AppContext.BaseDirectory;
+    var doomed = new[] { "CubeShelf.Updater.exe.old", "CubeShelf.exe.a1b2c3d4.old" };
+    var spared = new[] { "CubeShelf.Core.dll", "CubeShelf.Updater.exe", "notes.old", "CubeShelf.runtimeconfig.json" };
+    var created = new List<string>();
+
+    try
+    {
+        foreach (var name in doomed.Concat(spared))
+        {
+            var path = Path.Combine(dir, name);
+            if (File.Exists(path)) continue;
+            File.WriteAllText(path, "x");
+            created.Add(path);
+        }
+
+        LauncherUpdateService.RemoveDisplacedUpdaterImages();
+
+        foreach (var name in doomed) Assert(!File.Exists(Path.Combine(dir, name)));
+        foreach (var name in spared) Assert(File.Exists(Path.Combine(dir, name)));
+    }
+    finally
+    {
+        foreach (var path in created)
+            try { if (File.Exists(path)) File.Delete(path); } catch { }
+    }
+}
+
+// The whole self-update strategy rests on one Windows behaviour: a running executable
+// cannot be overwritten, but it can be renamed. If that ever stopped being true the
+// updater would be silently wrong again, so it is asserted rather than assumed -- against
+// this test's own image, which is the only running one it has.
+void TestRunningImageCanOnlyBeRenamed()
+{
+    if (!OperatingSystem.IsWindows()) return;
+
+    var self = Environment.ProcessPath;
+    if (string.IsNullOrEmpty(self) || !File.Exists(self)) return;
+
+    var source = Path.Combine(Path.GetTempPath(), "cubeshelf-image-" + Guid.NewGuid().ToString("N"));
+    File.WriteAllText(source, "replacement");
+    var displaced = self + ".renametest";
+
+    try
+    {
+        AssertThrows<IOException>(() => File.Copy(source, self, true));
+
+        File.Move(self, displaced);
+        Assert(!File.Exists(self));
+        Assert(File.Exists(displaced));
+    }
+    finally
+    {
+        // Put the image back under its own name whatever happened above; a test must not
+        // leave the binary it runs from renamed.
+        try { if (File.Exists(displaced) && !File.Exists(self)) File.Move(displaced, self); } catch { }
+        try { if (File.Exists(source)) File.Delete(source); } catch { }
+    }
+}
+
 void TestShippedCatalogIsCoherent()
 {
     var catalog = FindRepositoryFile(Path.Combine("src", "CubeShelf.Launcher", "games.json"));

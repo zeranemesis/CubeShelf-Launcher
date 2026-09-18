@@ -46,6 +46,10 @@ public sealed partial class MainWindow : Window
         var migration = new LegacyDataMigrator(paths, AppContext.BaseDirectory).Run();
         _preferencesStore = new UserPreferencesStore(paths);
         _launcherUpdates = new LauncherUpdateService(paths);
+
+        // If we are the first run after an update, the updater left its old image beside
+        // us; it could not delete what it was running from. We can.
+        LauncherUpdateService.RemoveDisplacedUpdaterImages();
         _preferences = _preferencesStore.Load();
         ApplyPreferences();
         _profileStore = new GameProfileStore(paths.ConfigurationDirectory);

@@ -215,6 +215,10 @@ internal sealed class UpdaterWindow : Window
             SetStatus("Préparation des fichiers…");
             SetProgress(0.08);
 
+            // The previous update left its own displaced image behind -- it could not
+            // delete it while running from it. Nothing maps it now, so it goes here.
+            RemoveDisplacedImages();
+
             if (!File.Exists(_zip))
             {
                 throw new FileNotFoundException(
@@ -280,6 +284,10 @@ internal sealed class UpdaterWindow : Window
 
                 Directory.CreateDirectory(
                     Path.GetDirectoryName(dst)!);
+
+                // The updater ships inside its own update. Its running image cannot be
+                // overwritten, so move it aside and write the new build in its place.
+                DisplaceIfRunningImage(dst);
 
                 File.Copy(
                     file,
@@ -455,12 +463,95 @@ internal sealed class UpdaterWindow : Window
         foreach (var entry in Directory.EnumerateFileSystemEntries(_installDir).ToList())
         {
             if (Directory.Exists(entry))
+            {
                 Directory.Delete(entry, true);
-            else
-                File.Delete(entry);
+            }
+            else if (!DisplaceIfRunningImage(entry))
+            {
+                // Anything else that resists deletion must not abort the restore: leaving
+                // one stale file behind is recoverable, stopping half way through is not.
+                // The copy below overwrites whatever survived.
+                try { File.Delete(entry); } catch { }
+            }
         }
 
         await CopyDirectoryAsync(_backupDirectory, _installDir);
+    }
+
+    // Windows refuses to overwrite or delete the image of a running process, and the
+    // updater is itself part of what it installs. That is what broke an update in the
+    // field on 2026-09-18: the install loop reached CubeShelf.Updater.exe, Windows said
+    // "being used by another process", and the rollback -- which empties the install
+    // directory before restoring -- died on the same file after it had already deleted
+    // CubeShelf.exe. The user was left with no application at all, which is worse than
+    // the failure it was trying to undo.
+    //
+    // Windows does allow *renaming* a running image. Moving the live file aside frees its
+    // name, the new build is written there, and the displaced copy is deleted by the next
+    // run, when nothing maps it any more. This is the only way a program can replace its
+    // own executable, and it is why the two helpers below exist.
+    private const string DisplacedSuffix = ".old";
+
+    private static readonly string SelfImagePath =
+        string.IsNullOrEmpty(Environment.ProcessPath)
+            ? ""
+            : Path.GetFullPath(Environment.ProcessPath);
+
+    private static bool IsRunningImage(string path)
+    {
+        if (SelfImagePath.Length == 0)
+            return false;
+
+        try
+        {
+            return string.Equals(
+                Path.GetFullPath(path),
+                SelfImagePath,
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Frees a path that cannot be written because it is this process's own image.
+    // Returns true when the caller may now treat the path as absent.
+    private static bool DisplaceIfRunningImage(string path)
+    {
+        if (!IsRunningImage(path) || !File.Exists(path))
+            return false;
+
+        var displaced = path + DisplacedSuffix;
+
+        // A leftover from a previous update is not locked any more, so it can go. If it
+        // somehow still is, a unique name keeps this update moving rather than failing.
+        try
+        {
+            if (File.Exists(displaced))
+                File.Delete(displaced);
+        }
+        catch
+        {
+            displaced = path + "." + Guid.NewGuid().ToString("N")[..8] + DisplacedSuffix;
+        }
+
+        File.Move(path, displaced);
+        return true;
+    }
+
+    // Removes images displaced by an earlier run. It is deliberately narrow -- only
+    // CubeShelf's own executables, only the exact suffix this file writes -- so it can
+    // never reach a file that belongs to the application.
+    private void RemoveDisplacedImages()
+    {
+        if (!Directory.Exists(_installDir))
+            return;
+
+        foreach (var stale in Directory.EnumerateFiles(_installDir, "CubeShelf*.exe*" + DisplacedSuffix))
+        {
+            try { File.Delete(stale); } catch { }
+        }
     }
 
     private static async Task CopyDirectoryAsync(string source, string destination)
