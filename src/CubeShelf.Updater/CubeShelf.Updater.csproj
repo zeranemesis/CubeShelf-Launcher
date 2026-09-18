@@ -11,6 +11,5 @@
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <AssemblyName>CubeShelf.Updater</AssemblyName>
-    <Version>0.7.0</Version>
   </PropertyGroup>
 </Project>

@@ -10,7 +10,6 @@
     <SelfContained>true</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <AssemblyName>CubeShelf</AssemblyName>
-    <Version>0.7.0</Version>
       <ApplicationIcon>Assets\Brand\gamecube_logo.ico</ApplicationIcon>
   </PropertyGroup>
 
