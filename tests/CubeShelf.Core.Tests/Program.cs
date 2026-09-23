@@ -49,6 +49,9 @@ Run("sealed presence rejects tampering", TestSealedPresenceRejectsTampering);
 Run("sealed presence hides the friend count", TestSealedPresenceHidesFriendCount);
 Run("friend store rejects self and replays", TestFriendStoreRejectsSelfAndReplays);
 Run("presence goes stale rather than lying", TestPresenceFreshness);
+Run("reading mod state leaves the game alone", TestReadingModStateLeavesTheGameAlone);
+Run("mod state survives hostile input", TestModStateSurvivesHostileInput);
+Run("the active list is written atomically", TestActiveListIsWrittenAtomically);
 
 if (failures.Count == 0)
 {
@@ -1024,6 +1027,115 @@ string CurrentArchitecture() =>
 
 string CurrentRid() =>
     (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
+
+// ---------------------------------------------------------------------------
+// Reading mod state must never disturb it: PortableModManager's constructor rewrites
+// active-mods.txt, which is the file a running game reads.
+// ---------------------------------------------------------------------------
+
+void TestReadingModStateLeavesTheGameAlone()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "GRSEAF");
+        Directory.CreateDirectory(modDirectory);
+
+        var content = Path.Combine(modDirectory, "packs", "42");
+        Directory.CreateDirectory(content);
+        File.WriteAllText(Path.Combine(modDirectory, "installed.json"), System.Text.Json.JsonSerializer.Serialize(new[]
+        {
+            new PortableInstalledMod(42, "Board pack", 0, true, 10, content, ""),
+            new PortableInstalledMod(43, "Muted by the player", 0, true, 5, content, ""),
+            new PortableInstalledMod(44, "Switched off in the launcher", 0, false, 1, content, "")
+        }));
+        File.WriteAllText(Path.Combine(modDirectory, "player-disabled.json"), "[43]");
+
+        // Stand in for what a running game is reading, and prove we do not touch it.
+        var activeList = Path.Combine(modDirectory, "active-mods.txt");
+        File.WriteAllText(activeList, "whatever the game is currently using\n");
+        var before = File.ReadAllBytes(activeList);
+        var writtenAt = File.GetLastWriteTimeUtc(activeList);
+
+        var effective = PortableModState.ReadEffective(paths, "GRSEAF");
+
+        Assert(effective.Count == 3);
+        Assert(effective[0].Id == 42 && effective[0].Enabled);
+        Assert(effective[1].Id == 43 && !effective[1].Enabled);   // the player switched it off in game
+        Assert(effective[2].Id == 44 && !effective[2].Enabled);   // switched off in the launcher
+
+        Assert(File.ReadAllBytes(activeList).SequenceEqual(before));
+        Assert(File.GetLastWriteTimeUtc(activeList) == writtenAt);
+
+        // Reading a game that has never had a mod must not bring its directory into existence.
+        var untouched = Path.Combine(paths.DataDirectory, "Mods", "GMPE01_00");
+        Assert(PortableModState.ReadEffective(paths, "GMPE01_00").Count == 0);
+        Assert(!Directory.Exists(untouched));
+    });
+}
+
+void TestModStateSurvivesHostileInput()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+
+        // A catalog walk must not die on one entry, and must not be steered out of Mods/.
+        foreach (var hostile in new[] { "..", "../escape", "a/b", "a\\b", "with space", "", "   " })
+        {
+            Assert(!PortableModState.IsValidGameId(hostile));
+            Assert(PortableModState.ReadEffective(paths, hostile).Count == 0);
+            Assert(PortableModState.ReadInstalled(paths, hostile).Count == 0);
+            Assert(PortableModState.ReadPlayerDisabled(paths, hostile).Count == 0);
+        }
+        Assert(PortableModState.IsValidGameId("GMPE01_00") && PortableModState.IsValidGameId("CUSTOM-1a2b"));
+
+        var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "BROKEN");
+        Directory.CreateDirectory(modDirectory);
+        var installed = Path.Combine(modDirectory, "installed.json");
+
+        File.WriteAllText(installed, "[{\"Id\": 1, \"Name\": \"trunc");
+        Assert(PortableModState.ReadEffective(paths, "BROKEN").Count == 0);
+
+        File.WriteAllBytes(installed, new byte[] { 0xFF, 0x00, 0x13, 0x37 });
+        Assert(PortableModState.ReadEffective(paths, "BROKEN").Count == 0);
+
+        // The launcher writes these from the UI thread while this reader runs in the background,
+        // so a sharing violation has to read as "no mods", not as an exception escaping a loop.
+        File.WriteAllText(installed, "[]");
+        using (File.Open(installed, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            Assert(PortableModState.ReadEffective(paths, "BROKEN").Count == 0);
+    });
+}
+
+void TestActiveListIsWrittenAtomically()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GRSEAF");
+        var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "GRSEAF");
+
+        var content = Path.Combine(modDirectory, "packs", "7");
+        Directory.CreateDirectory(content);
+        File.WriteAllText(Path.Combine(modDirectory, "installed.json"), System.Text.Json.JsonSerializer.Serialize(new[]
+        {
+            new PortableInstalledMod(7, "Pack", 0, true, 1, content, "")
+        }));
+        manager.SetEnabled(7, true);
+
+        var activeList = Path.Combine(modDirectory, "active-mods.txt");
+        Assert(File.Exists(activeList));
+
+        // The format the game parses has not changed: one path per line, last line terminated.
+        var text = File.ReadAllText(activeList);
+        Assert(text.EndsWith(Environment.NewLine, StringComparison.Ordinal));
+        Assert(File.ReadAllLines(activeList).Length == 1);
+
+        // No temporary file is left behind for a sync client or the game to trip over.
+        Assert(Directory.GetFiles(modDirectory, "*.tmp").Length == 0);
+    });
+}
 
 // ---------------------------------------------------------------------------
 // Decentralised friends: identity, friend codes, and the sealed presence document.

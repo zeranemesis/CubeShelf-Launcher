@@ -44,12 +44,8 @@ public sealed class PortableModManager
     /// file; the launcher only reads it, so the two never disagree about what is
     /// loaded. A mod runs when it is enabled here and not in there.
     /// </summary>
-    public IReadOnlyCollection<int> GetPlayerDisabled()
-    {
-        if (!File.Exists(_playerDisabled)) return Array.Empty<int>();
-        try { return JsonSerializer.Deserialize<HashSet<int>>(File.ReadAllText(_playerDisabled)) ?? new HashSet<int>(); }
-        catch (JsonException) { return Array.Empty<int>(); }
-    }
+    public IReadOnlyCollection<int> GetPlayerDisabled() =>
+        PortableModState.ReadPlayerDisabledFrom(_root);
 
     /// <summary>
     /// Clears the in-game switch for one mod, so enabling it in the launcher
@@ -73,12 +69,8 @@ public sealed class PortableModManager
         return _active;
     }
 
-    public IReadOnlyList<PortableInstalledMod> GetInstalled()
-    {
-        if (!File.Exists(_state)) return Array.Empty<PortableInstalledMod>();
-        try { return JsonSerializer.Deserialize<List<PortableInstalledMod>>(File.ReadAllText(_state)) ?? new(); }
-        catch (JsonException) { return Array.Empty<PortableInstalledMod>(); }
-    }
+    public IReadOnlyList<PortableInstalledMod> GetInstalled() =>
+        PortableModState.ReadInstalledFrom(_root);
 
     public async Task<PortableInstalledMod> InstallAsync(GameBananaMod mod, GameBananaClient client,
         IProgress<double>? progress = null, CancellationToken cancellationToken = default)
@@ -381,10 +373,26 @@ public sealed class PortableModManager
             .Select(item => item with { ContentRoot = Path.GetFullPath(item.ContentRoot) })
             .ToArray();
 
-        File.WriteAllLines(_active, active.Select(item => item.ContentRoot));
-        File.WriteAllText(_activeDetails, JsonSerializer.Serialize(
+        // Written through a temporary file in the same directory, then renamed. The game reads
+        // these while it runs, and the launcher now also reads them from a background thread to
+        // compose presence, so a half-written file is no longer a theoretical race.
+        // Every line terminated, including the last: that is what WriteAllLines produced here
+        // before, and the game parses this file.
+        AtomicWrite(_active, string.Concat(active.Select(item => item.ContentRoot + Environment.NewLine)));
+        AtomicWrite(_activeDetails, JsonSerializer.Serialize(
             active.Select(item => new PortableActiveMod(item.Id, item.Name, item.Priority, item.ContentRoot)),
             new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    /// <summary>
+    /// The temporary file must sit beside its target: across volumes File.Move degrades to a
+    /// copy, which is exactly the non-atomic write being avoided.
+    /// </summary>
+    private static void AtomicWrite(string path, string contents)
+    {
+        var temporary = path + ".tmp";
+        File.WriteAllText(temporary, contents);
+        File.Move(temporary, path, true);
     }
 
     private static readonly HashSet<string> DiscRootEntries =
