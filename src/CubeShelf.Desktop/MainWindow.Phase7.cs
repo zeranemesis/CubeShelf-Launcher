@@ -141,7 +141,9 @@ public sealed partial class MainWindow
         {
             if (GameView.IsVisible)
                 ParityShowLibrary(this, new RoutedEventArgs());
-            else if (ModsView.IsVisible || DownloadsView.IsVisible || SettingsView.IsVisible)
+            // Any page that is not the library or a game goes back the same way, so a page added
+            // later is covered without being named here.
+            else if (!LibraryView.IsVisible)
             {
                 if (_selectedGame is not null)
                     ParityBackToGame(this, new RoutedEventArgs());

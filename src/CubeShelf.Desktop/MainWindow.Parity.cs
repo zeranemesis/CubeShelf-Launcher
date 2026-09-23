@@ -87,19 +87,16 @@ public sealed partial class MainWindow
             return;
         }
         ShowMods(sender, args);
-        GameView.IsVisible = false;
     }
 
     private void ParityShowDownloads(object? sender, RoutedEventArgs args)
     {
         ShowDownloads(sender, args);
-        GameView.IsVisible = false;
     }
 
     private void ParityShowSettings(object? sender, RoutedEventArgs args)
     {
         ShowSettings(sender, args);
-        GameView.IsVisible = false;
         RefreshStorageParity();
     }
 
@@ -114,13 +111,38 @@ public sealed partial class MainWindow
         RefreshParityGameDetails();
     }
 
+    private IReadOnlyList<Control>? _contentViews;
+
+    /// <summary>
+    /// The pages that take turns filling the window, read from the tree rather than listed here.
+    /// Listing them meant every new page had to be remembered in several places at once, and
+    /// forgetting one left two pages drawn on top of each other. A page now joins simply by
+    /// carrying Classes="view" in the markup.
+    ///
+    /// The overlays -- the toast host, the connectivity banner, the theme fade -- deliberately
+    /// carry no such class, so they are never hidden by a page change.
+    /// </summary>
+    private IReadOnlyList<Control> ContentViews => _contentViews ??=
+        ViewHost.Children.OfType<Control>().Where(child => child.Classes.Contains("view")).ToArray();
+
     private void ShowParityView(Control view)
     {
-        LibraryView.IsVisible = ReferenceEquals(view, LibraryView);
-        GameView.IsVisible = ReferenceEquals(view, GameView);
-        ModsView.IsVisible = ReferenceEquals(view, ModsView);
-        DownloadsView.IsVisible = ReferenceEquals(view, DownloadsView);
-        SettingsView.IsVisible = ReferenceEquals(view, SettingsView);
+        foreach (var candidate in ContentViews)
+            candidate.IsVisible = ReferenceEquals(candidate, view);
+    }
+
+    /// <summary>
+    /// The marker class is a string, so a typo would silently produce a page that never hides.
+    /// Cheap to check once at startup, and only worth the developer's time.
+    /// </summary>
+    [System.Diagnostics.Conditional("DEBUG")]
+    private void VerifyContentViewsAreTagged()
+    {
+        foreach (var child in ViewHost.Children.OfType<Control>())
+            if (child.Name?.EndsWith("View", StringComparison.Ordinal) == true &&
+                !child.Classes.Contains("view"))
+                throw new InvalidOperationException(
+                    $"{child.Name} est une vue de contenu mais n’a pas Classes=\"view\".");
     }
 
     private void LibrarySearchChanged(object? sender, TextChangedEventArgs args) => RefreshLibraryParity();

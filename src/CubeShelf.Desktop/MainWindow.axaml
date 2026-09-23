@@ -51,9 +51,9 @@
       </DockPanel>
     </Border>
 
-    <Grid Grid.Column="1">
+    <Grid x:Name="ViewHost" Grid.Column="1">
       <!-- LIBRARY -->
-      <Grid x:Name="LibraryView" RowDefinitions="155,*">
+      <Grid x:Name="LibraryView" Classes="view" RowDefinitions="155,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
           <Grid Margin="34,24" ColumnDefinitions="*,Auto">
             <StackPanel VerticalAlignment="Center" Spacing="5">
@@ -120,7 +120,7 @@
       </Grid>
 
       <!-- GAME -->
-      <Grid x:Name="GameView" IsVisible="False" RowDefinitions="74,*">
+      <Grid x:Name="GameView" Classes="view" IsVisible="False" RowDefinitions="74,*">
         <Grid Margin="28,13,28,7" ColumnDefinitions="Auto,*,Auto">
           <Button Content="{DynamicResource BackLibrary}" Click="ParityShowLibrary" />
           <TextBlock x:Name="GameTitle" Grid.Column="1" Foreground="{DynamicResource Muted}" VerticalAlignment="Center" Margin="16,0" FontSize="13" />
@@ -230,7 +230,7 @@
       </Grid>
 
       <!-- MODS -->
-      <Grid x:Name="ModsView" IsVisible="False" RowDefinitions="120,*">
+      <Grid x:Name="ModsView" Classes="view" IsVisible="False" RowDefinitions="120,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
           <Grid Margin="34,22" ColumnDefinitions="*,Auto">
             <StackPanel Spacing="5"><TextBlock Text="{DynamicResource ModsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource AppMods}" FontSize="31" FontWeight="Bold" Foreground="{DynamicResource Text}" /></StackPanel>
@@ -268,7 +268,7 @@
       </Grid>
 
       <!-- DOWNLOADS -->
-      <Grid x:Name="DownloadsView" IsVisible="False" RowDefinitions="132,*">
+      <Grid x:Name="DownloadsView" Classes="view" IsVisible="False" RowDefinitions="132,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
           <Grid Margin="34,24" ColumnDefinitions="*,Auto"><StackPanel><TextBlock Text="{DynamicResource DownloadsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource DownloadsTitle}" Foreground="{DynamicResource Text}" FontSize="32" FontWeight="Bold" Margin="0,5,0,0" /><TextBlock Text="{DynamicResource DownloadsSubtitle}" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{DynamicResource ClearFinished}" Click="ClearPortableDownloads" /></StackPanel></Grid>
         </Border>
@@ -307,7 +307,7 @@
       </Grid>
 
       <!-- SETTINGS -->
-      <ScrollViewer x:Name="SettingsView" IsVisible="False">
+      <ScrollViewer x:Name="SettingsView" Classes="view" IsVisible="False">
         <StackPanel Margin="34,26,34,34" Spacing="14">
           <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="24" Margin="0,0,0,4">
             <StackPanel Spacing="5"><TextBlock Text="{DynamicResource SettingsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource SettingsTitle}" FontSize="32" FontWeight="Bold" /><TextBlock Text="{DynamicResource SettingsSubtitle}" Foreground="{DynamicResource Muted}" /></StackPanel>

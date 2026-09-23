@@ -371,22 +371,9 @@ public sealed partial class MainWindow : Window
                 ? Path.GetFullPath(path)
                 : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
 
-    private void ShowLibrary(object? sender, RoutedEventArgs args)
-    {
-        GameView.IsVisible = false;
-        LibraryView.IsVisible = true;
-        ModsView.IsVisible = false;
-        DownloadsView.IsVisible = false;
-        SettingsView.IsVisible = false;
-    }
-
     private void ShowMods(object? sender, RoutedEventArgs args)
     {
-        GameView.IsVisible = false;
-        LibraryView.IsVisible = false;
-        ModsView.IsVisible = true;
-        DownloadsView.IsVisible = false;
-        SettingsView.IsVisible = false;
+        ShowParityView(ModsView);
         RefreshModItems();
         if (_preferences.RefreshModsOnOpen && _remoteMods.Count == 0) RefreshMods(sender, args);
     }
@@ -513,11 +500,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowDownloads(object? sender, RoutedEventArgs args)
     {
-        GameView.IsVisible = false;
-        LibraryView.IsVisible = false;
-        ModsView.IsVisible = false;
-        DownloadsView.IsVisible = true;
-        SettingsView.IsVisible = false;
+        ShowParityView(DownloadsView);
         RefreshDownloadItems();
     }
 
@@ -651,9 +634,7 @@ public sealed partial class MainWindow : Window
 
     private void ShowSettings(object? sender, RoutedEventArgs args)
     {
-        GameView.IsVisible = false;
-        LibraryView.IsVisible = ModsView.IsVisible = DownloadsView.IsVisible = false;
-        SettingsView.IsVisible = true;
+        ShowParityView(SettingsView);
     }
 
     private void OpenDataDirectory(object? sender, RoutedEventArgs args)

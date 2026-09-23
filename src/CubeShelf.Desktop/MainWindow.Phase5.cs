@@ -27,7 +27,8 @@ public sealed partial class MainWindow
         PositionChanged += Phase5PositionChanged;
         ActualThemeVariantChanged += (_, _) => ApplyNativeTitleBarPhase5();
 
-        foreach (var view in new Control[] { LibraryView, GameView, ModsView, DownloadsView, SettingsView })
+        VerifyContentViewsAreTagged();
+        foreach (var view in ContentViews)
             view.PropertyChanged += (_, e) =>
             {
                 if (e.Property == Visual.IsVisibleProperty && view.IsVisible)
