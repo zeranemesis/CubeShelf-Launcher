@@ -6,6 +6,7 @@ using CubeShelf.Core.Security;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Mods;
 using CubeShelf.Core.Downloads;
+using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
@@ -41,6 +42,13 @@ Run("displaced updater images are reclaimed, nothing else", TestDisplacedUpdater
 Run("a running image resists overwrite but not rename", TestRunningImageCanOnlyBeRenamed);
 Run("release checksum file verifies the install", TestReleaseAssetChecksum);
 Run("no checksum means unverified, not blocked", TestReleaseAssetWithoutChecksum);
+Run("identity persists and both peers agree", TestIdentityPersistsAndAgrees);
+Run("friend code survives paste, not corruption", TestFriendCodeRoundTrip);
+Run("sealed presence reaches only friends", TestSealedPresenceReachesOnlyFriends);
+Run("sealed presence rejects tampering", TestSealedPresenceRejectsTampering);
+Run("sealed presence hides the friend count", TestSealedPresenceHidesFriendCount);
+Run("friend store rejects self and replays", TestFriendStoreRejectsSelfAndReplays);
+Run("presence goes stale rather than lying", TestPresenceFreshness);
 
 if (failures.Count == 0)
 {
@@ -1016,6 +1024,206 @@ string CurrentArchitecture() =>
 
 string CurrentRid() =>
     (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
+
+// ---------------------------------------------------------------------------
+// Decentralised friends: identity, friend codes, and the sealed presence document.
+// ---------------------------------------------------------------------------
+
+void TestIdentityPersistsAndAgrees()
+{
+    WithTempRoot(root =>
+    {
+        var path = Path.Combine(root, "identity.key");
+        byte[] publicKey;
+        using (var created = PeerIdentity.LoadOrCreate(path))
+        {
+            publicKey = created.PublicKey;
+            Assert(publicKey.Length == PeerIdentity.PublicKeyLength && publicKey[0] == 0x04);
+        }
+
+        // The identity has to survive a restart: it is what friends added.
+        using var reloaded = PeerIdentity.LoadOrCreate(path);
+        Assert(reloaded.PublicKey.SequenceEqual(publicKey));
+
+        // Both peers reach the same pairwise key from opposite directions, which is the whole
+        // basis for the scheme -- no exchange, no server.
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var mallory = PeerIdentity.Create();
+
+        var aliceView = alice.DeriveSharedKey(bob.PublicKey);
+        var bobView = bob.DeriveSharedKey(alice.PublicKey);
+        Assert(aliceView.SequenceEqual(bobView));
+        Assert(!alice.DeriveSharedKey(mallory.PublicKey).SequenceEqual(aliceView));
+    });
+}
+
+void TestFriendCodeRoundTrip()
+{
+    using var identity = PeerIdentity.Create();
+    const string url = "https://gist.githubusercontent.com/someone/abc123/raw/presence.json";
+    var code = FriendCode.Encode(identity.PublicKey, url);
+
+    Assert(FriendCode.TryDecode(code, out var payload, out _));
+    Assert(payload!.PublicKey.SequenceEqual(identity.PublicKey));
+    Assert(payload.PresenceUrl == url);
+
+    // Codes travel through chat windows, which add line breaks.
+    Assert(FriendCode.TryDecode("  " + code[..20] + "\n" + code[20..] + " ", out _, out _));
+
+    // A single altered character must not silently yield a different key: that is what the
+    // checksum is for.
+    var swapped = code[^1] == 'A' ? 'B' : 'A';
+    var corrupted = code[..^1] + swapped;
+    Assert(!FriendCode.TryDecode(corrupted, out _, out var corruptError));
+    Assert(corruptError.Length > 0);
+
+    Assert(!FriendCode.TryDecode(code[..^6], out _, out _));
+    Assert(!FriendCode.TryDecode("hello", out _, out _));
+
+    // The URL is pasted from elsewhere, so a plaintext scheme is someone else choosing a
+    // downgrade on the user behalf. Refuse it at the door.
+    AssertThrows<ArgumentException>(() =>
+        FriendCode.Encode(identity.PublicKey, "http://example.test/presence.json"));
+}
+
+void TestSealedPresenceReachesOnlyFriends()
+{
+    using var author = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    using var other = PeerIdentity.Create();
+    using var stranger = PeerIdentity.Create();
+
+    var snapshot = SampleSnapshot(7);
+    var envelope = SealedPresence.Seal(author, snapshot,
+        new[] { friend.PublicKey, other.PublicKey });
+
+    Assert(SealedPresence.TryOpen(friend, author.PublicKey, envelope, out var opened));
+    Assert(opened!.DisplayName == snapshot.DisplayName);
+    Assert(opened.Sequence == 7);
+    Assert(opened.CurrentGameId == "GRSEAF");
+    Assert(opened.Library.Count == 1 && opened.Library[0].Title == "Soulcalibur II");
+    Assert(opened.Mods.Count == 1 && opened.Mods[0].Enabled);
+
+    // Addressed to someone else: no box opens.
+    Assert(!SealedPresence.TryOpen(stranger, author.PublicKey, envelope, out _));
+
+    // Right reader, wrong claimed author: the pairwise key differs, so nothing opens. This is
+    // what stands in for a signature.
+    Assert(!SealedPresence.TryOpen(friend, stranger.PublicKey, envelope, out _));
+
+    // The document survives the trip through its published form.
+    var reparsed = SealedPresence.FromJson(SealedPresence.ToJson(envelope));
+    Assert(SealedPresence.TryOpen(other, author.PublicKey, reparsed, out var alsoOpened));
+    Assert(alsoOpened!.Sequence == 7);
+}
+
+void TestSealedPresenceRejectsTampering()
+{
+    using var author = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var envelope = SealedPresence.Seal(author, SampleSnapshot(1), new[] { friend.PublicKey });
+
+    var payload = Convert.FromBase64String(envelope.Payload);
+    payload[0] ^= 0xFF;
+    var tampered = SealedPresence.FromJson(SealedPresence.ToJson(envelope))!;
+    tampered.Payload = Convert.ToBase64String(payload);
+    Assert(!SealedPresence.TryOpen(friend, author.PublicKey, tampered, out _));
+
+    var reTagged = SealedPresence.FromJson(SealedPresence.ToJson(envelope))!;
+    reTagged.Tag = Convert.ToBase64String(new byte[16]);
+    Assert(!SealedPresence.TryOpen(friend, author.PublicKey, reTagged, out _));
+
+    Assert(!SealedPresence.TryOpen(friend, author.PublicKey, null, out _));
+}
+
+void TestSealedPresenceHidesFriendCount()
+{
+    using var author = PeerIdentity.Create();
+
+    // One friend and seven friends have to look the same from outside, or the file leaks the
+    // size of the circle on every publish.
+    var one = SealedPresence.Seal(author, SampleSnapshot(1),
+        new[] { PeerIdentity.Create().PublicKey });
+    var several = SealedPresence.Seal(author, SampleSnapshot(1),
+        Enumerable.Range(0, 7).Select(_ => PeerIdentity.Create().PublicKey).ToArray());
+
+    Assert(one.Boxes.Count == 8 && several.Boxes.Count == 8);
+    Assert(SealedPresence.Seal(author, SampleSnapshot(1),
+        Enumerable.Range(0, 9).Select(_ => PeerIdentity.Create().PublicKey).ToArray()).Boxes.Count == 16);
+
+    // Nobody is addressed at all, and the document still looks ordinary.
+    Assert(SealedPresence.Seal(author, SampleSnapshot(1), Array.Empty<byte[]>()).Boxes.Count == 8);
+}
+
+void TestFriendStoreRejectsSelfAndReplays()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var store = new FriendStore(root);
+        const string url = "https://example.test/presence.json";
+
+        Assert(!store.TryAdd(new FriendCodePayload(me.PublicKey, url), "moi", me.PublicKey, out var selfError));
+        Assert(selfError.Length > 0);
+
+        var payload = new FriendCodePayload(friend.PublicKey, url);
+        Assert(store.TryAdd(payload, "Zera", me.PublicKey, out _));
+        Assert(!store.TryAdd(payload, "Zera encore", me.PublicKey, out _));
+        Assert(store.Load().Count == 1);
+
+        var key = Convert.ToBase64String(friend.PublicKey);
+        var now = DateTimeOffset.UtcNow;
+        Assert(store.TryAcceptSequence(key, 5, now));
+
+        // A replayed document carries a sequence already seen, and must not move the state back.
+        Assert(!store.TryAcceptSequence(key, 5, now));
+        Assert(!store.TryAcceptSequence(key, 4, now));
+        Assert(store.TryAcceptSequence(key, 6, now));
+        Assert(store.Load()[0].LastSequence == 6);
+
+        // Pausing takes a friend out of the next document without forgetting them.
+        Assert(store.ActiveRecipients().Count == 1);
+        Assert(store.Update(key, entry => entry.Paused = true));
+        Assert(store.ActiveRecipients().Count == 0);
+        Assert(store.Load().Count == 1);
+
+        Assert(store.Remove(key));
+        Assert(store.Load().Count == 0);
+    });
+}
+
+void TestPresenceFreshness()
+{
+    var now = DateTimeOffset.UtcNow;
+    var window = TimeSpan.FromMinutes(15);
+
+    var fresh = SampleSnapshot(1) with { PublishedAt = now };
+    Assert(fresh.IsFresh(window, now));
+    Assert(fresh.EffectiveStatus(window, now) == PresenceStatus.InGame);
+
+    // Publishing is periodic, so a peer that stopped publishing reads as offline rather than
+    // staying frozen in whatever game it was last seen playing.
+    var stale = SampleSnapshot(1) with { PublishedAt = now - TimeSpan.FromHours(2) };
+    Assert(!stale.IsFresh(window, now));
+    Assert(stale.EffectiveStatus(window, now) == PresenceStatus.Offline);
+
+    // A clock far in the future is not evidence of presence either.
+    var future = SampleSnapshot(1) with { PublishedAt = now + TimeSpan.FromDays(1) };
+    Assert(future.EffectiveStatus(window, now) == PresenceStatus.Offline);
+}
+
+PresenceSnapshot SampleSnapshot(long sequence) => new(
+    PresenceSnapshot.CurrentVersion,
+    "Zera",
+    DateTimeOffset.UtcNow,
+    sequence,
+    PresenceStatus.InGame,
+    "GRSEAF",
+    "Soulcalibur II",
+    new[] { new SharedGame("GRSEAF", "Soulcalibur II", 12, 3600, true, DateTimeOffset.UtcNow) },
+    new[] { new SharedMod("GMPE01_00", "4242", "Board pack", true) });
 
 string WriteDiscHeader(string root, string name, string discId, byte revision)
 {
