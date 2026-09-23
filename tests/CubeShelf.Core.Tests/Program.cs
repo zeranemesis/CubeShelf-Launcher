@@ -1073,8 +1073,15 @@ void TestFriendCodeRoundTrip()
 
     // A single altered character must not silently yield a different key: that is what the
     // checksum is for.
-    var swapped = code[^1] == 'A' ? 'B' : 'A';
-    var corrupted = code[..^1] + swapped;
+    //
+    // Corrupt a character in the middle, never the last one. The blob is not a multiple of three
+    // bytes, so the final base64 character carries only two significant bits and the other four
+    // are padding -- editing it can decode to the very same bytes, which is a property of base64
+    // rather than a hole in the checksum. An earlier version of this test flipped the last
+    // character and failed one run in four.
+    var index = code.Length / 2;
+    var replacement = code[index] == 'A' ? 'B' : 'A';
+    var corrupted = code[..index] + replacement + code[(index + 1)..];
     Assert(!FriendCode.TryDecode(corrupted, out _, out var corruptError));
     Assert(corruptError.Length > 0);
 
