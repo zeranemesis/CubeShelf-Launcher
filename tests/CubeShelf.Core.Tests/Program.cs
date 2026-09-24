@@ -60,6 +60,10 @@ Run("the composer is deterministic", TestComposerIsDeterministic);
 Run("publishing into a synced folder", TestSyncedFolderPublisher);
 Run("the publisher refuses what cannot work", TestSyncedFolderPublisherRefusesWhatCannotWork);
 Run("documents are addressed to their author too", TestDocumentsAreAddressedToTheirAuthorToo);
+Run("an unchanged document costs a 304", TestFetcherReadsAndThenSpendsA304);
+Run("replays are rejected but their ETag is kept", TestFetcherRejectsReplaysButKeepsTheETag);
+Run("one broken friend does not stop the others", TestOneBrokenFriendDoesNotStopTheOthers);
+Run("oversized and unsafe addresses are refused", TestFetcherRefusesOversizedAndUnsafeAddresses);
 
 if (failures.Count == 0)
 {
@@ -1038,6 +1042,175 @@ string CurrentRid() =>
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// Reading friends' documents. Every address came from a pasted code, so it is
+// attacker-chosen text and nothing about the response is taken on trust.
+// ---------------------------------------------------------------------------
+
+void TestFetcherReadsAndThenSpendsA304()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var author = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        const string url = "https://cloud.example.test/p.json";
+        Assert(friends.TryAdd(new FriendCodePayload(author.PublicKey, url), "Zera", me.PublicKey, out _));
+
+        var snapshot = new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Zera",
+            DateTimeOffset.UtcNow, 42, PresenceStatus.InGame, "GRSEAF", "Soulcalibur II",
+            Array.Empty<SharedGame>(), Array.Empty<SharedMod>());
+        var document = SealedPresence.ToJson(
+            SealedPresence.Seal(author, snapshot, new[] { me.PublicKey }));
+
+        var handler = new PresenceHttpHandler(document, "\"rev-1\"");
+        using var client = new HttpClient(handler);
+        using var fetcher = new PresenceFetcher(me, friends, client);
+
+        var first = fetcher.PollAsync().GetAwaiter().GetResult();
+        Assert(first.Count == 1 && first[0].Status == PresenceFetchStatus.Updated);
+        Assert(first[0].Snapshot!.CurrentGameTitle == "Soulcalibur II");
+        Assert(handler.ConditionalRequests == 0);          // nothing cached yet
+        Assert(friends.Load()[0].LastETag == "\"rev-1\"");
+        Assert(friends.Load()[0].LastSequence == 42);
+
+        // The second poll must cost a 304, not an exception: EnsureSuccessStatusCode would treat
+        // the cheapest possible answer as a failure, which is the trap this guards.
+        handler.RespondNotModified = true;
+        var second = fetcher.PollAsync().GetAwaiter().GetResult();
+        Assert(second[0].Status == PresenceFetchStatus.NotModified);
+        Assert(handler.ConditionalRequests == 1);
+        Assert(friends.Load()[0].LastETag == "\"rev-1\"");
+
+        // A stored ETag that is not a valid header value is ignored, not fatal.
+        Assert(friends.Update(Convert.ToBase64String(author.PublicKey), entry => entry.LastETag = "not an etag"));
+        handler.RespondNotModified = false;
+        handler.Document = SealedPresence.ToJson(SealedPresence.Seal(author,
+            snapshot with { Sequence = 43 }, new[] { me.PublicKey }));
+        Assert(fetcher.PollAsync().GetAwaiter().GetResult()[0].Status == PresenceFetchStatus.Updated);
+    });
+}
+
+void TestFetcherRejectsReplaysButKeepsTheETag()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var author = PeerIdentity.Create();
+        using var stranger = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(author.PublicKey, "https://cloud.example.test/p.json"),
+            "Zera", me.PublicKey, out _));
+        var key = Convert.ToBase64String(author.PublicKey);
+
+        var snapshot = PresenceComposer.Offline("Zera", 10, DateTimeOffset.UtcNow);
+        var handler = new PresenceHttpHandler(
+            SealedPresence.ToJson(SealedPresence.Seal(author, snapshot, new[] { me.PublicKey })), "\"a\"");
+        using var client = new HttpClient(handler);
+        using var fetcher = new PresenceFetcher(me, friends, client);
+
+        Assert(fetcher.PollAsync().GetAwaiter().GetResult()[0].Status == PresenceFetchStatus.Updated);
+
+        // Serving a genuine but older document back is a replay, and the sequence refuses it.
+        handler.Document = SealedPresence.ToJson(
+            SealedPresence.Seal(author, snapshot with { Sequence = 9 }, new[] { me.PublicKey }));
+        handler.ETag = "\"b\"";
+        var replayed = fetcher.PollAsync().GetAwaiter().GetResult();
+        Assert(replayed[0].Status == PresenceFetchStatus.Rejected);
+
+        // The new ETag is stored anyway -- otherwise that document would be downloaded in full
+        // on every poll, forever.
+        Assert(friends.Load()[0].LastETag == "\"b\"");
+        Assert(friends.Load()[0].LastSequence == 10);
+
+        // A document no longer addressed to us reads as exactly that, which is the useful signal.
+        handler.Document = SealedPresence.ToJson(
+            SealedPresence.Seal(author, snapshot with { Sequence = 11 }, new[] { stranger.PublicKey }));
+        handler.ETag = "\"c\"";
+        var dropped = fetcher.PollAsync().GetAwaiter().GetResult();
+        Assert(dropped[0].Status == PresenceFetchStatus.Rejected && dropped[0].Error is { Length: > 0 });
+    });
+}
+
+void TestOneBrokenFriendDoesNotStopTheOthers()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var good = PeerIdentity.Create();
+        using var missing = PeerIdentity.Create();
+        using var broken = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+
+        Assert(friends.TryAdd(new FriendCodePayload(good.PublicKey, "https://ok.example.test/p.json"),
+            "Bon", me.PublicKey, out _));
+        Assert(friends.TryAdd(new FriendCodePayload(missing.PublicKey, "https://gone.example.test/p.json"),
+            "Absent", me.PublicKey, out _));
+        Assert(friends.TryAdd(new FriendCodePayload(broken.PublicKey, "https://down.example.test/p.json"),
+            "Panne", me.PublicKey, out _));
+
+        var document = SealedPresence.ToJson(SealedPresence.Seal(
+            good, PresenceComposer.Offline("Bon", 1, DateTimeOffset.UtcNow), new[] { me.PublicKey }));
+
+        using var client = new HttpClient(new PerHostHttpHandler(document));
+        using var fetcher = new PresenceFetcher(me, friends, client);
+        var outcomes = fetcher.PollAsync().GetAwaiter().GetResult();
+
+        Assert(outcomes.Count == 3);
+        Assert(outcomes.Count(o => o.Status == PresenceFetchStatus.Updated) == 1);
+        Assert(outcomes.Count(o => o.Status == PresenceFetchStatus.NotPublished) == 1);
+        Assert(outcomes.Count(o => o.Status == PresenceFetchStatus.Unreachable) == 1);
+
+        // A 404 is a friend who has not published, not a network problem: it must not raise the
+        // global connectivity banner.
+        Assert(outcomes.Single(o => o.Status == PresenceFetchStatus.NotPublished).IsConnectivityFailure == false);
+        Assert(outcomes.Single(o => o.Status == PresenceFetchStatus.Unreachable).IsConnectivityFailure);
+
+        // Failures back off and are skipped next time; the working friend keeps its cadence.
+        var failed = friends.Load().Where(f => f.ConsecutiveFailures > 0).ToArray();
+        Assert(failed.Length == 2 && failed.All(f => f.NextAttemptAt is not null));
+        var again = fetcher.PollAsync().GetAwaiter().GetResult();
+        Assert(again.Count(o => o.Status == PresenceFetchStatus.Skipped) == 2);
+    });
+}
+
+void TestFetcherRefusesOversizedAndUnsafeAddresses()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var author = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(author.PublicKey, "https://cloud.example.test/p.json"),
+            "Zera", me.PublicKey, out _));
+        var key = Convert.ToBase64String(author.PublicKey);
+
+        // Content-Length can be absent or simply untrue, so the body is counted as it arrives.
+        var enormous = new string('x', (int)PresencePolicy.MaximumDocumentBytes + 1024);
+        foreach (var lying in new[] { true, false })
+        {
+            var handler = new PresenceHttpHandler(enormous, "\"big\"") { SuppressContentLength = lying };
+            using var client = new HttpClient(handler);
+            using var fetcher = new PresenceFetcher(me, friends, client);
+            friends.Update(key, entry => { entry.ConsecutiveFailures = 0; entry.NextAttemptAt = null; });
+            Assert(fetcher.PollAsync().GetAwaiter().GetResult()[0].Status == PresenceFetchStatus.Unreachable);
+        }
+
+        // friends.json is a plain file a user can edit; a downgraded scheme is refused at read
+        // time and not only when the code was decoded.
+        friends.Update(key, entry =>
+        {
+            entry.PresenceUrl = "http://cloud.example.test/p.json";
+            entry.ConsecutiveFailures = 0;
+            entry.NextAttemptAt = null;
+        });
+        using var plain = new HttpClient(new PresenceHttpHandler("{}", "\"x\""));
+        using var strict = new PresenceFetcher(me, friends, plain);
+        var outcome = strict.PollAsync().GetAwaiter().GetResult()[0];
+        Assert(outcome.Status == PresenceFetchStatus.Unreachable && !outcome.IsConnectivityFailure);
+    });
+}
+
+// ---------------------------------------------------------------------------
 // Publishing into a folder something else synchronises: no account, no secret at rest.
 // ---------------------------------------------------------------------------
 
@@ -1789,5 +1962,56 @@ sealed class UpdateHttpHandler(byte[] manifest, byte[] package) : HttpMessageHan
     {
         var content = new ByteArrayContent(request.RequestUri!.AbsolutePath.EndsWith("manifest.json", StringComparison.Ordinal) ? manifest : package);
         return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = content, RequestMessage = request });
+    }
+}
+
+/// <summary>Serves one presence document, and counts how often it was asked conditionally.</summary>
+sealed class PresenceHttpHandler(string document, string etag) : HttpMessageHandler
+{
+    public string Document { get; set; } = document;
+    public string ETag { get; set; } = etag;
+    public bool RespondNotModified { get; set; }
+    public bool SuppressContentLength { get; set; }
+    public int ConditionalRequests { get; private set; }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (request.Headers.IfNoneMatch.Count > 0) ConditionalRequests++;
+
+        if (RespondNotModified)
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotModified)
+            {
+                RequestMessage = request
+            });
+
+        var content = new StringContent(Document);
+        if (SuppressContentLength) content.Headers.ContentLength = null;
+
+        var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = content,
+            RequestMessage = request
+        };
+        response.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue(ETag);
+        return Task.FromResult(response);
+    }
+}
+
+/// <summary>One host serves a document, one is gone, one is down.</summary>
+sealed class PerHostHttpHandler(string document) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var host = request.RequestUri!.Host;
+        if (host.StartsWith("gone", StringComparison.Ordinal))
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request });
+        if (host.StartsWith("down", StringComparison.Ordinal))
+            throw new HttpRequestException("connexion refusée");
+
+        return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(document),
+            RequestMessage = request
+        });
     }
 }

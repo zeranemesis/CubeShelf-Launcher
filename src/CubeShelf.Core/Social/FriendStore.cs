@@ -26,6 +26,17 @@ public sealed class Friend
 
     /// <summary>Cached ETag, so polling an unchanged document costs a 304 rather than a download.</summary>
     public string? LastETag { get; set; }
+
+    /// <summary>
+    /// How many polls in a row have failed, and when to try again.
+    ///
+    /// Persisted rather than kept in memory because the failure being defended against -- an
+    /// address that is simply gone -- is permanent, while a launcher restarts several times a
+    /// day. In-memory backoff would resume full-rate polling of a dead address every launch.
+    /// </summary>
+    public int ConsecutiveFailures { get; set; }
+
+    public DateTimeOffset? NextAttemptAt { get; set; }
 }
 
 /// <summary>
