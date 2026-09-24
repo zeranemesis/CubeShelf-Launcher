@@ -85,16 +85,34 @@ Le principe tient en une phrase : chacun publie un petit document chiffré à un
 
 ### Mise en route
 
-1. **Paramètres → Amis et présence.** Choisis un nom affiché. Il est vide par défaut et n'est jamais déduit de ton compte Windows : ce nom part chez tous tes amis.
+Tout se passe sur la page **Mon profil** (Ctrl+7, ou la pastille en bas de la barre latérale).
+
+1. **Crée ton identité.** Un pseudo est obligatoire pour tout ce qui touche aux amis, et pour rien d'autre : jouer seul n'en demande pas. Il n'est jamais déduit de ton compte Windows.
 2. **Choisis un dossier déjà synchronisé** par Nextcloud, Dropbox ou équivalent, et colle l'adresse publique de ce dossier.
-3. **Teste l'adresse.** CubeShelf publie un document, le relit depuis cette adresse et le déchiffre avec ta clé. **Ton code ami n'apparaît qu'après.**
-4. Coche « Publier ma présence », puis échange ton code (Ctrl+6 pour la page Amis).
+3. **Teste l'adresse.** CubeShelf publie un document, le relit depuis cette adresse et le déchiffre avec ta clé. **Ton code ami n'apparaît qu'après**, et il reste là d'un lancement à l'autre.
+4. Coche « Publier ma présence ».
+5. **« Copier mon code »** copie un message prêt à coller dans n'importe quelle conversation. Ton ami le copie à son tour, ouvre sa page Amis (Ctrl+6), et CubeShelf le trouve tout seul dans le presse-papiers : « Ajouter Zera#4821 ? ».
+6. **Il doit t'ajouter lui aussi.** L'amitié va dans un sens à la fois : l'ajouter te permet de le lire, pas à lui de te lire.
+
+### Le pseudo et son numéro
+
+Tes amis te voient sous la forme `Zera#4821`. Les quatre chiffres ne sont choisis par personne : ils sont lus sur ta clé publique, donc identiques sur tous tes PC, et ils distinguent deux joueurs du même pseudo.
+
+Ce que le numéro n'est pas, et c'est structurel :
+
+- **Un moyen de trouver quelqu'un.** Taper `Zera#4821` ne suffit pas pour ajouter Zera : il n'existe aucun annuaire où le chercher. Discord le peut parce que ses serveurs savent qui est qui ; ici, personne ne le sait, et c'est voulu. C'est le code qui transporte la clé et l'adresse.
+- **Une preuve d'identité.** Quatre chiffres, ce sont dix mille possibilités : n'importe qui peut fabriquer une clé qui donne `#4821` en quelques secondes. Le numéro sert à reconnaître, le code sert à se fier.
+
+Les codes de la 0.9.0 (`CSF1-…`) restent acceptés ; ils arrivent simplement sans pseudo. Ceux de la 0.9.1 (`CSF2-…`) portent le pseudo, et **une 0.9.0 ne sait pas les lire** : les deux PC doivent être en 0.9.1.
 
 Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ; c'est la **lecture** qui casse, silencieusement, et du côté où personne ne peut diagnostiquer. Le cas le plus fréquent : **un lien de partage Nextcloud sert une page HTML et non le fichier tant qu'on n'ajoute pas `/download` à la fin.** Sans le test, tu distribuerais un code ami inerte et tes amis ne te verraient jamais, sans savoir pourquoi.
 
 > Syncthing ne convient pas : il n'expose aucune adresse HTTP, donc tes amis n'ont rien à interroger.
 
 ### Profil, blocage, invitations
+
+> Le profil (avatar, statut, jeu mis en avant) se règle lui aussi sur la page **Mon profil**.
+
 
 > **Jamais testé entre deux machines.** Les invitations ont été compilées et testées
 > unitairement, jamais jouées. [TEST_DEUX_PC.md](TEST_DEUX_PC.md) donne la procédure et, surtout,

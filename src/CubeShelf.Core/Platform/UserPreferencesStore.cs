@@ -46,7 +46,14 @@ public sealed record UserPreferences(
     /// ours to state because nobody else can: a friend only ever sees us from the day they
     /// added us.
     /// </summary>
-    DateTimeOffset? ProfileFirstSeenAt = null);
+    DateTimeOffset? ProfileFirstSeenAt = null,
+
+    /// <summary>
+    /// The address the last successful round trip proved, so the friend code survives a restart.
+    /// It counts only while it equals <see cref="PresenceUrl"/>: change the address, or the folder
+    /// behind it, and the code is withheld until a new test proves the new pair.
+    /// </summary>
+    string PresenceVerifiedUrl = "");
 
 public sealed class UserPreferencesStore
 {

@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -63,6 +63,10 @@ public sealed partial class MainWindow
 
         var bitmap = LoadAvatar(AvatarFile);
         ProfileAvatarImage.Source = bitmap;
+        // The same face in the three places it shows: the profile card, the page header and
+        // the sidebar, where it stands for you the way Discord's corner does.
+        ProfileHeroAvatar.Source = bitmap;
+        SidebarAvatar.Source = bitmap;
         ProfileAvatarImage.IsVisible = bitmap is not null;
         ProfileAvatarEmpty.IsVisible = bitmap is null;
         ClearProfileAvatarButton.IsEnabled = bitmap is not null;

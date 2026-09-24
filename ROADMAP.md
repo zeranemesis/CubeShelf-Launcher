@@ -99,6 +99,9 @@ Pair-à-pair sans service central : chacun publie un document chiffré à un end
 - [x] blocage avec pierre tombale : le code recollé ne défait pas la décision
 - [x] profil publié (avatar réduit en 96×96, statut, agrégats, jeu mis en avant)
 - [x] invitations limitées au seul jeu dont le runtime a un compagnon en ligne
+- [x] page Mon profil, pseudo obligatoire, numéro lu sur la clé (Zera#4821)
+- [x] code ami portant le pseudo, détecté tout seul dans le presse-papiers
+- [ ] lien cliquable dans Discord : demande une page relais https (GitHub Pages)
 - [ ] rejoindre sans coller : demande une option de ligne de commande côté PartyBoard
 - [ ] mesurer la latence réelle d'un client de synchro et réajuster la fenêtre de fraîcheur
 - [ ] partage décidé ami par ami plutôt que globalement

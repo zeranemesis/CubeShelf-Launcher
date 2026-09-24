@@ -51,8 +51,8 @@ public sealed partial class MainWindow
         if (ShortcutSummaryText is not null)
         {
             ShortcutSummaryText.Text = P7(
-                "Ctrl+1 Bibliothèque • Ctrl+2 Favoris • Ctrl+3 Mods • Ctrl+4 Téléchargements • Ctrl+5 Paramètres • Ctrl+6 Amis • Ctrl+F Rechercher • F5 Actualiser • Échap Retour",
-                "Ctrl+1 Library • Ctrl+2 Favorites • Ctrl+3 Mods • Ctrl+4 Downloads • Ctrl+5 Settings • Ctrl+6 Friends • Ctrl+F Search • F5 Refresh • Esc Back");
+                "Ctrl+1 Bibliothèque • Ctrl+2 Favoris • Ctrl+3 Mods • Ctrl+4 Téléchargements • Ctrl+5 Paramètres • Ctrl+6 Amis • Ctrl+7 Mon profil • Ctrl+F Rechercher • F5 Actualiser • Échap Retour",
+                "Ctrl+1 Library • Ctrl+2 Favorites • Ctrl+3 Mods • Ctrl+4 Downloads • Ctrl+5 Settings • Ctrl+6 Friends • Ctrl+7 My profile • Ctrl+F Search • F5 Refresh • Esc Back");
         }
     }
 
@@ -64,6 +64,11 @@ public sealed partial class MainWindow
         ConfigureAccessiblePhase7(NavDownloadsButton, P7("Téléchargements", "Downloads"), "Ctrl+4");
         ConfigureAccessiblePhase7(NavFriendsButton, P7("Amis", "Friends"), "Ctrl+6");
         ConfigureAccessiblePhase7(NavSettingsButton, P7("Paramètres", "Settings"), "Ctrl+5");
+        ConfigureAccessiblePhase7(ProfileChipButton, P7("Mon profil", "My profile"), "Ctrl+7");
+        ConfigureAccessiblePhase7(IdentityNameBox, P7("Ton pseudo", "Your pseudo"));
+        ConfigureAccessiblePhase7(CreateIdentityButton, P7("Créer mon identité", "Create my identity"));
+        ConfigureAccessiblePhase7(ClipboardAddButton, P7("Ajouter l’ami trouvé dans le presse-papiers", "Add the friend found in the clipboard"));
+        AutomationProperties.SetLiveSetting(ClipboardInviteText, AutomationLiveSetting.Polite);
         ConfigureAccessiblePhase7(LibrarySearchBox, P7("Rechercher dans la bibliothèque", "Search the library"), "Ctrl+F");
         ConfigureAccessiblePhase7(PlayButton, P7("Jouer ou arrêter le jeu sélectionné", "Play or stop the selected game"));
         ConfigureAccessiblePhase7(GameCase, P7("Boîtier 3D du jeu. Cliquer pour retourner la jaquette.", "3D game case. Click to flip the cover."));
@@ -96,6 +101,7 @@ public sealed partial class MainWindow
         ToolTip.SetTip(NavDownloadsButton, P7("Téléchargements • Ctrl+4", "Downloads • Ctrl+4"));
         ToolTip.SetTip(NavFriendsButton, P7("Amis • Ctrl+6", "Friends • Ctrl+6"));
         ToolTip.SetTip(NavSettingsButton, P7("Paramètres • Ctrl+5", "Settings • Ctrl+5"));
+        ToolTip.SetTip(ProfileChipButton, P7("Mon profil • Ctrl+7", "My profile • Ctrl+7"));
         ToolTip.SetTip(LibrarySearchBox, P7("Rechercher • Ctrl+F", "Search • Ctrl+F"));
     }
 
@@ -140,6 +146,10 @@ public sealed partial class MainWindow
                     return;
                 case Key.D6:
                     ParityShowFriends(this, new RoutedEventArgs());
+                    args.Handled = true;
+                    return;
+                case Key.D7:
+                    ParityShowProfile(this, new RoutedEventArgs());
                     args.Handled = true;
                     return;
                 case Key.F:
@@ -187,6 +197,13 @@ public sealed partial class MainWindow
         {
             await RefreshFriendsSilentlyAsync();
             RefreshFriendsView();
+            await CheckClipboardForFriendCodeAsync();
+            return;
+        }
+
+        if (ProfileView.IsVisible)
+        {
+            RefreshIdentityUi();
             return;
         }
 

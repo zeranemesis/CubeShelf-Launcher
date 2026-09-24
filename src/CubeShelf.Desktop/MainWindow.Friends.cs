@@ -78,6 +78,9 @@ public sealed partial class MainWindow
 
         if (!_preferences.PresencePublishEnabled) return;
 
+        // No pseudo, no document: a friend would be reading someone with no name.
+        if (!HasIdentity) return;
+
         var publisher = new SyncedFolderPresencePublisher(new SyncedFolderTarget(
             _preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName, _preferences.PresenceUrl));
         if (!publisher.IsConfigured)
@@ -195,6 +198,7 @@ public sealed partial class MainWindow
     {
         ShowParityView(FriendsView);
         RefreshFriendsView();
+        _ = CheckClipboardForFriendCodeAsync();
         if (_presence is not null) _ = RefreshFriendsSilentlyAsync();
     }
 
@@ -246,8 +250,9 @@ public sealed partial class MainWindow
         // closes their lobby and opens a new one is announced again.
         if (!_announcedInvites.Add(friendPublicKey + '|' + invite.JoinPayload)) return;
 
+        var handle = PeerName.Handle(friend.DisplayName, friend.PublicKey);
         ShowToastParity(
-            P7($"{friend.DisplayName} t’invite", $"{friend.DisplayName} invites you"),
+            P7($"{handle} t’invite", $"{handle} invites you"),
             P7($"{invite.GameTitle} — ouvre la page Amis pour rejoindre.",
                $"{invite.GameTitle} — open the Friends page to join."));
     }
@@ -263,6 +268,18 @@ public sealed partial class MainWindow
             FriendsEmptyText.Text = _friendsFailure.Length > 0
                 ? P7($"Amis indisponibles : {_friendsFailure}", $"Friends unavailable: {_friendsFailure}")
                 : P7("Amis indisponibles.", "Friends unavailable.");
+            FriendsSubtitleText.Text = "";
+            return;
+        }
+
+        // Without a pseudo there is nothing to add anyone as; the page says so and points at
+        // the one place that fixes it.
+        FriendsIdentityGate.IsVisible = !HasIdentity;
+        FriendsList.IsVisible = HasIdentity;
+        if (!HasIdentity)
+        {
+            FriendsEmptyText.IsVisible = false;
+            ClipboardInviteBanner.IsVisible = false;
             FriendsSubtitleText.Text = "";
             return;
         }
@@ -324,7 +341,7 @@ public sealed partial class MainWindow
 
         return new FriendRow(
             friend.PublicKey,
-            friend.DisplayName,
+            PeerName.Handle(friend.DisplayName, friend.PublicKey),
             statusText,
             invited.Length > 0 ? invited : detail,
             seen + failing,

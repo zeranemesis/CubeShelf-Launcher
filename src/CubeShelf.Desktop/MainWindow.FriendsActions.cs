@@ -16,10 +16,16 @@ public sealed partial class MainWindow
             return;
         }
 
-        var dialog = CreatePhase7Dialog(P7("Ajouter un ami", "Add a friend"), 620, 340);
+        if (!HasIdentity)
+        {
+            ParityShowProfile(sender, args);
+            return;
+        }
+
+        var dialog = CreatePhase7Dialog(P7("Ajouter un ami", "Add a friend"), 620, 360);
         var codeBox = new TextBox
         {
-            Watermark = "CSF1-…",
+            Watermark = P7("Colle ici le message ou le code de ton ami", "Paste your friend’s message or code here"),
             AcceptsReturn = true,
             TextWrapping = Avalonia.Media.TextWrapping.Wrap,
             Height = 92
@@ -36,14 +42,21 @@ public sealed partial class MainWindow
         FriendCodePayload? decoded = null;
         codeBox.TextChanged += (_, _) =>
         {
-            if (FriendCode.TryDecode(codeBox.Text, out var payload, out var error))
+            // A whole chat message is fine: the code is found inside it. Only when nothing is
+            // found is the text judged as a bare code, so the error says what is wrong with it.
+            FriendCodePayload? payload = null;
+            var error = "";
+            var ok = FriendCode.TryFind(codeBox.Text, out payload) ||
+                     FriendCode.TryDecode(codeBox.Text, out payload, out error);
+            if (ok && payload is not null)
             {
                 decoded = payload;
                 confirm.IsEnabled = true;
-                // Naming the host is the one thing worth showing: the user is about to start
-                // polling that address every couple of minutes.
-                status.Text = P7($"Code valide. Adresse : {new Uri(payload!.PresenceUrl).Host}",
-                                 $"Valid code. Address: {new Uri(payload!.PresenceUrl).Host}");
+                if (string.IsNullOrWhiteSpace(nameBox.Text) && payload.DisplayName.Length > 0)
+                    nameBox.Text = payload.DisplayName;
+                // Who, and where: the user is about to poll that address every couple of minutes.
+                status.Text = P7($"Tu vas ajouter {payload.Handle}. Adresse : {new Uri(payload.PresenceUrl).Host}",
+                                 $"You are adding {payload.Handle}. Address: {new Uri(payload.PresenceUrl).Host}");
             }
             else
             {
@@ -73,7 +86,8 @@ public sealed partial class MainWindow
             {
                 new TextBlock
                 {
-                    Text = P7("Colle le code ami qu’on t’a donné.", "Paste the friend code you were given."),
+                    Text = P7("Colle le message ou le code que ton ami t’a envoyé.",
+                              "Paste the message or code your friend sent you."),
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap
                 },
                 codeBox,
@@ -88,8 +102,13 @@ public sealed partial class MainWindow
             }
         };
 
+        // Opened with a code already in the clipboard, the dialog starts filled in.
+        if (_clipboardCandidate is { } candidate)
+            codeBox.Text = FriendCode.Encode(candidate.PublicKey, candidate.PresenceUrl, candidate.DisplayName);
+
         await dialog.ShowDialog(this);
 
+        _ = CheckClipboardForFriendCodeAsync();
         RefreshFriendsView();
         // The recipient list changed, so the next document has to include them.
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
@@ -165,7 +184,8 @@ public sealed partial class MainWindow
         try
         {
             // Rebuilding their code is how two of your friends get introduced to each other.
-            var code = FriendCode.Encode(Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl);
+            var code = FriendCode.Encode(
+                Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl, friend.DisplayName);
             await CopyToClipboardAsync(code, P7($"Code de {friend.DisplayName} copié.",
                                                 $"{friend.DisplayName}’s code copied."));
         }
@@ -179,8 +199,12 @@ public sealed partial class MainWindow
     private async void CopyOwnFriendCode(object? sender, RoutedEventArgs args)
     {
         if (_ownFriendCode.Length == 0) return;
-        await CopyToClipboardAsync(_ownFriendCode,
-            P7("Ton code ami est copié.", "Your friend code is copied."));
+
+        // A message rather than the bare code: it reads as something in a chat window, and it
+        // tells the friend what to do with it. The code inside is found on their side.
+        await CopyToClipboardAsync(ShareMessage(),
+            P7("Message copié : colle-le dans ta conversation avec ton ami.",
+               "Message copied: paste it into your chat with your friend."));
     }
 
     private async Task CopyToClipboardAsync(string text, string confirmation)
@@ -195,23 +219,24 @@ public sealed partial class MainWindow
         if (_loadingSettings) return;
 
         var url = (PresenceUrlBox.Text ?? "").Trim();
+        var folder = (PresenceFolderBox.Text ?? "").Trim();
         var addressChanged = !string.Equals(url, _preferences.PresenceUrl, StringComparison.Ordinal);
+        var folderChanged = !string.Equals(folder, _preferences.PresenceFolder, StringComparison.Ordinal);
 
         _preferences = _preferences with
         {
-            FriendsDisplayName = (PresenceNameBox.Text ?? "").Trim(),
-            PresenceFolder = (PresenceFolderBox.Text ?? "").Trim(),
-            PresenceUrl = url
+            PresenceFolder = folder,
+            PresenceUrl = url,
+            // The proof was of this folder served at this address. Either one moving voids it.
+            PresenceVerifiedUrl = addressChanged || folderChanged ? "" : _preferences.PresenceVerifiedUrl
         };
         _preferencesStore.Save(_preferences);
+        RefreshOwnFriendCode();
 
         if (addressChanged)
         {
             // The address is sealed inside every friend code already handed out. Changing it
             // silently orphans every existing friend, who keeps polling the old one forever.
-            _ownFriendCode = "";
-            CopyOwnCodeButton.IsEnabled = false;
-            OwnFriendCodeBox.Text = "";
             PresenceStatusText.Text = P7(
                 "Adresse modifiée : teste-la, puis redistribue ton code ami. Les codes déjà donnés ne fonctionnent plus.",
                 "Address changed: test it, then hand out your friend code again. Codes already given no longer work.");
@@ -237,6 +262,11 @@ public sealed partial class MainWindow
     private async void RunPresenceSelfTest(object? sender, RoutedEventArgs args)
     {
         if (_identity is null || _friends is null) return;
+        if (!HasIdentity)
+        {
+            ParityShowProfile(sender, args);
+            return;
+        }
 
         PresenceSelfTestButton.IsEnabled = false;
         PresenceStatusText.Text = P7("Test en cours…", "Testing…");
@@ -255,9 +285,10 @@ public sealed partial class MainWindow
 
             if (result.Succeeded)
             {
-                _ownFriendCode = result.FriendCode;
-                OwnFriendCodeBox.Text = result.FriendCode;
-                CopyOwnCodeButton.IsEnabled = true;
+                // Remembered, so the code is still there after a restart.
+                _preferences = _preferences with { PresenceVerifiedUrl = _preferences.PresenceUrl };
+                _preferencesStore.Save(_preferences);
+                RefreshOwnFriendCode();
                 PresenceStatusText.Text = P7(
                     "Adresse vérifiée : ton document a été relu et déchiffré. Tu peux distribuer ton code.",
                     "Address verified: your document was read back and decrypted. You can hand out your code.");
@@ -265,9 +296,9 @@ public sealed partial class MainWindow
             }
             else
             {
-                _ownFriendCode = "";
-                OwnFriendCodeBox.Text = "";
-                CopyOwnCodeButton.IsEnabled = false;
+                _preferences = _preferences with { PresenceVerifiedUrl = "" };
+                _preferencesStore.Save(_preferences);
+                RefreshOwnFriendCode();
                 PresenceStatusText.Text = result.Error ?? P7("Le test a échoué.", "The test failed.");
             }
         }
@@ -297,13 +328,13 @@ public sealed partial class MainWindow
 
         // The code stays hidden until a self-test proves the address serves a readable document.
         // Offering it earlier would be handing out a promise we have not checked.
-        OwnFriendCodeBox.Text = _ownFriendCode;
-        CopyOwnCodeButton.IsEnabled = _ownFriendCode.Length > 0;
+        RefreshOwnFriendCode();
     }
 
     /// <summary>Reads the presence card back. Called from SaveSettings.</summary>
     private void SavePresencePreferences()
     {
+        var before = _preferences;
         _preferences = _preferences with
         {
             PresencePublishEnabled = PresencePublishBox.IsChecked == true,
@@ -313,5 +344,15 @@ public sealed partial class MainWindow
             ShareMods = ShareModsBox.IsChecked == true,
             ShareProfile = ShareProfileBox.IsChecked == true
         };
+
+        // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,
+        // so the box did nothing until the next launch -- a friend could add you and see nobody.
+        if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled)
+            StartPresenceService();
+        else if (before != _preferences)
+            _presence?.RequestPublish(PresencePublishReason.ProfileChanged);
+
+        RefreshOwnFriendCode();
+        if (FriendsView.IsVisible) RefreshFriendsView();
     }
 }

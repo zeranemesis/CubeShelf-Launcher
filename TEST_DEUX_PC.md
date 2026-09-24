@@ -1,4 +1,4 @@
-# Essai à deux PC — invitations CubeShelf
+﻿# Essai à deux PC — invitations CubeShelf
 
 Le système d'invitation n'a **jamais tourné entre deux machines physiques**. Tout ce qui suit a
 été compilé, raisonné et testé unitairement ; rien n'a été joué. Ce document est la procédure
@@ -14,7 +14,7 @@ Compte deux heures pour le premier essai, dont l'essentiel en attente de téléc
 | Windows x64 | Le compagnon est WinForms, PartyBoard est win-x64 uniquement |
 | Le **même fichier disque**, octet pour octet | Le salon compare un SHA-256 complet et refuse deux fichiers différents. Un ISO et un RVZ du même jeu sont deux fichiers différents |
 | Un dossier synchronisé servi en HTTPS | Nextcloud, Dropbox… c'est ainsi que la présence circule |
-| CubeShelf ≥ le commit `459813b` | Avant, « Rejoindre » ne faisait que copier un code |
+| CubeShelf **0.9.1**, installé avec `CubeShelf-Setup-x64.exe` | La 0.9.0 se fige à la fermeture quand la présence est activée, et sa mise à jour intégrée peut détruire l'installation. Ses codes amis ne sont pas lisibles par la 0.9.1 non plus |
 | PartyBoard ≥ **0.16.0** | Avant, le compagnon ignore `--host` et `--join` |
 
 > **Le fichier disque est le piège le plus coûteux.** Copiez-le d'un PC à l'autre plutôt que de
@@ -39,12 +39,17 @@ ici : réinstallez PartyBoard des deux côtés depuis la même release.
 
 Avant de toucher au multijoueur, prouvez que les deux CubeShelf se voient.
 
-1. Sur chaque PC : **Paramètres → Amis et présence**. Nom affiché, dossier de publication,
-   adresse publique, puis **« Tester l'adresse »**.
-2. Le code ami n'apparaît **qu'après** un test réussi. S'il n'apparaît pas, l'adresse ne sert pas
-   le fichier : un partage Nextcloud demande `/download` à la fin.
-3. Échangez les deux codes (Ctrl+6, « Ajouter un ami »).
-4. **Attendez.** La lecture se fait toutes les 2 minutes, plus la latence de votre client de
+1. Sur chaque PC : **Mon profil** (Ctrl+7). Créez votre identité, puis dossier de publication,
+   adresse publique, **« Tester l'adresse »**, et cochez **« Publier ma présence »**. La liste en
+   haut de la page coche chaque étape ; le code n'apparaît que quand elles le sont toutes.
+2. S'il n'apparaît pas, l'adresse ne sert pas le fichier : un partage Nextcloud demande
+   `/download` à la fin.
+3. **« Copier mon code »**, collez le message dans votre conversation. L'autre le copie, ouvre sa
+   page Amis (Ctrl+6) : un bandeau propose « Ajouter Zera#4821 ? ». Vérifiez de vive voix que le
+   numéro affiché est bien celui de l'autre.
+4. **Faites-le dans les deux sens.** L'amitié va dans un sens à la fois : A qui ajoute B peut
+   lire B, pas l'inverse. Tant que B n'a pas ajouté A, A reste invisible pour B.
+5. **Attendez.** La lecture se fait toutes les 2 minutes, plus la latence de votre client de
    synchro. C'est le bon moment pour mesurer ce délai réel — notez-le, il décide si la fenêtre de
    fraîcheur de 15 minutes est bien réglée.
 
@@ -91,6 +96,8 @@ Personne n'a rien copié.
 | Le compagnon s'ouvre **vide** au lieu de créer le salon | Les flags n'ont pas été reçus : vérifiez que c'est bien le compagnon 0.16.0 qui a démarré |
 | CubeShelf attend puis dit *« Le compagnon n'a pas créé de salon »* | Le salon n'a pas abouti côté compagnon — regardez sa fenêtre, pas CubeShelf |
 | L'invité ne voit jamais l'invitation | Problème de présence (étape 1), ou l'ami est en pause ou bloqué |
+| Le bandeau « Code ami trouvé » n'apparaît pas | Le presse-papiers ne contient pas le message entier, ou cet ami est déjà dans la liste. Collez le message dans « Ajouter un ami » à la place |
+| L'un voit l'autre, pas l'inverse | Un seul des deux a ajouté l'autre (étape 1.4) |
 | **« DISQUE DIFFÉRENT »** | Les deux fichiers ne sont pas identiques. Recopiez-en un sur l'autre PC |
 | Les deux se voient mais le ping reste « En attente… » | Le réseau : routeur, pare-feu, NAT. **CubeShelf n'y est pour rien** — c'est le compagnon qui traverse |
 | La partie se lance et chacun attend seul | Vérifiez l'empreinte de l'étape 0 |

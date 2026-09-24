@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -7,7 +7,15 @@ namespace CubeShelf.Core.Social;
 /// <summary>What one CubeShelf user hands another so they can become friends.</summary>
 /// <param name="PublicKey">The peer's identity, 65 bytes.</param>
 /// <param name="PresenceUrl">Where that peer publishes its presence document.</param>
-public sealed record FriendCodePayload(byte[] PublicKey, string PresenceUrl);
+/// <param name="DisplayName">
+/// The pseudo they chose, so the person adding them sees <c>Zera#4821</c> before confirming
+/// instead of having to type a name. Empty for a version-1 code, which never carried one.
+/// </param>
+public sealed record FriendCodePayload(byte[] PublicKey, string PresenceUrl, string DisplayName = "")
+{
+    /// <summary><c>Zera#4821</c>, or <c>#4821</c> for a code that carried no pseudo.</summary>
+    public string Handle => PeerName.Handle(DisplayName, PublicKey);
+}
 
 /// <summary>
 /// Encodes and decodes friend codes.
@@ -18,20 +26,25 @@ public sealed record FriendCodePayload(byte[] PublicKey, string PresenceUrl);
 /// </summary>
 public static class FriendCode
 {
-    private const string Prefix = "CSF1-";
-    private static readonly byte[] Magic = "CSF1"u8.ToArray();
+    // Version 2 appends the pseudo. Version 1 is still read, so a code handed out before the
+    // change keeps working; it just arrives without a name.
+    private const string Prefix = "CSF2-";
+    private const string LegacyPrefix = "CSF1-";
+    private static readonly byte[] Magic = "CSF2"u8.ToArray();
+    private static readonly byte[] LegacyMagic = "CSF1"u8.ToArray();
     private const int ChecksumLength = 4;
     private const int MaximumUrlLength = 2048;
 
-    public static string Encode(ReadOnlySpan<byte> publicKey, string presenceUrl)
+    public static string Encode(ReadOnlySpan<byte> publicKey, string presenceUrl, string? displayName = null)
     {
         PeerIdentity.ValidatePublicKey(publicKey);
         var url = NormalizeUrl(presenceUrl);
         var urlBytes = Encoding.UTF8.GetBytes(url);
         if (urlBytes.Length > MaximumUrlLength)
             throw new ArgumentException("L’URL de présence est trop longue.", nameof(presenceUrl));
+        var nameBytes = PeerName.Encode(displayName);
 
-        var body = new byte[Magic.Length + PeerIdentity.PublicKeyLength + 2 + urlBytes.Length];
+        var body = new byte[Magic.Length + PeerIdentity.PublicKeyLength + 2 + urlBytes.Length + 1 + nameBytes.Length];
         var offset = 0;
         Magic.CopyTo(body, offset);
         offset += Magic.Length;
@@ -40,6 +53,9 @@ public static class FriendCode
         BinaryPrimitives.WriteUInt16BigEndian(body.AsSpan(offset), (ushort)urlBytes.Length);
         offset += 2;
         urlBytes.CopyTo(body, offset);
+        offset += urlBytes.Length;
+        body[offset++] = (byte)nameBytes.Length;
+        nameBytes.CopyTo(body, offset);
 
         var framed = new byte[body.Length + ChecksumLength];
         body.CopyTo(framed, 0);
@@ -60,7 +76,8 @@ public static class FriendCode
 
         // Pasting out of a chat window routinely brings spaces and line breaks along.
         var cleaned = new string(code.Where(character => !char.IsWhiteSpace(character)).ToArray());
-        if (!cleaned.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+        var legacy = cleaned.StartsWith(LegacyPrefix, StringComparison.OrdinalIgnoreCase);
+        if (!legacy && !cleaned.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
         {
             error = "Ce n’est pas un code ami CubeShelf.";
             return false;
@@ -92,7 +109,8 @@ public static class FriendCode
             return false;
         }
 
-        if (!body[..Magic.Length].SequenceEqual(Magic))
+        // The prefix is a label a person can read; the magic inside the checksum is what counts.
+        if (!body[..Magic.Length].SequenceEqual(legacy ? LegacyMagic : Magic))
         {
             error = "Version de code ami non prise en charge.";
             return false;
@@ -104,7 +122,12 @@ public static class FriendCode
         var urlLength = BinaryPrimitives.ReadUInt16BigEndian(body[offset..]);
         offset += 2;
 
-        if (body.Length - offset != urlLength)
+        // Version 1 ends with the address; version 2 follows it with one length byte and the
+        // pseudo. Either way every byte must be accounted for.
+        var remaining = body.Length - offset;
+        var nameLength = !legacy && remaining > urlLength ? body[offset + urlLength] : 0;
+        var declared = legacy ? urlLength : urlLength + 1 + nameLength;
+        if (remaining != declared)
         {
             error = "Code ami incohérent : la longueur annoncée ne correspond pas.";
             return false;
@@ -122,9 +145,47 @@ public static class FriendCode
             return false;
         }
 
-        payload = new FriendCodePayload(publicKey, url);
+        // Chosen by someone else and about to be shown: cleaned, never trusted.
+        var name = legacy
+            ? ""
+            : PeerName.Sanitize(Encoding.UTF8.GetString(body.Slice(offset + urlLength + 1, nameLength)));
+
+        payload = new FriendCodePayload(publicKey, url, name);
         return true;
     }
+
+    /// <summary>
+    /// Finds a friend code inside whatever was pasted -- typically a whole chat message, the
+    /// pseudo on one line and the code on the next. The first candidate that decodes wins, so a
+    /// message quoting a broken code and then a good one still works.
+    /// </summary>
+    public static bool TryFind(string? text, out FriendCodePayload? payload)
+    {
+        payload = null;
+        if (string.IsNullOrEmpty(text) || text.Length > 64 * 1024) return false;
+
+        try
+        {
+            foreach (System.Text.RegularExpressions.Match match in CandidatePattern.Matches(text))
+            {
+                if (TryDecode(match.Value, out payload, out _)) return true;
+            }
+        }
+        catch (System.Text.RegularExpressions.RegexMatchTimeoutException)
+        {
+        }
+
+        payload = null;
+        return false;
+    }
+
+    // A version-1 code is never shorter than about a hundred characters, so eighty rules out
+    // every stray "CSF1-" a message might contain without ruling out any real code.
+    private static readonly System.Text.RegularExpressions.Regex CandidatePattern = new(
+        "CSF[12]-[A-Za-z0-9_-]{80,}",
+        System.Text.RegularExpressions.RegexOptions.CultureInvariant |
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase,
+        TimeSpan.FromMilliseconds(250));
 
     /// <summary>
     /// Only https. A friend code is pasted from somewhere the user does not control, so a code

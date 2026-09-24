@@ -1,4 +1,4 @@
-namespace CubeShelf.Core.Social;
+﻿namespace CubeShelf.Core.Social;
 
 /// <param name="PresenceUrl">Proven to serve a document this identity can open.</param>
 /// <param name="FriendCode">Empty unless the test succeeded: a code is a promise, not a guess.</param>
@@ -93,7 +93,7 @@ public sealed class PresenceSelfTest : IDisposable
                 // is serving something stale -- a cache, or a different file altogether.
                 if (opened.Sequence == snapshot.Sequence)
                     return new(true, published.PresenceUrl,
-                        FriendCode.Encode(_identity.PublicKey, published.PresenceUrl));
+                        FriendCode.Encode(_identity.PublicKey, published.PresenceUrl, snapshot.DisplayName));
 
                 lastError = "L’adresse sert encore un document plus ancien.";
             }

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -229,6 +229,7 @@ public sealed partial class MainWindow
         SetNavSelectedPhase5(NavDownloadsButton, DownloadsView.IsVisible);
         SetNavSelectedPhase5(NavFriendsButton, FriendsView.IsVisible);
         SetNavSelectedPhase5(NavSettingsButton, SettingsView.IsVisible);
+        SetNavSelectedPhase5(ProfileChipButton, ProfileView.IsVisible);
     }
 
     private static void SetNavSelectedPhase5(Button button, bool selected)

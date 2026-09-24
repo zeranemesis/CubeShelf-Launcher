@@ -105,6 +105,14 @@ public sealed partial class MainWindow : Window
         // And again here, because the pinned-game list is the shelf: ApplyPreferences ran before
         // the catalog existed and could only offer "None".
         ApplyProfilePreferences();
+        // The handle needs the key, and the key exists only once InitializeFriends has run.
+        RefreshIdentityUi();
+        ShowRunningVersion();
+        // Copy a friend's message in any chat app, come back to the Friends page: it is found.
+        Activated += (_, _) =>
+        {
+            if (FriendsView.IsVisible) _ = CheckClipboardForFriendCodeAsync();
+        };
         RefreshDownloadItems();
         Closing += (_, _) =>
         {
@@ -713,7 +721,8 @@ public sealed partial class MainWindow : Window
             ShareProfile: _preferences.ShareProfile,
             ProfileStatus: _preferences.ProfileStatus,
             ProfilePinnedGameId: _preferences.ProfilePinnedGameId,
-            ProfileFirstSeenAt: _preferences.ProfileFirstSeenAt);
+            ProfileFirstSeenAt: _preferences.ProfileFirstSeenAt,
+            PresenceVerifiedUrl: _preferences.PresenceVerifiedUrl);
 
         ApplyPreferences();
         _preferencesStore.Save(_preferences);

@@ -74,6 +74,8 @@ Run("blocking stops both directions", TestBlockingStopsBothDirections);
 Run("the profile is published and capped", TestProfileIsPublishedAndCapped);
 Run("invitations expire and can be targeted", TestInvitationsExpireAndAreTargeted);
 Run("only games with a companion can invite", TestOnlyGamesWithACompanionCanInvite);
+Run("a pseudo gets a tag read off the key", TestPseudoAndTag);
+Run("the friend code carries the pseudo", TestFriendCodeCarriesThePseudo);
 
 if (failures.Count == 0)
 {
@@ -2160,6 +2162,110 @@ void TestIdentityPersistsAndAgrees()
         Assert(aliceView.SequenceEqual(bobView));
         Assert(!alice.DeriveSharedKey(mallory.PublicKey).SequenceEqual(aliceView));
     });
+}
+
+void TestPseudoAndTag()
+{
+    Assert(PeerName.TryNormalize("  Zera   la   Reine ", out var name, out _) && name == "Zera la Reine");
+    Assert(!PeerName.TryNormalize("Z", out _, out var shortError) && shortError.Length > 0);
+    Assert(!PeerName.TryNormalize("", out _, out _));
+    Assert(!PeerName.TryNormalize("Zera#1234", out _, out _));          // the hash belongs to the tag
+    Assert(!PeerName.TryNormalize("Ze\u0007ra", out _, out _));           // invisible characters
+    Assert(!PeerName.TryNormalize(new string('a', PeerName.MaximumLength + 1), out _, out _));
+    Assert(PeerName.TryNormalize(new string('a', PeerName.MaximumLength), out _, out _));
+
+    using var identity = PeerIdentity.Create();
+    var tag = PeerName.Tag(identity.PublicKey);
+    Assert(tag.Length == 4 && tag.All(char.IsDigit));
+
+    // Read off the key, so the same person has the same tag on every machine.
+    Assert(PeerName.Tag(identity.PublicKey.ToArray()) == tag);
+    Assert(PeerName.Handle("Zera", identity.PublicKey) == "Zera#" + tag);
+    Assert(PeerName.Handle("", identity.PublicKey) == "#" + tag);
+    Assert(PeerName.Handle("Zera", Convert.ToBase64String(identity.PublicKey)) == "Zera#" + tag);
+    Assert(PeerName.Handle("Zera", "not base64 at all") == "Zera");
+
+    // Different keys usually land on different tags -- usually, not always: there are ten
+    // thousand of them, and two hundred keys expect about two collisions.
+    var tags = new HashSet<string>();
+    for (var i = 0; i < 200; i++)
+    {
+        using var other = PeerIdentity.Create();
+        tags.Add(PeerName.Tag(other.PublicKey));
+    }
+    Assert(tags.Count > 180);
+
+    // A name someone else chose is shown, not judged: cleaned and capped, never refused.
+    Assert(PeerName.Sanitize("Ev\u0000il#99 Name") == "Evil99 Name");
+    Assert(PeerName.Sanitize(new string('b', 50)).Length == PeerName.MaximumLength);
+    Assert(PeerName.Sanitize(null) == "");
+
+    // Capping never splits an emoji in two.
+    var emoji = new string('c', PeerName.MaximumLength - 1) + "\U0001F600";
+    Assert(!char.IsHighSurrogate(PeerName.Sanitize(emoji)[^1]));
+}
+
+void TestFriendCodeCarriesThePseudo()
+{
+    using var identity = PeerIdentity.Create();
+    const string url = "https://cloud.example.test/s/abc/download";
+    var tag = PeerName.Tag(identity.PublicKey);
+
+    var code = FriendCode.Encode(identity.PublicKey, url, "Zera");
+    Assert(code.StartsWith("CSF2-", StringComparison.Ordinal));
+    Assert(FriendCode.TryDecode(code, out var payload, out _));
+    Assert(payload!.DisplayName == "Zera" && payload.PresenceUrl == url);
+    Assert(payload.Handle == "Zera#" + tag);
+
+    // A code handed out before the pseudo existed still works; it arrives without a name.
+    var legacy = HandBuiltFriendCode("CSF1", identity.PublicKey, url, null);
+    Assert(FriendCode.TryDecode(legacy, out var old, out _));
+    Assert(old!.DisplayName == "" && old.PresenceUrl == url && old.PublicKey.SequenceEqual(identity.PublicKey));
+    Assert(old.Handle == "#" + tag);
+
+    // The prefix is a label for people; the magic under the checksum decides.
+    Assert(!FriendCode.TryDecode("CSF1-" + code["CSF2-".Length..], out _, out _));
+
+    // Every byte is accounted for: a name length that runs past the end is refused.
+    var overlong = HandBuiltFriendCode("CSF2", identity.PublicKey, url, System.Text.Encoding.UTF8.GetBytes("Zera"), declaredNameLength: 9);
+    Assert(!FriendCode.TryDecode(overlong, out _, out _));
+
+    // Someone else's pseudo is cleaned on the way in, never trusted.
+    var hostile = HandBuiltFriendCode("CSF2", identity.PublicKey, url,
+        System.Text.Encoding.UTF8.GetBytes("Evil#99\u0007X"));
+    Assert(FriendCode.TryDecode(hostile, out var cleaned, out _) && cleaned!.DisplayName == "Evil99X");
+
+    // Found inside a whole chat message, the way it actually arrives.
+    var message = $"Ajoute-moi sur CubeShelf : Zera#{tag}\n{code}\n(colle ce message dans CubeShelf)";
+    Assert(FriendCode.TryFind(message, out var found) && found!.DisplayName == "Zera");
+
+    // A broken code quoted before a good one does not hide the good one.
+    var middle = code.Length / 2;
+    var broken = code[..middle] + (code[middle] == 'A' ? 'B' : 'A') + code[(middle + 1)..];
+    Assert(FriendCode.TryFind(broken + "\n" + code, out var second) && second!.PresenceUrl == url);
+
+    Assert(!FriendCode.TryFind("rien à voir ici, pas même CSF2-abc", out _));
+    Assert(!FriendCode.TryFind(null, out _));
+    Assert(!FriendCode.TryFind(broken, out _));
+}
+
+string HandBuiltFriendCode(string magic, byte[] key, string url, byte[]? name, int? declaredNameLength = null)
+{
+    var urlBytes = System.Text.Encoding.UTF8.GetBytes(url);
+    var body = new List<byte>();
+    body.AddRange(System.Text.Encoding.ASCII.GetBytes(magic));
+    body.AddRange(key);
+    body.Add((byte)(urlBytes.Length >> 8));
+    body.Add((byte)urlBytes.Length);
+    body.AddRange(urlBytes);
+    if (name is not null)
+    {
+        body.Add((byte)(declaredNameLength ?? name.Length));
+        body.AddRange(name);
+    }
+    var raw = body.ToArray();
+    var framed = raw.Concat(System.Security.Cryptography.SHA256.HashData(raw).Take(4)).ToArray();
+    return magic + "-" + Convert.ToBase64String(framed).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 }
 
 void TestFriendCodeRoundTrip()
