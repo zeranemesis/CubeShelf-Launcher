@@ -52,6 +52,8 @@ Run("presence goes stale rather than lying", TestPresenceFreshness);
 Run("reading mod state leaves the game alone", TestReadingModStateLeavesTheGameAlone);
 Run("mod state survives hostile input", TestModStateSurvivesHostileInput);
 Run("the active list is written atomically", TestActiveListIsWrittenAtomically);
+Run("the sequence never goes backwards", TestSequenceNeverGoesBackwards);
+Run("the sequence adopts a document ahead of it", TestSequenceAdoptsADocumentAhead);
 
 if (failures.Count == 0)
 {
@@ -1029,6 +1031,86 @@ string CurrentRid() =>
     (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
 
 // ---------------------------------------------------------------------------
+// The published sequence. A friend that has seen a higher one rejects everything below it
+// for good, so going backwards is the one failure this must never have.
+// ---------------------------------------------------------------------------
+
+void TestSequenceNeverGoesBackwards()
+{
+    WithTempRoot(root =>
+    {
+        var start = DateTimeOffset.UtcNow;
+
+        // Publishes are spaced by at least MinimumPublishGap in the real loop, so model that
+        // rather than forty calls inside one second.
+        var clock = start;
+        var seen = new List<long>();
+        var sequence = new PresenceSequence(root);
+        for (var index = 0; index < 40; index++)
+        {
+            seen.Add(sequence.Next(clock));
+            clock += PresencePolicy.MinimumPublishGap;
+        }
+        var last = seen[^1];
+
+        // Strictly increasing, and no number handed out twice.
+        Assert(seen.Zip(seen.Skip(1)).All(pair => pair.Second > pair.First));
+        Assert(seen.Distinct().Count() == seen.Count);
+
+        // A restart must not reuse anything: the reservation is persisted before the numbers go
+        // out, so the next run resumes above the batch, not above the last number issued.
+        var reopened = new PresenceSequence(root);
+        Assert(reopened.Next(clock) > last);
+        Assert(reopened.InstanceId == sequence.InstanceId);
+
+        // Losing the state file is survivable because the clock is a floor -- the profile
+        // restored from an old backup lands above everything it published, since time moved on
+        // meanwhile. That is the guarantee, and it holds exactly while the counter is not ahead
+        // of wall clock, which MinimumPublishGap is what ensures.
+        File.Delete(Path.Combine(root, "presence-state.json"));
+        var afterLoss = new PresenceSequence(root);
+        Assert(afterLoss.Next(clock) > last);
+
+        // A burst inside one second still hands out distinct, increasing numbers; it is only the
+        // rescue-from-a-lost-file property that needs the clock to have moved.
+        var burst = new PresenceSequence(root);
+        var sameInstant = Enumerable.Range(0, 5).Select(_ => burst.Next(clock)).ToArray();
+        Assert(sameInstant.Zip(sameInstant.Skip(1)).All(pair => pair.Second > pair.First));
+
+        // And a clock dragged backwards does not pull the counter with it.
+        var backwards = new PresenceSequence(root);
+        var beforeJump = backwards.Next(start);
+        Assert(backwards.Next(start - TimeSpan.FromDays(365)) > beforeJump);
+    });
+}
+
+void TestSequenceAdoptsADocumentAhead()
+{
+    WithTempRoot(root =>
+    {
+        var now = DateTimeOffset.UtcNow;
+        var sequence = new PresenceSequence(root);
+        var mine = sequence.Next(now);
+
+        // Our own last document, or an older one: nothing to do.
+        Assert(sequence.Reconcile(mine) == PresenceSequenceReconciliation.Consistent);
+        Assert(sequence.Reconcile(mine - 100) == PresenceSequenceReconciliation.Consistent);
+        Assert(sequence.Current == mine);
+
+        // A document at our own address carrying a number we never issued means a second
+        // installation is publishing under this identity -- a copied profile.
+        var foreign = mine + 5_000;
+        Assert(sequence.Reconcile(foreign) == PresenceSequenceReconciliation.RemoteAhead);
+
+        // Having seen it, we must climb above it. Publishing below would produce documents every
+        // friend rejects, which is the unrecoverable failure.
+        Assert(sequence.Next(now) > foreign);
+
+        // The adoption is persisted, so a restart does not fall back under it.
+        Assert(new PresenceSequence(root).Next(now) > foreign);
+    });
+}
+
 // Reading mod state must never disturb it: PortableModManager's constructor rewrites
 // active-mods.txt, which is the file a running game reads.
 // ---------------------------------------------------------------------------
