@@ -1,4 +1,4 @@
-# CubeShelf Launcher
+﻿# CubeShelf Launcher
 
 CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.8 utilise une interface Avalonia commune à Windows et Linux : elle installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II, Strikers pour Super Mario Strikers), prépare les images fournies légalement par l’utilisateur, gère les mods GameBanana, et propose un système d’amis pair-à-pair sans serveur.
 
@@ -94,6 +94,36 @@ Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ;
 
 > Syncthing ne convient pas : il n'expose aucune adresse HTTP, donc tes amis n'ont rien à interroger.
 
+### Profil, blocage, invitations
+
+**Ton profil** est ce que tes amis voient à côté de ton nom : un avatar, une ligne de statut,
+la taille de ta bibliothèque et un jeu mis en avant. Rien n'est obligatoire et tout voyage dans
+le même document chiffré. L'avatar est recadré au carré puis réduit en 96×96 avant publication —
+ce document est réécrit à chaque battement, une photo non réduite ne serait pas un coût unique
+mais un flux permanent à travers ton dossier synchronisé. Le jeu mis en avant se choisit dans
+ta bibliothèque et ne se tape pas : un champ libre laisserait publier un titre que personne ne
+peut ouvrir.
+
+**Bloquer est plus fort que retirer.** Retirer arrête la relation ; recoller le code la rétablit.
+Bloquer laisse une pierre tombale dans `friends.json` précisément pour que le code ne puisse plus
+défaire la décision en silence — c'est toute la différence entre les deux. Un bloqué cesse de
+recevoir ta présence *et* d'être lu. Ce que ça ne fait pas est dit dans la boîte de dialogue
+plutôt que découvert : il garde ton adresse et voit encore quand ton fichier change.
+
+**Les invitations n'existent que pour Mario Party 4**, et la raison est structurelle : un launcher
+n'ajoute pas du multijoueur à un jeu qu'il se contente de démarrer. Le champ `OnlineCompanion` du
+catalogue porte toute la portée — PartyBoard livre `PartyBoardOnline.exe`, Ring Out et Strikers ne
+livrent aucun netplay, et pour eux la carte n'apparaît pas du tout.
+
+Le compagnon crée le salon et te donne un code court ; CubeShelf transporte ce code sans le lire.
+Ce qu'il ajoute par rapport à le coller dans une conversation : il part chiffré aux seuls amis
+visés, il expire seul au bout d'un quart d'heure, et il s'affiche dans le launcher.
+
+Une étape reste manuelle, et l'interface le dit au lieu de le cacher : `PartyBoardOnline.exe`
+n'accepte aucun argument pour rejoindre un salon. « Rejoindre » copie donc le code et ouvre le
+compagnon, à toi de le coller. La livraison est par sondage : ton ami voit l'invitation à sa
+prochaine lecture, pas immédiatement. C'est une invitation posée sur la table, pas une sonnerie.
+
 ### Comment c'est construit
 
 | Élément | Choix |
@@ -120,6 +150,8 @@ Ces limites sont structurelles, pas des oublis :
 - **L'hébergeur peut taire, pas falsifier.** AES-GCM bloque la forgerie ; geler ton document te laisse « en jeu » jusqu'à expiration. La fenêtre de fraîcheur borne cette attaque.
 - **Une identité par installation.** Copier ton profil sur une seconde machine fait publier deux CubeShelf à la même adresse sous la même identité, et celui qui prend du retard finit rejeté par tes amis. La seconde machine doit générer sa propre identité, et vous vous ajoutez mutuellement.
 - **Le partage est décidé globalement**, pas ami par ami : les quatre cases s'appliquent à tout le monde.
+- **Une invitation est une offre, pas une notification.** Le transport est en sondage : compte jusqu'à quelques minutes, plus ce que ton client de synchro ajoute.
+- **CubeShelf ne valide pas qu'un salon est joignable.** Il transporte le code du compagnon ; c'est le compagnon qui traverse — ou non — les box et les pare-feu.
 
 ### Où vivent les fichiers
 
@@ -130,6 +162,7 @@ Dans le profil utilisateur (`%LOCALAPPDATA%\CubeShelf` sous Windows) :
 | `identity.key` | Ta clé privée. La perdre oblige tous tes amis à te rajouter. |
 | `friends.json` | Tes amis, leur adresse, et l'état de lecture de chacun. |
 | `presence-state.json` | Le compteur de séquence. **Ne le supprime pas** sans raison. |
+| `avatar.png` | Ton avatar, déjà réduit en 96×96. Le supprimer, c'est ne plus en publier. |
 ## Aperçu Linux et Steam Deck
 
 Le dépôt contient désormais un noyau portable `CubeShelf.Core`, une interface Avalonia `CubeShelf.Desktop` et un pipeline AppImage `linux-x64`. Cet aperçu affiche la bibliothèque avec des chemins conformes à XDG, permet de sélectionner et valider une image ISO/GCM/RVZ, puis télécharge le runtime PartyBoard correspondant à la plateforme. La taille et le SHA-256 du paquet sont contrôlés avant son activation. L’interface sait ensuite mettre à jour, réparer ou désinstaller ce runtime sans supprimer l’image originale.

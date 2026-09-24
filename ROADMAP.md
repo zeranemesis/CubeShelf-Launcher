@@ -1,4 +1,4 @@
-# Roadmap
+﻿# Roadmap
 
 ## v0.6
 - [x] Français / English
@@ -96,6 +96,10 @@ Pair-à-pair sans service central : chacun publie un document chiffré à un end
 - [x] un ami injoignable n'interrompt pas les autres et ne lève pas le bandeau réseau
 - [x] boucle de publication : anti-rebond, battement, document d'adieu à la fermeture
 - [x] page Amis, carte Paramètres, ajout par code collé
+- [x] blocage avec pierre tombale : le code recollé ne défait pas la décision
+- [x] profil publié (avatar réduit en 96×96, statut, agrégats, jeu mis en avant)
+- [x] invitations limitées au seul jeu dont le runtime a un compagnon en ligne
+- [ ] rejoindre sans coller : demande une option de ligne de commande côté PartyBoard
 - [ ] mesurer la latence réelle d'un client de synchro et réajuster la fenêtre de fraîcheur
 - [ ] partage décidé ami par ami plutôt que globalement
 - [ ] rembourrage du clair pour masquer la taille de la bibliothèque
