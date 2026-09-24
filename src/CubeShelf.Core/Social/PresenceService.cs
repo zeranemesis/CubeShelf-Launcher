@@ -149,17 +149,31 @@ public sealed class PresenceService : IAsyncDisposable
     /// it, someone who quits mid-game reads as still playing for the whole freshness window,
     /// which is the most visible thing a presence system can get wrong.
     /// </summary>
-    public async Task ShutdownAsync(TimeSpan budget)
+    /// <param name="displayName">
+    /// The name to say goodbye with. A caller closing a window should pass it: without it the
+    /// service asks the capture, the capture runs on the UI thread, and the UI thread is exactly
+    /// what a closing window is blocking. That wait is what kept CubeShelf 0.9.0 alive after its
+    /// window closed whenever presence was on.
+    /// </param>
+    public async Task ShutdownAsync(TimeSpan budget, string? displayName = null)
     {
         if (Interlocked.Exchange(ref _shutdownPublished, 1) == 1) return;
         _lifetime?.Cancel();
 
         using var deadline = new CancellationTokenSource(budget);
+        var gated = false;
         try
         {
-            var inputs = await _capture(deadline.Token).ConfigureAwait(false);
-            var snapshot = PresenceComposer.Offline(
-                inputs.DisplayName, _sequence.Next(_clock()), _clock());
+            var name = displayName ??
+                (await CaptureAsync(deadline.Token).ConfigureAwait(false)).DisplayName;
+
+            // Behind any publish still in flight, so a document written late cannot land on top
+            // of the farewell and leave friends reading "online" for someone who has left. The
+            // lifetime was cancelled above, so whatever holds the gate is already on its way out.
+            await _publishGate.WaitAsync(deadline.Token).ConfigureAwait(false);
+            gated = true;
+
+            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock());
             await PublishSnapshotAsync(PresencePublishReason.Shutdown, snapshot, deadline.Token)
                 .ConfigureAwait(false);
         }
@@ -168,7 +182,20 @@ public sealed class PresenceService : IAsyncDisposable
             // Closing the window must stay instant; a farewell that does not fit the budget is
             // simply not sent.
         }
+        finally
+        {
+            if (gated) _publishGate.Release();
+        }
     }
+
+    /// <summary>
+    /// The capture belongs to the caller and may never answer -- a UI thread that is itself
+    /// blocked waiting on this service is the obvious case. So cancellation is enforced here
+    /// rather than trusted to it: a stuck capture costs one publish, never the service's
+    /// ability to stop.
+    /// </summary>
+    private Task<PresenceInputs> CaptureAsync(CancellationToken cancellationToken) =>
+        _capture(cancellationToken).WaitAsync(cancellationToken);
 
     private async Task PublishLoopAsync(CancellationToken cancellationToken)
     {
@@ -222,7 +249,7 @@ public sealed class PresenceService : IAsyncDisposable
                     await Task.Delay(_options.MinimumGap - since, cancellationToken).ConfigureAwait(false);
             }
 
-            var inputs = await _capture(cancellationToken).ConfigureAwait(false);
+            var inputs = await CaptureAsync(cancellationToken).ConfigureAwait(false);
             var candidate = _composer.Compose(
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
                 sequence: 0, _clock(), inputs.Profile, inputs.Invite);

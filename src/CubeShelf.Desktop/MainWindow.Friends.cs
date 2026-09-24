@@ -74,8 +74,7 @@ public sealed partial class MainWindow
     {
         if (_identity is null || _friends is null) return;
 
-        _presence?.DisposeAsync().AsTask().GetAwaiter().GetResult();
-        _presence = null;
+        StopPresenceServiceBounded();
 
         if (!_preferences.PresencePublishEnabled) return;
 
@@ -146,11 +145,19 @@ public sealed partial class MainWindow
         // Say goodbye before the lifetime is cancelled, so a friend who sees us quit mid-game
         // does not keep reading "in a game" for the whole freshness window. Bounded, because
         // closing the window has to stay instant.
+        //
+        // The name is read here, on the UI thread, and handed over. Asking the service to fetch it
+        // would have it post to this very thread while this call blocks it -- a deadlock that kept
+        // CubeShelf 0.9.0 alive after its window closed, which in turn is what let its updater copy
+        // files under a CubeShelf that never exited.
         try
         {
-            _presence?.ShutdownAsync(PresencePolicy.ShutdownBudget).GetAwaiter().GetResult();
+            _presence?.ShutdownAsync(PresencePolicy.ShutdownBudget, _preferences.FriendsDisplayName)
+                .WaitAsync(PresencePolicy.ShutdownBudget + TimeSpan.FromSeconds(1))
+                .GetAwaiter().GetResult();
         }
-        catch (Exception exception) when (exception is IOException or OperationCanceledException)
+        catch (Exception exception) when (
+            exception is IOException or OperationCanceledException or TimeoutException)
         {
         }
 
@@ -158,17 +165,30 @@ public sealed partial class MainWindow
         _friendsLifetime?.Dispose();
         _friendsLifetime = null;
 
-        try
-        {
-            _presence?.DisposeAsync().AsTask().GetAwaiter().GetResult();
-        }
-        catch (Exception exception) when (exception is IOException or OperationCanceledException)
-        {
-        }
-        _presence = null;
+        StopPresenceServiceBounded();
 
         // _identity is deliberately not disposed: a Seal may still be in flight on a thread pool
         // thread, and disposing it there would throw inside crypto for no benefit at exit.
+    }
+
+    /// <summary>
+    /// Disposes the service without letting it hold the UI thread. Every wait on the UI thread is
+    /// bounded, because a window that will not close is worse than anything left unfinished:
+    /// the service is cancelled first and has two seconds to notice.
+    /// </summary>
+    private void StopPresenceServiceBounded()
+    {
+        try
+        {
+            _presence?.DisposeAsync().AsTask()
+                .WaitAsync(TimeSpan.FromSeconds(2))
+                .GetAwaiter().GetResult();
+        }
+        catch (Exception exception) when (
+            exception is IOException or OperationCanceledException or TimeoutException)
+        {
+        }
+        _presence = null;
     }
 
     private void ParityShowFriends(object? sender, RoutedEventArgs args)

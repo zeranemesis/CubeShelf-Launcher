@@ -68,6 +68,7 @@ Run("the self-test proves the round trip", TestSelfTestProvesTheRoundTrip);
 Run("the self-test catches an address serving something else", TestSelfTestCatchesAnAddressThatServesSomethingElse);
 Run("a burst becomes one publish", TestServiceCoalescesABurstIntoOnePublish);
 Run("the service says goodbye exactly once", TestServiceSaysGoodbyeExactlyOnce);
+Run("a stuck capture cannot hold the service", TestAStuckCaptureCannotHoldTheService);
 Run("the service reads friends and reports them", TestServiceReadsFriendsAndReportsThem);
 Run("blocking stops both directions", TestBlockingStopsBothDirections);
 Run("the profile is published and capped", TestProfileIsPublishedAndCapped);
@@ -1312,6 +1313,53 @@ void TestServiceCoalescesABurstIntoOnePublish()
         var document = File.ReadAllText(Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
         Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(document), out var published));
         Assert(published!.Status == PresenceStatus.InGame);
+    });
+}
+
+void TestAStuckCaptureCannotHoldTheService()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://c.example.test/p.json"));
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        // The capture a closing window hands over: it posts to a UI thread that is blocked
+        // waiting on this very service, so it never answers -- and it ignores its token.
+        var never = new TaskCompletionSource<PresenceInputs>();
+        var captures = 0;
+        var options = new PresenceServiceOptions(
+            TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
+
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            new PresenceSequence(root), publisher, fetcher,
+            _ => { Interlocked.Increment(ref captures); return never.Task; }, options);
+        service.Start(CancellationToken.None);
+
+        var waitForCapture = DateTime.UtcNow.AddSeconds(5);
+        while (Volatile.Read(ref captures) == 0 && DateTime.UtcNow < waitForCapture) Thread.Sleep(20);
+        Assert(Volatile.Read(ref captures) > 0);   // the startup publish is stuck inside it now
+
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        // The farewell carries the name it is given and asks nothing of the capture, so it goes
+        // out even though a publish is stuck holding the gate.
+        Assert(service.ShutdownAsync(TimeSpan.FromSeconds(3), "Zera").Wait(TimeSpan.FromSeconds(5)));
+        var document = Path.Combine(folder, SyncedFolderTarget.DefaultFileName);
+        Assert(File.Exists(document));
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(File.ReadAllText(document)), out var farewell));
+        Assert(farewell!.Status == PresenceStatus.Offline && farewell.DisplayName == "Zera");
+
+        // Disposing does not wait on it either. This wait, unbounded, is what kept CubeShelf
+        // 0.9.0 alive after its window closed whenever presence was on.
+        Assert(service.DisposeAsync().AsTask().Wait(TimeSpan.FromSeconds(3)));
+        Assert(clock.Elapsed < TimeSpan.FromSeconds(4));
     });
 }
 
