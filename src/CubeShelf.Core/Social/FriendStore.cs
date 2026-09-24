@@ -19,10 +19,23 @@ public sealed class Friend
     public DateTimeOffset? LastSeenAt { get; set; }
 
     /// <summary>
-    /// Stop publishing to this friend without forgetting them. Their lockbox is left out of the
-    /// next document, which takes effect on the next publish and needs no other co-ordination.
+    /// A temporary quiet: they receive nothing and are not read, but nothing is forgotten and
+    /// one click puts it back. Takes effect on the next publish, with no other co-ordination.
     /// </summary>
     public bool Paused { get; set; }
+
+    /// <summary>
+    /// Blocked. Like paused in what it stops, and different in what it means: the entry is kept
+    /// deliberately as a tombstone so the same code cannot be re-added by accident later.
+    ///
+    /// It is local, and it has to be, because there is no server to enforce anything. It stops
+    /// us addressing them and stops us reading them. It does not stop them watching our address
+    /// change -- and so knowing when we play -- nor retract what they already downloaded. Only
+    /// a new publishing address ends that.
+    /// </summary>
+    public bool Blocked { get; set; }
+
+    public DateTimeOffset? BlockedAt { get; set; }
 
     /// <summary>Cached ETag, so polling an unchanged document costs a 304 rather than a download.</summary>
     public string? LastETag { get; set; }
@@ -90,7 +103,17 @@ public sealed class FriendStore
         lock (_gate)
         {
             var friends = LoadUnsynchronized().ToList();
-            if (friends.Any(friend => friend.PublicKey == encoded))
+            var existing = friends.FirstOrDefault(friend => friend.PublicKey == encoded);
+
+            // The whole point of keeping a blocked entry is that a code pasted again months
+            // later does not quietly undo the decision.
+            if (existing is { Blocked: true })
+            {
+                error = "Tu as bloqué cette personne. Débloque-la d’abord si c’est voulu.";
+                return false;
+            }
+
+            if (existing is not null)
             {
                 error = "Cet ami est déjà dans ta liste.";
                 return false;
@@ -158,10 +181,50 @@ public sealed class FriendStore
         }
     }
 
+    /// <summary>
+    /// Blocks a peer, keeping the entry as a tombstone. Works on someone already in the list and
+    /// on a code that was never added, which is the case that matters: blocking should not
+    /// require befriending first.
+    /// </summary>
+    public void Block(FriendCodePayload payload, string displayName)
+    {
+        ArgumentNullException.ThrowIfNull(payload);
+        var encoded = Convert.ToBase64String(payload.PublicKey);
+
+        lock (_gate)
+        {
+            var friends = LoadUnsynchronized().ToList();
+            var target = friends.FirstOrDefault(friend => friend.PublicKey == encoded);
+            if (target is null)
+            {
+                target = new Friend
+                {
+                    PublicKey = encoded,
+                    DisplayName = string.IsNullOrWhiteSpace(displayName) ? "Bloqué" : displayName.Trim(),
+                    PresenceUrl = payload.PresenceUrl,
+                    AddedAt = DateTimeOffset.UtcNow
+                };
+                friends.Add(target);
+            }
+
+            target.Blocked = true;
+            target.BlockedAt = DateTimeOffset.UtcNow;
+            target.Paused = false;
+            SaveUnsynchronized(friends);
+        }
+    }
+
+    public bool Unblock(string publicKeyBase64) =>
+        Update(publicKeyBase64, friend =>
+        {
+            friend.Blocked = false;
+            friend.BlockedAt = null;
+        });
+
     /// <summary>The peers a document should currently be addressed to.</summary>
     public IReadOnlyList<byte[]> ActiveRecipients() =>
         Load()
-            .Where(friend => !friend.Paused)
+            .Where(friend => !friend.Paused && !friend.Blocked)
             .Select(friend => TryDecodeKey(friend.PublicKey))
             .OfType<byte[]>()
             .ToArray();

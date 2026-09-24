@@ -21,7 +21,9 @@ public sealed record PresenceInputs(
     string DisplayName,
     IReadOnlyList<PresenceGame> Games,
     IReadOnlyCollection<string> RunningGameIds,
-    PresenceSharingOptions Sharing);
+    PresenceSharingOptions Sharing,
+    ProfileInputs? Profile = null,
+    PresenceInvite? Invite = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
@@ -220,7 +222,7 @@ public sealed class PresenceService : IAsyncDisposable
             var inputs = await _capture(cancellationToken).ConfigureAwait(false);
             var candidate = _composer.Compose(
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
-                sequence: 0, _clock());
+                sequence: 0, _clock(), inputs.Profile, inputs.Invite);
 
             var fingerprint = PresenceComposer.ContentFingerprint(candidate);
             var heartbeatDue = _lastPublishedAt is not { } previous ||

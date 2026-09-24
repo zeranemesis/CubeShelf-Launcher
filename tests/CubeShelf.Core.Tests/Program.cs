@@ -69,6 +69,10 @@ Run("the self-test catches an address serving something else", TestSelfTestCatch
 Run("a burst becomes one publish", TestServiceCoalescesABurstIntoOnePublish);
 Run("the service says goodbye exactly once", TestServiceSaysGoodbyeExactlyOnce);
 Run("the service reads friends and reports them", TestServiceReadsFriendsAndReportsThem);
+Run("blocking stops both directions", TestBlockingStopsBothDirections);
+Run("the profile is published and capped", TestProfileIsPublishedAndCapped);
+Run("invitations expire and can be targeted", TestInvitationsExpireAndAreTargeted);
+Run("invite readiness says what it cannot know", TestInviteReadinessSaysWhatItCannotKnow);
 
 if (failures.Count == 0)
 {
@@ -1047,6 +1051,156 @@ string CurrentRid() =>
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Blocking, profiles and invitations.
+// ---------------------------------------------------------------------------
+
+void TestBlockingStopsBothDirections()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var nuisance = PeerIdentity.Create();
+        var store = new FriendStore(root);
+        var payload = new FriendCodePayload(nuisance.PublicKey, "https://cloud.example.test/p.json");
+        var key = Convert.ToBase64String(nuisance.PublicKey);
+
+        Assert(store.TryAdd(payload, "Quelqu'un", me.PublicKey, out _));
+        Assert(store.ActiveRecipients().Count == 1);
+
+        store.Block(payload, "Quelqu'un");
+
+        // Blocking has to stop both directions: they stop receiving, and we stop reading.
+        Assert(store.ActiveRecipients().Count == 0);
+        Assert(store.Load().Single().Blocked && store.Load().Single().BlockedAt is not null);
+
+        using var client = new HttpClient(new FixedBodyHandler("{}"));
+        using var fetcher = new PresenceFetcher(me, store, client);
+        Assert(fetcher.PollAsync().GetAwaiter().GetResult().Count == 0);
+
+        // The entry is kept as a tombstone so the same code pasted again later cannot quietly
+        // undo the decision. That is the whole difference between blocking and removing.
+        Assert(!store.TryAdd(payload, "Quelqu'un", me.PublicKey, out var blockedError));
+        Assert(blockedError.Length > 0);
+
+        Assert(store.Unblock(key));
+        Assert(store.ActiveRecipients().Count == 1);
+        Assert(!store.Load().Single().Blocked);
+
+        // Blocking someone never befriended must work too: it should not require adding them.
+        using var stranger = PeerIdentity.Create();
+        var strangerPayload = new FriendCodePayload(stranger.PublicKey, "https://cloud.example.test/s.json");
+        store.Block(strangerPayload, "Inconnu");
+        Assert(store.Load().Count == 2);
+        Assert(!store.TryAdd(strangerPayload, "Inconnu", me.PublicKey, out _));
+    });
+}
+
+void TestProfileIsPublishedAndCapped()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        Directory.CreateDirectory(paths.ConfigurationDirectory);
+        var composer = new PresenceComposer(paths);
+        var now = DateTimeOffset.UtcNow;
+        var games = SampleLibrary();
+        var joined = now.AddYears(-1);
+        var profile = new ProfileInputs("Dispo pour un match", "GRSEAF", joined);
+
+        var withProfile = composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, now, profile);
+        Assert(withProfile.Profile is not null);
+        Assert(withProfile.Profile!.StatusLine == "Dispo pour un match");
+        Assert(withProfile.Profile.PinnedGameId == "GRSEAF");
+        Assert(withProfile.Profile.PinnedGameTitle == "Soulcalibur II");
+        Assert(withProfile.Profile.TotalGames == 2);
+        Assert(withProfile.Profile.TotalPlaySeconds == 4500);
+        Assert(withProfile.Profile.FirstSeenAt == joined);
+        Assert(withProfile.Profile.AvatarPng is null);      // none stored yet
+
+        // An avatar within the cap travels; one over it is dropped rather than sent, because
+        // this document is rewritten on every heartbeat.
+        File.WriteAllBytes(composer.AvatarFile, new byte[1024]);
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, now, profile).Profile!.AvatarPng is not null);
+
+        File.WriteAllBytes(composer.AvatarFile, new byte[PeerProfile.MaximumAvatarBytes + 1]);
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, now, profile).Profile!.AvatarPng is null);
+
+        // A long status is trimmed rather than refused.
+        var chatty = new ProfileInputs(new string('a', PeerProfile.MaximumStatusLength + 50));
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
+            1, now, chatty).Profile!.StatusLine.Length == PeerProfile.MaximumStatusLength);
+
+        // The aggregates follow the same switches as the detail: turning the library off must
+        // not leave its size published in another field.
+        var hidden = composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(ShareLibrary: false, SharePlayTime: false), 1, now, profile);
+        Assert(hidden.Profile!.TotalGames == 0 && hidden.Profile.TotalPlaySeconds == 0);
+
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(ShareProfile: false), 1, now, profile).Profile is null);
+    });
+}
+
+void TestInvitationsExpireAndAreTargeted()
+{
+    WithTempRoot(root =>
+    {
+        var composer = new PresenceComposer(new TestPaths(root));
+        var now = DateTimeOffset.UtcNow;
+        var games = SampleLibrary();
+
+        var live = new PresenceInvite("GRSEAF", "Soulcalibur II", "192.168.1.20",
+            InviteHost.DefaultPort, now.Add(PresenceInvite.DefaultLifetime));
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
+            1, now, null, live).Invite is not null);
+
+        // A lapsed invitation is not published: it would send a friend at a port nobody is
+        // listening on any more.
+        var lapsed = live with { ExpiresAt = now.AddMinutes(-1) };
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
+            1, now, null, lapsed).Invite is null);
+
+        using var friend = PeerIdentity.Create();
+        var friendKey = Convert.ToBase64String(friend.PublicKey);
+        Assert(live.IsFor(friendKey));                                   // open to everyone
+        Assert((live with { ForFriend = friendKey }).IsFor(friendKey));
+        Assert(!(live with { ForFriend = "someone-else" }).IsFor(friendKey));
+    });
+}
+
+void TestInviteReadinessSaysWhatItCannotKnow()
+{
+    // A private address only works on a LAN or a VPN, and that has to be said rather than
+    // discovered by a friend who cannot connect.
+    var privateCheck = InviteHost.Check("192.168.1.20", InviteHost.DefaultPort);
+    Assert(privateCheck.Reachable && privateCheck.IsPrivateAddress);
+    Assert(privateCheck.Message.Contains("réseau", StringComparison.Ordinal));
+
+    var publicCheck = InviteHost.Check("203.0.113.10", InviteHost.DefaultPort + 1);
+    Assert(publicCheck.Reachable && !publicCheck.IsPrivateAddress);
+
+    Assert(!InviteHost.Check("not-an-address", InviteHost.DefaultPort).Reachable);
+    Assert(!InviteHost.Check("192.168.1.20", 80).Reachable);             // privileged port
+
+    // A port already taken here is one failure that genuinely is knowable locally.
+    var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, 0);
+    listener.Start();
+    var taken = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+    try
+    {
+        var busy = InviteHost.Check("192.168.1.20", taken);
+        Assert(!busy.Reachable && busy.Message.Contains(taken.ToString(), StringComparison.Ordinal));
+    }
+    finally
+    {
+        listener.Stop();
+    }
+}
+
 // ---------------------------------------------------------------------------
 // The loop that keeps our document published and friends' documents read.
 // ---------------------------------------------------------------------------

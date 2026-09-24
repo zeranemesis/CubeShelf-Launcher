@@ -24,6 +24,32 @@ public sealed record SharedMod(
     bool Enabled);
 
 /// <summary>
+/// The part of a peer that barely ever changes: who they are rather than what they are doing.
+///
+/// It travels inside the presence document rather than in one of its own. A separate file would
+/// save rewriting the avatar on every heartbeat, but a share link points at a single file, so it
+/// would also mean a second address in every friend code and a second round trip to verify --
+/// more cost than the bytes it saves. The avatar is capped small instead.
+/// </summary>
+public sealed record PeerProfile(
+    string StatusLine = "",
+    string? AvatarPng = null,
+    string? PinnedGameId = null,
+    string? PinnedGameTitle = null,
+    int TotalGames = 0,
+    long TotalPlaySeconds = 0,
+    DateTimeOffset? FirstSeenAt = null)
+{
+    /// <summary>
+    /// 8 KiB is generous for the 96x96 the launcher stores, and it is what keeps a heartbeat
+    /// every five minutes from turning into megabytes of sync traffic a day.
+    /// </summary>
+    public const int MaximumAvatarBytes = 8 * 1024;
+
+    public const int MaximumStatusLength = 140;
+}
+
+/// <summary>
 /// What a peer publishes for its friends to read.
 ///
 /// <paramref name="Sequence"/> only ever increases. A reader that has seen a higher sequence
@@ -39,7 +65,9 @@ public sealed record PresenceSnapshot(
     string? CurrentGameId,
     string? CurrentGameTitle,
     IReadOnlyList<SharedGame> Library,
-    IReadOnlyList<SharedMod> Mods)
+    IReadOnlyList<SharedMod> Mods,
+    PeerProfile? Profile = null,
+    PresenceInvite? Invite = null)
 {
     public const int CurrentVersion = 1;
 

@@ -70,7 +70,9 @@ public sealed class PresenceFetcher : IDisposable
     public async Task<IReadOnlyList<PresenceFetchOutcome>> PollAsync(
         CancellationToken cancellationToken = default)
     {
-        var due = _friends.Load().Where(friend => !friend.Paused).ToArray();
+        // Blocked peers are not read either: blocking has to stop both directions, or it only
+        // means "they cannot see me" while their document still reaches our screen.
+        var due = _friends.Load().Where(friend => !friend.Paused && !friend.Blocked).ToArray();
         if (due.Length == 0) return Array.Empty<PresenceFetchOutcome>();
 
         using var gate = new SemaphoreSlim(PresencePolicy.PollConcurrency);
