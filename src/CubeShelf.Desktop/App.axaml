@@ -91,6 +91,8 @@
       <x:String x:Key="OpenCompanion">Ouvrir le compagnon en ligne</x:String>
       <x:String x:Key="InviteCodeHint">Code d'invitation donné par le compagnon</x:String>
       <x:String x:Key="PublishInvite">Inviter mes amis</x:String>
+      <x:String x:Key="HostLobbyInvite">Créer un salon et inviter mes amis</x:String>
+      <x:String x:Key="InviteManual">Déjà un salon ouvert ? Colle son code ici.</x:String>
       <x:String x:Key="CancelInvite">Retirer l'invitation</x:String>
       <x:String x:Key="FriendJoin">Rejoindre</x:String>
       <x:String x:Key="Presence">Amis et présence</x:String>

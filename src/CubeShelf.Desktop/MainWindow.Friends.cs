@@ -189,10 +189,16 @@ public sealed partial class MainWindow
         }
     }
 
+    /// <summary>Invitations already announced, so a heartbeat does not announce them again.</summary>
+    private readonly HashSet<string> _announcedInvites = new(StringComparer.Ordinal);
+
     private void ApplyFriendOutcomes(IReadOnlyList<PresenceFetchOutcome> outcomes)
     {
         foreach (var outcome in outcomes.Where(o => o.Snapshot is not null))
+        {
             _friendPresence[outcome.FriendPublicKey] = outcome.Snapshot!;
+            AnnounceInvite(outcome.FriendPublicKey, outcome.Snapshot!);
+        }
 
         // Only a genuine network failure raises the global banner; a friend who has not
         // published is not a connectivity problem and must not look like one.
@@ -200,6 +206,30 @@ public sealed partial class MainWindow
             MarkConnectivityIssuePhase7(P7("Présence des amis indisponible.", "Friends presence unavailable."));
 
         if (FriendsView.IsVisible) RefreshFriendsView();
+    }
+
+    /// <summary>
+    /// A toast the first time an invitation is seen. The document is republished on every
+    /// heartbeat with the invitation unchanged, so without remembering what has already been
+    /// announced a standing invitation would ring every five minutes for a quarter of an hour.
+    /// </summary>
+    private void AnnounceInvite(string friendPublicKey, PresenceSnapshot snapshot)
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (snapshot.Invite is not { } invite || !invite.IsLive(now)) return;
+        if (_identity is null || !invite.IsFor(Convert.ToBase64String(_identity.PublicKey))) return;
+
+        var friend = _friends?.Load().FirstOrDefault(entry => entry.PublicKey == friendPublicKey);
+        if (friend is null || friend.Paused || friend.Blocked) return;
+
+        // Keyed on the payload, so the same lobby announced twice is silent but a friend who
+        // closes their lobby and opens a new one is announced again.
+        if (!_announcedInvites.Add(friendPublicKey + '|' + invite.JoinPayload)) return;
+
+        ShowToastParity(
+            P7($"{friend.DisplayName} t’invite", $"{friend.DisplayName} invites you"),
+            P7($"{invite.GameTitle} — ouvre la page Amis pour rejoindre.",
+               $"{invite.GameTitle} — open the Friends page to join."));
     }
 
     private void RefreshFriendsView()

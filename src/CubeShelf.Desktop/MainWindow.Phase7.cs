@@ -71,6 +71,8 @@ public sealed partial class MainWindow
         ConfigureAccessiblePhase7(NextModImageButton, P7("Image suivante du mod", "Next mod image"));
         ConfigureAccessiblePhase7(OpenModImageButton, P7("Ouvrir l’image du mod", "Open mod image"));
         ConfigureAccessiblePhase7(RetryConnectivityButton, P7("Réessayer les vérifications réseau", "Retry network checks"));
+        ConfigureAccessiblePhase7(HostLobbyButton,
+            P7("Créer un salon et inviter mes amis", "Create a lobby and invite my friends"));
         ConfigureAccessiblePhase7(OpenCompanionButton,
             P7("Ouvrir le compagnon en ligne du runtime", "Open the runtime’s online companion"));
         ConfigureAccessiblePhase7(InvitePayloadBox,
