@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Platform.Storage;
@@ -293,6 +293,7 @@ public sealed partial class MainWindow
         SharePlayTimeBox.IsChecked = _preferences.SharePlayTime;
         ShareCurrentGameBox.IsChecked = _preferences.ShareCurrentGame;
         ShareModsBox.IsChecked = _preferences.ShareMods;
+        ApplyProfilePreferences();
 
         // The code stays hidden until a self-test proves the address serves a readable document.
         // Offering it earlier would be handing out a promise we have not checked.
@@ -309,7 +310,8 @@ public sealed partial class MainWindow
             ShareLibrary = ShareLibraryBox.IsChecked == true,
             SharePlayTime = SharePlayTimeBox.IsChecked == true,
             ShareCurrentGame = ShareCurrentGameBox.IsChecked == true,
-            ShareMods = ShareModsBox.IsChecked == true
+            ShareMods = ShareModsBox.IsChecked == true,
+            ShareProfile = ShareProfileBox.IsChecked == true
         };
     }
 }

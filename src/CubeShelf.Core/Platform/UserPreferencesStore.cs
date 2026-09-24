@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace CubeShelf.Core.Platform;
 
@@ -32,7 +32,21 @@ public sealed record UserPreferences(
     bool ShareLibrary = true,
     bool SharePlayTime = true,
     bool ShareCurrentGame = true,
-    bool ShareMods = true);
+    bool ShareMods = true,
+    bool ShareProfile = true,
+
+    /// <summary>One line friends read beside our name. Free text, capped when composed.</summary>
+    string ProfileStatus = "",
+
+    /// <summary>The one game we chose to put forward, by catalog id.</summary>
+    string ProfilePinnedGameId = "",
+
+    /// <summary>
+    /// When this profile started publishing, set once on the first successful publish. It is
+    /// ours to state because nobody else can: a friend only ever sees us from the day they
+    /// added us.
+    /// </summary>
+    DateTimeOffset? ProfileFirstSeenAt = null);
 
 public sealed class UserPreferencesStore
 {

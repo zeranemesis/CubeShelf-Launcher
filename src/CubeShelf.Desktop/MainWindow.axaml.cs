@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Library;
 using Avalonia.Interactivity;
@@ -102,6 +102,9 @@ public sealed partial class MainWindow : Window
 
         // After the catalog is loaded, so the first document published is not an empty shelf.
         InitializeFriends();
+        // And again here, because the pinned-game list is the shelf: ApplyPreferences ran before
+        // the catalog existed and could only offer "None".
+        ApplyProfilePreferences();
         RefreshDownloadItems();
         Closing += (_, _) =>
         {
@@ -706,7 +709,11 @@ public sealed partial class MainWindow : Window
             ShareLibrary: _preferences.ShareLibrary,
             SharePlayTime: _preferences.SharePlayTime,
             ShareCurrentGame: _preferences.ShareCurrentGame,
-            ShareMods: _preferences.ShareMods);
+            ShareMods: _preferences.ShareMods,
+            ShareProfile: _preferences.ShareProfile,
+            ProfileStatus: _preferences.ProfileStatus,
+            ProfilePinnedGameId: _preferences.ProfilePinnedGameId,
+            ProfileFirstSeenAt: _preferences.ProfileFirstSeenAt);
 
         ApplyPreferences();
         _preferencesStore.Save(_preferences);

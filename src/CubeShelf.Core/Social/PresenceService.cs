@@ -1,4 +1,4 @@
-namespace CubeShelf.Core.Social;
+﻿namespace CubeShelf.Core.Social;
 
 /// <summary>Why a publish was asked for. Only used for reporting; every reason publishes alike.</summary>
 public enum PresencePublishReason
@@ -8,7 +8,10 @@ public enum PresencePublishReason
     GameChanged = 2,
     FriendsChanged = 3,
     Manual = 4,
-    Shutdown = 5
+    Shutdown = 5,
+
+    /// <summary>The profile or an invitation changed: same document, different contents.</summary>
+    ProfileChanged = 6
 }
 
 /// <summary>

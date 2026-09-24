@@ -371,11 +371,37 @@
                 <Button x:Name="CopyOwnCodeButton" Grid.Column="1" Content="{DynamicResource Copy}" IsEnabled="False" Click="CopyOwnFriendCode" />
               </Grid>
 
+              <TextBlock Text="{DynamicResource MyProfile}" FontWeight="Bold" Margin="0,14,0,0" />
+              <TextBlock Text="{DynamicResource MyProfileHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" Margin="0,6,0,0">
+                <Border Width="96" Height="96" CornerRadius="48" ClipToBounds="True" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+                  <Panel>
+                    <TextBlock x:Name="ProfileAvatarEmpty" Text="☺" FontSize="34" Foreground="{DynamicResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image x:Name="ProfileAvatarImage" Stretch="UniformToFill" IsVisible="False" />
+                  </Panel>
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="{DynamicResource ProfileAvatarChoose}" Click="ChooseProfileAvatar" />
+                    <Button x:Name="ClearProfileAvatarButton" Content="{DynamicResource ProfileAvatarClear}" Click="ClearProfileAvatar" />
+                  </StackPanel>
+                  <TextBlock Text="{DynamicResource ProfileAvatarHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+              </Grid>
+
+              <TextBlock Text="{DynamicResource ProfileStatus}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <TextBox x:Name="ProfileStatusBox" MaxLength="140" Watermark="{DynamicResource ProfileStatusHint}" LostFocus="SaveProfileText" />
+
+              <TextBlock Text="{DynamicResource ProfilePinned}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <ComboBox x:Name="ProfilePinnedBox" HorizontalAlignment="Stretch" SelectionChanged="SavePinnedGame" />
+
               <TextBlock Text="{DynamicResource WhatYouShare}" FontWeight="Bold" Margin="0,10,0,0" />
               <CheckBox x:Name="ShareLibraryBox" Content="{DynamicResource ShareLibrary}" Checked="SaveSettings" Unchecked="SaveSettings" />
               <CheckBox x:Name="SharePlayTimeBox" Content="{DynamicResource SharePlayTime}" Checked="SaveSettings" Unchecked="SaveSettings" />
               <CheckBox x:Name="ShareCurrentGameBox" Content="{DynamicResource ShareCurrentGame}" Checked="SaveSettings" Unchecked="SaveSettings" />
               <CheckBox x:Name="ShareModsBox" Content="{DynamicResource ShareMods}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="ShareProfileBox" Content="{DynamicResource ShareProfile}" Checked="SaveSettings" Unchecked="SaveSettings" />
             </StackPanel>
           </Border>
           <StackPanel Orientation="Horizontal"><Button Content="{DynamicResource ResetSettings}" Click="ResetSettings" /></StackPanel>
@@ -406,19 +432,30 @@
                 <DataTemplate>
                   <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
                     <Grid ColumnDefinitions="1.4*,2*,Auto">
-                      <StackPanel>
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
-                        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Accent2}" FontSize="12" />
-                      </StackPanel>
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+                        <Border Width="44" Height="44" CornerRadius="22" ClipToBounds="True" VerticalAlignment="Top" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+                          <Panel>
+                            <TextBlock Text="☺" FontSize="18" Foreground="{DynamicResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding Avatar}" Stretch="UniformToFill" />
+                          </Panel>
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Accent2}" FontSize="12" />
+                        </StackPanel>
+                      </Grid>
                       <StackPanel Grid.Column="1" Margin="18,0">
                         <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding StatusLine}" Foreground="{DynamicResource Text}" Opacity="0.8" FontSize="12" FontStyle="Italic" TextWrapping="Wrap" IsVisible="{Binding HasStatusLine}" />
                         <TextBlock Text="{Binding Extra}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
                       </StackPanel>
                       <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Classes="primary" Content="{DynamicResource FriendJoin}" Tag="{Binding}" IsVisible="{Binding CanJoin}" Click="JoinFriendInvite" />
-                        <Button Content="{Binding PauseAction}" Tag="{Binding}" Click="ToggleFriendPause" />
-                        <Button Content="{DynamicResource FriendCopyCode}" Tag="{Binding}" IsEnabled="{Binding CanCopyCode}" Click="CopyFriendCode" />
-                        <Button Classes="danger" Content="{DynamicResource FriendRemove}" Tag="{Binding}" Click="RemoveFriend" />
+                        <Button Content="{Binding PauseAction}" Tag="{Binding}" IsVisible="{Binding CanBlock}" Click="ToggleFriendPause" />
+                        <Button Content="{DynamicResource FriendCopyCode}" Tag="{Binding}" IsVisible="{Binding CanBlock}" IsEnabled="{Binding CanCopyCode}" Click="CopyFriendCode" />
+                        <Button Content="{DynamicResource FriendUnblock}" Tag="{Binding}" IsVisible="{Binding IsBlocked}" Click="UnblockFriend" />
+                        <Button Classes="danger" Content="{DynamicResource FriendBlock}" Tag="{Binding}" IsVisible="{Binding CanBlock}" Click="BlockFriend" />
+                        <Button Classes="danger" Content="{DynamicResource FriendRemove}" Tag="{Binding}" IsVisible="{Binding CanBlock}" Click="RemoveFriend" />
                       </StackPanel>
                     </Grid>
                   </Border>

@@ -23,7 +23,16 @@ public sealed partial class MainWindow
         bool CanJoin = false,
         string InviteGameId = "",
         string InviteGameTitle = "",
-        string JoinPayload = "");
+        string JoinPayload = "",
+        bool IsBlocked = false,
+        Avalonia.Media.Imaging.Bitmap? Avatar = null,
+        string StatusLine = "")
+    {
+        /// <summary>Everything that is a decision about an active friend, and not about a tombstone.</summary>
+        public bool CanBlock => !IsBlocked;
+
+        public bool HasStatusLine => StatusLine.Length > 0;
+    }
 
     private PeerIdentity? _identity;
     private FriendStore? _friends;
@@ -78,6 +87,14 @@ public sealed partial class MainWindow
             return;
         }
 
+        // The day we started publishing is ours to state because nobody else can: a friend only
+        // ever sees us from the day they added us. Set once, on the first configured publisher.
+        if (_preferences.ProfileFirstSeenAt is null)
+        {
+            _preferences = _preferences with { ProfileFirstSeenAt = DateTimeOffset.UtcNow };
+            _preferencesStore.Save(_preferences);
+        }
+
         var service = new PresenceService(
             _identity,
             _friends,
@@ -108,8 +125,9 @@ public sealed partial class MainWindow
                 _preferences.ShareLibrary,
                 _preferences.SharePlayTime,
                 _preferences.ShareCurrentGame,
-                _preferences.ShareMods),
-            null,
+                _preferences.ShareMods,
+                _preferences.ShareProfile),
+            CurrentProfileInputs(),
             // A lapsed invitation is handed over unchanged and the composer drops it, so an
             // invitation nobody withdrew simply stops being published when its time is up.
             _outgoingInvite)).GetTask();
@@ -215,7 +233,9 @@ public sealed partial class MainWindow
         var known = _friendPresence.TryGetValue(friend.PublicKey, out var snapshot) ? snapshot : null;
         var status = known?.EffectiveStatus(PresencePolicy.FreshnessWindow, now) ?? PresenceStatus.Offline;
 
-        var statusText = friend.Paused
+        var statusText = friend.Blocked
+            ? P7("⛔ Bloqué", "⛔ Blocked")
+            : friend.Paused
             ? P7("⏸ En pause", "⏸ Paused")
             : status switch
             {
@@ -224,10 +244,13 @@ public sealed partial class MainWindow
                 _ => P7("○ Hors ligne", "○ Offline")
             };
 
-        var detail = known is null
-            ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
-                 "Never seen. Their presence is read on the next poll.")
-            : P7($"{known.Library.Count} jeux partagés", $"{known.Library.Count} games shared");
+        var detail = friend.Blocked
+            ? P7("Bloqué. Ni lu, ni destinataire de ta présence.",
+                 "Blocked. Neither read, nor a recipient of your presence.")
+            : known is null
+                ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
+                     "Never seen. Their presence is read on the next poll.")
+                : DescribeFriendLibrary(known);
 
         var seen = friend.LastSeenAt is { } last
             ? P7($"Vu le {last.ToLocalTime():dd/MM/yyyy HH:mm}", $"Seen {last.ToLocalTime():dd/MM/yyyy HH:mm}")
@@ -257,10 +280,27 @@ public sealed partial class MainWindow
             seen + failing,
             friend.Paused ? P7("Reprendre", "Resume") : P7("Mettre en pause", "Pause"),
             CanRebuildCode(friend),
-            mine && !friend.Paused,
+            mine && !friend.Paused && !friend.Blocked,
             invite?.GameId ?? "",
             invite?.GameTitle ?? "",
-            mine ? invite!.JoinPayload : "");
+            mine ? invite!.JoinPayload : "",
+            friend.Blocked,
+            // A blocked peer's face is not shown: the point of blocking is to stop seeing them.
+            friend.Blocked ? null : FriendAvatar(known?.Profile?.AvatarPng),
+            friend.Blocked ? "" : known?.Profile?.StatusLine ?? "");
+    }
+
+    /// <summary>
+    /// The library line, with the profile's own pick folded in when there is one. A friend who
+    /// chose a game to put forward said something; the count alone would drop it.
+    /// </summary>
+    private string DescribeFriendLibrary(PresenceSnapshot known)
+    {
+        var games = P7($"{known.Library.Count} jeux partagés", $"{known.Library.Count} games shared");
+        var pinned = known.Profile?.PinnedGameTitle;
+        return string.IsNullOrWhiteSpace(pinned)
+            ? games
+            : games + P7($" • en avant : {pinned}", $" • featured: {pinned}");
     }
 
     /// <summary>
