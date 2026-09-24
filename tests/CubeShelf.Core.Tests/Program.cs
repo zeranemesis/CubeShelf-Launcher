@@ -54,6 +54,9 @@ Run("mod state survives hostile input", TestModStateSurvivesHostileInput);
 Run("the active list is written atomically", TestActiveListIsWrittenAtomically);
 Run("the sequence never goes backwards", TestSequenceNeverGoesBackwards);
 Run("the sequence adopts a document ahead of it", TestSequenceAdoptsADocumentAhead);
+Run("the composer shares only what was agreed", TestComposerSharesOnlyWhatWasAgreed);
+Run("the composer reports mods without touching them", TestComposerReportsModsWithoutTouchingThem);
+Run("the composer is deterministic", TestComposerIsDeterministic);
 
 if (failures.Count == 0)
 {
@@ -1031,6 +1034,144 @@ string CurrentRid() =>
     (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Composing the document to publish: what is shared, and nothing written while doing it.
+// ---------------------------------------------------------------------------
+
+void TestComposerSharesOnlyWhatWasAgreed()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var composer = new PresenceComposer(paths);
+        var now = DateTimeOffset.UtcNow;
+        var games = SampleLibrary();
+
+        var everything = composer.Compose("Zera", games, new[] { "GRSEAF" },
+            new PresenceSharingOptions(), 1, now);
+        Assert(everything.Status == PresenceStatus.InGame);
+        Assert(everything.CurrentGameId == "GRSEAF" && everything.CurrentGameTitle == "Soulcalibur II");
+        Assert(everything.Library.Count == 2);
+        Assert(everything.Library[0].Id == "G4QE01");         // ordered, not catalog order
+        Assert(everything.Library[1].PlayCount == 12);
+        Assert(everything.DisplayName == "Zera");
+
+        // Each flag removes exactly its own data and nothing else.
+        var noLibrary = composer.Compose("Zera", games, new[] { "GRSEAF" },
+            new PresenceSharingOptions(ShareLibrary: false), 1, now);
+        Assert(noLibrary.Library.Count == 0);
+        Assert(noLibrary.CurrentGameId == "GRSEAF");          // still in a game
+
+        var noPlayTime = composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(SharePlayTime: false), 1, now);
+        Assert(noPlayTime.Library.Count == 2);
+        Assert(noPlayTime.Library.All(game => game.PlayCount == 0 && game.TotalPlaySeconds == 0));
+        Assert(noPlayTime.Library.All(game => game.LastPlayedAt is null));
+        Assert(noPlayTime.Library.Any(game => game.IsFavorite));   // a favourite is not play time
+
+        var noCurrentGame = composer.Compose("Zera", games, new[] { "GRSEAF" },
+            new PresenceSharingOptions(ShareCurrentGame: false), 1, now);
+        Assert(noCurrentGame.CurrentGameId is null && noCurrentGame.CurrentGameTitle is null);
+        Assert(noCurrentGame.Status == PresenceStatus.Online);     // present, just not saying what
+        Assert(noCurrentGame.Library.Count == 2);
+
+        // Not playing anything reads as online, never as offline: only staleness means offline,
+        // because a peer that stopped publishing cannot publish that it stopped.
+        var idle = composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(), 1, now);
+        Assert(idle.Status == PresenceStatus.Online && idle.CurrentGameId is null);
+
+        var farewell = PresenceComposer.Offline("Zera", 9, now);
+        Assert(farewell.Status == PresenceStatus.Offline);
+        Assert(farewell.Library.Count == 0 && farewell.Mods.Count == 0 && farewell.Sequence == 9);
+    });
+}
+
+void TestComposerReportsModsWithoutTouchingThem()
+{
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "GMPE01_00");
+        Directory.CreateDirectory(modDirectory);
+        File.WriteAllText(Path.Combine(modDirectory, "installed.json"), System.Text.Json.JsonSerializer.Serialize(new[]
+        {
+            new PortableInstalledMod(7, "Board pack", 0, true, 1, modDirectory, ""),
+            new PortableInstalledMod(8, "Muted in game", 0, true, 1, modDirectory, "")
+        }));
+        File.WriteAllText(Path.Combine(modDirectory, "player-disabled.json"), "[8]");
+
+        var activeList = Path.Combine(modDirectory, "active-mods.txt");
+        File.WriteAllText(activeList, "what the running game is reading\n");
+        var before = File.ReadAllBytes(activeList);
+        var writtenAt = File.GetLastWriteTimeUtc(activeList);
+
+        // Mods are reported for games in the library, so the game that owns them has to be in it.
+        var library = SampleLibrary()
+            .Append(new PresenceGame("GMPE01_00", "Mario Party 4", 40, 7200, false, null))
+            .ToArray();
+
+        var composer = new PresenceComposer(paths);
+        var snapshot = composer.Compose("Zera", library, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow);
+
+        Assert(snapshot.Mods.Count == 2);
+        Assert(snapshot.Mods[0] is { GameId: "GMPE01_00", ModId: "7", Enabled: true });
+        Assert(snapshot.Mods[1] is { ModId: "8", Enabled: false });   // the player switched it off
+
+        // Composing must leave the mod state exactly as it found it -- one of these games could
+        // be running while the background loop publishes.
+        Assert(File.ReadAllBytes(activeList).SequenceEqual(before));
+        Assert(File.GetLastWriteTimeUtc(activeList) == writtenAt);
+
+        var withoutMods = composer.Compose("Zera", library, Array.Empty<string>(),
+            new PresenceSharingOptions(ShareMods: false), 1, DateTimeOffset.UtcNow);
+        Assert(withoutMods.Mods.Count == 0);
+
+        // A game that is not in the library contributes no mods, even with state on disk: the
+        // catalog decides what a friend can see.
+        Assert(composer.Compose("Zera", SampleLibrary(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow).Mods.Count == 0);
+    });
+}
+
+void TestComposerIsDeterministic()
+{
+    WithTempRoot(root =>
+    {
+        var composer = new PresenceComposer(new TestPaths(root));
+        var games = SampleLibrary();
+
+        // Two publishes of an unchanged shelf differ only by when and which number, so the
+        // fingerprint lets the loop skip a needless write.
+        var first = composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow);
+        var second = composer.Compose("Zera", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 99, DateTimeOffset.UtcNow.AddHours(3));
+        Assert(PresenceComposer.ContentFingerprint(first) == PresenceComposer.ContentFingerprint(second));
+
+        // Anything a friend would actually see does change it.
+        var playing = composer.Compose("Zera", games, new[] { "GRSEAF" },
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow);
+        Assert(PresenceComposer.ContentFingerprint(playing) != PresenceComposer.ContentFingerprint(first));
+
+        var renamed = composer.Compose("Someone else", games, Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow);
+        Assert(PresenceComposer.ContentFingerprint(renamed) != PresenceComposer.ContentFingerprint(first));
+
+        // Catalog order must not leak into the document, or the fingerprint would change for no
+        // reason a friend could see.
+        var reordered = composer.Compose("Zera", games.Reverse().ToArray(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 1, DateTimeOffset.UtcNow);
+        Assert(PresenceComposer.ContentFingerprint(reordered) == PresenceComposer.ContentFingerprint(first));
+    });
+}
+
+IReadOnlyList<PresenceGame> SampleLibrary() => new[]
+{
+    new PresenceGame("GRSEAF", "Soulcalibur II", 12, 3600, true, DateTimeOffset.UnixEpoch.AddDays(1)),
+    new PresenceGame("G4QE01", "Super Mario Strikers", 3, 900, false, null)
+};
+
 // The published sequence. A friend that has seen a higher one rejects everything below it
 // for good, so going backwards is the one failure this must never have.
 // ---------------------------------------------------------------------------
