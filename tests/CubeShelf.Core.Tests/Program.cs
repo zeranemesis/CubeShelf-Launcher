@@ -64,6 +64,8 @@ Run("an unchanged document costs a 304", TestFetcherReadsAndThenSpendsA304);
 Run("replays are rejected but their ETag is kept", TestFetcherRejectsReplaysButKeepsTheETag);
 Run("one broken friend does not stop the others", TestOneBrokenFriendDoesNotStopTheOthers);
 Run("oversized and unsafe addresses are refused", TestFetcherRefusesOversizedAndUnsafeAddresses);
+Run("the self-test proves the round trip", TestSelfTestProvesTheRoundTrip);
+Run("the self-test catches an address serving something else", TestSelfTestCatchesAnAddressThatServesSomethingElse);
 
 if (failures.Count == 0)
 {
@@ -1042,6 +1044,95 @@ string CurrentRid() =>
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// The self-test: a friend code is only offered once a document has made the round trip.
+// ---------------------------------------------------------------------------
+
+void TestSelfTestProvesTheRoundTrip()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        const string url = "https://cloud.example.test/s/token/download";
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, url));
+
+        // The share link serves whatever the folder currently holds.
+        var served = new ServedFolderHandler(Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
+        using var client = new HttpClient(served);
+        using var selfTest = new PresenceSelfTest(me, client, TimeSpan.FromMilliseconds(10));
+
+        var snapshot = PresenceComposer.Offline("Zera", 77, DateTimeOffset.UtcNow);
+        var result = selfTest.RunAsync(publisher, snapshot,
+            PresenceRecipients.ForPublication(me, friends), TimeSpan.FromSeconds(2))
+            .GetAwaiter().GetResult();
+
+        Assert(result.Succeeded && result.PresenceUrl == url);
+        Assert(FriendCode.TryDecode(result.FriendCode, out var decoded, out _));
+        Assert(decoded!.PresenceUrl == url && decoded.PublicKey.SequenceEqual(me.PublicKey));
+    });
+}
+
+void TestSelfTestCatchesAnAddressThatServesSomethingElse()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        const string url = "https://cloud.example.test/s/token";
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, url));
+        var snapshot = PresenceComposer.Offline("Zera", 1, DateTimeOffset.UtcNow);
+        var recipients = PresenceRecipients.ForPublication(me, friends);
+
+        // The classic failure: a share link without /download serves an HTML preview page. The
+        // write succeeded, so nothing short of reading it back would notice.
+        using (var preview = new HttpClient(new FixedBodyHandler("<!DOCTYPE html><html>Nextcloud</html>")))
+        using (var selfTest = new PresenceSelfTest(me, preview, TimeSpan.FromMilliseconds(10)))
+        {
+            var result = selfTest.RunAsync(publisher, snapshot, recipients, TimeSpan.FromMilliseconds(60))
+                .GetAwaiter().GetResult();
+            Assert(!result.Succeeded);
+            Assert(result.FriendCode.Length == 0);      // no code is handed out on a guess
+            Assert(result.Error!.Contains("/download", StringComparison.Ordinal));
+        }
+
+        // Nothing there yet at all: worth waiting for, then reported plainly.
+        using (var absent = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound)))
+        using (var selfTest = new PresenceSelfTest(me, absent, TimeSpan.FromMilliseconds(10)))
+        {
+            var result = selfTest.RunAsync(publisher, snapshot, recipients, TimeSpan.FromMilliseconds(60))
+                .GetAwaiter().GetResult();
+            Assert(!result.Succeeded && result.Error is { Length: > 0 });
+        }
+
+        // A stale copy -- a cache, or the sync client not caught up -- is not a pass either.
+        var stale = SealedPresence.ToJson(SealedPresence.Seal(me,
+            PresenceComposer.Offline("Zera", 0, DateTimeOffset.UtcNow), recipients));
+        using (var cached = new HttpClient(new FixedBodyHandler(stale)))
+        using (var selfTest = new PresenceSelfTest(me, cached, TimeSpan.FromMilliseconds(10)))
+        {
+            var result = selfTest.RunAsync(publisher, snapshot with { Sequence = 5 }, recipients,
+                TimeSpan.FromMilliseconds(60)).GetAwaiter().GetResult();
+            Assert(!result.Succeeded && result.Error!.Contains("ancien", StringComparison.Ordinal));
+        }
+
+        // An unconfigured publisher never even writes.
+        var unconfigured = new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, "p.json", ""));
+        using (var client = new HttpClient(new FixedBodyHandler("{}")))
+        using (var selfTest = new PresenceSelfTest(me, client, TimeSpan.FromMilliseconds(10)))
+            Assert(!selfTest.RunAsync(unconfigured, snapshot, recipients, TimeSpan.FromMilliseconds(30))
+                .GetAwaiter().GetResult().Succeeded);
+    });
+}
+
 // Reading friends' documents. Every address came from a pasted code, so it is
 // attacker-chosen text and nothing about the response is taken on trust.
 // ---------------------------------------------------------------------------
@@ -2014,4 +2105,31 @@ sealed class PerHostHttpHandler(string document) : HttpMessageHandler
             RequestMessage = request
         });
     }
+}
+
+/// <summary>Serves whatever the folder currently holds, like a share link would.</summary>
+sealed class ServedFolderHandler(string path) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+        Task.FromResult(File.Exists(path)
+            ? new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(File.ReadAllText(path)), RequestMessage = request
+            }
+            : new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request });
+}
+
+sealed class FixedBodyHandler(string body) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+        Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(body), RequestMessage = request
+        });
+}
+
+sealed class StatusHandler(System.Net.HttpStatusCode status) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+        Task.FromResult(new HttpResponseMessage(status) { RequestMessage = request });
 }

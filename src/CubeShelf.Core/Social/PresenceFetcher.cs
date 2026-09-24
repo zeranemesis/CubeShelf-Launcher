@@ -122,45 +122,26 @@ public sealed class PresenceFetcher : IDisposable
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, address);
-
-            // A hand-edited ETag would make ParseAdd throw. Omitting the header costs one full
-            // download; failing the fetch would cost the friend entirely.
-            if (!string.IsNullOrWhiteSpace(friend.LastETag) &&
-                EntityTagHeaderValue.TryParse(friend.LastETag, out var tag))
-                request.Headers.IfNoneMatch.Add(tag);
-
-            using var response = await _http
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token)
+            var read = await PresenceDocumentReader
+                .ReadAsync(_http, address, friend.LastETag, timeout.Token)
                 .ConfigureAwait(false);
 
-            // Before any success check: 304 is not 2xx, so EnsureSuccessStatusCode would treat
-            // the cheapest possible answer as a failure.
-            if (response.StatusCode == HttpStatusCode.NotModified)
+            if (read.NotModified)
             {
                 Succeed(friend, friend.LastETag, now, advanceSequence: null);
                 return new(friend.PublicKey, PresenceFetchStatus.NotModified);
             }
 
-            if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone)
+            if (read.NotPublished)
                 return Fail(friend, PresenceFetchStatus.NotPublished,
                     "Cet ami n’a pas encore publié sa présence.", connectivity: false);
 
-            if (!response.IsSuccessStatusCode)
+            if (!read.Ok)
                 return Fail(friend, PresenceFetchStatus.Unreachable,
-                    $"L’adresse a répondu {(int)response.StatusCode}.",
-                    connectivity: (int)response.StatusCode >= 500);
+                    read.Error ?? "Lecture impossible.", read.IsConnectivityFailure);
 
-            if (response.Content.Headers.ContentLength > PresencePolicy.MaximumDocumentBytes)
-                return Fail(friend, PresenceFetchStatus.Unreachable,
-                    "Le document de présence est trop volumineux.", connectivity: false);
-
-            var json = await ReadCappedAsync(response, timeout.Token).ConfigureAwait(false);
-            if (json is null)
-                return Fail(friend, PresenceFetchStatus.Unreachable,
-                    "Le document de présence est trop volumineux.", connectivity: false);
-
-            var etag = response.Headers.ETag?.ToString();
+            var json = read.Json!;
+            var etag = read.ETag;
 
             if (!SealedPresence.TryOpen(_identity, publicKey, SealedPresence.FromJson(json), out var snapshot) ||
                 snapshot is null)
@@ -196,27 +177,6 @@ public sealed class PresenceFetcher : IDisposable
         {
             return Fail(friend, PresenceFetchStatus.Unreachable, exception.Message, connectivity: true);
         }
-    }
-
-    /// <summary>
-    /// Reads the body while counting, because Content-Length may be absent or simply untrue.
-    /// Returns null once the cap is passed.
-    /// </summary>
-    private static async Task<string?> ReadCappedAsync(HttpResponseMessage response, CancellationToken cancellationToken)
-    {
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using var buffer = new MemoryStream();
-        var chunk = new byte[64 * 1024];
-
-        while (true)
-        {
-            var read = await stream.ReadAsync(chunk, cancellationToken).ConfigureAwait(false);
-            if (read == 0) break;
-            if (buffer.Length + read > PresencePolicy.MaximumDocumentBytes) return null;
-            buffer.Write(chunk, 0, read);
-        }
-
-        return System.Text.Encoding.UTF8.GetString(buffer.ToArray());
     }
 
     private void Succeed(Friend friend, string? etag, DateTimeOffset now, long? advanceSequence)
