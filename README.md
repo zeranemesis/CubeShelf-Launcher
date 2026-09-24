@@ -1,6 +1,6 @@
 # CubeShelf Launcher
 
-CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.8 utilise une interface Avalonia commune à Windows et Linux : elle installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II), prépare les images fournies légalement par l’utilisateur et gère les mods GameBanana.
+CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.8 utilise une interface Avalonia commune à Windows et Linux : elle installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II, Strikers pour Super Mario Strikers), prépare les images fournies légalement par l’utilisateur, gère les mods GameBanana, et propose un système d’amis pair-à-pair sans serveur.
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
@@ -77,6 +77,59 @@ Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et enviro
 
 Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`, en trois fichiers : `pal_front.png`, `pal_back.png` et `pal_spine.png`. Pour en remplacer une, écrase ces fichiers sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image. Les jaquettes complètes (dos + tranche + face) se découpent aux proportions GameCube standard : dos 900, tranche 120, face 900 sur 1920.
 
+## Amis décentralisés
+
+CubeShelf peut montrer qui de tes amis est en ligne, à quoi il joue, sa bibliothèque et ses mods — **sans service central, sans compte, sans mot de passe enregistré**.
+
+Le principe tient en une phrase : chacun publie un petit document chiffré à un endroit qu'il contrôle, et les amis le relisent en HTTPS.
+
+### Mise en route
+
+1. **Paramètres → Amis et présence.** Choisis un nom affiché. Il est vide par défaut et n'est jamais déduit de ton compte Windows : ce nom part chez tous tes amis.
+2. **Choisis un dossier déjà synchronisé** par Nextcloud, Dropbox ou équivalent, et colle l'adresse publique de ce dossier.
+3. **Teste l'adresse.** CubeShelf publie un document, le relit depuis cette adresse et le déchiffre avec ta clé. **Ton code ami n'apparaît qu'après.**
+4. Coche « Publier ma présence », puis échange ton code (Ctrl+6 pour la page Amis).
+
+Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ; c'est la **lecture** qui casse, silencieusement, et du côté où personne ne peut diagnostiquer. Le cas le plus fréquent : **un lien de partage Nextcloud sert une page HTML et non le fichier tant qu'on n'ajoute pas `/download` à la fin.** Sans le test, tu distribuerais un code ami inerte et tes amis ne te verraient jamais, sans savoir pourquoi.
+
+> Syncthing ne convient pas : il n'expose aucune adresse HTTP, donc tes amis n'ont rien à interroger.
+
+### Comment c'est construit
+
+| Élément | Choix |
+| --- | --- |
+| Identité | Une paire de clés P-256 générée au premier lancement. La clé publique **est** l'identité : rien n'est délivré par personne. |
+| Code ami | Clé publique + adresse de publication + somme de contrôle. L'adresse doit y figurer : sans annuaire, une clé seule ne dit pas où lire. |
+| Chiffrement | Le document est chiffré une fois sous une clé de contenu aléatoire, elle-même emballée par ami. Retirer un ami = ne plus inclure son coffre. |
+| Authenticité | Aucune signature. AES-GCM est authentifié et la clé de paire n'est connue que de vous deux : un document qui s'ouvre vient de cet ami. |
+| Anti-rejeu | Un numéro de séquence strictement croissant. Une copie conservée d'un ancien document est inerte. |
+| Fraîcheur | Un document périmé se lit **hors ligne**, plutôt que de figer un ami sur son dernier jeu. |
+
+Le nombre de coffres est rembourré à un multiple de huit : le fichier ne publie pas combien tu as d'amis.
+
+Aucune dépendance n'a été ajoutée — ECDH, HKDF et AES-GCM viennent de .NET 8.
+
+### Ce que ça ne protège pas
+
+Ces limites sont structurelles, pas des oublis :
+
+- **Retirer un ami ne l'empêche pas de t'observer.** Il garde ton adresse et voit *quand* ton fichier change, donc quand tu joues. Il garde aussi la clé de paire, qui dérive des deux identités et **ne peut pas être changée sans changer d'identité**. Seule une rotation de l'adresse y met fin — et elle invalide tous les codes amis distribués.
+- **Changer d'adresse casse silencieusement les amis existants** : ils continuent d'interroger l'ancienne, sans jamais l'apprendre.
+- **Pas de confidentialité persistante.** Qui obtient ta clé d'identité déchiffre rétroactivement tout document que tu as publié.
+- **Ta clé privée est un fichier en clair** dans ton profil, protégé par les permissions du système de fichiers. C'est le même niveau que le reste du profil, mais autant le dire.
+- **L'hébergeur peut taire, pas falsifier.** AES-GCM bloque la forgerie ; geler ton document te laisse « en jeu » jusqu'à expiration. La fenêtre de fraîcheur borne cette attaque.
+- **Une identité par installation.** Copier ton profil sur une seconde machine fait publier deux CubeShelf à la même adresse sous la même identité, et celui qui prend du retard finit rejeté par tes amis. La seconde machine doit générer sa propre identité, et vous vous ajoutez mutuellement.
+- **Le partage est décidé globalement**, pas ami par ami : les quatre cases s'appliquent à tout le monde.
+
+### Où vivent les fichiers
+
+Dans le profil utilisateur (`%LOCALAPPDATA%\CubeShelf` sous Windows) :
+
+| Fichier | Contenu |
+| --- | --- |
+| `identity.key` | Ta clé privée. La perdre oblige tous tes amis à te rajouter. |
+| `friends.json` | Tes amis, leur adresse, et l'état de lecture de chacun. |
+| `presence-state.json` | Le compteur de séquence. **Ne le supprime pas** sans raison. |
 ## Aperçu Linux et Steam Deck
 
 Le dépôt contient désormais un noyau portable `CubeShelf.Core`, une interface Avalonia `CubeShelf.Desktop` et un pipeline AppImage `linux-x64`. Cet aperçu affiche la bibliothèque avec des chemins conformes à XDG, permet de sélectionner et valider une image ISO/GCM/RVZ, puis télécharge le runtime PartyBoard correspondant à la plateforme. La taille et le SHA-256 du paquet sont contrôlés avant son activation. L’interface sait ensuite mettre à jour, réparer ou désinstaller ce runtime sans supprimer l’image originale.
@@ -102,8 +155,10 @@ dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj -c Release -r linu
 - extraction d’archives confinée, avec refus des chemins absolus, traversées et doublons ;
 - mises à jour automatiques du launcher désactivées par défaut ;
 - installation issue d’un éditeur sans manifeste ni checksum marquée comme non vérifiée et tracée dans l’état du runtime ;
-- releases stables signées obligatoirement, sauf dérogation manuelle explicite.
-- téléchargement de l’outil AppImage épinglé et vérifié par SHA-256.
+- releases stables signées obligatoirement, sauf dérogation manuelle explicite ;
+- téléchargement de l’outil AppImage épinglé et vérifié par SHA-256 ;
+- présence des amis chiffrée de bout en bout par paire, sans service central ni secret stocké ;
+- adresse de publication vérifiée par un aller-retour réel avant qu’un code ami ne soit délivré.
 
 ## Séparation des responsabilités
 
