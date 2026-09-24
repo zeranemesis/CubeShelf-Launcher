@@ -33,7 +33,10 @@
           <Button x:Name="NavDownloadsButton" Classes="nav" TabIndex="4" Click="ParityShowDownloads">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="↓" Width="18" /><TextBlock Text="{DynamicResource AppDownloads}" /></StackPanel>
           </Button>
-          <Button x:Name="NavSettingsButton" Classes="nav" TabIndex="5" Click="ParityShowSettings">
+          <Button x:Name="NavFriendsButton" Classes="nav" TabIndex="5" Click="ParityShowFriends">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="☺" Width="18" /><TextBlock Text="{DynamicResource AppFriends}" /></StackPanel>
+          </Button>
+          <Button x:Name="NavSettingsButton" Classes="nav" TabIndex="6" Click="ParityShowSettings">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⚙" Width="18" /><TextBlock Text="{DynamicResource AppSettings}" /></StackPanel>
           </Button>
         </StackPanel>
@@ -321,10 +324,93 @@
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><StackPanel Spacing="5"><TextBlock Text="{DynamicResource Shortcuts}" FontSize="18" FontWeight="Bold" /><TextBlock Text="{DynamicResource ShortcutsHelp}" Foreground="{DynamicResource Muted}" /><TextBlock x:Name="ShortcutSummaryText" Foreground="{DynamicResource Text}" TextWrapping="Wrap" Margin="0,4,0,0" /></StackPanel></Border>
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock Text="{DynamicResource FirstRunAssistant}" FontSize="18" FontWeight="Bold" /><TextBlock Text="{DynamicResource StartupAssistantHelp}" Foreground="{DynamicResource Muted}" /></StackPanel><Button Grid.Column="1" Content="{DynamicResource RunAssistant}" Click="RunFirstStartWizard" /></Grid></Border>
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock Text="{DynamicResource Diagnostics}" FontSize="18" FontWeight="Bold" /><TextBlock Text="{DynamicResource DiagnosticsHelp}" Foreground="{DynamicResource Muted}" /></StackPanel><Button Grid.Column="1" Content="{DynamicResource OpenDiagnostics}" Click="OpenDiagnosticsPhase6" /></Grid></Border>
+          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+            <StackPanel Spacing="9">
+              <TextBlock Text="{DynamicResource Presence}" FontSize="18" FontWeight="Bold" />
+              <TextBlock Text="{DynamicResource PresenceHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+
+              <TextBlock Text="{DynamicResource PresenceDisplayName}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <TextBox x:Name="PresenceNameBox" Watermark="{DynamicResource PresenceDisplayNameHint}" LostFocus="SavePresenceText" />
+
+              <TextBlock Text="{DynamicResource PresenceFolder}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="PresenceFolderBox" LostFocus="SavePresenceText" />
+                <Button Grid.Column="1" Content="{DynamicResource PresenceBrowse}" Click="BrowsePresenceFolder" />
+              </Grid>
+
+              <TextBlock Text="{DynamicResource PresenceUrl}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <TextBox x:Name="PresenceUrlBox" Watermark="https://…/download" LostFocus="SavePresenceText" />
+              <TextBlock Text="{DynamicResource PresenceUrlHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+
+              <StackPanel Orientation="Horizontal">
+                <Button x:Name="PresenceSelfTestButton" Classes="primary" Content="{DynamicResource PresenceTest}" Click="RunPresenceSelfTest" />
+                <CheckBox x:Name="PresencePublishBox" Content="{DynamicResource PresencePublish}" VerticalAlignment="Center" Margin="10,0,0,0" Checked="SaveSettings" Unchecked="SaveSettings" />
+              </StackPanel>
+              <TextBlock x:Name="PresenceStatusText" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+
+              <TextBlock Text="{DynamicResource MyFriendCode}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="OwnFriendCodeBox" IsReadOnly="True" Watermark="{DynamicResource MyFriendCodeHint}" />
+                <Button x:Name="CopyOwnCodeButton" Grid.Column="1" Content="{DynamicResource Copy}" IsEnabled="False" Click="CopyOwnFriendCode" />
+              </Grid>
+
+              <TextBlock Text="{DynamicResource WhatYouShare}" FontWeight="Bold" Margin="0,10,0,0" />
+              <CheckBox x:Name="ShareLibraryBox" Content="{DynamicResource ShareLibrary}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="SharePlayTimeBox" Content="{DynamicResource SharePlayTime}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="ShareCurrentGameBox" Content="{DynamicResource ShareCurrentGame}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="ShareModsBox" Content="{DynamicResource ShareMods}" Checked="SaveSettings" Unchecked="SaveSettings" />
+            </StackPanel>
+          </Border>
           <StackPanel Orientation="Horizontal"><Button Content="{DynamicResource ResetSettings}" Click="ResetSettings" /></StackPanel>
           <TextBlock x:Name="SettingsStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
         </StackPanel>
       </ScrollViewer>
+
+      <!-- FRIENDS -->
+      <Grid x:Name="FriendsView" Classes="view" IsVisible="False" RowDefinitions="132,*">
+        <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+          <Grid Margin="34,24" ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource FriendsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" />
+              <TextBlock Text="{DynamicResource FriendsTitle}" Foreground="{DynamicResource Text}" FontSize="32" FontWeight="Bold" Margin="0,5,0,0" />
+              <TextBlock x:Name="FriendsSubtitleText" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button Content="{DynamicResource AddFriend}" Classes="primary" Click="AddFriend" />
+              <Button Content="{DynamicResource FriendsRefresh}" Click="RefreshFriendsNow" />
+              <Button Content="{DynamicResource PresenceSettings}" Click="ParityShowSettings" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        <Border Grid.Row="1" Margin="28,20,28,28" Background="{DynamicResource Panel}" CornerRadius="14" Padding="14">
+          <Grid>
+            <ListBox x:Name="FriendsList" Background="Transparent" BorderThickness="0">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
+                    <Grid ColumnDefinitions="1.4*,2*,Auto">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Accent2}" FontSize="12" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Margin="18,0">
+                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Extra}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="{Binding PauseAction}" Tag="{Binding}" Click="ToggleFriendPause" />
+                        <Button Content="{DynamicResource FriendCopyCode}" Tag="{Binding}" IsEnabled="{Binding CanCopyCode}" Click="CopyFriendCode" />
+                        <Button Classes="danger" Content="{DynamicResource FriendRemove}" Tag="{Binding}" Click="RemoveFriend" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock x:Name="FriendsEmptyText" Text="{DynamicResource FriendsEmpty}" Foreground="{DynamicResource Muted}" FontSize="16" HorizontalAlignment="Center" Margin="0,60" TextWrapping="Wrap" MaxWidth="560" TextAlignment="Center" IsVisible="False" />
+          </Grid>
+        </Border>
+      </Grid>
 
       <!-- CONNECTIVITY / OFFLINE STATE -->
       <Border x:Name="ConnectivityBanner" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Bottom" MaxWidth="620" Margin="24,24,24,92" Padding="14" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Warning}" BorderThickness="1" CornerRadius="14" ZIndex="40">

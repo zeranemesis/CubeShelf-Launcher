@@ -99,11 +99,17 @@ public sealed partial class MainWindow : Window
             RefreshGameState();
             RefreshModItems();
         }
+
+        // After the catalog is loaded, so the first document published is not an empty shelf.
+        InitializeFriends();
         RefreshDownloadItems();
         Closing += (_, _) =>
         {
             _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
             _preferencesStore.Save(_preferences);
+            // Before the tracker is disposed: the farewell document has to still know whether
+            // a game is running, or a friend is left looking at a stale "in a game".
+            DisposeFriends();
             _sessions.Dispose();
             DisposePhase3Parity();
             DisposePhase4Parity();
@@ -501,6 +507,9 @@ public sealed partial class MainWindow : Window
     private void ShowDownloads(object? sender, RoutedEventArgs args)
     {
         ShowParityView(DownloadsView);
+
+        // After the catalog is loaded, so the first document published is not an empty shelf.
+        InitializeFriends();
         RefreshDownloadItems();
     }
 
@@ -652,6 +661,7 @@ public sealed partial class MainWindow : Window
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
+        ApplyPresencePreferences();
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
         if (Avalonia.Application.Current is { } application)
@@ -672,6 +682,7 @@ public sealed partial class MainWindow : Window
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
             RefreshModsOnOpen = RefreshModsBox.IsChecked == true
         };
+        SavePresencePreferences();
         _preferencesStore.Save(_preferences);
         if (Avalonia.Application.Current is { } application)
             application.RequestedThemeVariant = theme == "light" ? ThemeVariant.Light : ThemeVariant.Dark;
@@ -683,10 +694,23 @@ public sealed partial class MainWindow : Window
     private void ResetSettings(object? sender, RoutedEventArgs args)
     {
         _preferencesStore.Reset();
-        _preferences = new UserPreferences();
+
+        // The friends settings survive a reset. Wiping the name and the address while
+        // friends.json and identity.key stay on disk would leave the user with a friends list
+        // they have silently stopped publishing to -- broken in the one direction nobody checks.
+        _preferences = new UserPreferences(
+            FriendsDisplayName: _preferences.FriendsDisplayName,
+            PresenceFolder: _preferences.PresenceFolder,
+            PresenceUrl: _preferences.PresenceUrl,
+            PresencePublishEnabled: _preferences.PresencePublishEnabled,
+            ShareLibrary: _preferences.ShareLibrary,
+            SharePlayTime: _preferences.SharePlayTime,
+            ShareCurrentGame: _preferences.ShareCurrentGame,
+            ShareMods: _preferences.ShareMods);
+
         ApplyPreferences();
         _preferencesStore.Save(_preferences);
-        SettingsStatus.Text = "Paramètres réinitialisés.";
+        SettingsStatus.Text = "Paramètres réinitialisés. Ton identité et tes amis sont conservés.";
     }
 
     private async void CheckLauncherUpdate(object? sender, RoutedEventArgs args)

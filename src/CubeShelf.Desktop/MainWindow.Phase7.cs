@@ -39,6 +39,7 @@ public sealed partial class MainWindow
             RefreshDolphinStatusPhase4Core();
             RefreshStoragePhase6();
             RefreshParityGameDetails();
+            RefreshFriendsView();
         }, DispatcherPriority.Background);
     }
 
@@ -50,8 +51,8 @@ public sealed partial class MainWindow
         if (ShortcutSummaryText is not null)
         {
             ShortcutSummaryText.Text = P7(
-                "Ctrl+1 Bibliothèque • Ctrl+2 Favoris • Ctrl+3 Mods • Ctrl+4 Téléchargements • Ctrl+5 Paramètres • Ctrl+F Rechercher • F5 Actualiser • Échap Retour",
-                "Ctrl+1 Library • Ctrl+2 Favorites • Ctrl+3 Mods • Ctrl+4 Downloads • Ctrl+5 Settings • Ctrl+F Search • F5 Refresh • Esc Back");
+                "Ctrl+1 Bibliothèque • Ctrl+2 Favoris • Ctrl+3 Mods • Ctrl+4 Téléchargements • Ctrl+5 Paramètres • Ctrl+6 Amis • Ctrl+F Rechercher • F5 Actualiser • Échap Retour",
+                "Ctrl+1 Library • Ctrl+2 Favorites • Ctrl+3 Mods • Ctrl+4 Downloads • Ctrl+5 Settings • Ctrl+6 Friends • Ctrl+F Search • F5 Refresh • Esc Back");
         }
     }
 
@@ -61,6 +62,7 @@ public sealed partial class MainWindow
         ConfigureAccessiblePhase7(NavFavoritesButton, P7("Favoris", "Favorites"), "Ctrl+2");
         ConfigureAccessiblePhase7(NavModsButton, P7("Mods du jeu sélectionné", "Mods for selected game"), "Ctrl+3");
         ConfigureAccessiblePhase7(NavDownloadsButton, P7("Téléchargements", "Downloads"), "Ctrl+4");
+        ConfigureAccessiblePhase7(NavFriendsButton, P7("Amis", "Friends"), "Ctrl+6");
         ConfigureAccessiblePhase7(NavSettingsButton, P7("Paramètres", "Settings"), "Ctrl+5");
         ConfigureAccessiblePhase7(LibrarySearchBox, P7("Rechercher dans la bibliothèque", "Search the library"), "Ctrl+F");
         ConfigureAccessiblePhase7(PlayButton, P7("Jouer ou arrêter le jeu sélectionné", "Play or stop the selected game"));
@@ -79,6 +81,7 @@ public sealed partial class MainWindow
         ToolTip.SetTip(NavFavoritesButton, P7("Favoris • Ctrl+2", "Favorites • Ctrl+2"));
         ToolTip.SetTip(NavModsButton, P7("Mods • Ctrl+3", "Mods • Ctrl+3"));
         ToolTip.SetTip(NavDownloadsButton, P7("Téléchargements • Ctrl+4", "Downloads • Ctrl+4"));
+        ToolTip.SetTip(NavFriendsButton, P7("Amis • Ctrl+6", "Friends • Ctrl+6"));
         ToolTip.SetTip(NavSettingsButton, P7("Paramètres • Ctrl+5", "Settings • Ctrl+5"));
         ToolTip.SetTip(LibrarySearchBox, P7("Rechercher • Ctrl+F", "Search • Ctrl+F"));
     }
@@ -117,7 +120,13 @@ public sealed partial class MainWindow
                     args.Handled = true;
                     return;
                 case Key.D5:
+                    // Ctrl+5 stays Settings: it is in users' fingers and printed in the
+                    // shortcut summary. Friends takes the next free number instead.
                     ParityShowSettings(this, new RoutedEventArgs());
+                    args.Handled = true;
+                    return;
+                case Key.D6:
+                    ParityShowFriends(this, new RoutedEventArgs());
                     args.Handled = true;
                     return;
                 case Key.F:
@@ -161,6 +170,13 @@ public sealed partial class MainWindow
 
     private async Task RefreshCurrentViewPhase7Async()
     {
+        if (FriendsView.IsVisible)
+        {
+            await RefreshFriendsSilentlyAsync();
+            RefreshFriendsView();
+            return;
+        }
+
         if (ModsView.IsVisible)
         {
             RefreshMods(this, new RoutedEventArgs());

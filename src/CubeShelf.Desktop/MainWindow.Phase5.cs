@@ -227,6 +227,7 @@ public sealed partial class MainWindow
         SetNavSelectedPhase5(NavFavoritesButton, LibraryView.IsVisible && _favoritesOnly);
         SetNavSelectedPhase5(NavModsButton, ModsView.IsVisible);
         SetNavSelectedPhase5(NavDownloadsButton, DownloadsView.IsVisible);
+        SetNavSelectedPhase5(NavFriendsButton, FriendsView.IsVisible);
         SetNavSelectedPhase5(NavSettingsButton, SettingsView.IsVisible);
     }
 

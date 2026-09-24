@@ -10,6 +10,34 @@ internal static class UiLocalization
         ["AppFavorites"] = "Favoris",
         ["AppMods"] = "Mods du jeu",
         ["AppDownloads"] = "Téléchargements",
+        ["AppFriends"] = "Amis",
+        ["FriendsEyebrow"] = "AMIS",
+        ["FriendsTitle"] = "Tes amis",
+        ["FriendsEmpty"] = "Personne pour l'instant. Partage ton code ami depuis les Paramètres, puis ajoute celui qu'on te donne.",
+        ["FriendsRefresh"] = "Actualiser",
+        ["AddFriend"] = "Ajouter un ami",
+        ["FriendRemove"] = "Retirer",
+        ["FriendCopyCode"] = "Copier son code",
+        ["Presence"] = "Amis et présence",
+        ["PresenceHelp"] = "CubeShelf publie ta présence dans un dossier que tu synchronises déjà (Nextcloud, Dropbox…) et lit celle de tes amis depuis le lien qu'ils t'ont donné. Aucun serveur, aucun compte, aucun mot de passe enregistré.",
+        ["PresenceDisplayName"] = "Nom affiché",
+        ["PresenceDisplayNameHint"] = "Le nom que tes amis verront",
+        ["PresenceDisplayNameHelp"] = "Laissé vide par défaut : ton nom de compte Windows ne sera jamais publié sans que tu le tapes.",
+        ["PresenceFolder"] = "Dossier de publication",
+        ["PresenceBrowse"] = "Parcourir…",
+        ["PresenceUrl"] = "Adresse publique de ce fichier",
+        ["PresenceUrlHelp"] = "Le lien de partage doit servir le fichier lui-même : un partage Nextcloud demande /download à la fin. Change cette adresse et tous les codes amis déjà distribués cessent de fonctionner.",
+        ["PresenceTest"] = "Tester l'adresse",
+        ["PresencePublish"] = "Publier ma présence",
+        ["PresenceSettings"] = "Réglages",
+        ["MyFriendCode"] = "Ton code ami",
+        ["MyFriendCodeHint"] = "Disponible après un test réussi",
+        ["Copy"] = "Copier",
+        ["WhatYouShare"] = "Ce que tu partages",
+        ["ShareLibrary"] = "Ma bibliothèque",
+        ["SharePlayTime"] = "Mon temps de jeu",
+        ["ShareCurrentGame"] = "Le jeu auquel je joue",
+        ["ShareMods"] = "Mes mods installés",
         ["AppSettings"] = "Paramètres",
         ["LibraryEyebrow"] = "BIBLIOTHÈQUE",
         ["LibraryTitle"] = "Tes jeux GameCube",
@@ -123,6 +151,34 @@ internal static class UiLocalization
         ["AppFavorites"] = "Favorites",
         ["AppMods"] = "Game Mods",
         ["AppDownloads"] = "Downloads",
+        ["AppFriends"] = "Friends",
+        ["FriendsEyebrow"] = "FRIENDS",
+        ["FriendsTitle"] = "Your friends",
+        ["FriendsEmpty"] = "Nobody yet. Share your friend code from Settings, then add the one you are given.",
+        ["FriendsRefresh"] = "Refresh",
+        ["AddFriend"] = "Add a friend",
+        ["FriendRemove"] = "Remove",
+        ["FriendCopyCode"] = "Copy their code",
+        ["Presence"] = "Friends and presence",
+        ["PresenceHelp"] = "CubeShelf publishes your presence into a folder you already synchronise (Nextcloud, Dropbox…) and reads your friends' from the link they gave you. No server, no account, no stored password.",
+        ["PresenceDisplayName"] = "Display name",
+        ["PresenceDisplayNameHint"] = "The name your friends will see",
+        ["PresenceDisplayNameHelp"] = "Empty by default: your Windows account name is never published unless you type it.",
+        ["PresenceFolder"] = "Publishing folder",
+        ["PresenceBrowse"] = "Browse…",
+        ["PresenceUrl"] = "Public address of that file",
+        ["PresenceUrlHelp"] = "The share link must serve the file itself: a Nextcloud share needs /download at the end. Change this address and every friend code already handed out stops working.",
+        ["PresenceTest"] = "Test the address",
+        ["PresencePublish"] = "Publish my presence",
+        ["PresenceSettings"] = "Settings",
+        ["MyFriendCode"] = "Your friend code",
+        ["MyFriendCodeHint"] = "Available after a successful test",
+        ["Copy"] = "Copy",
+        ["WhatYouShare"] = "What you share",
+        ["ShareLibrary"] = "My library",
+        ["SharePlayTime"] = "My play time",
+        ["ShareCurrentGame"] = "The game I am playing",
+        ["ShareMods"] = "My installed mods",
         ["AppSettings"] = "Settings",
         ["LibraryEyebrow"] = "LIBRARY",
         ["LibraryTitle"] = "Your GameCube games",
@@ -242,8 +298,27 @@ internal static class UiLocalization
     public static void Apply(string? language)
     {
         if (Application.Current is null) return;
+        VerifyDictionariesMatch();
         var dictionary = IsEnglish(language) ? English : French;
         foreach (var pair in dictionary)
             Application.Current.Resources[pair.Key] = pair.Value;
+    }
+
+    /// <summary>
+    /// Apply only writes the selected dictionary, so a key present in one and missing from the
+    /// other leaves the previous language's value sitting in the resources -- visible only as a
+    /// stray French label in an English window, which nobody notices in review. Cheap to catch
+    /// at the one place both dictionaries are known, and only the developer's problem.
+    /// </summary>
+    [System.Diagnostics.Conditional("DEBUG")]
+    private static void VerifyDictionariesMatch()
+    {
+        if (French.Keys.ToHashSet(StringComparer.Ordinal).SetEquals(English.Keys)) return;
+
+        var missing = French.Keys.Except(English.Keys, StringComparer.Ordinal)
+            .Select(key => "EN: " + key)
+            .Concat(English.Keys.Except(French.Keys, StringComparer.Ordinal).Select(key => "FR: " + key));
+        throw new InvalidOperationException(
+            "UiLocalization : les dictionnaires ont divergé — " + string.Join(", ", missing));
     }
 }

@@ -11,7 +11,28 @@ public sealed record UserPreferences(
     bool AutoFitWindowToScreen = true,
     double WindowWidth = 1530,
     double WindowHeight = 930,
-    bool FirstRunCompleted = false);
+    bool FirstRunCompleted = false,
+
+    // Decentralised friends. Publishing is off until the user has both named themselves and
+    // proved an address works, so none of this does anything by accident.
+
+    /// <summary>
+    /// How friends see us. Never defaulted from the account name: that would publish the
+    /// Windows login to everyone the user adds.
+    /// </summary>
+    string FriendsDisplayName = "",
+
+    /// <summary>A folder something else already synchronises and serves.</summary>
+    string PresenceFolder = "",
+
+    /// <summary>The public address that folder is served from, proven by the self-test.</summary>
+    string PresenceUrl = "",
+
+    bool PresencePublishEnabled = false,
+    bool ShareLibrary = true,
+    bool SharePlayTime = true,
+    bool ShareCurrentGame = true,
+    bool ShareMods = true);
 
 public sealed class UserPreferencesStore
 {
