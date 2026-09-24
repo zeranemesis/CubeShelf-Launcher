@@ -66,6 +66,9 @@ Run("one broken friend does not stop the others", TestOneBrokenFriendDoesNotStop
 Run("oversized and unsafe addresses are refused", TestFetcherRefusesOversizedAndUnsafeAddresses);
 Run("the self-test proves the round trip", TestSelfTestProvesTheRoundTrip);
 Run("the self-test catches an address serving something else", TestSelfTestCatchesAnAddressThatServesSomethingElse);
+Run("a burst becomes one publish", TestServiceCoalescesABurstIntoOnePublish);
+Run("the service says goodbye exactly once", TestServiceSaysGoodbyeExactlyOnce);
+Run("the service reads friends and reports them", TestServiceReadsFriendsAndReportsThem);
 
 if (failures.Count == 0)
 {
@@ -1044,6 +1047,150 @@ string CurrentRid() =>
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// The loop that keeps our document published and friends' documents read.
+// ---------------------------------------------------------------------------
+
+void TestServiceCoalescesABurstIntoOnePublish()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://c.example.test/p.json"));
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+
+        // Milliseconds instead of minutes, so the loop is testable without waiting.
+        var options = new PresenceServiceOptions(
+            Debounce: TimeSpan.FromMilliseconds(60),
+            MinimumGap: TimeSpan.Zero,
+            Heartbeat: TimeSpan.FromHours(1),
+            PollInterval: TimeSpan.FromHours(1));
+
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            new PresenceSequence(root), publisher, fetcher, _ => Task.FromResult(inputs), options);
+
+        service.Start(CancellationToken.None);
+
+        // Starting a game raises several reasons at once; they must produce one document.
+        for (var index = 0; index < 5; index++)
+            service.RequestPublish(PresencePublishReason.GameChanged);
+
+        Thread.Sleep(600);
+        Assert(service.PublishCount == 1);
+
+        // Nothing a friend would see has changed, so asking again writes nothing: the sync
+        // client should not be churned for an identical document.
+        service.RequestPublish(PresencePublishReason.Manual);
+        Thread.Sleep(300);
+        Assert(service.PublishCount == 1);
+
+        // A change a friend would see does publish.
+        inputs = inputs with { RunningGameIds = new[] { "GRSEAF" } };
+        service.RequestPublish(PresencePublishReason.GameChanged);
+        Thread.Sleep(300);
+        Assert(service.PublishCount == 2);
+
+        service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+        // What landed on disk is a real document, opened here with our own key.
+        var document = File.ReadAllText(Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(document), out var published));
+        Assert(published!.Status == PresenceStatus.InGame);
+    });
+}
+
+void TestServiceSaysGoodbyeExactlyOnce()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://c.example.test/p.json"));
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), new[] { "GRSEAF" }, new PresenceSharingOptions());
+        var options = new PresenceServiceOptions(
+            TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
+
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            new PresenceSequence(root), publisher, fetcher, _ => Task.FromResult(inputs), options);
+        service.Start(CancellationToken.None);
+        Thread.Sleep(300);
+
+        var document = Path.Combine(folder, SyncedFolderTarget.DefaultFileName);
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(File.ReadAllText(document)), out var playing));
+        Assert(playing!.Status == PresenceStatus.InGame);
+
+        service.ShutdownAsync(TimeSpan.FromSeconds(2)).GetAwaiter().GetResult();
+
+        // Without the farewell, someone who quits mid-game reads as still playing for the whole
+        // freshness window -- the most visible thing a presence system can get wrong.
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(File.ReadAllText(document)), out var gone));
+        Assert(gone!.Status == PresenceStatus.Offline && gone.CurrentGameId is null);
+        Assert(gone.Sequence > playing.Sequence);
+
+        // Calling it again must not publish a second farewell.
+        var before = service.PublishCount;
+        service.ShutdownAsync(TimeSpan.FromSeconds(2)).GetAwaiter().GetResult();
+        Assert(service.PublishCount == before);
+
+        service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    });
+}
+
+void TestServiceReadsFriendsAndReportsThem()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var author = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(author.PublicKey, "https://cloud.example.test/p.json"),
+            "Zera", me.PublicKey, out _));
+
+        var theirs = SealedPresence.ToJson(SealedPresence.Seal(author,
+            new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Zera", DateTimeOffset.UtcNow, 5,
+                PresenceStatus.InGame, "G4QE01", "Super Mario Strikers",
+                Array.Empty<SharedGame>(), Array.Empty<SharedMod>()),
+            new[] { me.PublicKey }));
+
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://c.example.test/p.json"));
+        using var client = new HttpClient(new FixedBodyHandler(theirs));
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        var inputs = new PresenceInputs("Moi", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            new PresenceSequence(root), publisher, fetcher, _ => Task.FromResult(inputs),
+            new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1)));
+
+        IReadOnlyList<PresenceFetchOutcome>? reported = null;
+        service.FriendsRefreshed += outcomes => reported = outcomes;
+
+        var direct = service.RefreshNowAsync().GetAwaiter().GetResult();
+        Assert(direct.Count == 1 && direct[0].Status == PresenceFetchStatus.Updated);
+        Assert(direct[0].Snapshot!.CurrentGameTitle == "Super Mario Strikers");
+        Assert(reported is not null && reported.Count == 1);
+
+        service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    });
+}
+
 // ---------------------------------------------------------------------------
 // The self-test: a friend code is only offered once a document has made the round trip.
 // ---------------------------------------------------------------------------
