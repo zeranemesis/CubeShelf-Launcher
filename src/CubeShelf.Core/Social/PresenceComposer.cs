@@ -97,9 +97,9 @@ public sealed class PresenceComposer
             sharing.ShareLibrary ? ComposeLibrary(games, sharing) : Array.Empty<SharedGame>(),
             sharing.ShareMods ? ComposeMods(games) : Array.Empty<SharedMod>(),
             sharing.ShareProfile ? ComposeProfile(profile, games, sharing) : null,
-            // An expired invitation is simply not published: a stale one would send a friend to
-            // a port nobody is listening on.
-            invite is not null && invite.IsLive(now) ? invite : null);
+            // A lapsed or empty invitation is simply not published: a friend acting on a stale
+            // one would be sent to a lobby that has already closed.
+            invite is not null && invite.IsPublishable(now) ? invite : null);
     }
 
     private PeerProfile? ComposeProfile(

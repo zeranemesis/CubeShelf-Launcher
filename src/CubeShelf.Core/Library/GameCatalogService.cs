@@ -106,6 +106,15 @@ public sealed class GameCatalogEntry
     /// <summary>Project page shown to the user, for runtimes CubeShelf cannot fully automate.</summary>
     public string HomepageUrl { get; set; } = "";
 
+    /// <summary>
+    /// The runtime's own online companion, relative to the installed runtime, when it has one.
+    ///
+    /// Empty means this game cannot be played together and CubeShelf offers no invitation for
+    /// it -- which is the honest default, since a launcher cannot add multiplayer to a game it
+    /// only starts. PartyBoard ships PartyBoardOnline.exe; Strikers has no netplay at all.
+    /// </summary>
+    public string OnlineCompanion { get; set; } = "";
+
     public List<GameCover> Covers { get; set; } = new();
 
     // User-owned state. These values must survive catalog updates.
@@ -242,6 +251,7 @@ public sealed class GameCatalogService
             target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
             target.HomepageUrl = source.HomepageUrl;
+            target.OnlineCompanion = source.OnlineCompanion;
 
             // Executable/GameRoot/DiscImage and all play statistics are intentionally preserved.
         }
@@ -275,6 +285,7 @@ public sealed class GameCatalogService
         RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
         HomepageUrl = source.HomepageUrl,
+        OnlineCompanion = source.OnlineCompanion,
         Covers = source.Covers.Select(Clone).ToList(),
         IsFavorite = source.IsFavorite,
         PlayCount = source.PlayCount,

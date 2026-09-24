@@ -18,6 +18,7 @@
     "RuntimeSource": "Manifest",
     "DataPreparation": "Runtime",
     "HomepageUrl": "https://github.com/zeranemesis/Marioparty4",
+    "OnlineCompanion": "PartyBoardOnline.exe",
     "Covers": [
       {
         "Label": "PAL Europe",

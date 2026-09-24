@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 
 namespace CubeShelf.Desktop;
 
@@ -18,6 +18,13 @@ internal static class UiLocalization
         ["AddFriend"] = "Ajouter un ami",
         ["FriendRemove"] = "Retirer",
         ["FriendCopyCode"] = "Copier son code",
+        ["PlayTogether"] = "JOUER ENSEMBLE",
+        ["PlayTogetherHelp"] = "CubeShelf ne crée pas le salon : le compagnon en ligne du runtime le fait. Ouvre-le, crée ton salon, puis colle ici le code qu'il te donne. CubeShelf le transporte chiffré jusqu'à tes amis et le fait expirer tout seul.",
+        ["OpenCompanion"] = "Ouvrir le compagnon en ligne",
+        ["InviteCodeHint"] = "Code d'invitation donné par le compagnon",
+        ["PublishInvite"] = "Inviter mes amis",
+        ["CancelInvite"] = "Retirer l'invitation",
+        ["FriendJoin"] = "Rejoindre",
         ["Presence"] = "Amis et présence",
         ["PresenceHelp"] = "CubeShelf publie ta présence dans un dossier que tu synchronises déjà (Nextcloud, Dropbox…) et lit celle de tes amis depuis le lien qu'ils t'ont donné. Aucun serveur, aucun compte, aucun mot de passe enregistré.",
         ["PresenceDisplayName"] = "Nom affiché",
@@ -159,6 +166,13 @@ internal static class UiLocalization
         ["AddFriend"] = "Add a friend",
         ["FriendRemove"] = "Remove",
         ["FriendCopyCode"] = "Copy their code",
+        ["PlayTogether"] = "PLAY TOGETHER",
+        ["PlayTogetherHelp"] = "CubeShelf does not create the lobby: the runtime's online companion does. Open it, create your lobby, then paste the code it gives you here. CubeShelf carries it encrypted to your friends and expires it on its own.",
+        ["OpenCompanion"] = "Open the online companion",
+        ["InviteCodeHint"] = "Invitation code from the companion",
+        ["PublishInvite"] = "Invite my friends",
+        ["CancelInvite"] = "Withdraw the invitation",
+        ["FriendJoin"] = "Join",
         ["Presence"] = "Friends and presence",
         ["PresenceHelp"] = "CubeShelf publishes your presence into a folder you already synchronise (Nextcloud, Dropbox…) and reads your friends' from the link they gave you. No server, no account, no stored password.",
         ["PresenceDisplayName"] = "Display name",

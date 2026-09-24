@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -262,6 +262,7 @@ public sealed partial class MainWindow
     {
         if (_selectedGame is null || SelectedTitleText is null) return;
         var game = _selectedGame;
+        RefreshInviteCard();
         SelectedTitleText.Text = game.Title;
         SelectedMetaText.Text = string.Join("  •  ", new[]
         {

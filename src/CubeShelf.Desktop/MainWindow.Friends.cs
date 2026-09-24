@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -19,7 +19,11 @@ public sealed partial class MainWindow
         string Detail,
         string Extra,
         string PauseAction,
-        bool CanCopyCode);
+        bool CanCopyCode,
+        bool CanJoin = false,
+        string InviteGameId = "",
+        string InviteGameTitle = "",
+        string JoinPayload = "");
 
     private PeerIdentity? _identity;
     private FriendStore? _friends;
@@ -104,7 +108,11 @@ public sealed partial class MainWindow
                 _preferences.ShareLibrary,
                 _preferences.SharePlayTime,
                 _preferences.ShareCurrentGame,
-                _preferences.ShareMods))).GetTask();
+                _preferences.ShareMods),
+            null,
+            // A lapsed invitation is handed over unchanged and the composer drops it, so an
+            // invitation nobody withdrew simply stops being published when its time is up.
+            _outgoingInvite)).GetTask();
 
     private void OnFriendsSessionChanged(string gameId) =>
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
@@ -228,14 +236,31 @@ public sealed partial class MainWindow
             ? P7($" • {friend.ConsecutiveFailures} échec(s) de lecture", $" • {friend.ConsecutiveFailures} read failure(s)")
             : "";
 
+        // An invitation is only ours to act on if it is still live and either open to everyone
+        // or addressed to us -- the document is sealed once for every friend, so the address is
+        // what separates "come and play" from "this was meant for someone else".
+        var invite = known?.Invite;
+        var mine = invite is not null &&
+                   invite.IsLive(now) &&
+                   _identity is not null &&
+                   invite.IsFor(Convert.ToBase64String(_identity.PublicKey));
+
+        var invited = mine
+            ? P7($"T’invite sur {invite!.GameTitle}", $"Invites you to {invite!.GameTitle}")
+            : "";
+
         return new FriendRow(
             friend.PublicKey,
             friend.DisplayName,
             statusText,
-            detail,
+            invited.Length > 0 ? invited : detail,
             seen + failing,
             friend.Paused ? P7("Reprendre", "Resume") : P7("Mettre en pause", "Pause"),
-            CanRebuildCode(friend));
+            CanRebuildCode(friend),
+            mine && !friend.Paused,
+            invite?.GameId ?? "",
+            invite?.GameTitle ?? "",
+            mine ? invite!.JoinPayload : "");
     }
 
     /// <summary>

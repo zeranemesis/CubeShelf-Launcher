@@ -1,4 +1,4 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text.Json;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Releases;
@@ -72,7 +72,7 @@ Run("the service reads friends and reports them", TestServiceReadsFriendsAndRepo
 Run("blocking stops both directions", TestBlockingStopsBothDirections);
 Run("the profile is published and capped", TestProfileIsPublishedAndCapped);
 Run("invitations expire and can be targeted", TestInvitationsExpireAndAreTargeted);
-Run("invite readiness says what it cannot know", TestInviteReadinessSaysWhatItCannotKnow);
+Run("only games with a companion can invite", TestOnlyGamesWithACompanionCanInvite);
 
 if (failures.Count == 0)
 {
@@ -1145,24 +1145,80 @@ void TestProfileIsPublishedAndCapped()
     });
 }
 
+void TestOnlyGamesWithACompanionCanInvite()
+{
+    // The whole scoping of invitations lives in one catalog field. Mario Party 4 names
+    // PartyBoard's companion; the other two name none, and must not be offered an invitation
+    // CubeShelf could not carry to anything.
+    Assert(!OnlineCompanion.IsSupported(null));
+    Assert(!OnlineCompanion.IsSupported(new GameCatalogEntry()));
+    Assert(OnlineCompanion.IsSupported(new GameCatalogEntry { OnlineCompanion = "PartyBoardOnline.exe" }));
+
+    WithTempRoot(root =>
+    {
+        var runtime = Path.Combine(root, "PartyBoard.exe");
+        var companion = Path.Combine(root, "PartyBoardOnline.exe");
+        File.WriteAllText(runtime, "");
+
+        // The runtime is installed but this release ships no companion: no invitation, rather
+        // than one whose last step would fail.
+        Assert(!OnlineCompanion.TryResolve(runtime, "PartyBoardOnline.exe", out _));
+
+        File.WriteAllText(companion, "");
+        Assert(OnlineCompanion.TryResolve(runtime, "PartyBoardOnline.exe", out var found));
+        Assert(string.Equals(found, companion, StringComparison.OrdinalIgnoreCase));
+
+        // A game that declares no companion resolves to nothing even when one sits beside it.
+        Assert(!OnlineCompanion.TryResolve(runtime, "", out _));
+        Assert(!OnlineCompanion.TryResolve("", "PartyBoardOnline.exe", out _));
+
+        // games.json is a file on disk and this value reaches Process.Start, so a companion
+        // name is a file name beside the runtime and never a path out of it.
+        Assert(!OnlineCompanion.TryResolve(runtime, "..\\PartyBoardOnline.exe", out _));
+        Assert(!OnlineCompanion.TryResolve(runtime, "sub/PartyBoardOnline.exe", out _));
+        Assert(!OnlineCompanion.TryResolve(runtime, "C:\\Windows\\System32\\cmd.exe", out _));
+        Assert(!OnlineCompanion.TryResolve(runtime, "..", out _));
+    });
+}
+
 void TestInvitationsExpireAndAreTargeted()
 {
     WithTempRoot(root =>
     {
         var composer = new PresenceComposer(new TestPaths(root));
         var now = DateTimeOffset.UtcNow;
-        var games = SampleLibrary();
+        var games = SampleLibrary()
+            .Append(new PresenceGame("GMPE01_00", "Mario Party 4", 40, 7200, false, null))
+            .ToArray();
 
-        var live = new PresenceInvite("GRSEAF", "Soulcalibur II", "192.168.1.20",
-            InviteHost.DefaultPort, now.Add(PresenceInvite.DefaultLifetime));
+        // The payload is PartyBoard's own invitation string, carried and not read. CubeShelf
+        // does not know what is inside it and must not start pretending to.
+        var live = new PresenceInvite("GMPE01_00", "Mario Party 4", "PBINV1-abcdef0123456789",
+            now.Add(PresenceInvite.DefaultLifetime));
         Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
             1, now, null, live).Invite is not null);
 
-        // A lapsed invitation is not published: it would send a friend at a port nobody is
-        // listening on any more.
+        // A lapsed invitation is not published: it would send a friend to a lobby the host has
+        // already closed.
         var lapsed = live with { ExpiresAt = now.AddMinutes(-1) };
+        Assert(!lapsed.IsPublishable(now));
         Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
             1, now, null, lapsed).Invite is null);
+
+        // Nor is one with nothing to join with. The host pastes the code the companion gave
+        // them; until they do there is no invitation, only an intention.
+        Assert(!(live with { JoinPayload = "" }).IsPublishable(now));
+        Assert(!(live with { JoinPayload = "   " }).IsPublishable(now));
+        Assert(!(live with { GameId = "" }).IsPublishable(now));
+        Assert(composer.Compose("Zera", games, Array.Empty<string>(), new PresenceSharingOptions(),
+            1, now, null, live with { JoinPayload = "" }).Invite is null);
+
+        // The cap is what stops a malformed payload from bloating every heartbeat, since this
+        // document is republished on a timer whether or not anything changed.
+        Assert(!(live with { JoinPayload = new string('x', PresenceInvite.MaximumPayloadLength + 1) })
+            .IsPublishable(now));
+        Assert((live with { JoinPayload = new string('x', PresenceInvite.MaximumPayloadLength) })
+            .IsPublishable(now));
 
         using var friend = PeerIdentity.Create();
         var friendKey = Convert.ToBase64String(friend.PublicKey);
@@ -1170,35 +1226,6 @@ void TestInvitationsExpireAndAreTargeted()
         Assert((live with { ForFriend = friendKey }).IsFor(friendKey));
         Assert(!(live with { ForFriend = "someone-else" }).IsFor(friendKey));
     });
-}
-
-void TestInviteReadinessSaysWhatItCannotKnow()
-{
-    // A private address only works on a LAN or a VPN, and that has to be said rather than
-    // discovered by a friend who cannot connect.
-    var privateCheck = InviteHost.Check("192.168.1.20", InviteHost.DefaultPort);
-    Assert(privateCheck.Reachable && privateCheck.IsPrivateAddress);
-    Assert(privateCheck.Message.Contains("réseau", StringComparison.Ordinal));
-
-    var publicCheck = InviteHost.Check("203.0.113.10", InviteHost.DefaultPort + 1);
-    Assert(publicCheck.Reachable && !publicCheck.IsPrivateAddress);
-
-    Assert(!InviteHost.Check("not-an-address", InviteHost.DefaultPort).Reachable);
-    Assert(!InviteHost.Check("192.168.1.20", 80).Reachable);             // privileged port
-
-    // A port already taken here is one failure that genuinely is knowable locally.
-    var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, 0);
-    listener.Start();
-    var taken = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
-    try
-    {
-        var busy = InviteHost.Check("192.168.1.20", taken);
-        Assert(!busy.Reachable && busy.Message.Contains(taken.ToString(), StringComparison.Ordinal));
-    }
-    finally
-    {
-        listener.Stop();
-    }
 }
 
 // ---------------------------------------------------------------------------

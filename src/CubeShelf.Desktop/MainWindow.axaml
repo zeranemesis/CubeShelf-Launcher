@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:CubeShelf.Desktop.Controls"
         x:Class="CubeShelf.Desktop.MainWindow"
@@ -183,6 +183,23 @@
                 </StackPanel>
               </Border>
             </Grid>
+            <!-- PLAY TOGETHER: only for a game whose catalog entry names an online companion -->
+            <Border x:Name="InviteCard" IsVisible="False" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+              <StackPanel Spacing="10">
+                <TextBlock Text="{DynamicResource PlayTogether}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource PlayTogetherHelp}" Foreground="{DynamicResource Text}" Opacity="0.82" FontSize="13" LineHeight="20" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="OpenCompanionButton" Content="{DynamicResource OpenCompanion}" Click="OpenCompanion" />
+                </StackPanel>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                  <TextBox x:Name="InvitePayloadBox" Watermark="{DynamicResource InviteCodeHint}" />
+                  <Button Grid.Column="1" x:Name="PublishInviteButton" Classes="primary" Content="{DynamicResource PublishInvite}" Click="PublishInvite" />
+                  <Button Grid.Column="2" x:Name="CancelInviteButton" IsVisible="False" Content="{DynamicResource CancelInvite}" Click="CancelInvite" />
+                </Grid>
+                <TextBlock x:Name="InviteStatusText" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+
             <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
               <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
@@ -398,6 +415,7 @@
                         <TextBlock Text="{Binding Extra}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
                       </StackPanel>
                       <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Classes="primary" Content="{DynamicResource FriendJoin}" Tag="{Binding}" IsVisible="{Binding CanJoin}" Click="JoinFriendInvite" />
                         <Button Content="{Binding PauseAction}" Tag="{Binding}" Click="ToggleFriendPause" />
                         <Button Content="{DynamicResource FriendCopyCode}" Tag="{Binding}" IsEnabled="{Binding CanCopyCode}" Click="CopyFriendCode" />
                         <Button Classes="danger" Content="{DynamicResource FriendRemove}" Tag="{Binding}" Click="RemoveFriend" />

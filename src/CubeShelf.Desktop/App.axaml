@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CubeShelf.Desktop.App"
              RequestedThemeVariant="Dark">
@@ -72,6 +72,13 @@
       <x:String x:Key="AddFriend">Ajouter un ami</x:String>
       <x:String x:Key="FriendRemove">Retirer</x:String>
       <x:String x:Key="FriendCopyCode">Copier son code</x:String>
+      <x:String x:Key="PlayTogether">JOUER ENSEMBLE</x:String>
+      <x:String x:Key="PlayTogetherHelp">CubeShelf ne crée pas le salon : le compagnon en ligne du runtime le fait. Ouvre-le, crée ton salon, puis colle ici le code qu'il te donne. CubeShelf le transporte chiffré jusqu'à tes amis et le fait expirer tout seul.</x:String>
+      <x:String x:Key="OpenCompanion">Ouvrir le compagnon en ligne</x:String>
+      <x:String x:Key="InviteCodeHint">Code d'invitation donné par le compagnon</x:String>
+      <x:String x:Key="PublishInvite">Inviter mes amis</x:String>
+      <x:String x:Key="CancelInvite">Retirer l'invitation</x:String>
+      <x:String x:Key="FriendJoin">Rejoindre</x:String>
       <x:String x:Key="Presence">Amis et présence</x:String>
       <x:String x:Key="PresenceHelp">CubeShelf publie ta présence dans un dossier que tu synchronises déjà (Nextcloud, Dropbox…) et lit celle de tes amis depuis le lien qu'ils t'ont donné. Aucun serveur, aucun compte, aucun mot de passe enregistré.</x:String>
       <x:String x:Key="PresenceDisplayName">Nom affiché</x:String>

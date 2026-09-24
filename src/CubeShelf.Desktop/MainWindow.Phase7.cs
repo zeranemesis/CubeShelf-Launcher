@@ -1,4 +1,4 @@
-using Avalonia.Automation;
+﻿using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -71,6 +71,17 @@ public sealed partial class MainWindow
         ConfigureAccessiblePhase7(NextModImageButton, P7("Image suivante du mod", "Next mod image"));
         ConfigureAccessiblePhase7(OpenModImageButton, P7("Ouvrir l’image du mod", "Open mod image"));
         ConfigureAccessiblePhase7(RetryConnectivityButton, P7("Réessayer les vérifications réseau", "Retry network checks"));
+        ConfigureAccessiblePhase7(OpenCompanionButton,
+            P7("Ouvrir le compagnon en ligne du runtime", "Open the runtime’s online companion"));
+        ConfigureAccessiblePhase7(InvitePayloadBox,
+            P7("Code d’invitation donné par le compagnon", "Invitation code given by the companion"));
+        ConfigureAccessiblePhase7(PublishInviteButton,
+            P7("Publier cette invitation pour mes amis", "Publish this invitation for my friends"));
+        ConfigureAccessiblePhase7(CancelInviteButton,
+            P7("Retirer l’invitation publiée", "Withdraw the published invitation"));
+
+        // The invitation status is the only place that says an invitation is not a notification.
+        AutomationProperties.SetLiveSetting(InviteStatusText, AutomationLiveSetting.Polite);
 
         AutomationProperties.SetName(ToastHost, P7("Notification CubeShelf", "CubeShelf notification"));
         AutomationProperties.SetLiveSetting(ToastHost, AutomationLiveSetting.Polite);
