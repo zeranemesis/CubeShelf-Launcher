@@ -26,7 +26,8 @@ public sealed partial class MainWindow
         string JoinPayload = "",
         bool IsBlocked = false,
         Avalonia.Media.Imaging.Bitmap? Avatar = null,
-        string StatusLine = "")
+        string StatusLine = "",
+        bool CanInvite = false)
     {
         /// <summary>Everything that is a decision about an active friend, and not about a tombstone.</summary>
         public bool CanBlock => !IsBlocked;
@@ -285,8 +286,13 @@ public sealed partial class MainWindow
         }
 
         var now = DateTimeOffset.UtcNow;
-        var rows = _friends.Load()
-            .Select(friend => BuildFriendRow(friend, now))
+        var listed = _friends.Load();
+        // Two friends who would read identically get six digits instead of four.
+        var handles = FriendHandles(listed);
+        var game = OnlineGame();
+        var canHost = game is not null && HostingBlocker(game) is null && _hostWatch is not { IsCancellationRequested: false };
+        var rows = listed
+            .Select(friend => BuildFriendRow(friend, handles[friend.PublicKey], canHost, now))
             .OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
 
@@ -295,7 +301,7 @@ public sealed partial class MainWindow
         FriendsSubtitleText.Text = DescribePublishingState();
     }
 
-    private FriendRow BuildFriendRow(Friend friend, DateTimeOffset now)
+    private FriendRow BuildFriendRow(Friend friend, string handle, bool canHost, DateTimeOffset now)
     {
         var known = _friendPresence.TryGetValue(friend.PublicKey, out var snapshot) ? snapshot : null;
         var status = known?.EffectiveStatus(PresencePolicy.FreshnessWindow, now) ?? PresenceStatus.Offline;
@@ -339,9 +345,14 @@ public sealed partial class MainWindow
             ? P7($"T’invite sur {invite!.GameTitle}", $"Invites you to {invite!.GameTitle}")
             : "";
 
+        // Invite someone who could come now; not someone who is inviting you already -- the Join
+        // button beside them is the answer to that.
+        var reachable = status is PresenceStatus.Online or PresenceStatus.InGame;
+        var canInvite = canHost && reachable && !mine && !friend.Paused && !friend.Blocked;
+
         return new FriendRow(
             friend.PublicKey,
-            PeerName.Handle(friend.DisplayName, friend.PublicKey),
+            handle,
             statusText,
             invited.Length > 0 ? invited : detail,
             seen + failing,
@@ -354,7 +365,8 @@ public sealed partial class MainWindow
             friend.Blocked,
             // A blocked peer's face is not shown: the point of blocking is to stop seeing them.
             friend.Blocked ? null : FriendAvatar(known?.Profile?.AvatarPng),
-            friend.Blocked ? "" : known?.Profile?.StatusLine ?? "");
+            friend.Blocked ? "" : known?.Profile?.StatusLine ?? "",
+            canInvite);
     }
 
     /// <summary>

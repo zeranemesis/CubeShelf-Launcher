@@ -22,6 +22,8 @@ public static class PeerName
     public const int MinimumLength = 2;
     public const int MaximumLength = 32;
 
+    private static readonly char[] Reserved = { '<', '>' };
+
     /// <summary>
     /// Checks a pseudo the user is choosing for themselves. Whitespace runs collapse to one
     /// space. The hash sign is refused because it separates the pseudo from its tag, and
@@ -43,6 +45,13 @@ public static class PeerName
         if (collapsed.Contains('#'))
         {
             error = "Le pseudo ne peut pas contenir #, qui sépare le pseudo de son numéro.";
+            return false;
+        }
+        // The game's menu is RmlUi, and some of its surfaces -- the toasts, the modals -- read a
+        // string that starts with '<' as markup. A pseudo is shown there too.
+        if (collapsed.IndexOfAny(Reserved) >= 0)
+        {
+            error = "Le pseudo ne peut pas contenir < ni >.";
             return false;
         }
         if (collapsed.Length < MinimumLength)
@@ -67,7 +76,7 @@ public static class PeerName
     public static string Sanitize(string? untrusted)
     {
         var kept = new string((untrusted ?? "")
-            .Where(character => !char.IsControl(character) && character != '#')
+            .Where(character => !char.IsControl(character) && character != '#' && Array.IndexOf(Reserved, character) < 0)
             .ToArray());
         var collapsed = string.Join(' ', kept.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
         if (collapsed.Length <= MaximumLength) return collapsed;
@@ -82,6 +91,25 @@ public static class PeerName
     /// <summary>The four digits read off a public key.</summary>
     public static string Tag(ReadOnlySpan<byte> publicKey)
     {
+        var digest = Digest(publicKey);
+        var value = ((uint)digest[0] << 24) | ((uint)digest[1] << 16) | ((uint)digest[2] << 8) | digest[3];
+        return (value % 10000).ToString("D4", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Six digits, the first four being <see cref="Tag"/>. Shown only when two people in the same
+    /// list would otherwise read identically -- one chance in ten thousand for two players who
+    /// share a pseudo -- so the number everyone knows you by stays the one in front.
+    /// </summary>
+    public static string LongTag(ReadOnlySpan<byte> publicKey)
+    {
+        var digest = Digest(publicKey);
+        var extra = (((uint)digest[4] << 8) | digest[5]) % 100;
+        return Tag(publicKey) + extra.ToString("D2", CultureInfo.InvariantCulture);
+    }
+
+    private static byte[] Digest(ReadOnlySpan<byte> publicKey)
+    {
         PeerIdentity.ValidatePublicKey(publicKey);
 
         // Domain-separated, so these digits can never coincide by construction with any other
@@ -90,25 +118,22 @@ public static class PeerName
         var input = new byte[label.Length + publicKey.Length];
         label.CopyTo(input);
         publicKey.CopyTo(input.AsSpan(label.Length));
-
-        var digest = SHA256.HashData(input);
-        var value = ((uint)digest[0] << 24) | ((uint)digest[1] << 16) | ((uint)digest[2] << 8) | digest[3];
-        return (value % 10000).ToString("D4", CultureInfo.InvariantCulture);
+        return SHA256.HashData(input);
     }
 
     /// <summary><c>Zera#4821</c>, or just <c>#4821</c> when there is no pseudo to put in front.</summary>
-    public static string Handle(string? name, ReadOnlySpan<byte> publicKey)
+    public static string Handle(string? name, ReadOnlySpan<byte> publicKey, bool longTag = false)
     {
         var shown = Sanitize(name);
-        return (shown.Length == 0 ? "" : shown) + "#" + Tag(publicKey);
+        return (shown.Length == 0 ? "" : shown) + "#" + (longTag ? LongTag(publicKey) : Tag(publicKey));
     }
 
     /// <summary><see cref="Handle"/> from the base64 key friends.json stores, or empty if unreadable.</summary>
-    public static string Handle(string? name, string publicKeyBase64)
+    public static string Handle(string? name, string publicKeyBase64, bool longTag = false)
     {
         try
         {
-            return Handle(name, Convert.FromBase64String(publicKeyBase64));
+            return Handle(name, Convert.FromBase64String(publicKeyBase64), longTag);
         }
         catch (Exception exception) when (exception is FormatException or ArgumentException)
         {

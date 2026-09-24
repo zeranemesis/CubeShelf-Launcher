@@ -108,6 +108,8 @@ public sealed partial class MainWindow : Window
         // The handle needs the key, and the key exists only once InitializeFriends has run.
         RefreshIdentityUi();
         ShowRunningVersion();
+        // Feeds the F1 Friends tab inside Mario Party 4, only while the game runs.
+        StartInGameBridge();
         // Copy a friend's message in any chat app, come back to the Friends page: it is found.
         Activated += (_, _) =>
         {
@@ -120,6 +122,7 @@ public sealed partial class MainWindow : Window
             _preferencesStore.Save(_preferences);
             // Before the tracker is disposed: the farewell document has to still know whether
             // a game is running, or a friend is left looking at a stale "in a game".
+            StopInGameBridge();
             DisposeFriends();
             _sessions.Dispose();
             DisposePhase3Parity();
@@ -151,15 +154,21 @@ public sealed partial class MainWindow : Window
 
         try
         {
+            var environment = new Dictionary<string, string?>
+            {
+                ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
+                ["PARTYBOARD_MOD_LIST"] = _modManager?.PrepareActiveList()
+            };
+            // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
+            // tab exists, with its name in the player's language, from the first frame.
+            foreach (var pair in InGameEnvironment(_selectedGame)) environment[pair.Key] = pair.Value;
+            if (environment.ContainsKey(CubeShelf.Core.Social.InGameBridge.DirectoryVariable)) WriteInGameState();
+
             _sessions.Start(
                 _selectedGame.Id,
                 _selectedGame.Executable,
                 Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-                new Dictionary<string, string?>
-                {
-                    ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
-                    ["PARTYBOARD_MOD_LIST"] = _modManager?.PrepareActiveList()
-                });
+                environment);
 
             _selectedGame.PlayCount++;
             _selectedGame.LastPlayedAt = DateTimeOffset.Now;

@@ -76,6 +76,9 @@ Run("invitations expire and can be targeted", TestInvitationsExpireAndAreTargete
 Run("only games with a companion can invite", TestOnlyGamesWithACompanionCanInvite);
 Run("a pseudo gets a tag read off the key", TestPseudoAndTag);
 Run("the friend code carries the pseudo", TestFriendCodeCarriesThePseudo);
+Run("the tag never changes", TestTagNeverChanges);
+Run("the in-game state is what the game reads", TestInGameStateIsWhatTheGameReads);
+Run("in-game requests are acted on once", TestInGameRequestsAreActedOnOnce);
 
 if (failures.Count == 0)
 {
@@ -2161,6 +2164,121 @@ void TestIdentityPersistsAndAgrees()
         var bobView = bob.DeriveSharedKey(alice.PublicKey);
         Assert(aliceView.SequenceEqual(bobView));
         Assert(!alice.DeriveSharedKey(mallory.PublicKey).SequenceEqual(aliceView));
+    });
+}
+
+void TestTagNeverChanges()
+{
+    // Worked out with the 0.9.1 release itself. Friends know each other by these four digits; a
+    // change to how they are derived would rename everyone at once, silently.
+    var key = Convert.FromBase64String(
+        "BC68R70yzj3DSvzkczKf6roOgFCvIP0b9ZsXYX5rTYKAze/fsZlCQBUGZ8wMH/kXhX7JCXnR2BxWawy2S7rihPw=");
+    Assert(PeerName.Tag(key) == "6024");
+
+    // The long form only ever extends it, so the number people know stays in front.
+    var longTag = PeerName.LongTag(key);
+    Assert(longTag.Length == 6 && longTag.StartsWith("6024", StringComparison.Ordinal) && longTag.All(char.IsDigit));
+    Assert(PeerName.Handle("Zera", key, longTag: true) == "Zera#" + longTag);
+
+    // The game's menu reads a string starting with '<' as markup in places; a pseudo cannot
+    // carry one, and a pseudo received from someone else loses it.
+    Assert(!PeerName.TryNormalize("<b>Zera", out _, out var markupError) && markupError.Length > 0);
+    Assert(!PeerName.TryNormalize("Zera>", out _, out _));
+    Assert(PeerName.Sanitize("<img src=x>Zera") == "img src=xZera");
+}
+
+void TestInGameStateIsWhatTheGameReads()
+{
+    WithTempRoot(root =>
+    {
+        var now = DateTimeOffset.UtcNow;
+        var text = new Dictionary<string, string> { ["tab"] = "Amis", ["host"] = "Créer un salon" };
+        var friends = new[] { new InGameFriend("a2V5", "Chelou#1234", "online", "En ligne", true, "abc") };
+        var state = new InGameState("Zera#6024", true, "", true, false, friends, text);
+
+        var revision = InGameBridge.WriteState(root, state, now);
+        var json = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(InGameBridge.StateFile(root)))!.AsObject();
+
+        // Every name here is one src/port/ui/cubeshelf.cpp reads. A rename on either side alone
+        // shows an empty Friends tab and no error anywhere.
+        Assert(json["schema"]!.GetValue<int>() == 1);
+        Assert(json["updatedAt"]!.GetValue<long>() == now.ToUnixTimeSeconds());
+        Assert(json["revision"]!.GetValue<long>() == revision);
+        Assert(json["me"]!.GetValue<string>() == "Zera#6024");
+        Assert(json["ready"]!.GetValue<bool>() && json["canHost"]!.GetValue<bool>() && !json["hosting"]!.GetValue<bool>());
+        Assert(json["text"]!["tab"]!.GetValue<string>() == "Amis");
+        var first = json["friends"]![0]!;
+        Assert(first["key"]!.GetValue<string>() == "a2V5" && first["handle"]!.GetValue<string>() == "Chelou#1234");
+        Assert(first["status"]!.GetValue<string>() == "online" && first["label"]!.GetValue<string>() == "En ligne");
+        Assert(first["invitesYou"]!.GetValue<bool>() && first["inviteId"]!.GetValue<string>() == "abc");
+
+        // The revision moves with what is shown, not with the clock: a heartbeat must not make
+        // the game rebuild its tab and steal the focus from whoever is choosing a friend.
+        Assert(InGameBridge.WriteState(root, state, now.AddSeconds(3)) == revision);
+        Assert(InGameBridge.WriteState(root, state with { Hosting = true }, now) != revision);
+    });
+}
+
+void TestInGameRequestsAreActedOnOnce()
+{
+    WithTempRoot(root =>
+    {
+        var now = DateTimeOffset.UtcNow;
+        var requests = InGameBridge.RequestsDirectory(root);
+        Directory.CreateDirectory(requests);
+        using var friend = PeerIdentity.Create();
+        var key = Convert.ToBase64String(friend.PublicKey);
+
+        void Write(string name, string body, DateTimeOffset? at = null)
+        {
+            var path = Path.Combine(requests, name);
+            File.WriteAllText(path, body);
+            if (at is { } when) File.SetLastWriteTimeUtc(path, when.UtcDateTime);
+        }
+
+        Write("aaaa0000aaaa0000.json", "{\"schema\":1,\"id\":\"aaaa0000aaaa0000\",\"action\":\"host\",\"key\":\"\"}");
+        Write("bbbb0000bbbb0000.json", $"{{\"schema\":1,\"id\":\"bbbb0000bbbb0000\",\"action\":\"invite\",\"key\":\"{key}\"}}");
+        // Refused and answered, so the game is not left waiting out its timeout:
+        Write("cccc0000cccc0000.json", "{\"schema\":1,\"id\":\"cccc0000cccc0000\",\"action\":\"format-c\",\"key\":\"\"}");
+        Write("dddd0000dddd0000.json", "{\"schema\":1,\"id\":\"dddd0000dddd0000\",\"action\":\"join\",\"key\":\"not a key\"}");
+        Write("eeee0000eeee0000.json", "{\"schema\":1,\"id\":\"another-id\",\"action\":\"host\",\"key\":\"\"}");
+        Write("ffff0000ffff0000.json", "{ this is not json");
+        // Written while CubeShelf was closed: dropped, never acted on, even much later.
+        Write("9999000099990000.json", "{\"schema\":1,\"id\":\"9999000099990000\",\"action\":\"host\",\"key\":\"\"}", now.AddMinutes(-5));
+        // Half written by the game, not yet renamed into place: not a request yet.
+        Write("8888000088880000.json.tmp", "{\"schema\":1");
+
+        var found = InGameBridge.ReadRequests(root, now);
+        Assert(found.Count == 2);
+        Assert(found.Any(r => r.Id == "aaaa0000aaaa0000" && r.Action == InGameAction.Host && r.FriendKey == ""));
+        Assert(found.Any(r => r.Id == "bbbb0000bbbb0000" && r.Action == InGameAction.Invite && r.FriendKey == key));
+
+        foreach (var refused in new[] { "cccc0000cccc0000", "dddd0000dddd0000", "eeee0000eeee0000", "ffff0000ffff0000" })
+        {
+            Assert(!File.Exists(Path.Combine(requests, refused + ".json")));
+            var answer = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.Combine(requests, refused + ".done")))!;
+            Assert(!answer["ok"]!.GetValue<bool>());
+        }
+        Assert(!File.Exists(Path.Combine(requests, "9999000099990000.json")));
+        Assert(!File.Exists(Path.Combine(requests, "9999000099990000.done")));   // nobody is waiting for it
+        Assert(File.Exists(Path.Combine(requests, "8888000088880000.json.tmp")));
+
+        // Answered once, then gone: a second read acts on nothing.
+        foreach (var request in found) InGameBridge.Complete(root, request, true, "ok");
+        Assert(InGameBridge.ReadRequests(root, now).Count == 0);
+        var done = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.Combine(requests, "aaaa0000aaaa0000.done")))!;
+        Assert(done["ok"]!.GetValue<bool>() && done["message"]!.GetValue<string>() == "ok");
+
+        // An id is a file name: nothing that could climb out of the directory is ever used as one.
+        Write("..%2Fevil.json", "{}");
+        Assert(InGameBridge.ReadRequests(root, now).Count == 0);
+        Assert(!File.Exists(Path.Combine(requests, "..%2Fevil.json")));
+
+        // Answers the game never collected -- it closed first -- are swept after a while.
+        File.SetLastWriteTimeUtc(Path.Combine(requests, "aaaa0000aaaa0000.done"), now.AddMinutes(-10).UtcDateTime);
+        InGameBridge.RemoveStaleAnswers(root, now);
+        Assert(!File.Exists(Path.Combine(requests, "aaaa0000aaaa0000.done")));
+        Assert(File.Exists(Path.Combine(requests, "bbbb0000bbbb0000.done")));
     });
 }
 

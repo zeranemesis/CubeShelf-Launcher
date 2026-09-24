@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
@@ -14,9 +14,10 @@ namespace CubeShelf.Desktop;
 /// who their friends are, and it can carry an invitation encrypted to exactly the people it is
 /// meant for. So it hands the companion what it already knows and lets it do the network part.
 ///
-/// Neither side types anything. The host clicks once and CubeShelf reads the invitation the
-/// companion writes; the guest clicks once and the companion opens already joining. The manual
-/// paste box stays for the case CubeShelf cannot cover: a lobby the player opened themselves.
+/// Three actions, each returning what happened in words instead of showing it, because they are
+/// asked for from three places: the game's F1 menu, where CubeShelf is minimised behind the game
+/// and a toast of its own would reach nobody; the Friends page; and nowhere else -- the game page
+/// used to carry a card for this and does not any more.
 /// </summary>
 public sealed partial class MainWindow
 {
@@ -27,81 +28,40 @@ public sealed partial class MainWindow
     private string PendingInviteFile =>
         Path.Combine(_paths.ConfigurationDirectory, "pending-invite.txt");
 
+    /// <summary>The game that can be played together, if the catalog has one. Today, Mario Party 4.</summary>
+    private GameCatalogEntry? OnlineGame() => _catalogGames.FirstOrDefault(OnlineCompanion.IsSupported);
+
+    private bool IsHosting =>
+        _hostWatch is { IsCancellationRequested: false } ||
+        (_outgoingInvite is not null && _outgoingInvite.IsPublishable(DateTimeOffset.UtcNow));
+
     /// <summary>
-    /// Shows the card only for a game whose catalog entry names a companion. Mario Party 4 does;
-    /// Soulcalibur II and Super Mario Strikers do not, and for them there is nothing honest to
-    /// put here, so nothing is put here.
+    /// Why this player cannot host right now, in words, or null when they can. Every reason names
+    /// the one thing to do about it, because it is read in the game, far from any setting.
     /// </summary>
-    private void RefreshInviteCard()
+    private string? HostingBlocker(GameCatalogEntry game)
     {
-        if (InviteCard is null) return;
+        if (!TryResolveCompanion(game, out var companion))
+            return P7($"Installe {game.RuntimeName} depuis CubeShelf : son compagnon en ligne vient avec.",
+                      $"Install {game.RuntimeName} from CubeShelf: its online companion comes with it.");
 
-        var game = _selectedGame;
-        InviteCard.IsVisible = OnlineCompanion.IsSupported(game);
-        if (!InviteCard.IsVisible || game is null) return;
+        if (!OnlineCompanion.SupportsLauncherInvites(companion))
+            return P7($"Ton {game.RuntimeName} est trop ancien pour les invitations : mets-le à jour depuis CubeShelf.",
+                      $"Your {game.RuntimeName} is too old for invitations: update it from CubeShelf.");
 
-        var installed = TryResolveCompanion(game, out var companion);
-        var driveable = installed && OnlineCompanion.SupportsLauncherInvites(companion);
-        var waiting = _hostWatch is { IsCancellationRequested: false };
-        var live = _outgoingInvite is not null &&
-                   string.Equals(_outgoingInvite.GameId, game.Id, StringComparison.OrdinalIgnoreCase) &&
-                   _outgoingInvite.IsPublishable(DateTimeOffset.UtcNow);
-
-        HostLobbyButton.IsEnabled = driveable && !waiting && !live;
-        HostLobbyButton.IsVisible = driveable || !installed;
-        OpenCompanionButton.IsEnabled = installed;
-        InvitePayloadBox.IsEnabled = installed;
-        PublishInviteButton.IsEnabled = installed;
-        CancelInviteButton.IsVisible = live || waiting;
-        // With an older companion the manual box is not a fallback, it is the only way, so it
-        // stops being introduced as an afterthought.
-        InviteManualHint.IsVisible = driveable;
-
-        InviteStatusText.Text = DescribeInviteState(game, installed, driveable, live, waiting);
-    }
-
-    private string DescribeInviteState(
-        GameCatalogEntry game, bool installed, bool driveable, bool live, bool waiting)
-    {
-        if (!installed)
-            return P7($"Installe {game.RuntimeName} : son compagnon en ligne vient avec.",
-                      $"Install {game.RuntimeName}: its online companion comes with it.");
+        if (!HasIdentity)
+            return P7("Crée d’abord ton identité : CubeShelf, page Mon profil.",
+                      "Create your identity first: CubeShelf, My profile page.");
 
         if (!_preferences.PresencePublishEnabled || _presence is null)
-            return P7("Tu ne publies pas ta présence, donc personne ne recevrait l’invitation. " +
-                      "Active la publication dans les Paramètres.",
-                      "You are not publishing your presence, so nobody would receive the invitation. " +
-                      "Turn publishing on in Settings.");
+            return P7("Ta présence n’est pas publiée, donc personne ne recevrait l’invitation : CubeShelf, page Mon profil.",
+                      "Your presence is not published, so nobody would receive the invitation: CubeShelf, My profile page.");
 
-        var recipients = _friends?.ActiveRecipients().Count ?? 0;
-        if (recipients == 0)
-            return P7("Ajoute un ami : une invitation ne part qu’à des amis.",
-                      "Add a friend: an invitation only goes to friends.");
+        if ((_friends?.ActiveRecipients().Count ?? 0) == 0)
+            return P7("Ajoute un ami dans CubeShelf : une invitation ne part qu’à des amis.",
+                      "Add a friend in CubeShelf: an invitation only goes to friends.");
 
-        if (!driveable)
-            return P7($"Ton {game.RuntimeName} est trop ancien pour être piloté par CubeShelf : " +
-                      "mets-le à jour, ou crée le salon dans le compagnon et colle son code ici.",
-                      $"Your {game.RuntimeName} is too old for CubeShelf to drive: update it, or " +
-                      "create the lobby in the companion and paste its code here.");
-
-        if (waiting)
-            return P7("Le compagnon prépare le salon. Il vérifie ton disque en entier, ce qui prend " +
-                      "un moment ; dès qu’il a l’invitation, CubeShelf la publie tout seul.",
-                      "The companion is preparing the lobby. It hashes your whole disc, which takes a " +
-                      "moment; as soon as it has the invitation, CubeShelf publishes it by itself.");
-
-        if (!live)
-            return P7($"Un clic : le compagnon crée le salon et CubeShelf envoie l’invitation, chiffrée, " +
-                      $"à tes {recipients} ami(s).",
-                      $"One click: the companion creates the lobby and CubeShelf sends the invitation, " +
-                      $"encrypted, to your {recipients} friend(s).");
-
-        var remaining = _outgoingInvite!.ExpiresAt - DateTimeOffset.UtcNow;
-        var minutes = Math.Max(1, (int)Math.Ceiling(remaining.TotalMinutes));
-        return P7($"Invitation publiée, elle expire dans {minutes} min. Tes amis la verront à leur " +
-                  "prochaine lecture, pas immédiatement : c’est une invitation posée, pas une sonnerie.",
-                  $"Invitation published, it expires in {minutes} min. Friends see it at their next " +
-                  "poll, not immediately: it is an invitation left on the table, not a ring.");
+        return null;
     }
 
     /// <summary>The companion beside the runtime CubeShelf installed, if both are there.</summary>
@@ -128,15 +88,25 @@ public sealed partial class MainWindow
         if (!string.IsNullOrWhiteSpace(disc) && File.Exists(disc))
             environment["PARTYBOARD_ONLINE_DISC"] = disc;
 
+        // The game the companion starts for online play inherits this, so its F1 menu still
+        // reaches CubeShelf.
+        foreach (var pair in InGameEnvironment(game)) environment[pair.Key] = pair.Value;
+
         return environment;
     }
 
     private bool TryStartCompanion(
         GameCatalogEntry game,
         Dictionary<string, string?> environment,
-        IReadOnlyList<string>? arguments)
+        IReadOnlyList<string>? arguments,
+        out string error)
     {
-        if (!TryResolveCompanion(game, out var companion)) return false;
+        error = "";
+        if (!TryResolveCompanion(game, out var companion))
+        {
+            error = P7($"Le compagnon de {game.RuntimeName} est introuvable.", $"{game.RuntimeName}’s companion is missing.");
+            return false;
+        }
 
         try
         {
@@ -147,45 +117,43 @@ public sealed partial class MainWindow
         catch (Exception exception) when (
             exception is IOException or System.ComponentModel.Win32Exception or InvalidOperationException)
         {
-            ShowToastParity(P7("Invitation", "Invitation"),
-                P7($"Impossible de lancer le compagnon : {exception.Message}",
-                   $"The companion could not be started: {exception.Message}"));
+            error = P7($"Impossible de lancer le compagnon : {exception.Message}",
+                       $"The companion could not be started: {exception.Message}");
             return false;
         }
     }
 
-    private void OpenCompanion(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedGame is { } game) TryStartCompanion(game, CompanionEnvironment(game), null);
-    }
-
     /// <summary>
-    /// The host's one click. The companion creates the lobby and writes the invitation where we
-    /// told it to; we watch that file and publish what lands there.
+    /// Opens a lobby. The companion creates it and writes the invitation where we told it to; we
+    /// watch that file and publish what lands there, to everyone or to the one friend named.
     /// </summary>
-    private void HostLobbyAndInvite(object? sender, RoutedEventArgs args)
+    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey)
     {
-        if (_selectedGame is not { } game) return;
+        if (HostingBlocker(game) is { } blocker) return (false, blocker);
+        if (_hostWatch is { IsCancellationRequested: false })
+            return (false, P7("Un salon est déjà en préparation.", "A lobby is already being prepared."));
 
         // A leftover from a previous lobby would be published as if it were this one's.
         TryDeletePendingInvite();
 
         var environment = CompanionEnvironment(game);
         environment["PARTYBOARD_ONLINE_INVITE_OUT"] = PendingInviteFile;
-        if (!TryStartCompanion(game, environment, new[] { "--host" })) return;
+        if (!TryStartCompanion(game, environment, new[] { "--host" }, out var error)) return (false, error);
 
-        _hostWatch?.Cancel();
+        _hostWatch?.Dispose();
         _hostWatch = CancellationTokenSource.CreateLinkedTokenSource(
             _friendsLifetime?.Token ?? CancellationToken.None);
-        _ = WatchForInvitationAsync(game, _hostWatch.Token);
-        RefreshInviteCard();
+        _ = WatchForInvitationAsync(game, forFriendKey ?? "", _hostWatch.Token);
+        WriteInGameState();
+        return (true, "");
     }
 
     /// <summary>
     /// Waits for the companion to publish its invitation. Bounded: a player who changes their mind
     /// and closes the companion must not leave a task watching a file forever.
     /// </summary>
-    private async Task WatchForInvitationAsync(GameCatalogEntry game, CancellationToken cancellationToken)
+    private async Task WatchForInvitationAsync(
+        GameCatalogEntry game, string forFriendKey, CancellationToken cancellationToken)
     {
         var deadline = DateTimeOffset.UtcNow.AddMinutes(10);
         try
@@ -208,7 +176,7 @@ public sealed partial class MainWindow
 
                 if (payload.Length == 0) continue;
                 TryDeletePendingInvite();
-                await Dispatcher.UIThread.InvokeAsync(() => PublishInvitation(game, payload));
+                await Dispatcher.UIThread.InvokeAsync(() => PublishInvitation(game, payload, forFriendKey));
                 return;
             }
 
@@ -228,15 +196,16 @@ public sealed partial class MainWindow
                     _hostWatch.Dispose();
                     _hostWatch = null;
                 }
-                RefreshInviteCard();
+                WriteInGameState();
+                if (FriendsView.IsVisible) RefreshFriendsView();
             });
         }
     }
 
-    private void PublishInvitation(GameCatalogEntry game, string payload)
+    private void PublishInvitation(GameCatalogEntry game, string payload, string forFriendKey)
     {
         var candidate = new PresenceInvite(
-            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime));
+            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime), forFriendKey);
 
         // The only checks CubeShelf can make on a payload it deliberately does not read: that
         // there is one, and that it is not large enough to bloat every heartbeat from here on.
@@ -251,28 +220,24 @@ public sealed partial class MainWindow
 
         _outgoingInvite = candidate;
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
-        RefreshInviteCard();
+        WriteInGameState();
         ShowToastParity(P7("Invitation", "Invitation"),
-            P7("Salon prêt, invitation envoyée à tes amis.", "Lobby ready, invitation sent to your friends."));
+            forFriendKey.Length > 0
+                ? P7("Salon prêt, invitation envoyée à ton ami.", "Lobby ready, invitation sent to your friend.")
+                : P7("Salon prêt, invitation envoyée à tes amis.", "Lobby ready, invitation sent to your friends."));
     }
 
-    /// <summary>The manual path, for a lobby the player opened themselves.</summary>
-    private void PublishInvite(object? sender, RoutedEventArgs args)
-    {
-        if (_selectedGame is { } game)
-            PublishInvitation(game, (InvitePayloadBox.Text ?? "").Trim());
-    }
-
-    private void CancelInvite(object? sender, RoutedEventArgs args)
+    /// <summary>Withdraws the invitation, and stops waiting for one that has not arrived yet.</summary>
+    private string CancelHosting()
     {
         _hostWatch?.Cancel();
         _outgoingInvite = null;
-        InvitePayloadBox.Text = "";
         TryDeletePendingInvite();
         // Republish at once: an invitation withdrawn here should stop being offered there,
         // rather than standing for the rest of its quarter of an hour.
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
-        RefreshInviteCard();
+        WriteInGameState();
+        return P7("Invitation retirée.", "Invitation withdrawn.");
     }
 
     private void TryDeletePendingInvite()
@@ -287,68 +252,72 @@ public sealed partial class MainWindow
     }
 
     /// <summary>
-    /// The guest's half against a companion CubeShelf cannot drive: the code goes to the
-    /// clipboard and the companion is opened for them to paste it. Worse than one click, and
-    /// still better than a button that appears to do nothing.
+    /// Joins a friend's lobby. The companion opens already holding the invitation, the pseudo and
+    /// the disc, so there is nothing to paste and nothing to pick. Against a companion too old to
+    /// be driven, the code goes to the clipboard and the message says so.
     /// </summary>
-    private async Task JoinTheOldWayAsync(
-        FriendRow row, GameCatalogEntry game, Dictionary<string, string?> environment)
+    private (bool Started, string Message) StartJoining(GameCatalogEntry game, string friendHandle, string payload)
     {
-        if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
-            await clipboard.SetTextAsync(row.JoinPayload);
+        if (!TryResolveCompanion(game, out var companion))
+            return (false, P7($"{friendHandle} t’invite sur {game.Title}, mais {game.RuntimeName} n’est pas installé ici.",
+                              $"{friendHandle} invites you to {game.Title}, but {game.RuntimeName} is not installed here."));
 
-        if (!TryStartCompanion(game, environment, null)) return;
+        var environment = CompanionEnvironment(game);
 
-        ShowToastParity(P7("Invitation", "Invitation"),
-            P7($"Ton {game.RuntimeName} est trop ancien pour rejoindre tout seul. Le code est " +
-               "copié : colle-le dans le compagnon, puis « Rejoindre ».",
-               $"Your {game.RuntimeName} is too old to join by itself. The code is copied: paste " +
-               "it into the companion, then press Join."));
+        if (!OnlineCompanion.SupportsLauncherInvites(companion))
+        {
+            _ = TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(payload);
+            return TryStartCompanion(game, environment, null, out var oldError)
+                ? (true, P7($"Ton {game.RuntimeName} est trop ancien pour rejoindre tout seul. Le code est copié : colle-le dans le compagnon, puis « Rejoindre ».",
+                            $"Your {game.RuntimeName} is too old to join by itself. The code is copied: paste it into the companion, then press Join."))
+                : (false, oldError);
+        }
+
+        environment["PARTYBOARD_ONLINE_INVITE"] = payload;
+        if (!TryStartCompanion(game, environment, new[] { "--join" }, out var error)) return (false, error);
+
+        // Both sides need byte-identical files, and only the companion can say so -- but a disc
+        // we never configured is a failure CubeShelf can see coming.
+        return environment.ContainsKey("PARTYBOARD_ONLINE_DISC")
+            ? (true, "")
+            : (true, P7("Choisis ton disque dans le compagnon : la partie commencera dès qu’il sera vérifié.",
+                        "Pick your disc in the companion: it will join as soon as the file is verified."));
     }
 
-    /// <summary>
-    /// The guest's one click. The companion opens already holding the invitation, the pseudo and
-    /// the disc, so there is nothing to paste and nothing to pick.
-    /// </summary>
+    /// <summary>The Friends page's Join button.</summary>
     private void JoinFriendInvite(object? sender, RoutedEventArgs args)
     {
         if (sender is not Button { Tag: FriendRow row } || row.JoinPayload.Length == 0) return;
 
         var game = _catalogGames.FirstOrDefault(entry =>
             string.Equals(entry.Id, row.InviteGameId, StringComparison.OrdinalIgnoreCase));
-
-        if (game is null || !TryResolveCompanion(game, out _))
+        if (game is null)
         {
             ShowToastParity(P7("Invitation", "Invitation"),
-                P7($"{row.Name} t’invite sur {row.InviteGameTitle}, mais ce jeu n’est pas installé ici.",
-                   $"{row.Name} invites you to {row.InviteGameTitle}, but it is not installed here."));
+                P7($"{row.Name} t’invite sur {row.InviteGameTitle}, qui n’est pas dans ta bibliothèque.",
+                   $"{row.Name} invites you to {row.InviteGameTitle}, which is not on your shelf."));
             return;
         }
 
-        var environment = CompanionEnvironment(game);
-        TryResolveCompanion(game, out var companion);
-
-        // An older companion ignores --join and opens its ordinary window, so the guest would be
-        // left with nothing to paste. Give them the code and say what to do with it.
-        if (!OnlineCompanion.SupportsLauncherInvites(companion))
-        {
-            _ = JoinTheOldWayAsync(row, game, environment);
-            return;
-        }
-
-        environment["PARTYBOARD_ONLINE_INVITE"] = row.JoinPayload;
-        if (!TryStartCompanion(game, environment, new[] { "--join" })) return;
-
-        // Both sides need byte-identical files, and only the companion can say so -- but a disc
-        // we never configured is a failure CubeShelf can see coming.
-        var missingDisc = !environment.ContainsKey("PARTYBOARD_ONLINE_DISC");
+        var (started, message) = StartJoining(game, row.Name, row.JoinPayload);
         ShowToastParity(P7("Invitation", "Invitation"),
-            missingDisc
-                ? P7($"Salon de {row.Name} ouvert. Choisis ton disque dans le compagnon : la partie " +
-                     "commencera dès qu’il sera vérifié.",
-                     $"{row.Name}’s lobby opened. Pick your disc in the companion: it will join as " +
-                     "soon as the file is verified.")
+            message.Length > 0 ? message
                 : P7($"Tu rejoins {row.Name}. Le compagnon vérifie ton disque puis entre dans le salon.",
                      $"Joining {row.Name}. The companion checks your disc, then enters the lobby."));
+        if (started) RefreshFriendsView();
+    }
+
+    /// <summary>The Friends page's Invite button: a lobby, and the invitation addressed to them alone.</summary>
+    private void InviteFriend(object? sender, RoutedEventArgs args)
+    {
+        if (sender is not Button { Tag: FriendRow row } || OnlineGame() is not { } game) return;
+
+        var (started, message) = StartHosting(game, row.PublicKey);
+        ShowToastParity(P7("Invitation", "Invitation"),
+            started
+                ? P7($"Le compagnon prépare le salon. {row.Name} recevra l’invitation dès qu’il sera prêt.",
+                     $"The companion is preparing the lobby. {row.Name} gets the invitation as soon as it is ready.")
+                : message);
+        RefreshFriendsView();
     }
 }

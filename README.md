@@ -135,16 +135,35 @@ plutôt que découvert : il garde ton adresse et voit encore quand ton fichier c
 **Les invitations n'existent que pour Mario Party 4**, et la raison est structurelle : un launcher
 n'ajoute pas du multijoueur à un jeu qu'il se contente de démarrer. Le champ `OnlineCompanion` du
 catalogue porte toute la portée — PartyBoard livre `PartyBoardOnline.exe`, Ring Out et Strikers ne
-livrent aucun netplay, et pour eux la carte n'apparaît pas du tout.
+livrent aucun netplay, et pour eux rien n'est proposé.
 
-Le compagnon crée le salon et te donne un code court ; CubeShelf transporte ce code sans le lire.
-Ce qu'il ajoute par rapport à le coller dans une conversation : il part chiffré aux seuls amis
-visés, il expire seul au bout d'un quart d'heure, et il s'affiche dans le launcher.
+**Où inviter, comme sur Steam :**
 
-Une étape reste manuelle, et l'interface le dit au lieu de le cacher : `PartyBoardOnline.exe`
-n'accepte aucun argument pour rejoindre un salon. « Rejoindre » copie donc le code et ouvre le
-compagnon, à toi de le coller. La livraison est par sondage : ton ami voit l'invitation à sa
-prochaine lecture, pas immédiatement. C'est une invitation posée sur la table, pas une sonnerie.
+- **Dans le jeu, F1 → onglet Amis.** Qui est connecté ou en jeu, « Inviter » à côté de chacun,
+  « Créer un salon », « Rejoindre » à côté d'un ami qui t'invite. Et une notification dans le jeu,
+  quel que soit l'écran, la première fois qu'un ami t'invite.
+- **Dans CubeShelf, page Amis**, les mêmes « Inviter » et « Rejoindre » à côté de chaque ami.
+
+La page du jeu, elle, ne propose plus rien : c'était peu pratique.
+
+**Créer ou rejoindre un salon ferme la partie en cours**, et une confirmation le dit avant. Le jeu
+en ligne de PartyBoard démarre les deux jeux ensemble depuis le salon ; c'est déjà ce que fait son
+onglet « Play Online ». Sur Steam, on rejoint en cours de partie parce que ces jeux sont faits
+pour ; ce portage ne l'est pas.
+
+Le compagnon crée le salon et écrit son invitation là où CubeShelf la guette. CubeShelf la
+transporte sans la lire : chiffrée aux seuls amis visés, elle expire seule au bout d'un quart
+d'heure. Côté invité, le compagnon s'ouvre déjà en train de rejoindre, pseudo et disque remplis.
+La livraison est par sondage : ton ami voit l'invitation à sa prochaine lecture, pas à l'instant.
+C'est une invitation posée sur la table, pas une sonnerie.
+
+Le jeu et CubeShelf se parlent par deux fichiers dans `%LOCALAPPDATA%\CubeShelf\ingame` : CubeShelf
+y écrit l'état des amis toutes les trois secondes tant que le jeu tourne, le jeu y dépose ses
+demandes. Ni réseau, ni port. Une demande de plus de trente secondes est jetée sans être exécutée :
+cliquée pendant que CubeShelf était fermé, elle n'ouvrira pas un salon une heure plus tard.
+
+Deux amis qui liraient pareil — même pseudo, même numéro, une chance sur dix mille — apparaissent
+avec six chiffres au lieu de quatre, les quatre premiers inchangés.
 
 ### Comment c'est construit
 

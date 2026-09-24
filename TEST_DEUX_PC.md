@@ -62,23 +62,25 @@ invitations. Inutile de continuer.
 
 **PC A (hôte)**
 
-1. Bibliothèque → Mario Party 4. La carte **« Jouer ensemble »** doit être là.
-2. Lisez la ligne d'état. Si elle dit *« trop ancien pour être piloté par CubeShelf »*, le PC A
-   a un PartyBoard < 0.16.0 : retour à l'étape 0.
-3. Cliquez **« Créer un salon et inviter mes amis »**.
+1. Lancez Mario Party 4 **depuis CubeShelf**, puis **F1 → onglet Amis**. Sans lancer le jeu :
+   page Amis de CubeShelf (Ctrl+6).
+2. Si le haut de l'onglet dit *« trop ancien pour les invitations »*, le PartyBoard installé ne
+   déclare pas qu'il peut être piloté : réinstallez-le depuis CubeShelf, puis retour à l'étape 0.
+3. **« Inviter »** à côté de l'ami (ou « Créer un salon et inviter tout le monde »). Confirmez :
+   Mario Party 4 se ferme.
 
 ✅ Le compagnon s'ouvre, le pseudo est déjà rempli, le disque est déjà sélectionné et en cours de
-vérification. CubeShelf affiche *« Le compagnon prépare le salon »*.
+vérification.
 
-✅ Une fois le disque haché, CubeShelf bascule tout seul sur *« Salon prêt, invitation envoyée »*.
-Personne n'a rien copié.
+✅ Une fois le disque haché, CubeShelf publie l'invitation tout seul. Personne n'a rien copié.
 
 **PC B (invité)**
 
-4. Une notification apparaît : *« <nom> t'invite — Mario Party 4 »*. Elle peut prendre quelques
-   minutes : la livraison se fait par sondage, pas par sonnerie.
-5. Ctrl+6, le bouton **« Rejoindre »** est sur la ligne de l'ami.
-6. Cliquez.
+4. Une notification apparaît : dans le jeu si vous y êtes (*« Zera#4821 t'invite à jouer. F1,
+   onglet Amis, pour rejoindre. »*), sinon dans CubeShelf. Elle peut prendre quelques minutes :
+   la livraison se fait par sondage, pas par sonnerie.
+5. F1 → onglet Amis, **« Rejoindre »** à côté de l'ami. Ou page Amis de CubeShelf.
+6. Confirmez : le jeu se ferme.
 
 ✅ Le compagnon s'ouvre déjà en train de rejoindre. Rien à coller, rien à choisir.
 
@@ -91,8 +93,9 @@ Personne n'a rien copié.
 
 | Symptôme | Maillon en cause |
 | --- | --- |
-| La carte « Jouer ensemble » n'apparaît pas | `OnlineCompanion` absent du catalogue, ou jeu autre que Mario Party 4 |
-| « trop ancien pour être piloté » | `manifest.json` sans `capabilities` — PartyBoard < 0.16.0 |
+| Pas d'onglet « Amis » dans F1 | Le jeu n'a pas été lancé par CubeShelf, ou ce PartyBoard n'a pas encore l'onglet |
+| « CubeShelf n'est pas ouvert » dans l'onglet | CubeShelf a été fermé : l'onglet passe par lui |
+| « trop ancien pour les invitations » | Le paquet PartyBoard ne contient pas de `manifest.json` déclarant `launcher-invites`. Ceux publiés avant le 2026-09-24 au soir n'en avaient pas : réinstallez PartyBoard |
 | Le compagnon s'ouvre **vide** au lieu de créer le salon | Les flags n'ont pas été reçus : vérifiez que c'est bien le compagnon 0.16.0 qui a démarré |
 | CubeShelf attend puis dit *« Le compagnon n'a pas créé de salon »* | Le salon n'a pas abouti côté compagnon — regardez sa fenêtre, pas CubeShelf |
 | L'invité ne voit jamais l'invitation | Problème de présence (étape 1), ou l'ami est en pause ou bloqué |
@@ -113,10 +116,8 @@ Personne n'a rien copié.
 
 ## Le repli, si le pilotage échoue
 
-Rien n'est perdu : la boîte **« Déjà un salon ouvert ? Colle son code ici »** reste sous la carte,
-et le bouton « Rejoindre » d'un compagnon trop ancien copie le code au presse-papiers en le
-disant. C'est l'ancien flux, plus pénible, mais il fonctionne — et c'est utile de tester les deux
-chemins pendant que vous y êtes.
+Rien n'est perdu : contre un compagnon trop ancien, « Rejoindre » copie le code au presse-papiers
+et ouvre le compagnon en le disant. C'est l'ancien flux, plus pénible, mais il fonctionne.
 
 ## À rapporter après l'essai
 
