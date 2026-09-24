@@ -57,6 +57,9 @@ Run("the sequence adopts a document ahead of it", TestSequenceAdoptsADocumentAhe
 Run("the composer shares only what was agreed", TestComposerSharesOnlyWhatWasAgreed);
 Run("the composer reports mods without touching them", TestComposerReportsModsWithoutTouchingThem);
 Run("the composer is deterministic", TestComposerIsDeterministic);
+Run("publishing into a synced folder", TestSyncedFolderPublisher);
+Run("the publisher refuses what cannot work", TestSyncedFolderPublisherRefusesWhatCannotWork);
+Run("documents are addressed to their author too", TestDocumentsAreAddressedToTheirAuthorToo);
 
 if (failures.Count == 0)
 {
@@ -1034,6 +1037,105 @@ string CurrentRid() =>
     (OperatingSystem.IsWindows() ? "win-" : OperatingSystem.IsLinux() ? "linux-" : "osx-") + CurrentArchitecture();
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Publishing into a folder something else synchronises: no account, no secret at rest.
+// ---------------------------------------------------------------------------
+
+void TestSyncedFolderPublisher()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        const string url = "https://cloud.example.test/s/token/download";
+
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, url));
+        Assert(publisher.IsConfigured && publisher.PresenceUrl == url);
+
+        var result = publisher.PublishAsync("{\"v\":1}").GetAwaiter().GetResult();
+        Assert(result.Succeeded && result.PresenceUrl == url && result.Error is null);
+
+        var document = Path.Combine(folder, SyncedFolderTarget.DefaultFileName);
+        Assert(File.ReadAllText(document) == "{\"v\":1}");
+
+        // Nothing half-written left for the sync client to upload.
+        Assert(Directory.GetFiles(folder, "*.tmp").Length == 0);
+        Assert(Directory.GetFiles(folder).Length == 1);
+
+        // Republishing replaces in place rather than accumulating.
+        Assert(publisher.PublishAsync("{\"v\":2}").GetAwaiter().GetResult().Succeeded);
+        Assert(File.ReadAllText(document) == "{\"v\":2}");
+        Assert(Directory.GetFiles(folder).Length == 1);
+    });
+}
+
+void TestSyncedFolderPublisherRefusesWhatCannotWork()
+{
+    WithTempRoot(root =>
+    {
+        const string url = "https://cloud.example.test/s/token/download";
+
+        // A missing folder is far more likely to be a typo than an intention, and creating it
+        // would publish into a path nothing synchronises: looks successful, reaches nobody.
+        var missing = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(Path.Combine(root, "not-there"), "p.json", url));
+        var result = missing.PublishAsync("{}").GetAwaiter().GetResult();
+        Assert(!result.Succeeded && result.Error is { Length: > 0 });
+        Assert(!Directory.Exists(Path.Combine(root, "not-there")));
+
+        // The read address goes straight into a friend code, which accepts https only. Finding
+        // out here beats finding out when a friend cannot read you.
+        foreach (var bad in new[] { "", "   ", "http://cloud.example.test/p.json", "cloud.example.test/p.json" })
+        {
+            var publisher = new SyncedFolderPresencePublisher(new SyncedFolderTarget(root, "p.json", bad));
+            Assert(!publisher.IsConfigured);
+            Assert(publisher.PresenceUrl.Length == 0);
+            Assert(!publisher.PublishAsync("{}").GetAwaiter().GetResult().Succeeded);
+        }
+
+        // A configured publisher is one a friend code can be built from.
+        var good = new SyncedFolderPresencePublisher(new SyncedFolderTarget(root, "p.json", url));
+        Assert(good.IsConfigured);
+        using var identity = PeerIdentity.Create();
+        Assert(FriendCode.TryDecode(
+            FriendCode.Encode(identity.PublicKey, good.PresenceUrl), out var decoded, out _));
+        Assert(decoded!.PresenceUrl == url);
+    });
+}
+
+void TestDocumentsAreAddressedToTheirAuthorToo()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(friend.PublicKey, "https://example.test/p.json"),
+            "Ami", me.PublicKey, out _));
+
+        var recipients = PresenceRecipients.ForPublication(me, friends);
+        Assert(recipients.Count == 2);
+
+        var snapshot = PresenceComposer.Offline("Zera", 1, DateTimeOffset.UtcNow);
+        var envelope = SealedPresence.Seal(me, snapshot, recipients);
+
+        // The friend still reads it, and so do we -- which is what lets a self-test prove the
+        // published URL really serves a document this identity can open.
+        Assert(SealedPresence.TryOpen(friend, me.PublicKey, envelope, out _));
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, envelope, out var mine));
+        Assert(mine!.Sequence == 1);
+
+        // A paused friend drops out; we never do.
+        Assert(friends.Update(Convert.ToBase64String(friend.PublicKey), entry => entry.Paused = true));
+        var paused = PresenceRecipients.ForPublication(me, friends);
+        Assert(paused.Count == 1);
+        var afterPause = SealedPresence.Seal(me, snapshot, paused);
+        Assert(!SealedPresence.TryOpen(friend, me.PublicKey, afterPause, out _));
+        Assert(SealedPresence.TryOpen(me, me.PublicKey, afterPause, out _));
+    });
+}
+
 // ---------------------------------------------------------------------------
 // Composing the document to publish: what is shared, and nothing written while doing it.
 // ---------------------------------------------------------------------------
