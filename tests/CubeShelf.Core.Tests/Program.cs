@@ -914,7 +914,7 @@ void TestRunningImageCanOnlyBeRenamed()
 
 void TestShippedCatalogIsCoherent()
 {
-    var catalog = FindRepositoryFile(Path.Combine("src", "CubeShelf.Launcher", "games.json"));
+    var catalog = FindRepositoryFile(Path.Combine("src", "CubeShelf.Desktop", "games.json"));
     var data = Path.Combine(Path.GetTempPath(), "cubeshelf-catalog-" + Guid.NewGuid().ToString("N"));
     Directory.CreateDirectory(data);
     try

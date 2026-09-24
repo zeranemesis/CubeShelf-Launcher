@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "CubeShelfLauncher.sln",
+    "projects": [
+      "src\\CubeShelf.Core\\CubeShelf.Core.csproj",
+      "src\\CubeShelf.Desktop\\CubeShelf.Desktop.csproj",
+      "tests\\CubeShelf.Core.Tests\\CubeShelf.Core.Tests.csproj",
+      "tests\\CubeShelf.Tests\\CubeShelf.Tests.csproj"
+    ]
+  }
+}

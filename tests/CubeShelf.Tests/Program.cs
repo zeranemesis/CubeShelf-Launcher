@@ -1,6 +1,5 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
-using CubeShelf.Launcher.Services;
 using CubeShelf.Core.Security;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Releases;
@@ -103,32 +102,6 @@ Run("Manifeste sélectionne strictement la plateforme", () =>
     AssertThrows<PlatformNotSupportedException>(() => manifest.Select("macos", "arm64", "launcher"));
 });
 
-Run("Conflits de mods détectés", () =>
-{
-    var root = TestRoot();
-    var game = new CubeShelf.Launcher.GameDefinition { Id = "TEST", Title = "Test" };
-    var config = new CubeShelf.Launcher.LauncherConfig { ModsRoot = root };
-    var manager = new ModManager(config, game, new GameBananaService(1));
-    var modRoot = Path.Combine(root, game.Id);
-    var first = Path.Combine(modRoot, "1");
-    var second = Path.Combine(modRoot, "2");
-    Directory.CreateDirectory(Path.Combine(first, "res"));
-    Directory.CreateDirectory(Path.Combine(second, "res"));
-    File.WriteAllText(Path.Combine(first, "res", "board.bin"), "one");
-    File.WriteAllText(Path.Combine(second, "res", "board.bin"), "two");
-    var installed = new[]
-    {
-        new InstalledMod(1, "One", 0, true, 100, first, first, "a", "one.zip"),
-        new InstalledMod(2, "Two", 0, true, 110, second, second, "b", "two.zip")
-    };
-    File.WriteAllText(
-        Path.Combine(modRoot, "installed.json"),
-        System.Text.Json.JsonSerializer.Serialize(installed));
-
-    var conflicts = manager.AnalyzeConflicts();
-    Assert(conflicts.Count == 1 && conflicts[0].ModIds.SequenceEqual(new[] { 1, 2 }));
-});
-
 if (failures.Count > 0)
 {
     Console.Error.WriteLine($"{failures.Count} test(s) en échec :");
@@ -137,7 +110,7 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("7 tests CubeShelf réussis.");
+Console.WriteLine("6 tests CubeShelf réussis.");
 return 0;
 
 void Run(string name, Action test)

@@ -19,8 +19,12 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+      - name: Build everything that is not Windows-only
+        run: dotnet build CubeShelf.Portable.slnf -c Release
       - name: Test portable Core
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Test archive and disc handling
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
       - name: Publish experimental launcher
         run: >
           dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj

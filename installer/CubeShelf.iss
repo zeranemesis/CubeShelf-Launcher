@@ -1,4 +1,4 @@
-; MyAppVersion / MyAppNumericVersion are fallbacks for compiling this script by hand.
+﻿; MyAppVersion / MyAppNumericVersion are fallbacks for compiling this script by hand.
 ; BUILD_INSTALLER.ps1 always passes /DMyAppVersion and /DMyAppNumericVersion from
 ; the VERSION file at the repository root, which is the single source of truth.
 #ifndef MyAppVersion
@@ -34,7 +34,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
 OutputDir={#InstallerOutputDirectory}
 OutputBaseFilename=CubeShelf-Setup-x64
-SetupIconFile=..\src\CubeShelf.Launcher\Assets\Brand\gamecube_logo.ico
+SetupIconFile=..\src\CubeShelf.Desktop\Assets\Brand\gamecube_logo.ico
 UninstallDisplayIcon={app}\CubeShelf.exe
 Compression=lzma2/ultra64
 SolidCompression=yes

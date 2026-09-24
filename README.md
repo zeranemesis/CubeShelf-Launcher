@@ -37,7 +37,7 @@ Le résultat est créé dans `dist\CubeShelf-Setup-x64.exe`.
 
 ## Jeux pris en charge
 
-Le catalogue est piloté par les données : `src/CubeShelf.Launcher/games.json` décrit chaque jeu, son runtime, les révisions de disque acceptées et la façon dont le runtime est récupéré. Ajouter un jeu ne demande pas de code.
+Le catalogue est piloté par les données : `src/CubeShelf.Desktop/games.json` décrit chaque jeu, son runtime, les révisions de disque acceptées et la façon dont le runtime est récupéré. Ajouter un jeu ne demande pas de code.
 
 | Jeu | Runtime | Disques acceptés | Acquisition | Préparation du disque |
 | --- | --- | --- | --- | --- |
@@ -75,7 +75,7 @@ Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et enviro
 
 ### Jaquettes
 
-Les jaquettes vivent dans `src/CubeShelf.Launcher/Assets/Covers/<Jeu>/`, en trois fichiers : `pal_front.png`, `pal_back.png` et `pal_spine.png`. Pour en remplacer une, écrase ces fichiers sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image. Les jaquettes complètes (dos + tranche + face) se découpent aux proportions GameCube standard : dos 900, tranche 120, face 900 sur 1920.
+Les jaquettes vivent dans `src/CubeShelf.Desktop/Assets/Covers/<Jeu>/`, en trois fichiers : `pal_front.png`, `pal_back.png` et `pal_spine.png`. Pour en remplacer une, écrase ces fichiers sans toucher au catalogue. Une jaquette absente n’est pas une erreur, la fiche s’affiche sans image. Les jaquettes complètes (dos + tranche + face) se découpent aux proportions GameCube standard : dos 900, tranche 120, face 900 sur 1920.
 
 ## Amis décentralisés
 
@@ -180,6 +180,28 @@ Publication locale de l’aperçu :
 ```powershell
 dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj -c Release -r linux-x64 --self-contained true -o publish/linux-x64
 ```
+
+### Compiler hors Windows
+
+L’ancien launcher WPF a été supprimé. Il ne servait plus qu’à héberger `games.json` et les
+jaquettes, mais il ciblait `net8.0-windows` avec `UseWPF` : il restait compilé à chaque CI
+Windows sans jamais être publié, et il rendait la solution incompilable ailleurs.
+
+Il reste un projet Windows par nécessité — `CubeShelf.Updater` est la mise à jour intégrée
+Windows et utilise WPF pour sa fenêtre de progression. Un filtre de solution met tout le reste
+de côté :
+
+```bash
+dotnet build CubeShelf.Portable.slnf -c Release
+dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
+```
+
+Les deux suites de tests tournent désormais sur les trois plateformes. `CubeShelf.Tests` était
+épinglée à `net8.0-windows` et `win-x64` uniquement à cause de sa référence à l’ancien projet ;
+l’extraction d’archives et la reconnaissance de disque n’étaient donc vérifiées que sous Windows.
+
+Sous Windows, `CubeShelfLauncher.sln` construit toujours l’ensemble, updater compris.
 
 ## Sécurité
 

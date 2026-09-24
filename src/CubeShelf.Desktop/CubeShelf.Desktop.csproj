@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <AssemblyName>CubeShelf</AssemblyName>
@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\CubeShelf.Launcher\Assets\Brand\gamecube_logo.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\Brand\gamecube_logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
@@ -16,8 +16,8 @@
     <ProjectReference Include="..\CubeShelf.Core\CubeShelf.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\CubeShelf.Launcher\games.json" Link="games.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\CubeShelf.Launcher\Assets\Covers\**\*" Link="Assets\Covers\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
-    <AvaloniaResource Include="..\CubeShelf.Launcher\Assets\Brand\gamecube_logo.png" Link="Assets\Brand\gamecube_logo.png" />
+    <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
   </ItemGroup>
 </Project>

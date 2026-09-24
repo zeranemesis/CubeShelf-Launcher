@@ -38,8 +38,12 @@ jobs:
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then tag="$GITHUB_REF_NAME"; else tag="v${{ inputs.version }}"; fi
           [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release tag"; exit 1; }
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - name: Build everything that is not Windows-only
+        run: dotnet build CubeShelf.Portable.slnf -c Release -p:Version=${{ steps.version.outputs.version }}
       - name: Test portable Core
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Test archive and disc handling
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
       - name: Publish Linux x64
         run: >
           dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
@@ -54,7 +58,7 @@ jobs:
           cp -a publish/linux-x64/. AppDir/usr/bin/
           cp packaging/linux/AppRun AppDir/AppRun
           cp packaging/linux/cubeshelf.desktop AppDir/cubeshelf.desktop
-          cp src/CubeShelf.Launcher/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
+          cp src/CubeShelf.Desktop/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
           cp AppDir/cubeshelf.png AppDir/.DirIcon
           chmod +x AppDir/AppRun AppDir/usr/bin/CubeShelf
           curl --fail --location --retry 3 https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage --output appimagetool
@@ -83,8 +87,12 @@ jobs:
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then tag="$GITHUB_REF_NAME"; else tag="v${{ inputs.version }}"; fi
           [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release tag"; exit 1; }
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - name: Build everything that is not Windows-only
+        run: dotnet build CubeShelf.Portable.slnf -c Release -p:Version=${{ steps.version.outputs.version }}
       - name: Test portable Core
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Test archive and disc handling
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
       - name: Publish ${{ matrix.rid }}
         run: >
           dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
@@ -140,7 +148,7 @@ jobs:
         run: dotnet build CubeShelfLauncher.sln -c Release --no-restore -p:Version=${{ steps.version.outputs.version }}
 
       - name: Run security and compatibility tests
-        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release -r win-x64 -p:Version=${{ steps.version.outputs.version }}
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release -p:Version=${{ steps.version.outputs.version }}
 
       - name: Run portable Core tests
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release -p:Version=${{ steps.version.outputs.version }}

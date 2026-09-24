@@ -1,11 +1,11 @@
-@echo off
+﻿@echo off
 setlocal
 cd /d "%~dp0"
 echo CubeShelf v0.6.7 - correctif popup mises a jour
 where dotnet >nul 2>&1
 if errorlevel 1 ( echo [ERREUR] .NET 8 SDK n'est pas installe. & pause & exit /b 1 )
-if exist "src\CubeShelf.Launcher\bin" rmdir /s /q "src\CubeShelf.Launcher\bin"
-if exist "src\CubeShelf.Launcher\obj" rmdir /s /q "src\CubeShelf.Launcher\obj"
+if exist "src\CubeShelf.Desktop\bin" rmdir /s /q "src\CubeShelf.Desktop\bin"
+if exist "src\CubeShelf.Desktop\obj" rmdir /s /q "src\CubeShelf.Desktop\obj"
 if exist "src\CubeShelf.Updater\bin" rmdir /s /q "src\CubeShelf.Updater\bin"
 if exist "src\CubeShelf.Updater\obj" rmdir /s /q "src\CubeShelf.Updater\obj"
 if exist "Release" rmdir /s /q "Release"
@@ -14,7 +14,7 @@ echo [1/4] Restore...
 dotnet restore CubeShelfLauncher.sln
 if errorlevel 1 goto :fail
 echo [2/4] Build CubeShelf...
-dotnet publish src\CubeShelf.Launcher\CubeShelf.Launcher.csproj -c Release -r win-x64 --self-contained true -o Release
+dotnet publish src\CubeShelf.Desktop\CubeShelf.Desktop.csproj -c Release -r win-x64 --self-contained true -o Release
 if errorlevel 1 goto :fail
 echo [3/4] Build updater...
 dotnet publish src\CubeShelf.Updater\CubeShelf.Updater.csproj -c Release -r win-x64 --self-contained true -o Release\UpdaterTmp

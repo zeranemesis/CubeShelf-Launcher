@@ -24,6 +24,8 @@ jobs:
 
       - name: Test portable core
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
+      - name: Test archive and disc handling
+        run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
 
       - name: Publish Linux x64
         run: >
@@ -40,7 +42,7 @@ jobs:
           cp -a publish/linux-x64/. AppDir/usr/bin/
           cp packaging/linux/AppRun AppDir/AppRun
           cp packaging/linux/cubeshelf.desktop AppDir/cubeshelf.desktop
-          cp src/CubeShelf.Launcher/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
+          cp src/CubeShelf.Desktop/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
           cp AppDir/cubeshelf.png AppDir/.DirIcon
           chmod +x AppDir/AppRun AppDir/usr/bin/CubeShelf
 

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Windows;
 using System.Windows.Controls;
@@ -624,7 +624,6 @@ internal sealed class UpdaterWindow : Window
         var names = new[]
         {
             "CubeShelf",
-            "CubeShelf.Launcher",
             "CubeShelf.Updater"
         };
 
