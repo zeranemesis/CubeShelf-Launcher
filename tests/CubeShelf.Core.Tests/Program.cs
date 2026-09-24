@@ -1172,6 +1172,33 @@ void TestOnlyGamesWithACompanionCanInvite()
         Assert(!OnlineCompanion.TryResolve(runtime, "", out _));
         Assert(!OnlineCompanion.TryResolve("", "PartyBoardOnline.exe", out _));
 
+        // A companion CubeShelf may drive says so in the manifest its package ships beside it.
+        // Probing is not an option: an older companion treats an unknown flag as no flag, opens
+        // its ordinary window and says nothing, so the launcher would wait on a lobby nobody is
+        // creating. Every uncertain answer is "no", which costs a manual paste and never a wait.
+        Assert(!OnlineCompanion.SupportsLauncherInvites(companion));   // no manifest at all
+        Assert(!OnlineCompanion.SupportsLauncherInvites(null));
+        Assert(!OnlineCompanion.SupportsLauncherInvites("   "));
+
+        var manifest = Path.Combine(root, "manifest.json");
+        File.WriteAllText(manifest, "{\"schema\":1,\"version\":\"0.15.6\"}");
+        Assert(!OnlineCompanion.SupportsLauncherInvites(companion));   // older package
+
+        File.WriteAllText(manifest, "{\"schema\":1,\"capabilities\":[\"something-else\"]}");
+        Assert(!OnlineCompanion.SupportsLauncherInvites(companion));
+
+        File.WriteAllText(manifest, "{\"schema\":1,\"capabilities\":\"launcher-invites\"}");
+        Assert(!OnlineCompanion.SupportsLauncherInvites(companion));   // not an array
+
+        File.WriteAllText(manifest, "{ this is not json");
+        Assert(!OnlineCompanion.SupportsLauncherInvites(companion));
+
+        File.WriteAllText(manifest, "{\"schema\":1,\"capabilities\":[\"launcher-invites\"]}");
+        Assert(OnlineCompanion.SupportsLauncherInvites(companion));
+        File.WriteAllText(manifest, "{\"schema\":1,\"capabilities\":[\"other\",\"launcher-invites\"]}");
+        Assert(OnlineCompanion.SupportsLauncherInvites(companion));
+        File.Delete(manifest);
+
         // games.json is a file on disk and this value reaches Process.Start, so a companion
         // name is a file name beside the runtime and never a path out of it.
         Assert(!OnlineCompanion.TryResolve(runtime, "..\\PartyBoardOnline.exe", out _));

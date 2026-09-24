@@ -194,7 +194,7 @@
                   <Button x:Name="OpenCompanionButton" Content="{DynamicResource OpenCompanion}" Click="OpenCompanion" />
                 </StackPanel>
                 <TextBlock x:Name="InviteStatusText" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
-                <TextBlock Text="{DynamicResource InviteManual}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,6,0,0" TextWrapping="Wrap" />
+                <TextBlock x:Name="InviteManualHint" Text="{DynamicResource InviteManual}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,6,0,0" TextWrapping="Wrap" />
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                   <TextBox x:Name="InvitePayloadBox" Watermark="{DynamicResource InviteCodeHint}" />
                   <Button Grid.Column="1" x:Name="PublishInviteButton" Content="{DynamicResource PublishInvite}" Click="PublishInvite" />

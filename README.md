@@ -96,6 +96,10 @@ Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ;
 
 ### Profil, blocage, invitations
 
+> **Jamais testé entre deux machines.** Les invitations ont été compilées et testées
+> unitairement, jamais jouées. [TEST_DEUX_PC.md](TEST_DEUX_PC.md) donne la procédure et, surtout,
+> ce que chaque échec veut dire.
+
 **Ton profil** est ce que tes amis voient à côté de ton nom : un avatar, une ligne de statut,
 la taille de ta bibliothèque et un jeu mis en avant. Rien n'est obligatoire et tout voyage dans
 le même document chiffré. L'avatar est recadré au carré puis réduit en 96×96 avant publication —

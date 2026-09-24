@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
@@ -40,22 +40,28 @@ public sealed partial class MainWindow
         InviteCard.IsVisible = OnlineCompanion.IsSupported(game);
         if (!InviteCard.IsVisible || game is null) return;
 
-        var installed = TryResolveCompanion(game, out _);
+        var installed = TryResolveCompanion(game, out var companion);
+        var driveable = installed && OnlineCompanion.SupportsLauncherInvites(companion);
         var waiting = _hostWatch is { IsCancellationRequested: false };
         var live = _outgoingInvite is not null &&
                    string.Equals(_outgoingInvite.GameId, game.Id, StringComparison.OrdinalIgnoreCase) &&
                    _outgoingInvite.IsPublishable(DateTimeOffset.UtcNow);
 
-        HostLobbyButton.IsEnabled = installed && !waiting && !live;
+        HostLobbyButton.IsEnabled = driveable && !waiting && !live;
+        HostLobbyButton.IsVisible = driveable || !installed;
         OpenCompanionButton.IsEnabled = installed;
         InvitePayloadBox.IsEnabled = installed;
         PublishInviteButton.IsEnabled = installed;
         CancelInviteButton.IsVisible = live || waiting;
+        // With an older companion the manual box is not a fallback, it is the only way, so it
+        // stops being introduced as an afterthought.
+        InviteManualHint.IsVisible = driveable;
 
-        InviteStatusText.Text = DescribeInviteState(game, installed, live, waiting);
+        InviteStatusText.Text = DescribeInviteState(game, installed, driveable, live, waiting);
     }
 
-    private string DescribeInviteState(GameCatalogEntry game, bool installed, bool live, bool waiting)
+    private string DescribeInviteState(
+        GameCatalogEntry game, bool installed, bool driveable, bool live, bool waiting)
     {
         if (!installed)
             return P7($"Installe {game.RuntimeName} : son compagnon en ligne vient avec.",
@@ -71,6 +77,12 @@ public sealed partial class MainWindow
         if (recipients == 0)
             return P7("Ajoute un ami : une invitation ne part qu’à des amis.",
                       "Add a friend: an invitation only goes to friends.");
+
+        if (!driveable)
+            return P7($"Ton {game.RuntimeName} est trop ancien pour être piloté par CubeShelf : " +
+                      "mets-le à jour, ou crée le salon dans le compagnon et colle son code ici.",
+                      $"Your {game.RuntimeName} is too old for CubeShelf to drive: update it, or " +
+                      "create the lobby in the companion and paste its code here.");
 
         if (waiting)
             return P7("Le compagnon prépare le salon. Il vérifie ton disque en entier, ce qui prend " +
@@ -275,6 +287,26 @@ public sealed partial class MainWindow
     }
 
     /// <summary>
+    /// The guest's half against a companion CubeShelf cannot drive: the code goes to the
+    /// clipboard and the companion is opened for them to paste it. Worse than one click, and
+    /// still better than a button that appears to do nothing.
+    /// </summary>
+    private async Task JoinTheOldWayAsync(
+        FriendRow row, GameCatalogEntry game, Dictionary<string, string?> environment)
+    {
+        if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(row.JoinPayload);
+
+        if (!TryStartCompanion(game, environment, null)) return;
+
+        ShowToastParity(P7("Invitation", "Invitation"),
+            P7($"Ton {game.RuntimeName} est trop ancien pour rejoindre tout seul. Le code est " +
+               "copié : colle-le dans le compagnon, puis « Rejoindre ».",
+               $"Your {game.RuntimeName} is too old to join by itself. The code is copied: paste " +
+               "it into the companion, then press Join."));
+    }
+
+    /// <summary>
     /// The guest's one click. The companion opens already holding the invitation, the pseudo and
     /// the disc, so there is nothing to paste and nothing to pick.
     /// </summary>
@@ -294,6 +326,16 @@ public sealed partial class MainWindow
         }
 
         var environment = CompanionEnvironment(game);
+        TryResolveCompanion(game, out var companion);
+
+        // An older companion ignores --join and opens its ordinary window, so the guest would be
+        // left with nothing to paste. Give them the code and say what to do with it.
+        if (!OnlineCompanion.SupportsLauncherInvites(companion))
+        {
+            _ = JoinTheOldWayAsync(row, game, environment);
+            return;
+        }
+
         environment["PARTYBOARD_ONLINE_INVITE"] = row.JoinPayload;
         if (!TryStartCompanion(game, environment, new[] { "--join" })) return;
 
