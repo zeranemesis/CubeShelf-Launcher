@@ -261,6 +261,11 @@ internal sealed class UpdaterWindow : Window
                     "Le package de mise à jour ne contient pas les exécutables CubeShelf attendus.");
             }
 
+            // Before the backup and before any write: if a file cannot be overwritten, say so
+            // now, while the installation is still exactly what the user had.
+            SetStatus("Vérification des fichiers…");
+            await EnsureDestinationsAreFreeAsync(staging, files);
+
             SetStatus("Sauvegarde de la version actuelle…");
             SetProgress(0.46);
             _backupDirectory = await CreateBackupAsync();
@@ -289,10 +294,7 @@ internal sealed class UpdaterWindow : Window
                 // overwritten, so move it aside and write the new build in its place.
                 DisplaceIfRunningImage(dst);
 
-                File.Copy(
-                    file,
-                    dst,
-                    true);
+                await CopyWithRetryAsync(file, dst);
 
                 SetProgress(
                     0.52 +
@@ -452,6 +454,35 @@ internal sealed class UpdaterWindow : Window
         return backup;
     }
 
+    // An antivirus looks at a file the moment something opens it -- and the backup has just
+    // opened every one of them. A copy that lands on such a scan is retried for a few seconds
+    // before it counts as a failure, so a scanner's glance does not turn into a rollback. The
+    // check before the backup cannot see these: they start after it, because of it.
+    private static async Task CopyWithRetryAsync(string source, string destination)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                File.Copy(source, destination, true);
+                return;
+            }
+            catch (Exception exception) when (
+                (exception is IOException or UnauthorizedAccessException) && attempt < 20)
+            {
+                await Task.Delay(250);
+            }
+        }
+    }
+
+    // Puts the backed-up files back over the installation without emptying it first.
+    //
+    // The restore used to delete everything and then copy. When one file resisted, the copy
+    // stopped there and every file after it in the listing was simply gone -- so an update that
+    // failed on its very first file could leave no application behind at all. Now each file is
+    // put back on its own, and a file that cannot be is set aside rather than ending the
+    // restore. Such a file is almost always one the failed update could not overwrite either,
+    // so it still holds the previous version; the message says where the full copy lives anyway.
     private async Task RestoreBackupAsync()
     {
         if (string.IsNullOrWhiteSpace(_backupDirectory) ||
@@ -460,22 +491,56 @@ internal sealed class UpdaterWindow : Window
 
         Directory.CreateDirectory(_installDir);
 
-        foreach (var entry in Directory.EnumerateFileSystemEntries(_installDir).ToList())
+        var backedUp = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var unrestored = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(_backupDirectory, "*", SearchOption.AllDirectories))
         {
-            if (Directory.Exists(entry))
+            var relative = Path.GetRelativePath(_backupDirectory, file);
+            backedUp.Add(relative);
+
+            var target = Path.Combine(_installDir, relative);
+            try
             {
-                Directory.Delete(entry, true);
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                DisplaceIfRunningImage(target);
+                await CopyWithRetryAsync(file, target);
             }
-            else if (!DisplaceIfRunningImage(entry))
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                // Anything else that resists deletion must not abort the restore: leaving
-                // one stale file behind is recoverable, stopping half way through is not.
-                // The copy below overwrites whatever survived.
-                try { File.Delete(entry); } catch { }
+                unrestored.Add(relative);
+            }
+
+            await Task.Yield();
+        }
+
+        // What the failed update added and the previous version never had. Displaced images
+        // are left for the next run, which deletes them once nothing maps them.
+        foreach (var file in Directory.EnumerateFiles(_installDir, "*", SearchOption.AllDirectories).ToList())
+        {
+            var relative = Path.GetRelativePath(_installDir, file);
+            if (backedUp.Contains(relative) ||
+                relative.EndsWith(DisplacedSuffix, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            try
+            {
+                if (!DisplaceIfRunningImage(file))
+                    File.Delete(file);
+            }
+            catch
+            {
             }
         }
 
-        await CopyDirectoryAsync(_backupDirectory, _installDir);
+        if (unrestored.Count > 0)
+        {
+            throw new IOException(
+                $"{unrestored.Count} fichier(s) n’ont pas pu être remis en place, dont {unrestored[0]}. " +
+                $"Une copie complète de la version précédente se trouve dans {_backupDirectory}. " +
+                "Le plus simple est de réinstaller CubeShelf avec CubeShelf-Setup-x64.exe : " +
+                "tes amis, tes jeux et tes mods sont ailleurs et ne seront pas touchés.");
+        }
     }
 
     // Windows refuses to overwrite or delete the image of a running process, and the
@@ -593,93 +658,176 @@ internal sealed class UpdaterWindow : Window
         _backupDirectory = null;
     }
 
+    // How long CubeShelf gets to close by itself before it is killed. It saves its preferences
+    // on the way out and, from 0.9, writes a farewell presence document bounded at three
+    // seconds. Two seconds was already too short for some machines before that.
+    private static readonly TimeSpan GracefulExit = TimeSpan.FromSeconds(10);
+
     private async Task StopAllCubeShelfProcessesAsync()
     {
         SetStatus("Fermeture complète de CubeShelf…");
         SetProgress(0.02);
 
+        // CubeShelf starts this updater, so this updater is its child -- and
+        // Kill(entireProcessTree: true) refuses any tree that contains the calling process. It
+        // throws InvalidOperationException, which the catch here used to swallow, so this phase
+        // never killed anything at all: an update only worked when CubeShelf happened to close by
+        // itself within about two seconds, and when it did not, the copy started with the old
+        // CubeShelf still mapping its own DLLs. Each process is now killed on its own. On Windows
+        // killing a parent does not take its children with it, and a game CubeShelf launched maps
+        // nothing in the install directory, so there is no tree worth taking down anyway.
         try
         {
             using var parent = Process.GetProcessById(_pid);
 
             var graceful = parent.WaitForExitAsync();
-            var timeout = Task.Delay(TimeSpan.FromSeconds(2));
-
-            if (await Task.WhenAny(graceful, timeout) != graceful &&
+            if (await Task.WhenAny(graceful, Task.Delay(GracefulExit)) != graceful &&
                 !parent.HasExited)
             {
-                parent.Kill(entireProcessTree: true);
+                SetStatus("CubeShelf ne se ferme pas, arrêt forcé…");
+                parent.Kill();
                 await parent.WaitForExitAsync();
             }
         }
         catch
         {
+            // Already gone, or not ours to kill. Either way the file check before the copy is
+            // what decides whether the update may proceed, not this.
         }
 
-        var installRoot =
-            Path.GetFullPath(_installDir)
-                .TrimEnd(Path.DirectorySeparatorChar) +
-            Path.DirectorySeparatorChar;
-
-        var names = new[]
-        {
-            "CubeShelf",
-            "CubeShelf.Updater"
-        };
-
-        var deadline = DateTime.UtcNow.AddSeconds(6);
+        var deadline = DateTime.UtcNow.AddSeconds(10);
 
         while (DateTime.UtcNow < deadline)
         {
-            var killedSomething = false;
+            var remaining = RunningFromInstallDirectory();
+            if (remaining.Count == 0)
+                break;
 
-            foreach (var name in names)
+            foreach (var process in remaining)
             {
-                foreach (var process in Process.GetProcessesByName(name))
+                try
                 {
-                    try
+                    if (!process.HasExited)
                     {
-                        if (process.Id == Environment.ProcessId)
-                            continue;
-
-                        var path = process.MainModule?.FileName;
-                        if (string.IsNullOrWhiteSpace(path))
-                            continue;
-
-                        var fullPath = Path.GetFullPath(path);
-
-                        if (!fullPath.StartsWith(
-                                installRoot,
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        if (!process.HasExited)
-                        {
-                            process.Kill(entireProcessTree: true);
-                            await process.WaitForExitAsync();
-                            killedSomething = true;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        process.Dispose();
+                        process.Kill();
+                        await process.WaitForExitAsync();
                     }
                 }
+                catch
+                {
+                }
+                finally
+                {
+                    process.Dispose();
+                }
             }
-
-            if (!killedSomething)
-                break;
 
             await Task.Delay(150);
         }
 
         await Task.Delay(350);
         SetProgress(0.06);
+    }
+
+    // CubeShelf processes whose image lives in the directory being updated. Another copy
+    // installed elsewhere is left alone: it maps none of the files this update writes.
+    private List<Process> RunningFromInstallDirectory()
+    {
+        var installRoot =
+            Path.GetFullPath(_installDir)
+                .TrimEnd(Path.DirectorySeparatorChar) +
+            Path.DirectorySeparatorChar;
+
+        var found = new List<Process>();
+
+        foreach (var name in new[] { "CubeShelf", "CubeShelf.Updater" })
+        {
+            foreach (var process in Process.GetProcessesByName(name))
+            {
+                var keep = false;
+                try
+                {
+                    if (process.Id != Environment.ProcessId && !process.HasExited)
+                    {
+                        var path = process.MainModule?.FileName;
+                        keep = !string.IsNullOrWhiteSpace(path) &&
+                               Path.GetFullPath(path).StartsWith(installRoot, StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+                catch
+                {
+                    // A process whose modules we may not read is one we cannot place. The file
+                    // check before the copy catches it if it matters.
+                }
+
+                if (keep)
+                    found.Add(process);
+                else
+                    process.Dispose();
+            }
+        }
+
+        return found;
+    }
+
+    // The stop phase finds processes by name and path, and can miss one: an elevated copy
+    // whose modules we may not read, an antivirus holding a freshly written DLL open, a second
+    // copy started under another name. What matters is whether the files can be written, so
+    // that is what is checked -- before a single one is touched. Failing here costs a retry.
+    // Failing half way through the copy is what left an installation broken in the field on
+    // 2026-09-24: Avalonia.Base.dll was still mapped by the CubeShelf this updater had failed
+    // to close, and the rollback died on the same file.
+    private async Task EnsureDestinationsAreFreeAsync(string staging, IReadOnlyList<string> files)
+    {
+        // Long enough for an antivirus to finish looking at a file, short enough that someone
+        // with CubeShelf genuinely still open is told so rather than left watching a bar.
+        var deadline = DateTime.UtcNow.AddSeconds(15);
+
+        while (true)
+        {
+            var locked = FirstLockedDestination(staging, files);
+            if (locked is null)
+                return;
+
+            if (DateTime.UtcNow >= deadline)
+            {
+                throw new IOException(
+                    $"{Path.GetFileName(locked)} est encore utilisé par un autre programme, " +
+                    "sans doute CubeShelf lui-même.\n\n" +
+                    "Rien n’a été modifié : ta version actuelle est intacte.\n\n" +
+                    "Ferme CubeShelf depuis le gestionnaire des tâches, puis relance la mise à jour " +
+                    "depuis les Paramètres.");
+            }
+
+            SetStatus($"En attente de la libération de {Path.GetFileName(locked)}…");
+            await Task.Delay(500);
+        }
+    }
+
+    private string? FirstLockedDestination(string staging, IReadOnlyList<string> files)
+    {
+        foreach (var file in files)
+        {
+            var destination = Path.Combine(_installDir, Path.GetRelativePath(staging, file));
+
+            // Our own image is locked by definition, and is moved aside rather than written.
+            if (!File.Exists(destination) || IsRunningImage(destination))
+                continue;
+
+            try
+            {
+                // Exclusive, and for writing: exactly what the copy is about to need. A DLL
+                // mapped by another process refuses this, and so does any open handle at all.
+                using var probe = new FileStream(
+                    destination, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                return destination;
+            }
+        }
+
+        return null;
     }
 
     private async void RestartButton_Click(
