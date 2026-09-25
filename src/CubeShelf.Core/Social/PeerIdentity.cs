@@ -190,6 +190,81 @@ public sealed class PeerIdentity : IDisposable
         }
     }
 
+    /// <summary>
+    /// The raw private scalar, left-padded to 32 bytes. Only <see cref="ProfileTransfer"/> uses it,
+    /// to hand this identity to PartyBoard on a phone inside a passphrase-sealed file.
+    /// </summary>
+    public byte[] ExportPrivateScalar()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        var d = _key.ExportParameters(true).D ??
+                throw new CryptographicException("La clé privée n’est pas exportable.");
+        try
+        {
+            var padded = new byte[CoordinateLength];
+            d.CopyTo(padded, CoordinateLength - d.Length);
+            return padded;
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(d);
+        }
+    }
+
+    /// <summary>Rebuilds an identity from <see cref="ExportPrivateScalar"/> and its public key.</summary>
+    public static PeerIdentity FromPrivateScalar(ReadOnlySpan<byte> scalar, ReadOnlySpan<byte> publicKey)
+    {
+        ValidatePublicKey(publicKey);
+        if (scalar.Length != CoordinateLength)
+            throw new ArgumentException("Clé privée CubeShelf invalide.", nameof(scalar));
+
+        var parameters = new ECParameters
+        {
+            Curve = ECCurve.NamedCurves.nistP256,
+            D = scalar.ToArray(),
+            Q = new ECPoint
+            {
+                X = publicKey.Slice(1, CoordinateLength).ToArray(),
+                Y = publicKey.Slice(1 + CoordinateLength, CoordinateLength).ToArray()
+            }
+        };
+        try
+        {
+            parameters.Validate();
+            ECDiffieHellman key;
+            try
+            {
+                key = ECDiffieHellman.Create(parameters);
+            }
+            catch (CryptographicException exception)
+            {
+                // OpenSSL checks the pair on import where it can; other providers leave that to
+                // the probe below. Either way it is the same refusal.
+                throw new ArgumentException("La clé privée ne correspond pas à la clé publique.", nameof(scalar), exception);
+            }
+            var identity = new PeerIdentity(key);
+
+            // Exporting would only echo back the Q we supplied, so prove the pair instead: an
+            // agreement with a throwaway key must land on the same secret from both ends.
+            using var probe = Create();
+            var ours = identity.DeriveSharedKey(probe.PublicKey);
+            var theirs = probe.DeriveSharedKey(publicKey);
+            var matches = CryptographicOperations.FixedTimeEquals(ours, theirs);
+            CryptographicOperations.ZeroMemory(ours);
+            CryptographicOperations.ZeroMemory(theirs);
+            if (!matches)
+            {
+                identity.Dispose();
+                throw new ArgumentException("La clé privée ne correspond pas à la clé publique.", nameof(scalar));
+            }
+            return identity;
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(parameters.D);
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed) return;

@@ -462,6 +462,16 @@
             </Border>
             <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
               <StackPanel Spacing="9">
+                <TextBlock Text="{DynamicResource PhoneTransferTitle}" FontSize="18" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource PhoneTransferHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                <TextBox x:Name="PhoneTransferPassphraseBox" PasswordChar="•" Watermark="{DynamicResource PhoneTransferPassphrase}" />
+                <TextBox x:Name="PhoneTransferConfirmBox" PasswordChar="•" Watermark="{DynamicResource PhoneTransferConfirm}" />
+                <StackPanel Orientation="Horizontal"><Button Classes="primary" Content="{DynamicResource PhoneTransferExport}" Click="ExportProfileForPhone" /></StackPanel>
+                <TextBlock x:Name="PhoneTransferStatusText" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+              <StackPanel Spacing="9">
                 <TextBlock Text="{DynamicResource PresenceDisplayName}" Foreground="{DynamicResource Muted}" FontSize="11" FontWeight="Bold" Margin="0,6,0,0" />
                 <TextBox x:Name="PresenceNameBox" Watermark="{DynamicResource PresenceDisplayNameHint}" MaxLength="32" LostFocus="SavePseudo" />
 

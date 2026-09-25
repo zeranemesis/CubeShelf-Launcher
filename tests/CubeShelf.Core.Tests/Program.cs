@@ -79,6 +79,8 @@ Run("the friend code carries the pseudo", TestFriendCodeCarriesThePseudo);
 Run("the tag never changes", TestTagNeverChanges);
 Run("the in-game state is what the game reads", TestInGameStateIsWhatTheGameReads);
 Run("in-game requests are acted on once", TestInGameRequestsAreActedOnOnce);
+Run("a profile moves to the phone intact", TestProfileTransferRoundTrip);
+Run("a profile file refuses the wrong passphrase", TestProfileTransferRefusesWrongPassphrase);
 
 if (failures.Count == 0)
 {
@@ -2582,6 +2584,73 @@ string FindRepositoryFile(string relativePath)
         directory = directory.Parent;
     }
     throw new DirectoryNotFoundException("Racine du dépôt introuvable depuis " + AppContext.BaseDirectory);
+}
+
+void TestProfileTransferRoundTrip()
+{
+    using var me = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var friends = new[]
+    {
+        new Friend
+        {
+            PublicKey = Convert.ToBase64String(friend.PublicKey), DisplayName = "Alex",
+            PresenceUrl = "https://example.org/alex.json", LastSequence = 41, Paused = true
+        },
+        new Friend
+        {
+            PublicKey = Convert.ToBase64String(PeerIdentity.Create().PublicKey), DisplayName = "Gone",
+            PresenceUrl = "https://example.org/gone.json", Blocked = true
+        }
+    };
+    var now = new DateTimeOffset(2026, 9, 25, 12, 0, 0, TimeSpan.Zero);
+
+    var exported = ProfileTransfer.Export(me, "Zera", friends, "correct horse", now);
+    Assert(exported.StartsWith(ProfileTransfer.Prefix, StringComparison.Ordinal));
+    // No trace of the name or the addresses in the file itself.
+    Assert(!exported.Contains("Zera") && !exported.Contains("example"));
+
+    // Pasted out of a chat or a mail, line breaks come along.
+    var wrapped = string.Join("\n", exported.Chunk(76).Select(chunk => new string(chunk)));
+    Assert(ProfileTransfer.TryImport(wrapped, "correct horse", out var payload, out var error));
+    Assert(error.Length == 0);
+    Assert(payload!.DisplayName == "Zera" && payload.ExportedAt == now);
+    Assert(payload.PublicKey.SequenceEqual(me.PublicKey));
+
+    // Blocked people stay behind; everyone else arrives as they were.
+    Assert(payload.Friends.Count == 1);
+    var alex = payload.Friends[0];
+    Assert(alex.DisplayName == "Alex" && alex.LastSequence == 41 && alex.Paused);
+    Assert(alex.PresenceUrl == "https://example.org/alex.json");
+    Assert(alex.PublicKey == Convert.ToBase64String(friend.PublicKey));
+
+    // The phone is the same person: what a friend seals for us, it opens.
+    using var rebuilt = PeerIdentity.FromPrivateScalar(payload.PrivateKey, payload.PublicKey);
+    var envelope = SealedPresence.Seal(friend, SampleSnapshot(3), new[] { me.PublicKey });
+    Assert(SealedPresence.TryOpen(rebuilt, friend.PublicKey, envelope, out var opened) && opened!.Sequence == 3);
+
+    // A scalar paired with somebody else's public key is refused rather than half-working.
+    AssertThrows<ArgumentException>(() => PeerIdentity.FromPrivateScalar(payload.PrivateKey, friend.PublicKey));
+}
+
+void TestProfileTransferRefusesWrongPassphrase()
+{
+    using var me = PeerIdentity.Create();
+    var now = DateTimeOffset.UtcNow;
+    AssertThrows<ArgumentException>(() => ProfileTransfer.Export(me, "Zera", Array.Empty<Friend>(), "short", now));
+    AssertThrows<ArgumentException>(() => ProfileTransfer.Export(me, "#", Array.Empty<Friend>(), "long enough", now));
+
+    var exported = ProfileTransfer.Export(me, "Zera", Array.Empty<Friend>(), "long enough", now);
+    Assert(!ProfileTransfer.TryImport(exported, "long enougH", out var payload, out var error) && payload is null);
+    Assert(error.Length > 0);
+
+    // One flipped character anywhere breaks the seal.
+    var index = ProfileTransfer.Prefix.Length + 30;
+    var tampered = exported[..index] + (exported[index] == 'A' ? 'B' : 'A') + exported[(index + 1)..];
+    Assert(!ProfileTransfer.TryImport(tampered, "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport(exported[..^10], "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport("CSF2-notaprofile", "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport(null, "long enough", out _, out _));
 }
 
 sealed class StaticHttpHandler(Func<Uri, byte[]> content) : HttpMessageHandler
