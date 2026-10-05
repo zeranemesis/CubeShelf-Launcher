@@ -59,6 +59,12 @@ The same overlay covers every disc entry point — `DVDOpen()`,
 the `sound/` audio banks), and the async reads — because it is installed in the
 FST itself rather than in a single open function.
 
+The online companion (`PartyBoardOnline.exe`) receives the same
+`PARTYBOARD_MOD_LIST` when CubeShelf opens it for an invitation, exactly as it
+inherits it when the game opens it. It reads `installed.json` beside the list to
+offer every installed mod in its *Mods…* panel, for that salon only, and never
+writes back.
+
 `PARTYBOARD_DISC_IMAGE` names the copy of the game being started, and therefore
 the one the mods were installed against. PartyBoard now boots it in preference to
 its own remembered `backend.isoPath`, and skips its pre-launch picker, so a
