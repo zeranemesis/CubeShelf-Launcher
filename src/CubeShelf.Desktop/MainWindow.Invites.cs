@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
+using CubeShelf.Core.Mods;
 using CubeShelf.Core.Social;
 
 namespace CubeShelf.Desktop;
@@ -87,6 +88,20 @@ public sealed partial class MainWindow
         var disc = ResolveApplicationPath(game.DiscImage);
         if (!string.IsNullOrWhiteSpace(disc) && File.Exists(disc))
             environment["PARTYBOARD_ONLINE_DISC"] = disc;
+
+        // Where this game's mods live. The salon reads them from beside this list -- its
+        // Mods… panel offers every installed one and starts from what CubeShelf has on --
+        // and a salon opened from inside the game already inherits it from Play. Without
+        // it here a salon opened from CubeShelf guessed the default data folder, and on a
+        // portable install found no mods at all.
+        try
+        {
+            environment["PARTYBOARD_MOD_LIST"] = new PortableModManager(_paths, game.Id).PrepareActiveList();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // The salon still opens; it simply offers no mods.
+        }
 
         // The game the companion starts for online play inherits this, so its F1 menu still
         // reaches CubeShelf.
