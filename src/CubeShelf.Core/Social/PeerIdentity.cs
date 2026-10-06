@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace CubeShelf.Core.Social;
 
@@ -35,6 +35,9 @@ public sealed class PeerIdentity : IDisposable
     /// <summary>The identity itself, safe to publish. 65 bytes.</summary>
     public byte[] PublicKey { get; }
 
+    /// <summary>Whether a saved key is encrypted for the Windows account, rather than only by file permissions.</summary>
+    public static bool ProtectedAtRest => IdentityProtection.Available;
+
     public static PeerIdentity Create() =>
         new(ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256));
 
@@ -50,23 +53,60 @@ public sealed class PeerIdentity : IDisposable
 
         if (File.Exists(full))
         {
+            var text = File.ReadAllText(full).Trim();
+            var wasProtected = text.StartsWith(IdentityProtection.Marker, StringComparison.Ordinal);
             byte[] pkcs8;
-            try
+            if (wasProtected)
             {
-                pkcs8 = Convert.FromBase64String(File.ReadAllText(full).Trim());
+                if (!IdentityProtection.Available)
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) a été protégée par Windows : elle ne s’ouvre que sur le PC et le compte " +
+                        "qui l’ont créée. Restaure ta sauvegarde d’identité (Mon profil).");
+                try
+                {
+                    pkcs8 = IdentityProtection.Unprotect(text);
+                }
+                catch (CryptographicException exception)
+                {
+                    // Not deleted, not replaced: it still opens on the PC and account it came from.
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) a été protégée par un autre compte Windows, ou sur un autre PC : " +
+                        "elle ne s’ouvre pas ici. Restaure ta sauvegarde d’identité (Mon profil → Restaurer une sauvegarde).", exception);
+                }
             }
-            catch (FormatException exception)
+            else
             {
-                throw new CryptographicException(
-                    $"L’identité CubeShelf ({full}) est illisible. La supprimer en créera une " +
-                    "nouvelle, mais tes amis devront t’ajouter de nouveau.", exception);
+                try
+                {
+                    pkcs8 = Convert.FromBase64String(text);
+                }
+                catch (FormatException exception)
+                {
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) est illisible. La supprimer en créera une " +
+                        "nouvelle, mais tes amis devront t’ajouter de nouveau.", exception);
+                }
             }
 
             var restored = ECDiffieHellman.Create();
             try
             {
                 restored.ImportPkcs8PrivateKey(pkcs8, out _);
-                return new PeerIdentity(restored);
+                var loaded = new PeerIdentity(restored);
+
+                // A key from before protection existed is protected the first time it is read.
+                // Should that fail, it simply stays as it was and is tried again next time.
+                if (!wasProtected && IdentityProtection.Available)
+                {
+                    try
+                    {
+                        loaded.Save(full);
+                    }
+                    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or CryptographicException)
+                    {
+                    }
+                }
+                return loaded;
             }
             catch
             {
@@ -94,7 +134,10 @@ public sealed class PeerIdentity : IDisposable
         try
         {
             var temporary = full + ".tmp";
-            File.WriteAllText(temporary, Convert.ToBase64String(pkcs8));
+            // Encrypted for this Windows account where Windows can; elsewhere, as before.
+            File.WriteAllText(temporary, IdentityProtection.Available
+                ? IdentityProtection.Protect(pkcs8)
+                : Convert.ToBase64String(pkcs8));
             RestrictToOwner(temporary);
             File.Move(temporary, full, true);
             RestrictToOwner(full);

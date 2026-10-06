@@ -31,7 +31,7 @@ internal static class UiLocalization
         ["PhoneTransferHelp"] = "PartyBoard sur Android ne fait pas tourner CubeShelf. Le plus simple : téléphone et PC sur le même Wi-Fi, « Afficher le QR code », puis dans PartyBoard : onglet Amis, « Compte et sauvegardes (QR code) », Scanner. Le téléphone récupère ton compte, tes amis et tes sauvegardes de Mario Party 4, et peut renvoyer les siennes au PC. C’est ce PC qui continue à publier ta présence.",
         ["PhoneTransferPassphrase"] = "Mot de passe (8 caractères minimum)",
         ["PhoneTransferConfirm"] = "Confirme le mot de passe",
-        ["PhoneTransferExport"] = "Exporter pour le téléphone…",
+        ["PhoneTransferExport"] = "Exporter (sauvegarde ou téléphone)…",
         ["FriendsNeedIdentity"] = "Crée d'abord ton identité : un pseudo, et le numéro qui va avec. Sans elle, personne ne peut t'ajouter et tu ne peux ajouter personne.",
         ["OpenProfile"] = "Ouvrir mon profil",
         ["PresenceMovedHelp"] = "Ton pseudo, ton code ami et ta publication ont maintenant leur propre page : Mon profil (Ctrl+7).",
@@ -194,7 +194,8 @@ internal static class UiLocalization
         ["FriendMessage"] = "Message",
         ["AutoAway"] = "Me mettre « absent » après 10 minutes d’inactivité",
         ["PhoneLinkShow"] = "Afficher le QR code",
-        ["PhoneTransferFileTitle"] = "Sans Wi-Fi commun : par fichier",
+        ["PhoneTransferFileTitle"] = "Sauvegarde de ton identité, ou téléphone sans Wi-Fi commun : par fichier",
+        ["IdentityRestore"] = "Restaurer une sauvegarde…",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -224,7 +225,7 @@ internal static class UiLocalization
         ["PhoneTransferHelp"] = "PartyBoard on Android does not run CubeShelf. Simplest: phone and PC on the same Wi-Fi, “Show the QR code”, then in PartyBoard: Friends tab, “Account and saves (QR code)”, Scan. The phone gets your account, your friends and your Mario Party 4 saves, and can send its own back to the PC. This PC keeps publishing your presence.",
         ["PhoneTransferPassphrase"] = "Passphrase (8 characters minimum)",
         ["PhoneTransferConfirm"] = "Confirm the passphrase",
-        ["PhoneTransferExport"] = "Export for the phone…",
+        ["PhoneTransferExport"] = "Export (backup or phone)…",
         ["FriendsNeedIdentity"] = "Create your identity first: a pseudo, and the number that goes with it. Without it nobody can add you and you cannot add anyone.",
         ["OpenProfile"] = "Open my profile",
         ["PresenceMovedHelp"] = "Your pseudo, friend code and publishing now have their own page: My profile (Ctrl+7).",
@@ -387,7 +388,8 @@ internal static class UiLocalization
         ["FriendMessage"] = "Message",
         ["AutoAway"] = "Set me “away” after 10 minutes of inactivity",
         ["PhoneLinkShow"] = "Show the QR code",
-        ["PhoneTransferFileTitle"] = "No shared Wi-Fi: with a file",
+        ["PhoneTransferFileTitle"] = "Back up your identity, or a phone without shared Wi-Fi: with a file",
+        ["IdentityRestore"] = "Restore a backup…",
     };
 
     public static bool IsEnglish(string? language) =>

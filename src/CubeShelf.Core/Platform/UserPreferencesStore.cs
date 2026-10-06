@@ -85,7 +85,14 @@ public sealed record UserPreferences(
     /// old file gets a last document pointing at the new address, and friends follow on their own.
     /// </summary>
     string PreviousPresenceFolder = "",
-    string PreviousPresenceUrl = "");
+    string PreviousPresenceUrl = "",
+
+    /// <summary>
+    /// When the identity was last exported with a passphrase. Until it has been, the profile page
+    /// asks for it: the key is the one thing that cannot be recreated, and once protected by
+    /// Windows it no longer survives a reinstall by itself.
+    /// </summary>
+    DateTimeOffset? IdentityBackedUpAt = null);
 
 public sealed class UserPreferencesStore
 {

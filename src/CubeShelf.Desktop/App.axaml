@@ -85,7 +85,7 @@
       <x:String x:Key="PhoneTransferHelp">PartyBoard sur Android ne fait pas tourner CubeShelf. Le plus simple : téléphone et PC sur le même Wi-Fi, « Afficher le QR code », puis dans PartyBoard : onglet Amis, « Compte et sauvegardes (QR code) », Scanner. Le téléphone récupère ton compte, tes amis et tes sauvegardes de Mario Party 4, et peut renvoyer les siennes au PC. C’est ce PC qui continue à publier ta présence.</x:String>
       <x:String x:Key="PhoneTransferPassphrase">Mot de passe (8 caractères minimum)</x:String>
       <x:String x:Key="PhoneTransferConfirm">Confirme le mot de passe</x:String>
-      <x:String x:Key="PhoneTransferExport">Exporter pour le téléphone…</x:String>
+      <x:String x:Key="PhoneTransferExport">Exporter (sauvegarde ou téléphone)…</x:String>
       <x:String x:Key="FriendsNeedIdentity">Crée d'abord ton identité : un pseudo, et le numéro qui va avec. Sans elle, personne ne peut t'ajouter et tu ne peux ajouter personne.</x:String>
       <x:String x:Key="OpenProfile">Ouvrir mon profil</x:String>
       <x:String x:Key="PresenceMovedHelp">Ton pseudo, ton code ami et ta publication ont maintenant leur propre page : Mon profil (Ctrl+7).</x:String>
@@ -243,7 +243,8 @@
       <x:String x:Key="FriendMessage">Message</x:String>
       <x:String x:Key="AutoAway">Me mettre « absent » après 10 minutes d’inactivité</x:String>
       <x:String x:Key="PhoneLinkShow">Afficher le QR code</x:String>
-      <x:String x:Key="PhoneTransferFileTitle">Sans Wi-Fi commun : par fichier</x:String>
+      <x:String x:Key="PhoneTransferFileTitle">Sauvegarde de ton identité, ou téléphone sans Wi-Fi commun : par fichier</x:String>
+      <x:String x:Key="IdentityRestore">Restaurer une sauvegarde…</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

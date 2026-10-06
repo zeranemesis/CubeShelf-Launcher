@@ -746,7 +746,8 @@ public sealed partial class MainWindow : Window
         Availability = current.Availability,
         AutoAway = current.AutoAway,
         PreviousPresenceFolder = current.PreviousPresenceFolder,
-        PreviousPresenceUrl = current.PreviousPresenceUrl
+        PreviousPresenceUrl = current.PreviousPresenceUrl,
+        IdentityBackedUpAt = current.IdentityBackedUpAt
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)

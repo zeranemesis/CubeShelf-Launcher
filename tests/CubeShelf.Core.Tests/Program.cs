@@ -101,6 +101,8 @@ Run("a profile file refuses the wrong passphrase", TestProfileTransferRefusesWro
 Run("a QR code holds what it was given", TestQrCodeStructure);
 Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDownload);
 Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
+Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
+Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
 
 if (failures.Count == 0)
 {
@@ -3501,6 +3503,63 @@ void TestPhoneLinkUpload()
         {
             server.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
+    });
+}
+
+void TestIdentityIsProtectedAtRest()
+{
+    WithTempRoot(root =>
+    {
+        var path = Path.Combine(root, "identity.key");
+        byte[] publicKey;
+        using (var created = PeerIdentity.LoadOrCreate(path)) publicKey = created.PublicKey;
+        var text = File.ReadAllText(path);
+        Assert(text.StartsWith("dpapi1:", StringComparison.Ordinal) == OperatingSystem.IsWindows());
+        using (var loaded = PeerIdentity.LoadOrCreate(path)) Assert(loaded.PublicKey.SequenceEqual(publicKey));
+        if (!OperatingSystem.IsWindows()) return;
+
+        // A key written before protection existed opens, and is protected on the way.
+        var legacy = Path.Combine(root, "legacy.key");
+        using var ecdh = System.Security.Cryptography.ECDiffieHellman.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+        File.WriteAllText(legacy, System.Convert.ToBase64String(ecdh.ExportPkcs8PrivateKey()));
+        var expected = ecdh.ExportParameters(false);
+        using (var migrated = PeerIdentity.LoadOrCreate(legacy))
+            Assert(migrated.PublicKey.AsSpan(1, 32).SequenceEqual(expected.Q.X) && migrated.PublicKey.AsSpan(33, 32).SequenceEqual(expected.Q.Y));
+        Assert(File.ReadAllText(legacy).StartsWith("dpapi1:", StringComparison.Ordinal));
+        using (var again = PeerIdentity.LoadOrCreate(legacy)) Assert(again.PublicKey.AsSpan(1, 32).SequenceEqual(expected.Q.X));
+
+        // One that does not open here -- another account, another PC, or damage -- is refused,
+        // and left exactly as it was rather than replaced by a new identity.
+        var foreign = "dpapi1:" + System.Convert.ToBase64String(new byte[200]);
+        File.WriteAllText(path, foreign);
+        try
+        {
+            PeerIdentity.LoadOrCreate(path).Dispose();
+            Assert(false);
+        }
+        catch (System.Security.Cryptography.CryptographicException exception)
+        {
+            Assert(exception.Message.Contains("sauvegarde", StringComparison.Ordinal));
+        }
+        Assert(File.ReadAllText(path) == foreign);
+    });
+}
+
+void TestBackupRestoresTheIdentity()
+{
+    WithTempRoot(root =>
+    {
+        using var original = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var exported = ProfileTransfer.Export(original, "Zera", Array.Empty<Friend>(), "a long passphrase", DateTimeOffset.UtcNow);
+        Assert(ProfileTransfer.TryImport(exported, "a long passphrase", out var payload, out _));
+
+        // Rebuilt, written as this PC writes keys, read back: still the same person to a friend.
+        var path = Path.Combine(root, "identity.key");
+        using (var rebuilt = PeerIdentity.FromPrivateScalar(payload!.PrivateKey, payload.PublicKey)) rebuilt.Save(path);
+        using var restored = PeerIdentity.LoadOrCreate(path);
+        Assert(restored.PublicKey.SequenceEqual(original.PublicKey));
+        Assert(restored.DeriveSharedKey(friend.PublicKey).SequenceEqual(original.DeriveSharedKey(friend.PublicKey)));
     });
 }
 

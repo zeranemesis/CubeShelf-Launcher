@@ -63,6 +63,7 @@ public sealed partial class MainWindow
 
         RefreshOwnAvatar();
         RefreshOwnFriendCode();
+        RefreshBackupHint();
     }
 
     private void PreviewIdentity(object? sender, TextChangedEventArgs args)
