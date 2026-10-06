@@ -387,7 +387,9 @@ public sealed partial class MainWindow
         if (!friend.Blocked && IsOnLan(friend.PublicKey))
             seen = (seen.Length > 0 ? seen + " • " : "") + P7("📶 Sur ton réseau", "📶 On your network");
         else if (!friend.Blocked && _meshFriends?.IsConnected(friend.PublicKey) == true)
-            seen = (seen.Length > 0 ? seen + " • " : "") + P7("🔗 En direct", "🔗 Connected directly");
+            seen = (seen.Length > 0 ? seen + " • " : "") + (_meshFriends.IsRelayed(friend.PublicKey)
+                ? P7("🔗 En direct, par un relais", "🔗 Connected through a relay")
+                : P7("🔗 En direct", "🔗 Connected directly"));
         var unread = _messages?.Unread(friend.PublicKey) ?? 0;
         if (unread > 0 && !friend.Blocked)
             seen = P7($"💬 {unread} nouveau(x) message(s)", $"💬 {unread} new message(s)") + (seen.Length > 0 ? " • " + seen : "");

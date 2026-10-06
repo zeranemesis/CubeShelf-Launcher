@@ -115,6 +115,9 @@ public sealed class MeshFriends : IAsyncDisposable
 
     public bool IsConnected(string friendKey) => _sessions.TryGetValue(friendKey, out var session) && !session.Closed;
 
+    /// <summary>Connected, but through a relay: the routers would not let a direct path through.</summary>
+    public bool IsRelayed(string friendKey) => _sessions.TryGetValue(friendKey, out var session) && !session.Closed && !session.Route.IsDirect;
+
     public int ConnectedCount => _sessions.Values.Count(session => !session.Closed);
 
     public void Start()

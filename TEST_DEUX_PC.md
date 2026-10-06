@@ -1,11 +1,13 @@
-﻿# Essai à deux PC — invitations CubeShelf
+﻿# Essai à deux PC — le réseau CubeShelf et les invitations
 
-Le système d'invitation n'a **jamais tourné entre deux machines physiques**. Tout ce qui suit a
-été compilé, raisonné et testé unitairement ; rien n'a été joué. Ce document est la procédure
-pour le prouver ou le démentir, et surtout pour savoir *lequel des maillons* a lâché quand ça
-échoue.
+Ni le réseau CubeShelf ni les invitations n'ont **encore tourné entre deux box sur Internet**.
+Le réseau a été testé sur un Internet simulé (tous les types de box) et entre trois CubeShelf d'un
+même PC ; les invitations, unitairement. Ce document est la procédure pour le prouver ou le
+démentir, et surtout pour savoir *lequel des maillons* a lâché quand ça échoue.
 
-Compte deux heures pour le premier essai, dont l'essentiel en attente de téléchargements.
+Il y a deux essais, à faire dans l'ordre : **le réseau** (étape 1, un quart d'heure, sans jeu),
+puis **les invitations** (étapes 0 et 2). Compte deux heures pour le tout, dont l'essentiel en
+attente de téléchargements.
 
 ## Ce qu'il faut avant de commencer
 
@@ -13,8 +15,9 @@ Compte deux heures pour le premier essai, dont l'essentiel en attente de téléc
 | --- | --- |
 | Windows x64 | Le compagnon est WinForms, PartyBoard est win-x64 uniquement |
 | Le **même fichier disque**, octet pour octet | Le salon compare un SHA-256 complet et refuse deux fichiers différents. Un ISO et un RVZ du même jeu sont deux fichiers différents |
-| Un dossier synchronisé servi en HTTPS — **sauf** si les deux PC sont sur le même réseau | Dropbox, Nextcloud, OneDrive, Google Drive : c'est ainsi que la présence circule à distance. Sur le même réseau, CubeShelf s'en passe |
-| CubeShelf **0.10** | Réseau local, liens convertis, statuts, messages. Une 0.9.x voit une 0.10 « en ligne » mais rien de plus |
+| CubeShelf **0.10** sur les deux PC | Le réseau CubeShelf. Une 0.9 ne lit pas les codes de la 0.10 (`CSF3-…`) |
+| Chez **au moins un** des deux : une box qui accepte UPnP, ou de l'IPv6, ou le port UDP 47914 ouvert à la main | Il faut un PC joignable pour que le réseau existe. Voir *Si aucun des deux n'est joignable* |
+| Chez **chacun** : chez soi, pas sur le même réseau | C'est Internet qu'on teste. Sur le même réseau, CubeShelf passe par le réseau local et l'essai ne prouve rien |
 | PartyBoard ≥ **0.16.0** | Avant, le compagnon ignore `--host` et `--join` |
 
 > **Le fichier disque est le piège le plus coûteux.** Copiez-le d'un PC à l'autre plutôt que de
@@ -35,41 +38,59 @@ calcul, donc deux versions différentes du compagnon donnent deux empreintes dif
 salon refusera de lancer la partie, tard et sans dire pourquoi. Si elles diffèrent, arrêtez-vous
 ici : réinstallez PartyBoard des deux côtés depuis la même release.
 
-## Étape 1 — la présence circule (sans jeu, sans salon)
+## Étape 1 — le réseau CubeShelf (sans jeu, sans salon)
 
-Avant de toucher au multijoueur, prouvez que les deux CubeShelf se voient.
+Avant de toucher au multijoueur, prouvez que les deux CubeShelf se trouvent et se voient.
 
-**Sur le même réseau** (le plus simple, à faire en premier) :
+**1. Sur chaque PC : Mon profil (Ctrl+7).** Créez votre identité. Laissez cochés « Participer au
+réseau CubeShelf » et « Ouvrir le port de ma box automatiquement ». Si Windows demande d'autoriser
+CubeShelf sur le réseau, **acceptez** (réseaux privés *et* publics).
 
-1. Sur chaque PC : **Mon profil** (Ctrl+7), créez votre identité. C'est tout pour la configuration.
-2. Les deux ouvrent **Amis → « Réseau local »** en même temps. Chacun voit l'autre par son pseudo ;
-   l'un clique « Ajouter », l'autre « Accepter ». Si Windows demande d'autoriser CubeShelf sur le
-   réseau privé, acceptez.
+**2. Regardez la carte « Réseau CubeShelf »** et notez ce qu'elle dit, sur chaque PC. À ce stade,
+seul, chacun dit *« Aucun autre CubeShelf connu pour l'instant »* : c'est normal, personne n'a encore
+donné de porte d'entrée. Elle précise si **ta box a ouvert le port** : c'est ce qui compte pour la
+suite.
 
-✅ **Attendu** : en quelques secondes, chacun voit l'autre « En ligne » et « 📶 Sur ton réseau ».
+**3. Le premier code.** Si la carte de l'un dit que **sa box a ouvert le port**, c'est lui qui
+envoie son code : « Copier mon code », collez le message dans votre conversation. L'autre le copie,
+ouvre sa page Amis (Ctrl+6) : un bandeau propose « Ajouter Zera#4821 ? ». Vérifiez de vive voix que
+le numéro est bien celui de l'autre, puis ajoutez. Si aucune des deux cartes ne le dit, faites-le
+quand même, puis dans l'autre sens : une adresse IPv6 peut suffire.
 
-**À distance** (chacun chez soi) :
+> Pourquoi celui-là : un code porte l'adresse de son auteur quand sa box en annonce une. C'est par
+> le code de celui qui est joignable que l'autre entre dans le réseau.
 
-1. Sur chaque PC : **Mon profil**, choisissez un des dossiers synchronisés détectés. CubeShelf ouvre
-   le dossier et dit comment partager `cubeshelf-presence.json` avec votre service ; collez le lien
-   tel quel. Il est converti et testé tout seul ; le code apparaît quand il marche. Cochez
-   **« Publier ma présence »**.
-2. **« Copier mon code »**, collez le message dans votre conversation. L'autre le copie, ouvre sa
-   page Amis (Ctrl+6) : un bandeau propose « Ajouter Zera#4821 ? ». Vérifiez de vive voix que le
-   numéro affiché est bien celui de l'autre. Juste après l'ajout, CubeShelf propose de renvoyer son
-   propre code : faites-le.
-3. Tant que l'autre ne vous a pas ajouté, il apparaît **« En attente »** chez vous.
-4. **Attendez.** Un ami en ligne est relu toutes les 25 secondes, plus la latence de votre client de
-   synchro. Notez ce délai réel : il décide si la fenêtre de fraîcheur de 15 minutes est bien réglée.
+**4. Pas de code à renvoyer.** Chez celui qui a envoyé son code, une **demande d'ami** apparaît en
+haut de la page Amis, avec « Accepter ». Acceptez.
 
-✅ **Attendu** : chacun voit l'autre « En ligne », avec son avatar et son statut.
+✅ **Attendu, en moins d'une minute :**
+
+- la carte « Réseau CubeShelf » passe à *« Connecté et joignable directement »* ou *« Connecté,
+  joignable par N relais »* sur les deux PC ;
+- la demande d'ami arrive (étape 4), et une fois acceptée, chacun voit l'autre **« ● En ligne »**,
+  avec son avatar et son statut ;
+- sous son nom : **« 🔗 En direct »** (vos PC se parlent sans intermédiaire) ou **« 🔗 En direct, par
+  un relais »** (vos box n'ont pas laissé passer, un relais porte la conversation, chiffrée).
 
 **En passant** : écrivez-vous un message (bouton « Message ») et changez de statut (« Ne pas
-déranger » en haut de la page Amis). L'autre doit voir le message arriver et votre statut changer ;
-vous devez voir « remis » sous votre message une fois qu'il l'a reçu.
+déranger » en haut de la page Amis). En direct, l'autre voit le message et le statut en une ou deux
+secondes ; vous voyez « remis » sous votre message une fois qu'il l'a reçu.
 
-❌ Si l'un reste « Hors ligne » indéfiniment : le problème est dans la présence, pas dans les
-invitations. Inutile de continuer.
+❌ Si l'un reste « ○ Hors ligne » indéfiniment : le problème est dans le réseau, pas dans les
+invitations. Inutile de continuer — regardez le tableau en bas.
+
+### Si aucun des deux n'est joignable
+
+Si les deux cartes disent encore *« Aucun autre CubeShelf connu »* une minute après l'échange des
+codes, aucune de vos deux box n'a ouvert de porte (UPnP désactivé, IPv6 absent ou filtré). Il suffit
+qu'**une** des deux le fasse :
+
+1. Dans l'interface de la box (Livebox, Freebox, Bbox, box SFR…), activez **UPnP**, ou créez une
+   **redirection de port** : UDP 47914 vers l'adresse locale du PC.
+2. Redémarrez CubeShelf sur ce PC, puis **recopiez son code** : il porte maintenant une adresse.
+
+Sans aucun PC joignable, deux CubeShelf ne se voient que sur le même réseau local : c'est la limite
+de conception d'un réseau sans serveur.
 
 ## Étape 2 — le tour complet
 
@@ -90,8 +111,8 @@ vérification.
 **PC B (invité)**
 
 4. Une notification apparaît : dans le jeu si vous y êtes (*« Zera#4821 t'invite à jouer. F1,
-   onglet Amis, pour rejoindre. »*), sinon dans CubeShelf. Elle peut prendre quelques minutes :
-   la livraison se fait par sondage, pas par sonnerie.
+   onglet Amis, pour rejoindre. »*), sinon dans CubeShelf. En direct (étape 1), elle arrive en
+   quelques secondes ; sinon au prochain passage, 25 secondes au plus pour un ami en ligne.
 5. F1 → onglet Amis, **« Rejoindre »** à côté de l'ami. Ou page Amis de CubeShelf.
 6. Confirmez : le jeu se ferme.
 
@@ -113,9 +134,14 @@ vérification.
 | CubeShelf attend puis dit *« Le compagnon n'a pas créé de salon »* | Le salon n'a pas abouti côté compagnon — regardez sa fenêtre, pas CubeShelf |
 | L'invité ne voit jamais l'invitation | Problème de présence (étape 1), ou l'ami est en pause ou bloqué |
 | Le bandeau « Code ami trouvé » n'apparaît pas | Le presse-papiers ne contient pas le message entier, ou cet ami est déjà dans la liste. Collez le message dans « Ajouter un ami » à la place |
-| L'un voit l'autre, pas l'inverse | Un seul des deux a ajouté l'autre : il apparaît « En attente » chez celui qui l'a ajouté |
+| « Aucun autre CubeShelf connu » sur les deux PC, même après l'échange des codes | Aucune des deux box n'est ouverte : voir *Si aucun des deux n'est joignable* |
+| « Aucun autre CubeShelf connu » sur un seul PC | Celui-là n'a pas collé le code de l'autre, ou son pare-feu bloque CubeShelf : autorisez-le (Paramètres Windows → Pare-feu → Autoriser une application) |
+| « Connecté, joignable par 0 relais » | Il a trouvé le réseau mais aucun relais ne l'a accepté encore. Attendre une minute ; si ça dure, l'autre PC n'est pas joignable non plus |
+| La demande d'ami n'arrive jamais | Celui qui a collé le code n'est pas entré dans le réseau (sa carte le dit), ou la demande a été refusée une fois : elle n'est plus montrée jusqu'au prochain lancement. Collez alors aussi le code dans l'autre sens |
+| L'un voit l'autre, pas l'inverse | Un seul des deux a ajouté l'autre : il apparaît « En attente » chez celui qui l'a ajouté, et une demande attend chez l'autre |
+| « 🔗 En direct, par un relais » | Pas un échec : vos deux box refusent le perçage (box « symétriques », 4G). Tout marche, un peu plus lentement |
+| En ligne, mais jamais « 🔗 En direct » | Le réseau marche par relevés (25 s) ; la session directe n'a pas pu s'établir. Notez-le, avec vos modèles de box |
 | « Réseau local » : personne n'apparaît | Les deux PC ne sont pas sur le même réseau, un pare-feu bloque CubeShelf, ou le Wi-Fi isole ses clients (réseaux invités) |
-| Un bandeau dit que ton adresse sert une page, a disparu ou est en retard | Le lien de partage a été retiré ou le client de synchro est arrêté : recréez le lien et retestez |
 | **« DISQUE DIFFÉRENT »** | Les deux fichiers ne sont pas identiques. Recopiez-en un sur l'autre PC |
 | Les deux se voient mais le ping reste « En attente… » | Le réseau : routeur, pare-feu, NAT. **CubeShelf n'y est pour rien** — c'est le compagnon qui traverse |
 | La partie se lance et chacun attend seul | Vérifiez l'empreinte de l'étape 0 |
@@ -125,8 +151,10 @@ vérification.
 - **Que ça marche à travers n'importe quelle box.** L'auteur de PartyBoard l'écrit lui-même :
   l'accès réel à travers les box reste à valider, aucun pare-feu ni routeur n'a été modifié par
   les tests. Si le ping ne s'établit pas, c'est un problème PartyBoard, pas CubeShelf.
-- **Que l'invitation arrive vite à distance.** Sur le même réseau, elle arrive en une seconde ;
-  à distance, au prochain sondage (25 secondes pour un ami en ligne) plus la latence du service.
+- **Que le réseau tient à grande échelle.** À deux, chaque PC garde toutes les données de l'autre ;
+  la répartition, la réplication et les défenses contre les nœuds malveillants ne se voient qu'avec
+  beaucoup de monde. Elles sont couvertes par les tests sur Internet simulé, pas par cet essai.
+- **Que ça marche avec toutes les box.** Un essai ne vaut que pour vos deux box : notez leurs modèles.
 - **Que ça tient plus de deux joueurs.** Le salon créé depuis CubeShelf est pour deux ; on passe à
   trois ou quatre dans la fenêtre du compagnon pendant qu'il vérifie le disque.
 
@@ -137,7 +165,12 @@ et ouvre le compagnon en le disant. C'est l'ancien flux, plus pénible, mais il 
 
 ## À rapporter après l'essai
 
-1. Les deux empreintes de l'étape 0.
-2. Le **délai réel** entre la publication et la réception, mesuré à l'étape 1.
-3. Où ça a cassé, avec la fenêtre du compagnon en photo si le problème est de son côté.
-4. « Exporter diagnostic » dans le compagnon, **sur les deux PC**.
+1. **Pour chaque PC** : le modèle de la box, et ce que disait la carte « Réseau CubeShelf » au
+   début et une fois connectés (joignable directement, par relais, port ouvert sur ta box ou non).
+2. Ce qui s'affichait sous le nom de l'ami : « 🔗 En direct », « 🔗 En direct, par un relais », ou
+   rien.
+3. Combien de temps la demande d'ami a mis à arriver, et combien de temps avant de voir l'autre en
+   ligne.
+4. Les deux empreintes de l'étape 0.
+5. Où ça a cassé, avec la fenêtre du compagnon en photo si le problème est de son côté.
+6. « Exporter diagnostic » dans le compagnon, **sur les deux PC**.

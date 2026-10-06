@@ -163,9 +163,26 @@ public sealed class MeshNode : IAsyncDisposable
     public IReadOnlyList<IPEndPoint> EntryPoints(int count = 3)
     {
         var entries = new List<IPEndPoint>(_publicEndpoints);
+
+        // Nobody has been able to prove us reachable yet -- on a brand-new network there is
+        // nobody to ask -- so the code carries what the router and the interfaces claim, to be
+        // tried. Without them, two people starting together would each hand out a code with no
+        // way in at all, and neither could join the other.
+        if (entries.Count == 0) entries.AddRange(UnprovenCandidates());
+
         lock (_gate) entries.AddRange(_held.Where(held => !held.Session.Closed).Select(held => held.Endpoint));
         entries.AddRange(Table.All().OrderBy(_ => Random.Shared.Next()).Select(contact => contact.Endpoint));
         return entries.Distinct().Take(count).ToArray();
+    }
+
+    /// <summary>The address the router mapped for us, and our global IPv6 addresses: claims, until a probe proves one.</summary>
+    private IEnumerable<IPEndPoint> UnprovenCandidates()
+    {
+        if (_mapping is { ExternalAddress: { } external } mapping && _options.IsRoutable(external))
+            yield return new IPEndPoint(external, mapping.ExternalPort);
+        if (_options.UseInterfaceAddresses)
+            foreach (var address in GlobalIPv6Addresses().Take(1))
+                yield return new IPEndPoint(address, _socket.LocalEndPoint.Port);
     }
 
     /// <summary>Something about reachability, relays or the table changed.</summary>
@@ -449,10 +466,36 @@ public sealed class MeshNode : IAsyncDisposable
         // Not known to be reachable, and someone new to ask: find out again. At once when we knew
         // nobody at all -- the first session is the first chance -- otherwise at most every two
         // minutes. On a young network the first node up has nobody to ask until the next arrives.
+        if (!session.Route.IsDirect || _lifetime is not { } lifetime) return;
         var since = Environment.TickCount64 - _lastReachabilityCheck;
-        var due = Reachability == MeshReachability.Isolated ? since > 5_000
-            : Reachability == MeshReachability.Relayed && since > 120_000;
-        if (due && session.Route.IsDirect && _lifetime is { } lifetime) _ = CheckReachabilityAsync(lifetime.Token);
+        if (Reachability == MeshReachability.Isolated)
+        {
+            // Not dropped when too soon after the last check, only put off: the first peer to
+            // reach a node that just started -- often the very first check's moment -- is exactly
+            // the one it needs to ask. At most one check is waiting at a time.
+            if (Interlocked.Exchange(ref _recheckPending, 1) == 0)
+                _ = RecheckAfterAsync(TimeSpan.FromMilliseconds(Math.Max(0, 5_000 - since)), lifetime.Token);
+        }
+        else if (Reachability == MeshReachability.Relayed && since > 120_000)
+        {
+            _ = CheckReachabilityAsync(lifetime.Token);
+        }
+    }
+
+    private int _recheckPending;
+
+    private async Task RecheckAfterAsync(TimeSpan delay, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (delay > TimeSpan.Zero) await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+            Interlocked.Exchange(ref _recheckPending, 0);
+            await CheckReachabilityAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            Interlocked.Exchange(ref _recheckPending, 0);
+        }
     }
 
     private void OnSessionClosed(MeshSession session)

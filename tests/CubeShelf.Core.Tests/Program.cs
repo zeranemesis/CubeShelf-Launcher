@@ -126,6 +126,7 @@ Run("mesh: lies in answers never enter the table", MeshDhtTests.LiesInAnswersNev
 Run("mesh: reachability is proven, not claimed", MeshNodeTests.ReachabilityIsProvenNotClaimed);
 Run("mesh: two closed routers punch through", MeshNodeTests.TwoClosedRoutersPunchThrough);
 Run("mesh: symmetric routers fall back to the relay", MeshNodeTests.SymmetricRoutersFallBackToTheRelay);
+Run("mesh: two newcomers find each other from their codes", MeshNodeTests.TwoNewcomersFindEachOtherFromTheirCodes);
 Run("mesh: dial-backs cannot be aimed elsewhere", MeshNodeTests.DialBacksCannotBeAimedElsewhere);
 Run("mesh: the nodes file brings a node back without seeds", MeshNodeTests.NodesFileBringsANodeBackWithoutSeeds);
 Run("mesh: friend codes carry entry points, never private ones", MeshFriendsTests.FriendCodesCarryEntryPointsAndRefusePrivateOnes);

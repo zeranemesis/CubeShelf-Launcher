@@ -108,6 +108,10 @@ gardent ne peuvent ni les lire, ni les modifier, ni savoir à qui elles appartie
   viser un tiers.
 - Les nœuds annoncent leurs changements d'état sur leurs sessions ouvertes : une session d'ami qui
   dure des heures n'en reste pas à ce qu'elle savait au départ.
+- Sur un réseau tout neuf, personne ne peut encore sonder personne : un code ami porte alors, à
+  défaut d'adresse prouvée, celles que la box et les interfaces annoncent (le port ouvert, une IPv6
+  globale), à essayer. C'est ce qui permet à deux personnes qui commencent ensemble d'entrer l'une
+  par l'autre.
 
 ### 8. Relais et perçage des box
 
@@ -165,7 +169,8 @@ Ce sont des limites de conception, pas des oublis :
   - recherches qui convergent, enregistrements qui survivent au départ de leurs détenteurs, un nœud
     menteur qui ne pollue rien et ne fait pas viser le réseau local ;
   - joignabilité prouvée et non déclarée, perçage entre deux box fermées, repli sur le relais entre
-    deux box symétriques, sondes impossibles à détourner ;
+    deux box symétriques, sondes impossibles à détourner, deux nouveaux venus sans personne autour
+    qui se trouvent par leurs codes ;
   - amis qui se trouvent et étranger qui ne trouve rien, preuves impossibles à forger ou à rejouer,
     demandes impossibles à faire au nom d'un autre.
 - **Les traducteurs de port** (PCP, NAT-PMP, UPnP) sont testés contre de faux routeurs, y compris
@@ -175,7 +180,8 @@ Ce sont des limites de conception, pas des oublis :
   - un troisième, neuf, rejoint le réseau avec le seul code d'un ami : sa demande arrive en
     10 secondes, et il voit l'autre 5 secondes après l'acceptation.
 
-**Jamais essayé :** entre deux vraies box, sur Internet. C'est le prochain test à faire.
+**Jamais essayé :** entre deux vraies box, sur Internet. C'est le prochain test à faire :
+[TEST_DEUX_PC.md](TEST_DEUX_PC.md), étape 1.
 
 ## Réglages
 

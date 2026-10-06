@@ -155,6 +155,40 @@ static class MeshNodeTests
         }
     }
 
+    /// <summary>
+    /// Two people start CubeShelf for the first time, nobody else around. Neither can be proven
+    /// reachable -- there is nobody to send the probe -- yet each one's code has to carry a way in,
+    /// or neither could ever join the other: the router's mapped address is that way.
+    /// </summary>
+    public static void TwoNewcomersFindEachOtherFromTheirCodes()
+    {
+        var network = new SimulatedNetwork();
+        var natA = network.CreateNat(SimulatedNatKind.PortRestricted);
+        var socketA = network.BindBehind(natA);
+        var a = Node(network, socketA, null, new SimulatedPortMapper(natA, socketA));
+        MeshNode? b = null;
+        try
+        {
+            Eventually(() => a.Mapping is not null && a.Reachability == MeshReachability.Isolated, "alone, with its port mapped", 20000);
+            var code = a.EntryPoints();
+            Check(code.Any(entry => entry.Address.Equals(natA.PublicAddress) && entry.Port == a.Mapping!.ExternalPort),
+                "the code carries the mapped address, unproven as it is");
+
+            var natB = network.CreateNat(SimulatedNatKind.PortRestricted);
+            var socketB = network.BindBehind(natB);
+            b = Node(network, socketB, code, new SimulatedPortMapper(natB, socketB));
+            Eventually(() => a.Reachability == MeshReachability.Public && b.Reachability == MeshReachability.Public,
+                "each proves the other reachable", 20000);
+            Eventually(() => a.Table.Get(b.Transport.LocalId) is not null && b.Table.Get(a.Transport.LocalId) is not null,
+                "and each is in the other's table: a network of two", 20000);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().Wait();
+            b?.DisposeAsync().AsTask().Wait();
+        }
+    }
+
     public static void DialBacksCannotBeAimedElsewhere()
     {
         var network = new SimulatedNetwork();

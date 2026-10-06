@@ -279,9 +279,12 @@ public sealed partial class MainWindow
             MeshReachability.Relayed => P7(
                 $"Connecté, joignable par {node.RelayContacts.Count} relais : ta box ne laisse rien entrer, d’autres CubeShelf te mettent en contact. {known} nœud(s) connu(s), {_meshFriends?.ConnectedCount ?? 0} ami(s) en direct.",
                 $"Connected, reachable through {node.RelayContacts.Count} relay(s): your router lets nothing in, other CubeShelf nodes put friends in touch. {known} node(s) known, {_meshFriends?.ConnectedCount ?? 0} friend(s) connected directly."),
+            _ when node.Mapping is not null => P7(
+                "Aucun autre CubeShelf connu pour l’instant, mais ta box a ouvert le port : ton code ami permettra à un ami d’entrer dans le réseau par ton PC. Envoie-le-lui.",
+                "No other CubeShelf known yet, but your router opened the port: your friend code will let a friend into the network through your PC. Send it to them."),
             _ => P7(
-                "Aucun autre CubeShelf connu pour l’instant. Le code ami d’un ami sert de porte d’entrée : ajoute-en un. Si ni toi ni lui n’êtes joignables, vous ne vous verrez que sur le même réseau local.",
-                "No other CubeShelf known yet. A friend’s code is a way in: add one. If neither of you is reachable, you only see each other on the same local network.")
+                "Aucun autre CubeShelf connu pour l’instant, et ta box n’a pas ouvert le port. Le code ami d’un ami sert de porte d’entrée : ajoute-en un. Si ni toi ni lui n’êtes joignables, vous ne vous verrez que sur le même réseau local.",
+                "No other CubeShelf known yet, and your router did not open the port. A friend’s code is a way in: add one. If neither of you is reachable, you only see each other on the same local network.")
         };
     }
 }
