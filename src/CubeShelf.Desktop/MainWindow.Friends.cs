@@ -108,6 +108,7 @@ public sealed partial class MainWindow
             CapturePresenceInputsAsync);
 
         service.FriendsRefreshed += outcomes => Dispatcher.UIThread.Post(() => ApplyFriendOutcomes(outcomes));
+        service.AddressChecked += OnAddressChecked;
         service.Start(_friendsLifetime?.Token ?? CancellationToken.None);
         _presence = service;
     }
@@ -407,6 +408,10 @@ public sealed partial class MainWindow
         if (_presence is null)
             return P7("Publication configurée mais inactive : vérifie le dossier et l’adresse.",
                       "Publishing is configured but inactive: check the folder and the address.");
+
+        // A broken address outranks everything else said here: it is why nobody sees you.
+        if (_lastAddressReport is { NeedsAttention: true } report)
+            return "⚠ " + DescribeAddressReport(report);
 
         var recipients = _friends?.ActiveRecipients().Count ?? 0;
         return recipients == 0

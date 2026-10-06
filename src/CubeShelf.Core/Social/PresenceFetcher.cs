@@ -181,6 +181,36 @@ public sealed class PresenceFetcher : IDisposable
         }
     }
 
+    /// <summary>
+    /// Reads our own published document back from <paramref name="url"/> and opens it with our
+    /// own key, which works because every document is addressed to its author too.
+    /// </summary>
+    internal async Task<(PresenceReadResult Read, PresenceSnapshot? Opened)> ReadOwnAsync(
+        string url,
+        CancellationToken cancellationToken)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var address) ||
+            !address.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+            return (new PresenceReadResult(null, null, Error: "L’adresse de publication n’est pas une adresse https."), null);
+
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(PresencePolicy.FetchTimeout);
+        try
+        {
+            var read = await PresenceDocumentReader.ReadAsync(_http, address, null, timeout.Token).ConfigureAwait(false);
+            if (!read.Ok) return (read, null);
+
+            return SealedPresence.TryOpen(_identity, _identity.PublicKey, SealedPresence.FromJson(read.Json!), out var opened)
+                ? (read, opened)
+                : (read, null);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return (new PresenceReadResult(null, null, IsConnectivityFailure: true, Error: "Délai dépassé."), null);
+        }
+    }
+
     private void Succeed(Friend friend, string? etag, DateTimeOffset now, long? advanceSequence)
     {
         _friends.Update(friend.PublicKey, entry =>

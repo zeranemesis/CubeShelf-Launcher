@@ -218,7 +218,12 @@ public sealed partial class MainWindow
     {
         if (_loadingSettings) return;
 
-        var url = (PresenceUrlBox.Text ?? "").Trim();
+        // What is in the box is what the service gave, not necessarily what serves the file: it
+        // is read, recognised and turned into guesses, unless it is the address already proven.
+        var pasted = (PresenceUrlBox.Text ?? "").Trim();
+        var url = string.Equals(pasted, _preferences.PresenceUrl, StringComparison.Ordinal)
+            ? pasted
+            : InterpretPastedLink(pasted);
         var folder = (PresenceFolderBox.Text ?? "").Trim();
         var addressChanged = !string.Equals(url, _preferences.PresenceUrl, StringComparison.Ordinal);
         var folderChanged = !string.Equals(folder, _preferences.PresenceFolder, StringComparison.Ordinal);
@@ -244,6 +249,12 @@ public sealed partial class MainWindow
 
         StartPresenceService();
         RefreshFriendsView();
+        RefreshShareSteps();
+
+        // A new link is tested straight away: the user just did the one thing they had to do,
+        // and the answer -- does it work -- should not wait for a second click.
+        if (addressChanged && url.Length > 0 && HasIdentity && Directory.Exists(folder))
+            RunPresenceSelfTest(sender, args);
     }
 
     private async void BrowsePresenceFolder(object? sender, RoutedEventArgs args)
@@ -280,14 +291,30 @@ public sealed partial class MainWindow
             var snapshot = PresenceComposer.Offline(
                 _preferences.FriendsDisplayName, sequence.Next(DateTimeOffset.UtcNow), DateTimeOffset.UtcNow);
 
+            // The guesses made from the pasted link, or from the stored address when the test is
+            // run again by hand: a link stored before conversion existed gets converted too.
+            var candidates = _pendingCandidates ??
+                (ShareLink.TryConvert(_preferences.PresenceUrl, SyncedFolderTarget.DefaultFileName, out var stored, out _)
+                    ? stored!.Candidates
+                    : null);
+
             var result = await selfTest.RunAsync(publisher, snapshot,
-                PresenceRecipients.ForPublication(_identity, _friends), TimeSpan.FromMinutes(2));
+                PresenceRecipients.ForPublication(_identity, _friends), TimeSpan.FromMinutes(2), candidates);
 
             if (result.Succeeded)
             {
-                // Remembered, so the code is still there after a restart.
-                _preferences = _preferences with { PresenceVerifiedUrl = _preferences.PresenceUrl };
+                // Remembered, so the code is still there after a restart. The address kept is the
+                // guess that worked, which may not be the one tried first.
+                _preferences = _preferences with
+                {
+                    PresenceUrl = result.PresenceUrl,
+                    PresenceVerifiedUrl = result.PresenceUrl
+                };
                 _preferencesStore.Save(_preferences);
+                _pendingCandidates = null;
+                PresenceUrlBox.Text = result.PresenceUrl;
+                PresenceUrlConversionText.IsVisible = false;
+                RefreshShareSteps();
                 RefreshOwnFriendCode();
                 PresenceStatusText.Text = P7(
                     "Adresse vérifiée : ton document a été relu et déchiffré. Tu peux distribuer ton code.",

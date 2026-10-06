@@ -37,6 +37,8 @@ public sealed partial class MainWindow
     {
         ShowParityView(ProfileView);
         RefreshIdentityUi();
+        RefreshDetectedFolders();
+        RefreshAddressHealthUi();
         if (!HasIdentity) IdentityNameBox.Focus();
     }
 

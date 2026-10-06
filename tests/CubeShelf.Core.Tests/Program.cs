@@ -79,6 +79,10 @@ Run("the friend code carries the pseudo", TestFriendCodeCarriesThePseudo);
 Run("the tag never changes", TestTagNeverChanges);
 Run("the in-game state is what the game reads", TestInGameStateIsWhatTheGameReads);
 Run("in-game requests are acted on once", TestInGameRequestsAreActedOnOnce);
+Run("a share link becomes the file itself", TestShareLinksBecomeTheFileItself);
+Run("synced folders are found where their clients say", TestSyncedFoldersAreFound);
+Run("the self-test keeps the guess that works", TestSelfTestKeepsTheGuessThatWorks);
+Run("our own address is checked while we publish", TestOwnAddressIsChecked);
 
 if (failures.Count == 0)
 {
@@ -1509,7 +1513,7 @@ void TestSelfTestCatchesAnAddressThatServesSomethingElse()
                 .GetAwaiter().GetResult();
             Assert(!result.Succeeded);
             Assert(result.FriendCode.Length == 0);      // no code is handed out on a guess
-            Assert(result.Error!.Contains("/download", StringComparison.Ordinal));
+            Assert(result.Error!.Contains("aperçu", StringComparison.Ordinal));
         }
 
         // Nothing there yet at all: worth waiting for, then reported plainly.
@@ -2584,6 +2588,235 @@ string FindRepositoryFile(string relativePath)
     throw new DirectoryNotFoundException("Racine du dépôt introuvable depuis " + AppContext.BaseDirectory);
 }
 
+// ---------------------------------------------------------------------------
+// Setting up without knowing how each sync service spells "the file itself".
+// ---------------------------------------------------------------------------
+
+void TestShareLinksBecomeTheFileItself()
+{
+    const string file = "cubeshelf-presence.json";
+
+    ShareLinkConversion Convert(string pasted)
+    {
+        Assert(ShareLink.TryConvert(pasted, file, out var conversion, out var error));
+        Assert(error.Length == 0 && conversion is not null);
+        // Whatever was guessed, what was pasted is always among the tries.
+        Assert(conversion!.Candidates.Contains(conversion.Pasted));
+        return conversion;
+    }
+
+    // Dropbox: the preview page unless dl=1, and the opaque rlkey kept byte for byte.
+    var dropbox = Convert("https://www.dropbox.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq&dl=0");
+    Assert(dropbox.Provider == ShareLinkProvider.Dropbox && dropbox.Changed);
+    Assert(dropbox.Primary == "https://www.dropbox.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq&dl=1");
+    Assert(dropbox.Candidates.Contains("https://dl.dropboxusercontent.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq"));
+    Assert(Convert("https://www.dropbox.com/s/k3y/cubeshelf-presence.json").Primary ==
+           "https://www.dropbox.com/s/k3y/cubeshelf-presence.json?dl=1");
+    Assert(!ShareLink.TryConvert("https://www.dropbox.com/scl/fo/folder/x?rlkey=1&dl=0", file, out _, out var folderError) &&
+           folderError.Contains("dossier", StringComparison.Ordinal));
+
+    // Nextcloud, anywhere it is installed: the file share first, then the same token as a folder.
+    var nextcloud = Convert("https://cloud.example.org/s/AbCdEfGh12345");
+    Assert(nextcloud.Provider == ShareLinkProvider.Nextcloud);
+    Assert(nextcloud.Candidates[0] == "https://cloud.example.org/s/AbCdEfGh12345/download");
+    Assert(nextcloud.Candidates[1] == "https://cloud.example.org/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json");
+    Assert(nextcloud.Candidates[2] == "https://cloud.example.org/public.php/dav/files/AbCdEfGh12345/cubeshelf-presence.json");
+    var subfolder = Convert("https://example.org/nextcloud/index.php/s/AbCdEfGh12345/download");
+    Assert(subfolder.Candidates[0] == "https://example.org/nextcloud/index.php/s/AbCdEfGh12345/download");
+    Assert(subfolder.Candidates[2] == "https://example.org/nextcloud/public.php/dav/files/AbCdEfGh12345/cubeshelf-presence.json");
+
+    // Google Drive: the viewer page becomes the download endpoint; a folder is refused.
+    var google = Convert("https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp/view?usp=sharing");
+    Assert(google.Provider == ShareLinkProvider.GoogleDrive);
+    Assert(google.Primary == "https://drive.usercontent.google.com/download?id=1AbCdEfGhIjKlMnOp&export=download&confirm=t");
+    Assert(Convert("https://drive.google.com/open?id=1AbCdEfGhIjKlMnOp").Primary.Contains("id=1AbCdEfGhIjKlMnOp", StringComparison.Ordinal));
+    Assert(!ShareLink.TryConvert("https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOp", file, out _, out _));
+
+    // OneDrive personal: through its sharing API, the link itself encoded as u!<base64url>.
+    var onedrive = Convert("https://1drv.ms/u/s!AbCdEf?e=xyz");
+    var encoded = "u!" + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("https://1drv.ms/u/s!AbCdEf?e=xyz"))
+        .TrimEnd('=').Replace('/', '_').Replace('+', '-');
+    Assert(onedrive.Provider == ShareLinkProvider.OneDrive);
+    Assert(onedrive.Primary == "https://api.onedrive.com/v1.0/shares/" + encoded + "/root/content");
+
+    // OneDrive for work: SharePoint answers download=1.
+    var sharepoint = Convert("https://contoso-my.sharepoint.com/:u:/g/personal/zera/EAbc?e=Q1");
+    Assert(sharepoint.Provider == ShareLinkProvider.SharePoint && sharepoint.Primary.EndsWith("e=Q1&download=1", StringComparison.Ordinal));
+
+    // A whole chat message is fine, and the punctuation glued to the link is not part of it.
+    var chat = Convert("Voici mon lien (https://cloud.example.org/s/AbCdEfGh12345).");
+    Assert(chat.Pasted == "https://cloud.example.org/s/AbCdEfGh12345");
+
+    // An address we do not recognise is used as it is.
+    var plain = Convert("https://files.example.net/me/presence.json");
+    Assert(plain.Provider == ShareLinkProvider.Direct && !plain.Changed && plain.Candidates.Count == 1);
+
+    // Plain http is refused: anyone on the path could swap the document.
+    Assert(!ShareLink.TryConvert("http://cloud.example.org/s/AbCdEfGh12345", file, out _, out var httpError) &&
+           httpError.Contains("https", StringComparison.Ordinal));
+    Assert(!ShareLink.TryConvert("rien à voir", file, out _, out _));
+}
+
+void TestSyncedFoldersAreFound()
+{
+    WithTempRoot(root =>
+    {
+        var appData = Path.Combine(root, "AppData", "Roaming");
+        var dropbox = Path.Combine(root, "Dropbox");
+        var nextcloud = Path.Combine(root, "Nextcloud");
+        var onedrive = Path.Combine(root, "OneDrive");
+        var drive = Path.Combine(root, "G");
+        foreach (var folder in new[] { appData, dropbox, nextcloud, onedrive, Path.Combine(drive, "Mon Drive") })
+            Directory.CreateDirectory(folder);
+
+        Directory.CreateDirectory(Path.Combine(appData, "Dropbox"));
+        File.WriteAllText(Path.Combine(appData, "Dropbox", "info.json"),
+            JsonSerializer.Serialize(new { personal = new { path = dropbox }, business = new { path = Path.Combine(root, "gone") } }));
+
+        Directory.CreateDirectory(Path.Combine(appData, "Nextcloud"));
+        File.WriteAllText(Path.Combine(appData, "Nextcloud", "nextcloud.cfg"),
+            "[Accounts]\n0\\Folders\\1\\localPath=" + nextcloud.Replace('\\', '/') + "/\n0\\Folders\\1\\paused=false\n");
+
+        var variables = new Dictionary<string, string>
+        {
+            ["APPDATA"] = appData,
+            ["OneDriveConsumer"] = onedrive,
+            // The same folder announced twice is listed once.
+            ["OneDrive"] = onedrive
+        };
+        var environment = new SyncEnvironment(name => variables.GetValueOrDefault(name), Path.Combine(root, "home"), new[] { drive });
+
+        var found = SyncedFolderDetector.Detect(environment);
+        Assert(found.Count == 4);
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.Dropbox && f.Root == dropbox));
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.Nextcloud && Path.GetFullPath(f.Root).TrimEnd('\\', '/') == nextcloud));
+        Assert(found.Count(f => f.Provider == ShareLinkProvider.OneDrive) == 1);
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.GoogleDrive && f.Root.EndsWith("Mon Drive", StringComparison.Ordinal)));
+        // A path a client remembers but that is not there any more is not offered.
+        Assert(!found.Any(f => f.Root.Contains("gone", StringComparison.Ordinal)));
+
+        // Choosing one creates CubeShelf's own folder inside it, and only inside an existing one.
+        var prepared = SyncedFolderDetector.PreparePublishingFolder(dropbox);
+        Assert(prepared == Path.Combine(dropbox, "CubeShelf") && Directory.Exists(prepared));
+        try
+        {
+            SyncedFolderDetector.PreparePublishingFolder(Path.Combine(root, "nowhere"));
+            Assert(false);
+        }
+        catch (DirectoryNotFoundException)
+        {
+        }
+
+        // Nothing installed at all is an empty list, not an exception.
+        Assert(SyncedFolderDetector.Detect(new SyncEnvironment(_ => null, Path.Combine(root, "nobody"), Array.Empty<string>())).Count == 0);
+    });
+}
+
+void TestSelfTestKeepsTheGuessThatWorks()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(ShareLink.TryConvert("https://cloud.example.test/s/AbCdEfGh12345", SyncedFolderTarget.DefaultFileName,
+            out var conversion, out _));
+
+        // The share is a folder share: only the guess that names the file serves the document;
+        // the others answer with the service's own page.
+        var served = new OnePathServesHandler(
+            "/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json",
+            Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
+        using var client = new HttpClient(served);
+        using var selfTest = new PresenceSelfTest(me, client, TimeSpan.FromMilliseconds(10));
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, conversion!.Primary));
+
+        var result = selfTest.RunAsync(publisher, PresenceComposer.Offline("Zera", 90, DateTimeOffset.UtcNow),
+            PresenceRecipients.ForPublication(me, friends), TimeSpan.FromSeconds(2), conversion.Candidates)
+            .GetAwaiter().GetResult();
+
+        Assert(result.Succeeded);
+        Assert(result.PresenceUrl == "https://cloud.example.test/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json");
+        Assert(FriendCode.TryDecode(result.FriendCode, out var decoded, out _) && decoded!.PresenceUrl == result.PresenceUrl);
+
+        // When no guess works, the error says what the address served rather than "failed".
+        using var nothing = new HttpClient(new FixedBodyHandler("<html>aperçu</html>"));
+        using var failing = new PresenceSelfTest(me, nothing, TimeSpan.FromMilliseconds(10));
+        var failed = failing.RunAsync(publisher, PresenceComposer.Offline("Zera", 91, DateTimeOffset.UtcNow),
+            PresenceRecipients.ForPublication(me, friends), TimeSpan.FromMilliseconds(50), conversion.Candidates)
+            .GetAwaiter().GetResult();
+        Assert(!failed.Succeeded && failed.FriendCode.Length == 0 && failed.Error!.Contains("aperçu", StringComparison.Ordinal));
+    });
+}
+
+void TestOwnAddressIsChecked()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, SyncedFolderTarget.DefaultFileName);
+        const string url = "https://c.example.test/p.json";
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, url));
+        var handler = new SwitchableHandler();
+        using var client = new HttpClient(handler);
+        var fetcher = new PresenceFetcher(me, friends, client);
+        var sequence = new PresenceSequence(root);
+
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var options = new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1),
+            AddressCheckInterval: TimeSpan.FromHours(1), AddressFirstCheck: TimeSpan.Zero, AddressLagTolerance: TimeSpan.Zero);
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            sequence, publisher, fetcher, _ => Task.FromResult(inputs), options);
+
+        var reports = new List<PresenceAddressReport>();
+        service.AddressChecked += report => { lock (reports) reports.Add(report); };
+        service.Start(CancellationToken.None);
+        for (var wait = 0; wait < 100 && service.PublishCount == 0; wait++) Thread.Sleep(20);
+        Assert(service.PublishCount == 1);
+
+        // The first publish already triggered a check of its own, in the background.
+        for (var wait = 0; wait < 100 && reports.Count == 0; wait++) Thread.Sleep(20);
+        Assert(reports.Count == 1);
+
+        // Served as written: healthy.
+        handler.Serve = () => File.ReadAllText(file);
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.Healthy);
+
+        // The service keeps serving the first document while we have published since: lagging.
+        var stale = File.ReadAllText(file);
+        inputs = inputs with { RunningGameIds = new[] { "GMPE01" } };
+        service.RequestPublish(PresencePublishReason.GameChanged);
+        for (var wait = 0; wait < 100 && service.PublishCount < 2; wait++) Thread.Sleep(20);
+        handler.Serve = () => stale;
+        var lagging = service.CheckAddressNowAsync().GetAwaiter().GetResult();
+        Assert(lagging.Health == PresenceAddressHealth.Lagging && lagging.Lag is not null && lagging.NeedsAttention);
+
+        // A page instead of the file, then nothing at all.
+        handler.Serve = () => "<html>Connexion requise</html>";
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.NotOurs);
+        handler.Serve = () => null;
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.NotFound);
+
+        // A document of ours numbered past anything issued here: another machine publishes as us.
+        var foreign = SealedPresence.ToJson(SealedPresence.Seal(me,
+            PresenceComposer.Offline("Zera", sequence.Current + 1_000_000, DateTimeOffset.UtcNow),
+            new[] { me.PublicKey }));
+        handler.Serve = () => foreign;
+        var twin = service.CheckAddressNowAsync().GetAwaiter().GetResult();
+        Assert(twin.Health == PresenceAddressHealth.SomeoneElsePublishes && twin.NeedsAttention);
+        Assert(service.LastAddressReport == twin);
+
+        service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    });
+}
+
 sealed class StaticHttpHandler(Func<Uri, byte[]> content) : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -2759,4 +2992,33 @@ sealed class StatusHandler(System.Net.HttpStatusCode status) : HttpMessageHandle
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
         Task.FromResult(new HttpResponseMessage(status) { RequestMessage = request });
+}
+
+/// <summary>Like a share link to a folder: one exact path serves the file, everything else a page.</summary>
+sealed class OnePathServesHandler(string pathAndQuery, string file) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var body = request.RequestUri!.PathAndQuery == pathAndQuery && File.Exists(file)
+            ? File.ReadAllText(file)
+            : "<html>Page de partage</html>";
+        return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(body), RequestMessage = request
+        });
+    }
+}
+
+/// <summary>Serves whatever the test says right now; null is a 404.</summary>
+sealed class SwitchableHandler : HttpMessageHandler
+{
+    public Func<string?> Serve { get; set; } = () => null;
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var body = Serve();
+        return Task.FromResult(body is null
+            ? new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request }
+            : new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(body), RequestMessage = request });
+    }
 }

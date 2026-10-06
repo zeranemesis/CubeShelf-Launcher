@@ -65,4 +65,23 @@ public static class PresencePolicy
 
     /// <summary>How many friends are polled at once.</summary>
     public const int PollConcurrency = 4;
+
+    /// <summary>
+    /// How often our own address is read back while we publish. A share link can die quietly --
+    /// the file moved, the link revoked, the sync client stopped -- and the only one who never
+    /// notices is the publisher, who keeps writing into a folder nobody reads from any more.
+    /// </summary>
+    public static readonly TimeSpan AddressCheckInterval = TimeSpan.FromMinutes(20);
+
+    /// <summary>
+    /// The first check waits this long after start-up, so the sync client has had time to carry
+    /// out the first document of the session rather than being judged on the last one of yesterday.
+    /// </summary>
+    public static readonly TimeSpan AddressFirstCheck = TimeSpan.FromMinutes(6);
+
+    /// <summary>
+    /// How late the served document may be before it counts as lagging. A document written this
+    /// long ago and still not served means friends are reading us well behind the truth.
+    /// </summary>
+    public static readonly TimeSpan AddressLagTolerance = TimeSpan.FromMinutes(10);
 }

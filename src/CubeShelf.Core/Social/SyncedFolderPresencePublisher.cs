@@ -45,16 +45,40 @@ public sealed class SyncedFolderPresencePublisher : IPresencePublisher
             return Task.FromResult(new PresencePublishResult(
                 false, "", "La publication de présence n’est pas configurée."));
 
-        var directory = Path.GetFullPath(_target.Directory);
+        return Task.FromResult(TryWrite(_target.Directory, _target.FileName, envelopeJson, out var error)
+            ? new PresencePublishResult(true, PresenceUrl)
+            : new PresencePublishResult(false, "", error));
+    }
+
+    /// <summary>
+    /// Writes the document into the folder, with no address involved. Publishing uses it, and so
+    /// does setting up: the file has to exist before the user can ask their sync service to share
+    /// it, which is the step that gives us an address in the first place.
+    /// </summary>
+    public static bool TryWrite(string directory, string fileName, string envelopeJson, out string error)
+    {
+        error = "";
+        string full;
+        try
+        {
+            full = Path.GetFullPath(directory);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            error = $"Le dossier de publication est illisible : {exception.Message}";
+            return false;
+        }
 
         // Deliberately not created. A folder that does not exist is far more likely to be a typo
         // than an intention, and creating it would publish into a path nothing synchronises --
         // which looks like it worked and reaches nobody.
-        if (!Directory.Exists(directory))
-            return Task.FromResult(new PresencePublishResult(
-                false, "", $"Le dossier de publication est introuvable : {directory}"));
+        if (!Directory.Exists(full))
+        {
+            error = $"Le dossier de publication est introuvable : {full}";
+            return false;
+        }
 
-        var destination = Path.Combine(directory, Path.GetFileName(_target.FileName));
+        var destination = Path.Combine(full, Path.GetFileName(fileName));
         var temporary = destination + ".tmp";
         try
         {
@@ -62,14 +86,14 @@ public sealed class SyncedFolderPresencePublisher : IPresencePublisher
             // to a copy, and a sync client would then upload a half-written document.
             File.WriteAllText(temporary, envelopeJson);
             File.Move(temporary, destination, true);
-            return Task.FromResult(new PresencePublishResult(true, PresenceUrl));
+            return true;
         }
         catch (Exception exception) when (
             exception is IOException or UnauthorizedAccessException or NotSupportedException)
         {
             TryDelete(temporary);
-            return Task.FromResult(new PresencePublishResult(
-                false, "", $"Écriture impossible dans le dossier de publication : {exception.Message}"));
+            error = $"Écriture impossible dans le dossier de publication : {exception.Message}";
+            return false;
         }
     }
 
