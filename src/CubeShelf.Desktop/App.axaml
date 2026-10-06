@@ -81,6 +81,11 @@
       <x:String x:Key="IdentityCreate">Créer mon identité</x:String>
       <x:String x:Key="ShareCodeTitle">Ton code ami</x:String>
       <x:String x:Key="CopyMyCode">Copier mon code</x:String>
+      <x:String x:Key="PhoneTransferTitle">Jouer sur téléphone</x:String>
+      <x:String x:Key="PhoneTransferHelp">PartyBoard sur Android ne fait pas tourner CubeShelf. Exporte ton profil ici, copie le fichier sur le téléphone, puis importe-le dans PartyBoard (menu, onglet Amis) : il y verra tes amis et leurs invitations. C'est ce PC qui continue à publier ta présence. Le fichier contient ta clé : choisis un mot de passe que tu ne réutilises pas.</x:String>
+      <x:String x:Key="PhoneTransferPassphrase">Mot de passe (8 caractères minimum)</x:String>
+      <x:String x:Key="PhoneTransferConfirm">Confirme le mot de passe</x:String>
+      <x:String x:Key="PhoneTransferExport">Exporter pour le téléphone…</x:String>
       <x:String x:Key="FriendsNeedIdentity">Crée d'abord ton identité : un pseudo, et le numéro qui va avec. Sans elle, personne ne peut t'ajouter et tu ne peux ajouter personne.</x:String>
       <x:String x:Key="OpenProfile">Ouvrir mon profil</x:String>
       <x:String x:Key="PresenceMovedHelp">Ton pseudo, ton code ami et ta publication ont maintenant leur propre page : Mon profil (Ctrl+7).</x:String>
