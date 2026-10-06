@@ -79,23 +79,32 @@ Les jaquettes vivent dans `src/CubeShelf.Desktop/Assets/Covers/<Jeu>/`, en trois
 
 ## Amis décentralisés
 
-CubeShelf peut montrer qui de tes amis est en ligne, à quoi il joue, sa bibliothèque et ses mods — **sans service central, sans compte, sans mot de passe enregistré**.
+CubeShelf peut montrer qui de tes amis est en ligne, à quoi il joue, sa bibliothèque et ses mods —
+**sans serveur, sans cloud, sans compte, sans mot de passe enregistré**.
 
-Le principe tient en une phrase : chacun publie un petit document chiffré à un endroit qu'il contrôle, et les amis le relisent en HTTPS — ou directement, quand ils sont sur le même réseau local.
+Les CubeShelf forment eux-mêmes un **réseau maillé**. Chaque PC joignable depuis Internet en porte
+une petite part et relaie pour ceux qui ne le sont pas : plus il y a de monde, plus il est solide.
+Ta présence y est déposée chiffrée pour tes seuls amis ; eux la retrouvent, et quand vous êtes en
+ligne tous les deux, vos CubeShelf se parlent directement. Sur le même réseau local, c'est plus
+direct encore (voir *Réseau local*). Le fonctionnement et le modèle de sécurité sont détaillés dans
+[RESEAU.md](RESEAU.md).
 
 ### Mise en route
 
 Tout se passe sur la page **Mon profil** (Ctrl+7, ou la pastille en bas de la barre latérale).
 
 1. **Crée ton identité.** Un pseudo est obligatoire pour tout ce qui touche aux amis, et pour rien d'autre : jouer seul n'en demande pas. Il n'est jamais déduit de ton compte Windows.
-2. **Sur le même réseau, c'est déjà fini.** Deux amis sur le même réseau local se voient et s'invitent sans rien configurer de plus (voir *Réseau local*).
-3. **Pour être vu de partout, choisis un dossier synchronisé.** CubeShelf liste ceux que Dropbox, Nextcloud, OneDrive et Google Drive surveillent déjà sur ce PC : un clic crée le dossier `CubeShelf` dedans, y écrit un premier fichier et l'ouvre, avec la marche à suivre propre à ce service pour obtenir son lien de partage.
-4. **Colle le lien tel que le service te le donne** — un message entier convient. CubeShelf le reconnaît et le convertit pour lire le fichier lui-même (`dl=1` chez Dropbox, `/download` chez Nextcloud, l'API de partage de OneDrive, le point de téléchargement de Google Drive), puis le **teste aussitôt** : il publie, relit depuis chacune de ses hypothèses, et garde celle qui sert vraiment ton document. **Ton code ami n'apparaît qu'après.**
-5. Coche « Publier ma présence ».
-6. **« Copier mon code »** copie un message prêt à coller dans n'importe quelle conversation. Ton ami le copie à son tour, ouvre sa page Amis (Ctrl+6), et CubeShelf le trouve tout seul dans le presse-papiers : « Ajouter Zera#4821 ? ».
-7. **Il doit t'ajouter lui aussi.** L'amitié va dans un sens à la fois. Dès qu'il t'a ajouté, CubeShelf lui propose de te renvoyer son code ; tant qu'il ne l'a pas fait, il apparaît chez toi **« En attente »**, avec un bouton « Envoyer mon code ».
+2. **Ton code ami est prêt aussitôt.** Rien à configurer : il porte ta clé, ton pseudo et deux ou trois points d'entrée dans le réseau.
+3. **« Copier mon code »** copie un message prêt à coller dans n'importe quelle conversation. Ton ami le copie à son tour, ouvre sa page Amis (Ctrl+6), et CubeShelf le trouve tout seul dans le presse-papiers : « Ajouter Zera#4821 ? ».
+4. **La demande d'ami revient toute seule.** Dès qu'il t'a ajouté, son CubeShelf te dépose une demande dans le réseau : elle apparaît en haut de ta page Amis, avec « Accepter » et « Refuser ». Personne n'a à renvoyer son code. Tant que tu n'as pas accepté, il te voit **« En attente »**.
+5. **Ta box.** Si tu le laisses faire, CubeShelf lui demande d'ouvrir son port (PCP, NAT-PMP ou UPnP), et ton PC devient joignable. Sinon il passe par des relais : d'autres CubeShelf vous mettent en contact, puis vos deux PC tentent de percer leurs box pour se parler directement, et ne laissent le relais porter la conversation (chiffrée de bout en bout) que si c'est impossible.
 
-Ensuite, CubeShelf **relit ta propre adresse** de temps en temps (six minutes après le démarrage, puis toutes les vingt) : si le service met plus de dix minutes à servir ce que tu écris, si le lien sert une page au lieu du fichier, s'il a disparu, ou si une copie de ton profil publie à ta place, un bandeau et une notification le disent.
+La carte « Réseau CubeShelf » de Mon profil dit où en est ton PC : joignable directement, par
+relais, ou ne connaissant encore personne. Un code ami sert alors de porte d'entrée.
+
+**Le dossier synchronisé de la 0.9 n'est plus proposé.** Pour qui l'avait configuré, CubeShelf
+continue d'y publier pour les amis qui le lisent encore par ce lien, et la carte n'apparaît que
+dans ce cas.
 
 ### Le pseudo et son numéro
 
@@ -106,11 +115,9 @@ Ce que le numéro n'est pas, et c'est structurel :
 - **Un moyen de trouver quelqu'un.** Taper `Zera#4821` ne suffit pas pour ajouter Zera : il n'existe aucun annuaire où le chercher. Discord le peut parce que ses serveurs savent qui est qui ; ici, personne ne le sait, et c'est voulu. C'est le code qui transporte la clé et l'adresse.
 - **Une preuve d'identité.** Quatre chiffres, ce sont dix mille possibilités : n'importe qui peut fabriquer une clé qui donne `#4821` en quelques secondes. Le numéro sert à reconnaître, le code sert à se fier.
 
-Les codes de la 0.9.0 (`CSF1-…`) restent acceptés ; ils arrivent simplement sans pseudo. Ceux de la 0.9.1 (`CSF2-…`) portent le pseudo, et **une 0.9.0 ne sait pas les lire** : les deux PC doivent être en 0.9.1.
-
-Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ; c'est la **lecture** qui casse, silencieusement, et du côté où personne ne peut diagnostiquer : un lien de partage sert presque toujours une page d'aperçu plutôt que le fichier. La conversion automatique règle les cas connus ; le test tranche pour tous les autres. Sans lui, tu distribuerais un code ami inerte et tes amis ne te verraient jamais, sans savoir pourquoi.
-
-> Syncthing ne convient pas : il n'expose aucune adresse HTTP, donc tes amis n'ont rien à interroger.
+Les codes de la 0.10 (`CSF3-…`) n'ont plus d'adresse web : ils portent des points d'entrée dans
+le réseau, jamais une adresse privée. **Une 0.9 ne sait pas les lire** : les deux PC doivent être en
+0.10. Les codes plus anciens (`CSF1-…`, `CSF2-…`) restent acceptés.
 
 ### Profil, blocage, invitations
 
@@ -125,7 +132,7 @@ Le test n'est pas une formalité. Écrire le fichier réussit presque toujours ;
 la taille de ta bibliothèque et un jeu mis en avant. Rien n'est obligatoire et tout voyage dans
 le même document chiffré. L'avatar est recadré au carré puis réduit en 96×96 avant publication —
 ce document est réécrit à chaque battement, une photo non réduite ne serait pas un coût unique
-mais un flux permanent à travers ton dossier synchronisé. Le jeu mis en avant se choisit dans
+mais un flux permanent à travers le réseau. Le jeu mis en avant se choisit dans
 ta bibliothèque et ne se tape pas : un champ libre laisserait publier un titre que personne ne
 peut ouvrir.
 
@@ -133,7 +140,7 @@ peut ouvrir.
 Bloquer laisse une pierre tombale dans `friends.json` précisément pour que le code ne puisse plus
 défaire la décision en silence — c'est toute la différence entre les deux. Un bloqué cesse de
 recevoir ta présence *et* d'être lu. Ce que ça ne fait pas est dit dans la boîte de dialogue
-plutôt que découvert : il garde ton adresse et voit encore quand ton fichier change.
+plutôt que découvert : jusqu'à minuit (UTC), il peut encore voir que ta présence change.
 
 **Les invitations n'existent que pour Mario Party 4**, et la raison est structurelle : un launcher
 n'ajoute pas du multijoueur à un jeu qu'il se contente de démarrer. Le champ `OnlineCompanion` du
@@ -171,8 +178,8 @@ avec six chiffres au lieu de quatre, les quatre premiers inchangés.
 ### Réseau local
 
 Deux CubeShelf sur le même réseau se trouvent seuls, et **un ami trouvé là se lit directement** :
-présence, invitations et messages arrivent en une seconde, sans passer par le dossier synchronisé —
-et sans dossier du tout. Mesuré entre deux CubeShelf : 86 ms de la publication à l'écran de l'ami.
+présence, invitations et messages arrivent en une seconde, sans même passer par Internet.
+Mesuré entre deux CubeShelf : 86 ms de la publication à l'écran de l'ami.
 
 Ce que le réseau voit passer, et c'est voulu :
 
@@ -237,9 +244,9 @@ et la page Mon profil la réclame tant qu'elle n'existe pas. « Restaurer une sa
 identité sur un nouveau PC ; tes amis présents sont gardés, ceux du fichier ajoutés, et l'ancienne
 clé reste à côté, renommée. Une clé qui ne s'ouvre pas ici n'est jamais effacée ni remplacée.
 
-### Changer d'adresse
+### Changer d'adresse (dossier synchronisé)
 
-Change de dossier ou de lien quand tu veux : dès que la nouvelle adresse est vérifiée, **l'ancien
+Pour qui publie encore dans un dossier synchronisé. Change de dossier ou de lien quand tu veux : dès que la nouvelle adresse est vérifiée, **l'ancien
 fichier reçoit un dernier document qui indique la nouvelle**, chiffré pour tes amis actuels
 seulement. Leurs CubeShelf suivent tout seuls, sans nouveau code. Un ami retiré entre-temps ne peut
 pas le lire et l'ancien fichier ne bouge plus : il perd ta trace, et cesse de voir quand tu joues.
@@ -250,27 +257,34 @@ Garde l'ancien fichier quelques semaines, pour les amis qui ne lancent pas CubeS
 | Élément | Choix |
 | --- | --- |
 | Identité | Une paire de clés P-256 générée au premier lancement. La clé publique **est** l'identité : rien n'est délivré par personne. |
-| Code ami | Clé publique + adresse de publication + somme de contrôle. L'adresse doit y figurer : sans annuaire, une clé seule ne dit pas où lire. |
+| Code ami | Clé publique + pseudo + points d'entrée dans le réseau + somme de contrôle. |
 | Chiffrement | Le document est chiffré une fois sous une clé de contenu aléatoire, elle-même emballée par ami. Retirer un ami = ne plus inclure son coffre. |
-| Authenticité | Aucune signature. AES-GCM est authentifié et la clé de paire n'est connue que de vous deux : un document qui s'ouvre vient de cet ami. |
+| Authenticité | AES-GCM sous la clé de paire, que vous seuls connaissez : un document qui s'ouvre vient de cet ami. Dans le réseau, chaque enregistrement est en plus signé par une clé que son seul auteur sait dériver. |
 | Anti-rejeu | Un numéro de séquence strictement croissant. Une copie conservée d'un ancien document est inerte. |
 | Fraîcheur | Un document périmé se lit **hors ligne**, plutôt que de figer un ami sur son dernier jeu. |
+| Réseau | Une table distribuée de type Kademlia ; des sessions Noise XX (P-256, AES-256-GCM) entre nœuds ; un identifiant de nœud qui coûte une preuve de travail. Détail : [RESEAU.md](RESEAU.md). |
+| Où vit ta présence | À un endroit qui change chaque jour et que toi seul peux écrire ; chaque ami le trouve par un pointeur que vous seuls savez calculer. |
 
-Le nombre de coffres est rembourré à un multiple de huit : le fichier ne publie pas combien tu as d'amis. Le contenu chiffré l'est à un multiple de 4 Kio : sa taille ne dit pas combien de jeux, de mods ou de messages il porte.
+Le nombre de coffres est rembourré à un multiple de huit : le document ne publie pas combien tu as d'amis. Le contenu chiffré l'est à un multiple de 4 Kio : sa taille ne dit pas combien de jeux, de mods ou de messages il porte.
 
-Aucune dépendance n'a été ajoutée — ECDH, HKDF et AES-GCM viennent de .NET 8.
+Aucune dépendance n'a été ajoutée — ECDH, ECDSA, HKDF et AES-GCM viennent de .NET 8.
 
 ### Ce que ça ne protège pas
 
 Ces limites sont structurelles, pas des oublis :
 
-- **Retirer un ami ne l'empêche pas de t'observer** tant que tu gardes la même adresse : il voit *quand* ton fichier change, donc quand tu joues. Il garde aussi la clé de paire, qui dérive des deux identités et **ne peut pas être changée sans changer d'identité**. Changer d'adresse y met fin (voir plus haut) ; les codes donnés à des gens pas encore amis pointent encore vers l'ancienne.
+- **Un ami retiré te perd de vue à minuit (UTC).** Jusque-là il peut encore voir *que* ta présence change, sans pouvoir la lire ; ensuite ton document change de place et il n'a plus de pointeur pour le retrouver. Il garde la clé de paire, qui dérive des deux identités et **ne peut pas être changée sans changer d'identité**. (Avec l'ancien dossier synchronisé, il voit quand ton fichier change tant que tu gardes la même adresse.)
+- **Ton adresse IP n'est pas secrète.** Comme dans tout réseau pair-à-pair, les nœuds avec qui ton PC échange la voient — sans savoir qui tu es. Ton code ami contient l'adresse de ton PC quand il est joignable : donne-le plutôt en privé.
+- **Un relais voit qui parle à qui, et quand** — pas ce qui se dit : la session entre amis est chiffrée de bout en bout.
+- **Un réseau naissant a besoin d'un PC joignable.** Si ni toi ni aucun de tes amis n'est joignable (box fermée, UPnP coupé, pas d'IPv6), vous ne vous verrez que sur le même réseau local.
+- **Un adversaire avec beaucoup d'adresses et de calcul** peut gêner le réseau, c'est-à-dire taire des enregistrements ; il ne peut ni les lire ni les falsifier. Les places de ta présence sont imprévisibles pour qui n'est pas ton ami, ce qui empêche de te viser.
 - **Pas de confidentialité persistante.** Qui obtient ta clé d'identité déchiffre rétroactivement tout document que tu as publié.
 - **Ta clé privée est chiffrée pour ton compte Windows**, pas par un mot de passe : quelqu'un qui ouvre une session sous ton compte peut s'en servir. Hors Windows, elle n'est protégée que par les permissions du fichier.
 - **L'hébergeur peut taire, pas falsifier.** AES-GCM bloque la forgerie ; geler ton document te laisse « en jeu » jusqu'à expiration. La fenêtre de fraîcheur borne cette attaque.
 - **Une identité par installation.** Restaurer ta sauvegarde sur une seconde machine fait publier deux CubeShelf sous la même identité, et celui qui prend du retard finit rejeté par tes amis ; CubeShelf le détecte et le dit. La seconde machine doit générer sa propre identité, et vous vous ajoutez mutuellement. Un téléphone, lui, ne publie jamais.
 - **Le partage est décidé globalement**, pas ami par ami : les quatre cases s'appliquent à tout le monde.
-- **Hors réseau local, tout va au rythme du dossier.** Un ami en ligne est relu toutes les 25 secondes, les autres toutes les deux minutes ; ton service de synchronisation ajoute son propre délai. Sur le réseau local, c'est une seconde.
+- **Entre amis en ligne, tout arrive en direct**, poussé sur leur session. Sinon, un ami en ligne est relu toutes les 25 secondes, les autres toutes les deux minutes. Sur le réseau local, c'est une seconde.
+- **Le téléphone ne lit pas encore le réseau.** PartyBoard sur Android sait lire un ami qui publie dans un dossier, pas encore un ami du réseau CubeShelf.
 - **Le réseau local s'annonce.** Même sans nom, un CubeShelf qui diffuse ses marqueurs révèle qu'un CubeShelf tourne sur ce PC. Le réglage se décoche.
 - **CubeShelf ne valide pas qu'un salon est joignable.** Il transporte le code du compagnon ; c'est le compagnon qui traverse — ou non — les box et les pare-feu.
 
@@ -285,9 +299,12 @@ Dans le profil utilisateur (`%LOCALAPPDATA%\CubeShelf` sous Windows) :
 | `presence-state.json` | Le compteur de séquence. **Ne le supprime pas** sans raison. |
 | `avatar.png` | Ton avatar, déjà réduit en 96×96. Le supprimer, c'est ne plus en publier. |
 | `messages.json` | Tes conversations, une semaine de messages en attente au plus. |
+| `mesh-nodes.json` | Quelques nœuds publics du réseau, pour le rejoindre au prochain lancement sans code. |
 
 `CUBESHELF_DATA_DIR`, s'il désigne un dossier absolu, y place tout le profil : deux identités sur un
 même PC — pour essayer le réseau local seul — ou un test qui ne touche pas au vrai profil.
+`CUBESHELF_MESH_ALLOW_PRIVATE=1` fait compter les adresses privées comme Internet, pour essayer le
+réseau CubeShelf entre plusieurs profils d'un même PC ou d'une même maison. Pour les essais seulement.
 ## Aperçu Linux et Steam Deck
 
 Le dépôt contient désormais un noyau portable `CubeShelf.Core`, une interface Avalonia `CubeShelf.Desktop` et un pipeline AppImage `linux-x64`. Cet aperçu affiche la bibliothèque avec des chemins conformes à XDG, permet de sélectionner et valider une image ISO/GCM/RVZ, puis télécharge le runtime PartyBoard correspondant à la plateforme. La taille et le SHA-256 du paquet sont contrôlés avant son activation. L’interface sait ensuite mettre à jour, réparer ou désinstaller ce runtime sans supprimer l’image originale.
