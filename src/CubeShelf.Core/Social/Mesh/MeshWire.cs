@@ -265,6 +265,17 @@ public ref struct MeshReader
 public static class MeshAddresses
 {
     /// <summary>
+    /// <c>CUBESHELF_MESH_ALLOW_PRIVATE=1</c>: private IPv4 addresses (10/8, 172.16/12, 192.168/16)
+    /// count as the Internet. For testing on one machine or one home network only -- that is the
+    /// only way two nodes without a public address can form a network. Read once, at start-up.
+    /// </summary>
+    public static readonly bool AllowPrivateForTesting =
+        Environment.GetEnvironmentVariable("CUBESHELF_MESH_ALLOW_PRIVATE") == "1";
+
+    private static bool IsPrivateIPv4(ReadOnlySpan<byte> bytes) =>
+        bytes[0] == 10 || (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) || (bytes[0] == 192 && bytes[1] == 168);
+
+    /// <summary>
     /// A unicast address on the public Internet: not private, loopback, link-local, multicast,
     /// carrier-grade NAT or documentation space. Contacts with anything else are not kept or passed
     /// on -- they mean nothing to a stranger, and passing a private address around the world leaks
@@ -275,6 +286,7 @@ public static class MeshAddresses
         if (address.IsIPv4MappedToIPv6) address = address.MapToIPv4();
         Span<byte> bytes = stackalloc byte[16];
         if (!address.TryWriteBytes(bytes, out var written)) return false;
+        if (AllowPrivateForTesting && written == 4 && IsPrivateIPv4(bytes)) return true;
 
         if (written == 4)
         {

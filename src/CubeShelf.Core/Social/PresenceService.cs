@@ -384,7 +384,8 @@ public sealed class PresenceService : IAsyncDisposable
             if (inputs.Availability != PresenceAvailability.Invisible && !string.IsNullOrEmpty(inputs.Mesh))
                 candidate = candidate with { Mesh = inputs.Mesh };
 
-            var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes);
+            var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes) + "|" +
+                              PresenceRecipients.Digest(PresenceRecipients.ForPublication(_identity, _friends));
             var heartbeatDue = _lastPublishedAt is not { } previous ||
                 _clock() - previous >= _options.Heartbeat;
 

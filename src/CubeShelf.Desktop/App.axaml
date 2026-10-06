@@ -67,7 +67,7 @@
       <x:String x:Key="AppFriends">Amis</x:String>
       <x:String x:Key="FriendsEyebrow">AMIS</x:String>
       <x:String x:Key="FriendsTitle">Tes amis</x:String>
-      <x:String x:Key="FriendsEmpty">Personne pour l'instant. Partage ton code ami depuis les Paramètres, puis ajoute celui qu'on te donne.</x:String>
+      <x:String x:Key="FriendsEmpty">Personne pour l'instant. Copie ton code ami depuis Mon profil et envoie-le, ou colle ici celui qu'on te donne.</x:String>
       <x:String x:Key="FriendsRefresh">Actualiser</x:String>
       <x:String x:Key="AddFriend">Ajouter un ami</x:String>
       <x:String x:Key="FriendRemove">Retirer</x:String>
@@ -108,7 +108,16 @@
       <x:String x:Key="FriendJoin">Rejoindre</x:String>
       <x:String x:Key="FriendInvite">Inviter</x:String>
       <x:String x:Key="Presence">Amis et présence</x:String>
-      <x:String x:Key="PresenceHelp">CubeShelf publie ta présence dans un dossier que tu synchronises déjà (Dropbox, Nextcloud, OneDrive, Google Drive…) et lit celle de tes amis depuis le lien qu’ils t’ont donné. Aucun serveur, aucun compte, aucun mot de passe enregistré.</x:String>
+      <x:String x:Key="MeshTitle">Réseau CubeShelf</x:String>
+      <x:String x:Key="MeshHelp">Tes amis te voient par le réseau CubeShelf : un réseau maillé formé par les CubeShelf eux-mêmes, sans serveur ni cloud. Chaque PC joignable en porte une petite part et relaie pour les autres ; plus il y a de monde, plus il est solide. Tout ce qui y circule est chiffré pour tes seuls amis.</x:String>
+      <x:String x:Key="MeshEnabled">Participer au réseau CubeShelf</x:String>
+      <x:String x:Key="MeshMapPort">Ouvrir le port de ma box automatiquement (UPnP)</x:String>
+      <x:String x:Key="MeshPrivacy">Comme dans tout réseau pair-à-pair, les PC avec qui le tien échange voient son adresse IP ; ils ne savent pas qui tu es. Ton code ami contient l’adresse de ton PC quand il est joignable : donne-le plutôt en privé. Windows peut demander d’autoriser CubeShelf sur le réseau : accepte.</x:String>
+      <x:String x:Key="PresenceLegacyTitle">Ancienne méthode : dossier synchronisé</x:String>
+      <x:String x:Key="MeshRequestsTitle">DEMANDES D’AMIS</x:String>
+      <x:String x:Key="MeshRequestAccept">Accepter</x:String>
+      <x:String x:Key="MeshRequestDecline">Refuser</x:String>
+      <x:String x:Key="PresenceHelp">Si tu publiais déjà dans un dossier synchronisé, CubeShelf continue pour les amis qui te lisent par ce lien. Le réseau CubeShelf ci-dessus n’en a plus besoin.</x:String>
       <x:String x:Key="PresenceDisplayName">Nom affiché</x:String>
       <x:String x:Key="PresenceDisplayNameHint">Le nom que tes amis verront</x:String>
       <x:String x:Key="PresenceDisplayNameHelp">Laissé vide par défaut : ton nom de compte Windows ne sera jamais publié sans que tu le tapes.</x:String>
@@ -120,7 +129,7 @@
       <x:String x:Key="PresencePublish">Publier ma présence</x:String>
       <x:String x:Key="PresenceSettings">Réglages</x:String>
       <x:String x:Key="MyFriendCode">Ton code ami</x:String>
-      <x:String x:Key="MyFriendCodeHint">Disponible après un test réussi</x:String>
+      <x:String x:Key="MyFriendCodeHint">Disponible dès que tu as un pseudo</x:String>
       <x:String x:Key="Copy">Copier</x:String>
       <x:String x:Key="WhatYouShare">Ce que tu partages</x:String>
       <x:String x:Key="ShareLibrary">Ma bibliothèque</x:String>
@@ -235,7 +244,7 @@
       <x:String x:Key="FriendSendMyCode">Envoyer mon code</x:String>
       <x:String x:Key="LanAdd">Réseau local</x:String>
       <x:String x:Key="LanVisible">Me signaler à mes amis sur le réseau local</x:String>
-      <x:String x:Key="LanVisibleHelp">Tes amis sur le même réseau te voient et reçoivent tes invitations instantanément, même sans dossier synchronisé. Les autres ne voient que des marqueurs qui changent toutes les 10 minutes : ni ton pseudo, ni ta clé. Windows peut demander d’autoriser CubeShelf sur le réseau privé : accepte.</x:String>
+      <x:String x:Key="LanVisibleHelp">Tes amis sur le même réseau te voient et reçoivent tes invitations instantanément. Les autres ne voient que des marqueurs qui changent toutes les 10 minutes : ni ton pseudo, ni ta clé. Windows peut demander d’autoriser CubeShelf sur le réseau privé : accepte.</x:String>
       <x:String x:Key="NotificationsTitle">Notifications</x:String>
       <x:String x:Key="CloseToTray">Fermer la fenêtre garde CubeShelf près de l’horloge (tes amis te voient toujours, les invitations arrivent)</x:String>
       <x:String x:Key="NotifyFriendsOnline">Me prévenir quand un ami se connecte ou lance un jeu</x:String>

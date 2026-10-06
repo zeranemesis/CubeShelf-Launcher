@@ -18,6 +18,9 @@ public static class MeshOps
     public const byte RelayData = 0x08;
     public const byte Incoming = 0x09;
 
+    /// <summary>A node's flags and addresses changed: said on every open session, so long-lived ones do not keep stale claims.</summary>
+    public const byte Announce = 0x0A;
+
     public const byte FriendHello = 0x10;
     public const byte FriendDocument = 0x11;
 }

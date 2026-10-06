@@ -92,7 +92,20 @@ public sealed record UserPreferences(
     /// asks for it: the key is the one thing that cannot be recreated, and once protected by
     /// Windows it no longer survives a reinstall by itself.
     /// </summary>
-    DateTimeOffset? IdentityBackedUpAt = null);
+    DateTimeOffset? IdentityBackedUpAt = null,
+
+    /// <summary>
+    /// Whether this CubeShelf takes part in the CubeShelf network: how friends see each other
+    /// from anywhere, with no server and no cloud. On by default -- it is what makes a friend code
+    /// work at all.
+    /// </summary>
+    bool MeshEnabled = true,
+
+    /// <summary>Ask the router to open the network port (PCP, NAT-PMP, UPnP).</summary>
+    bool MeshMapPort = true,
+
+    /// <summary>The UDP port the network listens on; another one is taken if it is busy.</summary>
+    int MeshPort = 47914);
 
 public sealed class UserPreferencesStore
 {

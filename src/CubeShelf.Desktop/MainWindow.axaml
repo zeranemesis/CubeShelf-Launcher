@@ -365,6 +365,24 @@
         </Border>
         <Border Grid.Row="1" Margin="28,20,28,28" Background="{DynamicResource Panel}" CornerRadius="14" Padding="14">
           <Grid RowDefinitions="Auto,*">
+            <StackPanel>
+            <!-- Requests that came through the network: someone added us and asks to be added back. -->
+            <Border x:Name="MeshRequestsPanel" IsVisible="False" Margin="0,0,0,12" Padding="14" CornerRadius="12" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Accent2}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource MeshRequestsTitle}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" />
+                <ItemsControl x:Name="MeshRequestsList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,6">
+                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Classes="primary" Content="{DynamicResource MeshRequestAccept}" Tag="{Binding}" Click="AcceptMeshRequest" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" Content="{DynamicResource MeshRequestDecline}" Tag="{Binding}" Click="DeclineMeshRequest" VerticalAlignment="Center" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
             <!-- A friend code found in the clipboard: copy the message in any chat app, come back, one click. -->
             <Border x:Name="ClipboardInviteBanner" IsVisible="False" Margin="0,0,0,12" Padding="14" CornerRadius="12" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
@@ -373,6 +391,7 @@
                 <Button Grid.Column="2" Content="{DynamicResource ClipboardIgnore}" Click="IgnoreClipboardCode" VerticalAlignment="Center" />
               </Grid>
             </Border>
+            </StackPanel>
             <Grid Grid.Row="1">
             <ListBox x:Name="FriendsList" Background="Transparent" BorderThickness="0">
               <ListBox.ItemTemplate>
@@ -512,9 +531,21 @@
                 <ComboBox x:Name="ProfilePinnedBox" HorizontalAlignment="Stretch" SelectionChanged="SavePinnedGame" />
               </StackPanel>
             </Border>
+            <!-- The network: how friends see each other from anywhere, with no server and no cloud. -->
             <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
               <StackPanel Spacing="9">
-                <TextBlock Text="{DynamicResource Presence}" FontSize="18" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource MeshTitle}" FontSize="18" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource MeshHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                <TextBlock x:Name="MeshStatusText" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+                <CheckBox x:Name="MeshEnabledBox" Content="{DynamicResource MeshEnabled}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <CheckBox x:Name="MeshMapPortBox" Content="{DynamicResource MeshMapPort}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <TextBlock Text="{DynamicResource MeshPrivacy}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <!-- Only for whoever still publishes to a synced folder: nobody else is offered a cloud. -->
+            <Border x:Name="LegacyPresenceCard" IsVisible="False" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+              <StackPanel Spacing="9">
+                <TextBlock Text="{DynamicResource PresenceLegacyTitle}" FontSize="18" FontWeight="Bold" />
                 <TextBlock Text="{DynamicResource PresenceHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
 
                 <!-- Our own address read back: shown only when friends are not getting what we write. -->

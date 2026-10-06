@@ -76,7 +76,7 @@ public sealed partial class MainWindow
         // "in a game" from a document we will never refresh again.
         _friendPresence.TryRemove(row.PublicKey, out _);
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
     }
 
     private void UnblockFriend(object? sender, RoutedEventArgs args)
@@ -86,7 +86,7 @@ public sealed partial class MainWindow
         if (!_friends.Unblock(row.PublicKey)) return;
 
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
         ShowToastParity(P7("Amis", "Friends"),
             P7($"{row.Name} est débloqué et redevient un ami.",
                $"{row.Name} is unblocked and is a friend again."));

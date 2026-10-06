@@ -334,10 +334,45 @@ public sealed class MeshNode : IAsyncDisposable
             case MeshOps.Incoming when IsHeldRelay(session):
                 OnIncoming(message.Body);
                 break;
+            case MeshOps.Announce:
+                OnAnnounce(session, message.Body);
+                break;
             default:
                 ApplicationNotification?.Invoke(session, message);
                 break;
         }
+    }
+
+    /// <summary>
+    /// A peer's flags or addresses changed on a session that outlives the change -- a friend's, a
+    /// relay's. Taken as the same kind of claim the handshake makes, and checked the same way.
+    /// </summary>
+    private void OnAnnounce(MeshSession session, byte[] body)
+    {
+        var reader = new MeshReader(body);
+        var flags = (MeshNodeFlags)(reader.U8() & 0x03);
+        int count = reader.U8();
+        if (count > MeshPackets.MaximumAdvertised) return;
+        var advertised = new List<IPEndPoint>();
+        for (var index = 0; index < count; index++)
+            if (reader.Endpoint() is { } endpoint) advertised.Add(MeshAddresses.Normalize(endpoint));
+        if (!reader.Done) return;
+
+        var wasServer = session.RemoteFlags.HasFlag(MeshNodeFlags.Server);
+        session.RemoteFlags = flags;
+        session.RemoteAdvertised = advertised;
+        if (flags.HasFlag(MeshNodeFlags.Server)) Dht.OnSessionEstablished(session);
+        else if (wasServer) Table.Remove(session.RemoteId);
+    }
+
+    private void Announce()
+    {
+        var writer = new MeshWriter(64).U8((byte)_flags);
+        var advertised = _publicEndpoints.Take(MeshPackets.MaximumAdvertised).ToArray();
+        writer.U8((byte)advertised.Length);
+        foreach (var endpoint in advertised) writer.Endpoint(endpoint);
+        var body = writer.ToArray();
+        foreach (var session in Transport.Sessions) Transport.Notify(session, MeshOps.Announce, body);
     }
 
     /// <summary>Someone is calling through one of our relays: send out towards them so their packets get in.</summary>
@@ -391,7 +426,18 @@ public sealed class MeshNode : IAsyncDisposable
         }
     }
 
-    private void OnSessionEstablished(MeshSession session) => Dht.OnSessionEstablished(session);
+    private void OnSessionEstablished(MeshSession session)
+    {
+        Dht.OnSessionEstablished(session);
+
+        // Not known to be reachable, and someone new to ask: find out again. At once when we knew
+        // nobody at all -- the first session is the first chance -- otherwise at most every two
+        // minutes. On a young network the first node up has nobody to ask until the next arrives.
+        var since = Environment.TickCount64 - _lastReachabilityCheck;
+        var due = Reachability == MeshReachability.Isolated ? since > 5_000
+            : Reachability == MeshReachability.Relayed && since > 120_000;
+        if (due && session.Route.IsDirect && _lifetime is { } lifetime) _ = CheckReachabilityAsync(lifetime.Token);
+    }
 
     private void OnSessionClosed(MeshSession session)
     {
@@ -459,8 +505,10 @@ public sealed class MeshNode : IAsyncDisposable
         Records.Prune(DateTimeOffset.UtcNow);
         if (Table.Count < _options.Dht.K / 2) await JoinAsync(cancellationToken).ConfigureAwait(false);
         if (_mapping?.RenewAt is { } renewAt && DateTimeOffset.UtcNow >= renewAt) await MapPortAsync(cancellationToken).ConfigureAwait(false);
-        if (Environment.TickCount64 - _lastReachabilityCheck > TimeSpan.FromMinutes(30).TotalMilliseconds || Reachability is MeshReachability.Isolated)
-            await CheckReachabilityAsync(cancellationToken).ConfigureAwait(false);
+        // Every half hour; every round while nothing is known, or while "relayed" has no relay to show for it.
+        var stale = Environment.TickCount64 - _lastReachabilityCheck > TimeSpan.FromMinutes(30).TotalMilliseconds;
+        var unsettled = Reachability is MeshReachability.Isolated || (Reachability is MeshReachability.Relayed && RelayContacts.Count == 0);
+        if (stale || unsettled) await CheckReachabilityAsync(cancellationToken).ConfigureAwait(false);
         await EnsureRelaysAsync(cancellationToken).ConfigureAwait(false);
 
         if (tick % 5 == 0) await Dht.CheckStaleAsync(TimeSpan.FromMinutes(10), cancellationToken).ConfigureAwait(false);
@@ -588,14 +636,12 @@ public sealed class MeshNode : IAsyncDisposable
         Dht.Serving = serving;
         _relay.Enabled = serving;
 
-        // Sessions opened before we knew told their peers we were not reachable. Opening them
-        // again is how the network learns otherwise -- and how a node that stopped being
-        // reachable stops being routed to.
-        if (serving != wasServing && _lifetime is { } lifetime)
-        {
-            foreach (var session in Transport.Sessions.Where(session => !session.Pinned)) Transport.Close(session);
-            _ = JoinAsync(lifetime.Token);
-        }
+        // Sessions opened before we knew told their peers we were not reachable: they hear
+        // otherwise now, without being torn down (a friend's session, a request in flight). And
+        // a node that just became reachable looks itself up again, so the nodes near its id
+        // learn of it.
+        if (changed) Announce();
+        if (serving && !wasServing && _lifetime is { } lifetime) _ = JoinAsync(lifetime.Token);
         if (changed) Changed?.Invoke();
     }
 

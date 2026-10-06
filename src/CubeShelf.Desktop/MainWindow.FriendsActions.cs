@@ -54,9 +54,9 @@ public sealed partial class MainWindow
                 confirm.IsEnabled = true;
                 if (string.IsNullOrWhiteSpace(nameBox.Text) && payload.DisplayName.Length > 0)
                     nameBox.Text = payload.DisplayName;
-                // Who, and where: the user is about to poll that address every couple of minutes.
-                status.Text = P7($"Tu vas ajouter {payload.Handle}. Adresse : {new Uri(payload.PresenceUrl).Host}",
-                                 $"You are adding {payload.Handle}. Address: {new Uri(payload.PresenceUrl).Host}");
+                // Who, and where: the user is about to read them every couple of minutes.
+                status.Text = P7($"Tu vas ajouter {payload.Handle}. {DescribeCodeSource(payload, french: true)}",
+                                 $"You are adding {payload.Handle}. {DescribeCodeSource(payload, french: false)}");
             }
             else
             {
@@ -77,7 +77,9 @@ public sealed partial class MainWindow
             }
 
             // Same window, next step: friendship goes one way at a time, and the moment they were
-            // added is the moment to send our own code back.
+            // added is the moment to send our own code back -- the network carries a request on
+            // its own, the message is for when it cannot.
+            AfterAddingFromCode(decoded);
             dialog.Content = ReplyStep(decoded.Handle, () => dialog.Close());
         };
 
@@ -107,14 +109,16 @@ public sealed partial class MainWindow
 
         // Opened with a code already in the clipboard, the dialog starts filled in.
         if (_clipboardCandidate is { } candidate)
-            codeBox.Text = FriendCode.Encode(candidate.PublicKey, candidate.PresenceUrl, candidate.DisplayName);
+            codeBox.Text = string.IsNullOrEmpty(candidate.PresenceUrl)
+                ? FriendCode.EncodeForNetwork(candidate.PublicKey, candidate.DisplayName, candidate.Seeds)
+                : FriendCode.Encode(candidate.PublicKey, candidate.PresenceUrl, candidate.DisplayName);
 
         await dialog.ShowDialog(this);
 
         _ = CheckClipboardForFriendCodeAsync();
         RefreshFriendsView();
         // The recipient list changed, so the next document has to include them.
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
         // And read them now rather than in two minutes: whether they already added us back is
         // the first thing the list should say -- and keep reading actively for a while, since
         // that is usually the moment they do.
@@ -128,7 +132,7 @@ public sealed partial class MainWindow
 
         _friends.Update(row.PublicKey, friend => friend.Paused = !friend.Paused);
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
     }
 
     private async void RemoveFriend(object? sender, RoutedEventArgs args)
@@ -156,12 +160,17 @@ public sealed partial class MainWindow
                 // to them, and it does not stop them watching the address change.
                 new TextBlock
                 {
-                    Text = P7("Il peut le remarquer, et il garde ton adresse : il verra encore quand " +
-                              "ton fichier change, donc quand tu joues. Pour y mettre fin, change d’adresse (Mon profil) : " +
-                              "tes autres amis te suivront tout seuls, lui perdra ta trace.",
-                              "They may notice, and they keep your address: they can still see when your " +
-                              "file changes, and so when you play. To end that, change your address (My profile): " +
-                              "your other friends follow on their own, they lose track of you."),
+                    Text = string.IsNullOrWhiteSpace(_preferences.PresenceUrl)
+                        ? P7("Il peut le remarquer. Jusqu’à minuit (UTC), il pourra encore voir que ta présence change, sans pouvoir la lire ; " +
+                             "ensuite il perd ta trace sur le réseau CubeShelf.",
+                             "They may notice. Until midnight (UTC) they can still see your presence change, without being able to read it; " +
+                             "after that they lose track of you on the CubeShelf network.")
+                        : P7("Il peut le remarquer, et il garde ton adresse : il verra encore quand " +
+                             "ton fichier change, donc quand tu joues. Pour y mettre fin, change d’adresse (Mon profil) : " +
+                             "tes autres amis te suivront tout seuls, lui perdra ta trace.",
+                             "They may notice, and they keep your address: they can still see when your " +
+                             "file changes, and so when you play. To end that, change your address (My profile): " +
+                             "your other friends follow on their own, they lose track of you."),
                     Foreground = Avalonia.Media.Brushes.Gray,
                     FontSize = 12,
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap
@@ -182,7 +191,15 @@ public sealed partial class MainWindow
         _friendPresence.TryRemove(row.PublicKey, out _);
         _messages?.Forget(row.PublicKey);
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
+    }
+
+    /// <summary>Where a pasted code says its author publishes, in words: an https host, or the network.</summary>
+    private static string DescribeCodeSource(FriendCodePayload payload, bool french)
+    {
+        if (Uri.TryCreate(payload.PresenceUrl, UriKind.Absolute, out var uri))
+            return french ? $"Adresse : {uri.Host}" : $"Address: {uri.Host}";
+        return french ? "Par le réseau CubeShelf." : "Through the CubeShelf network.";
     }
 
     private async void CopyFriendCode(object? sender, RoutedEventArgs args)
@@ -195,8 +212,7 @@ public sealed partial class MainWindow
         try
         {
             // Rebuilding their code is how two of your friends get introduced to each other.
-            var code = FriendCode.Encode(
-                Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl, friend.DisplayName);
+            var code = FriendCodeOf(friend);
             await CopyToClipboardAsync(code, P7($"Code de {friend.DisplayName} copié.",
                                                 $"{friend.DisplayName}’s code copied."));
         }
@@ -407,6 +423,10 @@ public sealed partial class MainWindow
         ShareCurrentGameBox.IsChecked = _preferences.ShareCurrentGame;
         ShareModsBox.IsChecked = _preferences.ShareMods;
         LanVisibleBox.IsChecked = _preferences.LanVisible;
+        MeshEnabledBox.IsChecked = _preferences.MeshEnabled;
+        MeshMapPortBox.IsChecked = _preferences.MeshMapPort;
+        // The folder card is for whoever still has one set up; nobody else is shown a cloud.
+        LegacyPresenceCard.IsVisible = _preferences.PresenceFolder.Length > 0 || _preferences.PresenceUrl.Length > 0;
         CloseToTrayBox.IsChecked = _preferences.CloseToTray;
         NotifyOnlineBox.IsChecked = _preferences.NotifyFriendsOnline;
         AutoAwayBox.IsChecked = _preferences.AutoAway;
@@ -430,6 +450,8 @@ public sealed partial class MainWindow
             ShareMods = ShareModsBox.IsChecked == true,
             ShareProfile = ShareProfileBox.IsChecked == true,
             LanVisible = LanVisibleBox.IsChecked == true,
+            MeshEnabled = MeshEnabledBox.IsChecked == true,
+            MeshMapPort = MeshMapPortBox.IsChecked == true,
             CloseToTray = CloseToTrayBox.IsChecked == true,
             NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true,
             AutoAway = AutoAwayBox.IsChecked == true
@@ -438,7 +460,9 @@ public sealed partial class MainWindow
         // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,
         // so the box did nothing until the next launch -- a friend could add you and see nobody.
         // The local network decides whether there is anything to publish at all without a folder.
-        if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled ||
+        if (before.MeshEnabled != _preferences.MeshEnabled || before.MeshMapPort != _preferences.MeshMapPort)
+            RestartMesh();
+        else if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled ||
             before.LanVisible != _preferences.LanVisible)
             StartPresenceService();
         else if (before != _preferences)

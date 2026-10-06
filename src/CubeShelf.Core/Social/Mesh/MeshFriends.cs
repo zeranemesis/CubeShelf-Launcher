@@ -48,7 +48,21 @@ public sealed class MeshFriends : IAsyncDisposable
     private readonly ConcurrentDictionary<string, (long NextAttempt, int Failures)> _attempts = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, MeshFriendRequest> _requests = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, bool> _dismissed = new(StringComparer.Ordinal);
+
+    /// <summary>The day a request last reached each pending friend's mailbox: one a day keeps it there until they answer.</summary>
+    private readonly ConcurrentDictionary<string, long> _requestDelivered = new(StringComparer.Ordinal);
+    private readonly SemaphoreSlim _wake = new(0, 1);
     private readonly SemaphoreSlim _pointerGate = new(1, 1);
+
+    /// <summary>
+    /// A document that arrived on a session before its identity proof completed on our side --
+    /// the other side proves first and pushes at once, and its push can overtake our reading of
+    /// its answer. Kept, one per session, until the proof lands.
+    /// </summary>
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<MeshSession, byte[]> _early = new();
+
+    /// <summary>Sessions we are proving ourselves on right now: the only ones whose early document is kept.</summary>
+    private readonly ConcurrentDictionary<uint, byte> _helloPending = new();
 
     private volatile string? _lastEnvelope;
     private CancellationTokenSource? _lifetime;
@@ -77,6 +91,8 @@ public sealed class MeshFriends : IAsyncDisposable
         _node.ApplicationRequests = HandleRequestAsync;
         _node.ApplicationNotification += OnNotification;
         _node.Transport.SessionClosed += OnSessionClosed;
+        // Joining the network, gaining a relay: what was waiting for it can go now.
+        _node.Changed += Kick;
     }
 
     /// <summary>Looking offline: no direct session is offered or accepted, since one would give us away.</summary>
@@ -111,18 +127,55 @@ public sealed class MeshFriends : IAsyncDisposable
             {
                 try
                 {
-                    if (tick % 10 == 0) await CheckMailboxAsync(cancellationToken).ConfigureAwait(false);
+                    // Requests are read every minute: someone who just pasted our code is waiting.
+                    if (tick % 2 == 0) await CheckMailboxAsync(cancellationToken).ConfigureAwait(false);
+                    await DeliverRequestsAsync(cancellationToken).ConfigureAwait(false);
                     await ConnectFriendsAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception exception) when (exception is not OperationCanceledException and not OutOfMemoryException)
                 {
                 }
                 tick++;
-                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken).ConfigureAwait(false);
+                await _wake.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)
         {
+        }
+    }
+
+    /// <summary>Runs the loop now rather than at its next turn: the friends list just changed.</summary>
+    public void Kick()
+    {
+        try
+        {
+            _wake.Release();
+        }
+        catch (Exception exception) when (exception is SemaphoreFullException or ObjectDisposedException)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A request for every friend who has not added us back -- the one we just added from their
+    /// code, someone added last week who has not answered -- once a day, for two weeks: a mailbox
+    /// only keeps a day, and nobody should have to paste a code back. Retried at every turn until
+    /// one actually lands, since the first try often comes before we have joined the network.
+    /// </summary>
+    private async Task DeliverRequestsAsync(CancellationToken cancellationToken)
+    {
+        if (_node.Table.Count == 0 && !_node.Dht.Serving) return;
+        var now = _clock();
+        var today = DayOf(now);
+        var due = _friends.Load()
+            .Where(friend => !friend.Paused && !friend.Blocked && friend.SharesWithUs != true && now - friend.AddedAt < TimeSpan.FromDays(14))
+            .Where(friend => !_requestDelivered.TryGetValue(friend.PublicKey, out var day) || day != today)
+            .Take(4)
+            .ToArray();
+        foreach (var friend in due)
+        {
+            if (await SendRequestAsync(Convert.FromBase64String(friend.PublicKey), null, cancellationToken).ConfigureAwait(false))
+                _requestDelivered[friend.PublicKey] = today;
         }
     }
 
@@ -217,9 +270,10 @@ public sealed class MeshFriends : IAsyncDisposable
         }
     }
 
-    /// <summary>The friends list changed: pointers for newcomers are due at the next publish.</summary>
+    /// <summary>The friends list changed: pointers for newcomers are due at the next publish, requests now.</summary>
     public void FriendsChanged()
     {
+        Kick();
         var current = _friends.Load().Select(friend => friend.PublicKey).ToHashSet(StringComparer.Ordinal);
         foreach (var key in _pointersPublished.Keys.Where(key => !current.Contains(key)).ToArray()) _pointersPublished.TryRemove(key, out _);
         foreach (var (key, session) in _sessions.ToArray())
@@ -343,6 +397,7 @@ public sealed class MeshFriends : IAsyncDisposable
     {
         var friendKey = Convert.FromBase64String(friend.PublicKey);
         var pair = _identity.DeriveSharedKey(friendKey);
+        _helloPending[session.LocalIndex] = 0;
         try
         {
             var body = new MeshWriter(128).Fixed(_identity.PublicKey).Fixed(Proof(pair, session.IsInitiator, session.HandshakeHash)).ToArray();
@@ -357,6 +412,8 @@ public sealed class MeshFriends : IAsyncDisposable
         }
         finally
         {
+            _helloPending.TryRemove(session.LocalIndex, out _);
+            _early.Remove(session);
             CryptographicOperations.ZeroMemory(pair);
         }
     }
@@ -415,14 +472,26 @@ public sealed class MeshFriends : IAsyncDisposable
         _sessions[friendKey] = session;
         Changed?.Invoke();
 
+        if (_early.TryGetValue(session, out var early))
+        {
+            _early.Remove(session);
+            if (AcceptDocument(friendKey, Encoding.UTF8.GetString(early)) is { } outcome) DocumentReceived?.Invoke(outcome);
+        }
+
         // They get our latest at once, without waiting for the next change.
         if (_lastEnvelope is { } envelope) _node.Transport.Notify(session, MeshOps.FriendDocument, Encoding.UTF8.GetBytes(envelope));
     }
 
     private void OnNotification(MeshSession session, MeshMessage message)
     {
-        if (message.Op != MeshOps.FriendDocument || session.FriendKey is not { } friendKey) return;
-        if (message.Body.Length > PresencePolicy.MaximumDocumentBytes) return;
+        if (message.Op != MeshOps.FriendDocument || message.Body.Length > PresencePolicy.MaximumDocumentBytes) return;
+        if (session.FriendKey is not { } friendKey)
+        {
+            // Not proven yet: kept for when it is, never read before -- and only on a session we
+            // are proving ourselves on, so a stranger cannot make us hold documents for nothing.
+            if (_helloPending.ContainsKey(session.LocalIndex)) _early.AddOrUpdate(session, message.Body);
+            return;
+        }
         var outcome = AcceptDocument(friendKey, Encoding.UTF8.GetString(message.Body));
         if (outcome is not null) DocumentReceived?.Invoke(outcome);
     }
@@ -600,8 +669,10 @@ public sealed class MeshFriends : IAsyncDisposable
         }
         _node.Transport.SessionClosed -= OnSessionClosed;
         _node.ApplicationNotification -= OnNotification;
+        _node.Changed -= Kick;
         _lifetime?.Dispose();
         _pointerGate.Dispose();
+        _wake.Dispose();
         CryptographicOperations.ZeroMemory(_seed);
     }
 }

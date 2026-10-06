@@ -124,10 +124,11 @@ public sealed class MeshSession
     public byte[] RemotePublicKey { get; }
     public ulong RemoteNonce { get; }
     public NodeId RemoteId { get; }
-    public MeshNodeFlags RemoteFlags { get; }
+    /// <summary>What the peer says it offers: from the handshake, updated when it announces a change.</summary>
+    public MeshNodeFlags RemoteFlags { get; internal set; }
 
     /// <summary>The addresses the peer says it can be reached at. Claims, not facts, until someone connects there.</summary>
-    public IReadOnlyList<IPEndPoint> RemoteAdvertised { get; }
+    public IReadOnlyList<IPEndPoint> RemoteAdvertised { get; internal set; }
 
     /// <summary>Our own address as the peer sees it: how we learn what our NAT maps us to, without a STUN server.</summary>
     public IPEndPoint? ObservedSelf { get; }

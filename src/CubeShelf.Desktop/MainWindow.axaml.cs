@@ -747,7 +747,10 @@ public sealed partial class MainWindow : Window
         AutoAway = current.AutoAway,
         PreviousPresenceFolder = current.PreviousPresenceFolder,
         PreviousPresenceUrl = current.PreviousPresenceUrl,
-        IdentityBackedUpAt = current.IdentityBackedUpAt
+        IdentityBackedUpAt = current.IdentityBackedUpAt,
+        MeshEnabled = current.MeshEnabled,
+        MeshMapPort = current.MeshMapPort,
+        MeshPort = current.MeshPort
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)

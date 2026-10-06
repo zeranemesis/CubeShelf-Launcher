@@ -82,22 +82,26 @@ public sealed partial class MainWindow
 
         StopPresenceServiceBounded();
         EnsureLan();
+        EnsureMesh();
 
         // No pseudo, no document: a friend would be reading someone with no name.
         if (!HasIdentity) return;
 
-        // The sync folder when it is set up and switched on; otherwise, if friends on the network
-        // may see us, a document that only exists to be served there. Neither: nothing runs.
-        IPresencePublisher? publisher = null;
+        // The CubeShelf network when it runs, and a sync folder too for someone who still has one
+        // set up; with neither, if friends on the local network may see us, a document that only
+        // exists to be served there. None of them: nothing runs.
+        var publishers = new List<IPresencePublisher>();
+        if (_meshFriends is { } network) publishers.Add(new CubeShelf.Core.Social.Mesh.MeshPresencePublisher(network));
         if (_preferences.PresencePublishEnabled)
         {
             var folder = new SyncedFolderPresencePublisher(new SyncedFolderTarget(
                 _preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName, _preferences.PresenceUrl));
-            if (folder.IsConfigured) publisher = folder;
+            if (folder.IsConfigured) publishers.Add(folder);
             else folder.Dispose();
         }
-        if (publisher is null && _lan is not null) publisher = new CubeShelf.Core.Social.Lan.LanOnlyPublisher();
-        if (publisher is null) return;
+        if (publishers.Count == 0 && _lan is not null) publishers.Add(new CubeShelf.Core.Social.Lan.LanOnlyPublisher());
+        if (publishers.Count == 0) return;
+        IPresencePublisher publisher = publishers.Count == 1 ? publishers[0] : new CompositePresencePublisher(publishers.ToArray());
         _presenceLanOnly = publisher is CubeShelf.Core.Social.Lan.LanOnlyPublisher;
 
         // The day we started publishing is ours to state because nobody else can: a friend only
@@ -114,7 +118,11 @@ public sealed partial class MainWindow
             new PresenceComposer(_paths),
             new PresenceSequence(_paths.ConfigurationDirectory),
             publisher,
-            new PresenceFetcher(_identity, _friends),
+            new PresenceFetcher(_identity, _friends)
+            {
+                // Friends with no https address -- every friend of the network age -- are read there.
+                NetworkReader = _meshFriends is { } reader ? reader.ReadAsync : null
+            },
             CapturePresenceInputsAsync);
 
         service.FriendsRefreshed += outcomes => Dispatcher.UIThread.Post(() => ApplyFriendOutcomes(outcomes));
@@ -131,7 +139,14 @@ public sealed partial class MainWindow
     /// list would not be enough -- the entries themselves have to be projected.
     /// </summary>
     private Task<PresenceInputs> CapturePresenceInputsAsync(CancellationToken cancellationToken) =>
-        Dispatcher.UIThread.InvokeAsync(() => new PresenceInputs(
+        Dispatcher.UIThread.InvokeAsync(() => CapturePresenceInputs()).GetTask();
+
+    private PresenceInputs CapturePresenceInputs()
+    {
+        // Looking offline also means no direct session: answering one would say we are here.
+        if (_meshFriends is { } network) network.Invisible = EffectiveAvailability == PresenceAvailability.Invisible;
+        var mesh = _meshNode?.Address is { IsEmpty: false } address ? address.ToBase64() : null;
+        return new PresenceInputs(
             _preferences.FriendsDisplayName,
             _catalogGames.Select(game => new PresenceGame(
                 game.Id, game.Title, game.PlayCount, game.TotalPlaySeconds,
@@ -153,7 +168,10 @@ public sealed partial class MainWindow
             EffectiveAvailability,
             // What the game says is happening, while it runs.
             _sessions.RunningGameIds.Count > 0 ? InGameBridge.ReadActivity(InGameDirectory, DateTimeOffset.UtcNow) : null,
-            _messages?.Outgoing(DateTimeOffset.UtcNow))).GetTask();
+            _messages?.Outgoing(DateTimeOffset.UtcNow),
+            // Where friends reach us on the network, inside the sealed document.
+            mesh);
+    }
 
     private void OnFriendsSessionChanged(string gameId) =>
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
@@ -187,6 +205,7 @@ public sealed partial class MainWindow
 
         // The farewell was just handed to the network as well; friends there pull it now.
         FarewellLan();
+        StopMesh();
 
         _friendsLifetime?.Cancel();
         _friendsLifetime?.Dispose();
@@ -325,6 +344,7 @@ public sealed partial class MainWindow
         FriendsList.ItemsSource = rows;
         FriendsEmptyText.IsVisible = rows.Length == 0;
         FriendsSubtitleText.Text = DescribePublishingState();
+        RefreshMeshRequests();
     }
 
     private FriendRow BuildFriendRow(Friend friend, string handle, bool canHost, DateTimeOffset now)
@@ -350,9 +370,12 @@ public sealed partial class MainWindow
             : pending
             ? P7("Il ne t’a pas encore ajouté, ou ne partage plus sa présence avec toi. Envoie-lui ton code : dès qu’il t’aura ajouté, tu le verras ici.",
                  "They have not added you back yet, or stopped sharing their presence with you. Send them your code: once they add you, they show up here.")
+            : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && _meshFriends is null
+                ? P7("Tu le verras sur le même réseau local, ou partout une fois le réseau CubeShelf activé (Mon profil).",
+                     "You see them on the same local network, or anywhere once the CubeShelf network is on (My profile).")
             : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl)
-                ? P7("Ami du réseau local : tu le verras quand vous serez sur le même réseau, ou partout dès qu’il publiera une adresse.",
-                     "A local network friend: you see them when you share a network, or anywhere once they publish an address.")
+                ? P7("Pas encore vu sur le réseau CubeShelf. Il apparaîtra dès qu’il sera en ligne.",
+                     "Not seen on the CubeShelf network yet. They show up as soon as they are online.")
             : known is null
                 ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
                      "Never seen. Their presence is read on the next poll.")
@@ -363,6 +386,8 @@ public sealed partial class MainWindow
             : "";
         if (!friend.Blocked && IsOnLan(friend.PublicKey))
             seen = (seen.Length > 0 ? seen + " • " : "") + P7("📶 Sur ton réseau", "📶 On your network");
+        else if (!friend.Blocked && _meshFriends?.IsConnected(friend.PublicKey) == true)
+            seen = (seen.Length > 0 ? seen + " • " : "") + P7("🔗 En direct", "🔗 Connected directly");
         var unread = _messages?.Unread(friend.PublicKey) ?? 0;
         if (unread > 0 && !friend.Blocked)
             seen = P7($"💬 {unread} nouveau(x) message(s)", $"💬 {unread} new message(s)") + (seen.Length > 0 ? " • " + seen : "");
@@ -430,11 +455,11 @@ public sealed partial class MainWindow
     /// friends.json can be hand-edited, so a stored address may no longer be something
     /// FriendCode.Encode accepts. The button is disabled rather than throwing when pressed.
     /// </summary>
-    private static bool CanRebuildCode(Friend friend)
+    private bool CanRebuildCode(Friend friend)
     {
         try
         {
-            _ = FriendCode.Encode(Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl);
+            _ = FriendCodeOf(friend);
             return true;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException)
@@ -443,8 +468,35 @@ public sealed partial class MainWindow
         }
     }
 
+    /// <summary>
+    /// A friend's code, rebuilt to introduce them to someone else: an https one if they still
+    /// publish to a folder, a network one otherwise -- with our own ways in, which lead into the
+    /// same network theirs do.
+    /// </summary>
+    private string FriendCodeOf(Friend friend)
+    {
+        var key = Convert.FromBase64String(friend.PublicKey);
+        return string.IsNullOrWhiteSpace(friend.PresenceUrl)
+            ? FriendCode.EncodeForNetwork(key, friend.DisplayName, _meshNode?.EntryPoints() ?? Array.Empty<System.Net.IPEndPoint>())
+            : FriendCode.Encode(key, friend.PresenceUrl, friend.DisplayName);
+    }
+
     private string DescribePublishingState()
     {
+        if (_presence is not null && _meshFriends is not null)
+        {
+            var count = _friends?.ActiveRecipients().Count ?? 0;
+            var state = _meshNode?.Reachability switch
+            {
+                CubeShelf.Core.Social.Mesh.MeshReachability.Public => P7("joignable directement", "directly reachable"),
+                CubeShelf.Core.Social.Mesh.MeshReachability.Relayed => P7("joignable par relais", "reachable through relays"),
+                CubeShelf.Core.Social.Mesh.MeshReachability.Isolated => P7("aucun autre nœud connu", "no other node known"),
+                _ => P7("connexion…", "joining…")
+            };
+            return count == 0
+                ? P7($"Réseau CubeShelf : {state}. Ajoute un ami avec son code.", $"CubeShelf network: {state}. Add a friend with their code.")
+                : P7($"Réseau CubeShelf : {state}. Tu publies pour {count} ami(s).", $"CubeShelf network: {state}. Publishing to {count} friend(s).");
+        }
         if (_presence is not null && _presenceLanOnly)
             return P7("Sans adresse publique, seuls tes amis sur le même réseau local te voient. Mon profil pour être vu de partout.",
                       "Without a public address, only friends on the same local network see you. My profile to be seen from anywhere.");

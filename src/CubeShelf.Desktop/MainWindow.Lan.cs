@@ -41,7 +41,7 @@ public sealed partial class MainWindow
         {
             Notify(P7("Nouvel ami", "New friend"),
                 P7($"{handle} a accepté : vous êtes amis.", $"{handle} accepted: you are friends."));
-            _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+            OnFriendsListChanged();
             _presence?.PollEagerly();
             RefreshFriendsView();
         });
@@ -152,7 +152,7 @@ public sealed partial class MainWindow
                                                                 $"{request.Handle} is added but could not be told: they show as pending until they add you."),
                         _ => P7($"{request.Handle} est ajouté.", $"{request.Handle} is added.")
                     };
-                    _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+                    OnFriendsListChanged();
                     RefreshFriendsView();
                     Render();
                 };
@@ -193,7 +193,7 @@ public sealed partial class MainWindow
                     };
                     if (result == LanIntroductionResult.AlreadyFriends)
                     {
-                        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+                        OnFriendsListChanged();
                         RefreshFriendsView();
                     }
                     Render();
