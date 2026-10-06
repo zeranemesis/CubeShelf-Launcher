@@ -50,6 +50,14 @@ public sealed class Friend
     public int ConsecutiveFailures { get; set; }
 
     public DateTimeOffset? NextAttemptAt { get; set; }
+
+    /// <summary>
+    /// Whether their last document was addressed to us: true once one opened, false when one was
+    /// read and did not, null before anything was read. False is by far most often "they have not
+    /// added us back yet" -- friendship here goes one way at a time -- and is what lets the list
+    /// say so instead of showing someone who simply never appears.
+    /// </summary>
+    public bool? SharesWithUs { get; set; }
 }
 
 /// <summary>

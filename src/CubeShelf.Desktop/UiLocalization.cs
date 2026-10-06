@@ -178,6 +178,7 @@ internal static class UiLocalization
         ["PresenceOpenFolder"] = "Ouvrir",
         ["PresenceUrlHint"] = "Colle ici le lien de partage du fichier",
         ["AddressCheckNow"] = "Vérifier maintenant",
+        ["FriendSendMyCode"] = "Envoyer mon code",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -354,6 +355,7 @@ internal static class UiLocalization
         ["PresenceOpenFolder"] = "Open",
         ["PresenceUrlHint"] = "Paste the file’s share link here",
         ["AddressCheckNow"] = "Check now",
+        ["FriendSendMyCode"] = "Send my code",
     };
 
     public static bool IsEnglish(string? language) =>

@@ -199,6 +199,77 @@ public sealed partial class MainWindow
         $"Add me on CubeShelf: {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
         "Copy this whole message, then open CubeShelf’s Friends page: it will find it by itself.");
 
+    /// <summary>
+    /// What to send someone we just added: our own code, worded as an answer to theirs. Found in
+    /// a chat message on their side exactly like the first one was on ours.
+    /// </summary>
+    private string ReplyMessage(string theirHandle) => P7(
+        $"Je t’ai ajouté sur CubeShelf, {theirHandle} ! Ajoute-moi en retour : {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
+        "Copie tout ce message, puis ouvre la page Amis de CubeShelf : il le trouvera tout seul.",
+        $"I added you on CubeShelf, {theirHandle}! Add me back: {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
+        "Copy this whole message, then open CubeShelf’s Friends page: it will find it by itself.");
+
+    /// <summary>
+    /// The step after adding someone: send our code back, now, while the conversation is open.
+    /// Without a code of our own yet, it says what is missing instead of offering a dead button.
+    /// </summary>
+    private Control ReplyStep(string theirHandle, Action close)
+    {
+        var copy = new Button { Content = P7("Copier mon message pour lui", "Copy my message for them"), Classes = { "primary" } };
+        var later = new Button { Content = P7("Plus tard", "Later") };
+        later.Click += (_, _) => close();
+
+        string text;
+        if (_ownFriendCode.Length > 0)
+        {
+            text = P7($"{theirHandle} est ajouté. Pour qu’il te voie aussi, envoie-lui ton code : copie ce message et colle-le dans votre conversation.",
+                      $"{theirHandle} is added. For them to see you too, send them your code: copy this message and paste it into your conversation.");
+            copy.Click += async (_, _) =>
+            {
+                await CopyToClipboardAsync(ReplyMessage(theirHandle),
+                    P7("Message copié : colle-le dans ta conversation avec lui.", "Message copied: paste it into your conversation with them."));
+                close();
+            };
+        }
+        else
+        {
+            text = P7($"{theirHandle} est ajouté. Pour qu’il te voie aussi, il lui faudra ton code, qui n’est pas encore prêt : termine la page Mon profil, puis « Envoyer mon code » sur sa ligne.",
+                      $"{theirHandle} is added. For them to see you too they need your code, which is not ready yet: finish the My profile page, then “Send my code” on their line.");
+            copy.Content = P7("Ouvrir Mon profil", "Open My profile");
+            copy.Click += (_, _) =>
+            {
+                close();
+                ParityShowProfile(null, new RoutedEventArgs());
+            };
+        }
+
+        return new StackPanel
+        {
+            Margin = new Avalonia.Thickness(20),
+            Spacing = 12,
+            Children =
+            {
+                new TextBlock { Text = text, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                    Spacing = 8,
+                    Children = { later, copy }
+                }
+            }
+        };
+    }
+
+    /// <summary>The Friends page's "Send my code" on a pending friend.</summary>
+    private async void SendOwnCodeToFriend(object? sender, RoutedEventArgs args)
+    {
+        if (sender is not Button { Tag: FriendRow row } || _ownFriendCode.Length == 0) return;
+        await CopyToClipboardAsync(ReplyMessage(row.Name),
+            P7($"Message copié : colle-le dans ta conversation avec {row.Name}.",
+               $"Message copied: paste it into your conversation with {row.Name}."));
+    }
+
     // ----------------------------------------------------------------- clipboard
 
     /// <summary>
@@ -260,11 +331,12 @@ public sealed partial class MainWindow
         ClipboardInviteBanner.IsVisible = false;
         RefreshFriendsView();
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        _ = RefreshFriendsSilentlyAsync();
 
         // Friendship here goes one way at a time: adding them lets you read them, not them you.
-        ShowToastParity(P7("Amis", "Friends"),
-            P7($"{payload.Handle} ajouté. Pour qu’il te voie aussi, envoie-lui ton code en retour.",
-               $"{payload.Handle} added. For them to see you too, send them your code back."));
+        var dialog = CreatePhase7Dialog(P7("Ami ajouté", "Friend added"), 560, 280);
+        dialog.Content = ReplyStep(payload.Handle, () => dialog.Close());
+        _ = dialog.ShowDialog(this);
     }
 
     private void IgnoreClipboardCode(object? sender, RoutedEventArgs args)

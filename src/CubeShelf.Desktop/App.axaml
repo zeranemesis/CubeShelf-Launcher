@@ -227,6 +227,7 @@
       <x:String x:Key="PresenceOpenFolder">Ouvrir</x:String>
       <x:String x:Key="PresenceUrlHint">Colle ici le lien de partage du fichier</x:String>
       <x:String x:Key="AddressCheckNow">Vérifier maintenant</x:String>
+      <x:String x:Key="FriendSendMyCode">Envoyer mon code</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

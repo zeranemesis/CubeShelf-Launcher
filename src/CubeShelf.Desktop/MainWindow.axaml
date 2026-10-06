@@ -397,6 +397,7 @@
                       <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Classes="primary" Content="{DynamicResource FriendJoin}" Tag="{Binding}" IsVisible="{Binding CanJoin}" Click="JoinFriendInvite" />
                         <Button Classes="primary" Content="{DynamicResource FriendInvite}" Tag="{Binding}" IsVisible="{Binding CanInvite}" Click="InviteFriend" />
+                        <Button Classes="primary" Content="{DynamicResource FriendSendMyCode}" Tag="{Binding}" IsVisible="{Binding CanSendOwnCode}" Click="SendOwnCodeToFriend" />
                         <Button Content="{Binding PauseAction}" Tag="{Binding}" IsVisible="{Binding CanBlock}" Click="ToggleFriendPause" />
                         <Button Content="{DynamicResource FriendCopyCode}" Tag="{Binding}" IsVisible="{Binding CanBlock}" IsEnabled="{Binding CanCopyCode}" Click="CopyFriendCode" />
                         <Button Content="{DynamicResource FriendUnblock}" Tag="{Binding}" IsVisible="{Binding IsBlocked}" Click="UnblockFriend" />

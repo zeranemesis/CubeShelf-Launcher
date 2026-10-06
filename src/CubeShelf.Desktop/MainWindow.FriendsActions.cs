@@ -75,7 +75,10 @@ public sealed partial class MainWindow
                 status.Text = error;
                 return;
             }
-            dialog.Close();
+
+            // Same window, next step: friendship goes one way at a time, and the moment they were
+            // added is the moment to send our own code back.
+            dialog.Content = ReplyStep(decoded.Handle, () => dialog.Close());
         };
 
         dialog.Content = new StackPanel
@@ -112,6 +115,9 @@ public sealed partial class MainWindow
         RefreshFriendsView();
         // The recipient list changed, so the next document has to include them.
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        // And read them now rather than in two minutes: whether they already added us back is
+        // the first thing the list should say.
+        _ = RefreshFriendsSilentlyAsync();
     }
 
     private void ToggleFriendPause(object? sender, RoutedEventArgs args)

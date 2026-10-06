@@ -27,7 +27,8 @@ public sealed partial class MainWindow
         bool IsBlocked = false,
         Avalonia.Media.Imaging.Bitmap? Avatar = null,
         string StatusLine = "",
-        bool CanInvite = false)
+        bool CanInvite = false,
+        bool CanSendOwnCode = false)
     {
         /// <summary>Everything that is a decision about an active friend, and not about a tombstone.</summary>
         public bool CanBlock => !IsBlocked;
@@ -307,10 +308,16 @@ public sealed partial class MainWindow
         var known = _friendPresence.TryGetValue(friend.PublicKey, out var snapshot) ? snapshot : null;
         var status = known?.EffectiveStatus(PresencePolicy.FreshnessWindow, now) ?? PresenceStatus.Offline;
 
+        // Read, and not addressed to us: almost always "has not added you back yet". Said as such,
+        // with the one thing to do about it, rather than leaving a friend who never appears.
+        var pending = friend.SharesWithUs == false && !friend.Paused && !friend.Blocked;
+
         var statusText = friend.Blocked
             ? P7("⛔ Bloqué", "⛔ Blocked")
             : friend.Paused
             ? P7("⏸ En pause", "⏸ Paused")
+            : pending
+            ? P7("⏳ En attente", "⏳ Pending")
             : status switch
             {
                 PresenceStatus.InGame => "▶ " + (known?.CurrentGameTitle ?? P7("En jeu", "In a game")),
@@ -321,6 +328,9 @@ public sealed partial class MainWindow
         var detail = friend.Blocked
             ? P7("Bloqué. Ni lu, ni destinataire de ta présence.",
                  "Blocked. Neither read, nor a recipient of your presence.")
+            : pending
+            ? P7("Il ne t’a pas encore ajouté, ou ne partage plus sa présence avec toi. Envoie-lui ton code : dès qu’il t’aura ajouté, tu le verras ici.",
+                 "They have not added you back yet, or stopped sharing their presence with you. Send them your code: once they add you, they show up here.")
             : known is null
                 ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
                      "Never seen. Their presence is read on the next poll.")
@@ -348,8 +358,9 @@ public sealed partial class MainWindow
 
         // Invite someone who could come now; not someone who is inviting you already -- the Join
         // button beside them is the answer to that.
+        // Nor someone pending: they do not read us, so an invitation would never reach them.
         var reachable = status is PresenceStatus.Online or PresenceStatus.InGame;
-        var canInvite = canHost && reachable && !mine && !friend.Paused && !friend.Blocked;
+        var canInvite = canHost && reachable && !mine && !pending && !friend.Paused && !friend.Blocked;
 
         return new FriendRow(
             friend.PublicKey,
@@ -367,7 +378,8 @@ public sealed partial class MainWindow
             // A blocked peer's face is not shown: the point of blocking is to stop seeing them.
             friend.Blocked ? null : FriendAvatar(known?.Profile?.AvatarPng),
             friend.Blocked ? "" : known?.Profile?.StatusLine ?? "",
-            canInvite);
+            canInvite,
+            pending && _ownFriendCode.Length > 0);
     }
 
     /// <summary>

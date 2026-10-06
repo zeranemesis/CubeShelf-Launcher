@@ -83,6 +83,7 @@ Run("a share link becomes the file itself", TestShareLinksBecomeTheFileItself);
 Run("synced folders are found where their clients say", TestSyncedFoldersAreFound);
 Run("the self-test keeps the guess that works", TestSelfTestKeepsTheGuessThatWorks);
 Run("our own address is checked while we publish", TestOwnAddressIsChecked);
+Run("a friend who has not added us back reads as pending", TestPendingFriendIsTold);
 
 if (failures.Count == 0)
 {
@@ -2749,6 +2750,42 @@ void TestSelfTestKeepsTheGuessThatWorks()
             PresenceRecipients.ForPublication(me, friends), TimeSpan.FromMilliseconds(50), conversion.Candidates)
             .GetAwaiter().GetResult();
         Assert(!failed.Succeeded && failed.FriendCode.Length == 0 && failed.Error!.Contains("aperçu", StringComparison.Ordinal));
+    });
+}
+
+void TestPendingFriendIsTold()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var them = PeerIdentity.Create();
+        using var someoneElse = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(them.PublicKey, "https://c.example.test/them.json"), "Alex", me.PublicKey, out _));
+        var key = System.Convert.ToBase64String(them.PublicKey);
+        Assert(friends.Load()[0].SharesWithUs is null);   // nothing read yet: unknown, not pending
+
+        // They publish, but for their other friends: they have not added us back.
+        var notForUs = SealedPresence.ToJson(SealedPresence.Seal(them,
+            PresenceComposer.Offline("Alex", 10, DateTimeOffset.UtcNow), new[] { someoneElse.PublicKey, them.PublicKey }));
+        var handler = new PresenceHttpHandler(notForUs, "\"a\"");
+        using var client = new HttpClient(handler);
+        using var fetcher = new PresenceFetcher(me, friends, client);
+        Assert(fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Rejected);
+        Assert(friends.Load()[0].SharesWithUs == false);
+
+        // A 304 says nothing new: still pending.
+        handler.RespondNotModified = true;
+        fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult();
+        Assert(friends.Load()[0].SharesWithUs == false);
+
+        // Then they add us: the next document opens, and they are no longer pending.
+        handler.RespondNotModified = false;
+        handler.Document = SealedPresence.ToJson(SealedPresence.Seal(them,
+            PresenceComposer.Offline("Alex", 11, DateTimeOffset.UtcNow), new[] { me.PublicKey, them.PublicKey }));
+        handler.ETag = "\"b\"";
+        Assert(fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Updated);
+        Assert(friends.Load().Single(f => f.PublicKey == key).SharesWithUs == true);
     });
 }
 

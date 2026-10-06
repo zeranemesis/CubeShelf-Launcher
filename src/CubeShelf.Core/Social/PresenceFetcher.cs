@@ -149,22 +149,23 @@ public sealed class PresenceFetcher : IDisposable
                 snapshot is null)
             {
                 // Indistinguishable from tampering by design, but by far the likeliest cause is
-                // benign and worth saying: they stopped addressing their document to us.
-                Succeed(friend, etag, now, advanceSequence: null);
+                // benign and worth saying: they have not added us back, or stopped addressing
+                // their document to us.
+                Succeed(friend, etag, now, advanceSequence: null, sharesWithUs: false);
                 return new(friend.PublicKey, PresenceFetchStatus.Rejected,
-                    Error: "Cet ami ne partage plus sa présence avec toi.");
+                    Error: "Cet ami ne partage pas (ou plus) sa présence avec toi.");
             }
 
             // The ETag is stored either way. Without that, a replayed document would be
             // downloaded in full on every single poll, forever.
             if (!_friends.TryAcceptSequence(friend.PublicKey, snapshot.Sequence, now))
             {
-                Succeed(friend, etag, now, advanceSequence: null);
+                Succeed(friend, etag, now, advanceSequence: null, sharesWithUs: true);
                 return new(friend.PublicKey, PresenceFetchStatus.Rejected,
                     Error: "Document de présence déjà vu.");
             }
 
-            Succeed(friend, etag, now, advanceSequence: snapshot.Sequence);
+            Succeed(friend, etag, now, advanceSequence: snapshot.Sequence, sharesWithUs: true);
             return new(friend.PublicKey, PresenceFetchStatus.Updated, snapshot);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -211,7 +212,7 @@ public sealed class PresenceFetcher : IDisposable
         }
     }
 
-    private void Succeed(Friend friend, string? etag, DateTimeOffset now, long? advanceSequence)
+    private void Succeed(Friend friend, string? etag, DateTimeOffset now, long? advanceSequence, bool? sharesWithUs = null)
     {
         _friends.Update(friend.PublicKey, entry =>
         {
@@ -219,6 +220,8 @@ public sealed class PresenceFetcher : IDisposable
             entry.ConsecutiveFailures = 0;
             entry.NextAttemptAt = null;
             if (advanceSequence is not null) entry.LastSeenAt = now;
+            // A 304 says nothing new about who the document is for, so it changes nothing here.
+            if (sharesWithUs is not null) entry.SharesWithUs = sharesWithUs;
         });
     }
 
