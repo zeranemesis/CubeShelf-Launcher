@@ -42,6 +42,9 @@ public sealed partial class MainWindow
     private CancellationTokenSource? _friendsLifetime;
     private readonly ConcurrentDictionary<string, PresenceSnapshot> _friendPresence = new(StringComparer.Ordinal);
     private string _ownFriendCode = "";
+
+    /// <summary>Whether the running service publishes for the local network only, with no folder behind it.</summary>
+    private bool _presenceLanOnly;
     private string _friendsFailure = "";
 
     private void InitializeFriends()
@@ -77,19 +80,24 @@ public sealed partial class MainWindow
         if (_identity is null || _friends is null) return;
 
         StopPresenceServiceBounded();
-
-        if (!_preferences.PresencePublishEnabled) return;
+        EnsureLan();
 
         // No pseudo, no document: a friend would be reading someone with no name.
         if (!HasIdentity) return;
 
-        var publisher = new SyncedFolderPresencePublisher(new SyncedFolderTarget(
-            _preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName, _preferences.PresenceUrl));
-        if (!publisher.IsConfigured)
+        // The sync folder when it is set up and switched on; otherwise, if friends on the network
+        // may see us, a document that only exists to be served there. Neither: nothing runs.
+        IPresencePublisher? publisher = null;
+        if (_preferences.PresencePublishEnabled)
         {
-            publisher.Dispose();
-            return;
+            var folder = new SyncedFolderPresencePublisher(new SyncedFolderTarget(
+                _preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName, _preferences.PresenceUrl));
+            if (folder.IsConfigured) publisher = folder;
+            else folder.Dispose();
         }
+        if (publisher is null && _lan is not null) publisher = new CubeShelf.Core.Social.Lan.LanOnlyPublisher();
+        if (publisher is null) return;
+        _presenceLanOnly = publisher is CubeShelf.Core.Social.Lan.LanOnlyPublisher;
 
         // The day we started publishing is ours to state because nobody else can: a friend only
         // ever sees us from the day they added us. Set once, on the first configured publisher.
@@ -110,6 +118,8 @@ public sealed partial class MainWindow
 
         service.FriendsRefreshed += outcomes => Dispatcher.UIThread.Post(() => ApplyFriendOutcomes(outcomes));
         service.AddressChecked += OnAddressChecked;
+        // Whatever is published is also what friends on the network pull.
+        service.DocumentPublished += (json, sequence) => _lan?.SetDocument(json, sequence);
         service.Start(_friendsLifetime?.Token ?? CancellationToken.None);
         _presence = service;
     }
@@ -135,7 +145,10 @@ public sealed partial class MainWindow
             CurrentProfileInputs(),
             // A lapsed invitation is handed over unchanged and the composer drops it, so an
             // invitation nobody withdrew simply stops being published when its time is up.
-            _outgoingInvite)).GetTask();
+            _outgoingInvite,
+            // Stated inside the document, so friends met on the network learn where to read us
+            // from anywhere -- only once a round trip has proven it.
+            IsAddressVerified() ? _preferences.PresenceUrl : null)).GetTask();
 
     private void OnFriendsSessionChanged(string gameId) =>
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
@@ -166,6 +179,9 @@ public sealed partial class MainWindow
             exception is IOException or OperationCanceledException or TimeoutException)
         {
         }
+
+        // The farewell was just handed to the network as well; friends there pull it now.
+        FarewellLan();
 
         _friendsLifetime?.Cancel();
         _friendsLifetime?.Dispose();
@@ -331,6 +347,9 @@ public sealed partial class MainWindow
             : pending
             ? P7("Il ne t’a pas encore ajouté, ou ne partage plus sa présence avec toi. Envoie-lui ton code : dès qu’il t’aura ajouté, tu le verras ici.",
                  "They have not added you back yet, or stopped sharing their presence with you. Send them your code: once they add you, they show up here.")
+            : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl)
+                ? P7("Ami du réseau local : tu le verras quand vous serez sur le même réseau, ou partout dès qu’il publiera une adresse.",
+                     "A local network friend: you see them when you share a network, or anywhere once they publish an address.")
             : known is null
                 ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
                      "Never seen. Their presence is read on the next poll.")
@@ -339,6 +358,8 @@ public sealed partial class MainWindow
         var seen = friend.LastSeenAt is { } last
             ? P7($"Vu le {last.ToLocalTime():dd/MM/yyyy HH:mm}", $"Seen {last.ToLocalTime():dd/MM/yyyy HH:mm}")
             : "";
+        if (!friend.Blocked && IsOnLan(friend.PublicKey))
+            seen = (seen.Length > 0 ? seen + " • " : "") + P7("📶 Sur ton réseau", "📶 On your network");
         var failing = friend.ConsecutiveFailures > 0
             ? P7($" • {friend.ConsecutiveFailures} échec(s) de lecture", $" • {friend.ConsecutiveFailures} read failure(s)")
             : "";
@@ -414,6 +435,9 @@ public sealed partial class MainWindow
 
     private string DescribePublishingState()
     {
+        if (_presence is not null && _presenceLanOnly)
+            return P7("Sans adresse publique, seuls tes amis sur le même réseau local te voient. Mon profil pour être vu de partout.",
+                      "Without a public address, only friends on the same local network see you. My profile to be seen from anywhere.");
         if (!_preferences.PresencePublishEnabled)
             return P7("Tu ne publies pas ta présence. Tes amis ne te verront pas.",
                       "You are not publishing your presence. Your friends will not see you.");

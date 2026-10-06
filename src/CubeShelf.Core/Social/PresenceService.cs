@@ -26,7 +26,8 @@ public sealed record PresenceInputs(
     IReadOnlyCollection<string> RunningGameIds,
     PresenceSharingOptions Sharing,
     ProfileInputs? Profile = null,
-    PresenceInvite? Invite = null);
+    PresenceInvite? Invite = null,
+    string? Address = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
@@ -76,6 +77,9 @@ public sealed class PresenceService : IAsyncDisposable
     private Task? _pollLoop;
 
     private string _lastFingerprint = "";
+
+    /// <summary>The address the last capture stated, so the farewell can state it too without asking again.</summary>
+    private string? _lastAddress;
     private DateTimeOffset? _lastPublishedAt;
     private int _shutdownPublished;
     private bool _disposed;
@@ -104,6 +108,12 @@ public sealed class PresenceService : IAsyncDisposable
 
     public event Action<PresencePublishReason, PresencePublishResult>? Published;
     public event Action<IReadOnlyList<PresenceFetchOutcome>>? FriendsRefreshed;
+
+    /// <summary>
+    /// Every document that reached the transport, sealed, with its sequence -- the farewell
+    /// included. The local network serves exactly this to friends who pull it.
+    /// </summary>
+    public event Action<string, long>? DocumentPublished;
 
     /// <summary>Raised after each read-back of our own address, on whatever thread did it.</summary>
     public event Action<PresenceAddressReport>? AddressChecked;
@@ -195,7 +205,7 @@ public sealed class PresenceService : IAsyncDisposable
             await _publishGate.WaitAsync(deadline.Token).ConfigureAwait(false);
             gated = true;
 
-            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock());
+            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock(), _lastAddress);
             await PublishSnapshotAsync(PresencePublishReason.Shutdown, snapshot, deadline.Token)
                 .ConfigureAwait(false);
         }
@@ -272,9 +282,10 @@ public sealed class PresenceService : IAsyncDisposable
             }
 
             var inputs = await CaptureAsync(cancellationToken).ConfigureAwait(false);
+            _lastAddress = inputs.Address;
             var candidate = _composer.Compose(
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
-                sequence: 0, _clock(), inputs.Profile, inputs.Invite);
+                sequence: 0, _clock(), inputs.Profile, inputs.Invite, inputs.Address);
 
             var fingerprint = PresenceComposer.ContentFingerprint(candidate);
             var heartbeatDue = _lastPublishedAt is not { } previous ||
@@ -390,14 +401,16 @@ public sealed class PresenceService : IAsyncDisposable
     {
         var envelope = SealedPresence.Seal(
             _identity, snapshot, PresenceRecipients.ForPublication(_identity, _friends));
+        var json = SealedPresence.ToJson(envelope);
         var result = await _publisher
-            .PublishAsync(SealedPresence.ToJson(envelope), cancellationToken)
+            .PublishAsync(json, cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Succeeded)
         {
             _lastPublishedAt = _clock();
             PublishCount++;
+            DocumentPublished?.Invoke(json, snapshot.Sequence);
         }
 
         Published?.Invoke(reason, result);

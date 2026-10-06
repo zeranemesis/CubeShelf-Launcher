@@ -53,7 +53,14 @@ public sealed record UserPreferences(
     /// It counts only while it equals <see cref="PresenceUrl"/>: change the address, or the folder
     /// behind it, and the code is withheld until a new test proves the new pair.
     /// </summary>
-    string PresenceVerifiedUrl = "");
+    string PresenceVerifiedUrl = "",
+
+    /// <summary>
+    /// Whether friends on the same network are told we are here, with tags only they recognise,
+    /// and can read us directly. On by default: it names nobody to anyone else, and it is what
+    /// makes two friends in one room see each other with nothing set up.
+    /// </summary>
+    bool LanVisible = true);
 
 public sealed class UserPreferencesStore
 {

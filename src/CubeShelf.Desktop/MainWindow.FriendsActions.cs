@@ -357,6 +357,7 @@ public sealed partial class MainWindow
         SharePlayTimeBox.IsChecked = _preferences.SharePlayTime;
         ShareCurrentGameBox.IsChecked = _preferences.ShareCurrentGame;
         ShareModsBox.IsChecked = _preferences.ShareMods;
+        LanVisibleBox.IsChecked = _preferences.LanVisible;
         ApplyProfilePreferences();
 
         // The code stays hidden until a self-test proves the address serves a readable document.
@@ -375,12 +376,15 @@ public sealed partial class MainWindow
             SharePlayTime = SharePlayTimeBox.IsChecked == true,
             ShareCurrentGame = ShareCurrentGameBox.IsChecked == true,
             ShareMods = ShareModsBox.IsChecked == true,
-            ShareProfile = ShareProfileBox.IsChecked == true
+            ShareProfile = ShareProfileBox.IsChecked == true,
+            LanVisible = LanVisibleBox.IsChecked == true
         };
 
         // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,
         // so the box did nothing until the next launch -- a friend could add you and see nobody.
-        if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled)
+        // The local network decides whether there is anything to publish at all without a folder.
+        if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled ||
+            before.LanVisible != _preferences.LanVisible)
             StartPresenceService();
         else if (before != _preferences)
             _presence?.RequestPublish(PresencePublishReason.ProfileChanged);

@@ -84,6 +84,10 @@ Run("synced folders are found where their clients say", TestSyncedFoldersAreFoun
 Run("the self-test keeps the guess that works", TestSelfTestKeepsTheGuessThatWorks);
 Run("our own address is checked while we publish", TestOwnAddressIsChecked);
 Run("a friend who has not added us back reads as pending", TestPendingFriendIsTold);
+Run("friends find each other on the network without naming themselves", TestLanFriendsFindEachOther);
+Run("befriending on the network takes both, and proof", TestLanIntroduction);
+Run("an impostor on the network gets nothing", TestLanImpostorIsRefused);
+Run("a friend's stated address is adopted", TestStatedAddressIsAdopted);
 
 if (failures.Count == 0)
 {
@@ -2854,6 +2858,232 @@ void TestOwnAddressIsChecked()
     });
 }
 
+// ---------------------------------------------------------------------------
+// The local network: friends without the sync service, strangers met in person.
+// ---------------------------------------------------------------------------
+
+void TestLanFriendsFindEachOther()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var carol = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var bobFriends = new FriendStore(Path.Combine(root, "b"));
+        var carolFriends = new FriendStore(Path.Combine(root, "c"));
+        // Friends with no address at all: met on the network, nothing published anywhere.
+        Assert(aliceFriends.TryAdd(new FriendCodePayload(bob.PublicKey, ""), "Bob", alice.PublicKey, out _));
+        Assert(bobFriends.TryAdd(new FriendCodePayload(alice.PublicKey, ""), "Alice", bob.PublicKey, out _));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "");
+        var b = new CubeShelf.Core.Social.Lan.LanNode(bob, bobFriends, bus.Join(), () => "Bob", () => "");
+        var c = new CubeShelf.Core.Social.Lan.LanNode(carol, carolFriends, bus.Join(), () => "Carol", () => "");
+        var bobGot = new List<PresenceFetchOutcome>();
+        var carolGot = new List<PresenceFetchOutcome>();
+        b.FriendDocumentReceived += outcome => { lock (bobGot) bobGot.Add(outcome); };
+        c.FriendDocumentReceived += outcome => { lock (carolGot) carolGot.Add(outcome); };
+        try
+        {
+            a.Start(); b.Start(); c.Start();
+
+            // What Alice says names nobody: no key, no name, and tags in a padded batch.
+            var said = a.BuildAnnouncements().Single();
+            Assert(said.PublicKey is null && said.Name is null && said.Tags.Count % 8 == 0 && said.Tags.Count >= 8);
+
+            var document = SealedPresence.ToJson(SealedPresence.Seal(alice,
+                new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Alice", DateTimeOffset.UtcNow, 50, PresenceStatus.InGame,
+                    "GMPE01", "Mario Party 4", Array.Empty<SharedGame>(), Array.Empty<SharedMod>()),
+                new[] { bob.PublicKey, alice.PublicKey }));
+            a.SetDocument(document, 50);
+
+            for (var wait = 0; wait < 150 && bobGot.Count == 0; wait++) Thread.Sleep(20);
+            Assert(bobGot.Count == 1 && bobGot[0].Snapshot!.CurrentGameTitle == "Mario Party 4");
+            Assert(b.IsOnNetwork(System.Convert.ToBase64String(alice.PublicKey)));
+            Assert(bobFriends.Load()[0].LastSequence == 50 && bobFriends.Load()[0].SharesWithUs == true);
+
+            // A stranger hears the broadcast but recognises nobody and lists nobody.
+            Thread.Sleep(100);
+            Assert(carolGot.Count == 0 && c.Strangers.Count == 0);
+
+            // An older document offered again is not taken: same rule as the sync folder.
+            var older = SealedPresence.ToJson(SealedPresence.Seal(alice,
+                PresenceComposer.Offline("Alice", 40, DateTimeOffset.UtcNow), new[] { bob.PublicKey, alice.PublicKey }));
+            Assert(b.AcceptDocument(System.Convert.ToBase64String(alice.PublicKey), older) is null);
+            Assert(bobFriends.Load()[0].LastSequence == 50);
+
+            // And with no address, the sync-folder poller has nothing to do and fails nothing.
+            using var http = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+            using var poller = new PresenceFetcher(bob, bobFriends, http);
+            Assert(poller.FetchAsync(bobFriends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Skipped);
+            Assert(bobFriends.Load()[0].ConsecutiveFailures == 0);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            b.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            c.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestLanIntroduction()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var carol = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var bobFriends = new FriendStore(Path.Combine(root, "b"));
+        var carolFriends = new FriendStore(Path.Combine(root, "c"));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "https://a.example.test/p.json");
+        var b = new CubeShelf.Core.Social.Lan.LanNode(bob, bobFriends, bus.Join(), () => "Bob", () => "");
+        var c = new CubeShelf.Core.Social.Lan.LanNode(carol, carolFriends, bus.Join(), () => "Carol", () => "");
+        var bobAdded = new List<string>();
+        b.FriendAdded += handle => { lock (bobAdded) bobAdded.Add(handle); };
+        try
+        {
+            a.Start(); b.Start(); c.Start();
+
+            // Alice asks to be found; Bob sees her, by name, as anyone on the network would.
+            a.SetDiscoverable(true);
+            for (var wait = 0; wait < 100 && b.Strangers.Count == 0; wait++) Thread.Sleep(20);
+            var seen = b.Strangers.Single();
+            Assert(seen.DisplayName == "Alice" && seen.PublicKey == System.Convert.ToBase64String(alice.PublicKey));
+
+            // Carol is not findable, so a request to her is refused without her ever seeing it.
+            var carolPeer = new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(carol.PublicKey), "Carol",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, c.Port), DateTimeOffset.UtcNow);
+            Assert(b.RequestFriendshipAsync(carolPeer).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Refused);
+            Assert(c.IncomingRequests.Count == 0);
+
+            // Bob asks Alice. It waits for her answer; nobody is added yet.
+            Assert(b.RequestFriendshipAsync(seen).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Sent);
+            Assert(b.IsAwaiting(seen.PublicKey));
+            var request = a.IncomingRequests.Single();
+            Assert(request.DisplayName == "Bob" && request.PresenceUrl == "");
+            Assert(aliceFriends.Load().Count == 0 && bobFriends.Load().Count == 0);
+
+            // She accepts: both lists hold the other, and Bob learnt her address on the way.
+            Assert(a.AcceptAsync(request).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Accepted);
+            Assert(aliceFriends.Load().Single().PublicKey == System.Convert.ToBase64String(bob.PublicKey));
+            var bobsAlice = bobFriends.Load().Single();
+            Assert(bobsAlice.PublicKey == seen.PublicKey && bobsAlice.PresenceUrl == "https://a.example.test/p.json");
+            Assert(bobAdded.Count == 1 && !b.IsAwaiting(seen.PublicKey) && a.IncomingRequests.Count == 0);
+
+            // An accept nobody asked for is refused: Carol cannot add herself to Bob's list.
+            var carolsRequest = new CubeShelf.Core.Social.Lan.LanFriendRequest(System.Convert.ToBase64String(bob.PublicKey), "Bob", "",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, b.Port), DateTimeOffset.UtcNow);
+            Assert(c.AcceptAsync(carolsRequest).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Refused);
+            Assert(bobFriends.Load().Count == 1);
+
+            // Asking someone who already has us completes it at once, no decision needed.
+            aliceFriends.Remove(System.Convert.ToBase64String(bob.PublicKey));
+            Assert(a.RequestFriendshipAsync(new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(bob.PublicKey), "Bob",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, b.Port), DateTimeOffset.UtcNow))
+                .GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.AlreadyFriends);
+            Assert(aliceFriends.Load().Single().PublicKey == System.Convert.ToBase64String(bob.PublicKey));
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            b.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            c.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestLanImpostorIsRefused()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var mallory = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var malloryFriends = new FriendStore(Path.Combine(root, "m"));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "");
+        var m = new CubeShelf.Core.Social.Lan.LanNode(mallory, malloryFriends, bus.Join(), () => "Bob", () => "");
+        try
+        {
+            a.Start(); m.Start();
+            a.SetDiscoverable(true);
+
+            // Mallory claims Bob's key. She can open the exchange, but not prove the key.
+            using (var client = new System.Net.Sockets.TcpClient())
+            {
+                client.Connect(System.Net.IPAddress.Loopback, a.Port);
+                using var stream = client.GetStream();
+                using var reader = new StreamReader(stream);
+                using var writer = new StreamWriter(stream) { AutoFlush = true, NewLine = "\n" };
+                writer.WriteLine(CubeShelf.Core.Social.Lan.LanProtocol.Serialize(new CubeShelf.Core.Social.Lan.LanMessage
+                {
+                    Op = "introduce", Purpose = "request", PublicKey = System.Convert.ToBase64String(bob.PublicKey),
+                    Name = "Bob", Nonce = CubeShelf.Core.Social.Lan.LanProtocol.RandomNonce()
+                }));
+                var challenge = CubeShelf.Core.Social.Lan.LanProtocol.ParseMessage(reader.ReadLine()!);
+                Assert(challenge is { Ok: true });
+                writer.WriteLine(CubeShelf.Core.Social.Lan.LanProtocol.Serialize(new CubeShelf.Core.Social.Lan.LanMessage
+                {
+                    Proof = System.Convert.ToBase64String(new byte[32])
+                }));
+                var verdict = CubeShelf.Core.Social.Lan.LanProtocol.ParseMessage(reader.ReadLine()!);
+                Assert(verdict is { Ok: false, Why: "proof" });
+            }
+            Assert(a.IncomingRequests.Count == 0);
+
+            // And the other way: Alice meant to reach Bob, Mallory answered at his address.
+            var fake = new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(bob.PublicKey), "Bob",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, m.Port), DateTimeOffset.UtcNow);
+            m.SetDiscoverable(true);
+            Assert(a.RequestFriendshipAsync(fake).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.NotGenuine);
+            Assert(aliceFriends.Load().Count == 0 && m.IncomingRequests.Count == 0);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            m.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestStatedAddressIsAdopted()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var them = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(them.PublicKey, ""), "Alex", me.PublicKey, out _));
+        var key = System.Convert.ToBase64String(them.PublicKey);
+
+        // Their document states an address: from now on they are read from anywhere.
+        var composed = new PresenceComposer(new TestPaths(root)).Compose("Alex", SampleLibrary(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 7, DateTimeOffset.UtcNow, address: "https://cloud.example.test/s/AbCdEfGh12345/download");
+        Assert(composed.Address == "https://cloud.example.test/s/AbCdEfGh12345/download");
+        Assert(friends.AdoptAddress(key, composed.Address));
+        Assert(friends.Load()[0].PresenceUrl == composed.Address);
+
+        // Nothing usable stated changes nothing: an empty address, plain http, the same one again.
+        Assert(!friends.AdoptAddress(key, null) && !friends.AdoptAddress(key, "http://x.example.test/p.json"));
+        Assert(!friends.AdoptAddress(key, composed.Address));
+        Assert(new PresenceComposer(new TestPaths(root)).Compose("Alex", SampleLibrary(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 8, DateTimeOffset.UtcNow, address: "http://x.example.test").Address is null);
+
+        // A move: the old document points at the new place, and the poller follows it.
+        friends.Update(key, friend => { friend.LastETag = "\"old\""; friend.ConsecutiveFailures = 3; });
+        Assert(friends.AdoptAddress(key, "https://elsewhere.example.test/p.json"));
+        var moved = friends.Load()[0];
+        Assert(moved.PresenceUrl == "https://elsewhere.example.test/p.json" && moved.LastETag is null && moved.ConsecutiveFailures == 0);
+    });
+}
+
 sealed class StaticHttpHandler(Func<Uri, byte[]> content) : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -3058,4 +3288,46 @@ sealed class SwitchableHandler : HttpMessageHandler
             ? new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request }
             : new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(body), RequestMessage = request });
     }
+}
+
+/// <summary>A local network in memory: every announcement reaches every other member, from loopback.</summary>
+sealed class TestLanBus
+{
+    private readonly List<TestAnnouncer> _members = new();
+
+    public TestAnnouncer Join()
+    {
+        var member = new TestAnnouncer(this);
+        lock (_members) _members.Add(member);
+        return member;
+    }
+
+    public void Broadcast(TestAnnouncer from, byte[] datagram)
+    {
+        TestAnnouncer[] members;
+        lock (_members) members = _members.Where(member => member != from).ToArray();
+        foreach (var member in members) member.Deliver(datagram);
+    }
+}
+
+sealed class TestAnnouncer(TestLanBus bus) : CubeShelf.Core.Social.Lan.ILanAnnouncer
+{
+    private bool _started;
+
+    public event Action<byte[], System.Net.IPAddress>? Received;
+
+    public void Start() => _started = true;
+
+    public Task SendAsync(byte[] datagram, CancellationToken cancellationToken = default)
+    {
+        if (_started) bus.Broadcast(this, datagram);
+        return Task.CompletedTask;
+    }
+
+    public void Deliver(byte[] datagram)
+    {
+        if (_started) Received?.Invoke(datagram, System.Net.IPAddress.Loopback);
+    }
+
+    public void Dispose() => _started = false;
 }

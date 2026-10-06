@@ -228,6 +228,9 @@
       <x:String x:Key="PresenceUrlHint">Colle ici le lien de partage du fichier</x:String>
       <x:String x:Key="AddressCheckNow">Vérifier maintenant</x:String>
       <x:String x:Key="FriendSendMyCode">Envoyer mon code</x:String>
+      <x:String x:Key="LanAdd">Réseau local</x:String>
+      <x:String x:Key="LanVisible">Me signaler à mes amis sur le réseau local</x:String>
+      <x:String x:Key="LanVisibleHelp">Tes amis sur le même réseau te voient et reçoivent tes invitations instantanément, même sans dossier synchronisé. Les autres ne voient que des marqueurs qui changent toutes les 10 minutes : ni ton pseudo, ni ta clé. Windows peut demander d’autoriser CubeShelf sur le réseau privé : accepte.</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

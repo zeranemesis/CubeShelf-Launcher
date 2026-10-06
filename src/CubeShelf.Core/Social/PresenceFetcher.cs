@@ -101,6 +101,12 @@ public sealed class PresenceFetcher : IDisposable
         if (friend.NextAttemptAt is { } next && next > now)
             return new(friend.PublicKey, PresenceFetchStatus.Skipped);
 
+        // A friend met on the local network who has no public address yet: nothing to poll,
+        // and nothing wrong either -- they are read on the network, and their first document
+        // that states an address makes them pollable from anywhere.
+        if (string.IsNullOrWhiteSpace(friend.PresenceUrl))
+            return new(friend.PublicKey, PresenceFetchStatus.Skipped);
+
         // friends.json is a plain file a user can edit, so the scheme is checked again here and
         // not only when the friend code was decoded.
         if (!Uri.TryCreate(friend.PresenceUrl, UriKind.Absolute, out var address) ||
@@ -166,6 +172,7 @@ public sealed class PresenceFetcher : IDisposable
             }
 
             Succeed(friend, etag, now, advanceSequence: snapshot.Sequence, sharesWithUs: true);
+            _friends.AdoptAddress(friend.PublicKey, snapshot.Address);
             return new(friend.PublicKey, PresenceFetchStatus.Updated, snapshot);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

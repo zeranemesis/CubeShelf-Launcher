@@ -65,7 +65,8 @@ public sealed class PresenceComposer
         long sequence,
         DateTimeOffset now,
         ProfileInputs? profile = null,
-        PresenceInvite? invite = null)
+        PresenceInvite? invite = null,
+        string? address = null)
     {
         ArgumentNullException.ThrowIfNull(games);
         ArgumentNullException.ThrowIfNull(runningGameIds);
@@ -99,8 +100,11 @@ public sealed class PresenceComposer
             sharing.ShareProfile ? ComposeProfile(profile, games, sharing) : null,
             // A lapsed or empty invitation is simply not published: a friend acting on a stale
             // one would be sent to a lobby that has already closed.
-            invite is not null && invite.IsPublishable(now) ? invite : null);
+            invite is not null && invite.IsPublishable(now) ? invite : null,
+            NullIfEmpty(Lan.LanProtocol.SafeUrl(address)));
     }
+
+    private static string? NullIfEmpty(string value) => value.Length == 0 ? null : value;
 
     private PeerProfile? ComposeProfile(
         ProfileInputs? profile,
@@ -151,7 +155,7 @@ public sealed class PresenceComposer
     }
 
     /// <summary>The farewell document: still us, doing nothing.</summary>
-    public static PresenceSnapshot Offline(string displayName, long sequence, DateTimeOffset now) =>
+    public static PresenceSnapshot Offline(string displayName, long sequence, DateTimeOffset now, string? address = null) =>
         new(PresenceSnapshot.CurrentVersion,
             (displayName ?? "").Trim(),
             now,
@@ -160,7 +164,8 @@ public sealed class PresenceComposer
             null,
             null,
             Array.Empty<SharedGame>(),
-            Array.Empty<SharedMod>());
+            Array.Empty<SharedMod>(),
+            Address: NullIfEmpty(Lan.LanProtocol.SafeUrl(address)));
 
     /// <summary>
     /// Everything in the document except when it was written and which number it carries, so two

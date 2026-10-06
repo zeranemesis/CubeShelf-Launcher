@@ -179,6 +179,9 @@ internal static class UiLocalization
         ["PresenceUrlHint"] = "Colle ici le lien de partage du fichier",
         ["AddressCheckNow"] = "Vérifier maintenant",
         ["FriendSendMyCode"] = "Envoyer mon code",
+        ["LanAdd"] = "Réseau local",
+        ["LanVisible"] = "Me signaler à mes amis sur le réseau local",
+        ["LanVisibleHelp"] = "Tes amis sur le même réseau te voient et reçoivent tes invitations instantanément, même sans dossier synchronisé. Les autres ne voient que des marqueurs qui changent toutes les 10 minutes : ni ton pseudo, ni ta clé. Windows peut demander d’autoriser CubeShelf sur le réseau privé : accepte.",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -356,6 +359,9 @@ internal static class UiLocalization
         ["PresenceUrlHint"] = "Paste the file’s share link here",
         ["AddressCheckNow"] = "Check now",
         ["FriendSendMyCode"] = "Send my code",
+        ["LanAdd"] = "Local network",
+        ["LanVisible"] = "Let my friends on the local network see me",
+        ["LanVisibleHelp"] = "Friends on the same network see you and get your invitations instantly, even without a synced folder. Others only see markers that change every 10 minutes: neither your name nor your key. Windows may ask to allow CubeShelf on private networks: accept.",
     };
 
     public static bool IsEnglish(string? language) =>

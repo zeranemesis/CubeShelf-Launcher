@@ -222,6 +222,32 @@ public sealed class FriendStore
         }
     }
 
+    /// <summary>
+    /// Takes the address a friend's own authenticated document states as theirs, when it is a
+    /// usable https address and differs from the one we hold. This is how a friend met on the
+    /// local network, with no address yet, becomes reachable from anywhere once they publish one,
+    /// and how a friend who moved their document is followed without a new code. Only a document
+    /// that opened under the key we share with them gets here, so only they can move themselves.
+    /// </summary>
+    public bool AdoptAddress(string publicKeyBase64, string? statedAddress)
+    {
+        var address = Lan.LanProtocol.SafeUrl(statedAddress);
+        if (address.Length == 0) return false;
+
+        var adopted = false;
+        Update(publicKeyBase64, friend =>
+        {
+            if (string.Equals(friend.PresenceUrl, address, StringComparison.Ordinal)) return;
+            friend.PresenceUrl = address;
+            // Everything learnt about the old address says nothing about the new one.
+            friend.LastETag = null;
+            friend.ConsecutiveFailures = 0;
+            friend.NextAttemptAt = null;
+            adopted = true;
+        });
+        return adopted;
+    }
+
     public bool Unblock(string publicKeyBase64) =>
         Update(publicKeyBase64, friend =>
         {

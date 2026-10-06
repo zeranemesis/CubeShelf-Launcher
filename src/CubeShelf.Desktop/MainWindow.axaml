@@ -356,6 +356,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
               <Button Content="{DynamicResource AddFriend}" Classes="primary" Click="AddFriend" />
+              <Button Content="{DynamicResource LanAdd}" Click="OpenLanDialog" />
               <Button Content="{DynamicResource FriendsRefresh}" Click="RefreshFriendsNow" />
               <Button Content="{DynamicResource AppProfile}" Click="ParityShowProfile" />
             </StackPanel>
@@ -553,6 +554,8 @@
                 <CheckBox x:Name="ShareCurrentGameBox" Content="{DynamicResource ShareCurrentGame}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="ShareModsBox" Content="{DynamicResource ShareMods}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="ShareProfileBox" Content="{DynamicResource ShareProfile}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <CheckBox x:Name="LanVisibleBox" Content="{DynamicResource LanVisible}" Checked="SaveSettings" Unchecked="SaveSettings" Margin="0,8,0,0" />
+                <TextBlock Text="{DynamicResource LanVisibleHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>

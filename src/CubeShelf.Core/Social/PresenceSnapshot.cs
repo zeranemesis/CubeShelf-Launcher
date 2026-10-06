@@ -67,7 +67,14 @@ public sealed record PresenceSnapshot(
     IReadOnlyList<SharedGame> Library,
     IReadOnlyList<SharedMod> Mods,
     PeerProfile? Profile = null,
-    PresenceInvite? Invite = null)
+    PresenceInvite? Invite = null,
+
+    /// <summary>
+    /// Where this document is published, as its author states it. A friend who met us on the
+    /// local network learns our address from here; one who still reads an old address learns the
+    /// new one (<see cref="FriendStore.AdoptAddress"/>). Null says nothing, and changes nothing.
+    /// </summary>
+    string? Address = null)
 {
     public const int CurrentVersion = 1;
 
