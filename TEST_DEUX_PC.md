@@ -13,8 +13,8 @@ Compte deux heures pour le premier essai, dont l'essentiel en attente de téléc
 | --- | --- |
 | Windows x64 | Le compagnon est WinForms, PartyBoard est win-x64 uniquement |
 | Le **même fichier disque**, octet pour octet | Le salon compare un SHA-256 complet et refuse deux fichiers différents. Un ISO et un RVZ du même jeu sont deux fichiers différents |
-| Un dossier synchronisé servi en HTTPS | Nextcloud, Dropbox… c'est ainsi que la présence circule |
-| CubeShelf **0.9.1**, installé avec `CubeShelf-Setup-x64.exe` | La 0.9.0 se fige à la fermeture quand la présence est activée, et sa mise à jour intégrée peut détruire l'installation. Ses codes amis ne sont pas lisibles par la 0.9.1 non plus |
+| Un dossier synchronisé servi en HTTPS — **sauf** si les deux PC sont sur le même réseau | Dropbox, Nextcloud, OneDrive, Google Drive : c'est ainsi que la présence circule à distance. Sur le même réseau, CubeShelf s'en passe |
+| CubeShelf **0.10** | Réseau local, liens convertis, statuts, messages. Une 0.9.x voit une 0.10 « en ligne » mais rien de plus |
 | PartyBoard ≥ **0.16.0** | Avant, le compagnon ignore `--host` et `--join` |
 
 > **Le fichier disque est le piège le plus coûteux.** Copiez-le d'un PC à l'autre plutôt que de
@@ -39,21 +39,34 @@ ici : réinstallez PartyBoard des deux côtés depuis la même release.
 
 Avant de toucher au multijoueur, prouvez que les deux CubeShelf se voient.
 
-1. Sur chaque PC : **Mon profil** (Ctrl+7). Créez votre identité, puis dossier de publication,
-   adresse publique, **« Tester l'adresse »**, et cochez **« Publier ma présence »**. La liste en
-   haut de la page coche chaque étape ; le code n'apparaît que quand elles le sont toutes.
-2. S'il n'apparaît pas, l'adresse ne sert pas le fichier : un partage Nextcloud demande
-   `/download` à la fin.
-3. **« Copier mon code »**, collez le message dans votre conversation. L'autre le copie, ouvre sa
+**Sur le même réseau** (le plus simple, à faire en premier) :
+
+1. Sur chaque PC : **Mon profil** (Ctrl+7), créez votre identité. C'est tout pour la configuration.
+2. Les deux ouvrent **Amis → « Réseau local »** en même temps. Chacun voit l'autre par son pseudo ;
+   l'un clique « Ajouter », l'autre « Accepter ». Si Windows demande d'autoriser CubeShelf sur le
+   réseau privé, acceptez.
+
+✅ **Attendu** : en quelques secondes, chacun voit l'autre « En ligne » et « 📶 Sur ton réseau ».
+
+**À distance** (chacun chez soi) :
+
+1. Sur chaque PC : **Mon profil**, choisissez un des dossiers synchronisés détectés. CubeShelf ouvre
+   le dossier et dit comment partager `cubeshelf-presence.json` avec votre service ; collez le lien
+   tel quel. Il est converti et testé tout seul ; le code apparaît quand il marche. Cochez
+   **« Publier ma présence »**.
+2. **« Copier mon code »**, collez le message dans votre conversation. L'autre le copie, ouvre sa
    page Amis (Ctrl+6) : un bandeau propose « Ajouter Zera#4821 ? ». Vérifiez de vive voix que le
-   numéro affiché est bien celui de l'autre.
-4. **Faites-le dans les deux sens.** L'amitié va dans un sens à la fois : A qui ajoute B peut
-   lire B, pas l'inverse. Tant que B n'a pas ajouté A, A reste invisible pour B.
-5. **Attendez.** La lecture se fait toutes les 2 minutes, plus la latence de votre client de
-   synchro. C'est le bon moment pour mesurer ce délai réel — notez-le, il décide si la fenêtre de
-   fraîcheur de 15 minutes est bien réglée.
+   numéro affiché est bien celui de l'autre. Juste après l'ajout, CubeShelf propose de renvoyer son
+   propre code : faites-le.
+3. Tant que l'autre ne vous a pas ajouté, il apparaît **« En attente »** chez vous.
+4. **Attendez.** Un ami en ligne est relu toutes les 25 secondes, plus la latence de votre client de
+   synchro. Notez ce délai réel : il décide si la fenêtre de fraîcheur de 15 minutes est bien réglée.
 
 ✅ **Attendu** : chacun voit l'autre « En ligne », avec son avatar et son statut.
+
+**En passant** : écrivez-vous un message (bouton « Message ») et changez de statut (« Ne pas
+déranger » en haut de la page Amis). L'autre doit voir le message arriver et votre statut changer ;
+vous devez voir « remis » sous votre message une fois qu'il l'a reçu.
 
 ❌ Si l'un reste « Hors ligne » indéfiniment : le problème est dans la présence, pas dans les
 invitations. Inutile de continuer.
@@ -100,7 +113,9 @@ vérification.
 | CubeShelf attend puis dit *« Le compagnon n'a pas créé de salon »* | Le salon n'a pas abouti côté compagnon — regardez sa fenêtre, pas CubeShelf |
 | L'invité ne voit jamais l'invitation | Problème de présence (étape 1), ou l'ami est en pause ou bloqué |
 | Le bandeau « Code ami trouvé » n'apparaît pas | Le presse-papiers ne contient pas le message entier, ou cet ami est déjà dans la liste. Collez le message dans « Ajouter un ami » à la place |
-| L'un voit l'autre, pas l'inverse | Un seul des deux a ajouté l'autre (étape 1.4) |
+| L'un voit l'autre, pas l'inverse | Un seul des deux a ajouté l'autre : il apparaît « En attente » chez celui qui l'a ajouté |
+| « Réseau local » : personne n'apparaît | Les deux PC ne sont pas sur le même réseau, un pare-feu bloque CubeShelf, ou le Wi-Fi isole ses clients (réseaux invités) |
+| Un bandeau dit que ton adresse sert une page, a disparu ou est en retard | Le lien de partage a été retiré ou le client de synchro est arrêté : recréez le lien et retestez |
 | **« DISQUE DIFFÉRENT »** | Les deux fichiers ne sont pas identiques. Recopiez-en un sur l'autre PC |
 | Les deux se voient mais le ping reste « En attente… » | Le réseau : routeur, pare-feu, NAT. **CubeShelf n'y est pour rien** — c'est le compagnon qui traverse |
 | La partie se lance et chacun attend seul | Vérifiez l'empreinte de l'étape 0 |
@@ -110,9 +125,10 @@ vérification.
 - **Que ça marche à travers n'importe quelle box.** L'auteur de PartyBoard l'écrit lui-même :
   l'accès réel à travers les box reste à valider, aucun pare-feu ni routeur n'a été modifié par
   les tests. Si le ping ne s'établit pas, c'est un problème PartyBoard, pas CubeShelf.
-- **Que l'invitation arrive vite.** Elle arrive au prochain sondage. C'est une invitation posée
-  sur la table, pas une sonnerie, et ça ne changera pas sans serveur.
-- **Que ça tient plus de deux joueurs.** Le salon est prévu pour deux.
+- **Que l'invitation arrive vite à distance.** Sur le même réseau, elle arrive en une seconde ;
+  à distance, au prochain sondage (25 secondes pour un ami en ligne) plus la latence du service.
+- **Que ça tient plus de deux joueurs.** Le salon créé depuis CubeShelf est pour deux ; on passe à
+  trois ou quatre dans la fenêtre du compagnon pendant qu'il vérifie le disque.
 
 ## Le repli, si le pilotage échoue
 

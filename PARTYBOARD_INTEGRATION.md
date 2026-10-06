@@ -106,6 +106,24 @@ laid out like the disc, three are Dolphin texture packs, two ship loose files an
 one offers variants. Nothing is ever blocked from installing, since a mod may
 legitimately add files the disc does not carry.
 
+## In-game friends bridge
+
+When CubeShelf starts the game it sets `CUBESHELF_INGAME_DIR` (UTF-8 path). Three things live
+there, all plain files, no network:
+
+| File | Writer | Content |
+| --- | --- | --- |
+| `state.json` | CubeShelf, every 3 s while the game runs | Friends, their status line (availability and what their game says included), invitations, the F1 tab's strings |
+| `requests/<id>.json`, `<id>.done` | the game, then CubeShelf | Host, invite, join, cancel; a request older than 30 s is dropped unanswered |
+| `activity.json` | the game | `{"schema":1,"text":"…","updatedAt":<unix seconds>}` -- one line about what is happening |
+
+`activity.json` is what friends see beside "Mario Party 4": the RetroAchievements rich presence
+while a set is played, otherwise the board and turn, a minigame, or the menus. The game rewrites
+it every few seconds while it changes and every 30 s otherwise; CubeShelf ignores one older than
+90 s, cleans it to one line of at most 120 characters, and publishes it only with the current game
+(same sharing switch). See `src/port/ui/cubeshelf.cpp` and `src/port/game_activity.cpp` in the
+game repository.
+
 ## Checks
 
 ```bash
