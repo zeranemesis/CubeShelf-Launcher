@@ -156,6 +156,16 @@ sealed class SimulatedNat
 
     public IPEndPoint Outgoing(IPEndPoint inside, IPEndPoint destination)
     {
+        lock (this) return OutgoingUnsynchronized(inside, destination);
+    }
+
+    public IPEndPoint? Incoming(int port, IPEndPoint source)
+    {
+        lock (this) return IncomingUnsynchronized(port, source);
+    }
+
+    private IPEndPoint OutgoingUnsynchronized(IPEndPoint inside, IPEndPoint destination)
+    {
         var forwarded = Forwarded.FirstOrDefault(entry => entry.Value.Equals(inside));
         if (forwarded.Value is not null) return new IPEndPoint(PublicAddress, forwarded.Key);
 
@@ -170,7 +180,7 @@ sealed class SimulatedNat
         return new IPEndPoint(PublicAddress, port);
     }
 
-    public IPEndPoint? Incoming(int port, IPEndPoint source)
+    private IPEndPoint? IncomingUnsynchronized(int port, IPEndPoint source)
     {
         if (Forwarded.TryGetValue(port, out var forwarded)) return forwarded;
         if (!_byPort.TryGetValue(port, out var mapping)) return null;

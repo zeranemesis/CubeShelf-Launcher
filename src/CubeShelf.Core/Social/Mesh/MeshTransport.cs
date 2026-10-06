@@ -198,6 +198,14 @@ public sealed class MeshTransport : IAsyncDisposable
         }
     }
 
+    /// <summary>A live session whose packets go straight to <paramref name="endpoint"/>, if any.</summary>
+    public MeshSession? SessionAt(IPEndPoint endpoint)
+    {
+        var normalized = MeshAddresses.Normalize(endpoint);
+        lock (_gate)
+            return _sessions.Values.FirstOrDefault(session => !session.Closed && session.Route.IsDirect && session.Route.Endpoint!.Equals(normalized));
+    }
+
     /// <summary>The live session with a node, if any.</summary>
     public MeshSession? SessionWith(NodeId node)
     {

@@ -121,6 +121,11 @@ Run("mesh: records are stored, found and updated", MeshDhtTests.RecordsAreStored
 Run("mesh: records outlive their holders", MeshDhtTests.RecordsOutliveTheirHolders);
 Run("mesh: nodes behind NAT use the table", MeshDhtTests.NodesBehindNatUseTheTable);
 Run("mesh: lies in answers never enter the table", MeshDhtTests.LiesInAnswersNeverEnterTheTable);
+Run("mesh: reachability is proven, not claimed", MeshNodeTests.ReachabilityIsProvenNotClaimed);
+Run("mesh: two closed routers punch through", MeshNodeTests.TwoClosedRoutersPunchThrough);
+Run("mesh: symmetric routers fall back to the relay", MeshNodeTests.SymmetricRoutersFallBackToTheRelay);
+Run("mesh: dial-backs cannot be aimed elsewhere", MeshNodeTests.DialBacksCannotBeAimedElsewhere);
+Run("mesh: the nodes file brings a node back without seeds", MeshNodeTests.NodesFileBringsANodeBackWithoutSeeds);
 Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
 Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
 Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);
