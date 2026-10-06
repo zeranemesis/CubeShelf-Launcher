@@ -78,7 +78,14 @@ public sealed record UserPreferences(
     string Availability = "",
 
     /// <summary>Away after ten minutes without input, back on the first touch, while available.</summary>
-    bool AutoAway = true);
+    bool AutoAway = true,
+
+    /// <summary>
+    /// The verified folder and address being replaced, until the new pair is verified: then the
+    /// old file gets a last document pointing at the new address, and friends follow on their own.
+    /// </summary>
+    string PreviousPresenceFolder = "",
+    string PreviousPresenceUrl = "");
 
 public sealed class UserPreferencesStore
 {

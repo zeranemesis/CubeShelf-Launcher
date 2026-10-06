@@ -94,6 +94,8 @@ Run("a note to one friend is read by that friend only", TestNotesReachOnlyTheirR
 Run("messages are delivered once and acknowledged", TestMessagesAreDeliveredAndAcknowledged);
 Run("availability, invisibility and what the game says", TestAvailabilityAndActivity);
 Run("unchanged notes do not force a publish", TestUnchangedNotesDoNotForceAPublish);
+Run("a document's size says a range, not a count", TestDocumentSizeIsPadded);
+Run("friends follow a move, a removed one cannot", TestFriendsFollowAMove);
 
 if (failures.Count == 0)
 {
@@ -3246,6 +3248,63 @@ void TestUnchangedNotesDoNotForceAPublish()
         finally
         {
             service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestDocumentSizeIsPadded()
+{
+    using var me = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var now = DateTimeOffset.UtcNow;
+
+    int PayloadBytes(int games)
+    {
+        var library = Enumerable.Range(0, games)
+            .Select(index => new SharedGame("G" + index, "Jeu " + index, 1, 60, false, now)).ToArray();
+        var snapshot = new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Zera", now, 1, PresenceStatus.Online, null, null,
+            library, Array.Empty<SharedMod>());
+        var envelope = SealedPresence.Seal(me, snapshot, new[] { friend.PublicKey });
+        // It still opens, padding and all.
+        Assert(SealedPresence.TryOpen(friend, me.PublicKey, envelope, out var opened) && opened!.Library.Count == games);
+        return System.Convert.FromBase64String(envelope.Payload).Length;
+    }
+
+    // One game more or less is invisible from outside; only a big change crosses a 4 KiB step.
+    Assert(PayloadBytes(3) == PayloadBytes(4) && PayloadBytes(4) == PayloadBytes(9));
+    Assert(PayloadBytes(9) % SealedPresence.PlaintextPadding == 0);
+    Assert(PayloadBytes(200) > PayloadBytes(9));
+}
+
+void TestFriendsFollowAMove()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var stays = PeerIdentity.Create();
+        using var removed = PeerIdentity.Create();
+        var myFriends = new FriendStore(Path.Combine(root, "me"));
+        Assert(myFriends.TryAdd(new FriendCodePayload(stays.PublicKey, "https://s.example.test/p.json"), "Stays", me.PublicKey, out _));
+        var oldFolder = Path.Combine(root, "old");
+        Directory.CreateDirectory(oldFolder);
+        const string oldUrl = "https://old.example.test/p.json";
+        const string newUrl = "https://new.example.test/p.json";
+
+        // The removed friend is no longer a recipient when the move is written.
+        var sequence = new PresenceSequence(Path.Combine(root, "me"));
+        Assert(PresenceAddressMove.WriteMovedDocument(me, myFriends, sequence, "Zera", oldFolder, newUrl, out _));
+        Assert(!PresenceAddressMove.WriteMovedDocument(me, myFriends, sequence, "Zera", oldFolder, "http://nope.example.test", out _));
+        var served = File.ReadAllText(Path.Combine(oldFolder, SyncedFolderTarget.DefaultFileName));
+
+        // The friend who stays reads the old address, and moves on to the new one by themselves.
+        foreach (var (reader, expectNewAddress) in new[] { (stays, true), (removed, false) })
+        {
+            var store = new FriendStore(Path.Combine(root, System.Convert.ToBase64String(reader.PublicKey)[..6].Replace('/', '_')));
+            Assert(store.TryAdd(new FriendCodePayload(me.PublicKey, oldUrl), "Zera", reader.PublicKey, out _));
+            using var client = new HttpClient(new FixedBodyHandler(served));
+            using var fetcher = new PresenceFetcher(reader, store, client);
+            fetcher.FetchAsync(store.Load()[0]).GetAwaiter().GetResult();
+            Assert((store.Load()[0].PresenceUrl == newUrl) == expectNewAddress);
         }
     });
 }

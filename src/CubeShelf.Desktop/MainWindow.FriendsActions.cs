@@ -157,9 +157,11 @@ public sealed partial class MainWindow
                 new TextBlock
                 {
                     Text = P7("Il peut le remarquer, et il garde ton adresse : il verra encore quand " +
-                              "ton fichier change, donc quand tu joues. Seul un changement d’adresse y met fin.",
+                              "ton fichier change, donc quand tu joues. Pour y mettre fin, change d’adresse (Mon profil) : " +
+                              "tes autres amis te suivront tout seuls, lui perdra ta trace.",
                               "They may notice, and they keep your address: they can still see when your " +
-                              "file changes, and so when you play. Only changing the address stops that."),
+                              "file changes, and so when you play. To end that, change your address (My profile): " +
+                              "your other friends follow on their own, they lose track of you."),
                     Foreground = Avalonia.Media.Brushes.Gray,
                     FontSize = 12,
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap
@@ -237,23 +239,31 @@ public sealed partial class MainWindow
         var addressChanged = !string.Equals(url, _preferences.PresenceUrl, StringComparison.Ordinal);
         var folderChanged = !string.Equals(folder, _preferences.PresenceFolder, StringComparison.Ordinal);
 
+        // Leaving a pair that works: remember it, so that once the new one is proven the old file
+        // can tell friends where we went. Only the first pair left behind counts -- an address
+        // tried and abandoned on the way never reached anyone.
+        var leavingVerified = (addressChanged || folderChanged) && IsAddressVerified() &&
+                              _preferences.PreviousPresenceUrl.Length == 0;
+
         _preferences = _preferences with
         {
             PresenceFolder = folder,
             PresenceUrl = url,
             // The proof was of this folder served at this address. Either one moving voids it.
-            PresenceVerifiedUrl = addressChanged || folderChanged ? "" : _preferences.PresenceVerifiedUrl
+            PresenceVerifiedUrl = addressChanged || folderChanged ? "" : _preferences.PresenceVerifiedUrl,
+            PreviousPresenceFolder = leavingVerified ? _preferences.PresenceFolder : _preferences.PreviousPresenceFolder,
+            PreviousPresenceUrl = leavingVerified ? _preferences.PresenceUrl : _preferences.PreviousPresenceUrl
         };
         _preferencesStore.Save(_preferences);
         RefreshOwnFriendCode();
 
         if (addressChanged)
         {
-            // The address is sealed inside every friend code already handed out. Changing it
-            // silently orphans every existing friend, who keeps polling the old one forever.
+            // Friends follow on their own once the new address is proven: the old file is left a
+            // last document pointing at it. Codes handed to people not yet friends still name the old one.
             PresenceStatusText.Text = P7(
-                "Adresse modifiée : teste-la, puis redistribue ton code ami. Les codes déjà donnés ne fonctionnent plus.",
-                "Address changed: test it, then hand out your friend code again. Codes already given no longer work.");
+                "Adresse modifiée : dès qu’elle sera vérifiée, l’ancien fichier indiquera la nouvelle à tes amis, qui suivront tout seuls. Laisse l’ancien fichier en place quelques semaines. Les codes donnés à des gens pas encore amis pointent encore vers l’ancienne.",
+                "Address changed: once it is verified, the old file points your friends at the new one and they follow on their own. Leave the old file in place for a few weeks. Codes given to people not yet friends still point at the old one.");
         }
 
         StartPresenceService();
@@ -264,6 +274,41 @@ public sealed partial class MainWindow
         // and the answer -- does it work -- should not wait for a second click.
         if (addressChanged && url.Length > 0 && HasIdentity && Directory.Exists(folder))
             RunPresenceSelfTest(sender, args);
+    }
+
+    /// <summary>
+    /// With a new address proven, the old file -- if it is somewhere else -- gets its last
+    /// document: offline, pointing at the new address, for the current friends only.
+    /// </summary>
+    private void LeaveForwardingAddress(string newAddress)
+    {
+        var oldFolder = _preferences.PreviousPresenceFolder;
+        var oldUrl = _preferences.PreviousPresenceUrl;
+        _preferences = _preferences with { PreviousPresenceFolder = "", PreviousPresenceUrl = "" };
+        _preferencesStore.Save(_preferences);
+
+        if (oldUrl.Length == 0 || string.Equals(oldUrl, newAddress, StringComparison.Ordinal)) return;
+        if (_identity is null || _friends is null) return;
+
+        // Same folder, new link: every document there already states the new address.
+        if (string.Equals(Path.GetFullPath(oldFolder), Path.GetFullPath(_preferences.PresenceFolder), StringComparison.OrdinalIgnoreCase))
+            return;
+
+        if (!Directory.Exists(oldFolder))
+        {
+            ShowToastParity(P7("Ta présence", "Your presence"),
+                P7("L’ancien dossier n’existe plus : tes amis ne peuvent pas être prévenus de ta nouvelle adresse. Envoie-leur ton nouveau code.",
+                   "The old folder is gone: your friends cannot be told about your new address. Send them your new code."));
+            return;
+        }
+
+        if (PresenceAddressMove.WriteMovedDocument(_identity, _friends, new PresenceSequence(_paths.ConfigurationDirectory),
+                _preferences.FriendsDisplayName, oldFolder, newAddress, out var error))
+            ShowToastParity(P7("Ta présence", "Your presence"),
+                P7("Nouvelle adresse en place. L’ancien fichier l’indique à tes amis actuels, qui suivront tout seuls : garde-le quelques semaines.",
+                   "New address in place. The old file tells your current friends, who follow on their own: keep it a few weeks."));
+        else
+            ShowToastParity(P7("Ta présence", "Your presence"), error);
     }
 
     private async void BrowsePresenceFolder(object? sender, RoutedEventArgs args)
@@ -323,6 +368,7 @@ public sealed partial class MainWindow
                 _pendingCandidates = null;
                 PresenceUrlBox.Text = result.PresenceUrl;
                 PresenceUrlConversionText.IsVisible = false;
+                LeaveForwardingAddress(result.PresenceUrl);
                 RefreshShareSteps();
                 RefreshOwnFriendCode();
                 PresenceStatusText.Text = P7(

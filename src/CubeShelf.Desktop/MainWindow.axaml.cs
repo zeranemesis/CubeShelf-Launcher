@@ -744,7 +744,9 @@ public sealed partial class MainWindow : Window
         NotifyFriendsOnline = current.NotifyFriendsOnline,
         TrayHintShown = current.TrayHintShown,
         Availability = current.Availability,
-        AutoAway = current.AutoAway
+        AutoAway = current.AutoAway,
+        PreviousPresenceFolder = current.PreviousPresenceFolder,
+        PreviousPresenceUrl = current.PreviousPresenceUrl
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)
