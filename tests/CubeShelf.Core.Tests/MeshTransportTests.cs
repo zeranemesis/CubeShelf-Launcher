@@ -344,6 +344,48 @@ static class MeshTransportTests
         }
     }
 
+    /// <summary>
+    /// A peer that starts big messages and never finishes them holds at most its own budget of
+    /// our memory, and gives all of it back when it goes.
+    /// </summary>
+    public static void HalfSentMessagesCannotExhaustMemory()
+    {
+        var network = new SimulatedNetwork();
+        var a = Transport(network.BindPublic());
+        var b = Transport(network.BindPublic());
+        try
+        {
+            var session = Wait(a.ConnectAsync(MeshRoute.Direct(b.LocalEndPoint)))!;
+            Eventually(() => session.Confirmed, "confirmed");
+
+            for (uint messageId = 1000; messageId < 1200; messageId++)
+            {
+                for (var index = 0; index < 5; index++)
+                {
+                    var frame = new byte[7 + MeshPackets.FragmentPayload];
+                    frame[0] = 1;
+                    System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(frame.AsSpan(1), messageId);
+                    frame[5] = (byte)index;
+                    frame[6] = 120;
+                    a.SendRaw(session.Encrypt(frame)!, b.LocalEndPoint);
+                }
+            }
+
+            Thread.Sleep(300);
+            var held = b.BufferedBytes;
+            Check(held > 0, "something is buffered");
+            Check(held <= new MeshTransportOptions().MaximumBufferedPerSession, $"never more than one session's budget ({held} bytes)");
+
+            a.DisposeAsync().AsTask().Wait();
+            Eventually(() => b.BufferedBytes == 0, "all of it given back when the peer leaves", 5000);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().Wait();
+            b.DisposeAsync().AsTask().Wait();
+        }
+    }
+
     private static byte[] Flip(byte[] message, int index)
     {
         var copy = (byte[])message.Clone();

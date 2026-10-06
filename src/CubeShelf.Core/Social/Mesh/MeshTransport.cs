@@ -82,6 +82,14 @@ public sealed record MeshTransportOptions
     public int MaximumConcurrentRequests { get; init; } = 64;
     public int MaximumReassembliesPerSession { get; init; } = 8;
 
+    /// <summary>
+    /// What all half-arrived messages may hold together, and what one session's may. Without a
+    /// total, a thousand sessions each starting eight large messages would be a gigabyte; with it,
+    /// a flood costs the flooder its own messages and nobody else's memory.
+    /// </summary>
+    public long MaximumBufferedBytes { get; init; } = 32L * 1024 * 1024;
+    public long MaximumBufferedPerSession { get; init; } = 1024 * 1024;
+
     /// <summary>The work every node id must show, ours and our peers'. Lowered only by tests.</summary>
     public int ProofDifficulty { get; init; } = NodeProof.Difficulty;
 }
@@ -125,6 +133,10 @@ public sealed class MeshTransport : IAsyncDisposable
     private long _handshakeSecond;
     private int _handshakesThisSecond;
     private int _nextRequestId;
+    private long _bufferedBytes;
+
+    /// <summary>Bytes held across every session's half-arrived messages. For tests and diagnostics.</summary>
+    public long BufferedBytes => Interlocked.Read(ref _bufferedBytes);
 
     private CancellationTokenSource? _lifetime;
     private Task? _receiveLoop;
@@ -644,7 +656,7 @@ public sealed class MeshTransport : IAsyncDisposable
                     if (session.Incoming.Count >= _options.MaximumReassembliesPerSession)
                     {
                         var oldest = session.Incoming.MinBy(entry => entry.Value.CreatedAt);
-                        session.Incoming.Remove(oldest.Key);
+                        Discard(session, oldest.Key, oldest.Value);
                     }
                     assembly = new Reassembly(count);
                     session.Incoming[messageId] = assembly;
@@ -654,14 +666,20 @@ public sealed class MeshTransport : IAsyncDisposable
                 assembly.LastFragmentAt = Environment.TickCount64;
                 if (assembly.Chunks[index] is null)
                 {
+                    // Over budget, the fragment is dropped: the sender asks again, or gives up.
+                    if (session.BufferedBytes + data.Length > _options.MaximumBufferedPerSession ||
+                        Interlocked.Read(ref _bufferedBytes) + data.Length > _options.MaximumBufferedBytes)
+                        return;
                     assembly.Chunks[index] = data.ToArray();
                     assembly.Received++;
                     assembly.Bytes += data.Length;
+                    session.BufferedBytes += data.Length;
+                    Interlocked.Add(ref _bufferedBytes, data.Length);
                 }
 
                 if (assembly.Bytes > _options.MaximumMessageBytes)
                 {
-                    session.Incoming.Remove(messageId);
+                    Discard(session, messageId, assembly);
                     return;
                 }
 
@@ -674,13 +692,21 @@ public sealed class MeshTransport : IAsyncDisposable
                         chunk!.CopyTo(complete, offset);
                         offset += chunk.Length;
                     }
-                    session.Incoming.Remove(messageId);
+                    Discard(session, messageId, assembly);
                     Remember(session, messageId);
                 }
             }
         }
 
         if (complete is not null) Deliver(session, complete);
+    }
+
+    /// <summary>Forgets a half-arrived message and gives its bytes back to the budgets. Called under the session's lock.</summary>
+    private void Discard(MeshSession session, uint messageId, Reassembly assembly)
+    {
+        if (!session.Incoming.Remove(messageId)) return;
+        session.BufferedBytes -= assembly.Bytes;
+        Interlocked.Add(ref _bufferedBytes, -assembly.Bytes);
     }
 
     private static void Remember(MeshSession session, uint messageId)
@@ -887,7 +913,7 @@ public sealed class MeshTransport : IAsyncDisposable
                     {
                         if (now - assembly.CreatedAt > 8000 || assembly.NacksSent >= 4)
                         {
-                            if (now - assembly.LastFragmentAt > 1000) session.Incoming.Remove(messageId);
+                            if (now - assembly.LastFragmentAt > 1000) Discard(session, messageId, assembly);
                             continue;
                         }
                         if (now - assembly.LastFragmentAt < 250) continue;
@@ -1000,7 +1026,11 @@ public sealed class MeshTransport : IAsyncDisposable
         foreach (var key in _requests.Keys.Where(key => key.Session == session.LocalIndex).ToArray())
             if (_requests.TryRemove(key, out var completion)) completion.TrySetResult(null);
 
-        lock (session) session.Dispose();
+        lock (session)
+        {
+            foreach (var (messageId, assembly) in session.Incoming.ToArray()) Discard(session, messageId, assembly);
+            session.Dispose();
+        }
         SessionClosed?.Invoke(session);
     }
 

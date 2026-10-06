@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CubeShelf.Core.Social.Mesh;
@@ -60,6 +61,12 @@ public sealed class MeshFriends : IAsyncDisposable
     /// its answer. Kept, one per session, until the proof lands.
     /// </summary>
     private readonly System.Runtime.CompilerServices.ConditionalWeakTable<MeshSession, byte[]> _early = new();
+
+    /// <summary>
+    /// Proofs asked for on each session. Checking one costs a key agreement, so a stranger
+    /// repeating claims on one session gets three tries, not an unlimited supply.
+    /// </summary>
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<MeshSession, StrongBox<int>> _helloAttempts = new();
 
     /// <summary>Sessions we are proving ourselves on right now: the only ones whose early document is kept.</summary>
     private readonly ConcurrentDictionary<uint, byte> _helloPending = new();
@@ -422,6 +429,8 @@ public sealed class MeshFriends : IAsyncDisposable
     {
         if (message.Op != MeshOps.FriendHello || Invisible || message.Body.Length != PeerIdentity.PublicKeyLength + 32)
             return Task.FromResult<byte[]?>(null);
+        var attempts = _helloAttempts.GetOrCreateValue(session);
+        if (Interlocked.Increment(ref attempts.Value) > 3) return Task.FromResult<byte[]?>(null);
 
         var theirKey = message.Body.AsSpan(0, PeerIdentity.PublicKeyLength).ToArray();
         var encoded = Convert.ToBase64String(theirKey);

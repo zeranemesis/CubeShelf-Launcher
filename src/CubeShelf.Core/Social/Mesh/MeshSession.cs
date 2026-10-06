@@ -157,6 +157,9 @@ public sealed class MeshSession
     public bool Closed { get; internal set; }
 
     internal readonly Dictionary<uint, Reassembly> Incoming = new();
+
+    /// <summary>Bytes held in <see cref="Incoming"/>, counted against the session's and the transport's budgets.</summary>
+    internal long BufferedBytes;
     internal readonly Queue<(uint MessageId, long At, byte[][] Frames)> RecentlySent = new();
     internal readonly Queue<uint> RecentlyCompleted = new();
     internal uint NextMessageId;

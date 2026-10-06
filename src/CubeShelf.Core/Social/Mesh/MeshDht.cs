@@ -71,6 +71,12 @@ public sealed class MeshDht
     private readonly Dictionary<NodeId, (int Good, int Bad)> _referrals = new();
     private readonly Dictionary<NodeId, long> _distrusted = new();
 
+    /// <summary>
+    /// Stores across all sessions: each one costs a signature check, and a thousand sessions at
+    /// their own allowance each would be a thousand checks a second.
+    /// </summary>
+    private readonly RateBucket _allStores = new(200);
+
     public MeshDht(MeshTransport transport, RoutingTable table, RecordStore records, MeshDhtOptions? options = null, Func<DateTimeOffset>? clock = null)
     {
         _transport = transport ?? throw new ArgumentNullException(nameof(transport));
@@ -133,6 +139,9 @@ public sealed class MeshDht
                 if (!Serving || !IsResponsibleFor(record.Locator)) return Task.FromResult<byte[]?>(new[] { (byte)StoreResult.NotResponsible });
                 if (!_budgets.GetOrCreateValue(session).TryTake(_options.StoresPerMinute))
                     return Task.FromResult<byte[]?>(new[] { (byte)StoreResult.Full });
+                lock (_allStores)
+                    if (!_allStores.TryTake(Environment.TickCount64, 100, 200))
+                        return Task.FromResult<byte[]?>(new[] { (byte)StoreResult.Full });
                 var result = Records.Put(record, SourceOf(session), _clock());
                 return Task.FromResult<byte[]?>(new[] { (byte)result });
             }
@@ -487,7 +496,9 @@ public sealed class MeshDht
         var reader = new MeshReader(reply);
         if (wantValue && reader.U8() == 1)
         {
-            int count = reader.U8();
+            // Each record costs a signature check: no answer gets to make us do more than a
+            // full mailbox's worth, however many it claims to hold.
+            int count = Math.Min((int)reader.U8(), Records.MailboxEntries);
             var records = new List<MeshRecord>();
             var now = _clock();
             for (var index = 0; index < count && reader.Ok; index++)

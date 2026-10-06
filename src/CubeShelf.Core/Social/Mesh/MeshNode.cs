@@ -73,6 +73,13 @@ public sealed class MeshNode : IAsyncDisposable
     private readonly RateBucket _dialBacks = new(20);
     private readonly HashSet<IPEndPoint> _seeds = new();
 
+    /// <summary>
+    /// Callers we punched towards lately. A relay that holds our reservation tells us where to
+    /// send: without a limit, a dishonest one could have us send a stream of datagrams at anyone.
+    /// </summary>
+    private readonly Dictionary<IPEndPoint, long> _punchedRecently = new();
+    private readonly RateBucket _incomingCalls = new(4);
+
     /// <summary>Circuits we opened as the caller, by relay session and circuit: their packets are ours to read.</summary>
     private readonly Dictionary<(uint Relay, uint Circuit), long> _callerCircuits = new();
 
@@ -382,6 +389,15 @@ public sealed class MeshNode : IAsyncDisposable
         reader.U32();
         var caller = reader.OptionalEndpoint();
         if (!reader.Done || caller is null || !_options.IsRoutable(caller.Address)) return;
+        lock (_punchedRecently)
+        {
+            var now = Environment.TickCount64;
+            // One answer per caller per ten seconds, and a few calls a minute in all.
+            if (_punchedRecently.TryGetValue(caller, out var at) && now - at < 10_000) return;
+            if (!_incomingCalls.TryTake(now, 0.1, 4)) return;
+            if (_punchedRecently.Count > 256) _punchedRecently.Clear();
+            _punchedRecently[caller] = now;
+        }
         Punch(caller);
         _ = Transport.ConnectAsync(MeshRoute.Direct(caller), _lifetime?.Token ?? CancellationToken.None);
     }
