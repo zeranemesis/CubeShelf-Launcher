@@ -181,9 +181,14 @@ public sealed class PeerIdentity : IDisposable
         return SHA256.HashData(buffer);
     }
 
+    /// <summary>
+    /// The right shape and a point of the curve. Every key from outside -- a friend code, the
+    /// friends file, the local network -- passes here, so a crafted key that is not on the curve
+    /// is refused at the door rather than breaking every later publish that tries to seal for it.
+    /// </summary>
     public static void ValidatePublicKey(ReadOnlySpan<byte> publicKey)
     {
-        if (publicKey.Length != PublicKeyLength || publicKey[0] != 0x04)
+        if (publicKey.Length != PublicKeyLength || publicKey[0] != 0x04 || !Mesh.MeshCrypto.IsOnCurve(publicKey))
             throw new ArgumentException("Clé publique CubeShelf invalide.", nameof(publicKey));
     }
 
@@ -200,10 +205,19 @@ public sealed class PeerIdentity : IDisposable
             }
         };
 
-        // Validate() rejects a point that is not on the curve, which is the check that stops a
-        // crafted "friend code" from steering the key agreement.
+        // Validate() only checks the shape; it is the import that rejects a point off the curve,
+        // which is what stops a crafted friend code from steering the key agreement. Windows
+        // reports that refusal as PlatformNotSupportedException, which every caller here would let
+        // escape, so it is turned into the CryptographicException they all expect.
         parameters.Validate();
-        return ECDiffieHellman.Create(parameters);
+        try
+        {
+            return ECDiffieHellman.Create(parameters);
+        }
+        catch (PlatformNotSupportedException exception)
+        {
+            throw new CryptographicException("Clé publique CubeShelf invalide.", exception);
+        }
     }
 
     private static byte[] ExportPublicKey(ECDiffieHellman key)

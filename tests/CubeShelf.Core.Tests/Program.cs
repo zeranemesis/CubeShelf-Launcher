@@ -103,6 +103,17 @@ Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDown
 Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
 Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
 Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
+Run("a key off the curve is refused at the door", KeyValidationTests.KeysOffTheCurveAreRefusedAtTheDoor);
+Run("mesh: noise handshake agrees and refuses tampering", MeshTransportTests.NoiseHandshakeAgreesAndRejectsTampering);
+Run("mesh: a node id costs a proof of work", MeshTransportTests.ProofOfWorkBindsTheId);
+Run("mesh: sessions carry requests both ways", MeshTransportTests.TransportCarriesRequestsBothWays);
+Run("mesh: sessions survive loss, duplicates and 120 KB", MeshTransportTests.TransportSurvivesLossDuplicationAndLargeMessages);
+Run("mesh: sessions drop replayed packets", MeshTransportTests.TransportDropsReplayedPackets);
+Run("mesh: transport shrugs off garbage and never amplifies", MeshTransportTests.TransportShrugsOffGarbageAndNeverAmplifies);
+Run("mesh: handshakes ask for cookies under load", MeshTransportTests.TransportAsksForCookiesUnderLoad);
+Run("mesh: a leaving peer fails pending requests at once", MeshTransportTests.TransportFailsPendingRequestsWhenThePeerLeaves);
+Run("mesh: a node never opens a session with itself", MeshTransportTests.TransportRefusesToTalkToItself);
+Run("mesh: sessions over real UDP sockets", MeshTransportTests.TransportWorksOverRealUdp);
 
 if (failures.Count == 0)
 {
@@ -115,6 +126,9 @@ return 1;
 
 void Run(string name, Action action)
 {
+    // CUBESHELF_TEST_FILTER=mesh runs only the tests whose name contains it, for quick iteration.
+    if (Environment.GetEnvironmentVariable("CUBESHELF_TEST_FILTER") is { Length: > 0 } filter &&
+        !name.Contains(filter, StringComparison.OrdinalIgnoreCase)) return;
     executed++;
     try { action(); Console.WriteLine($"OK  {name}"); }
     catch (Exception exception) { failures.Add($"FAIL {name}: {exception.Message}"); }
