@@ -103,6 +103,20 @@ Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDown
 Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
 Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
 Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
+Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
+Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
+Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);
+Run("UPnP discovers, maps, reads the external address and removes", PortMapperTests.UpnpMapsReadsAddressAndRemoves);
+Run("UPnP renewal follows a router that restarted on another port", PortMapperTests.UpnpRenewalFollowsARestartedRouter);
+Run("UPnP conflict 718 tries another external port", PortMapperTests.UpnpConflictTriesAnotherPort);
+Run("UPnP 725 falls back to a permanent lease", PortMapperTests.UpnpPermanentLeaseOnly);
+Run("UPnP refuses a LOCATION off the router that answered", PortMapperTests.UpnpRejectsForeignLocations);
+Run("UPnP refuses a control URL off the router", PortMapperTests.UpnpRejectsForeignControlUrls);
+Run("UPnP refuses DTDs, bombs, oversized and garbage descriptions", PortMapperTests.UpnpRejectsHostileDescriptions);
+Run("UPnP refuses hostile SOAP answers and bad external addresses", PortMapperTests.UpnpRejectsHostileSoapAnswers);
+Run("port mapping gives up within the budget when nothing answers", PortMapperTests.NothingAnswersWithinTheBudget);
+Run("port mapping never treats loopback as the network outside tests", PortMapperTests.LoopbackIsNotTheNetworkOutsideTests);
+Run("port mapping honours the caller's cancellation", PortMapperTests.CancellationIsHonoured);
 
 if (failures.Count == 0)
 {
