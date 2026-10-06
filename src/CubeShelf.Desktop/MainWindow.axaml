@@ -556,6 +556,10 @@
                 <CheckBox x:Name="ShareProfileBox" Content="{DynamicResource ShareProfile}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="LanVisibleBox" Content="{DynamicResource LanVisible}" Checked="SaveSettings" Unchecked="SaveSettings" Margin="0,8,0,0" />
                 <TextBlock Text="{DynamicResource LanVisibleHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+
+                <TextBlock Text="{DynamicResource NotificationsTitle}" FontWeight="Bold" Margin="0,14,0,0" />
+                <CheckBox x:Name="CloseToTrayBox" Content="{DynamicResource CloseToTray}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <CheckBox x:Name="NotifyOnlineBox" Content="{DynamicResource NotifyFriendsOnline}" Checked="SaveSettings" Unchecked="SaveSettings" />
               </StackPanel>
             </Border>
           </StackPanel>

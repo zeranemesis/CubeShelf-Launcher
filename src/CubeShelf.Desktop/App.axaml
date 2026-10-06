@@ -231,6 +231,9 @@
       <x:String x:Key="LanAdd">Réseau local</x:String>
       <x:String x:Key="LanVisible">Me signaler à mes amis sur le réseau local</x:String>
       <x:String x:Key="LanVisibleHelp">Tes amis sur le même réseau te voient et reçoivent tes invitations instantanément, même sans dossier synchronisé. Les autres ne voient que des marqueurs qui changent toutes les 10 minutes : ni ton pseudo, ni ta clé. Windows peut demander d’autoriser CubeShelf sur le réseau privé : accepte.</x:String>
+      <x:String x:Key="NotificationsTitle">Notifications</x:String>
+      <x:String x:Key="CloseToTray">Fermer la fenêtre garde CubeShelf près de l’horloge (tes amis te voient toujours, les invitations arrivent)</x:String>
+      <x:String x:Key="NotifyFriendsOnline">Me prévenir quand un ami se connecte ou lance un jeu</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

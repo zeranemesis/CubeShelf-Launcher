@@ -360,6 +360,8 @@ public sealed partial class MainWindow
         ShareCurrentGameBox.IsChecked = _preferences.ShareCurrentGame;
         ShareModsBox.IsChecked = _preferences.ShareMods;
         LanVisibleBox.IsChecked = _preferences.LanVisible;
+        CloseToTrayBox.IsChecked = _preferences.CloseToTray;
+        NotifyOnlineBox.IsChecked = _preferences.NotifyFriendsOnline;
         ApplyProfilePreferences();
 
         // The code stays hidden until a self-test proves the address serves a readable document.
@@ -379,7 +381,9 @@ public sealed partial class MainWindow
             ShareCurrentGame = ShareCurrentGameBox.IsChecked == true,
             ShareMods = ShareModsBox.IsChecked == true,
             ShareProfile = ShareProfileBox.IsChecked == true,
-            LanVisible = LanVisibleBox.IsChecked == true
+            LanVisible = LanVisibleBox.IsChecked == true,
+            CloseToTray = CloseToTrayBox.IsChecked == true,
+            NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true
         };
 
         // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,

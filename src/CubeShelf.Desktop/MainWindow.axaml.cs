@@ -110,14 +110,23 @@ public sealed partial class MainWindow : Window
         ShowRunningVersion();
         // Feeds the F1 Friends tab inside Mario Party 4, only while the game runs.
         StartInGameBridge();
+        // Near the clock, so closing the window does not mean leaving every friend.
+        InitializeTray();
         // Copy a friend's message in any chat app, come back to the Friends page: it is found.
         Activated += (_, _) =>
         {
             if (FriendsView.IsVisible) _ = CheckClipboardForFriendCodeAsync();
         };
         RefreshDownloadItems();
-        Closing += (_, _) =>
+        Closing += (_, closing) =>
         {
+            if (ShouldHideInsteadOfClosing(closing))
+            {
+                closing.Cancel = true;
+                HideToTray();
+                return;
+            }
+
             _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
             _preferencesStore.Save(_preferences);
             // Before the tracker is disposed: the farewell document has to still know whether
@@ -134,6 +143,7 @@ public sealed partial class MainWindow : Window
             foreach (var card in _parityCards) card.Dispose();
             _toastCancellation?.Cancel();
             _toastCancellation?.Dispose();
+            DisposeTray();
         };
     }
 
@@ -730,7 +740,10 @@ public sealed partial class MainWindow : Window
         ProfilePinnedGameId = current.ProfilePinnedGameId,
         ProfileFirstSeenAt = current.ProfileFirstSeenAt,
         PresenceVerifiedUrl = current.PresenceVerifiedUrl,
-        LanVisible = current.LanVisible
+        LanVisible = current.LanVisible,
+        CloseToTray = current.CloseToTray,
+        NotifyFriendsOnline = current.NotifyFriendsOnline,
+        TrayHintShown = current.TrayHintShown
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)

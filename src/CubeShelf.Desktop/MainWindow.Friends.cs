@@ -239,8 +239,10 @@ public sealed partial class MainWindow
     {
         foreach (var outcome in outcomes.Where(o => o.Snapshot is not null))
         {
+            _friendPresence.TryGetValue(outcome.FriendPublicKey, out var previous);
             _friendPresence[outcome.FriendPublicKey] = outcome.Snapshot!;
             AnnounceInvite(outcome.FriendPublicKey, outcome.Snapshot!);
+            AnnounceComingOnline(outcome.FriendPublicKey, previous, outcome.Snapshot!);
         }
 
         // Only a genuine network failure raises the global banner; a friend who has not
@@ -270,7 +272,7 @@ public sealed partial class MainWindow
         if (!_announcedInvites.Add(friendPublicKey + '|' + invite.JoinPayload)) return;
 
         var handle = PeerName.Handle(friend.DisplayName, friend.PublicKey);
-        ShowToastParity(
+        Notify(
             P7($"{handle} t’invite", $"{handle} invites you"),
             P7($"{invite.GameTitle} — ouvre la page Amis pour rejoindre.",
                $"{invite.GameTitle} — open the Friends page to join."));

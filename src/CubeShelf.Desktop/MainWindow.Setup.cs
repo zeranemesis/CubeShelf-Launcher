@@ -260,7 +260,7 @@ public sealed partial class MainWindow
 
         // Said once when it goes wrong, not at every check while it stays wrong.
         if (report.NeedsAttention && previous?.Health != report.Health)
-            ShowToastParity(P7("Ta présence", "Your presence"), DescribeAddressReport(report));
+            Notify(P7("Ta présence", "Your presence"), DescribeAddressReport(report), showFriends: false);
 
         if (FriendsView.IsVisible) RefreshFriendsView();
     }

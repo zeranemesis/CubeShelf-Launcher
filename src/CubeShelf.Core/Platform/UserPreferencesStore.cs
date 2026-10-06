@@ -60,7 +60,19 @@ public sealed record UserPreferences(
     /// and can read us directly. On by default: it names nobody to anyone else, and it is what
     /// makes two friends in one room see each other with nothing set up.
     /// </summary>
-    bool LanVisible = true);
+    bool LanVisible = true,
+
+    /// <summary>
+    /// Closing the window hides it near the clock instead of quitting, once friends are set up:
+    /// quitting says goodbye to every friend and stops invitations arriving.
+    /// </summary>
+    bool CloseToTray = true,
+
+    /// <summary>A notification when a friend comes online or starts a game.</summary>
+    bool NotifyFriendsOnline = true,
+
+    /// <summary>Whether the user was told, once, that closing hides rather than quits.</summary>
+    bool TrayHintShown = false);
 
 public sealed class UserPreferencesStore
 {

@@ -89,6 +89,7 @@ Run("befriending on the network takes both, and proof", TestLanIntroduction);
 Run("an impostor on the network gets nothing", TestLanImpostorIsRefused);
 Run("a friend's stated address is adopted", TestStatedAddressIsAdopted);
 Run("friends who are around are read more often", TestActiveFriendsAreReadMoreOften);
+Run("a profile can live in a folder of its own", TestDataDirectoryOverride);
 
 if (failures.Count == 0)
 {
@@ -3052,6 +3053,24 @@ void TestLanImpostorIsRefused()
             m.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
     });
+}
+
+void TestDataDirectoryOverride()
+{
+    var folder = Path.Combine(Path.GetTempPath(), "cubeshelf-second-profile");
+    foreach (var platform in new[] { PlatformFamily.Windows, PlatformFamily.Linux, PlatformFamily.MacOS })
+    {
+        var paths = new PlatformPaths("CubeShelf",
+            new Dictionary<string, string?> { [PlatformPaths.DataDirectoryVariable] = folder },
+            platform, userProfile: "/home/zera", windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+        Assert(paths.DataDirectory == Path.GetFullPath(folder) && paths.ConfigurationDirectory == paths.DataDirectory);
+        Assert(paths.CacheDirectory == Path.Combine(paths.DataDirectory, "Cache"));
+    }
+
+    // A relative path is ignored rather than resolved against wherever the process started.
+    var relative = new PlatformPaths("CubeShelf", new Dictionary<string, string?> { [PlatformPaths.DataDirectoryVariable] = "profil" },
+        PlatformFamily.Windows, windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+    Assert(relative.DataDirectory == Path.Combine(@"C:\Users\zera\AppData\Local", "CubeShelf"));
 }
 
 void TestActiveFriendsAreReadMoreOften()

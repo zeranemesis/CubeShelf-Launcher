@@ -61,8 +61,22 @@ public sealed class PlatformPaths : IPlatformPaths
                 break;
         }
 
+        // A whole profile somewhere else: a second identity on the same machine -- two friends
+        // on one PC to try the local network -- or a test run that must not touch the real one.
+        if (environment.TryGetValue(DataDirectoryVariable, out var overridden) &&
+            !string.IsNullOrWhiteSpace(overridden) &&
+            Path.IsPathRooted(overridden))
+        {
+            DataDirectory = Path.GetFullPath(overridden);
+            CacheDirectory = Path.Combine(DataDirectory, "Cache");
+            ConfigurationDirectory = DataDirectory;
+        }
+
         DownloadHistoryFile = Path.Combine(DataDirectory, "download-history.json");
     }
+
+    /// <summary>Set to an absolute folder, it holds the whole profile instead of the usual place.</summary>
+    public const string DataDirectoryVariable = "CUBESHELF_DATA_DIR";
 
     public string DataDirectory { get; }
     public string CacheDirectory { get; }
@@ -90,7 +104,8 @@ public sealed class PlatformPaths : IPlatformPaths
         {
             ["XDG_DATA_HOME"] = Environment.GetEnvironmentVariable("XDG_DATA_HOME"),
             ["XDG_CACHE_HOME"] = Environment.GetEnvironmentVariable("XDG_CACHE_HOME"),
-            ["XDG_CONFIG_HOME"] = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
+            ["XDG_CONFIG_HOME"] = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME"),
+            [DataDirectoryVariable] = Environment.GetEnvironmentVariable(DataDirectoryVariable)
         };
 
     private static PlatformFamily DetectPlatform()

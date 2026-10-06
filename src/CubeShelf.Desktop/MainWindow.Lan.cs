@@ -39,7 +39,7 @@ public sealed partial class MainWindow
         node.Changed += () => Dispatcher.UIThread.Post(OnLanChanged);
         node.FriendAdded += handle => Dispatcher.UIThread.Post(() =>
         {
-            ShowToastParity(P7("Amis", "Friends"),
+            Notify(P7("Nouvel ami", "New friend"),
                 P7($"{handle} a accepté : vous êtes amis.", $"{handle} accepted: you are friends."));
             _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
             _presence?.PollEagerly();
