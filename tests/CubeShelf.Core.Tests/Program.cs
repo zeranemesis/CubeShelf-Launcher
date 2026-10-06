@@ -104,6 +104,7 @@ Run("the phone link takes cards back, never under a running game", TestPhoneLink
 Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
 Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
 Run("a key off the curve is refused at the door", KeyValidationTests.KeysOffTheCurveAreRefusedAtTheDoor);
+Run("mesh: derived keys are the same everywhere", KeyValidationTests.DerivedKeysAreTheSameEverywhere);
 Run("mesh: noise handshake agrees and refuses tampering", MeshTransportTests.NoiseHandshakeAgreesAndRejectsTampering);
 Run("mesh: a node id costs a proof of work", MeshTransportTests.ProofOfWorkBindsTheId);
 Run("mesh: sessions carry requests both ways", MeshTransportTests.TransportCarriesRequestsBothWays);

@@ -129,7 +129,22 @@ public static class MeshCrypto
             raw.CopyTo(d, CoordinateLength - raw.Length);
             try
             {
-                return ECDsa.Create(new ECParameters { Curve = ECCurve.NamedCurves.nistP256, D = d });
+                try
+                {
+                    return ECDsa.Create(new ECParameters { Curve = ECCurve.NamedCurves.nistP256, D = d });
+                }
+                catch (Exception exception) when (exception is CryptographicException or PlatformNotSupportedException or ArgumentException)
+                {
+                    // A provider that will not compute the public point from the scalar alone:
+                    // compute it here and hand over both.
+                    var q = MultiplyBase(scalar);
+                    return ECDsa.Create(new ECParameters
+                    {
+                        Curve = ECCurve.NamedCurves.nistP256,
+                        D = d,
+                        Q = new ECPoint { X = Coordinate(q.X), Y = Coordinate(q.Y) }
+                    });
+                }
             }
             finally
             {
@@ -141,6 +156,54 @@ public static class MeshCrypto
         {
             CryptographicOperations.ZeroMemory(material);
         }
+    }
+
+    private static readonly BigInteger GeneratorX = BigInteger.Parse(
+        "06B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296", System.Globalization.NumberStyles.HexNumber);
+
+    private static readonly BigInteger GeneratorY = BigInteger.Parse(
+        "04FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5", System.Globalization.NumberStyles.HexNumber);
+
+    /// <summary>
+    /// <paramref name="scalar"/>·G on P-256, in plain affine arithmetic. Only the fallback of
+    /// <see cref="DeriveSigningKey"/> uses it, for a scalar that is not a long-term secret of
+    /// anyone's identity, so the timing of BigInteger arithmetic is not a concern here.
+    /// </summary>
+    internal static (BigInteger X, BigInteger Y) MultiplyBase(BigInteger scalar)
+    {
+        (BigInteger X, BigInteger Y)? result = null;
+        (BigInteger X, BigInteger Y) addend = (GeneratorX, GeneratorY);
+        while (scalar > 0)
+        {
+            if (!scalar.IsEven) result = result is { } current ? Add(current, addend) : addend;
+            addend = Add(addend, addend);
+            scalar >>= 1;
+        }
+        return result ?? throw new CryptographicException("Scalaire nul.");
+
+        static (BigInteger, BigInteger) Add((BigInteger X, BigInteger Y) p, (BigInteger X, BigInteger Y) q)
+        {
+            BigInteger slope;
+            if (p.X == q.X && p.Y == q.Y)
+                slope = (3 * p.X * p.X - 3) * Inverse(2 * p.Y) % FieldPrime;
+            else
+                slope = (q.Y - p.Y) * Inverse(q.X - p.X) % FieldPrime;
+            var x = Mod(slope * slope - p.X - q.X);
+            var y = Mod(slope * (p.X - x) - p.Y);
+            return (x, y);
+        }
+
+        static BigInteger Mod(BigInteger value) => (value % FieldPrime + FieldPrime) % FieldPrime;
+
+        static BigInteger Inverse(BigInteger value) => BigInteger.ModPow(Mod(value), FieldPrime - 2, FieldPrime);
+    }
+
+    private static byte[] Coordinate(BigInteger value)
+    {
+        var bytes = new byte[CoordinateLength];
+        var raw = value.ToByteArray(isUnsigned: true, isBigEndian: true);
+        raw.CopyTo(bytes, CoordinateLength - raw.Length);
+        return bytes;
     }
 
     public static byte[] Hkdf(ReadOnlySpan<byte> secret, string info, int length, ReadOnlySpan<byte> salt = default) =>

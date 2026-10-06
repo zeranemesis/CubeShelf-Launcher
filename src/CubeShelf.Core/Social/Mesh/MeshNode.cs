@@ -735,15 +735,26 @@ public sealed class MeshNode : IAsyncDisposable
         // than at the next round of upkeep, minutes away.
         if (missing > 0 && Interlocked.Exchange(ref _relayRetryPending, 1) == 0)
         {
-            _ = Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ContinueWith(async _ =>
-            {
-                Interlocked.Exchange(ref _relayRetryPending, 0);
-                if (!cancellationToken.IsCancellationRequested) await EnsureRelaysAsync(cancellationToken).ConfigureAwait(false);
-            }, TaskScheduler.Default);
+            _ = RetryRelaysSoonAsync(cancellationToken);
         }
     }
 
     private int _relayRetryPending;
+
+    private async Task RetryRelaysSoonAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+            Interlocked.Exchange(ref _relayRetryPending, 0);
+            await EnsureRelaysAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            // Cancelled at shutdown, or one more failed round: the upkeep loop tries again.
+            Interlocked.Exchange(ref _relayRetryPending, 0);
+        }
+    }
 
     private static IEnumerable<IPAddress> GlobalIPv6Addresses()
     {

@@ -64,6 +64,35 @@ static class KeyValidationTests
         }
     }
 
+    /// <summary>
+    /// The fallback that computes a public point from a derived scalar agrees with the platform's
+    /// own arithmetic, so a provider that needs it produces the same keys -- and the same record
+    /// locations -- as every other.
+    /// </summary>
+    public static void DerivedKeysAreTheSameEverywhere()
+    {
+        for (var trial = 0; trial < 6; trial++)
+        {
+            using var key = System.Security.Cryptography.ECDsa.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+            var parameters = key.ExportParameters(true);
+            var scalar = new System.Numerics.BigInteger(parameters.D, isUnsigned: true, isBigEndian: true);
+            var (x, y) = MeshCrypto.MultiplyBase(scalar);
+            Check(x == new System.Numerics.BigInteger(parameters.Q.X, isUnsigned: true, isBigEndian: true) &&
+                  y == new System.Numerics.BigInteger(parameters.Q.Y, isUnsigned: true, isBigEndian: true),
+                "our point multiplication matches the platform's");
+        }
+
+        // Same secret, same label: same key, on any machine.
+        using var first = MeshCrypto.DeriveSigningKey(new byte[32], "presence|1");
+        using var second = MeshCrypto.DeriveSigningKey(new byte[32], "presence|1");
+        using var other = MeshCrypto.DeriveSigningKey(new byte[32], "presence|2");
+        Check(MeshCrypto.PublicKeyOf(first).AsSpan().SequenceEqual(MeshCrypto.PublicKeyOf(second)), "deterministic");
+        Check(!MeshCrypto.PublicKeyOf(first).AsSpan().SequenceEqual(MeshCrypto.PublicKeyOf(other)), "a label is a different key");
+        Check(Convert.ToHexString(MeshCrypto.PublicKeyOf(first))[..16] == ExpectedPresence1Prefix(), "pinned value: every platform derives this exact key");
+    }
+
+    private static string ExpectedPresence1Prefix() => "04F067F673ED9D6D";
+
     private static string HandBuilt(byte[] key, string url, string name)
     {
         var urlBytes = Encoding.UTF8.GetBytes(url);
