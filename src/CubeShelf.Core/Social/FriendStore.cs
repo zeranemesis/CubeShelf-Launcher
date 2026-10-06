@@ -58,6 +58,12 @@ public sealed class Friend
     /// say so instead of showing someone who simply never appears.
     /// </summary>
     public bool? SharesWithUs { get; set; }
+
+    /// <summary>
+    /// How to reach their CubeShelf directly on the network, as their last document said
+    /// (<see cref="Mesh.MeshPeerAddress"/>, base64). Null until one said.
+    /// </summary>
+    public string? MeshAddress { get; set; }
 }
 
 /// <summary>
@@ -243,6 +249,23 @@ public sealed class FriendStore
             friend.LastETag = null;
             friend.ConsecutiveFailures = 0;
             friend.NextAttemptAt = null;
+            adopted = true;
+        });
+        return adopted;
+    }
+
+    /// <summary>
+    /// Takes the network address a friend's own authenticated document states, as <see cref="AdoptAddress"/>
+    /// does for the https one. Only something that decodes is kept.
+    /// </summary>
+    public bool AdoptMeshAddress(string publicKeyBase64, string? statedAddress)
+    {
+        if (Mesh.MeshPeerAddress.FromBase64(statedAddress) is not { IsEmpty: false }) return false;
+        var adopted = false;
+        Update(publicKeyBase64, friend =>
+        {
+            if (string.Equals(friend.MeshAddress, statedAddress, StringComparison.Ordinal)) return;
+            friend.MeshAddress = statedAddress;
             adopted = true;
         });
         return adopted;

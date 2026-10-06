@@ -30,7 +30,8 @@ public sealed record PresenceInputs(
     string? Address = null,
     PresenceAvailability Availability = PresenceAvailability.Available,
     string? Activity = null,
-    IReadOnlyDictionary<string, PairwiseNote>? Notes = null);
+    IReadOnlyDictionary<string, PairwiseNote>? Notes = null,
+    string? Mesh = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
@@ -378,6 +379,10 @@ public sealed class PresenceService : IAsyncDisposable
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
                 sequence: 0, _clock(), inputs.Profile, inputs.Invite, inputs.Address,
                 inputs.Availability, inputs.Activity);
+            // Where friends can reach us directly -- unless we asked to look offline, which a
+            // direct connection would give away.
+            if (inputs.Availability != PresenceAvailability.Invisible && !string.IsNullOrEmpty(inputs.Mesh))
+                candidate = candidate with { Mesh = inputs.Mesh };
 
             var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes);
             var heartbeatDue = _lastPublishedAt is not { } previous ||
@@ -501,7 +506,7 @@ public sealed class PresenceService : IAsyncDisposable
             _identity, snapshot, PresenceRecipients.ForPublication(_identity, _friends));
         var json = SealedPresence.ToJson(envelope);
         var result = await _publisher
-            .PublishAsync(json, cancellationToken)
+            .PublishAsync(json, snapshot.Sequence, cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Succeeded)

@@ -24,6 +24,10 @@ public enum PresenceFetchStatus
     Skipped = 5
 }
 
+/// <summary>What the network had for one friend: their sealed document and its sequence, or nothing.</summary>
+/// <param name="Reachable">False when this CubeShelf is not on the network at all: nothing can be said about the friend.</param>
+public sealed record PresenceNetworkRead(string? Json, long Sequence, bool Reachable = true);
+
 public sealed record PresenceFetchOutcome(
     string FriendPublicKey,
     PresenceFetchStatus Status,
@@ -46,6 +50,9 @@ public sealed class PresenceFetcher : IDisposable
     private readonly bool _ownsHttpClient;
     private readonly Func<DateTimeOffset> _clock;
     private bool _disposed;
+
+    /// <summary>Reads a friend through the CubeShelf network, for friends with no https address. Null: not on the network.</summary>
+    public Func<Friend, byte[], CancellationToken, Task<PresenceNetworkRead>>? NetworkReader { get; set; }
 
     public PresenceFetcher(
         PeerIdentity identity,
@@ -109,11 +116,12 @@ public sealed class PresenceFetcher : IDisposable
         if (friend.NextAttemptAt is { } next && next > now)
             return new(friend.PublicKey, PresenceFetchStatus.Skipped);
 
-        // A friend met on the local network who has no public address yet: nothing to poll,
-        // and nothing wrong either -- they are read on the network, and their first document
-        // that states an address makes them pollable from anywhere.
+        // No https address: a friend of the network age, or one met on the local network. They
+        // are read through the network when we are on it, and only then.
         if (string.IsNullOrWhiteSpace(friend.PresenceUrl))
-            return new(friend.PublicKey, PresenceFetchStatus.Skipped);
+            return NetworkReader is { } network
+                ? await FetchFromNetworkAsync(friend, network, now, cancellationToken).ConfigureAwait(false)
+                : new(friend.PublicKey, PresenceFetchStatus.Skipped);
 
         // friends.json is a plain file a user can edit, so the scheme is checked again here and
         // not only when the friend code was decoded.
@@ -181,6 +189,7 @@ public sealed class PresenceFetcher : IDisposable
 
             Succeed(friend, etag, now, advanceSequence: snapshot.Sequence, sharesWithUs: true);
             _friends.AdoptAddress(friend.PublicKey, snapshot.Address);
+            _friends.AdoptMeshAddress(friend.PublicKey, snapshot.Mesh);
             return new(friend.PublicKey, PresenceFetchStatus.Updated, snapshot);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -195,6 +204,55 @@ public sealed class PresenceFetcher : IDisposable
         {
             return Fail(friend, PresenceFetchStatus.Unreachable, exception.Message, connectivity: true);
         }
+    }
+
+    private async Task<PresenceFetchOutcome> FetchFromNetworkAsync(
+        Friend friend,
+        Func<Friend, byte[], CancellationToken, Task<PresenceNetworkRead>> network,
+        DateTimeOffset now,
+        CancellationToken cancellationToken)
+    {
+        byte[] publicKey;
+        try
+        {
+            publicKey = Convert.FromBase64String(friend.PublicKey);
+            PeerIdentity.ValidatePublicKey(publicKey);
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException)
+        {
+            return new(friend.PublicKey, PresenceFetchStatus.Unreachable, Error: "Clé publique illisible.");
+        }
+
+        var read = await network(friend, publicKey, cancellationToken).ConfigureAwait(false);
+        if (!read.Reachable) return new(friend.PublicKey, PresenceFetchStatus.Skipped);
+
+        // Nothing published in the last day or so. Not a failure to back off from: they are
+        // simply not around, and should be seen the moment they are.
+        if (read.Json is null) return new(friend.PublicKey, PresenceFetchStatus.NotPublished, Error: "Cet ami n’a rien publié récemment.");
+
+        // The record's sequence is signed by a key only that friend can derive, so an unchanged
+        // one needs no opening -- the network's equivalent of a 304.
+        if (read.Sequence <= friend.LastSequence) return new(friend.PublicKey, PresenceFetchStatus.NotModified);
+
+        if (read.Json.Length > PresencePolicy.MaximumDocumentBytes ||
+            !SealedPresence.TryOpen(_identity, publicKey, SealedPresence.FromJson(read.Json), out var snapshot) || snapshot is null)
+        {
+            _friends.Update(friend.PublicKey, entry => entry.SharesWithUs = false);
+            return new(friend.PublicKey, PresenceFetchStatus.Rejected, Error: "Cet ami ne partage pas (ou plus) sa présence avec toi.");
+        }
+
+        if (!_friends.TryAcceptSequence(friend.PublicKey, snapshot.Sequence, now))
+            return new(friend.PublicKey, PresenceFetchStatus.Rejected, Error: "Document de présence déjà vu.");
+
+        _friends.Update(friend.PublicKey, entry =>
+        {
+            entry.SharesWithUs = true;
+            entry.ConsecutiveFailures = 0;
+            entry.NextAttemptAt = null;
+        });
+        _friends.AdoptAddress(friend.PublicKey, snapshot.Address);
+        _friends.AdoptMeshAddress(friend.PublicKey, snapshot.Mesh);
+        return new(friend.PublicKey, PresenceFetchStatus.Updated, snapshot);
     }
 
     /// <summary>

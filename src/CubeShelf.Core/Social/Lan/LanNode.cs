@@ -381,6 +381,7 @@ public sealed class LanNode : IAsyncDisposable
 
         _friends.Update(friendKey, entry => entry.SharesWithUs = true);
         _friends.AdoptAddress(friendKey, snapshot.Address);
+        _friends.AdoptMeshAddress(friendKey, snapshot.Mesh);
         return new PresenceFetchOutcome(friendKey, PresenceFetchStatus.Updated, snapshot);
     }
 

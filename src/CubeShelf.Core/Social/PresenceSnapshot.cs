@@ -97,7 +97,14 @@ public sealed record PresenceSnapshot(
     string? Activity = null,
 
     /// <summary>Messages and answers for single friends, each sealed for its one reader (<see cref="PairwiseNotes"/>).</summary>
-    IReadOnlyList<SealedNote>? Notes = null)
+    IReadOnlyList<SealedNote>? Notes = null,
+
+    /// <summary>
+    /// How to reach the author's CubeShelf on the network directly (<see cref="Mesh.MeshPeerAddress"/>,
+    /// base64): its own addresses when it can listen, its relays otherwise. Inside the sealed
+    /// document, so only friends ever learn it.
+    /// </summary>
+    string? Mesh = null)
 {
     public const string AvailabilityAway = "away";
     public const string AvailabilityBusy = "busy";

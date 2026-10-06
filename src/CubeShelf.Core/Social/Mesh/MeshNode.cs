@@ -646,6 +646,13 @@ public sealed class MeshNode : IAsyncDisposable
                 if (_held.Any(held => held.Endpoint.Equals(contact.Endpoint))) continue;
 
             var session = await Transport.ConnectAsync(MeshRoute.Direct(contact.Endpoint), cancellationToken).ConfigureAwait(false);
+            if (session is not null && session.RemoteId == contact.Id && !session.RemoteFlags.HasFlag(MeshNodeFlags.Relay) && !session.Pinned)
+            {
+                // A session from before that node knew it was reachable still says it is not:
+                // the table says otherwise, so ask again on a fresh handshake.
+                Transport.Close(session);
+                session = await Transport.ConnectAsync(MeshRoute.Direct(contact.Endpoint), cancellationToken).ConfigureAwait(false);
+            }
             if (session is null || session.RemoteId != contact.Id || !session.RemoteFlags.HasFlag(MeshNodeFlags.Relay)) continue;
             var reply = await Transport.RequestAsync(session, MeshOps.Reserve, new byte[MeshRelayContact.TokenLength], cancellationToken).ConfigureAwait(false);
             if (reply is not { Length: 1 + MeshRelayContact.TokenLength + 4 } || reply[0] != 0) continue;
@@ -661,7 +668,20 @@ public sealed class MeshNode : IAsyncDisposable
             changed = true;
         }
         if (changed) Changed?.Invoke();
+
+        // Short of relays -- the table was still thin, a relay was full: try again soon rather
+        // than at the next round of upkeep, minutes away.
+        if (missing > 0 && Interlocked.Exchange(ref _relayRetryPending, 1) == 0)
+        {
+            _ = Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ContinueWith(async _ =>
+            {
+                Interlocked.Exchange(ref _relayRetryPending, 0);
+                if (!cancellationToken.IsCancellationRequested) await EnsureRelaysAsync(cancellationToken).ConfigureAwait(false);
+            }, TaskScheduler.Default);
+        }
     }
+
+    private int _relayRetryPending;
 
     private static IEnumerable<IPAddress> GlobalIPv6Addresses()
     {

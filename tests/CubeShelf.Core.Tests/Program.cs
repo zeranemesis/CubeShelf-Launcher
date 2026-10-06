@@ -126,6 +126,11 @@ Run("mesh: two closed routers punch through", MeshNodeTests.TwoClosedRoutersPunc
 Run("mesh: symmetric routers fall back to the relay", MeshNodeTests.SymmetricRoutersFallBackToTheRelay);
 Run("mesh: dial-backs cannot be aimed elsewhere", MeshNodeTests.DialBacksCannotBeAimedElsewhere);
 Run("mesh: the nodes file brings a node back without seeds", MeshNodeTests.NodesFileBringsANodeBackWithoutSeeds);
+Run("mesh: friend codes carry entry points, never private ones", MeshFriendsTests.FriendCodesCarryEntryPointsAndRefusePrivateOnes);
+Run("mesh: friends find each other, strangers do not", MeshFriendsTests.FriendsFindEachOtherAndStrangersDoNot);
+Run("mesh: online friends talk directly", MeshFriendsTests.OnlineFriendsTalkDirectly);
+Run("mesh: friend proofs cannot be forged or replayed", MeshFriendsTests.FriendProofsCannotBeForgedOrReplayed);
+Run("mesh: requests arrive and cannot be forged", MeshFriendsTests.RequestsArriveAndCannotBeForged);
 Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
 Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
 Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);
