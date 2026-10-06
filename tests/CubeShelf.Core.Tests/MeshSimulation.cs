@@ -47,7 +47,8 @@ sealed class SimulatedNetwork
         lock (_gate)
         {
             var n = _nextPublic++;
-            return new IPAddress(new byte[] { 11, (byte)(n >> 16), (byte)(n >> 8), (byte)n });
+            // One /24 per host, as on the real Internet: the diversity limits are per neighbourhood.
+            return new IPAddress(new byte[] { 11, (byte)(n >> 8), (byte)n, 1 });
         }
     }
 
@@ -251,6 +252,11 @@ static class MeshKit
     {
         if (!task.Wait(milliseconds)) throw new InvalidOperationException("Délai dépassé dans le test.");
         return task.Result;
+    }
+
+    public static void Wait(Task task, int milliseconds = 15000)
+    {
+        if (!task.Wait(milliseconds)) throw new InvalidOperationException("Délai dépassé dans le test.");
     }
 
     public static void Eventually(Func<bool> condition, string what, int milliseconds = 8000)

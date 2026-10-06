@@ -114,6 +114,13 @@ Run("mesh: handshakes ask for cookies under load", MeshTransportTests.TransportA
 Run("mesh: a leaving peer fails pending requests at once", MeshTransportTests.TransportFailsPendingRequestsWhenThePeerLeaves);
 Run("mesh: a node never opens a session with itself", MeshTransportTests.TransportRefusesToTalkToItself);
 Run("mesh: sessions over real UDP sockets", MeshTransportTests.TransportWorksOverRealUdp);
+Run("mesh: one neighbourhood cannot flood the routing table", MeshDhtTests.TableLimitsOneNeighbourhood);
+Run("mesh: holders refuse what does not verify", MeshDhtTests.HoldersRefuseWhatDoesNotVerify);
+Run("mesh: lookups converge on the closest nodes", MeshDhtTests.LookupsConvergeOnTheClosestNodes);
+Run("mesh: records are stored, found and updated", MeshDhtTests.RecordsAreStoredFoundAndUpdated);
+Run("mesh: records outlive their holders", MeshDhtTests.RecordsOutliveTheirHolders);
+Run("mesh: nodes behind NAT use the table", MeshDhtTests.NodesBehindNatUseTheTable);
+Run("mesh: lies in answers never enter the table", MeshDhtTests.LiesInAnswersNeverEnterTheTable);
 
 if (failures.Count == 0)
 {
