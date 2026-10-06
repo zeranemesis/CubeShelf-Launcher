@@ -28,7 +28,8 @@ public sealed partial class MainWindow
         Avalonia.Media.Imaging.Bitmap? Avatar = null,
         string StatusLine = "",
         bool CanInvite = false,
-        bool CanSendOwnCode = false)
+        bool CanSendOwnCode = false,
+        bool CanMessage = false)
     {
         /// <summary>Everything that is a decision about an active friend, and not about a tombstone.</summary>
         public bool CanBlock => !IsBlocked;
@@ -148,7 +149,11 @@ public sealed partial class MainWindow
             _outgoingInvite,
             // Stated inside the document, so friends met on the network learn where to read us
             // from anywhere -- only once a round trip has proven it.
-            IsAddressVerified() ? _preferences.PresenceUrl : null)).GetTask();
+            IsAddressVerified() ? _preferences.PresenceUrl : null,
+            EffectiveAvailability,
+            // What the game says is happening, while it runs.
+            _sessions.RunningGameIds.Count > 0 ? InGameBridge.ReadActivity(InGameDirectory, DateTimeOffset.UtcNow) : null,
+            _messages?.Outgoing(DateTimeOffset.UtcNow))).GetTask();
 
     private void OnFriendsSessionChanged(string gameId) =>
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
@@ -241,6 +246,7 @@ public sealed partial class MainWindow
         {
             _friendPresence.TryGetValue(outcome.FriendPublicKey, out var previous);
             _friendPresence[outcome.FriendPublicKey] = outcome.Snapshot!;
+            ReceiveNotes(outcome.FriendPublicKey, outcome.Snapshot!);
             AnnounceInvite(outcome.FriendPublicKey, outcome.Snapshot!);
             AnnounceComingOnline(outcome.FriendPublicKey, previous, outcome.Snapshot!);
         }
@@ -336,12 +342,7 @@ public sealed partial class MainWindow
             ? P7("⏸ En pause", "⏸ Paused")
             : pending
             ? P7("⏳ En attente", "⏳ Pending")
-            : status switch
-            {
-                PresenceStatus.InGame => "▶ " + (known?.CurrentGameTitle ?? P7("En jeu", "In a game")),
-                PresenceStatus.Online => P7("● En ligne", "● Online"),
-                _ => P7("○ Hors ligne", "○ Offline")
-            };
+            : DescribeFriendStatus(known, status);
 
         var detail = friend.Blocked
             ? P7("Bloqué. Ni lu, ni destinataire de ta présence.",
@@ -362,6 +363,9 @@ public sealed partial class MainWindow
             : "";
         if (!friend.Blocked && IsOnLan(friend.PublicKey))
             seen = (seen.Length > 0 ? seen + " • " : "") + P7("📶 Sur ton réseau", "📶 On your network");
+        var unread = _messages?.Unread(friend.PublicKey) ?? 0;
+        if (unread > 0 && !friend.Blocked)
+            seen = P7($"💬 {unread} nouveau(x) message(s)", $"💬 {unread} new message(s)") + (seen.Length > 0 ? " • " + seen : "");
         var failing = friend.ConsecutiveFailures > 0
             ? P7($" • {friend.ConsecutiveFailures} échec(s) de lecture", $" • {friend.ConsecutiveFailures} read failure(s)")
             : "";
@@ -373,11 +377,13 @@ public sealed partial class MainWindow
         var mine = invite is not null &&
                    invite.IsLive(now) &&
                    _identity is not null &&
-                   invite.IsFor(Convert.ToBase64String(_identity.PublicKey));
+                   invite.IsFor(Convert.ToBase64String(_identity.PublicKey)) &&
+                   !IsDeclined(friend.PublicKey, invite);
 
+        var answered = InviteAnswerLine(friend.PublicKey);
         var invited = mine
             ? P7($"T’invite sur {invite!.GameTitle}", $"Invites you to {invite!.GameTitle}")
-            : "";
+            : answered;
 
         // Invite someone who could come now; not someone who is inviting you already -- the Join
         // button beside them is the answer to that.
@@ -402,7 +408,9 @@ public sealed partial class MainWindow
             friend.Blocked ? null : FriendAvatar(known?.Profile?.AvatarPng),
             friend.Blocked ? "" : known?.Profile?.StatusLine ?? "",
             canInvite,
-            pending && _ownFriendCode.Length > 0);
+            pending && _ownFriendCode.Length > 0,
+            // Writing to someone who does not read us would go nowhere; they get "Send my code".
+            !friend.Paused && !friend.Blocked && !pending && _messages is not null);
     }
 
     /// <summary>

@@ -317,6 +317,8 @@ public sealed partial class MainWindow
         }
 
         var (started, message) = StartJoining(game, row.Name, row.JoinPayload);
+        if (started && _friendPresence.TryGetValue(row.PublicKey, out var known) && known.Invite is { } accepted)
+            AnswerInvite(row.PublicKey, accepted, InviteReply.Joined);
         ShowToastParity(P7("Invitation", "Invitation"),
             message.Length > 0 ? message
                 : P7($"Tu rejoins {row.Name}. Le compagnon vérifie ton disque puis entre dans le salon.",

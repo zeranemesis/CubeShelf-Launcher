@@ -38,6 +38,7 @@ public sealed partial class MainWindow
             RefreshPortableQueueView();
             RefreshDolphinStatusPhase4Core();
             RefreshStoragePhase6();
+            ApplyAvailabilityPicker();
             RefreshParityGameDetails();
             RefreshFriendsView();
         }, DispatcherPriority.Background);

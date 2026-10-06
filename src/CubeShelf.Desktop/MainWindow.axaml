@@ -355,6 +355,7 @@
               <TextBlock x:Name="FriendsSubtitleText" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <ComboBox x:Name="AvailabilityPicker" MinWidth="170" VerticalAlignment="Center" Margin="0,0,8,0" SelectionChanged="AvailabilityChanged" />
               <Button Content="{DynamicResource AddFriend}" Classes="primary" Click="AddFriend" />
               <Button Content="{DynamicResource LanAdd}" Click="OpenLanDialog" />
               <Button Content="{DynamicResource FriendsRefresh}" Click="RefreshFriendsNow" />
@@ -397,6 +398,8 @@
                       </StackPanel>
                       <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Classes="primary" Content="{DynamicResource FriendJoin}" Tag="{Binding}" IsVisible="{Binding CanJoin}" Click="JoinFriendInvite" />
+                        <Button Content="{DynamicResource FriendDecline}" Tag="{Binding}" IsVisible="{Binding CanJoin}" Click="DeclineFriendInvite" />
+                        <Button Content="{DynamicResource FriendMessage}" Tag="{Binding}" IsVisible="{Binding CanMessage}" Click="OpenChat" />
                         <Button Classes="primary" Content="{DynamicResource FriendInvite}" Tag="{Binding}" IsVisible="{Binding CanInvite}" Click="InviteFriend" />
                         <Button Classes="primary" Content="{DynamicResource FriendSendMyCode}" Tag="{Binding}" IsVisible="{Binding CanSendOwnCode}" Click="SendOwnCodeToFriend" />
                         <Button Content="{Binding PauseAction}" Tag="{Binding}" IsVisible="{Binding CanBlock}" Click="ToggleFriendPause" />
@@ -560,6 +563,7 @@
                 <TextBlock Text="{DynamicResource NotificationsTitle}" FontWeight="Bold" Margin="0,14,0,0" />
                 <CheckBox x:Name="CloseToTrayBox" Content="{DynamicResource CloseToTray}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="NotifyOnlineBox" Content="{DynamicResource NotifyFriendsOnline}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <CheckBox x:Name="AutoAwayBox" Content="{DynamicResource AutoAway}" Checked="SaveSettings" Unchecked="SaveSettings" />
               </StackPanel>
             </Border>
           </StackPanel>

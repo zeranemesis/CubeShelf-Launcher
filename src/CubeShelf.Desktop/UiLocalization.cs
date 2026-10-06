@@ -185,6 +185,9 @@ internal static class UiLocalization
         ["NotificationsTitle"] = "Notifications",
         ["CloseToTray"] = "Fermer la fenêtre garde CubeShelf près de l’horloge (tes amis te voient toujours, les invitations arrivent)",
         ["NotifyFriendsOnline"] = "Me prévenir quand un ami se connecte ou lance un jeu",
+        ["FriendDecline"] = "Décliner",
+        ["FriendMessage"] = "Message",
+        ["AutoAway"] = "Me mettre « absent » après 10 minutes d’inactivité",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -368,6 +371,9 @@ internal static class UiLocalization
         ["NotificationsTitle"] = "Notifications",
         ["CloseToTray"] = "Closing the window keeps CubeShelf near the clock (friends still see you, invitations still arrive)",
         ["NotifyFriendsOnline"] = "Tell me when a friend comes online or starts a game",
+        ["FriendDecline"] = "Decline",
+        ["FriendMessage"] = "Message",
+        ["AutoAway"] = "Set me “away” after 10 minutes of inactivity",
     };
 
     public static bool IsEnglish(string? language) =>

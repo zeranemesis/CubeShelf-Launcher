@@ -178,6 +178,7 @@ public sealed partial class MainWindow
 
         _friends.Remove(row.PublicKey);
         _friendPresence.TryRemove(row.PublicKey, out _);
+        _messages?.Forget(row.PublicKey);
         RefreshFriendsView();
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
     }
@@ -362,6 +363,7 @@ public sealed partial class MainWindow
         LanVisibleBox.IsChecked = _preferences.LanVisible;
         CloseToTrayBox.IsChecked = _preferences.CloseToTray;
         NotifyOnlineBox.IsChecked = _preferences.NotifyFriendsOnline;
+        AutoAwayBox.IsChecked = _preferences.AutoAway;
         ApplyProfilePreferences();
 
         // The code stays hidden until a self-test proves the address serves a readable document.
@@ -383,7 +385,8 @@ public sealed partial class MainWindow
             ShareProfile = ShareProfileBox.IsChecked == true,
             LanVisible = LanVisibleBox.IsChecked == true,
             CloseToTray = CloseToTrayBox.IsChecked == true,
-            NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true
+            NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true,
+            AutoAway = AutoAwayBox.IsChecked == true
         };
 
         // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,

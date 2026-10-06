@@ -102,6 +102,7 @@ public sealed partial class MainWindow : Window
 
         // After the catalog is loaded, so the first document published is not an empty shelf.
         InitializeFriends();
+        InitializeSocial();
         // And again here, because the pinned-game list is the shelf: ApplyPreferences ran before
         // the catalog existed and could only offer "None".
         ApplyProfilePreferences();
@@ -132,6 +133,7 @@ public sealed partial class MainWindow : Window
             // Before the tracker is disposed: the farewell document has to still know whether
             // a game is running, or a friend is left looking at a stale "in a game".
             StopInGameBridge();
+            DisposeSocial();
             DisposeFriends();
             _sessions.Dispose();
             DisposePhase3Parity();
@@ -537,9 +539,6 @@ public sealed partial class MainWindow : Window
     private void ShowDownloads(object? sender, RoutedEventArgs args)
     {
         ShowParityView(DownloadsView);
-
-        // After the catalog is loaded, so the first document published is not an empty shelf.
-        InitializeFriends();
         RefreshDownloadItems();
     }
 
@@ -743,7 +742,9 @@ public sealed partial class MainWindow : Window
         LanVisible = current.LanVisible,
         CloseToTray = current.CloseToTray,
         NotifyFriendsOnline = current.NotifyFriendsOnline,
-        TrayHintShown = current.TrayHintShown
+        TrayHintShown = current.TrayHintShown,
+        Availability = current.Availability,
+        AutoAway = current.AutoAway
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)

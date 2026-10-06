@@ -234,6 +234,9 @@
       <x:String x:Key="NotificationsTitle">Notifications</x:String>
       <x:String x:Key="CloseToTray">Fermer la fenêtre garde CubeShelf près de l’horloge (tes amis te voient toujours, les invitations arrivent)</x:String>
       <x:String x:Key="NotifyFriendsOnline">Me prévenir quand un ami se connecte ou lance un jeu</x:String>
+      <x:String x:Key="FriendDecline">Décliner</x:String>
+      <x:String x:Key="FriendMessage">Message</x:String>
+      <x:String x:Key="AutoAway">Me mettre « absent » après 10 minutes d’inactivité</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

@@ -27,7 +27,10 @@ public sealed record PresenceInputs(
     PresenceSharingOptions Sharing,
     ProfileInputs? Profile = null,
     PresenceInvite? Invite = null,
-    string? Address = null);
+    string? Address = null,
+    PresenceAvailability Availability = PresenceAvailability.Available,
+    string? Activity = null,
+    IReadOnlyDictionary<string, PairwiseNote>? Notes = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
@@ -87,6 +90,9 @@ public sealed class PresenceService : IAsyncDisposable
 
     /// <summary>The address the last capture stated, so the farewell can state it too without asking again.</summary>
     private string? _lastAddress;
+
+    /// <summary>The notes the last capture had, for the same reason.</summary>
+    private IReadOnlyDictionary<string, PairwiseNote>? _lastNotes;
     private DateTimeOffset? _lastPublishedAt;
     private int _shutdownPublished;
     private bool _disposed;
@@ -282,7 +288,12 @@ public sealed class PresenceService : IAsyncDisposable
             await _publishGate.WaitAsync(deadline.Token).ConfigureAwait(false);
             gated = true;
 
-            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock(), _lastAddress);
+            // The farewell still carries what we had to say to single friends: a message sent
+            // just before quitting reaches them while we are away, not when we come back.
+            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock(), _lastAddress) with
+            {
+                Notes = _lastNotes is { Count: > 0 } notes ? PairwiseNotes.SealAll(_identity, notes) : null
+            };
             await PublishSnapshotAsync(PresencePublishReason.Shutdown, snapshot, deadline.Token)
                 .ConfigureAwait(false);
         }
@@ -362,11 +373,13 @@ public sealed class PresenceService : IAsyncDisposable
 
             var inputs = await CaptureAsync(cancellationToken).ConfigureAwait(false);
             _lastAddress = inputs.Address;
+            _lastNotes = inputs.Notes;
             var candidate = _composer.Compose(
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
-                sequence: 0, _clock(), inputs.Profile, inputs.Invite, inputs.Address);
+                sequence: 0, _clock(), inputs.Profile, inputs.Invite, inputs.Address,
+                inputs.Availability, inputs.Activity);
 
-            var fingerprint = PresenceComposer.ContentFingerprint(candidate);
+            var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes);
             var heartbeatDue = _lastPublishedAt is not { } previous ||
                 _clock() - previous >= _options.Heartbeat;
 
@@ -374,7 +387,13 @@ public sealed class PresenceService : IAsyncDisposable
             // again would only churn the sync client.
             if (fingerprint == _lastFingerprint && !heartbeatDue) return;
 
-            var snapshot = candidate with { Sequence = _sequence.Next(_clock()) };
+            var snapshot = candidate with
+            {
+                Sequence = _sequence.Next(_clock()),
+                Notes = inputs.Notes is { Count: > 0 } notes && PairwiseNotes.SealAll(_identity, notes) is { Count: > 0 } sealedNotes
+                    ? sealedNotes
+                    : null
+            };
             var result = await PublishSnapshotAsync(reason, snapshot, cancellationToken).ConfigureAwait(false);
             if (result.Succeeded)
             {

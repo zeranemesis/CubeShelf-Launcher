@@ -108,8 +108,9 @@ public sealed partial class MainWindow
     /// </summary>
     private void Notify(string title, string body, bool showFriends = true)
     {
+        // Do not disturb means exactly that: nothing in the corner, only the line in the window.
         var looking = IsVisible && IsActive && WindowState != WindowState.Minimized;
-        if (looking || _sessions.RunningGameIds.Count > 0)
+        if (looking || DoNotDisturb || _sessions.RunningGameIds.Count > 0)
         {
             ShowToastParity(title, body);
             return;

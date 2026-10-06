@@ -90,6 +90,10 @@ Run("an impostor on the network gets nothing", TestLanImpostorIsRefused);
 Run("a friend's stated address is adopted", TestStatedAddressIsAdopted);
 Run("friends who are around are read more often", TestActiveFriendsAreReadMoreOften);
 Run("a profile can live in a folder of its own", TestDataDirectoryOverride);
+Run("a note to one friend is read by that friend only", TestNotesReachOnlyTheirReader);
+Run("messages are delivered once and acknowledged", TestMessagesAreDeliveredAndAcknowledged);
+Run("availability, invisibility and what the game says", TestAvailabilityAndActivity);
+Run("unchanged notes do not force a publish", TestUnchangedNotesDoNotForceAPublish);
 
 if (failures.Count == 0)
 {
@@ -3051,6 +3055,197 @@ void TestLanImpostorIsRefused()
         {
             a.DisposeAsync().AsTask().GetAwaiter().GetResult();
             m.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestNotesReachOnlyTheirReader()
+{
+    using var alice = PeerIdentity.Create();
+    using var bob = PeerIdentity.Create();
+    using var carol = PeerIdentity.Create();
+    var bobKey = System.Convert.ToBase64String(bob.PublicKey);
+    var carolKey = System.Convert.ToBase64String(carol.PublicKey);
+
+    var toBob = new PairwiseNote(new[] { new NoteMessage(1, "Salut Bob", DateTimeOffset.UtcNow) }, 0, Array.Empty<InviteReply>());
+    var toCarol = new PairwiseNote(Array.Empty<NoteMessage>(), 5, new[] { new InviteReply("abc", InviteReply.Declined, DateTimeOffset.UtcNow) });
+    var notes = PairwiseNotes.SealAll(alice, new Dictionary<string, PairwiseNote>
+    {
+        [bobKey] = toBob,
+        [carolKey] = toCarol,
+        [System.Convert.ToBase64String(alice.PublicKey)] = PairwiseNote.Empty   // nothing to say: no note at all
+    });
+    // Two real notes, padded with decoys: the count does not say who one talks to.
+    Assert(notes.Count == 4);
+
+    Assert(PairwiseNotes.TryOpen(bob, alice.PublicKey, notes, out var bobs) && bobs!.Messages.Single().Text == "Salut Bob");
+    Assert(PairwiseNotes.TryOpen(carol, alice.PublicKey, notes, out var carols) && carols!.Ack == 5 &&
+           carols.Replies.Single().Reply == InviteReply.Declined && carols.Messages.Count == 0);
+
+    // Read under the wrong author -- someone passing Alice's note to Bob off as Carol's -- nothing opens.
+    Assert(!PairwiseNotes.TryOpen(bob, carol.PublicKey, notes, out _));
+    // And a tampered note opens for nobody.
+    var tampered = notes.Select(note => new SealedNote { Hint = note.Hint, Nonce = note.Nonce, Tag = note.Tag,
+        Ciphertext = System.Convert.ToBase64String(System.Convert.FromBase64String(note.Ciphertext).Select(b => (byte)(b ^ 1)).ToArray()) }).ToArray();
+    Assert(!PairwiseNotes.TryOpen(bob, alice.PublicKey, tampered, out _));
+
+    // Whatever the friend's software wrote, only plain bounded text comes out.
+    var hostile = PairwiseNotes.SealAll(alice, new Dictionary<string, PairwiseNote>
+    {
+        [bobKey] = new(new[] { new NoteMessage(2, "a\u001b[31mb‮c" + new string('x', 900), DateTimeOffset.UtcNow) }, -3,
+            new[] { new InviteReply("i", "pwned", DateTimeOffset.UtcNow) })
+    });
+    Assert(PairwiseNotes.TryOpen(bob, alice.PublicKey, hostile, out var cleaned));
+    var text = cleaned!.Messages.Single().Text;
+    Assert(!text.Contains('\u001b') && !text.Contains('‮') && text.Length <= ChatText.MaximumLength);
+    Assert(cleaned.Ack == 0 && cleaned.Replies.Count == 0);
+}
+
+void TestMessagesAreDeliveredAndAcknowledged()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        var aliceKey = System.Convert.ToBase64String(alice.PublicKey);
+        var bobKey = System.Convert.ToBase64String(bob.PublicKey);
+        var aliceStore = new MessageStore(Path.Combine(root, "a"));
+        var bobStore = new MessageStore(Path.Combine(root, "b"));
+        var now = DateTimeOffset.UtcNow;
+
+        // What travels is what the stores say, sealed and opened as the documents would carry it.
+        PairwiseNote Carry(PeerIdentity from, PeerIdentity to, MessageStore store)
+        {
+            var outgoing = store.Outgoing(now);
+            var sealedNotes = PairwiseNotes.SealAll(from, outgoing);
+            return PairwiseNotes.TryOpen(to, from.PublicKey, sealedNotes, out var note) ? note! : PairwiseNote.Empty;
+        }
+
+        var first = aliceStore.Send(bobKey, "On joue ce soir ?", now)!;
+        var second = aliceStore.Send(bobKey, "  \u0007  ", now);   // nothing left once cleaned: not sent
+        aliceStore.Send(bobKey, "Mario Party 4", now);
+        Assert(second is null);
+
+        var arrived = bobStore.Receive(aliceKey, Carry(alice, bob, aliceStore), now);
+        Assert(arrived.Count == 2 && arrived[0].Text == "On joue ce soir ?" && bobStore.Unread(aliceKey) == 2);
+
+        // The same document read again -- the next heartbeat -- brings nothing new.
+        Assert(bobStore.Receive(aliceKey, Carry(alice, bob, aliceStore), now).Count == 0 && bobStore.Unread(aliceKey) == 2);
+
+        // Bob's next document acknowledges them; Alice stops carrying them.
+        Assert(aliceStore.Receive(bobKey, Carry(bob, alice, bobStore), now).Count == 0);
+        Assert(aliceStore.Conversation(bobKey).All(message => message.Delivered));
+        Assert(!aliceStore.Outgoing(now).ContainsKey(bobKey));
+
+        bobStore.MarkRead(aliceKey);
+        Assert(bobStore.Unread(aliceKey) == 0);
+
+        // An answer to an invitation rides along until it is stale.
+        bobStore.Reply(aliceKey, "inv1", InviteReply.Joined, now);
+        Assert(Carry(bob, alice, bobStore).Replies.Single().Invite == "inv1");
+        Assert(!bobStore.Outgoing(now + TimeSpan.FromHours(1)).TryGetValue(aliceKey, out var later) || later.Replies.Count == 0);
+
+        // A lost history does not restart numbering below what the friend already has.
+        File.Delete(Path.Combine(root, "a", "messages.json"));
+        var fresh = new MessageStore(Path.Combine(root, "a")).Send(bobKey, "Toujours là", now + TimeSpan.FromSeconds(5))!;
+        Assert(fresh.Id > first.Id);
+    });
+}
+
+void TestAvailabilityAndActivity()
+{
+    WithTempRoot(root =>
+    {
+        var composer = new PresenceComposer(new TestPaths(root));
+        var now = DateTimeOffset.UtcNow;
+        var playing = new[] { "GMPE01" };
+        var library = new[] { new PresenceGame("GMPE01", "Mario Party 4", 3, 3600, true, now) };
+
+        var away = composer.Compose("Zera", library, Array.Empty<string>(), new PresenceSharingOptions(), 1, now,
+            availability: PresenceAvailability.Away);
+        // An older CubeShelf still reads "online": the nuance is a separate field.
+        Assert(away.Status == PresenceStatus.Online && away.Availability == PresenceSnapshot.AvailabilityAway);
+
+        var busy = composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 2, now,
+            availability: PresenceAvailability.Busy, activity: "Plateau de Toad\n— tour 12/20\u001b");
+        Assert(busy.Status == PresenceStatus.InGame && busy.Availability == PresenceSnapshot.AvailabilityBusy);
+        Assert(busy.Activity == "Plateau de Toad — tour 12/20");
+
+        // What the game says is only published with the game, and under the same switch.
+        Assert(composer.Compose("Zera", library, Array.Empty<string>(), new PresenceSharingOptions(), 3, now, activity: "x").Activity is null);
+        Assert(composer.Compose("Zera", library, playing, new PresenceSharingOptions(ShareCurrentGame: false), 4, now, activity: "x").Activity is null);
+        Assert(composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 5, now, activity: new string('a', 400))
+            .Activity!.Length == PresenceSnapshot.MaximumActivityLength);
+
+        // Invisible: offline to everyone, playing or not, nothing else -- except notes and the address.
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var notes = PairwiseNotes.SealAll(me, new Dictionary<string, PairwiseNote>
+        {
+            [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(9, "psst", now) }, 0, Array.Empty<InviteReply>())
+        });
+        var invisible = composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 6, now,
+            address: "https://c.example.test/p.json", availability: PresenceAvailability.Invisible, activity: "x", notes: notes);
+        Assert(invisible.Status == PresenceStatus.Offline && invisible.CurrentGameId is null && invisible.Library.Count == 0);
+        Assert(invisible.Activity is null && invisible.Availability is null && invisible.Profile is null);
+        Assert(invisible.Address == "https://c.example.test/p.json" && invisible.Notes!.Count == notes.Count);
+        Assert(PairwiseNotes.TryOpen(friend, me.PublicKey, invisible.Notes, out var still) && still!.Messages.Single().Text == "psst");
+
+        // An invitation is named in answers by an id, never by its payload.
+        var invite = new PresenceInvite("GMPE01", "Mario Party 4", "secret-lobby-token", now.AddMinutes(10));
+        Assert(invite.Id.Length == 16 && invite.Id == new PresenceInvite("GMPE01", "x", "secret-lobby-token", now).Id);
+        Assert(!System.Text.Json.JsonSerializer.Serialize(invite).Contains(invite.Id, StringComparison.Ordinal));
+    });
+}
+
+void TestUnchangedNotesDoNotForceAPublish()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(friend.PublicKey, "https://f.example.test/p.json"), "F", me.PublicKey, out _));
+        var notes = new Dictionary<string, PairwiseNote>
+        {
+            [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(1, "salut", DateTimeOffset.UtcNow) }, 0, Array.Empty<InviteReply>())
+        };
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions(), Notes: notes);
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)), new PresenceSequence(root),
+            new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://me.example.test/p.json")),
+            new PresenceFetcher(me, friends, client), _ => Task.FromResult(inputs),
+            new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1)));
+        try
+        {
+            service.Start(CancellationToken.None);
+            for (var wait = 0; wait < 100 && service.PublishCount == 0; wait++) Thread.Sleep(20);
+            Assert(service.PublishCount == 1);
+
+            // Same notes again: sealed afresh they would differ byte for byte, but nothing changed.
+            service.RequestPublish(PresencePublishReason.Manual);
+            Thread.Sleep(300);
+            Assert(service.PublishCount == 1);
+
+            // A new message is a change.
+            inputs = inputs with { Notes = new Dictionary<string, PairwiseNote>
+            {
+                [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(1, "salut", DateTimeOffset.UnixEpoch), new NoteMessage(2, "ça va ?", DateTimeOffset.UnixEpoch) }, 0, Array.Empty<InviteReply>())
+            } };
+            service.RequestPublish(PresencePublishReason.Manual);
+            for (var wait = 0; wait < 100 && service.PublishCount == 1; wait++) Thread.Sleep(20);
+            Assert(service.PublishCount == 2);
+
+            // And the published document carries it, readable by its one friend.
+            var envelope = SealedPresence.FromJson(File.ReadAllText(Path.Combine(folder, SyncedFolderTarget.DefaultFileName)));
+            Assert(SealedPresence.TryOpen(friend, me.PublicKey, envelope, out var opened));
+            Assert(PairwiseNotes.TryOpen(friend, me.PublicKey, opened!.Notes, out var note) && note!.Messages.Count == 2);
+        }
+        finally
+        {
+            service.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
     });
 }

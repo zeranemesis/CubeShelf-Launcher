@@ -52,6 +52,37 @@ public sealed record InGameRequest(string Id, InGameAction Action, string Friend
 public static class InGameBridge
 {
     public const string DirectoryVariable = "CUBESHELF_INGAME_DIR";
+
+    /// <summary>
+    /// What the game says is happening -- the board, the turn, the minigame -- written by the game
+    /// beside the state: {"schema":1,"text":"…","updatedAt":unix seconds}. Older than this, it is
+    /// about a moment that has passed and is not published.
+    /// </summary>
+    public const string ActivityFile = "activity.json";
+    public static readonly TimeSpan ActivityLifetime = TimeSpan.FromSeconds(90);
+
+    /// <summary>The game's own line about what is happening, if it wrote a recent one.</summary>
+    public static string? ReadActivity(string directory, DateTimeOffset now)
+    {
+        try
+        {
+            var path = Path.Combine(directory, ActivityFile);
+            var file = new FileInfo(path);
+            if (!file.Exists || file.Length > 4096) return null;
+
+            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            var root = document.RootElement;
+            if (root.ValueKind != System.Text.Json.JsonValueKind.Object) return null;
+            if (!root.TryGetProperty("updatedAt", out var updated) || !updated.TryGetInt64(out var seconds)) return null;
+            if (now - DateTimeOffset.FromUnixTimeSeconds(seconds) > ActivityLifetime) return null;
+            if (!root.TryGetProperty("text", out var text) || text.ValueKind != System.Text.Json.JsonValueKind.String) return null;
+            return PresenceComposer.CleanActivity(text.GetString());
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
+        {
+            return null;
+        }
+    }
     public const int Schema = 1;
 
     /// <summary>

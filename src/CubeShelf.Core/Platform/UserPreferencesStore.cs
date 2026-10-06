@@ -72,7 +72,13 @@ public sealed record UserPreferences(
     bool NotifyFriendsOnline = true,
 
     /// <summary>Whether the user was told, once, that closing hides rather than quits.</summary>
-    bool TrayHintShown = false);
+    bool TrayHintShown = false,
+
+    /// <summary>"" (available), "away", "busy" or "invisible", as the user chose it.</summary>
+    string Availability = "",
+
+    /// <summary>Away after ten minutes without input, back on the first touch, while available.</summary>
+    bool AutoAway = true);
 
 public sealed class UserPreferencesStore
 {
