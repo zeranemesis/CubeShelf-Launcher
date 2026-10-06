@@ -98,6 +98,9 @@ Run("a document's size says a range, not a count", TestDocumentSizeIsPadded);
 Run("friends follow a move, a removed one cannot", TestFriendsFollowAMove);
 Run("a profile moves to the phone intact", TestProfileTransferRoundTrip);
 Run("a profile file refuses the wrong passphrase", TestProfileTransferRefusesWrongPassphrase);
+Run("a QR code holds what it was given", TestQrCodeStructure);
+Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDownload);
+Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
 
 if (failures.Count == 0)
 {
@@ -3307,6 +3310,196 @@ void TestFriendsFollowAMove()
             using var fetcher = new PresenceFetcher(reader, store, client);
             fetcher.FetchAsync(store.Load()[0]).GetAwaiter().GetResult();
             Assert((store.Load()[0].PresenceUrl == newUrl) == expectNewAddress);
+        }
+    });
+}
+
+void TestQrCodeStructure()
+{
+    // Decoding is checked separately against a real decoder; here, what must hold by construction.
+    var qr = QrCode.Encode("CSL1:192.168.1.20:48213/AbCdEfGhIjKlMnOpQrStUvWx#" + new string('k', 43));
+    Assert(qr.Size == qr.Version * 4 + 17 && qr.Version is >= 5 and <= 7 && qr.Mask is >= 0 and <= 7);
+
+    // Three finder patterns: a dark ring, a light ring, a dark 3x3 core, at three corners.
+    foreach (var (cx, cy) in new[] { (3, 3), (qr.Size - 4, 3), (3, qr.Size - 4) })
+    {
+        Assert(qr[cx, cy] && qr[cx - 1, cy - 1] && qr[cx + 1, cy + 1]);
+        Assert(!qr[cx - 2, cy] && !qr[cx + 2, cy] && !qr[cx, cy - 2]);
+        Assert(qr[cx - 3, cy] && qr[cx + 3, cy] && qr[cx, cy + 3]);
+    }
+    // Timing patterns alternate, and the always-dark module is dark.
+    for (var i = 8; i < qr.Size - 8; i++) Assert(qr[i, 6] == (i % 2 == 0) && qr[6, i] == (i % 2 == 0));
+    Assert(qr[8, qr.Size - 8]);
+
+    // Both copies of the format information agree.
+    int first = 0, second = 0;
+    var firstPositions = new[] { (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 7), (8, 8), (7, 8), (5, 8), (4, 8), (3, 8), (2, 8), (1, 8), (0, 8) };
+    for (var i = 0; i < 15; i++) if (qr[firstPositions[i].Item1, firstPositions[i].Item2]) first |= 1 << i;
+    for (var i = 0; i < 8; i++) if (qr[qr.Size - 1 - i, 8]) second |= 1 << i;
+    for (var i = 8; i < 15; i++) if (qr[8, qr.Size - 15 + i]) second |= 1 << i;
+    Assert(first == second);
+    var format = first ^ 0x5412;
+    Assert(((format >> 10) & 7) == qr.Mask && (format >> 13) == 0);   // level M is 00
+
+    // Too long for any version is refused, not drawn wrong.
+    try
+    {
+        QrCode.Encode(new string('x', 4000));
+        Assert(false);
+    }
+    catch (ArgumentException)
+    {
+    }
+}
+
+/// <summary>The phone's side, as CubeShelfLink.java does it: raw HTTP, sealed bodies.</summary>
+(int Status, byte[] Body) PhoneRequest(int port, string method, string path, byte[]? body)
+{
+    using var client = new System.Net.Sockets.TcpClient();
+    client.Connect(System.Net.IPAddress.Loopback, port);
+    using var stream = client.GetStream();
+    var head = method + " " + path + " HTTP/1.1\r\nHost: 127.0.0.1:" + port + "\r\nContent-Length: " + (body?.Length ?? 0) + "\r\nConnection: close\r\n\r\n";
+    stream.Write(System.Text.Encoding.ASCII.GetBytes(head));
+    if (body is not null) stream.Write(body);
+    client.Client.Shutdown(System.Net.Sockets.SocketShutdown.Send);
+    using var all = new MemoryStream();
+    stream.CopyTo(all);
+    var bytes = all.ToArray();
+    var split = -1;
+    for (var i = 0; i + 3 < bytes.Length; i++)
+        if (bytes[i] == '\r' && bytes[i + 1] == '\n' && bytes[i + 2] == '\r' && bytes[i + 3] == '\n') { split = i; break; }
+    Assert(split > 0);
+    var lines = System.Text.Encoding.ASCII.GetString(bytes, 0, split).Split("\r\n");
+    var status = int.Parse(lines[0].Split(' ')[1]);
+    var length = long.Parse(lines.First(line => line.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase))[15..].Trim());
+    Assert(bytes.Length - split - 4 == length);   // the phone refuses a short reply
+    return (status, bytes[(split + 4)..]);
+}
+
+void TestPhoneLinkDownload()
+{
+    WithTempRoot(root =>
+    {
+        var saves = Path.Combine(root, "Party Board");
+        Directory.CreateDirectory(Path.Combine(saves, "USA", "Card A"));
+        File.WriteAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"), Enumerable.Range(0, 5000).Select(i => (byte)i).ToArray());
+        File.WriteAllBytes(Path.Combine(saves, "USA", "Card A", "01-GMPE-save.gci"), new byte[] { 1, 2, 3 });
+        File.WriteAllText(Path.Combine(saves, "config.json"), "{\"secret\":true}");   // not a save: never sent
+
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var friends = new[] { new Friend { PublicKey = System.Convert.ToBase64String(friend.PublicKey), DisplayName = "Alex",
+            PresenceUrl = "https://example.org/alex.json", LastSequence = 9 } };
+        var server = new PhoneLinkServer(() => ProfileTransfer.Document(me, "Zera", friends, DateTimeOffset.UtcNow),
+            saves, () => false, System.Net.IPAddress.Parse("192.168.1.20"));
+        try
+        {
+            server.Start();
+            // The code, as the phone parses it: a private address, the port, a token, a 32-byte key.
+            var match = System.Text.RegularExpressions.Regex.Match(server.Code,
+                @"^CSL1:(\d{1,3}(\.\d{1,3}){3}):(\d+)/([A-Za-z0-9_-]{16,64})#([A-Za-z0-9_-]+)$");
+            Assert(match.Success && match.Groups[1].Value == "192.168.1.20" && int.Parse(match.Groups[3].Value) == server.Port);
+            var key = PhoneLinkServer.KeyOf(server.Code)!;
+            Assert(key.Length == 32);
+
+            // A wrong token is refused.
+            Assert(PhoneRequest(server.Port, "GET", "/l/wrong-token-0000000", null).Status == 404);
+
+            var (status, body) = PhoneRequest(server.Port, "GET", "/l/" + server.Token, null);
+            Assert(status == 200);
+            // Sealed "down": opens under the key, not under "up", not under another key.
+            Assert(PhoneLinkServer.Open(key, "up", body) is null && PhoneLinkServer.Open(new byte[32], "down", body) is null);
+            var document = System.Text.Json.Nodes.JsonNode.Parse(PhoneLinkServer.Open(key, "down", body)!)!;
+            Assert(document["v"]!.GetValue<int>() == 1);
+
+            var profile = document["profile"]!;
+            Assert(profile["v"]!.GetValue<int>() == 1 && profile["name"]!.GetValue<string>() == "Zera");
+            Assert(profile["q"]!.GetValue<string>() == System.Convert.ToBase64String(me.PublicKey));
+            Assert(System.Convert.FromBase64String(profile["d"]!.GetValue<string>()).Length == 32);
+            Assert(profile["friends"]![0]!["k"]!.GetValue<string>() == friends[0].PublicKey && profile["friends"]![0]!["s"]!.GetValue<long>() == 9);
+
+            var sent = document["saves"]!.AsArray().Select(save => save!["path"]!.GetValue<string>()).OrderBy(p => p).ToArray();
+            Assert(sent.SequenceEqual(new[] { "MemoryCardA.USA.raw", "USA/Card A/01-GMPE-save.gci" }));
+            var raw = document["saves"]!.AsArray().First(save => save!["path"]!.GetValue<string>() == "MemoryCardA.USA.raw")!;
+            using var gz = new System.IO.Compression.GZipStream(new MemoryStream(System.Convert.FromBase64String(raw["gz"]!.GetValue<string>())),
+                System.IO.Compression.CompressionMode.Decompress);
+            using var unpacked = new MemoryStream();
+            gz.CopyTo(unpacked);
+            Assert(unpacked.ToArray().SequenceEqual(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"))));
+
+            // The rule both sides share.
+            Assert(PhoneLinkServer.IsSavePath("MemoryCardB.EUR.raw") && PhoneLinkServer.IsSavePath("JAP/Card B/x.gci"));
+            Assert(!PhoneLinkServer.IsSavePath("../MemoryCardA.raw") && !PhoneLinkServer.IsSavePath("USA/Card C/x.gci") &&
+                   !PhoneLinkServer.IsSavePath("USA/Card A/../../evil.gci") && !PhoneLinkServer.IsSavePath("config.json") &&
+                   !PhoneLinkServer.IsSavePath("USA//x.gci"));
+            Assert(PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("10.1.2.3")) && PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("172.20.0.1")) &&
+                   !PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("8.8.8.8")) && !PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("172.32.0.1")));
+        }
+        finally
+        {
+            server.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestPhoneLinkUpload()
+{
+    WithTempRoot(root =>
+    {
+        var saves = Path.Combine(root, "Party Board");
+        Directory.CreateDirectory(saves);
+        File.WriteAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"), new byte[] { 9, 9, 9 });
+
+        using var me = PeerIdentity.Create();
+        var gameRunning = true;
+        var server = new PhoneLinkServer(() => ProfileTransfer.Document(me, "Zera", Array.Empty<Friend>(), DateTimeOffset.UtcNow),
+            saves, () => gameRunning, System.Net.IPAddress.Parse("192.168.1.20"), french: false);
+        try
+        {
+            server.Start();
+            var key = PhoneLinkServer.KeyOf(server.Code)!;
+
+            byte[] Gz(byte[] data)
+            {
+                using var output = new MemoryStream();
+                using (var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionLevel.Fastest, true)) gzip.Write(data);
+                return output.ToArray();
+            }
+
+            var upload = new System.Text.Json.Nodes.JsonObject
+            {
+                ["v"] = 1,
+                ["saves"] = new System.Text.Json.Nodes.JsonArray(
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "MemoryCardA.USA.raw", ["modified"] = "2026-10-06T08:00:00+00:00", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 1, 2, 3, 4 })) },
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "EUR/Card B/new.gci", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 7 })) },
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "../escape.raw", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 6 })) })
+            };
+            var body = PhoneLinkServer.Seal(key, "up", System.Text.Encoding.UTF8.GetBytes(upload.ToJsonString()));
+
+            // With the game open on the PC, nothing is written, and the phone is told why.
+            var (status, reply) = PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves", body);
+            var said = System.Text.Encoding.UTF8.GetString(PhoneLinkServer.Open(key, "down", reply)!);
+            Assert(status == 200 && said.Contains("close it", StringComparison.Ordinal));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 9, 9, 9 }));
+
+            // Closed: the cards go in place, what they replace is kept, a path out of the folder is ignored.
+            gameRunning = false;
+            (status, reply) = PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves", body);
+            said = System.Text.Encoding.UTF8.GetString(PhoneLinkServer.Open(key, "down", reply)!);
+            Assert(status == 200 && said.StartsWith("2 save(s) received", StringComparison.Ordinal));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 1, 2, 3, 4 }));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "EUR", "Card B", "new.gci")).SequenceEqual(new byte[] { 7 }));
+            Assert(!File.Exists(Path.Combine(root, "escape.raw")));
+            var backup = Directory.GetDirectories(Path.Combine(saves, "save-backups")).Single();
+            Assert(File.ReadAllBytes(Path.Combine(backup, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 9, 9, 9 }));
+
+            // A body sealed under another key, or tampered with, is refused outright.
+            Assert(PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves",
+                PhoneLinkServer.Seal(new byte[32], "up", System.Text.Encoding.UTF8.GetBytes(upload.ToJsonString()))).Status == 400);
+        }
+        finally
+        {
+            server.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
     });
 }

@@ -28,7 +28,7 @@ internal static class UiLocalization
         ["ShareCodeTitle"] = "Ton code ami",
         ["CopyMyCode"] = "Copier mon code",
         ["PhoneTransferTitle"] = "Jouer sur téléphone",
-        ["PhoneTransferHelp"] = "PartyBoard sur Android ne fait pas tourner CubeShelf. Exporte ton profil ici, copie le fichier sur le téléphone, puis importe-le dans PartyBoard (menu, onglet Amis) : il y verra tes amis et leurs invitations. C'est ce PC qui continue à publier ta présence. Le fichier contient ta clé : choisis un mot de passe que tu ne réutilises pas.",
+        ["PhoneTransferHelp"] = "PartyBoard sur Android ne fait pas tourner CubeShelf. Le plus simple : téléphone et PC sur le même Wi-Fi, « Afficher le QR code », puis dans PartyBoard : onglet Amis, « Compte et sauvegardes (QR code) », Scanner. Le téléphone récupère ton compte, tes amis et tes sauvegardes de Mario Party 4, et peut renvoyer les siennes au PC. C’est ce PC qui continue à publier ta présence.",
         ["PhoneTransferPassphrase"] = "Mot de passe (8 caractères minimum)",
         ["PhoneTransferConfirm"] = "Confirme le mot de passe",
         ["PhoneTransferExport"] = "Exporter pour le téléphone…",
@@ -193,6 +193,8 @@ internal static class UiLocalization
         ["FriendDecline"] = "Décliner",
         ["FriendMessage"] = "Message",
         ["AutoAway"] = "Me mettre « absent » après 10 minutes d’inactivité",
+        ["PhoneLinkShow"] = "Afficher le QR code",
+        ["PhoneTransferFileTitle"] = "Sans Wi-Fi commun : par fichier",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -219,7 +221,7 @@ internal static class UiLocalization
         ["ShareCodeTitle"] = "Your friend code",
         ["CopyMyCode"] = "Copy my code",
         ["PhoneTransferTitle"] = "Play on a phone",
-        ["PhoneTransferHelp"] = "PartyBoard on Android does not run CubeShelf. Export your profile here, copy the file to the phone, then import it in PartyBoard (menu, Friends tab): it will see your friends and their invitations there. This PC keeps publishing your presence. The file holds your key: choose a passphrase you do not use anywhere else.",
+        ["PhoneTransferHelp"] = "PartyBoard on Android does not run CubeShelf. Simplest: phone and PC on the same Wi-Fi, “Show the QR code”, then in PartyBoard: Friends tab, “Account and saves (QR code)”, Scan. The phone gets your account, your friends and your Mario Party 4 saves, and can send its own back to the PC. This PC keeps publishing your presence.",
         ["PhoneTransferPassphrase"] = "Passphrase (8 characters minimum)",
         ["PhoneTransferConfirm"] = "Confirm the passphrase",
         ["PhoneTransferExport"] = "Export for the phone…",
@@ -384,6 +386,8 @@ internal static class UiLocalization
         ["FriendDecline"] = "Decline",
         ["FriendMessage"] = "Message",
         ["AutoAway"] = "Set me “away” after 10 minutes of inactivity",
+        ["PhoneLinkShow"] = "Show the QR code",
+        ["PhoneTransferFileTitle"] = "No shared Wi-Fi: with a file",
     };
 
     public static bool IsEnglish(string? language) =>

@@ -82,7 +82,7 @@
       <x:String x:Key="ShareCodeTitle">Ton code ami</x:String>
       <x:String x:Key="CopyMyCode">Copier mon code</x:String>
       <x:String x:Key="PhoneTransferTitle">Jouer sur téléphone</x:String>
-      <x:String x:Key="PhoneTransferHelp">PartyBoard sur Android ne fait pas tourner CubeShelf. Exporte ton profil ici, copie le fichier sur le téléphone, puis importe-le dans PartyBoard (menu, onglet Amis) : il y verra tes amis et leurs invitations. C'est ce PC qui continue à publier ta présence. Le fichier contient ta clé : choisis un mot de passe que tu ne réutilises pas.</x:String>
+      <x:String x:Key="PhoneTransferHelp">PartyBoard sur Android ne fait pas tourner CubeShelf. Le plus simple : téléphone et PC sur le même Wi-Fi, « Afficher le QR code », puis dans PartyBoard : onglet Amis, « Compte et sauvegardes (QR code) », Scanner. Le téléphone récupère ton compte, tes amis et tes sauvegardes de Mario Party 4, et peut renvoyer les siennes au PC. C’est ce PC qui continue à publier ta présence.</x:String>
       <x:String x:Key="PhoneTransferPassphrase">Mot de passe (8 caractères minimum)</x:String>
       <x:String x:Key="PhoneTransferConfirm">Confirme le mot de passe</x:String>
       <x:String x:Key="PhoneTransferExport">Exporter pour le téléphone…</x:String>
@@ -242,6 +242,8 @@
       <x:String x:Key="FriendDecline">Décliner</x:String>
       <x:String x:Key="FriendMessage">Message</x:String>
       <x:String x:Key="AutoAway">Me mettre « absent » après 10 minutes d’inactivité</x:String>
+      <x:String x:Key="PhoneLinkShow">Afficher le QR code</x:String>
+      <x:String x:Key="PhoneTransferFileTitle">Sans Wi-Fi commun : par fichier</x:String>
     </ResourceDictionary>
   </Application.Resources>
 

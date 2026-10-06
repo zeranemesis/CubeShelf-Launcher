@@ -94,24 +94,7 @@ public static class ProfileTransfer
         var key = DeriveKey(passphrase, salt);
         try
         {
-            var document = new TransferDocument
-            {
-                Name = name,
-                PrivateKey = Convert.ToBase64String(scalar),
-                PublicKey = Convert.ToBase64String(identity.PublicKey),
-                ExportedAt = now,
-                Friends = friends
-                    .Where(friend => !friend.Blocked)
-                    .Select(friend => new TransferDocumentFriend
-                    {
-                        PublicKey = friend.PublicKey,
-                        Name = PeerName.Sanitize(friend.DisplayName),
-                        PresenceUrl = friend.PresenceUrl,
-                        LastSequence = friend.LastSequence,
-                        Paused = friend.Paused
-                    })
-                    .ToList()
-            };
+            var document = BuildDocument(name, scalar, identity.PublicKey, friends, now);
             plaintext = JsonSerializer.SerializeToUtf8Bytes(document, Json);
 
             var framed = new byte[SaltLength + NonceLength + plaintext.Length + TagLength];
@@ -132,6 +115,56 @@ public static class ProfileTransfer
             CryptographicOperations.ZeroMemory(scalar);
             CryptographicOperations.ZeroMemory(key);
             if (plaintext is not null) CryptographicOperations.ZeroMemory(plaintext);
+        }
+    }
+
+    private static TransferDocument BuildDocument(
+        string name,
+        byte[] scalar,
+        byte[] publicKey,
+        IEnumerable<Friend> friends,
+        DateTimeOffset now) => new()
+    {
+        Name = name,
+        PrivateKey = Convert.ToBase64String(scalar),
+        PublicKey = Convert.ToBase64String(publicKey),
+        ExportedAt = now,
+        Friends = friends
+            .Where(friend => !friend.Blocked)
+            .Select(friend => new TransferDocumentFriend
+            {
+                PublicKey = friend.PublicKey,
+                Name = PeerName.Sanitize(friend.DisplayName),
+                PresenceUrl = friend.PresenceUrl,
+                LastSequence = friend.LastSequence,
+                Paused = friend.Paused
+            })
+            .ToList()
+    };
+
+    /// <summary>
+    /// The same document, unsealed, as a JSON node: what the QR-code link (<see cref="PhoneLinkServer"/>)
+    /// sends inside its own encryption instead of a passphrase.
+    /// </summary>
+    public static System.Text.Json.Nodes.JsonNode Document(
+        PeerIdentity identity,
+        string displayName,
+        IEnumerable<Friend> friends,
+        DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        ArgumentNullException.ThrowIfNull(friends);
+        if (!PeerName.TryNormalize(displayName, out var name, out var nameError))
+            throw new ArgumentException(nameError, nameof(displayName));
+
+        var scalar = identity.ExportPrivateScalar();
+        try
+        {
+            return JsonSerializer.SerializeToNode(BuildDocument(name, scalar, identity.PublicKey, friends, now), Json)!;
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(scalar);
         }
     }
 
