@@ -211,6 +211,32 @@ le réseau local » est sur la page Mon profil.
 - **Répondre à une invitation** : « Rejoindre » ou « Décliner » ; l'hôte voit « rejoint ton salon »
   ou « a décliné ».
 
+### Jouer sur téléphone
+
+PartyBoard sur Android ne fait pas tourner CubeShelf, mais il peut devenir *toi* : il ouvre ce que
+tes amis scellent pour toi, voit leurs invitations, et récupère tes sauvegardes de Mario Party 4.
+C'est le PC qui continue à publier ta présence.
+
+- **Par QR code** (même Wi-Fi) : Mon profil → « Afficher le QR code », puis dans PartyBoard : onglet
+  Amis → « Compte et sauvegardes (QR code) » → Scanner. Le code porte l'adresse du PC sur le réseau
+  local, un jeton et une clé AES-256 : tout ce qui passe est chiffré sous cette clé, et seul celui qui
+  voit l'écran peut la lire. Le lien ne vit que le temps de la fenêtre, dix minutes au plus. Le
+  téléphone peut aussi renvoyer ses sauvegardes au PC ; elles ne sont jamais écrites sous un
+  Mario Party 4 ouvert, et ce qu'elles remplacent est gardé dans `save-backups`.
+- **Par fichier**, sans Wi-Fi commun : « Exporter (sauvegarde ou téléphone)… » avec un mot de passe.
+
+### Ton identité, et sa sauvegarde
+
+`identity.key` est la seule chose qui ne se recrée pas : la perdre oblige chaque ami à t'ajouter
+de nouveau. Sous Windows, elle est **chiffrée pour ton compte Windows** (DPAPI) : une copie du
+profil sur un autre PC ou un autre compte ne contient pas de clé utilisable, et ne peut donc pas
+publier à ta place. La contrepartie : elle ne survit plus seule à une réinstallation de Windows.
+
+D'où la **sauvegarde** : l'export protégé par mot de passe est aussi la sauvegarde de ton identité,
+et la page Mon profil la réclame tant qu'elle n'existe pas. « Restaurer une sauvegarde… » te rend ton
+identité sur un nouveau PC ; tes amis présents sont gardés, ceux du fichier ajoutés, et l'ancienne
+clé reste à côté, renommée. Une clé qui ne s'ouvre pas ici n'est jamais effacée ni remplacée.
+
 ### Changer d'adresse
 
 Change de dossier ou de lien quand tu veux : dès que la nouvelle adresse est vérifiée, **l'ancien
@@ -240,9 +266,9 @@ Ces limites sont structurelles, pas des oublis :
 
 - **Retirer un ami ne l'empêche pas de t'observer** tant que tu gardes la même adresse : il voit *quand* ton fichier change, donc quand tu joues. Il garde aussi la clé de paire, qui dérive des deux identités et **ne peut pas être changée sans changer d'identité**. Changer d'adresse y met fin (voir plus haut) ; les codes donnés à des gens pas encore amis pointent encore vers l'ancienne.
 - **Pas de confidentialité persistante.** Qui obtient ta clé d'identité déchiffre rétroactivement tout document que tu as publié.
-- **Ta clé privée est un fichier en clair** dans ton profil, protégé par les permissions du système de fichiers. C'est le même niveau que le reste du profil, mais autant le dire.
+- **Ta clé privée est chiffrée pour ton compte Windows**, pas par un mot de passe : quelqu'un qui ouvre une session sous ton compte peut s'en servir. Hors Windows, elle n'est protégée que par les permissions du fichier.
 - **L'hébergeur peut taire, pas falsifier.** AES-GCM bloque la forgerie ; geler ton document te laisse « en jeu » jusqu'à expiration. La fenêtre de fraîcheur borne cette attaque.
-- **Une identité par installation.** Copier ton profil sur une seconde machine fait publier deux CubeShelf à la même adresse sous la même identité, et celui qui prend du retard finit rejeté par tes amis. La seconde machine doit générer sa propre identité, et vous vous ajoutez mutuellement.
+- **Une identité par installation.** Restaurer ta sauvegarde sur une seconde machine fait publier deux CubeShelf sous la même identité, et celui qui prend du retard finit rejeté par tes amis ; CubeShelf le détecte et le dit. La seconde machine doit générer sa propre identité, et vous vous ajoutez mutuellement. Un téléphone, lui, ne publie jamais.
 - **Le partage est décidé globalement**, pas ami par ami : les quatre cases s'appliquent à tout le monde.
 - **Hors réseau local, tout va au rythme du dossier.** Un ami en ligne est relu toutes les 25 secondes, les autres toutes les deux minutes ; ton service de synchronisation ajoute son propre délai. Sur le réseau local, c'est une seconde.
 - **Le réseau local s'annonce.** Même sans nom, un CubeShelf qui diffuse ses marqueurs révèle qu'un CubeShelf tourne sur ce PC. Le réglage se décoche.
@@ -254,7 +280,7 @@ Dans le profil utilisateur (`%LOCALAPPDATA%\CubeShelf` sous Windows) :
 
 | Fichier | Contenu |
 | --- | --- |
-| `identity.key` | Ta clé privée. La perdre oblige tous tes amis à te rajouter. |
+| `identity.key` | Ta clé privée, chiffrée pour ton compte Windows. La perdre oblige tous tes amis à te rajouter : sauvegarde-la (Mon profil). |
 | `friends.json` | Tes amis, leur adresse, et l'état de lecture de chacun. |
 | `presence-state.json` | Le compteur de séquence. **Ne le supprime pas** sans raison. |
 | `avatar.png` | Ton avatar, déjà réduit en 96×96. Le supprimer, c'est ne plus en publier. |
