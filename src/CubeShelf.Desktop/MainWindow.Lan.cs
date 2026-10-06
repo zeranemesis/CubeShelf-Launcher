@@ -31,13 +31,18 @@ public sealed partial class MainWindow
             () => _preferences.FriendsDisplayName,
             () => IsAddressVerified() ? _preferences.PresenceUrl : "");
 
-        node.FriendDocumentReceived += outcome => Dispatcher.UIThread.Post(() => ApplyFriendOutcomes(new[] { outcome }));
+        node.FriendDocumentReceived += outcome =>
+        {
+            if (outcome.Snapshot is not null) _presence?.NoteSnapshot(outcome.FriendPublicKey, outcome.Snapshot);
+            Dispatcher.UIThread.Post(() => ApplyFriendOutcomes(new[] { outcome }));
+        };
         node.Changed += () => Dispatcher.UIThread.Post(OnLanChanged);
         node.FriendAdded += handle => Dispatcher.UIThread.Post(() =>
         {
             ShowToastParity(P7("Amis", "Friends"),
                 P7($"{handle} a accepté : vous êtes amis.", $"{handle} accepted: you are friends."));
             _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+            _presence?.PollEagerly();
             RefreshFriendsView();
         });
 

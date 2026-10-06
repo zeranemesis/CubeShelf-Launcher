@@ -235,6 +235,8 @@ public sealed partial class MainWindow
 
         _outgoingInvite = candidate;
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
+        // Whoever answers should be seen within seconds, not at the next two-minute poll.
+        _presence?.PollEagerly();
         WriteInGameState();
         ShowToastParity(P7("Invitation", "Invitation"),
             forFriendKey.Length > 0

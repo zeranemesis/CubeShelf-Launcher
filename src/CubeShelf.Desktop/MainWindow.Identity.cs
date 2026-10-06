@@ -332,6 +332,7 @@ public sealed partial class MainWindow
         RefreshFriendsView();
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
         _ = RefreshFriendsSilentlyAsync();
+        _presence?.PollEagerly();
 
         // Friendship here goes one way at a time: adding them lets you read them, not them you.
         var dialog = CreatePhase7Dialog(P7("Ami ajouté", "Friend added"), 560, 280);

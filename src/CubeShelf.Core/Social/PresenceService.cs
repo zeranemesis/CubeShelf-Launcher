@@ -37,8 +37,15 @@ public sealed record PresenceServiceOptions(
     TimeSpan PollInterval,
     TimeSpan? AddressCheckInterval = null,
     TimeSpan? AddressFirstCheck = null,
-    TimeSpan? AddressLagTolerance = null)
+    TimeSpan? AddressLagTolerance = null,
+    TimeSpan? ActivePollInterval = null)
 {
+    /// <summary>Never longer than the idle interval: "active" can only mean sooner.</summary>
+    public TimeSpan EffectiveActivePollInterval =>
+        ActivePollInterval is { } active && active < PollInterval ? active
+        : PresencePolicy.ActivePollInterval < PollInterval ? PresencePolicy.ActivePollInterval
+        : PollInterval;
+
     public TimeSpan EffectiveAddressCheckInterval => AddressCheckInterval ?? PresencePolicy.AddressCheckInterval;
     public TimeSpan EffectiveAddressFirstCheck => AddressFirstCheck ?? PresencePolicy.AddressFirstCheck;
     public TimeSpan EffectiveAddressLagTolerance => AddressLagTolerance ?? PresencePolicy.AddressLagTolerance;
@@ -169,8 +176,78 @@ public sealed class PresenceService : IAsyncDisposable
     public async Task<IReadOnlyList<PresenceFetchOutcome>> RefreshNowAsync(CancellationToken cancellationToken = default)
     {
         var outcomes = await _fetcher.PollAsync(cancellationToken).ConfigureAwait(false);
+        var now = _clock();
+        foreach (var outcome in outcomes) _lastPolled[outcome.FriendPublicKey] = now;
+        Remember(outcomes);
         if (outcomes.Count > 0) FriendsRefreshed?.Invoke(outcomes);
         return outcomes;
+    }
+
+    /// <summary>The latest document of each friend, from any source, for deciding how often to read them.</summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, PresenceSnapshot> _latest = new(StringComparer.Ordinal);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> _lastPolled = new(StringComparer.Ordinal);
+    private DateTimeOffset _eagerUntil = DateTimeOffset.MinValue;
+
+    /// <summary>How many times each friend was read over HTTP. For tests and diagnostics.</summary>
+    public int PollsOf(string friendPublicKey) => _pollCounts.TryGetValue(friendPublicKey, out var count) ? count : 0;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> _pollCounts = new(StringComparer.Ordinal);
+
+    private void Remember(IEnumerable<PresenceFetchOutcome> outcomes)
+    {
+        foreach (var outcome in outcomes)
+        {
+            _pollCounts.AddOrUpdate(outcome.FriendPublicKey, 1, (_, count) => count + 1);
+            if (outcome.Snapshot is not null) _latest[outcome.FriendPublicKey] = outcome.Snapshot;
+        }
+    }
+
+    /// <summary>
+    /// A friend's document that arrived another way -- the local network. Counts toward deciding
+    /// how often to read them, like one read here would.
+    /// </summary>
+    public void NoteSnapshot(string friendPublicKey, PresenceSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        _latest[friendPublicKey] = snapshot;
+    }
+
+    /// <summary>
+    /// Reads everyone actively for a while: just after sending an invitation, whoever answers
+    /// should be seen within seconds, not minutes; just after adding someone, so is whether they
+    /// add us back.
+    /// </summary>
+    public void PollEagerly(TimeSpan? span = null) => _eagerUntil = _clock() + (span ?? PresencePolicy.EagerPollingSpan);
+
+    /// <summary>
+    /// Whether a friend deserves the short interval. Someone who is around -- online or playing --
+    /// or who is inviting us, is about to do something worth seeing soon; someone offline for
+    /// hours can wait the long one.
+    /// </summary>
+    private bool IsActive(string friendPublicKey, DateTimeOffset now)
+    {
+        if (now < _eagerUntil) return true;
+        if (!_latest.TryGetValue(friendPublicKey, out var latest)) return true;   // never read: find out
+        if (latest.EffectiveStatus(PresencePolicy.FreshnessWindow, now) is PresenceStatus.Online or PresenceStatus.InGame) return true;
+        return latest.Invite is { } invite && invite.IsLive(now) &&
+               invite.IsFor(Convert.ToBase64String(_identity.PublicKey));
+    }
+
+    private async Task PollDueAsync(CancellationToken cancellationToken)
+    {
+        var now = _clock();
+        var active = _options.EffectiveActivePollInterval;
+        var idle = _options.PollInterval;
+
+        var outcomes = await _fetcher.PollAsync(friend =>
+        {
+            var interval = IsActive(friend.PublicKey, now) ? active : idle;
+            // A little early rather than a whole tick late: the loop ticks at the active interval.
+            return !_lastPolled.TryGetValue(friend.PublicKey, out var last) || now - last >= interval - TimeSpan.FromMilliseconds(active.TotalMilliseconds / 4);
+        }, cancellationToken).ConfigureAwait(false);
+
+        foreach (var outcome in outcomes) _lastPolled[outcome.FriendPublicKey] = now;
+        Remember(outcomes);
+        if (outcomes.Count > 0) FriendsRefreshed?.Invoke(outcomes);
     }
 
     /// <summary>
@@ -257,8 +334,10 @@ public sealed class PresenceService : IAsyncDisposable
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await RefreshNowAsync(cancellationToken).ConfigureAwait(false);
-                await Task.Delay(_options.PollInterval, cancellationToken).ConfigureAwait(false);
+                // Ticks at the short interval; each tick reads only those due, so a friend away
+                // for hours is still read every couple of minutes, not every tick.
+                await PollDueAsync(cancellationToken).ConfigureAwait(false);
+                await Task.Delay(_options.EffectiveActivePollInterval, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

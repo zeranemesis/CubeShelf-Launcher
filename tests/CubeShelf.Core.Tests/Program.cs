@@ -88,6 +88,7 @@ Run("friends find each other on the network without naming themselves", TestLanF
 Run("befriending on the network takes both, and proof", TestLanIntroduction);
 Run("an impostor on the network gets nothing", TestLanImpostorIsRefused);
 Run("a friend's stated address is adopted", TestStatedAddressIsAdopted);
+Run("friends who are around are read more often", TestActiveFriendsAreReadMoreOften);
 
 if (failures.Count == 0)
 {
@@ -3053,6 +3054,61 @@ void TestLanImpostorIsRefused()
     });
 }
 
+void TestActiveFriendsAreReadMoreOften()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var online = PeerIdentity.Create();
+        using var away = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(online.PublicKey, "https://online.example.test/p.json"), "Ona", me.PublicKey, out _));
+        Assert(friends.TryAdd(new FriendCodePayload(away.PublicKey, "https://away.example.test/p.json"), "Awa", me.PublicKey, out _));
+
+        // Each host serves its owner's document, new every time it is read, so no 304 hides a poll.
+        var sequence = 100L;
+        var handler = new DelegatingTestHandler(request =>
+        {
+            var author = request.RequestUri!.Host.StartsWith("online", StringComparison.Ordinal) ? online : away;
+            var status = author == online ? PresenceStatus.Online : PresenceStatus.Offline;
+            var snapshot = new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "x", DateTimeOffset.UtcNow,
+                Interlocked.Increment(ref sequence), status, null, null, Array.Empty<SharedGame>(), Array.Empty<SharedMod>());
+            return SealedPresence.ToJson(SealedPresence.Seal(author, snapshot, new[] { me.PublicKey }));
+        });
+        using var client = new HttpClient(handler);
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        var inputs = new PresenceInputs("Moi", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)), new PresenceSequence(root),
+            new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://me.example.test/p.json")),
+            fetcher, _ => Task.FromResult(inputs),
+            new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), PollInterval: TimeSpan.FromHours(1),
+                ActivePollInterval: TimeSpan.FromMilliseconds(60)));
+        try
+        {
+            service.Start(CancellationToken.None);
+            Thread.Sleep(900);
+
+            var onlineKey = System.Convert.ToBase64String(online.PublicKey);
+            var awayKey = System.Convert.ToBase64String(away.PublicKey);
+            // Both read once to find out; then only the one who is around keeps being read.
+            Assert(service.PollsOf(awayKey) == 1);
+            Assert(service.PollsOf(onlineKey) >= 4);
+
+            // After an invitation, everyone is read actively for a while.
+            service.PollEagerly(TimeSpan.FromSeconds(10));
+            Thread.Sleep(500);
+            Assert(service.PollsOf(awayKey) >= 2);
+        }
+        finally
+        {
+            service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
 void TestStatedAddressIsAdopted()
 {
     WithTempRoot(root =>
@@ -3288,6 +3344,16 @@ sealed class SwitchableHandler : HttpMessageHandler
             ? new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request }
             : new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(body), RequestMessage = request });
     }
+}
+
+/// <summary>Answers every request with whatever the test computes for it.</summary>
+sealed class DelegatingTestHandler(Func<HttpRequestMessage, string> respond) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+        Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(respond(request)), RequestMessage = request
+        });
 }
 
 /// <summary>A local network in memory: every announcement reaches every other member, from loopback.</summary>

@@ -29,6 +29,17 @@ public static class PresencePolicy
     public static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(2);
 
     /// <summary>
+    /// How often a friend who is around -- online, playing, inviting us, or just invited by us --
+    /// is read. A conditional GET of an unchanged document costs a 304, so reading an active
+    /// friend this often is cheap; reading everyone this often would not be, which is why the
+    /// others stay at <see cref="PollInterval"/>.
+    /// </summary>
+    public static readonly TimeSpan ActivePollInterval = TimeSpan.FromSeconds(25);
+
+    /// <summary>After sending an invitation or adding someone, everyone is read actively this long.</summary>
+    public static readonly TimeSpan EagerPollingSpan = TimeSpan.FromMinutes(15);
+
+    /// <summary>
     /// Starting a game fires several state changes at once. Waiting a moment turns a burst into
     /// one document.
     /// </summary>

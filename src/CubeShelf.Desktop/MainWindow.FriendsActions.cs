@@ -116,8 +116,10 @@ public sealed partial class MainWindow
         // The recipient list changed, so the next document has to include them.
         _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
         // And read them now rather than in two minutes: whether they already added us back is
-        // the first thing the list should say.
+        // the first thing the list should say -- and keep reading actively for a while, since
+        // that is usually the moment they do.
         _ = RefreshFriendsSilentlyAsync();
+        _presence?.PollEagerly();
     }
 
     private void ToggleFriendPause(object? sender, RoutedEventArgs args)
