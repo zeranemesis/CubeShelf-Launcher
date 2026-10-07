@@ -6,6 +6,7 @@ using Avalonia.Automation;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
+using CubeShelf.Core.Achievements;
 using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Desktop;
@@ -19,12 +20,25 @@ public sealed class FirstRunWizardWindow : Window
     private readonly Button _back = new() { Content = "Retour" };
     private readonly Button _next = new() { Content = "Continuer" };
     private readonly Button _later = new() { Content = "Plus tard", HorizontalAlignment = HorizontalAlignment.Left };
+    private readonly Func<string, string, Task<RetroAchievementsLoginResult>>? _retroAchievementsLogin;
+    private string? _retroAchievementsUser;
     private int _page;
 
-    public FirstRunWizardWindow(IPlatformPaths paths, UserPreferencesStore store, UserPreferences preferences)
+    private const int PageCount = 5;
+
+    /// <param name="retroAchievementsLogin">Logs in and keeps the session, as the profile page does; null hides the step.</param>
+    /// <param name="retroAchievementsUser">Who is logged in already, when the wizard is run again.</param>
+    public FirstRunWizardWindow(
+        IPlatformPaths paths,
+        UserPreferencesStore store,
+        UserPreferences preferences,
+        Func<string, string, Task<RetroAchievementsLoginResult>>? retroAchievementsLogin = null,
+        string? retroAchievementsUser = null)
     {
         _paths = paths;
         _store = store;
+        _retroAchievementsLogin = retroAchievementsLogin;
+        _retroAchievementsUser = retroAchievementsUser;
         Preferences = preferences;
         this.Title = English ? "CubeShelf • First setup" : "CubeShelf • Premier démarrage";
         Width = 760;
@@ -73,7 +87,7 @@ public sealed class FirstRunWizardWindow : Window
         _later.Click += (_, _) => Close();
         var nav = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         _back.Click += (_, _) => { if (_page > 0) ShowPage(_page - 1); };
-        _next.Click += (_, _) => { if (_page < 3) ShowPage(_page + 1); else Finish(); };
+        _next.Click += (_, _) => { if (_page < PageCount - 1) ShowPage(_page + 1); else Finish(); };
         nav.Children.Add(_back);
         nav.Children.Add(_next);
         Grid.SetColumn(nav, 1);
@@ -86,20 +100,21 @@ public sealed class FirstRunWizardWindow : Window
 
     private void ShowPage(int page)
     {
-        _page = Math.Clamp(page, 0, 3);
+        _page = Math.Clamp(page, 0, PageCount - 1);
         _pageHost.Children.Clear();
         _pageHost.Children.Add(_page switch
         {
             0 => WelcomePage(),
             1 => PreferencesPage(),
             2 => StoragePage(),
+            3 => RetroAchievementsPage(),
             _ => GamePage()
         });
-        _step.Text = English ? $"Step {_page + 1} of 4" : $"Étape {_page + 1} sur 4";
+        _step.Text = English ? $"Step {_page + 1} of {PageCount}" : $"Étape {_page + 1} sur {PageCount}";
         _back.Content = English ? "Back" : "Retour";
         _later.Content = English ? "Later" : "Plus tard";
         _back.IsEnabled = _page > 0;
-        _next.Content = _page == 3
+        _next.Content = _page == PageCount - 1
             ? (English ? "Finish and configure Mario Party 4" : "Terminer et configurer Mario Party 4")
             : (English ? "Continue" : "Continuer");
     }
@@ -167,6 +182,66 @@ public sealed class FirstRunWizardWindow : Window
         return stack;
     }
 
+    /// <summary>
+    /// One RetroAchievements login for every game, asked for right away so the first game already
+    /// starts logged in. Optional: continuing without it is fine, and the profile page has it too.
+    /// </summary>
+    private Control RetroAchievementsPage()
+    {
+        var stack = PageStack();
+        stack.Children.Add(Heading("RetroAchievements"));
+        stack.Children.Add(Body(English
+            ? "Log in once here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: CubeShelf keeps only the token the site returns, encrypted for your Windows account. No account? Continue: you can log in later on the My profile page."
+            : "Connecte-toi une fois ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarrera connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows. Pas de compte ? Continue : tu pourras te connecter plus tard sur la page Mon profil."));
+
+        var status = new TextBlock { TextWrapping = TextWrapping.Wrap };
+        var user = new TextBox { MaxLength = 64, Watermark = English ? "RetroAchievements user name" : "Nom d’utilisateur RetroAchievements" };
+        var password = new TextBox { PasswordChar = '•', Watermark = English ? "Password" : "Mot de passe" };
+        var login = new Button { Content = English ? "Log in" : "Se connecter", HorizontalAlignment = HorizontalAlignment.Left };
+        AutomationProperties.SetName(user, English ? "RetroAchievements user name" : "Nom d’utilisateur RetroAchievements");
+        AutomationProperties.SetName(password, English ? "Password" : "Mot de passe");
+
+        void ShowLoggedIn() => status.Text = English
+            ? $"Logged in as {_retroAchievementsUser}. Your games will start logged in."
+            : $"Connecté en tant que {_retroAchievementsUser}. Tes jeux démarreront connectés.";
+
+        if (_retroAchievementsUser is not null) ShowLoggedIn();
+
+        login.Click += async (_, _) =>
+        {
+            if (_retroAchievementsLogin is null) return;
+            login.IsEnabled = false;
+            status.Text = English ? "Logging in to RetroAchievements…" : "Connexion à RetroAchievements…";
+            try
+            {
+                var result = await _retroAchievementsLogin(user.Text?.Trim() ?? "", password.Text ?? "");
+                if (result.Succeeded && result.Session is not null)
+                {
+                    _retroAchievementsUser = result.Session.User;
+                    ShowLoggedIn();
+                }
+                else
+                {
+                    status.Text = result.Error ?? (English ? "Could not log in." : "Connexion impossible.");
+                }
+            }
+            finally
+            {
+                // The password is not kept anywhere, the box included.
+                password.Text = "";
+                login.IsEnabled = true;
+            }
+        };
+
+        var panel = new StackPanel { Spacing = 10 };
+        panel.Children.Add(user);
+        panel.Children.Add(password);
+        panel.Children.Add(login);
+        panel.Children.Add(status);
+        stack.Children.Add(Card(English ? "One account for every game" : "Un compte pour tous tes jeux", panel));
+        return stack;
+    }
+
     private Control GamePage()
     {
         var stack = PageStack();
@@ -189,9 +264,10 @@ public sealed class FirstRunWizardWindow : Window
             return;
         }
 
-        if (args.Key == Key.Enter && args.KeyModifiers == KeyModifiers.None)
+        // Enter in the login fields belongs to them, not to the wizard.
+        if (args.Key == Key.Enter && args.KeyModifiers == KeyModifiers.None && args.Source is not TextBox)
         {
-            if (_page < 3) ShowPage(_page + 1);
+            if (_page < PageCount - 1) ShowPage(_page + 1);
             else Finish();
             args.Handled = true;
         }

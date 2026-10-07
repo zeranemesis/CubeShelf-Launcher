@@ -364,12 +364,15 @@ public sealed partial class MainWindow
     private async Task ShowFirstRunWizardAsync(bool force = false)
     {
         if (!force && _preferences.FirstRunCompleted) return;
-        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences);
+        string? raUser = null;
+        if (_raStore is not null && _raStore.Load(out var rejected) is { } session && !rejected) raUser = session.User;
+        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser);
         await wizard.ShowDialog(this);
         if (!wizard.Completed) return;
 
         _preferences = wizard.Preferences;
         ApplyPreferences();
+        RefreshRetroAchievementsUi();
         RefreshLibraryParity();
         if (wizard.OpenGameAfterFinish && _catalogGames.FirstOrDefault() is { } game)
             SelectCatalogGame(game);

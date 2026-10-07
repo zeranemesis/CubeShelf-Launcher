@@ -149,17 +149,13 @@ public sealed partial class MainWindow
         RaStatusText.Text = P7("Connexion à RetroAchievements…", "Logging in to RetroAchievements…");
         try
         {
-            var login = new RetroAchievementsLogin(RetroAchievementsHttp, UserAgent());
-            var result = await login.LoginAsync(user, password);
+            var result = await SignInRetroAchievementsAsync(user, password);
             if (!result.Succeeded || result.Session is null)
             {
                 RaStatusText.Text = result.Error ?? P7("Connexion impossible.", "Could not log in.");
                 return;
             }
 
-            var previous = _raStore.Load();
-            if (previous is not null && !string.Equals(previous.User, result.Session.User, StringComparison.OrdinalIgnoreCase)) _raCache.Clear();
-            _raStore.Save(result.Session);
             RefreshRetroAchievementsUi();
             ShowToastParity("RetroAchievements", P7(
                 $"Connecté en tant que {result.Session.User} ({result.Score} pts). Lance un jeu : il sera connecté tout seul.",
@@ -171,6 +167,22 @@ public sealed partial class MainWindow
             RaPasswordBox.Text = "";
             RaLoginButton.IsEnabled = true;
         }
+    }
+
+    /// <summary>
+    /// Logs in and keeps the session: the profile page and the first-start wizard both come here.
+    /// Another account than the one before starts from an empty progress cache.
+    /// </summary>
+    private async Task<RetroAchievementsLoginResult> SignInRetroAchievementsAsync(string user, string password)
+    {
+        if (_raStore is null || _raCache is null) return new RetroAchievementsLoginResult(false, Error: P7("Indisponible.", "Unavailable."));
+        var result = await new RetroAchievementsLogin(RetroAchievementsHttp, UserAgent()).LoginAsync(user, password);
+        if (!result.Succeeded || result.Session is null) return result;
+
+        var previous = _raStore.Load();
+        if (previous is not null && !string.Equals(previous.User, result.Session.User, StringComparison.OrdinalIgnoreCase)) _raCache.Clear();
+        _raStore.Save(result.Session);
+        return result;
     }
 
     private void LogoutRetroAchievements(object? sender, RoutedEventArgs args)
