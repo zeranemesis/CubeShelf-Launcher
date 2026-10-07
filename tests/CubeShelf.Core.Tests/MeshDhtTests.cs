@@ -257,12 +257,24 @@ static class MeshDhtTests
                 if (to.Address.GetAddressBytes()[0] == 192) privateTouched = true;
                 return true;
             };
+            // Nobody listens at the invented addresses, so the network never delivers there: what
+            // the asker's own socket sent is the count.
+            var askerSocket = (SimulatedSocket)asker.Socket;
+            long SentToInvented()
+            {
+                lock (askerSocket.SentTo)
+                    return askerSocket.SentTo.Where(entry => entry.Key.Address.GetAddressBytes() is [11, 250, ..]).Sum(entry => entry.Value);
+            }
 
             Wait(asker.Dht.BootstrapAsync(new[] { liar.Endpoint, nodes[0].Endpoint }), 60000);
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            // Let the handshakes the bootstrap started run out, then see what later lookups add.
+            Thread.Sleep(3500);
+            var paidOnce = SentToInvented();
             for (var i = 0; i < 3; i++) Wait(asker.Dht.FindClosestAsync(NodeId.Random()), 60000);
-            // The invented addresses cost a timeout once, not on every lookup.
-            Check(watch.ElapsedMilliseconds < 5000, $"later lookups do not keep paying for the lies ({watch.ElapsedMilliseconds} ms)");
+            // The invented addresses cost a timeout once, not on every lookup. Counted in bytes
+            // sent rather than timed: a slow test machine must not decide it.
+            Check(paidOnce > 0, "the lies were tried once");
+            Check(SentToInvented() == paidOnce, $"later lookups never try them again ({SentToInvented() - paidOnce} more bytes)");
 
             var table = asker.Table.All().Select(contact => contact.Id).ToHashSet();
             Check(fakes.All(fake => !table.Contains(fake.Id)), "no invented contact entered the table");
