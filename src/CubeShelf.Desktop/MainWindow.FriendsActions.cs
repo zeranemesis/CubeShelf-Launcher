@@ -54,9 +54,9 @@ public sealed partial class MainWindow
                 confirm.IsEnabled = true;
                 if (string.IsNullOrWhiteSpace(nameBox.Text) && payload.DisplayName.Length > 0)
                     nameBox.Text = payload.DisplayName;
-                // Who, and where: the user is about to poll that address every couple of minutes.
-                status.Text = P7($"Tu vas ajouter {payload.Handle}. Adresse : {new Uri(payload.PresenceUrl).Host}",
-                                 $"You are adding {payload.Handle}. Address: {new Uri(payload.PresenceUrl).Host}");
+                // Who, and where: the user is about to read them every couple of minutes.
+                status.Text = P7($"Tu vas ajouter {payload.Handle}. {DescribeCodeSource(payload, french: true)}",
+                                 $"You are adding {payload.Handle}. {DescribeCodeSource(payload, french: false)}");
             }
             else
             {
@@ -75,7 +75,12 @@ public sealed partial class MainWindow
                 status.Text = error;
                 return;
             }
-            dialog.Close();
+
+            // Same window, next step: friendship goes one way at a time, and the moment they were
+            // added is the moment to send our own code back -- the network carries a request on
+            // its own, the message is for when it cannot.
+            AfterAddingFromCode(decoded);
+            dialog.Content = ReplyStep(decoded.Handle, () => dialog.Close());
         };
 
         dialog.Content = new StackPanel
@@ -104,14 +109,21 @@ public sealed partial class MainWindow
 
         // Opened with a code already in the clipboard, the dialog starts filled in.
         if (_clipboardCandidate is { } candidate)
-            codeBox.Text = FriendCode.Encode(candidate.PublicKey, candidate.PresenceUrl, candidate.DisplayName);
+            codeBox.Text = string.IsNullOrEmpty(candidate.PresenceUrl)
+                ? FriendCode.EncodeForNetwork(candidate.PublicKey, candidate.DisplayName, candidate.Seeds)
+                : FriendCode.Encode(candidate.PublicKey, candidate.PresenceUrl, candidate.DisplayName);
 
         await dialog.ShowDialog(this);
 
         _ = CheckClipboardForFriendCodeAsync();
         RefreshFriendsView();
         // The recipient list changed, so the next document has to include them.
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
+        // And read them now rather than in two minutes: whether they already added us back is
+        // the first thing the list should say -- and keep reading actively for a while, since
+        // that is usually the moment they do.
+        _ = RefreshFriendsSilentlyAsync();
+        _presence?.PollEagerly();
     }
 
     private void ToggleFriendPause(object? sender, RoutedEventArgs args)
@@ -120,7 +132,7 @@ public sealed partial class MainWindow
 
         _friends.Update(row.PublicKey, friend => friend.Paused = !friend.Paused);
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
     }
 
     private async void RemoveFriend(object? sender, RoutedEventArgs args)
@@ -148,10 +160,17 @@ public sealed partial class MainWindow
                 // to them, and it does not stop them watching the address change.
                 new TextBlock
                 {
-                    Text = P7("Il peut le remarquer, et il garde ton adresse : il verra encore quand " +
-                              "ton fichier change, donc quand tu joues. Seul un changement d’adresse y met fin.",
-                              "They may notice, and they keep your address: they can still see when your " +
-                              "file changes, and so when you play. Only changing the address stops that."),
+                    Text = string.IsNullOrWhiteSpace(_preferences.PresenceUrl)
+                        ? P7("Il peut le remarquer. Jusqu’à minuit (UTC), il pourra encore voir que ta présence change, sans pouvoir la lire ; " +
+                             "ensuite il perd ta trace sur le réseau CubeShelf.",
+                             "They may notice. Until midnight (UTC) they can still see your presence change, without being able to read it; " +
+                             "after that they lose track of you on the CubeShelf network.")
+                        : P7("Il peut le remarquer, et il garde ton adresse : il verra encore quand " +
+                             "ton fichier change, donc quand tu joues. Pour y mettre fin, change d’adresse (Mon profil) : " +
+                             "tes autres amis te suivront tout seuls, lui perdra ta trace.",
+                             "They may notice, and they keep your address: they can still see when your " +
+                             "file changes, and so when you play. To end that, change your address (My profile): " +
+                             "your other friends follow on their own, they lose track of you."),
                     Foreground = Avalonia.Media.Brushes.Gray,
                     FontSize = 12,
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap
@@ -170,8 +189,17 @@ public sealed partial class MainWindow
 
         _friends.Remove(row.PublicKey);
         _friendPresence.TryRemove(row.PublicKey, out _);
+        _messages?.Forget(row.PublicKey);
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        OnFriendsListChanged();
+    }
+
+    /// <summary>Where a pasted code says its author publishes, in words: an https host, or the network.</summary>
+    private static string DescribeCodeSource(FriendCodePayload payload, bool french)
+    {
+        if (Uri.TryCreate(payload.PresenceUrl, UriKind.Absolute, out var uri))
+            return french ? $"Adresse : {uri.Host}" : $"Address: {uri.Host}";
+        return french ? "Par le réseau CubeShelf." : "Through the CubeShelf network.";
     }
 
     private async void CopyFriendCode(object? sender, RoutedEventArgs args)
@@ -184,8 +212,7 @@ public sealed partial class MainWindow
         try
         {
             // Rebuilding their code is how two of your friends get introduced to each other.
-            var code = FriendCode.Encode(
-                Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl, friend.DisplayName);
+            var code = FriendCodeOf(friend);
             await CopyToClipboardAsync(code, P7($"Code de {friend.DisplayName} copié.",
                                                 $"{friend.DisplayName}’s code copied."));
         }
@@ -218,32 +245,86 @@ public sealed partial class MainWindow
     {
         if (_loadingSettings) return;
 
-        var url = (PresenceUrlBox.Text ?? "").Trim();
+        // What is in the box is what the service gave, not necessarily what serves the file: it
+        // is read, recognised and turned into guesses, unless it is the address already proven.
+        var pasted = (PresenceUrlBox.Text ?? "").Trim();
+        var url = string.Equals(pasted, _preferences.PresenceUrl, StringComparison.Ordinal)
+            ? pasted
+            : InterpretPastedLink(pasted);
         var folder = (PresenceFolderBox.Text ?? "").Trim();
         var addressChanged = !string.Equals(url, _preferences.PresenceUrl, StringComparison.Ordinal);
         var folderChanged = !string.Equals(folder, _preferences.PresenceFolder, StringComparison.Ordinal);
+
+        // Leaving a pair that works: remember it, so that once the new one is proven the old file
+        // can tell friends where we went. Only the first pair left behind counts -- an address
+        // tried and abandoned on the way never reached anyone.
+        var leavingVerified = (addressChanged || folderChanged) && IsAddressVerified() &&
+                              _preferences.PreviousPresenceUrl.Length == 0;
 
         _preferences = _preferences with
         {
             PresenceFolder = folder,
             PresenceUrl = url,
             // The proof was of this folder served at this address. Either one moving voids it.
-            PresenceVerifiedUrl = addressChanged || folderChanged ? "" : _preferences.PresenceVerifiedUrl
+            PresenceVerifiedUrl = addressChanged || folderChanged ? "" : _preferences.PresenceVerifiedUrl,
+            PreviousPresenceFolder = leavingVerified ? _preferences.PresenceFolder : _preferences.PreviousPresenceFolder,
+            PreviousPresenceUrl = leavingVerified ? _preferences.PresenceUrl : _preferences.PreviousPresenceUrl
         };
         _preferencesStore.Save(_preferences);
         RefreshOwnFriendCode();
 
         if (addressChanged)
         {
-            // The address is sealed inside every friend code already handed out. Changing it
-            // silently orphans every existing friend, who keeps polling the old one forever.
+            // Friends follow on their own once the new address is proven: the old file is left a
+            // last document pointing at it. Codes handed to people not yet friends still name the old one.
             PresenceStatusText.Text = P7(
-                "Adresse modifiée : teste-la, puis redistribue ton code ami. Les codes déjà donnés ne fonctionnent plus.",
-                "Address changed: test it, then hand out your friend code again. Codes already given no longer work.");
+                "Adresse modifiée : dès qu’elle sera vérifiée, l’ancien fichier indiquera la nouvelle à tes amis, qui suivront tout seuls. Laisse l’ancien fichier en place quelques semaines. Les codes donnés à des gens pas encore amis pointent encore vers l’ancienne.",
+                "Address changed: once it is verified, the old file points your friends at the new one and they follow on their own. Leave the old file in place for a few weeks. Codes given to people not yet friends still point at the old one.");
         }
 
         StartPresenceService();
         RefreshFriendsView();
+        RefreshShareSteps();
+
+        // A new link is tested straight away: the user just did the one thing they had to do,
+        // and the answer -- does it work -- should not wait for a second click.
+        if (addressChanged && url.Length > 0 && HasIdentity && Directory.Exists(folder))
+            RunPresenceSelfTest(sender, args);
+    }
+
+    /// <summary>
+    /// With a new address proven, the old file -- if it is somewhere else -- gets its last
+    /// document: offline, pointing at the new address, for the current friends only.
+    /// </summary>
+    private void LeaveForwardingAddress(string newAddress)
+    {
+        var oldFolder = _preferences.PreviousPresenceFolder;
+        var oldUrl = _preferences.PreviousPresenceUrl;
+        _preferences = _preferences with { PreviousPresenceFolder = "", PreviousPresenceUrl = "" };
+        _preferencesStore.Save(_preferences);
+
+        if (oldUrl.Length == 0 || string.Equals(oldUrl, newAddress, StringComparison.Ordinal)) return;
+        if (_identity is null || _friends is null) return;
+
+        // Same folder, new link: every document there already states the new address.
+        if (string.Equals(Path.GetFullPath(oldFolder), Path.GetFullPath(_preferences.PresenceFolder), StringComparison.OrdinalIgnoreCase))
+            return;
+
+        if (!Directory.Exists(oldFolder))
+        {
+            ShowToastParity(P7("Ta présence", "Your presence"),
+                P7("L’ancien dossier n’existe plus : tes amis ne peuvent pas être prévenus de ta nouvelle adresse. Envoie-leur ton nouveau code.",
+                   "The old folder is gone: your friends cannot be told about your new address. Send them your new code."));
+            return;
+        }
+
+        if (PresenceAddressMove.WriteMovedDocument(_identity, _friends, new PresenceSequence(_paths.ConfigurationDirectory),
+                _preferences.FriendsDisplayName, oldFolder, newAddress, out var error))
+            ShowToastParity(P7("Ta présence", "Your presence"),
+                P7("Nouvelle adresse en place. L’ancien fichier l’indique à tes amis actuels, qui suivront tout seuls : garde-le quelques semaines.",
+                   "New address in place. The old file tells your current friends, who follow on their own: keep it a few weeks."));
+        else
+            ShowToastParity(P7("Ta présence", "Your presence"), error);
     }
 
     private async void BrowsePresenceFolder(object? sender, RoutedEventArgs args)
@@ -280,14 +361,31 @@ public sealed partial class MainWindow
             var snapshot = PresenceComposer.Offline(
                 _preferences.FriendsDisplayName, sequence.Next(DateTimeOffset.UtcNow), DateTimeOffset.UtcNow);
 
+            // The guesses made from the pasted link, or from the stored address when the test is
+            // run again by hand: a link stored before conversion existed gets converted too.
+            var candidates = _pendingCandidates ??
+                (ShareLink.TryConvert(_preferences.PresenceUrl, SyncedFolderTarget.DefaultFileName, out var stored, out _)
+                    ? stored!.Candidates
+                    : null);
+
             var result = await selfTest.RunAsync(publisher, snapshot,
-                PresenceRecipients.ForPublication(_identity, _friends), TimeSpan.FromMinutes(2));
+                PresenceRecipients.ForPublication(_identity, _friends), TimeSpan.FromMinutes(2), candidates);
 
             if (result.Succeeded)
             {
-                // Remembered, so the code is still there after a restart.
-                _preferences = _preferences with { PresenceVerifiedUrl = _preferences.PresenceUrl };
+                // Remembered, so the code is still there after a restart. The address kept is the
+                // guess that worked, which may not be the one tried first.
+                _preferences = _preferences with
+                {
+                    PresenceUrl = result.PresenceUrl,
+                    PresenceVerifiedUrl = result.PresenceUrl
+                };
                 _preferencesStore.Save(_preferences);
+                _pendingCandidates = null;
+                PresenceUrlBox.Text = result.PresenceUrl;
+                PresenceUrlConversionText.IsVisible = false;
+                LeaveForwardingAddress(result.PresenceUrl);
+                RefreshShareSteps();
                 RefreshOwnFriendCode();
                 PresenceStatusText.Text = P7(
                     "Adresse vérifiée : ton document a été relu et déchiffré. Tu peux distribuer ton code.",
@@ -324,6 +422,14 @@ public sealed partial class MainWindow
         SharePlayTimeBox.IsChecked = _preferences.SharePlayTime;
         ShareCurrentGameBox.IsChecked = _preferences.ShareCurrentGame;
         ShareModsBox.IsChecked = _preferences.ShareMods;
+        LanVisibleBox.IsChecked = _preferences.LanVisible;
+        MeshEnabledBox.IsChecked = _preferences.MeshEnabled;
+        MeshMapPortBox.IsChecked = _preferences.MeshMapPort;
+        // The folder card is for whoever still has one set up; nobody else is shown a cloud.
+        LegacyPresenceCard.IsVisible = _preferences.PresenceFolder.Length > 0 || _preferences.PresenceUrl.Length > 0;
+        CloseToTrayBox.IsChecked = _preferences.CloseToTray;
+        NotifyOnlineBox.IsChecked = _preferences.NotifyFriendsOnline;
+        AutoAwayBox.IsChecked = _preferences.AutoAway;
         ApplyProfilePreferences();
 
         // The code stays hidden until a self-test proves the address serves a readable document.
@@ -342,12 +448,22 @@ public sealed partial class MainWindow
             SharePlayTime = SharePlayTimeBox.IsChecked == true,
             ShareCurrentGame = ShareCurrentGameBox.IsChecked == true,
             ShareMods = ShareModsBox.IsChecked == true,
-            ShareProfile = ShareProfileBox.IsChecked == true
+            ShareProfile = ShareProfileBox.IsChecked == true,
+            LanVisible = LanVisibleBox.IsChecked == true,
+            MeshEnabled = MeshEnabledBox.IsChecked == true,
+            MeshMapPort = MeshMapPortBox.IsChecked == true,
+            CloseToTray = CloseToTrayBox.IsChecked == true,
+            NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true,
+            AutoAway = AutoAwayBox.IsChecked == true
         };
 
         // Ticking "publish" has to start publishing now. In 0.9.0 nothing restarted the service,
         // so the box did nothing until the next launch -- a friend could add you and see nobody.
-        if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled)
+        // The local network decides whether there is anything to publish at all without a folder.
+        if (before.MeshEnabled != _preferences.MeshEnabled || before.MeshMapPort != _preferences.MeshMapPort)
+            RestartMesh();
+        else if (before.PresencePublishEnabled != _preferences.PresencePublishEnabled ||
+            before.LanVisible != _preferences.LanVisible)
             StartPresenceService();
         else if (before != _preferences)
             _presence?.RequestPublish(PresencePublishReason.ProfileChanged);

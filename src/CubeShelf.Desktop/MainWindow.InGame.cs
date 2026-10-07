@@ -170,10 +170,16 @@ public sealed partial class MainWindow
                     PresenceStatus.Online => "online",
                     _ => "offline"
                 };
+                var busy = known?.Availability == PresenceSnapshot.AvailabilityBusy;
+                var away = known?.Availability == PresenceSnapshot.AvailabilityAway;
+                var activity = known?.Activity is { Length: > 0 } said ? " — " + (said.Length > 48 ? said[..48] + "…" : said) : "";
                 var label = status switch
                 {
                     "paused" => P7("En pause", "Paused"),
-                    "ingame" => P7($"En jeu : {known?.CurrentGameTitle ?? "un jeu"}", $"Playing {known?.CurrentGameTitle ?? "a game"}"),
+                    "ingame" => P7($"En jeu : {known?.CurrentGameTitle ?? "un jeu"}{activity}", $"Playing {known?.CurrentGameTitle ?? "a game"}{activity}")
+                                + (busy ? P7(" (ne pas déranger)", " (do not disturb)") : ""),
+                    "online" when busy => P7("Ne pas déranger", "Do not disturb"),
+                    "online" when away => P7("Absent", "Away"),
                     "online" => P7("En ligne", "Online"),
                     _ => P7("Hors ligne", "Offline")
                 };
@@ -183,6 +189,7 @@ public sealed partial class MainWindow
                                  invite is not null &&
                                  invite.IsLive(now) &&
                                  invite.IsFor(me) &&
+                                 !IsDeclined(friend.PublicKey, invite) &&
                                  string.Equals(invite.GameId, game.Id, StringComparison.OrdinalIgnoreCase);
 
                 friends.Add(new InGameFriend(
@@ -253,7 +260,9 @@ public sealed partial class MainWindow
             return (false, P7("Cette invitation n’est plus valable : le salon a été fermé ou a expiré.",
                               "That invitation is no longer valid: the lobby was closed or has expired."));
 
-        return StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload);
+        var joining = StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload);
+        if (joining.Started) AnswerInvite(friend.PublicKey, invite, InviteReply.Joined);
+        return joining;
     }
 
     /// <summary>Every string the tab shows, in the language the player chose in CubeShelf.</summary>

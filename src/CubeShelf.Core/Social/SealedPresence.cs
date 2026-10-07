@@ -50,6 +50,13 @@ public static class SealedPresence
     /// <summary>Boxes are padded up to a multiple of this so the count does not reveal how many friends a peer has.</summary>
     private const int BoxPadding = 8;
 
+    /// <summary>
+    /// The plaintext is padded up to a multiple of this, with spaces after the JSON -- which every
+    /// JSON reader skips -- so the size of a document says a range, not how many games, mods or
+    /// friends' notes are in it, nor when one was added.
+    /// </summary>
+    public const int PlaintextPadding = 4096;
+
     /// <summary>Refuse absurd documents before allocating for them.</summary>
     private const int MaximumBoxes = 4096;
     private const int MaximumPayloadBytes = 4 * 1024 * 1024;
@@ -72,7 +79,11 @@ public static class SealedPresence
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(recipientPublicKeys);
 
-        var plaintext = JsonSerializer.SerializeToUtf8Bytes(snapshot, Json);
+        var serialized = JsonSerializer.SerializeToUtf8Bytes(snapshot, Json);
+        var plaintext = new byte[(serialized.Length + PlaintextPadding - 1) / PlaintextPadding * PlaintextPadding];
+        serialized.CopyTo(plaintext, 0);
+        plaintext.AsSpan(serialized.Length).Fill((byte)' ');
+        CryptographicOperations.ZeroMemory(serialized);
         var contentKey = RandomNumberGenerator.GetBytes(KeyLength);
         try
         {

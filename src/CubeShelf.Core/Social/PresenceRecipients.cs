@@ -23,4 +23,17 @@ public static class PresenceRecipients
         var recipients = new List<byte[]>(friends.ActiveRecipients()) { identity.PublicKey };
         return recipients;
     }
+
+    /// <summary>
+    /// Who the document is for, as a short digest: part of what decides whether a publish is
+    /// needed. A friend just added, paused or unblocked changes who can open the document even
+    /// when nothing in it changed -- and without this, they waited for the next heartbeat, five
+    /// minutes, to see someone they had just added.
+    /// </summary>
+    public static string Digest(IEnumerable<byte[]> recipients)
+    {
+        var sorted = recipients.Select(Convert.ToBase64String).OrderBy(key => key, StringComparer.Ordinal);
+        return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.ASCII.GetBytes(string.Join("|", sorted))), 0, 8);
+    }
 }

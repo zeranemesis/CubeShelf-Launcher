@@ -29,6 +29,17 @@ public static class PresencePolicy
     public static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(2);
 
     /// <summary>
+    /// How often a friend who is around -- online, playing, inviting us, or just invited by us --
+    /// is read. A conditional GET of an unchanged document costs a 304, so reading an active
+    /// friend this often is cheap; reading everyone this often would not be, which is why the
+    /// others stay at <see cref="PollInterval"/>.
+    /// </summary>
+    public static readonly TimeSpan ActivePollInterval = TimeSpan.FromSeconds(25);
+
+    /// <summary>After sending an invitation or adding someone, everyone is read actively this long.</summary>
+    public static readonly TimeSpan EagerPollingSpan = TimeSpan.FromMinutes(15);
+
+    /// <summary>
     /// Starting a game fires several state changes at once. Waiting a moment turns a burst into
     /// one document.
     /// </summary>
@@ -65,4 +76,23 @@ public static class PresencePolicy
 
     /// <summary>How many friends are polled at once.</summary>
     public const int PollConcurrency = 4;
+
+    /// <summary>
+    /// How often our own address is read back while we publish. A share link can die quietly --
+    /// the file moved, the link revoked, the sync client stopped -- and the only one who never
+    /// notices is the publisher, who keeps writing into a folder nobody reads from any more.
+    /// </summary>
+    public static readonly TimeSpan AddressCheckInterval = TimeSpan.FromMinutes(20);
+
+    /// <summary>
+    /// The first check waits this long after start-up, so the sync client has had time to carry
+    /// out the first document of the session rather than being judged on the last one of yesterday.
+    /// </summary>
+    public static readonly TimeSpan AddressFirstCheck = TimeSpan.FromMinutes(6);
+
+    /// <summary>
+    /// How late the served document may be before it counts as lagging. A document written this
+    /// long ago and still not served means friends are reading us well behind the truth.
+    /// </summary>
+    public static readonly TimeSpan AddressLagTolerance = TimeSpan.FromMinutes(10);
 }

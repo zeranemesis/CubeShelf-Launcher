@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using CubeShelf.Core.Social;
+using CubeShelf.Core.Social.Mesh;
 
 namespace CubeShelf.Desktop;
 
@@ -37,6 +38,8 @@ public sealed partial class MainWindow
     {
         ShowParityView(ProfileView);
         RefreshIdentityUi();
+        RefreshDetectedFolders();
+        RefreshAddressHealthUi();
         if (!HasIdentity) IdentityNameBox.Focus();
     }
 
@@ -61,6 +64,8 @@ public sealed partial class MainWindow
 
         RefreshOwnAvatar();
         RefreshOwnFriendCode();
+        RefreshBackupHint();
+        RefreshMeshUi();
     }
 
     private void PreviewIdentity(object? sender, TextChangedEventArgs args)
@@ -95,9 +100,11 @@ public sealed partial class MainWindow
         RefreshIdentityUi();
         StartPresenceService();
         RefreshFriendsView();
-        ShowToastParity(P7("Profil", "Profile"),
-            P7($"Bienvenue, {OwnHandle()}. Il reste à choisir où publier pour obtenir ton code ami.",
-               $"Welcome, {OwnHandle()}. One step left: choose where to publish to get your friend code."));
+        ShowToastParity(P7("Profil", "Profile"), _preferences.MeshEnabled
+            ? P7($"Bienvenue, {OwnHandle()}. Ton code ami est prêt sur cette page : envoie-le à tes amis.",
+                 $"Welcome, {OwnHandle()}. Your friend code is ready on this page: send it to your friends.")
+            : P7($"Bienvenue, {OwnHandle()}. Active le réseau CubeShelf sur cette page pour obtenir ton code ami.",
+                 $"Welcome, {OwnHandle()}. Turn the CubeShelf network on, on this page, to get your friend code."));
     }
 
     /// <summary>Renaming later goes through the same rules as creating.</summary>
@@ -134,12 +141,15 @@ public sealed partial class MainWindow
         _ownFriendCode = "";
         var verified = IsAddressVerified();
 
-        if (_identity is not null && HasIdentity && verified)
+        if (_identity is not null && HasIdentity)
         {
             try
             {
-                _ownFriendCode = FriendCode.Encode(
-                    _identity.PublicKey, _preferences.PresenceUrl, _preferences.FriendsDisplayName);
+                // On the network a code needs nothing proven: the identity, the pseudo, and ways
+                // in. The old way still needs an address a round trip has proven.
+                if (_preferences.MeshEnabled) _ownFriendCode = BuildNetworkFriendCode();
+                else if (verified)
+                    _ownFriendCode = FriendCode.Encode(_identity.PublicKey, _preferences.PresenceUrl, _preferences.FriendsDisplayName);
             }
             catch (ArgumentException)
             {
@@ -160,6 +170,27 @@ public sealed partial class MainWindow
     private string DescribeShareSteps(bool verified)
     {
         static string Mark(bool done) => done ? "✓" : "○";
+
+        if (_preferences.MeshEnabled)
+        {
+            var node = _meshNode;
+            var joined = node is not null && (node.Table.Count > 0 || node.Reachability == MeshReachability.Public);
+            var reachable = node?.Reachability is MeshReachability.Public or MeshReachability.Relayed;
+            var how = node?.Reachability == MeshReachability.Public ? P7(" directement", " directly") : P7(" par relais", " through relays");
+            var networkSteps = P7(
+                $"{Mark(HasIdentity)} Identité : {OwnHandle()}\n" +
+                $"{Mark(joined)} Réseau CubeShelf rejoint\n" +
+                $"{Mark(reachable)} Joignable{(reachable ? how : "")}",
+                $"{Mark(HasIdentity)} Identity: {OwnHandle()}\n" +
+                $"{Mark(joined)} CubeShelf network joined\n" +
+                $"{Mark(reachable)} Reachable{(reachable ? how : "")}");
+            var networkVerdict = joined
+                ? P7("Ton code est prêt. « Copier mon code » copie un message à envoyer à ton ami : il le copie à son tour, ouvre sa page Amis, et CubeShelf le trouve tout seul. Une demande d’ami te revient ensuite par le réseau.",
+                     "Your code is ready. “Copy my code” copies a message to send your friend: they copy it in turn, open their Friends page, and CubeShelf finds it by itself. A friend request then comes back to you through the network.")
+                : P7("Ton code est prêt. Ton CubeShelf ne connaît encore aucun autre nœud : le code de ton ami lui servira de porte d’entrée, et le tien à lui.",
+                     "Your code is ready. Your CubeShelf knows no other node yet: your friend’s code will be its way in, and yours theirs.");
+            return networkSteps + "\n\n" + networkVerdict;
+        }
 
         var folder = !string.IsNullOrWhiteSpace(_preferences.PresenceFolder) &&
                      Directory.Exists(_preferences.PresenceFolder);
@@ -196,6 +227,80 @@ public sealed partial class MainWindow
         "Copie tout ce message, puis ouvre la page Amis de CubeShelf : il le trouvera tout seul.",
         $"Add me on CubeShelf: {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
         "Copy this whole message, then open CubeShelf’s Friends page: it will find it by itself.");
+
+    /// <summary>
+    /// What to send someone we just added: our own code, worded as an answer to theirs. Found in
+    /// a chat message on their side exactly like the first one was on ours.
+    /// </summary>
+    private string ReplyMessage(string theirHandle) => P7(
+        $"Je t’ai ajouté sur CubeShelf, {theirHandle} ! Ajoute-moi en retour : {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
+        "Copie tout ce message, puis ouvre la page Amis de CubeShelf : il le trouvera tout seul.",
+        $"I added you on CubeShelf, {theirHandle}! Add me back: {OwnHandle()}\n\n{_ownFriendCode}\n\n" +
+        "Copy this whole message, then open CubeShelf’s Friends page: it will find it by itself.");
+
+    /// <summary>
+    /// The step after adding someone: send our code back, now, while the conversation is open.
+    /// Without a code of our own yet, it says what is missing instead of offering a dead button.
+    /// </summary>
+    private Control ReplyStep(string theirHandle, Action close)
+    {
+        var copy = new Button { Content = P7("Copier mon message pour lui", "Copy my message for them"), Classes = { "primary" } };
+        var later = new Button { Content = P7("Plus tard", "Later") };
+        later.Click += (_, _) => close();
+
+        string text;
+        if (_ownFriendCode.Length > 0)
+        {
+            text = _meshFriends is not null
+                ? P7($"{theirHandle} est ajouté. Une demande d’ami lui part par le réseau CubeShelf : il la verra sur sa page Amis. Si elle tarde, envoie-lui aussi ton code : copie ce message et colle-le dans votre conversation.",
+                     $"{theirHandle} is added. A friend request goes to them through the CubeShelf network: they see it on their Friends page. If it is slow to arrive, send them your code too: copy this message and paste it into your conversation.")
+                : P7($"{theirHandle} est ajouté. Pour qu’il te voie aussi, envoie-lui ton code : copie ce message et colle-le dans votre conversation.",
+                     $"{theirHandle} is added. For them to see you too, send them your code: copy this message and paste it into your conversation.");
+            copy.Click += async (_, _) =>
+            {
+                await CopyToClipboardAsync(ReplyMessage(theirHandle),
+                    P7("Message copié : colle-le dans ta conversation avec lui.", "Message copied: paste it into your conversation with them."));
+                close();
+            };
+        }
+        else
+        {
+            text = P7($"{theirHandle} est ajouté. Pour qu’il te voie aussi, il lui faudra ton code, qui n’est pas encore prêt : termine la page Mon profil, puis « Envoyer mon code » sur sa ligne.",
+                      $"{theirHandle} is added. For them to see you too they need your code, which is not ready yet: finish the My profile page, then “Send my code” on their line.");
+            copy.Content = P7("Ouvrir Mon profil", "Open My profile");
+            copy.Click += (_, _) =>
+            {
+                close();
+                ParityShowProfile(null, new RoutedEventArgs());
+            };
+        }
+
+        return new StackPanel
+        {
+            Margin = new Avalonia.Thickness(20),
+            Spacing = 12,
+            Children =
+            {
+                new TextBlock { Text = text, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                    Spacing = 8,
+                    Children = { later, copy }
+                }
+            }
+        };
+    }
+
+    /// <summary>The Friends page's "Send my code" on a pending friend.</summary>
+    private async void SendOwnCodeToFriend(object? sender, RoutedEventArgs args)
+    {
+        if (sender is not Button { Tag: FriendRow row } || _ownFriendCode.Length == 0) return;
+        await CopyToClipboardAsync(ReplyMessage(row.Name),
+            P7($"Message copié : colle-le dans ta conversation avec {row.Name}.",
+               $"Message copied: paste it into your conversation with {row.Name}."));
+    }
 
     // ----------------------------------------------------------------- clipboard
 
@@ -237,10 +342,9 @@ public sealed partial class MainWindow
         ClipboardInviteBanner.IsVisible = found is not null;
         if (found is null) return;
 
-        var host = Uri.TryCreate(found.PresenceUrl, UriKind.Absolute, out var uri) ? uri.Host : "";
         ClipboardInviteText.Text = P7(
-            $"Code ami trouvé dans ton presse-papiers : {found.Handle}, qui publie sur {host}. L’ajouter ?",
-            $"Friend code found in your clipboard: {found.Handle}, publishing on {host}. Add them?");
+            $"Code ami trouvé dans ton presse-papiers : {found.Handle}. {DescribeCodeSource(found, french: true)} L’ajouter ?",
+            $"Friend code found in your clipboard: {found.Handle}. {DescribeCodeSource(found, french: false)} Add them?");
     }
 
     private void AddFriendFromClipboard(object? sender, RoutedEventArgs args)
@@ -257,12 +361,14 @@ public sealed partial class MainWindow
         _clipboardCandidate = null;
         ClipboardInviteBanner.IsVisible = false;
         RefreshFriendsView();
-        _presence?.RequestPublish(PresencePublishReason.FriendsChanged);
+        AfterAddingFromCode(payload);
+        _ = RefreshFriendsSilentlyAsync();
+        _presence?.PollEagerly();
 
         // Friendship here goes one way at a time: adding them lets you read them, not them you.
-        ShowToastParity(P7("Amis", "Friends"),
-            P7($"{payload.Handle} ajouté. Pour qu’il te voie aussi, envoie-lui ton code en retour.",
-               $"{payload.Handle} added. For them to see you too, send them your code back."));
+        var dialog = CreatePhase7Dialog(P7("Ami ajouté", "Friend added"), 560, 280);
+        dialog.Content = ReplyStep(payload.Handle, () => dialog.Close());
+        _ = dialog.ShowDialog(this);
     }
 
     private void IgnoreClipboardCode(object? sender, RoutedEventArgs args)

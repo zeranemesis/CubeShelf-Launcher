@@ -105,9 +105,33 @@ Pair-à-pair sans service central : chacun publie un document chiffré à un end
 - [ ] rejoindre sans coller : demande une option de ligne de commande côté PartyBoard
 - [ ] mesurer la latence réelle d'un client de synchro et réajuster la fenêtre de fraîcheur
 - [ ] partage décidé ami par ami plutôt que globalement
-- [ ] rembourrage du clair pour masquer la taille de la bibliothèque
-- [ ] rotation d'adresse assistée, qui prévienne les amis existants
-- [ ] second transport (Gist, WebDAV) derrière `IPresencePublisher`
+- [x] rembourrage du clair pour masquer la taille de la bibliothèque
+- [x] rotation d'adresse assistée, qui prévienne les amis existants
+- [x] ~~second transport (Gist, WebDAV)~~ : remplacé par le réseau CubeShelf, sans cloud (v0.10)
+
+## v0.10 - réseau CubeShelf, sans serveur ni cloud
+
+Les CubeShelf forment eux-mêmes un réseau maillé. Détail et modèle de sécurité : [RESEAU.md](RESEAU.md).
+
+- [x] identifiants de nœud payés par une preuve de travail, neufs à chaque lancement
+- [x] sessions Noise XX (P-256, AES-256-GCM), anti-rejeu, fragmentation et retransmission
+- [x] réponses jamais plus grandes que les demandes, cookies sous charge, plafonds mémoire et calcul
+- [x] table Kademlia : seuls les nœuds contactés y entrent, diversité par voisinage, anciens gardés
+- [x] enregistrements signés, à durée bornée, quotas par voisinage, réplication par les détenteurs
+- [x] présence à un endroit qui change chaque jour, retrouvée par des pointeurs que seuls les amis calculent
+- [x] sessions directes entre amis en ligne, preuves d'identité liées à la session, documents poussés
+- [x] demandes d'ami par boîte aux lettres, prouvées, renvoyées jusqu'à réponse
+- [x] ouverture du port de la box : PCP, NAT-PMP, UPnP, sans jamais sortir de la box
+- [x] joignabilité prouvée par une sonde venue d'ailleurs, jamais déclarée
+- [x] relais pour les PC injoignables, perçage des box, repli sur le relais chiffré de bout en bout
+- [x] code ami v3 sans adresse web, avec des points d'entrée dans le réseau
+- [x] le dossier synchronisé n'est plus proposé (gardé pour qui l'utilise déjà)
+- [x] réseau local, statuts, messages, barre des tâches, notifications
+- [x] téléphone par QR code, identité chiffrée pour le compte Windows et sa sauvegarde
+- [ ] essai réel entre deux box sur Internet
+- [ ] client du réseau dans PartyBoard Android, pour voir les amis du réseau sur téléphone
+- [ ] mesurer la fiabilité du perçage selon les box françaises (Livebox, Freebox, Bbox, SFR)
+- [ ] relais choisis par latence plutôt qu'au hasard
 
 ## v0.9 - Linux et Steam Deck
 

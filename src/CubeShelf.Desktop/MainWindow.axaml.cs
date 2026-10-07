@@ -102,6 +102,7 @@ public sealed partial class MainWindow : Window
 
         // After the catalog is loaded, so the first document published is not an empty shelf.
         InitializeFriends();
+        InitializeSocial();
         // And again here, because the pinned-game list is the shelf: ApplyPreferences ran before
         // the catalog existed and could only offer "None".
         ApplyProfilePreferences();
@@ -110,19 +111,29 @@ public sealed partial class MainWindow : Window
         ShowRunningVersion();
         // Feeds the F1 Friends tab inside Mario Party 4, only while the game runs.
         StartInGameBridge();
+        // Near the clock, so closing the window does not mean leaving every friend.
+        InitializeTray();
         // Copy a friend's message in any chat app, come back to the Friends page: it is found.
         Activated += (_, _) =>
         {
             if (FriendsView.IsVisible) _ = CheckClipboardForFriendCodeAsync();
         };
         RefreshDownloadItems();
-        Closing += (_, _) =>
+        Closing += (_, closing) =>
         {
+            if (ShouldHideInsteadOfClosing(closing))
+            {
+                closing.Cancel = true;
+                HideToTray();
+                return;
+            }
+
             _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
             _preferencesStore.Save(_preferences);
             // Before the tracker is disposed: the farewell document has to still know whether
             // a game is running, or a friend is left looking at a stale "in a game".
             StopInGameBridge();
+            DisposeSocial();
             DisposeFriends();
             _sessions.Dispose();
             DisposePhase3Parity();
@@ -134,6 +145,7 @@ public sealed partial class MainWindow : Window
             foreach (var card in _parityCards) card.Dispose();
             _toastCancellation?.Cancel();
             _toastCancellation?.Dispose();
+            DisposeTray();
         };
     }
 
@@ -527,9 +539,6 @@ public sealed partial class MainWindow : Window
     private void ShowDownloads(object? sender, RoutedEventArgs args)
     {
         ShowParityView(DownloadsView);
-
-        // After the catalog is loaded, so the first document published is not an empty shelf.
-        InitializeFriends();
         RefreshDownloadItems();
     }
 
@@ -711,6 +720,39 @@ public sealed partial class MainWindow : Window
             : "Paramètres enregistrés.";
     }
 
+    /// <summary>
+    /// Defaults everywhere except the friends settings, which a reset keeps -- every one of them,
+    /// listed in one place so a new one cannot be forgotten in a second.
+    /// </summary>
+    private static UserPreferences SocialPreferencesOnly(UserPreferences current) => new UserPreferences() with
+    {
+        FriendsDisplayName = current.FriendsDisplayName,
+        PresenceFolder = current.PresenceFolder,
+        PresenceUrl = current.PresenceUrl,
+        PresencePublishEnabled = current.PresencePublishEnabled,
+        ShareLibrary = current.ShareLibrary,
+        SharePlayTime = current.SharePlayTime,
+        ShareCurrentGame = current.ShareCurrentGame,
+        ShareMods = current.ShareMods,
+        ShareProfile = current.ShareProfile,
+        ProfileStatus = current.ProfileStatus,
+        ProfilePinnedGameId = current.ProfilePinnedGameId,
+        ProfileFirstSeenAt = current.ProfileFirstSeenAt,
+        PresenceVerifiedUrl = current.PresenceVerifiedUrl,
+        LanVisible = current.LanVisible,
+        CloseToTray = current.CloseToTray,
+        NotifyFriendsOnline = current.NotifyFriendsOnline,
+        TrayHintShown = current.TrayHintShown,
+        Availability = current.Availability,
+        AutoAway = current.AutoAway,
+        PreviousPresenceFolder = current.PreviousPresenceFolder,
+        PreviousPresenceUrl = current.PreviousPresenceUrl,
+        IdentityBackedUpAt = current.IdentityBackedUpAt,
+        MeshEnabled = current.MeshEnabled,
+        MeshMapPort = current.MeshMapPort,
+        MeshPort = current.MeshPort
+    };
+
     private void ResetSettings(object? sender, RoutedEventArgs args)
     {
         _preferencesStore.Reset();
@@ -718,20 +760,7 @@ public sealed partial class MainWindow : Window
         // The friends settings survive a reset. Wiping the name and the address while
         // friends.json and identity.key stay on disk would leave the user with a friends list
         // they have silently stopped publishing to -- broken in the one direction nobody checks.
-        _preferences = new UserPreferences(
-            FriendsDisplayName: _preferences.FriendsDisplayName,
-            PresenceFolder: _preferences.PresenceFolder,
-            PresenceUrl: _preferences.PresenceUrl,
-            PresencePublishEnabled: _preferences.PresencePublishEnabled,
-            ShareLibrary: _preferences.ShareLibrary,
-            SharePlayTime: _preferences.SharePlayTime,
-            ShareCurrentGame: _preferences.ShareCurrentGame,
-            ShareMods: _preferences.ShareMods,
-            ShareProfile: _preferences.ShareProfile,
-            ProfileStatus: _preferences.ProfileStatus,
-            ProfilePinnedGameId: _preferences.ProfilePinnedGameId,
-            ProfileFirstSeenAt: _preferences.ProfileFirstSeenAt,
-            PresenceVerifiedUrl: _preferences.PresenceVerifiedUrl);
+        _preferences = SocialPreferencesOnly(_preferences);
 
         ApplyPreferences();
         _preferencesStore.Save(_preferences);

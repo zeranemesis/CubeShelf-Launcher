@@ -53,7 +53,59 @@ public sealed record UserPreferences(
     /// It counts only while it equals <see cref="PresenceUrl"/>: change the address, or the folder
     /// behind it, and the code is withheld until a new test proves the new pair.
     /// </summary>
-    string PresenceVerifiedUrl = "");
+    string PresenceVerifiedUrl = "",
+
+    /// <summary>
+    /// Whether friends on the same network are told we are here, with tags only they recognise,
+    /// and can read us directly. On by default: it names nobody to anyone else, and it is what
+    /// makes two friends in one room see each other with nothing set up.
+    /// </summary>
+    bool LanVisible = true,
+
+    /// <summary>
+    /// Closing the window hides it near the clock instead of quitting, once friends are set up:
+    /// quitting says goodbye to every friend and stops invitations arriving.
+    /// </summary>
+    bool CloseToTray = true,
+
+    /// <summary>A notification when a friend comes online or starts a game.</summary>
+    bool NotifyFriendsOnline = true,
+
+    /// <summary>Whether the user was told, once, that closing hides rather than quits.</summary>
+    bool TrayHintShown = false,
+
+    /// <summary>"" (available), "away", "busy" or "invisible", as the user chose it.</summary>
+    string Availability = "",
+
+    /// <summary>Away after ten minutes without input, back on the first touch, while available.</summary>
+    bool AutoAway = true,
+
+    /// <summary>
+    /// The verified folder and address being replaced, until the new pair is verified: then the
+    /// old file gets a last document pointing at the new address, and friends follow on their own.
+    /// </summary>
+    string PreviousPresenceFolder = "",
+    string PreviousPresenceUrl = "",
+
+    /// <summary>
+    /// When the identity was last exported with a passphrase. Until it has been, the profile page
+    /// asks for it: the key is the one thing that cannot be recreated, and once protected by
+    /// Windows it no longer survives a reinstall by itself.
+    /// </summary>
+    DateTimeOffset? IdentityBackedUpAt = null,
+
+    /// <summary>
+    /// Whether this CubeShelf takes part in the CubeShelf network: how friends see each other
+    /// from anywhere, with no server and no cloud. On by default -- it is what makes a friend code
+    /// work at all.
+    /// </summary>
+    bool MeshEnabled = true,
+
+    /// <summary>Ask the router to open the network port (PCP, NAT-PMP, UPnP).</summary>
+    bool MeshMapPort = true,
+
+    /// <summary>The UDP port the network listens on; another one is taken if it is busy.</summary>
+    int MeshPort = 47914);
 
 public sealed class UserPreferencesStore
 {

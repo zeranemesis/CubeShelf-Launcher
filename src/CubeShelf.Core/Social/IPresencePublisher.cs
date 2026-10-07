@@ -33,4 +33,47 @@ public interface IPresencePublisher : IDisposable
     string PresenceUrl { get; }
 
     Task<PresencePublishResult> PublishAsync(string envelopeJson, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The same, knowing the document's sequence -- which a transport that versions what it stores
+    /// (the network) needs, and a folder does not.
+    /// </summary>
+    Task<PresencePublishResult> PublishAsync(string envelopeJson, long sequence, CancellationToken cancellationToken = default) =>
+        PublishAsync(envelopeJson, cancellationToken);
+}
+
+/// <summary>
+/// Several transports at once: the network, and a synced folder for someone who still has one
+/// set up. Published to all; succeeded if any did; the address is the first that has one.
+/// </summary>
+public sealed class CompositePresencePublisher : IPresencePublisher
+{
+    private readonly IPresencePublisher[] _publishers;
+
+    public CompositePresencePublisher(params IPresencePublisher[] publishers)
+    {
+        if (publishers is not { Length: > 0 }) throw new ArgumentException("Au moins un moyen de publication.", nameof(publishers));
+        _publishers = publishers;
+    }
+
+    public bool IsConfigured => _publishers.Any(publisher => publisher.IsConfigured);
+
+    public string PresenceUrl => _publishers.Select(publisher => publisher.PresenceUrl).FirstOrDefault(url => !string.IsNullOrEmpty(url)) ?? "";
+
+    public Task<PresencePublishResult> PublishAsync(string envelopeJson, CancellationToken cancellationToken = default) =>
+        PublishAsync(envelopeJson, 0, cancellationToken);
+
+    public async Task<PresencePublishResult> PublishAsync(string envelopeJson, long sequence, CancellationToken cancellationToken = default)
+    {
+        var results = await Task.WhenAll(_publishers.Where(publisher => publisher.IsConfigured)
+            .Select(publisher => publisher.PublishAsync(envelopeJson, sequence, cancellationToken))).ConfigureAwait(false);
+        var success = results.FirstOrDefault(result => result.Succeeded);
+        if (success is not null) return success with { PresenceUrl = PresenceUrl };
+        return results.FirstOrDefault() ?? new PresencePublishResult(false, PresenceUrl, "Aucun moyen de publication configuré.");
+    }
+
+    public void Dispose()
+    {
+        foreach (var publisher in _publishers) publisher.Dispose();
+    }
 }

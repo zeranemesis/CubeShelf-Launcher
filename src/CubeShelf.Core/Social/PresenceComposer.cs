@@ -65,11 +65,20 @@ public sealed class PresenceComposer
         long sequence,
         DateTimeOffset now,
         ProfileInputs? profile = null,
-        PresenceInvite? invite = null)
+        PresenceInvite? invite = null,
+        string? address = null,
+        PresenceAvailability availability = PresenceAvailability.Available,
+        string? activity = null,
+        IReadOnlyList<SealedNote>? notes = null)
     {
         ArgumentNullException.ThrowIfNull(games);
         ArgumentNullException.ThrowIfNull(runningGameIds);
         ArgumentNullException.ThrowIfNull(sharing);
+
+        // Invisible is offline to every friend, playing or not -- but still a document, so
+        // messages and answers keep reaching the ones they are for, and a move is still followed.
+        if (availability == PresenceAvailability.Invisible)
+            return Offline(displayName ?? "", sequence, now, address) with { Notes = NullIfEmpty(notes) };
 
         var running = runningGameIds
             .Where(id => !string.IsNullOrWhiteSpace(id))
@@ -99,8 +108,32 @@ public sealed class PresenceComposer
             sharing.ShareProfile ? ComposeProfile(profile, games, sharing) : null,
             // A lapsed or empty invitation is simply not published: a friend acting on a stale
             // one would be sent to a lobby that has already closed.
-            invite is not null && invite.IsPublishable(now) ? invite : null);
+            invite is not null && invite.IsPublishable(now) ? invite : null,
+            NullIfEmpty(Lan.LanProtocol.SafeUrl(address)),
+            availability switch
+            {
+                PresenceAvailability.Away => PresenceSnapshot.AvailabilityAway,
+                PresenceAvailability.Busy => PresenceSnapshot.AvailabilityBusy,
+                _ => null
+            },
+            // What the game says is happening travels with the game it is about, under the same
+            // switch: someone hiding what they play hides how far they are in it too.
+            status == PresenceStatus.InGame ? CleanActivity(activity) : null,
+            NullIfEmpty(notes));
     }
+
+    private static IReadOnlyList<SealedNote>? NullIfEmpty(IReadOnlyList<SealedNote>? notes) =>
+        notes is { Count: > 0 } ? notes : null;
+
+    /// <summary>One line of plain text, short: it is shown in a list and in a game menu.</summary>
+    public static string? CleanActivity(string? activity)
+    {
+        var clean = ChatText.Clean(activity).Replace('\n', ' ');
+        if (clean.Length > PresenceSnapshot.MaximumActivityLength) clean = clean[..PresenceSnapshot.MaximumActivityLength].TrimEnd();
+        return clean.Length == 0 ? null : clean;
+    }
+
+    private static string? NullIfEmpty(string value) => value.Length == 0 ? null : value;
 
     private PeerProfile? ComposeProfile(
         ProfileInputs? profile,
@@ -151,7 +184,7 @@ public sealed class PresenceComposer
     }
 
     /// <summary>The farewell document: still us, doing nothing.</summary>
-    public static PresenceSnapshot Offline(string displayName, long sequence, DateTimeOffset now) =>
+    public static PresenceSnapshot Offline(string displayName, long sequence, DateTimeOffset now, string? address = null) =>
         new(PresenceSnapshot.CurrentVersion,
             (displayName ?? "").Trim(),
             now,
@@ -160,7 +193,8 @@ public sealed class PresenceComposer
             null,
             null,
             Array.Empty<SharedGame>(),
-            Array.Empty<SharedMod>());
+            Array.Empty<SharedMod>(),
+            Address: NullIfEmpty(Lan.LanProtocol.SafeUrl(address)));
 
     /// <summary>
     /// Everything in the document except when it was written and which number it carries, so two
@@ -169,7 +203,9 @@ public sealed class PresenceComposer
     public static string ContentFingerprint(PresenceSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-        var comparable = snapshot with { PublishedAt = DateTimeOffset.UnixEpoch, Sequence = 0 };
+        // Sealed notes carry fresh nonces every time; what they say is compared separately
+        // (PairwiseNotes.Digest), or every publish would look like a change.
+        var comparable = snapshot with { PublishedAt = DateTimeOffset.UnixEpoch, Sequence = 0, Notes = null };
         return Convert.ToHexString(
             SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(comparable, Canonical))).ToLowerInvariant();
     }

@@ -26,15 +26,34 @@ public sealed record PresenceInputs(
     IReadOnlyCollection<string> RunningGameIds,
     PresenceSharingOptions Sharing,
     ProfileInputs? Profile = null,
-    PresenceInvite? Invite = null);
+    PresenceInvite? Invite = null,
+    string? Address = null,
+    PresenceAvailability Availability = PresenceAvailability.Available,
+    string? Activity = null,
+    IReadOnlyDictionary<string, PairwiseNote>? Notes = null,
+    string? Mesh = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
     TimeSpan Debounce,
     TimeSpan MinimumGap,
     TimeSpan Heartbeat,
-    TimeSpan PollInterval)
+    TimeSpan PollInterval,
+    TimeSpan? AddressCheckInterval = null,
+    TimeSpan? AddressFirstCheck = null,
+    TimeSpan? AddressLagTolerance = null,
+    TimeSpan? ActivePollInterval = null)
 {
+    /// <summary>Never longer than the idle interval: "active" can only mean sooner.</summary>
+    public TimeSpan EffectiveActivePollInterval =>
+        ActivePollInterval is { } active && active < PollInterval ? active
+        : PresencePolicy.ActivePollInterval < PollInterval ? PresencePolicy.ActivePollInterval
+        : PollInterval;
+
+    public TimeSpan EffectiveAddressCheckInterval => AddressCheckInterval ?? PresencePolicy.AddressCheckInterval;
+    public TimeSpan EffectiveAddressFirstCheck => AddressFirstCheck ?? PresencePolicy.AddressFirstCheck;
+    public TimeSpan EffectiveAddressLagTolerance => AddressLagTolerance ?? PresencePolicy.AddressLagTolerance;
+
     public static PresenceServiceOptions Default => new(
         PresencePolicy.PublishDebounce,
         PresencePolicy.MinimumPublishGap,
@@ -69,6 +88,12 @@ public sealed class PresenceService : IAsyncDisposable
     private Task? _pollLoop;
 
     private string _lastFingerprint = "";
+
+    /// <summary>The address the last capture stated, so the farewell can state it too without asking again.</summary>
+    private string? _lastAddress;
+
+    /// <summary>The notes the last capture had, for the same reason.</summary>
+    private IReadOnlyDictionary<string, PairwiseNote>? _lastNotes;
     private DateTimeOffset? _lastPublishedAt;
     private int _shutdownPublished;
     private bool _disposed;
@@ -98,6 +123,26 @@ public sealed class PresenceService : IAsyncDisposable
     public event Action<PresencePublishReason, PresencePublishResult>? Published;
     public event Action<IReadOnlyList<PresenceFetchOutcome>>? FriendsRefreshed;
 
+    /// <summary>
+    /// Every document that reached the transport, sealed, with its sequence -- the farewell
+    /// included. The local network serves exactly this to friends who pull it.
+    /// </summary>
+    public event Action<string, long>? DocumentPublished;
+
+    /// <summary>Raised after each read-back of our own address, on whatever thread did it.</summary>
+    public event Action<PresenceAddressReport>? AddressChecked;
+
+    /// <summary>The last read-back, or Unknown before the first.</summary>
+    public PresenceAddressReport LastAddressReport { get; private set; } =
+        new(PresenceAddressHealth.Unknown, DateTimeOffset.MinValue);
+
+    /// <summary>What this session published and when, newest last, for judging how late the address is.</summary>
+    private readonly List<(long Sequence, DateTimeOffset At)> _publishedHistory = new();
+    private readonly object _historyGate = new();
+    private DateTimeOffset _startedAt;
+    private DateTimeOffset? _lastAddressCheck;
+    private int _checkingAddress;
+
     /// <summary>How many publishes actually reached the transport. For tests and diagnostics.</summary>
     public int PublishCount { get; private set; }
 
@@ -107,6 +152,7 @@ public sealed class PresenceService : IAsyncDisposable
         if (_lifetime is not null) return;
 
         _lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _startedAt = _clock();
         RequestPublish(PresencePublishReason.Startup);
         _publishLoop = PublishLoopAsync(_lifetime.Token);
         _pollLoop = PollLoopAsync(_lifetime.Token);
@@ -137,8 +183,78 @@ public sealed class PresenceService : IAsyncDisposable
     public async Task<IReadOnlyList<PresenceFetchOutcome>> RefreshNowAsync(CancellationToken cancellationToken = default)
     {
         var outcomes = await _fetcher.PollAsync(cancellationToken).ConfigureAwait(false);
+        var now = _clock();
+        foreach (var outcome in outcomes) _lastPolled[outcome.FriendPublicKey] = now;
+        Remember(outcomes);
         if (outcomes.Count > 0) FriendsRefreshed?.Invoke(outcomes);
         return outcomes;
+    }
+
+    /// <summary>The latest document of each friend, from any source, for deciding how often to read them.</summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, PresenceSnapshot> _latest = new(StringComparer.Ordinal);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> _lastPolled = new(StringComparer.Ordinal);
+    private DateTimeOffset _eagerUntil = DateTimeOffset.MinValue;
+
+    /// <summary>How many times each friend was read over HTTP. For tests and diagnostics.</summary>
+    public int PollsOf(string friendPublicKey) => _pollCounts.TryGetValue(friendPublicKey, out var count) ? count : 0;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> _pollCounts = new(StringComparer.Ordinal);
+
+    private void Remember(IEnumerable<PresenceFetchOutcome> outcomes)
+    {
+        foreach (var outcome in outcomes)
+        {
+            _pollCounts.AddOrUpdate(outcome.FriendPublicKey, 1, (_, count) => count + 1);
+            if (outcome.Snapshot is not null) _latest[outcome.FriendPublicKey] = outcome.Snapshot;
+        }
+    }
+
+    /// <summary>
+    /// A friend's document that arrived another way -- the local network. Counts toward deciding
+    /// how often to read them, like one read here would.
+    /// </summary>
+    public void NoteSnapshot(string friendPublicKey, PresenceSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        _latest[friendPublicKey] = snapshot;
+    }
+
+    /// <summary>
+    /// Reads everyone actively for a while: just after sending an invitation, whoever answers
+    /// should be seen within seconds, not minutes; just after adding someone, so is whether they
+    /// add us back.
+    /// </summary>
+    public void PollEagerly(TimeSpan? span = null) => _eagerUntil = _clock() + (span ?? PresencePolicy.EagerPollingSpan);
+
+    /// <summary>
+    /// Whether a friend deserves the short interval. Someone who is around -- online or playing --
+    /// or who is inviting us, is about to do something worth seeing soon; someone offline for
+    /// hours can wait the long one.
+    /// </summary>
+    private bool IsActive(string friendPublicKey, DateTimeOffset now)
+    {
+        if (now < _eagerUntil) return true;
+        if (!_latest.TryGetValue(friendPublicKey, out var latest)) return true;   // never read: find out
+        if (latest.EffectiveStatus(PresencePolicy.FreshnessWindow, now) is PresenceStatus.Online or PresenceStatus.InGame) return true;
+        return latest.Invite is { } invite && invite.IsLive(now) &&
+               invite.IsFor(Convert.ToBase64String(_identity.PublicKey));
+    }
+
+    private async Task PollDueAsync(CancellationToken cancellationToken)
+    {
+        var now = _clock();
+        var active = _options.EffectiveActivePollInterval;
+        var idle = _options.PollInterval;
+
+        var outcomes = await _fetcher.PollAsync(friend =>
+        {
+            var interval = IsActive(friend.PublicKey, now) ? active : idle;
+            // A little early rather than a whole tick late: the loop ticks at the active interval.
+            return !_lastPolled.TryGetValue(friend.PublicKey, out var last) || now - last >= interval - TimeSpan.FromMilliseconds(active.TotalMilliseconds / 4);
+        }, cancellationToken).ConfigureAwait(false);
+
+        foreach (var outcome in outcomes) _lastPolled[outcome.FriendPublicKey] = now;
+        Remember(outcomes);
+        if (outcomes.Count > 0) FriendsRefreshed?.Invoke(outcomes);
     }
 
     /// <summary>
@@ -173,7 +289,12 @@ public sealed class PresenceService : IAsyncDisposable
             await _publishGate.WaitAsync(deadline.Token).ConfigureAwait(false);
             gated = true;
 
-            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock());
+            // The farewell still carries what we had to say to single friends: a message sent
+            // just before quitting reaches them while we are away, not when we come back.
+            var snapshot = PresenceComposer.Offline(name, _sequence.Next(_clock()), _clock(), _lastAddress) with
+            {
+                Notes = _lastNotes is { Count: > 0 } notes ? PairwiseNotes.SealAll(_identity, notes) : null
+            };
             await PublishSnapshotAsync(PresencePublishReason.Shutdown, snapshot, deadline.Token)
                 .ConfigureAwait(false);
         }
@@ -225,8 +346,10 @@ public sealed class PresenceService : IAsyncDisposable
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await RefreshNowAsync(cancellationToken).ConfigureAwait(false);
-                await Task.Delay(_options.PollInterval, cancellationToken).ConfigureAwait(false);
+                // Ticks at the short interval; each tick reads only those due, so a friend away
+                // for hours is still read every couple of minutes, not every tick.
+                await PollDueAsync(cancellationToken).ConfigureAwait(false);
+                await Task.Delay(_options.EffectiveActivePollInterval, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -250,11 +373,19 @@ public sealed class PresenceService : IAsyncDisposable
             }
 
             var inputs = await CaptureAsync(cancellationToken).ConfigureAwait(false);
+            _lastAddress = inputs.Address;
+            _lastNotes = inputs.Notes;
             var candidate = _composer.Compose(
                 inputs.DisplayName, inputs.Games, inputs.RunningGameIds, inputs.Sharing,
-                sequence: 0, _clock(), inputs.Profile, inputs.Invite);
+                sequence: 0, _clock(), inputs.Profile, inputs.Invite, inputs.Address,
+                inputs.Availability, inputs.Activity);
+            // Where friends can reach us directly -- unless we asked to look offline, which a
+            // direct connection would give away.
+            if (inputs.Availability != PresenceAvailability.Invisible && !string.IsNullOrEmpty(inputs.Mesh))
+                candidate = candidate with { Mesh = inputs.Mesh };
 
-            var fingerprint = PresenceComposer.ContentFingerprint(candidate);
+            var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes) + "|" +
+                              PresenceRecipients.Digest(PresenceRecipients.ForPublication(_identity, _friends));
             var heartbeatDue = _lastPublishedAt is not { } previous ||
                 _clock() - previous >= _options.Heartbeat;
 
@@ -262,9 +393,23 @@ public sealed class PresenceService : IAsyncDisposable
             // again would only churn the sync client.
             if (fingerprint == _lastFingerprint && !heartbeatDue) return;
 
-            var snapshot = candidate with { Sequence = _sequence.Next(_clock()) };
+            var snapshot = candidate with
+            {
+                Sequence = _sequence.Next(_clock()),
+                Notes = inputs.Notes is { Count: > 0 } notes && PairwiseNotes.SealAll(_identity, notes) is { Count: > 0 } sealedNotes
+                    ? sealedNotes
+                    : null
+            };
             var result = await PublishSnapshotAsync(reason, snapshot, cancellationToken).ConfigureAwait(false);
-            if (result.Succeeded) _lastFingerprint = fingerprint;
+            if (result.Succeeded)
+            {
+                _lastFingerprint = fingerprint;
+                lock (_historyGate)
+                {
+                    _publishedHistory.Add((snapshot.Sequence, _clock()));
+                    if (_publishedHistory.Count > 64) _publishedHistory.RemoveRange(0, _publishedHistory.Count - 64);
+                }
+            }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -273,6 +418,84 @@ public sealed class PresenceService : IAsyncDisposable
         {
             _publishGate.Release();
         }
+
+        // Outside the gate: a slow read of our own address must never delay the next publish.
+        if (AddressCheckDue()) _ = CheckAddressInBackgroundAsync(cancellationToken);
+    }
+
+    private bool AddressCheckDue()
+    {
+        if (string.IsNullOrEmpty(_publisher.PresenceUrl)) return false;
+        var now = _clock();
+        if (now - _startedAt < _options.EffectiveAddressFirstCheck) return false;
+        return _lastAddressCheck is not { } last || now - last >= _options.EffectiveAddressCheckInterval;
+    }
+
+    private async Task CheckAddressInBackgroundAsync(CancellationToken cancellationToken)
+    {
+        if (Interlocked.Exchange(ref _checkingAddress, 1) == 1) return;
+        try
+        {
+            await CheckAddressNowAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is OperationCanceledException or HttpRequestException or IOException)
+        {
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _checkingAddress, 0);
+        }
+    }
+
+    /// <summary>
+    /// Reads our own address back and says what friends are getting from it. Public so the
+    /// profile page can ask on demand; the service also runs it on its own while publishing.
+    /// </summary>
+    public async Task<PresenceAddressReport> CheckAddressNowAsync(CancellationToken cancellationToken = default)
+    {
+        var url = _publisher.PresenceUrl;
+        var now = _clock();
+        _lastAddressCheck = now;
+
+        PresenceAddressReport report;
+        if (string.IsNullOrEmpty(url))
+        {
+            report = new(PresenceAddressHealth.Unknown, now);
+        }
+        else
+        {
+            var (read, opened) = await _fetcher.ReadOwnAsync(url, cancellationToken).ConfigureAwait(false);
+            report = Judge(read, opened, _clock());
+        }
+
+        LastAddressReport = report;
+        AddressChecked?.Invoke(report);
+        return report;
+    }
+
+    private PresenceAddressReport Judge(PresenceReadResult read, PresenceSnapshot? opened, DateTimeOffset now)
+    {
+        if (read.NotPublished) return new(PresenceAddressHealth.NotFound, now, Detail: read.Error);
+        if (!read.Ok) return new(PresenceAddressHealth.Unreachable, now, Detail: read.Error);
+        if (opened is null) return new(PresenceAddressHealth.NotOurs, now);
+
+        if (_sequence.Reconcile(opened.Sequence) == PresenceSequenceReconciliation.RemoteAhead)
+            return new(PresenceAddressHealth.SomeoneElsePublishes, now);
+
+        lock (_historyGate)
+        {
+            // The newest document that has had plenty of time to arrive. Serving anything older
+            // than it means the sync client is behind by at least the tolerance.
+            var tolerance = _options.EffectiveAddressLagTolerance;
+            var due = _publishedHistory.Where(entry => now - entry.At >= tolerance).ToArray();
+            if (due.Length > 0 && opened.Sequence < due[^1].Sequence)
+            {
+                var firstMissed = _publishedHistory.First(entry => entry.Sequence > opened.Sequence);
+                return new(PresenceAddressHealth.Lagging, now, Lag: now - firstMissed.At);
+            }
+        }
+
+        return new(PresenceAddressHealth.Healthy, now);
     }
 
     private async Task<PresencePublishResult> PublishSnapshotAsync(
@@ -282,14 +505,16 @@ public sealed class PresenceService : IAsyncDisposable
     {
         var envelope = SealedPresence.Seal(
             _identity, snapshot, PresenceRecipients.ForPublication(_identity, _friends));
+        var json = SealedPresence.ToJson(envelope);
         var result = await _publisher
-            .PublishAsync(SealedPresence.ToJson(envelope), cancellationToken)
+            .PublishAsync(json, snapshot.Sequence, cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Succeeded)
         {
             _lastPublishedAt = _clock();
             PublishCount++;
+            DocumentPublished?.Invoke(json, snapshot.Sequence);
         }
 
         Published?.Invoke(reason, result);

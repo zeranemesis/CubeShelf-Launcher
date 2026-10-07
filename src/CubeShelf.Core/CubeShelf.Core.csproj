@@ -8,4 +8,7 @@
   <ItemGroup>
     <PackageReference Include="SharpCompress" Version="0.50.4" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CubeShelf.Core.Tests" />
+  </ItemGroup>
 </Project>

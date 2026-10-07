@@ -48,11 +48,25 @@ public sealed class PresenceSelfTest : IDisposable
     /// to become readable. <paramref name="recipients"/> must include this identity, which
     /// <see cref="PresenceRecipients.ForPublication"/> guarantees.
     /// </summary>
+    public Task<PresenceSelfTestResult> RunAsync(
+        IPresencePublisher publisher,
+        PresenceSnapshot snapshot,
+        IReadOnlyList<byte[]> recipients,
+        TimeSpan patience,
+        CancellationToken cancellationToken = default) =>
+        RunAsync(publisher, snapshot, recipients, patience, candidates: null, cancellationToken);
+
+    /// <summary>
+    /// Same round trip, reading back from each of <paramref name="candidates"/> in turn -- the
+    /// guesses <see cref="ShareLink"/> made from a pasted share link -- and keeping the first that
+    /// serves the document just published. Without candidates, the publisher's own address is read.
+    /// </summary>
     public async Task<PresenceSelfTestResult> RunAsync(
         IPresencePublisher publisher,
         PresenceSnapshot snapshot,
         IReadOnlyList<byte[]> recipients,
         TimeSpan patience,
+        IReadOnlyList<string>? candidates,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(publisher);
@@ -69,50 +83,69 @@ public sealed class PresenceSelfTest : IDisposable
         if (!published.Succeeded)
             return Failed(published.Error ?? "La publication a échoué.");
 
-        if (!Uri.TryCreate(published.PresenceUrl, UriKind.Absolute, out var address))
-            return Failed("L’adresse de lecture n’est pas une adresse valide.");
+        var addresses = (candidates is { Count: > 0 } ? candidates : new[] { published.PresenceUrl })
+            .Select(candidate => Uri.TryCreate(candidate, UriKind.Absolute, out var uri) &&
+                                 uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
+                ? uri
+                : null)
+            .OfType<Uri>()
+            .ToArray();
+        if (addresses.Length == 0)
+            return Failed("L’adresse de lecture n’est pas une adresse https valide.");
 
         var deadline = DateTimeOffset.UtcNow + patience;
         string? lastError = null;
 
         while (true)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            // No conditional request: we want whatever is there now, not confirmation that
-            // something we already hold is current.
-            var read = await PresenceDocumentReader
-                .ReadAsync(_http, address, null, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (read.Ok &&
-                SealedPresence.TryOpen(_identity, _identity.PublicKey, SealedPresence.FromJson(read.Json!), out var opened) &&
-                opened is not null)
+            var sawStale = false;
+            foreach (var address in addresses)
             {
-                // A document we can open but that is not the one just published means the address
-                // is serving something stale -- a cache, or a different file altogether.
-                if (opened.Sequence == snapshot.Sequence)
-                    return new(true, published.PresenceUrl,
-                        FriendCode.Encode(_identity.PublicKey, published.PresenceUrl, snapshot.DisplayName));
+                cancellationToken.ThrowIfCancellationRequested();
 
-                lastError = "L’adresse sert encore un document plus ancien.";
+                // No conditional request: we want whatever is there now, not confirmation that
+                // something we already hold is current.
+                var read = await PresenceDocumentReader
+                    .ReadAsync(_http, address, null, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (read.Ok &&
+                    SealedPresence.TryOpen(_identity, _identity.PublicKey, SealedPresence.FromJson(read.Json!), out var opened) &&
+                    opened is not null)
+                {
+                    // A document we can open but that is not the one just published means the
+                    // address serves something stale -- a cache, or the sync client still uploading.
+                    if (opened.Sequence == snapshot.Sequence)
+                    {
+                        var url = address.AbsoluteUri;
+                        return new(true, url, FriendCode.Encode(_identity.PublicKey, url, snapshot.DisplayName));
+                    }
+
+                    sawStale = true;
+                }
+                else if (read.Ok)
+                {
+                    // Readable but not ours: almost always a preview page instead of the file.
+                    lastError ??=
+                        "L’adresse répond, mais pas avec ton document de présence : c’est sans doute la page " +
+                        "d’aperçu du service. Vérifie que le lien désigne le fichier cubeshelf-presence.json " +
+                        "et qu’il est ouvert à « toute personne disposant du lien ».";
+                }
+                else
+                {
+                    lastError ??= read.Error ?? "Lecture impossible.";
+                }
             }
-            else if (read.Ok)
-            {
-                // Readable but not ours: almost always an HTML preview page instead of the file.
-                lastError =
-                    "L’adresse répond, mais pas avec ton document de présence. " +
-                    "Vérifie que le lien pointe sur le fichier lui-même : un lien de partage " +
-                    "Nextcloud demande /download à la fin.";
-            }
-            else
-            {
-                lastError = read.Error ?? "Lecture impossible.";
-            }
+
+            // Of everything seen this round, the one that says the most wins: "it is there but
+            // old" beats "this guess served a preview page", which beats a plain failure.
+            if (sawStale)
+                lastError = "L’adresse sert encore un document plus ancien : le service n’a pas fini de synchroniser.";
 
             if (DateTimeOffset.UtcNow + _retryDelay >= deadline)
                 return Failed(lastError);
 
+            lastError = null;
             await Task.Delay(_retryDelay, cancellationToken).ConfigureAwait(false);
         }
     }

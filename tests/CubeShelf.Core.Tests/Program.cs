@@ -79,6 +79,75 @@ Run("the friend code carries the pseudo", TestFriendCodeCarriesThePseudo);
 Run("the tag never changes", TestTagNeverChanges);
 Run("the in-game state is what the game reads", TestInGameStateIsWhatTheGameReads);
 Run("in-game requests are acted on once", TestInGameRequestsAreActedOnOnce);
+Run("a share link becomes the file itself", TestShareLinksBecomeTheFileItself);
+Run("synced folders are found where their clients say", TestSyncedFoldersAreFound);
+Run("the self-test keeps the guess that works", TestSelfTestKeepsTheGuessThatWorks);
+Run("our own address is checked while we publish", TestOwnAddressIsChecked);
+Run("a friend who has not added us back reads as pending", TestPendingFriendIsTold);
+Run("friends find each other on the network without naming themselves", TestLanFriendsFindEachOther);
+Run("befriending on the network takes both, and proof", TestLanIntroduction);
+Run("an impostor on the network gets nothing", TestLanImpostorIsRefused);
+Run("a friend's stated address is adopted", TestStatedAddressIsAdopted);
+Run("friends who are around are read more often", TestActiveFriendsAreReadMoreOften);
+Run("a profile can live in a folder of its own", TestDataDirectoryOverride);
+Run("a note to one friend is read by that friend only", TestNotesReachOnlyTheirReader);
+Run("messages are delivered once and acknowledged", TestMessagesAreDeliveredAndAcknowledged);
+Run("availability, invisibility and what the game says", TestAvailabilityAndActivity);
+Run("unchanged notes do not force a publish", TestUnchangedNotesDoNotForceAPublish);
+Run("a document's size says a range, not a count", TestDocumentSizeIsPadded);
+Run("friends follow a move, a removed one cannot", TestFriendsFollowAMove);
+Run("a profile moves to the phone intact", TestProfileTransferRoundTrip);
+Run("a profile file refuses the wrong passphrase", TestProfileTransferRefusesWrongPassphrase);
+Run("a QR code holds what it was given", TestQrCodeStructure);
+Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDownload);
+Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
+Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
+Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
+Run("a key off the curve is refused at the door", KeyValidationTests.KeysOffTheCurveAreRefusedAtTheDoor);
+Run("mesh: derived keys are the same everywhere", KeyValidationTests.DerivedKeysAreTheSameEverywhere);
+Run("mesh: noise handshake agrees and refuses tampering", MeshTransportTests.NoiseHandshakeAgreesAndRejectsTampering);
+Run("mesh: a node id costs a proof of work", MeshTransportTests.ProofOfWorkBindsTheId);
+Run("mesh: sessions carry requests both ways", MeshTransportTests.TransportCarriesRequestsBothWays);
+Run("mesh: sessions survive loss, duplicates and 120 KB", MeshTransportTests.TransportSurvivesLossDuplicationAndLargeMessages);
+Run("mesh: sessions drop replayed packets", MeshTransportTests.TransportDropsReplayedPackets);
+Run("mesh: transport shrugs off garbage and never amplifies", MeshTransportTests.TransportShrugsOffGarbageAndNeverAmplifies);
+Run("mesh: handshakes ask for cookies under load", MeshTransportTests.TransportAsksForCookiesUnderLoad);
+Run("mesh: a leaving peer fails pending requests at once", MeshTransportTests.TransportFailsPendingRequestsWhenThePeerLeaves);
+Run("mesh: a node never opens a session with itself", MeshTransportTests.TransportRefusesToTalkToItself);
+Run("mesh: sessions over real UDP sockets", MeshTransportTests.TransportWorksOverRealUdp);
+Run("mesh: half-sent messages cannot exhaust memory", MeshTransportTests.HalfSentMessagesCannotExhaustMemory);
+Run("mesh: one neighbourhood cannot flood the routing table", MeshDhtTests.TableLimitsOneNeighbourhood);
+Run("mesh: holders refuse what does not verify", MeshDhtTests.HoldersRefuseWhatDoesNotVerify);
+Run("mesh: lookups converge on the closest nodes", MeshDhtTests.LookupsConvergeOnTheClosestNodes);
+Run("mesh: records are stored, found and updated", MeshDhtTests.RecordsAreStoredFoundAndUpdated);
+Run("mesh: records outlive their holders", MeshDhtTests.RecordsOutliveTheirHolders);
+Run("mesh: nodes behind NAT use the table", MeshDhtTests.NodesBehindNatUseTheTable);
+Run("mesh: lies in answers never enter the table", MeshDhtTests.LiesInAnswersNeverEnterTheTable);
+Run("mesh: reachability is proven, not claimed", MeshNodeTests.ReachabilityIsProvenNotClaimed);
+Run("mesh: two closed routers punch through", MeshNodeTests.TwoClosedRoutersPunchThrough);
+Run("mesh: symmetric routers fall back to the relay", MeshNodeTests.SymmetricRoutersFallBackToTheRelay);
+Run("mesh: two newcomers find each other from their codes", MeshNodeTests.TwoNewcomersFindEachOtherFromTheirCodes);
+Run("mesh: dial-backs cannot be aimed elsewhere", MeshNodeTests.DialBacksCannotBeAimedElsewhere);
+Run("mesh: the nodes file brings a node back without seeds", MeshNodeTests.NodesFileBringsANodeBackWithoutSeeds);
+Run("mesh: friend codes carry entry points, never private ones", MeshFriendsTests.FriendCodesCarryEntryPointsAndRefusePrivateOnes);
+Run("mesh: friends find each other, strangers do not", MeshFriendsTests.FriendsFindEachOtherAndStrangersDoNot);
+Run("mesh: online friends talk directly", MeshFriendsTests.OnlineFriendsTalkDirectly);
+Run("mesh: friend proofs cannot be forged or replayed", MeshFriendsTests.FriendProofsCannotBeForgedOrReplayed);
+Run("mesh: requests arrive and cannot be forged", MeshFriendsTests.RequestsArriveAndCannotBeForged);
+Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
+Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
+Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);
+Run("UPnP discovers, maps, reads the external address and removes", PortMapperTests.UpnpMapsReadsAddressAndRemoves);
+Run("UPnP renewal follows a router that restarted on another port", PortMapperTests.UpnpRenewalFollowsARestartedRouter);
+Run("UPnP conflict 718 tries another external port", PortMapperTests.UpnpConflictTriesAnotherPort);
+Run("UPnP 725 falls back to a permanent lease", PortMapperTests.UpnpPermanentLeaseOnly);
+Run("UPnP refuses a LOCATION off the router that answered", PortMapperTests.UpnpRejectsForeignLocations);
+Run("UPnP refuses a control URL off the router", PortMapperTests.UpnpRejectsForeignControlUrls);
+Run("UPnP refuses DTDs, bombs, oversized and garbage descriptions", PortMapperTests.UpnpRejectsHostileDescriptions);
+Run("UPnP refuses hostile SOAP answers and bad external addresses", PortMapperTests.UpnpRejectsHostileSoapAnswers);
+Run("port mapping gives up within the budget when nothing answers", PortMapperTests.NothingAnswersWithinTheBudget);
+Run("port mapping never treats loopback as the network outside tests", PortMapperTests.LoopbackIsNotTheNetworkOutsideTests);
+Run("port mapping honours the caller's cancellation", PortMapperTests.CancellationIsHonoured);
 
 if (failures.Count == 0)
 {
@@ -91,6 +160,9 @@ return 1;
 
 void Run(string name, Action action)
 {
+    // CUBESHELF_TEST_FILTER=mesh runs only the tests whose name contains it, for quick iteration.
+    if (Environment.GetEnvironmentVariable("CUBESHELF_TEST_FILTER") is { Length: > 0 } filter &&
+        !name.Contains(filter, StringComparison.OrdinalIgnoreCase)) return;
     executed++;
     try { action(); Console.WriteLine($"OK  {name}"); }
     catch (Exception exception) { failures.Add($"FAIL {name}: {exception.Message}"); }
@@ -1509,7 +1581,7 @@ void TestSelfTestCatchesAnAddressThatServesSomethingElse()
                 .GetAwaiter().GetResult();
             Assert(!result.Succeeded);
             Assert(result.FriendCode.Length == 0);      // no code is handed out on a guess
-            Assert(result.Error!.Contains("/download", StringComparison.Ordinal));
+            Assert(result.Error!.Contains("aperçu", StringComparison.Ordinal));
         }
 
         // Nothing there yet at all: worth waiting for, then reported plainly.
@@ -2584,6 +2656,1136 @@ string FindRepositoryFile(string relativePath)
     throw new DirectoryNotFoundException("Racine du dépôt introuvable depuis " + AppContext.BaseDirectory);
 }
 
+// ---------------------------------------------------------------------------
+// Setting up without knowing how each sync service spells "the file itself".
+// ---------------------------------------------------------------------------
+
+void TestShareLinksBecomeTheFileItself()
+{
+    const string file = "cubeshelf-presence.json";
+
+    ShareLinkConversion Convert(string pasted)
+    {
+        Assert(ShareLink.TryConvert(pasted, file, out var conversion, out var error));
+        Assert(error.Length == 0 && conversion is not null);
+        // Whatever was guessed, what was pasted is always among the tries.
+        Assert(conversion!.Candidates.Contains(conversion.Pasted));
+        return conversion;
+    }
+
+    // Dropbox: the preview page unless dl=1, and the opaque rlkey kept byte for byte.
+    var dropbox = Convert("https://www.dropbox.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq&dl=0");
+    Assert(dropbox.Provider == ShareLinkProvider.Dropbox && dropbox.Changed);
+    Assert(dropbox.Primary == "https://www.dropbox.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq&dl=1");
+    Assert(dropbox.Candidates.Contains("https://dl.dropboxusercontent.com/scl/fi/abc123/cubeshelf-presence.json?rlkey=Zx9%2Fq"));
+    Assert(Convert("https://www.dropbox.com/s/k3y/cubeshelf-presence.json").Primary ==
+           "https://www.dropbox.com/s/k3y/cubeshelf-presence.json?dl=1");
+    Assert(!ShareLink.TryConvert("https://www.dropbox.com/scl/fo/folder/x?rlkey=1&dl=0", file, out _, out var folderError) &&
+           folderError.Contains("dossier", StringComparison.Ordinal));
+
+    // Nextcloud, anywhere it is installed: the file share first, then the same token as a folder.
+    var nextcloud = Convert("https://cloud.example.org/s/AbCdEfGh12345");
+    Assert(nextcloud.Provider == ShareLinkProvider.Nextcloud);
+    Assert(nextcloud.Candidates[0] == "https://cloud.example.org/s/AbCdEfGh12345/download");
+    Assert(nextcloud.Candidates[1] == "https://cloud.example.org/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json");
+    Assert(nextcloud.Candidates[2] == "https://cloud.example.org/public.php/dav/files/AbCdEfGh12345/cubeshelf-presence.json");
+    var subfolder = Convert("https://example.org/nextcloud/index.php/s/AbCdEfGh12345/download");
+    Assert(subfolder.Candidates[0] == "https://example.org/nextcloud/index.php/s/AbCdEfGh12345/download");
+    Assert(subfolder.Candidates[2] == "https://example.org/nextcloud/public.php/dav/files/AbCdEfGh12345/cubeshelf-presence.json");
+
+    // Google Drive: the viewer page becomes the download endpoint; a folder is refused.
+    var google = Convert("https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp/view?usp=sharing");
+    Assert(google.Provider == ShareLinkProvider.GoogleDrive);
+    Assert(google.Primary == "https://drive.usercontent.google.com/download?id=1AbCdEfGhIjKlMnOp&export=download&confirm=t");
+    Assert(Convert("https://drive.google.com/open?id=1AbCdEfGhIjKlMnOp").Primary.Contains("id=1AbCdEfGhIjKlMnOp", StringComparison.Ordinal));
+    Assert(!ShareLink.TryConvert("https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOp", file, out _, out _));
+
+    // OneDrive personal: through its sharing API, the link itself encoded as u!<base64url>.
+    var onedrive = Convert("https://1drv.ms/u/s!AbCdEf?e=xyz");
+    var encoded = "u!" + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("https://1drv.ms/u/s!AbCdEf?e=xyz"))
+        .TrimEnd('=').Replace('/', '_').Replace('+', '-');
+    Assert(onedrive.Provider == ShareLinkProvider.OneDrive);
+    Assert(onedrive.Primary == "https://api.onedrive.com/v1.0/shares/" + encoded + "/root/content");
+
+    // OneDrive for work: SharePoint answers download=1.
+    var sharepoint = Convert("https://contoso-my.sharepoint.com/:u:/g/personal/zera/EAbc?e=Q1");
+    Assert(sharepoint.Provider == ShareLinkProvider.SharePoint && sharepoint.Primary.EndsWith("e=Q1&download=1", StringComparison.Ordinal));
+
+    // A whole chat message is fine, and the punctuation glued to the link is not part of it.
+    var chat = Convert("Voici mon lien (https://cloud.example.org/s/AbCdEfGh12345).");
+    Assert(chat.Pasted == "https://cloud.example.org/s/AbCdEfGh12345");
+
+    // An address we do not recognise is used as it is.
+    var plain = Convert("https://files.example.net/me/presence.json");
+    Assert(plain.Provider == ShareLinkProvider.Direct && !plain.Changed && plain.Candidates.Count == 1);
+
+    // Plain http is refused: anyone on the path could swap the document.
+    Assert(!ShareLink.TryConvert("http://cloud.example.org/s/AbCdEfGh12345", file, out _, out var httpError) &&
+           httpError.Contains("https", StringComparison.Ordinal));
+    Assert(!ShareLink.TryConvert("rien à voir", file, out _, out _));
+}
+
+void TestSyncedFoldersAreFound()
+{
+    WithTempRoot(root =>
+    {
+        var appData = Path.Combine(root, "AppData", "Roaming");
+        var dropbox = Path.Combine(root, "Dropbox");
+        var nextcloud = Path.Combine(root, "Nextcloud");
+        var onedrive = Path.Combine(root, "OneDrive");
+        var drive = Path.Combine(root, "G");
+        foreach (var folder in new[] { appData, dropbox, nextcloud, onedrive, Path.Combine(drive, "Mon Drive") })
+            Directory.CreateDirectory(folder);
+
+        Directory.CreateDirectory(Path.Combine(appData, "Dropbox"));
+        File.WriteAllText(Path.Combine(appData, "Dropbox", "info.json"),
+            JsonSerializer.Serialize(new { personal = new { path = dropbox }, business = new { path = Path.Combine(root, "gone") } }));
+
+        Directory.CreateDirectory(Path.Combine(appData, "Nextcloud"));
+        File.WriteAllText(Path.Combine(appData, "Nextcloud", "nextcloud.cfg"),
+            "[Accounts]\n0\\Folders\\1\\localPath=" + nextcloud.Replace('\\', '/') + "/\n0\\Folders\\1\\paused=false\n");
+
+        var variables = new Dictionary<string, string>
+        {
+            ["APPDATA"] = appData,
+            ["OneDriveConsumer"] = onedrive,
+            // The same folder announced twice is listed once.
+            ["OneDrive"] = onedrive
+        };
+        var environment = new SyncEnvironment(name => variables.GetValueOrDefault(name), Path.Combine(root, "home"), new[] { drive });
+
+        var found = SyncedFolderDetector.Detect(environment);
+        Assert(found.Count == 4);
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.Dropbox && f.Root == dropbox));
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.Nextcloud && Path.GetFullPath(f.Root).TrimEnd('\\', '/') == nextcloud));
+        Assert(found.Count(f => f.Provider == ShareLinkProvider.OneDrive) == 1);
+        Assert(found.Any(f => f.Provider == ShareLinkProvider.GoogleDrive && f.Root.EndsWith("Mon Drive", StringComparison.Ordinal)));
+        // A path a client remembers but that is not there any more is not offered.
+        Assert(!found.Any(f => f.Root.Contains("gone", StringComparison.Ordinal)));
+
+        // Choosing one creates CubeShelf's own folder inside it, and only inside an existing one.
+        var prepared = SyncedFolderDetector.PreparePublishingFolder(dropbox);
+        Assert(prepared == Path.Combine(dropbox, "CubeShelf") && Directory.Exists(prepared));
+        try
+        {
+            SyncedFolderDetector.PreparePublishingFolder(Path.Combine(root, "nowhere"));
+            Assert(false);
+        }
+        catch (DirectoryNotFoundException)
+        {
+        }
+
+        // Nothing installed at all is an empty list, not an exception.
+        Assert(SyncedFolderDetector.Detect(new SyncEnvironment(_ => null, Path.Combine(root, "nobody"), Array.Empty<string>())).Count == 0);
+    });
+}
+
+void TestSelfTestKeepsTheGuessThatWorks()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(ShareLink.TryConvert("https://cloud.example.test/s/AbCdEfGh12345", SyncedFolderTarget.DefaultFileName,
+            out var conversion, out _));
+
+        // The share is a folder share: only the guess that names the file serves the document;
+        // the others answer with the service's own page.
+        var served = new OnePathServesHandler(
+            "/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json",
+            Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
+        using var client = new HttpClient(served);
+        using var selfTest = new PresenceSelfTest(me, client, TimeSpan.FromMilliseconds(10));
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, conversion!.Primary));
+
+        var result = selfTest.RunAsync(publisher, PresenceComposer.Offline("Zera", 90, DateTimeOffset.UtcNow),
+            PresenceRecipients.ForPublication(me, friends), TimeSpan.FromSeconds(2), conversion.Candidates)
+            .GetAwaiter().GetResult();
+
+        Assert(result.Succeeded);
+        Assert(result.PresenceUrl == "https://cloud.example.test/s/AbCdEfGh12345/download?path=%2F&files=cubeshelf-presence.json");
+        Assert(FriendCode.TryDecode(result.FriendCode, out var decoded, out _) && decoded!.PresenceUrl == result.PresenceUrl);
+
+        // When no guess works, the error says what the address served rather than "failed".
+        using var nothing = new HttpClient(new FixedBodyHandler("<html>aperçu</html>"));
+        using var failing = new PresenceSelfTest(me, nothing, TimeSpan.FromMilliseconds(10));
+        var failed = failing.RunAsync(publisher, PresenceComposer.Offline("Zera", 91, DateTimeOffset.UtcNow),
+            PresenceRecipients.ForPublication(me, friends), TimeSpan.FromMilliseconds(50), conversion.Candidates)
+            .GetAwaiter().GetResult();
+        Assert(!failed.Succeeded && failed.FriendCode.Length == 0 && failed.Error!.Contains("aperçu", StringComparison.Ordinal));
+    });
+}
+
+void TestPendingFriendIsTold()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var them = PeerIdentity.Create();
+        using var someoneElse = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(them.PublicKey, "https://c.example.test/them.json"), "Alex", me.PublicKey, out _));
+        var key = System.Convert.ToBase64String(them.PublicKey);
+        Assert(friends.Load()[0].SharesWithUs is null);   // nothing read yet: unknown, not pending
+
+        // They publish, but for their other friends: they have not added us back.
+        var notForUs = SealedPresence.ToJson(SealedPresence.Seal(them,
+            PresenceComposer.Offline("Alex", 10, DateTimeOffset.UtcNow), new[] { someoneElse.PublicKey, them.PublicKey }));
+        var handler = new PresenceHttpHandler(notForUs, "\"a\"");
+        using var client = new HttpClient(handler);
+        using var fetcher = new PresenceFetcher(me, friends, client);
+        Assert(fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Rejected);
+        Assert(friends.Load()[0].SharesWithUs == false);
+
+        // A 304 says nothing new: still pending.
+        handler.RespondNotModified = true;
+        fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult();
+        Assert(friends.Load()[0].SharesWithUs == false);
+
+        // Then they add us: the next document opens, and they are no longer pending.
+        handler.RespondNotModified = false;
+        handler.Document = SealedPresence.ToJson(SealedPresence.Seal(them,
+            PresenceComposer.Offline("Alex", 11, DateTimeOffset.UtcNow), new[] { me.PublicKey, them.PublicKey }));
+        handler.ETag = "\"b\"";
+        Assert(fetcher.FetchAsync(friends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Updated);
+        Assert(friends.Load().Single(f => f.PublicKey == key).SharesWithUs == true);
+    });
+}
+
+void TestOwnAddressIsChecked()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, SyncedFolderTarget.DefaultFileName);
+        const string url = "https://c.example.test/p.json";
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, url));
+        var handler = new SwitchableHandler();
+        using var client = new HttpClient(handler);
+        var fetcher = new PresenceFetcher(me, friends, client);
+        var sequence = new PresenceSequence(root);
+
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var options = new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1),
+            AddressCheckInterval: TimeSpan.FromHours(1), AddressFirstCheck: TimeSpan.Zero, AddressLagTolerance: TimeSpan.Zero);
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            sequence, publisher, fetcher, _ => Task.FromResult(inputs), options);
+
+        var reports = new List<PresenceAddressReport>();
+        service.AddressChecked += report => { lock (reports) reports.Add(report); };
+        service.Start(CancellationToken.None);
+        for (var wait = 0; wait < 100 && service.PublishCount == 0; wait++) Thread.Sleep(20);
+        Assert(service.PublishCount == 1);
+
+        // The first publish already triggered a check of its own, in the background.
+        for (var wait = 0; wait < 100 && reports.Count == 0; wait++) Thread.Sleep(20);
+        Assert(reports.Count == 1);
+
+        // Served as written: healthy.
+        handler.Serve = () => File.ReadAllText(file);
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.Healthy);
+
+        // The service keeps serving the first document while we have published since: lagging.
+        var stale = File.ReadAllText(file);
+        inputs = inputs with { RunningGameIds = new[] { "GMPE01" } };
+        service.RequestPublish(PresencePublishReason.GameChanged);
+        for (var wait = 0; wait < 100 && service.PublishCount < 2; wait++) Thread.Sleep(20);
+        handler.Serve = () => stale;
+        var lagging = service.CheckAddressNowAsync().GetAwaiter().GetResult();
+        Assert(lagging.Health == PresenceAddressHealth.Lagging && lagging.Lag is not null && lagging.NeedsAttention);
+
+        // A page instead of the file, then nothing at all.
+        handler.Serve = () => "<html>Connexion requise</html>";
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.NotOurs);
+        handler.Serve = () => null;
+        Assert(service.CheckAddressNowAsync().GetAwaiter().GetResult().Health == PresenceAddressHealth.NotFound);
+
+        // A document of ours numbered past anything issued here: another machine publishes as us.
+        var foreign = SealedPresence.ToJson(SealedPresence.Seal(me,
+            PresenceComposer.Offline("Zera", sequence.Current + 1_000_000, DateTimeOffset.UtcNow),
+            new[] { me.PublicKey }));
+        handler.Serve = () => foreign;
+        var twin = service.CheckAddressNowAsync().GetAwaiter().GetResult();
+        Assert(twin.Health == PresenceAddressHealth.SomeoneElsePublishes && twin.NeedsAttention);
+        Assert(service.LastAddressReport == twin);
+
+        service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    });
+}
+
+// ---------------------------------------------------------------------------
+// The local network: friends without the sync service, strangers met in person.
+// ---------------------------------------------------------------------------
+
+void TestLanFriendsFindEachOther()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var carol = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var bobFriends = new FriendStore(Path.Combine(root, "b"));
+        var carolFriends = new FriendStore(Path.Combine(root, "c"));
+        // Friends with no address at all: met on the network, nothing published anywhere.
+        Assert(aliceFriends.TryAdd(new FriendCodePayload(bob.PublicKey, ""), "Bob", alice.PublicKey, out _));
+        Assert(bobFriends.TryAdd(new FriendCodePayload(alice.PublicKey, ""), "Alice", bob.PublicKey, out _));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "");
+        var b = new CubeShelf.Core.Social.Lan.LanNode(bob, bobFriends, bus.Join(), () => "Bob", () => "");
+        var c = new CubeShelf.Core.Social.Lan.LanNode(carol, carolFriends, bus.Join(), () => "Carol", () => "");
+        var bobGot = new List<PresenceFetchOutcome>();
+        var carolGot = new List<PresenceFetchOutcome>();
+        b.FriendDocumentReceived += outcome => { lock (bobGot) bobGot.Add(outcome); };
+        c.FriendDocumentReceived += outcome => { lock (carolGot) carolGot.Add(outcome); };
+        try
+        {
+            a.Start(); b.Start(); c.Start();
+
+            // What Alice says names nobody: no key, no name, and tags in a padded batch.
+            var said = a.BuildAnnouncements().Single();
+            Assert(said.PublicKey is null && said.Name is null && said.Tags.Count % 8 == 0 && said.Tags.Count >= 8);
+
+            var document = SealedPresence.ToJson(SealedPresence.Seal(alice,
+                new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Alice", DateTimeOffset.UtcNow, 50, PresenceStatus.InGame,
+                    "GMPE01", "Mario Party 4", Array.Empty<SharedGame>(), Array.Empty<SharedMod>()),
+                new[] { bob.PublicKey, alice.PublicKey }));
+            a.SetDocument(document, 50);
+
+            for (var wait = 0; wait < 150 && bobGot.Count == 0; wait++) Thread.Sleep(20);
+            Assert(bobGot.Count == 1 && bobGot[0].Snapshot!.CurrentGameTitle == "Mario Party 4");
+            Assert(b.IsOnNetwork(System.Convert.ToBase64String(alice.PublicKey)));
+            Assert(bobFriends.Load()[0].LastSequence == 50 && bobFriends.Load()[0].SharesWithUs == true);
+
+            // A stranger hears the broadcast but recognises nobody and lists nobody.
+            Thread.Sleep(100);
+            Assert(carolGot.Count == 0 && c.Strangers.Count == 0);
+
+            // An older document offered again is not taken: same rule as the sync folder.
+            var older = SealedPresence.ToJson(SealedPresence.Seal(alice,
+                PresenceComposer.Offline("Alice", 40, DateTimeOffset.UtcNow), new[] { bob.PublicKey, alice.PublicKey }));
+            Assert(b.AcceptDocument(System.Convert.ToBase64String(alice.PublicKey), older) is null);
+            Assert(bobFriends.Load()[0].LastSequence == 50);
+
+            // And with no address, the sync-folder poller has nothing to do and fails nothing.
+            using var http = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+            using var poller = new PresenceFetcher(bob, bobFriends, http);
+            Assert(poller.FetchAsync(bobFriends.Load()[0]).GetAwaiter().GetResult().Status == PresenceFetchStatus.Skipped);
+            Assert(bobFriends.Load()[0].ConsecutiveFailures == 0);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            b.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            c.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestLanIntroduction()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var carol = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var bobFriends = new FriendStore(Path.Combine(root, "b"));
+        var carolFriends = new FriendStore(Path.Combine(root, "c"));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "https://a.example.test/p.json");
+        var b = new CubeShelf.Core.Social.Lan.LanNode(bob, bobFriends, bus.Join(), () => "Bob", () => "");
+        var c = new CubeShelf.Core.Social.Lan.LanNode(carol, carolFriends, bus.Join(), () => "Carol", () => "");
+        var bobAdded = new List<string>();
+        b.FriendAdded += handle => { lock (bobAdded) bobAdded.Add(handle); };
+        try
+        {
+            a.Start(); b.Start(); c.Start();
+
+            // Alice asks to be found; Bob sees her, by name, as anyone on the network would.
+            a.SetDiscoverable(true);
+            for (var wait = 0; wait < 100 && b.Strangers.Count == 0; wait++) Thread.Sleep(20);
+            var seen = b.Strangers.Single();
+            Assert(seen.DisplayName == "Alice" && seen.PublicKey == System.Convert.ToBase64String(alice.PublicKey));
+
+            // Carol is not findable, so a request to her is refused without her ever seeing it.
+            var carolPeer = new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(carol.PublicKey), "Carol",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, c.Port), DateTimeOffset.UtcNow);
+            Assert(b.RequestFriendshipAsync(carolPeer).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Refused);
+            Assert(c.IncomingRequests.Count == 0);
+
+            // Bob asks Alice. It waits for her answer; nobody is added yet.
+            Assert(b.RequestFriendshipAsync(seen).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Sent);
+            Assert(b.IsAwaiting(seen.PublicKey));
+            var request = a.IncomingRequests.Single();
+            Assert(request.DisplayName == "Bob" && request.PresenceUrl == "");
+            Assert(aliceFriends.Load().Count == 0 && bobFriends.Load().Count == 0);
+
+            // She accepts: both lists hold the other, and Bob learnt her address on the way.
+            Assert(a.AcceptAsync(request).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Accepted);
+            Assert(aliceFriends.Load().Single().PublicKey == System.Convert.ToBase64String(bob.PublicKey));
+            var bobsAlice = bobFriends.Load().Single();
+            Assert(bobsAlice.PublicKey == seen.PublicKey && bobsAlice.PresenceUrl == "https://a.example.test/p.json");
+            Assert(bobAdded.Count == 1 && !b.IsAwaiting(seen.PublicKey) && a.IncomingRequests.Count == 0);
+
+            // An accept nobody asked for is refused: Carol cannot add herself to Bob's list.
+            var carolsRequest = new CubeShelf.Core.Social.Lan.LanFriendRequest(System.Convert.ToBase64String(bob.PublicKey), "Bob", "",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, b.Port), DateTimeOffset.UtcNow);
+            Assert(c.AcceptAsync(carolsRequest).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.Refused);
+            Assert(bobFriends.Load().Count == 1);
+
+            // Asking someone who already has us completes it at once, no decision needed.
+            aliceFriends.Remove(System.Convert.ToBase64String(bob.PublicKey));
+            Assert(a.RequestFriendshipAsync(new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(bob.PublicKey), "Bob",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, b.Port), DateTimeOffset.UtcNow))
+                .GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.AlreadyFriends);
+            Assert(aliceFriends.Load().Single().PublicKey == System.Convert.ToBase64String(bob.PublicKey));
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            b.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            c.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestLanImpostorIsRefused()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        using var mallory = PeerIdentity.Create();
+        var aliceFriends = new FriendStore(Path.Combine(root, "a"));
+        var malloryFriends = new FriendStore(Path.Combine(root, "m"));
+
+        var bus = new TestLanBus();
+        var a = new CubeShelf.Core.Social.Lan.LanNode(alice, aliceFriends, bus.Join(), () => "Alice", () => "");
+        var m = new CubeShelf.Core.Social.Lan.LanNode(mallory, malloryFriends, bus.Join(), () => "Bob", () => "");
+        try
+        {
+            a.Start(); m.Start();
+            a.SetDiscoverable(true);
+
+            // Mallory claims Bob's key. She can open the exchange, but not prove the key.
+            using (var client = new System.Net.Sockets.TcpClient())
+            {
+                client.Connect(System.Net.IPAddress.Loopback, a.Port);
+                using var stream = client.GetStream();
+                using var reader = new StreamReader(stream);
+                using var writer = new StreamWriter(stream) { AutoFlush = true, NewLine = "\n" };
+                writer.WriteLine(CubeShelf.Core.Social.Lan.LanProtocol.Serialize(new CubeShelf.Core.Social.Lan.LanMessage
+                {
+                    Op = "introduce", Purpose = "request", PublicKey = System.Convert.ToBase64String(bob.PublicKey),
+                    Name = "Bob", Nonce = CubeShelf.Core.Social.Lan.LanProtocol.RandomNonce()
+                }));
+                var challenge = CubeShelf.Core.Social.Lan.LanProtocol.ParseMessage(reader.ReadLine()!);
+                Assert(challenge is { Ok: true });
+                writer.WriteLine(CubeShelf.Core.Social.Lan.LanProtocol.Serialize(new CubeShelf.Core.Social.Lan.LanMessage
+                {
+                    Proof = System.Convert.ToBase64String(new byte[32])
+                }));
+                var verdict = CubeShelf.Core.Social.Lan.LanProtocol.ParseMessage(reader.ReadLine()!);
+                Assert(verdict is { Ok: false, Why: "proof" });
+            }
+            Assert(a.IncomingRequests.Count == 0);
+
+            // And the other way: Alice meant to reach Bob, Mallory answered at his address.
+            var fake = new CubeShelf.Core.Social.Lan.LanPeer(System.Convert.ToBase64String(bob.PublicKey), "Bob",
+                new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, m.Port), DateTimeOffset.UtcNow);
+            m.SetDiscoverable(true);
+            Assert(a.RequestFriendshipAsync(fake).GetAwaiter().GetResult() == CubeShelf.Core.Social.Lan.LanIntroductionResult.NotGenuine);
+            Assert(aliceFriends.Load().Count == 0 && m.IncomingRequests.Count == 0);
+        }
+        finally
+        {
+            a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            m.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestNotesReachOnlyTheirReader()
+{
+    using var alice = PeerIdentity.Create();
+    using var bob = PeerIdentity.Create();
+    using var carol = PeerIdentity.Create();
+    var bobKey = System.Convert.ToBase64String(bob.PublicKey);
+    var carolKey = System.Convert.ToBase64String(carol.PublicKey);
+
+    var toBob = new PairwiseNote(new[] { new NoteMessage(1, "Salut Bob", DateTimeOffset.UtcNow) }, 0, Array.Empty<InviteReply>());
+    var toCarol = new PairwiseNote(Array.Empty<NoteMessage>(), 5, new[] { new InviteReply("abc", InviteReply.Declined, DateTimeOffset.UtcNow) });
+    var notes = PairwiseNotes.SealAll(alice, new Dictionary<string, PairwiseNote>
+    {
+        [bobKey] = toBob,
+        [carolKey] = toCarol,
+        [System.Convert.ToBase64String(alice.PublicKey)] = PairwiseNote.Empty   // nothing to say: no note at all
+    });
+    // Two real notes, padded with decoys: the count does not say who one talks to.
+    Assert(notes.Count == 4);
+
+    Assert(PairwiseNotes.TryOpen(bob, alice.PublicKey, notes, out var bobs) && bobs!.Messages.Single().Text == "Salut Bob");
+    Assert(PairwiseNotes.TryOpen(carol, alice.PublicKey, notes, out var carols) && carols!.Ack == 5 &&
+           carols.Replies.Single().Reply == InviteReply.Declined && carols.Messages.Count == 0);
+
+    // Read under the wrong author -- someone passing Alice's note to Bob off as Carol's -- nothing opens.
+    Assert(!PairwiseNotes.TryOpen(bob, carol.PublicKey, notes, out _));
+    // And a tampered note opens for nobody.
+    var tampered = notes.Select(note => new SealedNote { Hint = note.Hint, Nonce = note.Nonce, Tag = note.Tag,
+        Ciphertext = System.Convert.ToBase64String(System.Convert.FromBase64String(note.Ciphertext).Select(b => (byte)(b ^ 1)).ToArray()) }).ToArray();
+    Assert(!PairwiseNotes.TryOpen(bob, alice.PublicKey, tampered, out _));
+
+    // Whatever the friend's software wrote, only plain bounded text comes out.
+    var hostile = PairwiseNotes.SealAll(alice, new Dictionary<string, PairwiseNote>
+    {
+        [bobKey] = new(new[] { new NoteMessage(2, "a\u001b[31mb‮c" + new string('x', 900), DateTimeOffset.UtcNow) }, -3,
+            new[] { new InviteReply("i", "pwned", DateTimeOffset.UtcNow) })
+    });
+    Assert(PairwiseNotes.TryOpen(bob, alice.PublicKey, hostile, out var cleaned));
+    var text = cleaned!.Messages.Single().Text;
+    Assert(!text.Contains('\u001b') && !text.Contains('‮') && text.Length <= ChatText.MaximumLength);
+    Assert(cleaned.Ack == 0 && cleaned.Replies.Count == 0);
+}
+
+void TestMessagesAreDeliveredAndAcknowledged()
+{
+    WithTempRoot(root =>
+    {
+        using var alice = PeerIdentity.Create();
+        using var bob = PeerIdentity.Create();
+        var aliceKey = System.Convert.ToBase64String(alice.PublicKey);
+        var bobKey = System.Convert.ToBase64String(bob.PublicKey);
+        var aliceStore = new MessageStore(Path.Combine(root, "a"));
+        var bobStore = new MessageStore(Path.Combine(root, "b"));
+        var now = DateTimeOffset.UtcNow;
+
+        // What travels is what the stores say, sealed and opened as the documents would carry it.
+        PairwiseNote Carry(PeerIdentity from, PeerIdentity to, MessageStore store)
+        {
+            var outgoing = store.Outgoing(now);
+            var sealedNotes = PairwiseNotes.SealAll(from, outgoing);
+            return PairwiseNotes.TryOpen(to, from.PublicKey, sealedNotes, out var note) ? note! : PairwiseNote.Empty;
+        }
+
+        var first = aliceStore.Send(bobKey, "On joue ce soir ?", now)!;
+        var second = aliceStore.Send(bobKey, "  \u0007  ", now);   // nothing left once cleaned: not sent
+        aliceStore.Send(bobKey, "Mario Party 4", now);
+        Assert(second is null);
+
+        var arrived = bobStore.Receive(aliceKey, Carry(alice, bob, aliceStore), now);
+        Assert(arrived.Count == 2 && arrived[0].Text == "On joue ce soir ?" && bobStore.Unread(aliceKey) == 2);
+
+        // The same document read again -- the next heartbeat -- brings nothing new.
+        Assert(bobStore.Receive(aliceKey, Carry(alice, bob, aliceStore), now).Count == 0 && bobStore.Unread(aliceKey) == 2);
+
+        // Bob's next document acknowledges them; Alice stops carrying them.
+        Assert(aliceStore.Receive(bobKey, Carry(bob, alice, bobStore), now).Count == 0);
+        Assert(aliceStore.Conversation(bobKey).All(message => message.Delivered));
+        Assert(!aliceStore.Outgoing(now).ContainsKey(bobKey));
+
+        bobStore.MarkRead(aliceKey);
+        Assert(bobStore.Unread(aliceKey) == 0);
+
+        // An answer to an invitation rides along until it is stale.
+        bobStore.Reply(aliceKey, "inv1", InviteReply.Joined, now);
+        Assert(Carry(bob, alice, bobStore).Replies.Single().Invite == "inv1");
+        Assert(!bobStore.Outgoing(now + TimeSpan.FromHours(1)).TryGetValue(aliceKey, out var later) || later.Replies.Count == 0);
+
+        // A lost history does not restart numbering below what the friend already has.
+        File.Delete(Path.Combine(root, "a", "messages.json"));
+        var fresh = new MessageStore(Path.Combine(root, "a")).Send(bobKey, "Toujours là", now + TimeSpan.FromSeconds(5))!;
+        Assert(fresh.Id > first.Id);
+    });
+}
+
+void TestAvailabilityAndActivity()
+{
+    WithTempRoot(root =>
+    {
+        var composer = new PresenceComposer(new TestPaths(root));
+        var now = DateTimeOffset.UtcNow;
+        var playing = new[] { "GMPE01" };
+        var library = new[] { new PresenceGame("GMPE01", "Mario Party 4", 3, 3600, true, now) };
+
+        var away = composer.Compose("Zera", library, Array.Empty<string>(), new PresenceSharingOptions(), 1, now,
+            availability: PresenceAvailability.Away);
+        // An older CubeShelf still reads "online": the nuance is a separate field.
+        Assert(away.Status == PresenceStatus.Online && away.Availability == PresenceSnapshot.AvailabilityAway);
+
+        var busy = composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 2, now,
+            availability: PresenceAvailability.Busy, activity: "Plateau de Toad\n— tour 12/20\u001b");
+        Assert(busy.Status == PresenceStatus.InGame && busy.Availability == PresenceSnapshot.AvailabilityBusy);
+        Assert(busy.Activity == "Plateau de Toad — tour 12/20");
+
+        // What the game says is only published with the game, and under the same switch.
+        Assert(composer.Compose("Zera", library, Array.Empty<string>(), new PresenceSharingOptions(), 3, now, activity: "x").Activity is null);
+        Assert(composer.Compose("Zera", library, playing, new PresenceSharingOptions(ShareCurrentGame: false), 4, now, activity: "x").Activity is null);
+        Assert(composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 5, now, activity: new string('a', 400))
+            .Activity!.Length == PresenceSnapshot.MaximumActivityLength);
+
+        // Invisible: offline to everyone, playing or not, nothing else -- except notes and the address.
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var notes = PairwiseNotes.SealAll(me, new Dictionary<string, PairwiseNote>
+        {
+            [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(9, "psst", now) }, 0, Array.Empty<InviteReply>())
+        });
+        var invisible = composer.Compose("Zera", library, playing, new PresenceSharingOptions(), 6, now,
+            address: "https://c.example.test/p.json", availability: PresenceAvailability.Invisible, activity: "x", notes: notes);
+        Assert(invisible.Status == PresenceStatus.Offline && invisible.CurrentGameId is null && invisible.Library.Count == 0);
+        Assert(invisible.Activity is null && invisible.Availability is null && invisible.Profile is null);
+        Assert(invisible.Address == "https://c.example.test/p.json" && invisible.Notes!.Count == notes.Count);
+        Assert(PairwiseNotes.TryOpen(friend, me.PublicKey, invisible.Notes, out var still) && still!.Messages.Single().Text == "psst");
+
+        // An invitation is named in answers by an id, never by its payload.
+        var invite = new PresenceInvite("GMPE01", "Mario Party 4", "secret-lobby-token", now.AddMinutes(10));
+        Assert(invite.Id.Length == 16 && invite.Id == new PresenceInvite("GMPE01", "x", "secret-lobby-token", now).Id);
+        Assert(!System.Text.Json.JsonSerializer.Serialize(invite).Contains(invite.Id, StringComparison.Ordinal));
+    });
+}
+
+void TestUnchangedNotesDoNotForceAPublish()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(friend.PublicKey, "https://f.example.test/p.json"), "F", me.PublicKey, out _));
+        var notes = new Dictionary<string, PairwiseNote>
+        {
+            [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(1, "salut", DateTimeOffset.UtcNow) }, 0, Array.Empty<InviteReply>())
+        };
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions(), Notes: notes);
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)), new PresenceSequence(root),
+            new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://me.example.test/p.json")),
+            new PresenceFetcher(me, friends, client), _ => Task.FromResult(inputs),
+            new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), TimeSpan.FromHours(1)));
+        try
+        {
+            service.Start(CancellationToken.None);
+            for (var wait = 0; wait < 100 && service.PublishCount == 0; wait++) Thread.Sleep(20);
+            Assert(service.PublishCount == 1);
+
+            // Same notes again: sealed afresh they would differ byte for byte, but nothing changed.
+            service.RequestPublish(PresencePublishReason.Manual);
+            Thread.Sleep(300);
+            Assert(service.PublishCount == 1);
+
+            // A new message is a change.
+            inputs = inputs with { Notes = new Dictionary<string, PairwiseNote>
+            {
+                [System.Convert.ToBase64String(friend.PublicKey)] = new(new[] { new NoteMessage(1, "salut", DateTimeOffset.UnixEpoch), new NoteMessage(2, "ça va ?", DateTimeOffset.UnixEpoch) }, 0, Array.Empty<InviteReply>())
+            } };
+            service.RequestPublish(PresencePublishReason.Manual);
+            for (var wait = 0; wait < 100 && service.PublishCount == 1; wait++) Thread.Sleep(20);
+            Assert(service.PublishCount == 2);
+
+            // And the published document carries it, readable by its one friend.
+            var envelope = SealedPresence.FromJson(File.ReadAllText(Path.Combine(folder, SyncedFolderTarget.DefaultFileName)));
+            Assert(SealedPresence.TryOpen(friend, me.PublicKey, envelope, out var opened));
+            Assert(PairwiseNotes.TryOpen(friend, me.PublicKey, opened!.Notes, out var note) && note!.Messages.Count == 2);
+        }
+        finally
+        {
+            service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestDocumentSizeIsPadded()
+{
+    using var me = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var now = DateTimeOffset.UtcNow;
+
+    int PayloadBytes(int games)
+    {
+        var library = Enumerable.Range(0, games)
+            .Select(index => new SharedGame("G" + index, "Jeu " + index, 1, 60, false, now)).ToArray();
+        var snapshot = new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "Zera", now, 1, PresenceStatus.Online, null, null,
+            library, Array.Empty<SharedMod>());
+        var envelope = SealedPresence.Seal(me, snapshot, new[] { friend.PublicKey });
+        // It still opens, padding and all.
+        Assert(SealedPresence.TryOpen(friend, me.PublicKey, envelope, out var opened) && opened!.Library.Count == games);
+        return System.Convert.FromBase64String(envelope.Payload).Length;
+    }
+
+    // One game more or less is invisible from outside; only a big change crosses a 4 KiB step.
+    Assert(PayloadBytes(3) == PayloadBytes(4) && PayloadBytes(4) == PayloadBytes(9));
+    Assert(PayloadBytes(9) % SealedPresence.PlaintextPadding == 0);
+    Assert(PayloadBytes(200) > PayloadBytes(9));
+}
+
+void TestFriendsFollowAMove()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var stays = PeerIdentity.Create();
+        using var removed = PeerIdentity.Create();
+        var myFriends = new FriendStore(Path.Combine(root, "me"));
+        Assert(myFriends.TryAdd(new FriendCodePayload(stays.PublicKey, "https://s.example.test/p.json"), "Stays", me.PublicKey, out _));
+        var oldFolder = Path.Combine(root, "old");
+        Directory.CreateDirectory(oldFolder);
+        const string oldUrl = "https://old.example.test/p.json";
+        const string newUrl = "https://new.example.test/p.json";
+
+        // The removed friend is no longer a recipient when the move is written.
+        var sequence = new PresenceSequence(Path.Combine(root, "me"));
+        Assert(PresenceAddressMove.WriteMovedDocument(me, myFriends, sequence, "Zera", oldFolder, newUrl, out _));
+        Assert(!PresenceAddressMove.WriteMovedDocument(me, myFriends, sequence, "Zera", oldFolder, "http://nope.example.test", out _));
+        var served = File.ReadAllText(Path.Combine(oldFolder, SyncedFolderTarget.DefaultFileName));
+
+        // The friend who stays reads the old address, and moves on to the new one by themselves.
+        foreach (var (reader, expectNewAddress) in new[] { (stays, true), (removed, false) })
+        {
+            var store = new FriendStore(Path.Combine(root, System.Convert.ToBase64String(reader.PublicKey)[..6].Replace('/', '_')));
+            Assert(store.TryAdd(new FriendCodePayload(me.PublicKey, oldUrl), "Zera", reader.PublicKey, out _));
+            using var client = new HttpClient(new FixedBodyHandler(served));
+            using var fetcher = new PresenceFetcher(reader, store, client);
+            fetcher.FetchAsync(store.Load()[0]).GetAwaiter().GetResult();
+            Assert((store.Load()[0].PresenceUrl == newUrl) == expectNewAddress);
+        }
+    });
+}
+
+void TestQrCodeStructure()
+{
+    // Decoding is checked separately against a real decoder; here, what must hold by construction.
+    var qr = QrCode.Encode("CSL1:192.168.1.20:48213/AbCdEfGhIjKlMnOpQrStUvWx#" + new string('k', 43));
+    Assert(qr.Size == qr.Version * 4 + 17 && qr.Version is >= 5 and <= 7 && qr.Mask is >= 0 and <= 7);
+
+    // Three finder patterns: a dark ring, a light ring, a dark 3x3 core, at three corners.
+    foreach (var (cx, cy) in new[] { (3, 3), (qr.Size - 4, 3), (3, qr.Size - 4) })
+    {
+        Assert(qr[cx, cy] && qr[cx - 1, cy - 1] && qr[cx + 1, cy + 1]);
+        Assert(!qr[cx - 2, cy] && !qr[cx + 2, cy] && !qr[cx, cy - 2]);
+        Assert(qr[cx - 3, cy] && qr[cx + 3, cy] && qr[cx, cy + 3]);
+    }
+    // Timing patterns alternate, and the always-dark module is dark.
+    for (var i = 8; i < qr.Size - 8; i++) Assert(qr[i, 6] == (i % 2 == 0) && qr[6, i] == (i % 2 == 0));
+    Assert(qr[8, qr.Size - 8]);
+
+    // Both copies of the format information agree.
+    int first = 0, second = 0;
+    var firstPositions = new[] { (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 7), (8, 8), (7, 8), (5, 8), (4, 8), (3, 8), (2, 8), (1, 8), (0, 8) };
+    for (var i = 0; i < 15; i++) if (qr[firstPositions[i].Item1, firstPositions[i].Item2]) first |= 1 << i;
+    for (var i = 0; i < 8; i++) if (qr[qr.Size - 1 - i, 8]) second |= 1 << i;
+    for (var i = 8; i < 15; i++) if (qr[8, qr.Size - 15 + i]) second |= 1 << i;
+    Assert(first == second);
+    var format = first ^ 0x5412;
+    Assert(((format >> 10) & 7) == qr.Mask && (format >> 13) == 0);   // level M is 00
+
+    // Too long for any version is refused, not drawn wrong.
+    try
+    {
+        QrCode.Encode(new string('x', 4000));
+        Assert(false);
+    }
+    catch (ArgumentException)
+    {
+    }
+}
+
+/// <summary>The phone's side, as CubeShelfLink.java does it: raw HTTP, sealed bodies.</summary>
+(int Status, byte[] Body) PhoneRequest(int port, string method, string path, byte[]? body)
+{
+    using var client = new System.Net.Sockets.TcpClient();
+    client.Connect(System.Net.IPAddress.Loopback, port);
+    using var stream = client.GetStream();
+    var head = method + " " + path + " HTTP/1.1\r\nHost: 127.0.0.1:" + port + "\r\nContent-Length: " + (body?.Length ?? 0) + "\r\nConnection: close\r\n\r\n";
+    stream.Write(System.Text.Encoding.ASCII.GetBytes(head));
+    if (body is not null) stream.Write(body);
+    client.Client.Shutdown(System.Net.Sockets.SocketShutdown.Send);
+    using var all = new MemoryStream();
+    stream.CopyTo(all);
+    var bytes = all.ToArray();
+    var split = -1;
+    for (var i = 0; i + 3 < bytes.Length; i++)
+        if (bytes[i] == '\r' && bytes[i + 1] == '\n' && bytes[i + 2] == '\r' && bytes[i + 3] == '\n') { split = i; break; }
+    Assert(split > 0);
+    var lines = System.Text.Encoding.ASCII.GetString(bytes, 0, split).Split("\r\n");
+    var status = int.Parse(lines[0].Split(' ')[1]);
+    var length = long.Parse(lines.First(line => line.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase))[15..].Trim());
+    Assert(bytes.Length - split - 4 == length);   // the phone refuses a short reply
+    return (status, bytes[(split + 4)..]);
+}
+
+void TestPhoneLinkDownload()
+{
+    WithTempRoot(root =>
+    {
+        var saves = Path.Combine(root, "Party Board");
+        Directory.CreateDirectory(Path.Combine(saves, "USA", "Card A"));
+        File.WriteAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"), Enumerable.Range(0, 5000).Select(i => (byte)i).ToArray());
+        File.WriteAllBytes(Path.Combine(saves, "USA", "Card A", "01-GMPE-save.gci"), new byte[] { 1, 2, 3 });
+        File.WriteAllText(Path.Combine(saves, "config.json"), "{\"secret\":true}");   // not a save: never sent
+
+        using var me = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var friends = new[] { new Friend { PublicKey = System.Convert.ToBase64String(friend.PublicKey), DisplayName = "Alex",
+            PresenceUrl = "https://example.org/alex.json", LastSequence = 9 } };
+        var server = new PhoneLinkServer(() => ProfileTransfer.Document(me, "Zera", friends, DateTimeOffset.UtcNow),
+            saves, () => false, System.Net.IPAddress.Parse("192.168.1.20"));
+        try
+        {
+            server.Start();
+            // The code, as the phone parses it: a private address, the port, a token, a 32-byte key.
+            var match = System.Text.RegularExpressions.Regex.Match(server.Code,
+                @"^CSL1:(\d{1,3}(\.\d{1,3}){3}):(\d+)/([A-Za-z0-9_-]{16,64})#([A-Za-z0-9_-]+)$");
+            Assert(match.Success && match.Groups[1].Value == "192.168.1.20" && int.Parse(match.Groups[3].Value) == server.Port);
+            var key = PhoneLinkServer.KeyOf(server.Code)!;
+            Assert(key.Length == 32);
+
+            // A wrong token is refused.
+            Assert(PhoneRequest(server.Port, "GET", "/l/wrong-token-0000000", null).Status == 404);
+
+            var (status, body) = PhoneRequest(server.Port, "GET", "/l/" + server.Token, null);
+            Assert(status == 200);
+            // Sealed "down": opens under the key, not under "up", not under another key.
+            Assert(PhoneLinkServer.Open(key, "up", body) is null && PhoneLinkServer.Open(new byte[32], "down", body) is null);
+            var document = System.Text.Json.Nodes.JsonNode.Parse(PhoneLinkServer.Open(key, "down", body)!)!;
+            Assert(document["v"]!.GetValue<int>() == 1);
+
+            var profile = document["profile"]!;
+            Assert(profile["v"]!.GetValue<int>() == 1 && profile["name"]!.GetValue<string>() == "Zera");
+            Assert(profile["q"]!.GetValue<string>() == System.Convert.ToBase64String(me.PublicKey));
+            Assert(System.Convert.FromBase64String(profile["d"]!.GetValue<string>()).Length == 32);
+            Assert(profile["friends"]![0]!["k"]!.GetValue<string>() == friends[0].PublicKey && profile["friends"]![0]!["s"]!.GetValue<long>() == 9);
+
+            var sent = document["saves"]!.AsArray().Select(save => save!["path"]!.GetValue<string>()).OrderBy(p => p).ToArray();
+            Assert(sent.SequenceEqual(new[] { "MemoryCardA.USA.raw", "USA/Card A/01-GMPE-save.gci" }));
+            var raw = document["saves"]!.AsArray().First(save => save!["path"]!.GetValue<string>() == "MemoryCardA.USA.raw")!;
+            using var gz = new System.IO.Compression.GZipStream(new MemoryStream(System.Convert.FromBase64String(raw["gz"]!.GetValue<string>())),
+                System.IO.Compression.CompressionMode.Decompress);
+            using var unpacked = new MemoryStream();
+            gz.CopyTo(unpacked);
+            Assert(unpacked.ToArray().SequenceEqual(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"))));
+
+            // The rule both sides share.
+            Assert(PhoneLinkServer.IsSavePath("MemoryCardB.EUR.raw") && PhoneLinkServer.IsSavePath("JAP/Card B/x.gci"));
+            Assert(!PhoneLinkServer.IsSavePath("../MemoryCardA.raw") && !PhoneLinkServer.IsSavePath("USA/Card C/x.gci") &&
+                   !PhoneLinkServer.IsSavePath("USA/Card A/../../evil.gci") && !PhoneLinkServer.IsSavePath("config.json") &&
+                   !PhoneLinkServer.IsSavePath("USA//x.gci"));
+            Assert(PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("10.1.2.3")) && PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("172.20.0.1")) &&
+                   !PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("8.8.8.8")) && !PhoneLinkServer.IsPrivate(System.Net.IPAddress.Parse("172.32.0.1")));
+        }
+        finally
+        {
+            server.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestPhoneLinkUpload()
+{
+    WithTempRoot(root =>
+    {
+        var saves = Path.Combine(root, "Party Board");
+        Directory.CreateDirectory(saves);
+        File.WriteAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw"), new byte[] { 9, 9, 9 });
+
+        using var me = PeerIdentity.Create();
+        var gameRunning = true;
+        var server = new PhoneLinkServer(() => ProfileTransfer.Document(me, "Zera", Array.Empty<Friend>(), DateTimeOffset.UtcNow),
+            saves, () => gameRunning, System.Net.IPAddress.Parse("192.168.1.20"), french: false);
+        try
+        {
+            server.Start();
+            var key = PhoneLinkServer.KeyOf(server.Code)!;
+
+            byte[] Gz(byte[] data)
+            {
+                using var output = new MemoryStream();
+                using (var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionLevel.Fastest, true)) gzip.Write(data);
+                return output.ToArray();
+            }
+
+            var upload = new System.Text.Json.Nodes.JsonObject
+            {
+                ["v"] = 1,
+                ["saves"] = new System.Text.Json.Nodes.JsonArray(
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "MemoryCardA.USA.raw", ["modified"] = "2026-10-06T08:00:00+00:00", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 1, 2, 3, 4 })) },
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "EUR/Card B/new.gci", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 7 })) },
+                    new System.Text.Json.Nodes.JsonObject { ["path"] = "../escape.raw", ["gz"] = System.Convert.ToBase64String(Gz(new byte[] { 6 })) })
+            };
+            var body = PhoneLinkServer.Seal(key, "up", System.Text.Encoding.UTF8.GetBytes(upload.ToJsonString()));
+
+            // With the game open on the PC, nothing is written, and the phone is told why.
+            var (status, reply) = PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves", body);
+            var said = System.Text.Encoding.UTF8.GetString(PhoneLinkServer.Open(key, "down", reply)!);
+            Assert(status == 200 && said.Contains("close it", StringComparison.Ordinal));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 9, 9, 9 }));
+
+            // Closed: the cards go in place, what they replace is kept, a path out of the folder is ignored.
+            gameRunning = false;
+            (status, reply) = PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves", body);
+            said = System.Text.Encoding.UTF8.GetString(PhoneLinkServer.Open(key, "down", reply)!);
+            Assert(status == 200 && said.StartsWith("2 save(s) received", StringComparison.Ordinal));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 1, 2, 3, 4 }));
+            Assert(File.ReadAllBytes(Path.Combine(saves, "EUR", "Card B", "new.gci")).SequenceEqual(new byte[] { 7 }));
+            Assert(!File.Exists(Path.Combine(root, "escape.raw")));
+            var backup = Directory.GetDirectories(Path.Combine(saves, "save-backups")).Single();
+            Assert(File.ReadAllBytes(Path.Combine(backup, "MemoryCardA.USA.raw")).SequenceEqual(new byte[] { 9, 9, 9 }));
+
+            // A body sealed under another key, or tampered with, is refused outright.
+            Assert(PhoneRequest(server.Port, "POST", "/l/" + server.Token + "/saves",
+                PhoneLinkServer.Seal(new byte[32], "up", System.Text.Encoding.UTF8.GetBytes(upload.ToJsonString()))).Status == 400);
+        }
+        finally
+        {
+            server.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestIdentityIsProtectedAtRest()
+{
+    WithTempRoot(root =>
+    {
+        var path = Path.Combine(root, "identity.key");
+        byte[] publicKey;
+        using (var created = PeerIdentity.LoadOrCreate(path)) publicKey = created.PublicKey;
+        var text = File.ReadAllText(path);
+        Assert(text.StartsWith("dpapi1:", StringComparison.Ordinal) == OperatingSystem.IsWindows());
+        using (var loaded = PeerIdentity.LoadOrCreate(path)) Assert(loaded.PublicKey.SequenceEqual(publicKey));
+        if (!OperatingSystem.IsWindows()) return;
+
+        // A key written before protection existed opens, and is protected on the way.
+        var legacy = Path.Combine(root, "legacy.key");
+        using var ecdh = System.Security.Cryptography.ECDiffieHellman.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+        File.WriteAllText(legacy, System.Convert.ToBase64String(ecdh.ExportPkcs8PrivateKey()));
+        var expected = ecdh.ExportParameters(false);
+        using (var migrated = PeerIdentity.LoadOrCreate(legacy))
+            Assert(migrated.PublicKey.AsSpan(1, 32).SequenceEqual(expected.Q.X) && migrated.PublicKey.AsSpan(33, 32).SequenceEqual(expected.Q.Y));
+        Assert(File.ReadAllText(legacy).StartsWith("dpapi1:", StringComparison.Ordinal));
+        using (var again = PeerIdentity.LoadOrCreate(legacy)) Assert(again.PublicKey.AsSpan(1, 32).SequenceEqual(expected.Q.X));
+
+        // One that does not open here -- another account, another PC, or damage -- is refused,
+        // and left exactly as it was rather than replaced by a new identity.
+        var foreign = "dpapi1:" + System.Convert.ToBase64String(new byte[200]);
+        File.WriteAllText(path, foreign);
+        try
+        {
+            PeerIdentity.LoadOrCreate(path).Dispose();
+            Assert(false);
+        }
+        catch (System.Security.Cryptography.CryptographicException exception)
+        {
+            Assert(exception.Message.Contains("sauvegarde", StringComparison.Ordinal));
+        }
+        Assert(File.ReadAllText(path) == foreign);
+    });
+}
+
+void TestBackupRestoresTheIdentity()
+{
+    WithTempRoot(root =>
+    {
+        using var original = PeerIdentity.Create();
+        using var friend = PeerIdentity.Create();
+        var exported = ProfileTransfer.Export(original, "Zera", Array.Empty<Friend>(), "a long passphrase", DateTimeOffset.UtcNow);
+        Assert(ProfileTransfer.TryImport(exported, "a long passphrase", out var payload, out _));
+
+        // Rebuilt, written as this PC writes keys, read back: still the same person to a friend.
+        var path = Path.Combine(root, "identity.key");
+        using (var rebuilt = PeerIdentity.FromPrivateScalar(payload!.PrivateKey, payload.PublicKey)) rebuilt.Save(path);
+        using var restored = PeerIdentity.LoadOrCreate(path);
+        Assert(restored.PublicKey.SequenceEqual(original.PublicKey));
+        Assert(restored.DeriveSharedKey(friend.PublicKey).SequenceEqual(original.DeriveSharedKey(friend.PublicKey)));
+    });
+}
+
+void TestDataDirectoryOverride()
+{
+    var folder = Path.Combine(Path.GetTempPath(), "cubeshelf-second-profile");
+    foreach (var platform in new[] { PlatformFamily.Windows, PlatformFamily.Linux, PlatformFamily.MacOS })
+    {
+        var paths = new PlatformPaths("CubeShelf",
+            new Dictionary<string, string?> { [PlatformPaths.DataDirectoryVariable] = folder },
+            platform, userProfile: "/home/zera", windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+        Assert(paths.DataDirectory == Path.GetFullPath(folder) && paths.ConfigurationDirectory == paths.DataDirectory);
+        Assert(paths.CacheDirectory == Path.Combine(paths.DataDirectory, "Cache"));
+    }
+
+    // A relative path is ignored rather than resolved against wherever the process started: the
+    // profile stays exactly where it would be without the variable. Compared with that, not with a
+    // spelled-out Windows path, which Linux and macOS read as a relative one.
+    var relative = new PlatformPaths("CubeShelf", new Dictionary<string, string?> { [PlatformPaths.DataDirectoryVariable] = "profil" },
+        PlatformFamily.Windows, windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+    var usual = new PlatformPaths("CubeShelf", new Dictionary<string, string?>(),
+        PlatformFamily.Windows, windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+    Assert(relative.DataDirectory == usual.DataDirectory && relative.ConfigurationDirectory == usual.ConfigurationDirectory);
+}
+
+void TestActiveFriendsAreReadMoreOften()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var online = PeerIdentity.Create();
+        using var away = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(online.PublicKey, "https://online.example.test/p.json"), "Ona", me.PublicKey, out _));
+        Assert(friends.TryAdd(new FriendCodePayload(away.PublicKey, "https://away.example.test/p.json"), "Awa", me.PublicKey, out _));
+
+        // Each host serves its owner's document, new every time it is read, so no 304 hides a poll.
+        var sequence = 100L;
+        var handler = new DelegatingTestHandler(request =>
+        {
+            var author = request.RequestUri!.Host.StartsWith("online", StringComparison.Ordinal) ? online : away;
+            var status = author == online ? PresenceStatus.Online : PresenceStatus.Offline;
+            var snapshot = new PresenceSnapshot(PresenceSnapshot.CurrentVersion, "x", DateTimeOffset.UtcNow,
+                Interlocked.Increment(ref sequence), status, null, null, Array.Empty<SharedGame>(), Array.Empty<SharedMod>());
+            return SealedPresence.ToJson(SealedPresence.Seal(author, snapshot, new[] { me.PublicKey }));
+        });
+        using var client = new HttpClient(handler);
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+        var inputs = new PresenceInputs("Moi", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)), new PresenceSequence(root),
+            new SyncedFolderPresencePublisher(new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://me.example.test/p.json")),
+            fetcher, _ => Task.FromResult(inputs),
+            new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromHours(1), PollInterval: TimeSpan.FromHours(1),
+                ActivePollInterval: TimeSpan.FromMilliseconds(60)));
+        try
+        {
+            service.Start(CancellationToken.None);
+            Thread.Sleep(900);
+
+            var onlineKey = System.Convert.ToBase64String(online.PublicKey);
+            var awayKey = System.Convert.ToBase64String(away.PublicKey);
+            // Both read once to find out; then only the one who is around keeps being read.
+            Assert(service.PollsOf(awayKey) == 1);
+            Assert(service.PollsOf(onlineKey) >= 4);
+
+            // After an invitation, everyone is read actively for a while.
+            service.PollEagerly(TimeSpan.FromSeconds(10));
+            Thread.Sleep(500);
+            Assert(service.PollsOf(awayKey) >= 2);
+        }
+        finally
+        {
+            service.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
+    });
+}
+
+void TestStatedAddressIsAdopted()
+{
+    WithTempRoot(root =>
+    {
+        using var me = PeerIdentity.Create();
+        using var them = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        Assert(friends.TryAdd(new FriendCodePayload(them.PublicKey, ""), "Alex", me.PublicKey, out _));
+        var key = System.Convert.ToBase64String(them.PublicKey);
+
+        // Their document states an address: from now on they are read from anywhere.
+        var composed = new PresenceComposer(new TestPaths(root)).Compose("Alex", SampleLibrary(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 7, DateTimeOffset.UtcNow, address: "https://cloud.example.test/s/AbCdEfGh12345/download");
+        Assert(composed.Address == "https://cloud.example.test/s/AbCdEfGh12345/download");
+        Assert(friends.AdoptAddress(key, composed.Address));
+        Assert(friends.Load()[0].PresenceUrl == composed.Address);
+
+        // Nothing usable stated changes nothing: an empty address, plain http, the same one again.
+        Assert(!friends.AdoptAddress(key, null) && !friends.AdoptAddress(key, "http://x.example.test/p.json"));
+        Assert(!friends.AdoptAddress(key, composed.Address));
+        Assert(new PresenceComposer(new TestPaths(root)).Compose("Alex", SampleLibrary(), Array.Empty<string>(),
+            new PresenceSharingOptions(), 8, DateTimeOffset.UtcNow, address: "http://x.example.test").Address is null);
+
+        // A move: the old document points at the new place, and the poller follows it.
+        friends.Update(key, friend => { friend.LastETag = "\"old\""; friend.ConsecutiveFailures = 3; });
+        Assert(friends.AdoptAddress(key, "https://elsewhere.example.test/p.json"));
+        var moved = friends.Load()[0];
+        Assert(moved.PresenceUrl == "https://elsewhere.example.test/p.json" && moved.LastETag is null && moved.ConsecutiveFailures == 0);
+    });
+}
+
+void TestProfileTransferRoundTrip()
+{
+    using var me = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var friends = new[]
+    {
+        new Friend
+        {
+            PublicKey = Convert.ToBase64String(friend.PublicKey), DisplayName = "Alex",
+            PresenceUrl = "https://example.org/alex.json", LastSequence = 41, Paused = true
+        },
+        new Friend
+        {
+            PublicKey = Convert.ToBase64String(PeerIdentity.Create().PublicKey), DisplayName = "Gone",
+            PresenceUrl = "https://example.org/gone.json", Blocked = true
+        }
+    };
+    var now = new DateTimeOffset(2026, 9, 25, 12, 0, 0, TimeSpan.Zero);
+
+    var exported = ProfileTransfer.Export(me, "Zera", friends, "correct horse", now);
+    Assert(exported.StartsWith(ProfileTransfer.Prefix, StringComparison.Ordinal));
+    // No trace of the name or the addresses in the file itself.
+    Assert(!exported.Contains("Zera") && !exported.Contains("example"));
+
+    // Pasted out of a chat or a mail, line breaks come along.
+    var wrapped = string.Join("\n", exported.Chunk(76).Select(chunk => new string(chunk)));
+    Assert(ProfileTransfer.TryImport(wrapped, "correct horse", out var payload, out var error));
+    Assert(error.Length == 0);
+    Assert(payload!.DisplayName == "Zera" && payload.ExportedAt == now);
+    Assert(payload.PublicKey.SequenceEqual(me.PublicKey));
+
+    // Blocked people stay behind; everyone else arrives as they were.
+    Assert(payload.Friends.Count == 1);
+    var alex = payload.Friends[0];
+    Assert(alex.DisplayName == "Alex" && alex.LastSequence == 41 && alex.Paused);
+    Assert(alex.PresenceUrl == "https://example.org/alex.json");
+    Assert(alex.PublicKey == Convert.ToBase64String(friend.PublicKey));
+
+    // The phone is the same person: what a friend seals for us, it opens.
+    using var rebuilt = PeerIdentity.FromPrivateScalar(payload.PrivateKey, payload.PublicKey);
+    var envelope = SealedPresence.Seal(friend, SampleSnapshot(3), new[] { me.PublicKey });
+    Assert(SealedPresence.TryOpen(rebuilt, friend.PublicKey, envelope, out var opened) && opened!.Sequence == 3);
+
+    // A scalar paired with somebody else's public key is refused rather than half-working.
+    AssertThrows<ArgumentException>(() => PeerIdentity.FromPrivateScalar(payload.PrivateKey, friend.PublicKey));
+}
+
+void TestProfileTransferRefusesWrongPassphrase()
+{
+    using var me = PeerIdentity.Create();
+    var now = DateTimeOffset.UtcNow;
+    AssertThrows<ArgumentException>(() => ProfileTransfer.Export(me, "Zera", Array.Empty<Friend>(), "short", now));
+    AssertThrows<ArgumentException>(() => ProfileTransfer.Export(me, "#", Array.Empty<Friend>(), "long enough", now));
+
+    var exported = ProfileTransfer.Export(me, "Zera", Array.Empty<Friend>(), "long enough", now);
+    Assert(!ProfileTransfer.TryImport(exported, "long enougH", out var payload, out var error) && payload is null);
+    Assert(error.Length > 0);
+
+    // One flipped character anywhere breaks the seal.
+    var index = ProfileTransfer.Prefix.Length + 30;
+    var tampered = exported[..index] + (exported[index] == 'A' ? 'B' : 'A') + exported[(index + 1)..];
+    Assert(!ProfileTransfer.TryImport(tampered, "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport(exported[..^10], "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport("CSF2-notaprofile", "long enough", out _, out _));
+    Assert(!ProfileTransfer.TryImport(null, "long enough", out _, out _));
+}
+
 sealed class StaticHttpHandler(Func<Uri, byte[]> content) : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -2759,4 +3961,85 @@ sealed class StatusHandler(System.Net.HttpStatusCode status) : HttpMessageHandle
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
         Task.FromResult(new HttpResponseMessage(status) { RequestMessage = request });
+}
+
+/// <summary>Like a share link to a folder: one exact path serves the file, everything else a page.</summary>
+sealed class OnePathServesHandler(string pathAndQuery, string file) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var body = request.RequestUri!.PathAndQuery == pathAndQuery && File.Exists(file)
+            ? File.ReadAllText(file)
+            : "<html>Page de partage</html>";
+        return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(body), RequestMessage = request
+        });
+    }
+}
+
+/// <summary>Serves whatever the test says right now; null is a 404.</summary>
+sealed class SwitchableHandler : HttpMessageHandler
+{
+    public Func<string?> Serve { get; set; } = () => null;
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var body = Serve();
+        return Task.FromResult(body is null
+            ? new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) { RequestMessage = request }
+            : new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(body), RequestMessage = request });
+    }
+}
+
+/// <summary>Answers every request with whatever the test computes for it.</summary>
+sealed class DelegatingTestHandler(Func<HttpRequestMessage, string> respond) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+        Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(respond(request)), RequestMessage = request
+        });
+}
+
+/// <summary>A local network in memory: every announcement reaches every other member, from loopback.</summary>
+sealed class TestLanBus
+{
+    private readonly List<TestAnnouncer> _members = new();
+
+    public TestAnnouncer Join()
+    {
+        var member = new TestAnnouncer(this);
+        lock (_members) _members.Add(member);
+        return member;
+    }
+
+    public void Broadcast(TestAnnouncer from, byte[] datagram)
+    {
+        TestAnnouncer[] members;
+        lock (_members) members = _members.Where(member => member != from).ToArray();
+        foreach (var member in members) member.Deliver(datagram);
+    }
+}
+
+sealed class TestAnnouncer(TestLanBus bus) : CubeShelf.Core.Social.Lan.ILanAnnouncer
+{
+    private bool _started;
+
+    public event Action<byte[], System.Net.IPAddress>? Received;
+
+    public void Start() => _started = true;
+
+    public Task SendAsync(byte[] datagram, CancellationToken cancellationToken = default)
+    {
+        if (_started) bus.Broadcast(this, datagram);
+        return Task.CompletedTask;
+    }
+
+    public void Deliver(byte[] datagram)
+    {
+        if (_started) Received?.Invoke(datagram, System.Net.IPAddress.Loopback);
+    }
+
+    public void Dispose() => _started = false;
 }

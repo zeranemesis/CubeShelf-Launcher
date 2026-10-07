@@ -7,6 +7,20 @@ public enum PresenceStatus
     InGame = 2
 }
 
+/// <summary>
+/// What the user says about being available, on top of what CubeShelf observes. Published beside
+/// the status rather than as new status values, so an older CubeShelf still reads "online".
+/// </summary>
+public enum PresenceAvailability
+{
+    Available = 0,
+    Away = 1,
+    Busy = 2,
+
+    /// <summary>Published as offline, while still reading friends and receiving their messages.</summary>
+    Invisible = 3
+}
+
 /// <summary>One entry of a shared library. Deliberately small: this is published repeatedly.</summary>
 public sealed record SharedGame(
     string Id,
@@ -67,8 +81,36 @@ public sealed record PresenceSnapshot(
     IReadOnlyList<SharedGame> Library,
     IReadOnlyList<SharedMod> Mods,
     PeerProfile? Profile = null,
-    PresenceInvite? Invite = null)
+    PresenceInvite? Invite = null,
+
+    /// <summary>
+    /// Where this document is published, as its author states it. A friend who met us on the
+    /// local network learns our address from here; one who still reads an old address learns the
+    /// new one (<see cref="FriendStore.AdoptAddress"/>). Null says nothing, and changes nothing.
+    /// </summary>
+    string? Address = null,
+
+    /// <summary>"away" or "busy" when the user said so; null otherwise.</summary>
+    string? Availability = null,
+
+    /// <summary>What is happening in the game -- the board, the turn -- when the game says.</summary>
+    string? Activity = null,
+
+    /// <summary>Messages and answers for single friends, each sealed for its one reader (<see cref="PairwiseNotes"/>).</summary>
+    IReadOnlyList<SealedNote>? Notes = null,
+
+    /// <summary>
+    /// How to reach the author's CubeShelf on the network directly (<see cref="Mesh.MeshPeerAddress"/>,
+    /// base64): its own addresses when it can listen, its relays otherwise. Inside the sealed
+    /// document, so only friends ever learn it.
+    /// </summary>
+    string? Mesh = null)
 {
+    public const string AvailabilityAway = "away";
+    public const string AvailabilityBusy = "busy";
+
+    public const int MaximumActivityLength = 120;
+
     public const int CurrentVersion = 1;
 
     /// <summary>

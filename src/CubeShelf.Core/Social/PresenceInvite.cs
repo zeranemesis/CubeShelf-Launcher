@@ -27,6 +27,14 @@ public sealed record PresenceInvite(
     public static readonly TimeSpan DefaultLifetime = TimeSpan.FromMinutes(15);
 
     /// <summary>
+    /// Names this invitation in an answer to it, without repeating the payload -- a bearer token
+    /// -- in the friend's own document.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string Id => Convert.ToBase64String(
+        System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(JoinPayload ?? "")))[..16];
+
+    /// <summary>
     /// Generous, because the payload is a runtime's own blob and its shape is not ours to
     /// predict; small enough that a malformed document cannot bloat every publish.
     /// </summary>

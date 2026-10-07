@@ -50,6 +50,20 @@ public sealed class Friend
     public int ConsecutiveFailures { get; set; }
 
     public DateTimeOffset? NextAttemptAt { get; set; }
+
+    /// <summary>
+    /// Whether their last document was addressed to us: true once one opened, false when one was
+    /// read and did not, null before anything was read. False is by far most often "they have not
+    /// added us back yet" -- friendship here goes one way at a time -- and is what lets the list
+    /// say so instead of showing someone who simply never appears.
+    /// </summary>
+    public bool? SharesWithUs { get; set; }
+
+    /// <summary>
+    /// How to reach their CubeShelf directly on the network, as their last document said
+    /// (<see cref="Mesh.MeshPeerAddress"/>, base64). Null until one said.
+    /// </summary>
+    public string? MeshAddress { get; set; }
 }
 
 /// <summary>
@@ -212,6 +226,49 @@ public sealed class FriendStore
             target.Paused = false;
             SaveUnsynchronized(friends);
         }
+    }
+
+    /// <summary>
+    /// Takes the address a friend's own authenticated document states as theirs, when it is a
+    /// usable https address and differs from the one we hold. This is how a friend met on the
+    /// local network, with no address yet, becomes reachable from anywhere once they publish one,
+    /// and how a friend who moved their document is followed without a new code. Only a document
+    /// that opened under the key we share with them gets here, so only they can move themselves.
+    /// </summary>
+    public bool AdoptAddress(string publicKeyBase64, string? statedAddress)
+    {
+        var address = Lan.LanProtocol.SafeUrl(statedAddress);
+        if (address.Length == 0) return false;
+
+        var adopted = false;
+        Update(publicKeyBase64, friend =>
+        {
+            if (string.Equals(friend.PresenceUrl, address, StringComparison.Ordinal)) return;
+            friend.PresenceUrl = address;
+            // Everything learnt about the old address says nothing about the new one.
+            friend.LastETag = null;
+            friend.ConsecutiveFailures = 0;
+            friend.NextAttemptAt = null;
+            adopted = true;
+        });
+        return adopted;
+    }
+
+    /// <summary>
+    /// Takes the network address a friend's own authenticated document states, as <see cref="AdoptAddress"/>
+    /// does for the https one. Only something that decodes is kept.
+    /// </summary>
+    public bool AdoptMeshAddress(string publicKeyBase64, string? statedAddress)
+    {
+        if (Mesh.MeshPeerAddress.FromBase64(statedAddress) is not { IsEmpty: false }) return false;
+        var adopted = false;
+        Update(publicKeyBase64, friend =>
+        {
+            if (string.Equals(friend.MeshAddress, statedAddress, StringComparison.Ordinal)) return;
+            friend.MeshAddress = statedAddress;
+            adopted = true;
+        });
+        return adopted;
     }
 
     public bool Unblock(string publicKeyBase64) =>

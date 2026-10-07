@@ -54,9 +54,9 @@ public sealed partial class MainWindow
             return P7("Crée d’abord ton identité : CubeShelf, page Mon profil.",
                       "Create your identity first: CubeShelf, My profile page.");
 
-        if (!_preferences.PresencePublishEnabled || _presence is null)
-            return P7("Ta présence n’est pas publiée, donc personne ne recevrait l’invitation : CubeShelf, page Mon profil.",
-                      "Your presence is not published, so nobody would receive the invitation: CubeShelf, My profile page.");
+        if (_presence is null)
+            return P7("Ta présence n’est ni publiée ni visible sur le réseau local, donc personne ne recevrait l’invitation : CubeShelf, page Mon profil.",
+                      "Your presence is neither published nor visible on the local network, so nobody would receive the invitation: CubeShelf, My profile page.");
 
         if ((_friends?.ActiveRecipients().Count ?? 0) == 0)
             return P7("Ajoute un ami dans CubeShelf : une invitation ne part qu’à des amis.",
@@ -235,6 +235,8 @@ public sealed partial class MainWindow
 
         _outgoingInvite = candidate;
         _presence?.RequestPublish(PresencePublishReason.GameChanged);
+        // Whoever answers should be seen within seconds, not at the next two-minute poll.
+        _presence?.PollEagerly();
         WriteInGameState();
         ShowToastParity(P7("Invitation", "Invitation"),
             forFriendKey.Length > 0
@@ -315,6 +317,8 @@ public sealed partial class MainWindow
         }
 
         var (started, message) = StartJoining(game, row.Name, row.JoinPayload);
+        if (started && _friendPresence.TryGetValue(row.PublicKey, out var known) && known.Invite is { } accepted)
+            AnswerInvite(row.PublicKey, accepted, InviteReply.Joined);
         ShowToastParity(P7("Invitation", "Invitation"),
             message.Length > 0 ? message
                 : P7($"Tu rejoins {row.Name}. Le compagnon vérifie ton disque puis entre dans le salon.",

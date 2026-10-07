@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace CubeShelf.Core.Social;
 
@@ -35,6 +35,9 @@ public sealed class PeerIdentity : IDisposable
     /// <summary>The identity itself, safe to publish. 65 bytes.</summary>
     public byte[] PublicKey { get; }
 
+    /// <summary>Whether a saved key is encrypted for the Windows account, rather than only by file permissions.</summary>
+    public static bool ProtectedAtRest => IdentityProtection.Available;
+
     public static PeerIdentity Create() =>
         new(ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256));
 
@@ -50,23 +53,60 @@ public sealed class PeerIdentity : IDisposable
 
         if (File.Exists(full))
         {
+            var text = File.ReadAllText(full).Trim();
+            var wasProtected = text.StartsWith(IdentityProtection.Marker, StringComparison.Ordinal);
             byte[] pkcs8;
-            try
+            if (wasProtected)
             {
-                pkcs8 = Convert.FromBase64String(File.ReadAllText(full).Trim());
+                if (!IdentityProtection.Available)
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) a été protégée par Windows : elle ne s’ouvre que sur le PC et le compte " +
+                        "qui l’ont créée. Restaure ta sauvegarde d’identité (Mon profil).");
+                try
+                {
+                    pkcs8 = IdentityProtection.Unprotect(text);
+                }
+                catch (CryptographicException exception)
+                {
+                    // Not deleted, not replaced: it still opens on the PC and account it came from.
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) a été protégée par un autre compte Windows, ou sur un autre PC : " +
+                        "elle ne s’ouvre pas ici. Restaure ta sauvegarde d’identité (Mon profil → Restaurer une sauvegarde).", exception);
+                }
             }
-            catch (FormatException exception)
+            else
             {
-                throw new CryptographicException(
-                    $"L’identité CubeShelf ({full}) est illisible. La supprimer en créera une " +
-                    "nouvelle, mais tes amis devront t’ajouter de nouveau.", exception);
+                try
+                {
+                    pkcs8 = Convert.FromBase64String(text);
+                }
+                catch (FormatException exception)
+                {
+                    throw new CryptographicException(
+                        $"L’identité CubeShelf ({full}) est illisible. La supprimer en créera une " +
+                        "nouvelle, mais tes amis devront t’ajouter de nouveau.", exception);
+                }
             }
 
             var restored = ECDiffieHellman.Create();
             try
             {
                 restored.ImportPkcs8PrivateKey(pkcs8, out _);
-                return new PeerIdentity(restored);
+                var loaded = new PeerIdentity(restored);
+
+                // A key from before protection existed is protected the first time it is read.
+                // Should that fail, it simply stays as it was and is tried again next time.
+                if (!wasProtected && IdentityProtection.Available)
+                {
+                    try
+                    {
+                        loaded.Save(full);
+                    }
+                    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or CryptographicException)
+                    {
+                    }
+                }
+                return loaded;
             }
             catch
             {
@@ -94,7 +134,10 @@ public sealed class PeerIdentity : IDisposable
         try
         {
             var temporary = full + ".tmp";
-            File.WriteAllText(temporary, Convert.ToBase64String(pkcs8));
+            // Encrypted for this Windows account where Windows can; elsewhere, as before.
+            File.WriteAllText(temporary, IdentityProtection.Available
+                ? IdentityProtection.Protect(pkcs8)
+                : Convert.ToBase64String(pkcs8));
             RestrictToOwner(temporary);
             File.Move(temporary, full, true);
             RestrictToOwner(full);
@@ -138,9 +181,14 @@ public sealed class PeerIdentity : IDisposable
         return SHA256.HashData(buffer);
     }
 
+    /// <summary>
+    /// The right shape and a point of the curve. Every key from outside -- a friend code, the
+    /// friends file, the local network -- passes here, so a crafted key that is not on the curve
+    /// is refused at the door rather than breaking every later publish that tries to seal for it.
+    /// </summary>
     public static void ValidatePublicKey(ReadOnlySpan<byte> publicKey)
     {
-        if (publicKey.Length != PublicKeyLength || publicKey[0] != 0x04)
+        if (publicKey.Length != PublicKeyLength || publicKey[0] != 0x04 || !Mesh.MeshCrypto.IsOnCurve(publicKey))
             throw new ArgumentException("Clé publique CubeShelf invalide.", nameof(publicKey));
     }
 
@@ -157,10 +205,19 @@ public sealed class PeerIdentity : IDisposable
             }
         };
 
-        // Validate() rejects a point that is not on the curve, which is the check that stops a
-        // crafted "friend code" from steering the key agreement.
+        // Validate() only checks the shape; it is the import that rejects a point off the curve,
+        // which is what stops a crafted friend code from steering the key agreement. Windows
+        // reports that refusal as PlatformNotSupportedException, which every caller here would let
+        // escape, so it is turned into the CryptographicException they all expect.
         parameters.Validate();
-        return ECDiffieHellman.Create(parameters);
+        try
+        {
+            return ECDiffieHellman.Create(parameters);
+        }
+        catch (PlatformNotSupportedException exception)
+        {
+            throw new CryptographicException("Clé publique CubeShelf invalide.", exception);
+        }
     }
 
     private static byte[] ExportPublicKey(ECDiffieHellman key)
@@ -187,6 +244,81 @@ public sealed class PeerIdentity : IDisposable
         catch (IOException)
         {
             // A filesystem that cannot express permissions is not a reason to refuse to run.
+        }
+    }
+
+    /// <summary>
+    /// The raw private scalar, left-padded to 32 bytes. Only <see cref="ProfileTransfer"/> uses it,
+    /// to hand this identity to PartyBoard on a phone inside a passphrase-sealed file.
+    /// </summary>
+    public byte[] ExportPrivateScalar()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        var d = _key.ExportParameters(true).D ??
+                throw new CryptographicException("La clé privée n’est pas exportable.");
+        try
+        {
+            var padded = new byte[CoordinateLength];
+            d.CopyTo(padded, CoordinateLength - d.Length);
+            return padded;
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(d);
+        }
+    }
+
+    /// <summary>Rebuilds an identity from <see cref="ExportPrivateScalar"/> and its public key.</summary>
+    public static PeerIdentity FromPrivateScalar(ReadOnlySpan<byte> scalar, ReadOnlySpan<byte> publicKey)
+    {
+        ValidatePublicKey(publicKey);
+        if (scalar.Length != CoordinateLength)
+            throw new ArgumentException("Clé privée CubeShelf invalide.", nameof(scalar));
+
+        var parameters = new ECParameters
+        {
+            Curve = ECCurve.NamedCurves.nistP256,
+            D = scalar.ToArray(),
+            Q = new ECPoint
+            {
+                X = publicKey.Slice(1, CoordinateLength).ToArray(),
+                Y = publicKey.Slice(1 + CoordinateLength, CoordinateLength).ToArray()
+            }
+        };
+        try
+        {
+            parameters.Validate();
+            ECDiffieHellman key;
+            try
+            {
+                key = ECDiffieHellman.Create(parameters);
+            }
+            catch (CryptographicException exception)
+            {
+                // OpenSSL checks the pair on import where it can; other providers leave that to
+                // the probe below. Either way it is the same refusal.
+                throw new ArgumentException("La clé privée ne correspond pas à la clé publique.", nameof(scalar), exception);
+            }
+            var identity = new PeerIdentity(key);
+
+            // Exporting would only echo back the Q we supplied, so prove the pair instead: an
+            // agreement with a throwaway key must land on the same secret from both ends.
+            using var probe = Create();
+            var ours = identity.DeriveSharedKey(probe.PublicKey);
+            var theirs = probe.DeriveSharedKey(publicKey);
+            var matches = CryptographicOperations.FixedTimeEquals(ours, theirs);
+            CryptographicOperations.ZeroMemory(ours);
+            CryptographicOperations.ZeroMemory(theirs);
+            if (!matches)
+            {
+                identity.Dispose();
+                throw new ArgumentException("La clé privée ne correspond pas à la clé publique.", nameof(scalar));
+            }
+            return identity;
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(parameters.D);
         }
     }
 
