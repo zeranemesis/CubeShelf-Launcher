@@ -260,21 +260,23 @@ static class MeshDhtTests
             // Nobody listens at the invented addresses, so the network never delivers there: what
             // the asker's own socket sent is the count.
             var askerSocket = (SimulatedSocket)asker.Socket;
-            long SentToInvented()
+            Dictionary<System.Net.IPEndPoint, long> SentToInvented()
             {
                 lock (askerSocket.SentTo)
-                    return askerSocket.SentTo.Where(entry => entry.Key.Address.GetAddressBytes() is [11, 250, ..]).Sum(entry => entry.Value);
+                    return askerSocket.SentTo.Where(entry => entry.Key.Address.GetAddressBytes() is [11, 250, ..])
+                        .ToDictionary(entry => entry.Key, entry => entry.Value);
             }
 
             Wait(asker.Dht.BootstrapAsync(new[] { liar.Endpoint, nodes[0].Endpoint }), 60000);
-            // Let the handshakes the bootstrap started run out, then see what later lookups add.
-            Thread.Sleep(3500);
-            var paidOnce = SentToInvented();
             for (var i = 0; i < 3; i++) Wait(asker.Dht.FindClosestAsync(NodeId.Random()), 60000);
-            // The invented addresses cost a timeout once, not on every lookup. Counted in bytes
-            // sent rather than timed: a slow test machine must not decide it.
-            Check(paidOnce > 0, "the lies were tried once");
-            Check(SentToInvented() == paidOnce, $"later lookups never try them again ({SentToInvented() - paidOnce} more bytes)");
+            Thread.Sleep(3500);   // let the last handshakes run out
+            // Each invented address costs one handshake attempt -- its first message and three
+            // resends, 4 x 256 bytes -- and never a second, whichever lookup meets it first. Counted
+            // in bytes rather than timed: a slow test machine must not decide it.
+            var sent = SentToInvented();
+            Check(sent.Count > 0, "the lies were tried");
+            Check(sent.Values.All(bytes => bytes <= 4 * MeshPackets.InitLength),
+                "each invented address was tried once, never again: " + string.Join(", ", sent.Select(entry => $"{entry.Key}={entry.Value}")));
 
             var table = asker.Table.All().Select(contact => contact.Id).ToHashSet();
             Check(fakes.All(fake => !table.Contains(fake.Id)), "no invented contact entered the table");
