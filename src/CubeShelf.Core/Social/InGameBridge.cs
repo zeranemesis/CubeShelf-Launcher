@@ -12,7 +12,14 @@ public sealed record InGameFriend(
     string Status,
     string Label,
     bool InvitesYou = false,
-    string InviteId = "");
+    string InviteId = "",
+    InGameAchievements? Achievements = null);
+
+/// <summary>
+/// A friend's progress in the RetroAchievements set of the game being played: the ids they have,
+/// so the game can show, under each achievement, who among your friends has it too.
+/// </summary>
+public sealed record InGameAchievements(string User, long RaGameId, int Total, int Points, int TotalPoints, IReadOnlyList<int> Ids);
 
 /// <summary>What the game's Friends tab (F1) needs, already worded in the player's language.</summary>
 public sealed record InGameState(

@@ -117,6 +117,13 @@
       <x:String x:Key="MeshRequestsTitle">DEMANDES D’AMIS</x:String>
       <x:String x:Key="MeshRequestAccept">Accepter</x:String>
       <x:String x:Key="MeshRequestDecline">Refuser</x:String>
+      <x:String x:Key="RaTitle">RetroAchievements</x:String>
+      <x:String x:Key="RaHelp">Un seul compte pour tous tes jeux : connecte-toi ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarre connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows.</x:String>
+      <x:String x:Key="RaUser">Nom d’utilisateur RetroAchievements</x:String>
+      <x:String x:Key="RaPassword">Mot de passe</x:String>
+      <x:String x:Key="RaLogin">Se connecter</x:String>
+      <x:String x:Key="RaLogout">Se déconnecter</x:String>
+      <x:String x:Key="ShareAchievements">Mes succès RetroAchievements</x:String>
       <x:String x:Key="PresenceHelp">Si tu publiais déjà dans un dossier synchronisé, CubeShelf continue pour les amis qui te lisent par ce lien. Le réseau CubeShelf ci-dessus n’en a plus besoin.</x:String>
       <x:String x:Key="PresenceDisplayName">Nom affiché</x:String>
       <x:String x:Key="PresenceDisplayNameHint">Le nom que tes amis verront</x:String>

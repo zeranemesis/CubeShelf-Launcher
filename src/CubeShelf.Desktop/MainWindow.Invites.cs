@@ -106,6 +106,8 @@ public sealed partial class MainWindow
         // The game the companion starts for online play inherits this, so its F1 menu still
         // reaches CubeShelf.
         foreach (var pair in InGameEnvironment(game)) environment[pair.Key] = pair.Value;
+        // And it starts logged in to RetroAchievements, like a game started from here.
+        AddRetroAchievementsEnvironment(game, environment);
 
         return environment;
     }

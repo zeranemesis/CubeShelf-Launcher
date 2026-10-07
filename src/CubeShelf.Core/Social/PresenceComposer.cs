@@ -15,7 +15,8 @@ public sealed record PresenceSharingOptions(
     bool SharePlayTime = true,
     bool ShareCurrentGame = true,
     bool ShareMods = true,
-    bool ShareProfile = true);
+    bool ShareProfile = true,
+    bool ShareAchievements = true);
 
 /// <summary>What the user typed and chose for their profile, before any of it is published.</summary>
 public sealed record ProfileInputs(

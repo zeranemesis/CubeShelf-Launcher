@@ -46,7 +46,11 @@ public sealed partial class MainWindow
     private void StartInGameBridge()
     {
         _inGameTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-        _inGameTimer.Tick += (_, _) => PumpInGameBridge();
+        _inGameTimer.Tick += (_, _) =>
+        {
+            PumpInGameBridge();
+            PumpAchievements();
+        };
         _inGameTimer.Start();
     }
 
@@ -194,7 +198,9 @@ public sealed partial class MainWindow
 
                 friends.Add(new InGameFriend(
                     friend.PublicKey, handles[friend.PublicKey], status, label,
-                    invitesYou, invitesYou ? ShortId(invite!.JoinPayload) : ""));
+                    invitesYou, invitesYou ? ShortId(invite!.JoinPayload) : "",
+                    // Where they stand in this game's achievements, for the menu's comparison.
+                    friend.Paused ? null : FriendAchievementsFor(known, game.Id)));
             }
         }
 
@@ -288,6 +294,12 @@ public sealed partial class MainWindow
         ["noAnswer"] = P7("CubeShelf n’a pas répondu. Est-il toujours ouvert ?", "CubeShelf did not answer. Is it still open?"),
         ["inviteTitle"] = P7("Invitation", "Invitation"),
         ["inviteToast"] = P7("t’invite à jouer. F1, onglet Amis, pour rejoindre.", "invites you to play. F1, Friends tab, to join."),
+        // RetroAchievements: a friend's progress, who among your friends has an achievement, and
+        // the toast when one of them unlocks something.
+        ["achievementsShort"] = P7("succès", "achievements"),
+        ["achievementsAlso"] = P7("Aussi débloqué par", "Also unlocked by"),
+        ["achievementsUnlockedTitle"] = P7("Succès d’un ami", "A friend’s achievement"),
+        ["achievementsUnlocked"] = P7("a débloqué", "unlocked"),
         ["writeFailed"] = P7("La demande n’a pas pu être transmise à CubeShelf.", "The request could not be handed to CubeShelf.")
     };
 }

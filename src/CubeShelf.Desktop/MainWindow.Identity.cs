@@ -66,6 +66,7 @@ public sealed partial class MainWindow
         RefreshOwnFriendCode();
         RefreshBackupHint();
         RefreshMeshUi();
+        RefreshRetroAchievementsUi();
     }
 
     private void PreviewIdentity(object? sender, TextChangedEventArgs args)

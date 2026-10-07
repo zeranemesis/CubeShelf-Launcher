@@ -105,7 +105,10 @@ public sealed record UserPreferences(
     bool MeshMapPort = true,
 
     /// <summary>The UDP port the network listens on; another one is taken if it is busy.</summary>
-    int MeshPort = 47914);
+    int MeshPort = 47914,
+
+    /// <summary>Friends see where we stand in each game's RetroAchievements set.</summary>
+    bool ShareAchievements = true);
 
 public sealed class UserPreferencesStore
 {

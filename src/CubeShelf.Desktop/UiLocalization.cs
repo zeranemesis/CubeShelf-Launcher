@@ -205,6 +205,13 @@ internal static class UiLocalization
         ["MeshRequestsTitle"] = "DEMANDES D’AMIS",
         ["MeshRequestAccept"] = "Accepter",
         ["MeshRequestDecline"] = "Refuser",
+        ["RaTitle"] = "RetroAchievements",
+        ["RaHelp"] = "Un seul compte pour tous tes jeux : connecte-toi ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarre connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows.",
+        ["RaUser"] = "Nom d’utilisateur RetroAchievements",
+        ["RaPassword"] = "Mot de passe",
+        ["RaLogin"] = "Se connecter",
+        ["RaLogout"] = "Se déconnecter",
+        ["ShareAchievements"] = "Mes succès RetroAchievements",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -408,6 +415,13 @@ internal static class UiLocalization
         ["MeshRequestsTitle"] = "FRIEND REQUESTS",
         ["MeshRequestAccept"] = "Accept",
         ["MeshRequestDecline"] = "Decline",
+        ["RaTitle"] = "RetroAchievements",
+        ["RaHelp"] = "One account for all your games: log in here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: CubeShelf keeps only the token the site returns, encrypted for your Windows account.",
+        ["RaUser"] = "RetroAchievements user name",
+        ["RaPassword"] = "Password",
+        ["RaLogin"] = "Log in",
+        ["RaLogout"] = "Log out",
+        ["ShareAchievements"] = "My RetroAchievements progress",
     };
 
     public static bool IsEnglish(string? language) =>

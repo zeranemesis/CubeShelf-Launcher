@@ -27,10 +27,15 @@ internal static class IdentityProtection
 
     public static bool Available => OperatingSystem.IsWindows();
 
-    public static string Protect(byte[] secret) => Marker + Convert.ToBase64String(Transform(secret, protect: true));
+    /// <param name="purpose">
+    /// What the secret is, mixed into the protection: a token protected for one purpose does not
+    /// open as another. Null for the identity, which predates the parameter.
+    /// </param>
+    public static string Protect(byte[] secret, string? purpose = null) =>
+        Marker + Convert.ToBase64String(Transform(secret, protect: true, EntropyFor(purpose)));
 
     /// <summary>Throws <see cref="CryptographicException"/> when this account cannot open it.</summary>
-    public static byte[] Unprotect(string text)
+    public static byte[] Unprotect(string text, string? purpose = null)
     {
         if (!text.StartsWith(Marker, StringComparison.Ordinal))
             throw new CryptographicException("Not a protected identity.");
@@ -43,8 +48,11 @@ internal static class IdentityProtection
         {
             throw new CryptographicException("Protected identity unreadable.", exception);
         }
-        return Transform(blob, protect: false);
+        return Transform(blob, protect: false, EntropyFor(purpose));
     }
+
+    private static byte[] EntropyFor(string? purpose) =>
+        purpose is null ? Entropy : Encoding.ASCII.GetBytes("CubeShelf " + purpose + " v1");
 
     [StructLayout(LayoutKind.Sequential)]
     private struct DataBlob
@@ -66,17 +74,17 @@ internal static class IdentityProtection
     [DllImport("kernel32.dll")]
     private static extern IntPtr LocalFree(IntPtr memory);
 
-    private static byte[] Transform(byte[] input, bool protect)
+    private static byte[] Transform(byte[] input, bool protect, byte[] entropy)
     {
         if (!Available) throw new PlatformNotSupportedException("La protection de l’identité n’existe que sous Windows.");
 
         var inputBlob = new DataBlob { Size = input.Length, Data = Marshal.AllocHGlobal(Math.Max(1, input.Length)) };
-        var entropyBlob = new DataBlob { Size = Entropy.Length, Data = Marshal.AllocHGlobal(Entropy.Length) };
+        var entropyBlob = new DataBlob { Size = entropy.Length, Data = Marshal.AllocHGlobal(entropy.Length) };
         var output = new DataBlob();
         try
         {
             Marshal.Copy(input, 0, inputBlob.Data, input.Length);
-            Marshal.Copy(Entropy, 0, entropyBlob.Data, Entropy.Length);
+            Marshal.Copy(entropy, 0, entropyBlob.Data, entropy.Length);
 
             var ok = protect
                 ? CryptProtectData(ref inputBlob, "CubeShelf identity", ref entropyBlob, IntPtr.Zero, IntPtr.Zero, UiForbidden, ref output)

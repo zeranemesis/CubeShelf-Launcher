@@ -45,6 +45,50 @@ public sealed record SharedMod(
 /// would also mean a second address in every friend code and a second round trip to verify --
 /// more cost than the bytes it saves. The avatar is capped small instead.
 /// </summary>
+/// <summary>
+/// One game's RetroAchievements progress, as a friend publishes it. What their game reported --
+/// not something the server vouched for -- so it is shown with the account name, which anyone can
+/// look up on retroachievements.org.
+/// </summary>
+public sealed record SharedAchievements(
+    string GameId,
+    long RaGameId,
+    string Title,
+    string User,
+    int Total,
+    int Points,
+    int TotalPoints,
+    IReadOnlyList<int> UnlockedIds,
+    DateTimeOffset UpdatedAt)
+{
+    public const int MaximumGames = 32;
+    public const int MaximumIds = 2000;
+
+    public int Unlocked => UnlockedIds.Count;
+
+    /// <summary>
+    /// A friend's entry made safe to show: counts in range, names cleaned, ids positive and
+    /// distinct. Null for anything that does not hold together.
+    /// </summary>
+    public static SharedAchievements? Sanitized(SharedAchievements? entry)
+    {
+        if (entry is null || string.IsNullOrWhiteSpace(entry.GameId) || entry.GameId.Length > 128 || entry.RaGameId <= 0) return null;
+        if (!CubeShelf.Core.Achievements.RetroAchievementsSession.IsUser(entry.User)) return null;
+        var total = Math.Clamp(entry.Total, 0, MaximumIds);
+        var ids = (entry.UnlockedIds ?? Array.Empty<int>()).Where(id => id > 0).Distinct().Take(MaximumIds).OrderBy(id => id).ToArray();
+        if (total == 0 || ids.Length > total) return null;
+        var title = ChatText.Clean(entry.Title);
+        return entry with
+        {
+            Title = title.Length > 100 ? title[..100] : title,
+            Total = total,
+            Points = Math.Clamp(entry.Points, 0, 1_000_000),
+            TotalPoints = Math.Clamp(entry.TotalPoints, 0, 1_000_000),
+            UnlockedIds = ids
+        };
+    }
+}
+
 public sealed record PeerProfile(
     string StatusLine = "",
     string? AvatarPng = null,
@@ -104,7 +148,10 @@ public sealed record PresenceSnapshot(
     /// base64): its own addresses when it can listen, its relays otherwise. Inside the sealed
     /// document, so only friends ever learn it.
     /// </summary>
-    string? Mesh = null)
+    string? Mesh = null,
+
+    /// <summary>Where the author stands in each game's RetroAchievements set, as their games reported it.</summary>
+    IReadOnlyList<SharedAchievements>? Achievements = null)
 {
     public const string AvailabilityAway = "away";
     public const string AvailabilityBusy = "busy";

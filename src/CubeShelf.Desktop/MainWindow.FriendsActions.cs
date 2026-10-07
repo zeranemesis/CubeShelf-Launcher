@@ -424,6 +424,7 @@ public sealed partial class MainWindow
         ShareModsBox.IsChecked = _preferences.ShareMods;
         LanVisibleBox.IsChecked = _preferences.LanVisible;
         MeshEnabledBox.IsChecked = _preferences.MeshEnabled;
+        ShareAchievementsBox.IsChecked = _preferences.ShareAchievements;
         MeshMapPortBox.IsChecked = _preferences.MeshMapPort;
         // The folder card is for whoever still has one set up; nobody else is shown a cloud.
         LegacyPresenceCard.IsVisible = _preferences.PresenceFolder.Length > 0 || _preferences.PresenceUrl.Length > 0;
@@ -451,6 +452,7 @@ public sealed partial class MainWindow
             ShareProfile = ShareProfileBox.IsChecked == true,
             LanVisible = LanVisibleBox.IsChecked == true,
             MeshEnabled = MeshEnabledBox.IsChecked == true,
+            ShareAchievements = ShareAchievementsBox.IsChecked == true,
             MeshMapPort = MeshMapPortBox.IsChecked == true,
             CloseToTray = CloseToTrayBox.IsChecked == true,
             NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true,

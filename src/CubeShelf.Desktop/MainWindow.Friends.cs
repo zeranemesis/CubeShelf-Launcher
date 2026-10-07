@@ -157,7 +157,8 @@ public sealed partial class MainWindow
                 _preferences.SharePlayTime,
                 _preferences.ShareCurrentGame,
                 _preferences.ShareMods,
-                _preferences.ShareProfile),
+                _preferences.ShareProfile,
+                _preferences.ShareAchievements),
             CurrentProfileInputs(),
             // A lapsed invitation is handed over unchanged and the composer drops it, so an
             // invitation nobody withdrew simply stops being published when its time is up.
@@ -170,7 +171,8 @@ public sealed partial class MainWindow
             _sessions.RunningGameIds.Count > 0 ? InGameBridge.ReadActivity(InGameDirectory, DateTimeOffset.UtcNow) : null,
             _messages?.Outgoing(DateTimeOffset.UtcNow),
             // Where friends reach us on the network, inside the sealed document.
-            mesh);
+            mesh,
+            SharedAchievementsNow());
     }
 
     private void OnFriendsSessionChanged(string gameId) =>
@@ -379,7 +381,7 @@ public sealed partial class MainWindow
             : known is null
                 ? P7("Jamais vu. Sa présence sera lue au prochain passage.",
                      "Never seen. Their presence is read on the next poll.")
-                : DescribeFriendLibrary(known);
+                : DescribeFriendLibrary(known) + (DescribeFriendAchievements(known) is { Length: > 0 } trophies ? "\n" + trophies : "");
 
         var seen = friend.LastSeenAt is { } last
             ? P7($"Vu le {last.ToLocalTime():dd/MM/yyyy HH:mm}", $"Seen {last.ToLocalTime():dd/MM/yyyy HH:mm}")
