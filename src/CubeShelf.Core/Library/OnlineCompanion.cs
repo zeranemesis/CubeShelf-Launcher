@@ -70,38 +70,6 @@ public static class OnlineCompanion
     /// silent manifest answers no, which is the safe direction -- the worst outcome is offering
     /// the manual flow to someone who did not need it.
     /// </summary>
-    public static bool SupportsLauncherInvites(string? companionPath)
-    {
-        if (string.IsNullOrWhiteSpace(companionPath)) return false;
-
-        try
-        {
-            var directory = Path.GetDirectoryName(Path.GetFullPath(companionPath));
-            if (string.IsNullOrEmpty(directory)) return false;
-
-            var manifest = Path.Combine(directory, "manifest.json");
-            var file = new FileInfo(manifest);
-            if (!file.Exists || file.Length == 0 || file.Length > 1024 * 1024) return false;
-
-            using var document = JsonDocument.Parse(File.ReadAllBytes(manifest));
-            if (!document.RootElement.TryGetProperty("capabilities", out var capabilities) ||
-                capabilities.ValueKind != JsonValueKind.Array)
-                return false;
-
-            foreach (var capability in capabilities.EnumerateArray())
-            {
-                if (capability.ValueKind == JsonValueKind.String &&
-                    string.Equals(capability.GetString(), LauncherInvitesCapability, StringComparison.Ordinal))
-                    return true;
-            }
-
-            return false;
-        }
-        catch (Exception exception) when (
-            exception is IOException or UnauthorizedAccessException or JsonException
-                or ArgumentException or NotSupportedException or PathTooLongException)
-        {
-            return false;
-        }
-    }
+    public static bool SupportsLauncherInvites(string? companionPath) =>
+        RuntimeManifest.HasCapability(companionPath, LauncherInvitesCapability);
 }

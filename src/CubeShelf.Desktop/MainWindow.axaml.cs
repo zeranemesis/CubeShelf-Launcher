@@ -102,6 +102,7 @@ public sealed partial class MainWindow : Window
 
         // After the catalog is loaded, so the first document published is not an empty shelf.
         InitializeFriends();
+        InitializeAchievements();
         InitializeSocial();
         // And again here, because the pinned-game list is the shelf: ApplyPreferences ran before
         // the catalog existed and could only offer "None".
@@ -174,6 +175,8 @@ public sealed partial class MainWindow : Window
             // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
             // tab exists, with its name in the player's language, from the first frame.
             foreach (var pair in InGameEnvironment(_selectedGame)) environment[pair.Key] = pair.Value;
+            // One RetroAchievements login for every game that can take it.
+            AddRetroAchievementsEnvironment(_selectedGame, environment);
             if (environment.ContainsKey(CubeShelf.Core.Social.InGameBridge.DirectoryVariable)) WriteInGameState();
 
             _sessions.Start(
@@ -748,6 +751,7 @@ public sealed partial class MainWindow : Window
         PreviousPresenceFolder = current.PreviousPresenceFolder,
         PreviousPresenceUrl = current.PreviousPresenceUrl,
         IdentityBackedUpAt = current.IdentityBackedUpAt,
+        ShareAchievements = current.ShareAchievements,
         MeshEnabled = current.MeshEnabled,
         MeshMapPort = current.MeshMapPort,
         MeshPort = current.MeshPort

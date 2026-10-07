@@ -542,6 +542,20 @@
                 <TextBlock Text="{DynamicResource MeshPrivacy}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
+            <!-- One RetroAchievements login for every game that can take it. -->
+            <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+              <StackPanel Spacing="9">
+                <TextBlock Text="{DynamicResource RaTitle}" FontSize="18" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource RaHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                <TextBlock x:Name="RaStatusText" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+                <StackPanel x:Name="RaLoginPanel" Spacing="8">
+                  <TextBox x:Name="RaUserBox" MaxLength="64" Watermark="{DynamicResource RaUser}" />
+                  <TextBox x:Name="RaPasswordBox" PasswordChar="•" Watermark="{DynamicResource RaPassword}" />
+                  <StackPanel Orientation="Horizontal"><Button x:Name="RaLoginButton" Classes="primary" Content="{DynamicResource RaLogin}" Click="LoginRetroAchievements" /></StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"><Button x:Name="RaLogoutButton" Content="{DynamicResource RaLogout}" Click="LogoutRetroAchievements" IsVisible="False" /></StackPanel>
+              </StackPanel>
+            </Border>
             <!-- Only for whoever still publishes to a synced folder: nobody else is offered a cloud. -->
             <Border x:Name="LegacyPresenceCard" IsVisible="False" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
               <StackPanel Spacing="9">
@@ -604,6 +618,7 @@
                 <CheckBox x:Name="ShareCurrentGameBox" Content="{DynamicResource ShareCurrentGame}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="ShareModsBox" Content="{DynamicResource ShareMods}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="ShareProfileBox" Content="{DynamicResource ShareProfile}" Checked="SaveSettings" Unchecked="SaveSettings" />
+                <CheckBox x:Name="ShareAchievementsBox" Content="{DynamicResource ShareAchievements}" Checked="SaveSettings" Unchecked="SaveSettings" />
                 <CheckBox x:Name="LanVisibleBox" Content="{DynamicResource LanVisible}" Checked="SaveSettings" Unchecked="SaveSettings" Margin="0,8,0,0" />
                 <TextBlock Text="{DynamicResource LanVisibleHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
 

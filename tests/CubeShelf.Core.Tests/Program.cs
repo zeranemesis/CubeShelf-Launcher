@@ -103,6 +103,11 @@ Run("the phone link serves the profile and the cards, sealed", TestPhoneLinkDown
 Run("the phone link takes cards back, never under a running game", TestPhoneLinkUpload);
 Run("the identity is encrypted for this Windows account", TestIdentityIsProtectedAtRest);
 Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
+Run("ra: the token is kept encrypted, never the password", RetroAchievementsTests.TheTokenIsKeptEncryptedAndNeverThePassword);
+Run("ra: login talks to the server once and reads its answer", RetroAchievementsTests.LoginTalksToTheServerOnceAndReadsItsAnswer);
+Run("ra: the game is heard but not believed", RetroAchievementsTests.TheGameIsHeardButNotBelieved);
+Run("ra: friends see progress only when shared", RetroAchievementsTests.FriendsSeeProgressOnlyWhenShared);
+Run("ra: only a game that asks gets the session", RetroAchievementsTests.OnlyAGameThatAsksGetsTheSession);
 Run("a key off the curve is refused at the door", KeyValidationTests.KeysOffTheCurveAreRefusedAtTheDoor);
 Run("mesh: derived keys are the same everywhere", KeyValidationTests.DerivedKeysAreTheSameEverywhere);
 Run("mesh: noise handshake agrees and refuses tampering", MeshTransportTests.NoiseHandshakeAgreesAndRejectsTampering);

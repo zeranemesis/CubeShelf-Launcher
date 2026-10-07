@@ -116,6 +116,8 @@ there, all plain files, no network:
 | `state.json` | CubeShelf, every 3 s while the game runs | Friends, their status line (availability and what their game says included), invitations, the F1 tab's strings |
 | `requests/<id>.json`, `<id>.done` | the game, then CubeShelf | Host, invite, join, cancel; a request older than 30 s is dropped unanswered |
 | `activity.json` | the game | `{"schema":1,"text":"…","updatedAt":<unix seconds>}` -- one line about what is happening |
+| `ra-session.json` | the game, once | `{"schema":1,"event":"login"\|"logout"\|"rejected","user","token","at"}` -- read and deleted by CubeShelf |
+| `achievements.json` | the game | `{"schema":1,"gameId","title","user","unlocked":[ids],"total","points","totalPoints","updatedAt"}` |
 
 `activity.json` is what friends see beside "Mario Party 4": the RetroAchievements rich presence
 while a set is played, otherwise the board and turn, a minigame, or the menus. The game rewrites
@@ -123,6 +125,28 @@ it every few seconds while it changes and every 30 s otherwise; CubeShelf ignore
 90 s, cleans it to one line of at most 120 characters, and publishes it only with the current game
 (same sharing switch). See `src/port/ui/cubeshelf.cpp` and `src/port/game_activity.cpp` in the
 game repository.
+
+## One RetroAchievements session for every game
+
+CubeShelf keeps the player's RetroAchievements session (logged in once on its profile page; the
+password goes to retroachievements.org once and is never kept, the token is kept encrypted for the
+Windows account). It hands it to a game only when the package's `manifest.json` declares the
+`retroachievements-login` capability, and only in the environment of the process it starts:
+`CUBESHELF_RA_USER` and `CUBESHELF_RA_TOKEN`, plus `CUBESHELF_INGAME_DIR` for the answers.
+
+- The game logs in with that token and **does not save it** over its own settings.
+- A login or logout made inside the game, or the server refusing the session CubeShelf gave, goes
+  back in `ra-session.json`: CubeShelf adopts the new session, forgets it, or asks for the password
+  again on its profile page. Events older than ten minutes are ignored.
+- `achievements.json` is where the player stands in the set being played. CubeShelf keeps the last
+  one per game, shares it with friends inside the sealed presence document (unless "My
+  RetroAchievements progress" is unticked, or the player is invisible), and gives each friend's
+  progress back to the game in `state.json` (`friends[].achievements`: user, raGameId, total,
+  points, totalPoints, ids). The game shows each friend's count in the Friends tab, which friends
+  have each achievement, and a toast when one unlocks something.
+
+Everything the game writes is checked as if anyone had written it: user names and tokens to the
+characters the server issues, counts against the set's size, ids positive and distinct.
 
 ## Checks
 

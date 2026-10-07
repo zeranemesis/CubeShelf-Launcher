@@ -31,7 +31,8 @@ public sealed record PresenceInputs(
     PresenceAvailability Availability = PresenceAvailability.Available,
     string? Activity = null,
     IReadOnlyDictionary<string, PairwiseNote>? Notes = null,
-    string? Mesh = null);
+    string? Mesh = null,
+    IReadOnlyList<SharedAchievements>? Achievements = null);
 
 /// <summary>Timings, injectable so the loop can be tested in milliseconds rather than minutes.</summary>
 public sealed record PresenceServiceOptions(
@@ -383,6 +384,15 @@ public sealed class PresenceService : IAsyncDisposable
             // direct connection would give away.
             if (inputs.Availability != PresenceAvailability.Invisible && !string.IsNullOrEmpty(inputs.Mesh))
                 candidate = candidate with { Mesh = inputs.Mesh };
+            // Achievements are a profile thing, like the library: shared unless the box says no,
+            // and not while looking offline.
+            if (inputs.Availability != PresenceAvailability.Invisible && inputs.Sharing.ShareAchievements &&
+                inputs.Achievements is { Count: > 0 } achievements)
+                candidate = candidate with
+                {
+                    Achievements = achievements.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>()
+                        .OrderBy(entry => entry.GameId, StringComparer.Ordinal).Take(SharedAchievements.MaximumGames).ToArray()
+                };
 
             var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes) + "|" +
                               PresenceRecipients.Digest(PresenceRecipients.ForPublication(_identity, _friends));

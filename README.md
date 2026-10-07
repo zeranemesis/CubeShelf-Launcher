@@ -218,6 +218,22 @@ le réseau local » est sur la page Mon profil.
 - **Répondre à une invitation** : « Rejoindre » ou « Décliner » ; l'hôte voit « rejoint ton salon »
   ou « a décliné ».
 
+### RetroAchievements : un compte pour tous tes jeux
+
+Sur la page **Mon profil**, carte « RetroAchievements » : connecte-toi **une fois**, et chaque jeu
+qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarre connecté, sans rien taper.
+
+- **Ton mot de passe** part une fois vers retroachievements.org et n'est jamais gardé. CubeShelf
+  garde le jeton que le site renvoie, chiffré pour ton compte Windows, et ne le donne qu'aux jeux
+  qui déclarent savoir s'en servir, au moment où il les lance.
+- **Dans l'autre sens aussi** : si tu te connectes ou te déconnectes depuis le jeu, CubeShelf suit,
+  et si RetroAchievements refuse un jour ta session, la page te redemande le mot de passe.
+- **Tes amis voient ta progression** (« 🏆 Mario Party 4 : 31/58 · 280 pts »), et dans le jeu, F1 :
+  le nombre de succès de chacun, quels amis ont chaque succès, et une notification quand l'un d'eux
+  en débloque un. Ça passe par ta présence, chiffrée comme le reste ; la case « Mes succès
+  RetroAchievements » l'arrête. C'est ce que le jeu de ton ami déclare : son nom de compte est
+  affiché, le site fait foi.
+
 ### Jouer sur téléphone
 
 PartyBoard sur Android ne fait pas tourner CubeShelf, mais il peut devenir *toi* : il ouvre ce que
