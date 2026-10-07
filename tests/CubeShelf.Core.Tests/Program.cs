@@ -3623,10 +3623,14 @@ void TestDataDirectoryOverride()
         Assert(paths.CacheDirectory == Path.Combine(paths.DataDirectory, "Cache"));
     }
 
-    // A relative path is ignored rather than resolved against wherever the process started.
+    // A relative path is ignored rather than resolved against wherever the process started: the
+    // profile stays exactly where it would be without the variable. Compared with that, not with a
+    // spelled-out Windows path, which Linux and macOS read as a relative one.
     var relative = new PlatformPaths("CubeShelf", new Dictionary<string, string?> { [PlatformPaths.DataDirectoryVariable] = "profil" },
         PlatformFamily.Windows, windowsLocalAppData: @"C:\Users\zera\AppData\Local");
-    Assert(relative.DataDirectory == Path.Combine(@"C:\Users\zera\AppData\Local", "CubeShelf"));
+    var usual = new PlatformPaths("CubeShelf", new Dictionary<string, string?>(),
+        PlatformFamily.Windows, windowsLocalAppData: @"C:\Users\zera\AppData\Local");
+    Assert(relative.DataDirectory == usual.DataDirectory && relative.ConfigurationDirectory == usual.ConfigurationDirectory);
 }
 
 void TestActiveFriendsAreReadMoreOften()
