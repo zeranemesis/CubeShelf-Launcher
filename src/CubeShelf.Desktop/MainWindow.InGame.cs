@@ -91,7 +91,7 @@ public sealed partial class MainWindow
             WriteInGameState(force: false);
 
             var now = DateTimeOffset.UtcNow;
-            foreach (var request in InGameBridge.ReadRequests(InGameDirectory, now))
+            foreach (var request in InGameBridge.ReadRequests(InGameDirectory, now, P7("Demande illisible.", "Unreadable request.")))
             {
                 (bool Ok, string Message) outcome;
                 try

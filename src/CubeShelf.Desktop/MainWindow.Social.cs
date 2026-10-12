@@ -175,7 +175,8 @@ public sealed partial class MainWindow
         if (!PairwiseNotes.TryOpen(_identity, author, snapshot.Notes, out var note) || note is null) return;
 
         var friend = _friends?.Load().FirstOrDefault(entry => entry.PublicKey == friendKey);
-        if (friend is null || friend.Blocked) return;
+        // Paused stops both directions, messages included.
+        if (friend is null || friend.Blocked || friend.Paused) return;
         var handle = PeerName.Handle(friend.DisplayName, friend.PublicKey);
 
         var arrived = _messages.Receive(friendKey, note, DateTimeOffset.UtcNow);

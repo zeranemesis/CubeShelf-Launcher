@@ -34,6 +34,7 @@ public sealed class MeshFriends : IAsyncDisposable
     private static readonly TimeSpan RecordLifetime = TimeSpan.FromHours(24) - TimeSpan.FromMinutes(5);
     private const int RequestProofLength = 32;
     private const int MaximumNoteBytes = 280;
+    public const int MaximumPendingRequests = 50;
 
     private readonly MeshNode _node;
     private readonly PeerIdentity _identity;
@@ -48,7 +49,7 @@ public sealed class MeshFriends : IAsyncDisposable
     private readonly ConcurrentDictionary<string, (long Day, DateTimeOffset At)> _pointersPublished = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, (long NextAttempt, int Failures)> _attempts = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, MeshFriendRequest> _requests = new(StringComparer.Ordinal);
-    private readonly ConcurrentDictionary<string, bool> _dismissed = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, DateTimeOffset> _dismissed = new(StringComparer.Ordinal);
 
     /// <summary>The day a request last reached each pending friend's mailbox: one a day keeps it there until they answer.</summary>
     private readonly ConcurrentDictionary<string, long> _requestDelivered = new(StringComparer.Ordinal);
@@ -95,6 +96,8 @@ public sealed class MeshFriends : IAsyncDisposable
             CryptographicOperations.ZeroMemory(scalar);
         }
 
+        LoadDismissed();
+
         _node.ApplicationRequests = HandleRequestAsync;
         _node.ApplicationNotification += OnNotification;
         _node.Transport.SessionClosed += OnSessionClosed;
@@ -102,8 +105,32 @@ public sealed class MeshFriends : IAsyncDisposable
         _node.Changed += Kick;
     }
 
-    /// <summary>Looking offline: no direct session is offered or accepted, since one would give us away.</summary>
-    public bool Invisible { get; set; }
+    /// <summary>
+    /// Looking offline: no direct session is offered or accepted, since one would give us away --
+    /// and the ones already open end the moment this is set, for the same reason: a friend on the
+    /// other end of one sees us as connected.
+    /// </summary>
+    public bool Invisible
+    {
+        get => _invisible;
+        set
+        {
+            if (_invisible == value) return;
+            _invisible = value;
+            if (!value) return;
+            var closed = false;
+            foreach (var (key, session) in _sessions.ToArray())
+            {
+                if (!_sessions.TryRemove(key, out _)) continue;
+                session.FriendKey = null;
+                _node.Transport.Close(session);
+                closed = true;
+            }
+            if (closed) Changed?.Invoke();
+        }
+    }
+
+    private volatile bool _invisible;
 
     /// <summary>A friend's document arrived over a direct session, opened and accepted.</summary>
     public event Action<PresenceFetchOutcome>? DocumentReceived;
@@ -177,8 +204,11 @@ public sealed class MeshFriends : IAsyncDisposable
         if (_node.Table.Count == 0 && !_node.Dht.Serving) return;
         var now = _clock();
         var today = DayOf(now);
+        // Only to someone who never once shared with us: a friend we have read before added us
+        // at some point, and one who since removed us made a choice a daily request would nag.
         var due = _friends.Load()
-            .Where(friend => !friend.Paused && !friend.Blocked && friend.SharesWithUs != true && now - friend.AddedAt < TimeSpan.FromDays(14))
+            .Where(friend => !friend.Paused && !friend.Blocked && friend.SharesWithUs != true && friend.LastSeenAt is null &&
+                             now - friend.AddedAt < TimeSpan.FromDays(14))
             .Where(friend => !_requestDelivered.TryGetValue(friend.PublicKey, out var day) || day != today)
             .Take(4)
             .ToArray();
@@ -284,12 +314,12 @@ public sealed class MeshFriends : IAsyncDisposable
     public void FriendsChanged()
     {
         Kick();
-        var current = _friends.Load().Select(friend => friend.PublicKey).ToHashSet(StringComparer.Ordinal);
+        var listed = _friends.Load();
+        var current = listed.Select(friend => friend.PublicKey).ToHashSet(StringComparer.Ordinal);
         foreach (var key in _pointersPublished.Keys.Where(key => !current.Contains(key)).ToArray()) _pointersPublished.TryRemove(key, out _);
         foreach (var (key, session) in _sessions.ToArray())
         {
-            var friend = _friends.Load().FirstOrDefault(entry => entry.PublicKey == key);
-            if (friend is null || friend.Paused || friend.Blocked)
+            if (!IsActiveFriend(listed, key))
             {
                 // Removed, paused or blocked: the direct session ends now, not at its next keepalive.
                 _sessions.TryRemove(key, out _);
@@ -297,7 +327,16 @@ public sealed class MeshFriends : IAsyncDisposable
                 _node.Transport.Close(session);
             }
         }
+
+        // Someone added by code while their request was on its way has nothing left to ask.
+        var answered = false;
+        foreach (var key in _requests.Keys.Where(current.Contains).ToArray())
+            answered |= _requests.TryRemove(key, out _);
+        if (answered) Changed?.Invoke();
     }
+
+    private static bool IsActiveFriend(IEnumerable<Friend> listed, string key) =>
+        listed.FirstOrDefault(entry => entry.PublicKey == key) is { Paused: false, Blocked: false };
 
     private int Push(byte[] payload)
     {
@@ -417,6 +456,15 @@ public sealed class MeshFriends : IAsyncDisposable
             var expected = Proof(pair, !session.IsInitiator, session.HandshakeHash);
             if (!CryptographicOperations.FixedTimeEquals(expected, reply.AsSpan(PeerIdentity.PublicKeyLength))) return false;
 
+            // The answer took a round trip, and the user may have paused or blocked them -- or
+            // gone invisible -- meanwhile. FriendsChanged ran before this session was theirs and
+            // could not close it, so it is decided again here.
+            if (Invisible || !IsActiveFriend(_friends.Load(), friend.PublicKey))
+            {
+                _node.Transport.Close(session);
+                return false;
+            }
+
             Adopt(session, friend.PublicKey);
             return true;
         }
@@ -508,7 +556,11 @@ public sealed class MeshFriends : IAsyncDisposable
         if (outcome is not null) DocumentReceived?.Invoke(outcome);
     }
 
-    /// <summary>The same checks as any other way a document arrives: it opens under the pair key, and it is newer.</summary>
+    /// <summary>
+    /// The same checks as any other way a document arrives: from a friend who is neither paused
+    /// nor blocked now -- whatever was true when the session opened -- it opens under the pair
+    /// key, and it is newer.
+    /// </summary>
     private PresenceFetchOutcome? AcceptDocument(string friendKey, string envelopeJson)
     {
         byte[] raw;
@@ -520,12 +572,23 @@ public sealed class MeshFriends : IAsyncDisposable
         {
             return null;
         }
+        if (!IsActiveFriend(_friends.Load(), friendKey)) return null;
         if (!SealedPresence.TryOpen(_identity, raw, SealedPresence.FromJson(envelopeJson), out var snapshot) || snapshot is null) return null;
-        if (!_friends.TryAcceptSequence(friendKey, snapshot.Sequence, _clock())) return null;
-        _friends.Update(friendKey, entry => entry.SharesWithUs = true);
-        _friends.AdoptAddress(friendKey, snapshot.Address);
-        _friends.AdoptMeshAddress(friendKey, snapshot.Mesh);
-        return new PresenceFetchOutcome(friendKey, PresenceFetchStatus.Updated, snapshot);
+        var now = _clock();
+        try
+        {
+            if (!_friends.TryAcceptSequence(friendKey, snapshot.Sequence, now)) return null;
+            _friends.Update(friendKey, entry => entry.SharesWithUs = true);
+            _friends.AdoptAddress(friendKey, snapshot.Address);
+            _friends.AdoptMeshAddress(friendKey, snapshot.Mesh);
+        }
+        catch (IOException)
+        {
+            // The friends list is held by another program: this push is lost, the next one is not.
+            return null;
+        }
+        // Straight from them over a live session: written just now, whatever their clock says.
+        return new PresenceFetchOutcome(friendKey, PresenceFetchStatus.Updated, snapshot.AsDeliveredAt(now));
     }
 
     private void OnSessionClosed(MeshSession session)
@@ -598,6 +661,8 @@ public sealed class MeshFriends : IAsyncDisposable
                 if (_dismissed.ContainsKey(key) || _requests.ContainsKey(key)) continue;
                 var existing = _friends.Load().FirstOrDefault(friend => friend.PublicKey == key);
                 if (existing is not null) continue;
+                // Each one costs its sender a proof of work, and still: a page of them is plenty.
+                if (_requests.Count >= MaximumPendingRequests) break;
                 _requests[key] = request;
                 changed = true;
             }
@@ -656,12 +721,53 @@ public sealed class MeshFriends : IAsyncDisposable
         }
     }
 
-    /// <summary>Forgets a request, accepted or declined, and does not show it again this run.</summary>
+    /// <summary>
+    /// Forgets a request, accepted or declined, and does not show it again -- after a restart
+    /// either: a request is re-sent every day for two weeks, so a refusal kept only in memory
+    /// came back with every launch. Remembered for a month, longer than any request is sent.
+    /// </summary>
     public void Dismiss(MeshFriendRequest request)
     {
         _requests.TryRemove(request.PublicKey, out _);
-        _dismissed[request.PublicKey] = true;
+        _dismissed[request.PublicKey] = _clock();
+        SaveDismissed();
         Changed?.Invoke();
+    }
+
+    public static readonly TimeSpan DismissalMemory = TimeSpan.FromDays(30);
+
+    private string DismissedFile => Path.Combine(Path.GetDirectoryName(_friends.FriendsFile)!, "mesh-dismissed.json");
+
+    private void LoadDismissed()
+    {
+        try
+        {
+            var text = ProfileFiles.ReadText(DismissedFile);
+            if (text is null) return;
+            var now = _clock();
+            var stored = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTimeOffset>>(text);
+            foreach (var (key, at) in stored ?? new())
+                if (now - at < DismissalMemory && key.Length < 200) _dismissed[key] = at;
+        }
+        catch (Exception exception) when (exception is IOException or System.Text.Json.JsonException)
+        {
+        }
+    }
+
+    private void SaveDismissed()
+    {
+        var now = _clock();
+        foreach (var (key, at) in _dismissed.ToArray())
+            if (now - at >= DismissalMemory) _dismissed.TryRemove(key, out _);
+        try
+        {
+            ProfileFiles.WriteText(DismissedFile, System.Text.Json.JsonSerializer.Serialize(
+                _dismissed.ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal)));
+        }
+        catch (IOException)
+        {
+            // Remembered for this run; the next dismissal writes it.
+        }
     }
 
     public async ValueTask DisposeAsync()

@@ -353,9 +353,12 @@ public sealed partial class MainWindow
         if (_clipboardCandidate is not { } payload || _identity is null || _friends is null) return;
 
         var name = payload.DisplayName.Length > 0 ? payload.DisplayName : P7("Ami", "Friend");
-        if (!_friends.TryAdd(payload, name, _identity.PublicKey, out var error))
+        var refusal = FriendAddRefusal.None;
+        var added = false;
+        if (!TryChangeFriends(() => added = _friends.TryAddWithReason(payload, name, _identity.PublicKey, out refusal))) return;
+        if (!added)
         {
-            ShowToastParity(P7("Amis", "Friends"), error);
+            ShowToastParity(P7("Amis", "Friends"), FriendAddRefusalText(refusal));
             return;
         }
 

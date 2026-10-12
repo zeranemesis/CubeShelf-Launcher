@@ -193,16 +193,31 @@ public sealed class MessageStore
             conversation.Messages.RemoveRange(0, conversation.Messages.Count - MaximumHistory);
     }
 
+    /// <summary>
+    /// The history, read once. A file held by another program is not read as an empty history:
+    /// that would be cached and then saved over the real one. This call works from a scratch
+    /// state that is never saved, and the next call tries the file again.
+    /// </summary>
     private State Load()
     {
         if (_state is not null) return _state;
+        string? text;
         try
         {
-            if (File.Exists(_file))
-                _state = JsonSerializer.Deserialize<State>(File.ReadAllText(_file), _json);
+            text = ProfileFiles.ReadText(_file);
         }
-        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        catch (ProfileFileUnavailableException)
         {
+            return new State { Scratch = true };
+        }
+
+        try
+        {
+            _state = text is null ? null : JsonSerializer.Deserialize<State>(text, _json);
+        }
+        catch (JsonException)
+        {
+            ProfileFiles.SetAside(_file);
         }
         _state ??= new State();
         return _state;
@@ -210,14 +225,12 @@ public sealed class MessageStore
 
     private void Save(State state)
     {
+        if (state.Scratch) return;
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(_file)!);
-            var temporary = _file + ".tmp";
-            File.WriteAllText(temporary, JsonSerializer.Serialize(state, _json));
-            File.Move(temporary, _file, true);
+            ProfileFiles.WriteText(_file, JsonSerializer.Serialize(state, _json));
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (ProfileFileUnavailableException)
         {
             // Kept in memory for this session; the next successful save writes it.
         }
@@ -225,6 +238,10 @@ public sealed class MessageStore
 
     private sealed class State
     {
+        /// <summary>Stands in while the file cannot be read; never written over it.</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool Scratch { get; init; }
+
         public long LastSentId { get; set; }
         public Dictionary<string, ConversationState> Conversations { get; set; } = new(StringComparer.Ordinal);
     }

@@ -88,6 +88,17 @@ public sealed partial class MainWindow
         finally
         {
             _meshStarting = null;
+            // Stopped while starting -- a setting changed, the network switched off and on again:
+            // whatever asked for the restart found this start still running and did nothing, so
+            // the restart happens now. Not while closing: the friends lifetime is gone by then.
+            if (lifetime.IsCancellationRequested && _friendsLifetime is not null)
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_friendsLifetime is null) return;
+                    EnsureMesh();
+                    RefreshMeshUi();
+                    if (FriendsView.IsVisible) RefreshFriendsView();
+                });
         }
     }
 
@@ -210,13 +221,18 @@ public sealed partial class MainWindow
     private void RefreshMeshRequests()
     {
         if (MeshRequestsPanel is null) return;
-        var requests = _meshFriends?.Requests ?? Array.Empty<MeshFriendRequest>();
+        // Someone already in the list -- added by code while their request was on its way -- has
+        // nothing left to ask.
+        var listed = _friends?.Load().Select(friend => friend.PublicKey).ToHashSet(StringComparer.Ordinal) ?? new HashSet<string>();
+        var requests = (_meshFriends?.Requests ?? Array.Empty<MeshFriendRequest>())
+            .Where(request => !listed.Contains(request.PublicKey))
+            .ToArray();
         MeshRequestsList.ItemsSource = requests
             .Select(request => new MeshRequestRow(request.PublicKey, request.Note.Length > 0
                 ? P7($"{request.Handle} veut t’ajouter : « {request.Note} »", $"{request.Handle} wants to add you: “{request.Note}”")
                 : P7($"{request.Handle} veut t’ajouter.", $"{request.Handle} wants to add you.")))
             .ToArray();
-        MeshRequestsPanel.IsVisible = requests.Count > 0 && HasIdentity;
+        MeshRequestsPanel.IsVisible = requests.Length > 0 && HasIdentity;
     }
 
     private void AcceptMeshRequest(object? sender, RoutedEventArgs args)
@@ -226,14 +242,19 @@ public sealed partial class MainWindow
         if (request is null) return;
 
         var name = request.Code.DisplayName.Length > 0 ? request.Code.DisplayName : P7("Ami", "Friend");
-        if (!_friends.TryAdd(request.Code, name, _identity.PublicKey, out var error))
+        var refusal = FriendAddRefusal.None;
+        var added = false;
+        if (!TryChangeFriends(() => added = _friends.TryAddWithReason(request.Code, name, _identity.PublicKey, out refusal))) return;
+        if (!added)
         {
-            ShowToastParity(P7("Amis", "Friends"), error);
+            ShowToastParity(P7("Amis", "Friends"), FriendAddRefusalText(refusal));
             mesh.Dismiss(request);
+            RefreshMeshRequests();
             return;
         }
 
-        mesh.Dismiss(request);
+        // Not dismissed: that would be remembered as a refusal. Now a friend, the request is
+        // dropped by the network layer when it hears the list changed.
         _meshNode?.AddSeeds(request.Code.Seeds);
         OnFriendsListChanged();
         _presence?.PollEagerly();
@@ -247,6 +268,7 @@ public sealed partial class MainWindow
         if (sender is not Button { Tag: MeshRequestRow row } || _meshFriends is not { } mesh) return;
         var request = mesh.Requests.FirstOrDefault(entry => entry.PublicKey == row.PublicKey);
         if (request is not null) mesh.Dismiss(request);
+        RefreshMeshRequests();
     }
 
     // ----------------------------------------------------------------- the profile page

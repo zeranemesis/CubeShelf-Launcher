@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Platform.Storage;
@@ -40,6 +40,9 @@ public sealed partial class MainWindow
         };
 
         FriendCodePayload? decoded = null;
+        // The name this dialog filled in itself, as opposed to one the user typed: a second code
+        // pasted over the first replaces the former and leaves the latter alone.
+        string? filledName = null;
         codeBox.TextChanged += (_, _) =>
         {
             // A whole chat message is fine: the code is found inside it. Only when nothing is
@@ -52,8 +55,12 @@ public sealed partial class MainWindow
             {
                 decoded = payload;
                 confirm.IsEnabled = true;
-                if (string.IsNullOrWhiteSpace(nameBox.Text) && payload.DisplayName.Length > 0)
+                var typedByUser = !string.IsNullOrWhiteSpace(nameBox.Text) && nameBox.Text != filledName;
+                if (!typedByUser)
+                {
+                    filledName = payload.DisplayName;
                     nameBox.Text = payload.DisplayName;
+                }
                 // Who, and where: the user is about to read them every couple of minutes.
                 status.Text = P7($"Tu vas ajouter {payload.Handle}. {DescribeCodeSource(payload, french: true)}",
                                  $"You are adding {payload.Handle}. {DescribeCodeSource(payload, french: false)}");
@@ -62,7 +69,7 @@ public sealed partial class MainWindow
             {
                 decoded = null;
                 confirm.IsEnabled = false;
-                status.Text = codeBox.Text is { Length: > 0 } ? error : "";
+                status.Text = codeBox.Text is { Length: > 0 } ? FriendCodeErrorText(error) : "";
             }
         };
 
@@ -70,9 +77,12 @@ public sealed partial class MainWindow
         {
             if (decoded is null) return;
             var chosen = string.IsNullOrWhiteSpace(nameBox.Text) ? P7("Ami", "Friend") : nameBox.Text!.Trim();
-            if (!_friends.TryAdd(decoded, chosen, _identity.PublicKey, out var error))
+            var refusal = FriendAddRefusal.None;
+            var added = false;
+            if (!TryChangeFriends(() => added = _friends.TryAddWithReason(decoded, chosen, _identity.PublicKey, out refusal))) return;
+            if (!added)
             {
-                status.Text = error;
+                status.Text = FriendAddRefusalText(refusal);
                 return;
             }
 
@@ -130,7 +140,7 @@ public sealed partial class MainWindow
     {
         if (_friends is null || sender is not Button { Tag: FriendRow row }) return;
 
-        _friends.Update(row.PublicKey, friend => friend.Paused = !friend.Paused);
+        if (!TryChangeFriends(() => _friends.Update(row.PublicKey, friend => friend.Paused = !friend.Paused))) return;
         RefreshFriendsView();
         OnFriendsListChanged();
     }
@@ -187,7 +197,7 @@ public sealed partial class MainWindow
         await dialog.ShowDialog(this);
         if (!confirmed) return;
 
-        _friends.Remove(row.PublicKey);
+        if (!TryChangeFriends(() => _friends.Remove(row.PublicKey))) return;
         _friendPresence.TryRemove(row.PublicKey, out _);
         _messages?.Forget(row.PublicKey);
         RefreshFriendsView();
@@ -318,7 +328,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        if (PresenceAddressMove.WriteMovedDocument(_identity, _friends, new PresenceSequence(_paths.ConfigurationDirectory),
+        if (PresenceAddressMove.WriteMovedDocument(_identity, _friends, SharedPresenceSequence,
                 _preferences.FriendsDisplayName, oldFolder, newAddress, out var error))
             ShowToastParity(P7("Ta présence", "Your presence"),
                 P7("Nouvelle adresse en place. L’ancien fichier l’indique à tes amis actuels, qui suivront tout seuls : garde-le quelques semaines.",
@@ -357,7 +367,7 @@ public sealed partial class MainWindow
                 _preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName, _preferences.PresenceUrl));
             using var selfTest = new PresenceSelfTest(_identity);
 
-            var sequence = new PresenceSequence(_paths.ConfigurationDirectory);
+            var sequence = SharedPresenceSequence;
             var snapshot = PresenceComposer.Offline(
                 _preferences.FriendsDisplayName, sequence.Next(DateTimeOffset.UtcNow), DateTimeOffset.UtcNow);
 
@@ -407,6 +417,8 @@ public sealed partial class MainWindow
         finally
         {
             PresenceSelfTestButton.IsEnabled = true;
+            // The test wrote an "offline" document where the live one was: the live one goes back.
+            _presence?.Republish();
             RefreshFriendsView();
         }
     }
