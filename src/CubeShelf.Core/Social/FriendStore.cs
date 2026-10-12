@@ -66,6 +66,14 @@ public sealed class Friend
     public string? MeshAddress { get; set; }
 }
 
+public enum FriendAddRefusal
+{
+    None,
+    OwnCode,
+    AlreadyFriend,
+    Blocked
+}
+
 /// <summary>
 /// The friends list, in the user's profile. Small enough to rewrite whole on every change, and
 /// written through a temporary file so an interrupted save cannot leave a truncated list.
@@ -74,6 +82,7 @@ public sealed class FriendStore
 {
     private readonly string _file;
     private readonly object _gate = new();
+    private string? _lastGood;
     private readonly JsonSerializerOptions _json = new()
     {
         WriteIndented = true,
@@ -91,7 +100,7 @@ public sealed class FriendStore
     public IReadOnlyList<Friend> Load()
     {
         lock (_gate)
-            return LoadUnsynchronized();
+            return LoadForReading();
     }
 
     /// <summary>
@@ -104,12 +113,30 @@ public sealed class FriendStore
         ReadOnlySpan<byte> ownPublicKey,
         out string error)
     {
+        var added = TryAddWithReason(payload, displayName, ownPublicKey, out var refusal);
+        error = refusal switch
+        {
+            FriendAddRefusal.OwnCode => "Ce code ami est le tien.",
+            FriendAddRefusal.Blocked => "Tu as bloqué cette personne. Débloque-la d’abord si c’est voulu.",
+            FriendAddRefusal.AlreadyFriend => "Cet ami est déjà dans ta liste.",
+            _ => ""
+        };
+        return added;
+    }
+
+    /// <summary>As the other overload, with the reason as a value the screen can word in its own language.</summary>
+    public bool TryAddWithReason(
+        FriendCodePayload payload,
+        string displayName,
+        ReadOnlySpan<byte> ownPublicKey,
+        out FriendAddRefusal refusal)
+    {
         ArgumentNullException.ThrowIfNull(payload);
-        error = "";
+        refusal = FriendAddRefusal.None;
 
         if (payload.PublicKey.AsSpan().SequenceEqual(ownPublicKey))
         {
-            error = "Ce code ami est le tien.";
+            refusal = FriendAddRefusal.OwnCode;
             return false;
         }
 
@@ -123,13 +150,13 @@ public sealed class FriendStore
             // later does not quietly undo the decision.
             if (existing is { Blocked: true })
             {
-                error = "Tu as bloqué cette personne. Débloque-la d’abord si c’est voulu.";
+                refusal = FriendAddRefusal.Blocked;
                 return false;
             }
 
             if (existing is not null)
             {
-                error = "Cet ami est déjà dans ta liste.";
+                refusal = FriendAddRefusal.AlreadyFriend;
                 return false;
             }
 
@@ -278,9 +305,22 @@ public sealed class FriendStore
             friend.BlockedAt = null;
         });
 
-    /// <summary>The peers a document should currently be addressed to.</summary>
-    public IReadOnlyList<byte[]> ActiveRecipients() =>
-        Load()
+    /// <summary>The peers a document should currently be addressed to, for counting on screen.</summary>
+    public IReadOnlyList<byte[]> ActiveRecipients() => RecipientsOf(Load());
+
+    /// <summary>
+    /// The peers a document is about to be sealed for. Unlike <see cref="ActiveRecipients"/>, a
+    /// list that cannot be read is reported rather than taken as empty: a document sealed for
+    /// nobody tells every friend, wrongly, that they were dropped.
+    /// </summary>
+    public IReadOnlyList<byte[]> ActiveRecipientsForPublication()
+    {
+        lock (_gate)
+            return RecipientsOf(LoadUnsynchronized());
+    }
+
+    private static IReadOnlyList<byte[]> RecipientsOf(IEnumerable<Friend> friends) =>
+        friends
             .Where(friend => !friend.Paused && !friend.Blocked)
             .Select(friend => TryDecodeKey(friend.PublicKey))
             .OfType<byte[]>()
@@ -300,26 +340,63 @@ public sealed class FriendStore
         }
     }
 
+    /// <summary>
+    /// The list as it is on disk. When the file is held by another program for longer than a
+    /// short retry, the last list read or written stands in for it -- the friends have not gone
+    /// anywhere just because an antivirus is scanning the file. Only with nothing to stand in
+    /// does this report <see cref="ProfileFileUnavailableException"/>, so that no change is ever
+    /// saved on top of a list that was never read.
+    /// </summary>
     private List<Friend> LoadUnsynchronized()
     {
-        if (!File.Exists(_file)) return new();
+        string? text;
         try
         {
-            var friends = JsonSerializer.Deserialize<List<Friend>>(File.ReadAllText(_file), _json) ?? new();
+            text = ProfileFiles.ReadText(_file);
+        }
+        catch (ProfileFileUnavailableException)
+        {
+            if (_lastGood is null) throw;
+            text = _lastGood;
+        }
+
+        if (text is null) return new();
+        try
+        {
+            var friends = JsonSerializer.Deserialize<List<Friend>>(text, _json) ?? new();
+            _lastGood = text;
             // A hand-edited or partially written file should cost the unreadable entries, not the list.
             return friends.Where(friend => TryDecodeKey(friend.PublicKey) is not null).ToList();
         }
-        catch (Exception exception) when (exception is JsonException or IOException)
+        catch (JsonException)
         {
+            // Not a list at all. Kept under another name, for whoever wants it back, and the list
+            // goes on from the last one this session knew -- or from empty, which is the truth.
+            ProfileFiles.SetAside(_file);
+            if (_lastGood is not null && !ReferenceEquals(text, _lastGood))
+                return JsonSerializer.Deserialize<List<Friend>>(_lastGood, _json) ?? new();
+            _lastGood = null;
             return new();
         }
     }
 
     private void SaveUnsynchronized(List<Friend> friends)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(_file)!);
-        var temporary = _file + ".tmp";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(friends, _json));
-        File.Move(temporary, _file, true);
+        var text = JsonSerializer.Serialize(friends, _json);
+        ProfileFiles.WriteText(_file, text);
+        _lastGood = text;
+    }
+
+    /// <summary>The list for the screen and for loops that only read: never throws, empty at worst.</summary>
+    private List<Friend> LoadForReading()
+    {
+        try
+        {
+            return LoadUnsynchronized();
+        }
+        catch (ProfileFileUnavailableException)
+        {
+            return new();
+        }
     }
 }

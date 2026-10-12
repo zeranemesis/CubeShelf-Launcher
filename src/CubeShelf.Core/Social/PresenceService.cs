@@ -181,6 +181,17 @@ public sealed class PresenceService : IAsyncDisposable
 
     private volatile PresencePublishReason _pendingReason = PresencePublishReason.Startup;
 
+    /// <summary>
+    /// Publishes even if nothing changed: something else wrote over our document -- the address
+    /// test leaves an "offline" one -- and the fingerprint would otherwise call the next publish
+    /// unnecessary until the heartbeat, five minutes of looking gone.
+    /// </summary>
+    public void Republish()
+    {
+        _lastFingerprint = "";
+        RequestPublish(PresencePublishReason.Manual);
+    }
+
     public async Task<IReadOnlyList<PresenceFetchOutcome>> RefreshNowAsync(CancellationToken cancellationToken = default)
     {
         var outcomes = await _fetcher.PollAsync(cancellationToken).ConfigureAwait(false);
@@ -205,7 +216,33 @@ public sealed class PresenceService : IAsyncDisposable
         foreach (var outcome in outcomes)
         {
             _pollCounts.AddOrUpdate(outcome.FriendPublicKey, 1, (_, count) => count + 1);
-            if (outcome.Snapshot is not null) _latest[outcome.FriendPublicKey] = outcome.Snapshot;
+            if (outcome.Snapshot is not null) KeepNewest(_latest, outcome.FriendPublicKey, outcome.Snapshot);
+        }
+    }
+
+    /// <summary>
+    /// Stores a friend's document unless a newer one is already there. Documents reach us by
+    /// several roads at once -- a read over https that waited on slower friends, a push on the
+    /// network, the local network -- and the one that lands last is not always the one written
+    /// last. Without this an "in game" read before the farewell came back after it, for the
+    /// whole freshness window. Returns whether it was kept.
+    /// </summary>
+    public static bool KeepNewest(
+        System.Collections.Concurrent.ConcurrentDictionary<string, PresenceSnapshot> latest,
+        string friendPublicKey,
+        PresenceSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(latest);
+        ArgumentNullException.ThrowIfNull(snapshot);
+        while (true)
+        {
+            if (!latest.TryGetValue(friendPublicKey, out var current))
+            {
+                if (latest.TryAdd(friendPublicKey, snapshot)) return true;
+                continue;
+            }
+            if (snapshot.Sequence < current.Sequence) return false;
+            if (latest.TryUpdate(friendPublicKey, snapshot, current)) return true;
         }
     }
 
@@ -216,7 +253,7 @@ public sealed class PresenceService : IAsyncDisposable
     public void NoteSnapshot(string friendPublicKey, PresenceSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-        _latest[friendPublicKey] = snapshot;
+        KeepNewest(_latest, friendPublicKey, snapshot);
     }
 
     /// <summary>
@@ -319,21 +356,51 @@ public sealed class PresenceService : IAsyncDisposable
     private Task<PresenceInputs> CaptureAsync(CancellationToken cancellationToken) =>
         _capture(cancellationToken).WaitAsync(cancellationToken);
 
+    /// <summary>How many rounds of either loop failed and were carried over. For tests and diagnostics.</summary>
+    public int FailedRounds => _failedRounds;
+    private int _failedRounds;
+
+    /// <summary>
+    /// Both loops outlive any one failure. A round that throws -- a friends list another program
+    /// holds, a capture that failed, anything a transport did not expect -- is counted and the
+    /// loop carries on; without this one bad round ended publishing or reading for the rest of
+    /// the session, silently, with friends still listed.
+    /// </summary>
     private async Task PublishLoopAsync(CancellationToken cancellationToken)
     {
         try
         {
+            var retry = false;
             while (!cancellationToken.IsCancellationRequested)
             {
-                var heartbeat = _options.Heartbeat + RandomJitter(PresencePolicy.HeartbeatJitter);
-                var signalled = await _signal.WaitAsync(heartbeat, cancellationToken).ConfigureAwait(false);
-                var reason = signalled ? _pendingReason : PresencePublishReason.Heartbeat;
+                PresencePublishReason reason;
+                if (retry)
+                {
+                    // The last state still has to reach friends: tried again soon, not at the heartbeat.
+                    await Task.Delay(FailureRetryDelay, cancellationToken).ConfigureAwait(false);
+                    reason = _pendingReason;
+                }
+                else
+                {
+                    var heartbeat = _options.Heartbeat + RandomJitter(PresencePolicy.HeartbeatJitter);
+                    var signalled = await _signal.WaitAsync(heartbeat, cancellationToken).ConfigureAwait(false);
+                    reason = signalled ? _pendingReason : PresencePublishReason.Heartbeat;
 
-                // Let the rest of a burst arrive before composing anything.
-                if (signalled && _options.Debounce > TimeSpan.Zero)
-                    await Task.Delay(_options.Debounce, cancellationToken).ConfigureAwait(false);
+                    // Let the rest of a burst arrive before composing anything.
+                    if (signalled && _options.Debounce > TimeSpan.Zero)
+                        await Task.Delay(_options.Debounce, cancellationToken).ConfigureAwait(false);
+                }
 
-                await PublishOnceAsync(reason, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await PublishOnceAsync(reason, cancellationToken).ConfigureAwait(false);
+                    retry = false;
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+                {
+                    Interlocked.Increment(ref _failedRounds);
+                    retry = true;
+                }
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -349,7 +416,14 @@ public sealed class PresenceService : IAsyncDisposable
             {
                 // Ticks at the short interval; each tick reads only those due, so a friend away
                 // for hours is still read every couple of minutes, not every tick.
-                await PollDueAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await PollDueAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+                {
+                    Interlocked.Increment(ref _failedRounds);
+                }
                 await Task.Delay(_options.EffectiveActivePollInterval, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -357,6 +431,10 @@ public sealed class PresenceService : IAsyncDisposable
         {
         }
     }
+
+    /// <summary>Fifteen seconds, or the heartbeat when that is shorter (tests run it in milliseconds).</summary>
+    private TimeSpan FailureRetryDelay =>
+        _options.Heartbeat < TimeSpan.FromSeconds(15) ? _options.Heartbeat : TimeSpan.FromSeconds(15);
 
     private async Task PublishOnceAsync(PresencePublishReason reason, CancellationToken cancellationToken)
     {
@@ -384,15 +462,8 @@ public sealed class PresenceService : IAsyncDisposable
             // direct connection would give away.
             if (inputs.Availability != PresenceAvailability.Invisible && !string.IsNullOrEmpty(inputs.Mesh))
                 candidate = candidate with { Mesh = inputs.Mesh };
-            // Achievements are a profile thing, like the library: shared unless the box says no,
-            // and not while looking offline.
-            if (inputs.Availability != PresenceAvailability.Invisible && inputs.Sharing.ShareAchievements &&
-                inputs.Achievements is { Count: > 0 } achievements)
-                candidate = candidate with
-                {
-                    Achievements = achievements.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>()
-                        .OrderBy(entry => entry.GameId, StringComparer.Ordinal).Take(SharedAchievements.MaximumGames).ToArray()
-                };
+            if (AchievementsToShare(inputs) is { Count: > 0 } shared)
+                candidate = candidate with { Achievements = shared };
 
             var fingerprint = PresenceComposer.ContentFingerprint(candidate) + "|" + PairwiseNotes.Digest(inputs.Notes) + "|" +
                               PresenceRecipients.Digest(PresenceRecipients.ForPublication(_identity, _friends));
@@ -431,6 +502,28 @@ public sealed class PresenceService : IAsyncDisposable
 
         // Outside the gate: a slow read of our own address must never delay the next publish.
         if (AddressCheckDue()) _ = CheckAddressInBackgroundAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// The achievements a document may carry. They name games and change the moment something is
+    /// unlocked, so they answer to the boxes that cover those things and not only to their own:
+    /// none without the library, none while looking offline, and none for a game being played
+    /// unless the game being played is shared -- a count rising live in a named game says what
+    /// is being played as plainly as the "in game" line does.
+    /// </summary>
+    public static IReadOnlyList<SharedAchievements> AchievementsToShare(PresenceInputs inputs)
+    {
+        ArgumentNullException.ThrowIfNull(inputs);
+        if (inputs.Availability == PresenceAvailability.Invisible || !inputs.Sharing.ShareAchievements ||
+            !inputs.Sharing.ShareLibrary || inputs.Achievements is not { Count: > 0 } achievements)
+            return Array.Empty<SharedAchievements>();
+
+        var running = inputs.Sharing.ShareCurrentGame
+            ? new HashSet<string>(StringComparer.Ordinal)
+            : inputs.RunningGameIds.ToHashSet(StringComparer.Ordinal);
+        return achievements.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>()
+            .Where(entry => !running.Contains(entry.GameId))
+            .OrderBy(entry => entry.GameId, StringComparer.Ordinal).Take(SharedAchievements.MaximumGames).ToArray();
     }
 
     private bool AddressCheckDue()

@@ -106,7 +106,7 @@ public sealed partial class MainWindow
         var target = Path.Combine(_preferences.PresenceFolder, SyncedFolderTarget.DefaultFileName);
         if (File.Exists(target)) return true;
 
-        var sequence = new PresenceSequence(_paths.ConfigurationDirectory);
+        var sequence = SharedPresenceSequence;
         var snapshot = PresenceComposer.Offline(_preferences.FriendsDisplayName, sequence.Next(DateTimeOffset.UtcNow), DateTimeOffset.UtcNow);
         var json = SealedPresence.ToJson(SealedPresence.Seal(
             _identity, snapshot, PresenceRecipients.ForPublication(_identity, _friends)));

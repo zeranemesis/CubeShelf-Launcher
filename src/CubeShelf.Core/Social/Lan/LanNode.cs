@@ -364,14 +364,16 @@ public sealed class LanNode : IAsyncDisposable
     }
 
     /// <summary>
-    /// The same checks as a document read from the sync folder: it opens under the key we share
-    /// with this friend, and it is newer than anything accepted from them.
+    /// The same checks as a document read from the sync folder: from a friend neither paused nor
+    /// blocked now -- a pull already on its way when they were paused still lands here -- it
+    /// opens under the key we share with this friend, and it is newer than anything accepted.
     /// </summary>
     public PresenceFetchOutcome? AcceptDocument(string friendKey, string envelopeJson)
     {
         if (envelopeJson.Length > PresencePolicy.MaximumDocumentBytes) return null;
         var raw = LanProtocol.DecodeKey(friendKey);
         if (raw is null) return null;
+        if (_friends.Load().FirstOrDefault(entry => entry.PublicKey == friendKey) is not { Paused: false, Blocked: false }) return null;
 
         if (!SealedPresence.TryOpen(_identity, raw, SealedPresence.FromJson(envelopeJson), out var snapshot) || snapshot is null)
             return null;
@@ -382,7 +384,8 @@ public sealed class LanNode : IAsyncDisposable
         _friends.Update(friendKey, entry => entry.SharesWithUs = true);
         _friends.AdoptAddress(friendKey, snapshot.Address);
         _friends.AdoptMeshAddress(friendKey, snapshot.Mesh);
-        return new PresenceFetchOutcome(friendKey, PresenceFetchStatus.Updated, snapshot);
+        // Pulled from them on this network a moment ago: written just now, whatever their clock says.
+        return new PresenceFetchOutcome(friendKey, PresenceFetchStatus.Updated, snapshot.AsDeliveredAt(now));
     }
 
     // ------------------------------------------------------------------ introductions, as the one asking

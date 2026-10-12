@@ -98,6 +98,12 @@ public sealed class PresenceFetcher : IDisposable
             {
                 return await FetchAsync(friend, cancellationToken).ConfigureAwait(false);
             }
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                // Whatever one friend's read threw stays with that friend. Letting it out would
+                // fail the whole batch -- and with it the loop that reads everyone.
+                return new PresenceFetchOutcome(friend.PublicKey, PresenceFetchStatus.Unreachable, Error: exception.Message);
+            }
             finally
             {
                 gate.Release();
@@ -113,8 +119,6 @@ public sealed class PresenceFetcher : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         var now = _clock();
-        if (friend.NextAttemptAt is { } next && next > now)
-            return new(friend.PublicKey, PresenceFetchStatus.Skipped);
 
         // No https address: a friend of the network age, or one met on the local network. They
         // are read through the network when we are on it, and only then.
@@ -123,6 +127,31 @@ public sealed class PresenceFetcher : IDisposable
                 ? await FetchFromNetworkAsync(friend, network, now, cancellationToken).ConfigureAwait(false)
                 : new(friend.PublicKey, PresenceFetchStatus.Skipped);
 
+        var backedOff = friend.NextAttemptAt is { } next && next > now;
+        if (NetworkReader is not { } reader)
+            return backedOff
+                ? new(friend.PublicKey, PresenceFetchStatus.Skipped)
+                : await FetchOverHttpsAsync(friend, now, cancellationToken).ConfigureAwait(false);
+
+        // An https address and the network both. The address is kept forever once learnt, and a
+        // friend who has since moved to the network leaves it behind: gone (404, backing off),
+        // or still served but frozen (304, "already seen"). Anything short of a new document
+        // there is asked of the network too -- otherwise they read as offline for good.
+        var https = backedOff
+            ? new PresenceFetchOutcome(friend.PublicKey, PresenceFetchStatus.Skipped)
+            : await FetchOverHttpsAsync(friend, now, cancellationToken).ConfigureAwait(false);
+        if (https.Status == PresenceFetchStatus.Updated) return https;
+
+        var fromNetwork = await FetchFromNetworkAsync(friend, reader, now, cancellationToken).ConfigureAwait(false);
+        // The network's answer when it found them there, the address's otherwise.
+        return fromNetwork.Status is PresenceFetchStatus.Updated or PresenceFetchStatus.NotModified ||
+               https.Status == PresenceFetchStatus.Skipped
+            ? fromNetwork
+            : https;
+    }
+
+    private async Task<PresenceFetchOutcome> FetchOverHttpsAsync(Friend friend, DateTimeOffset now, CancellationToken cancellationToken)
+    {
         // friends.json is a plain file a user can edit, so the scheme is checked again here and
         // not only when the friend code was decoded.
         if (!Uri.TryCreate(friend.PresenceUrl, UriKind.Absolute, out var address) ||
@@ -204,6 +233,12 @@ public sealed class PresenceFetcher : IDisposable
         {
             return Fail(friend, PresenceFetchStatus.Unreachable, exception.Message, connectivity: true);
         }
+        catch (IOException exception) when (exception is not ProfileFileUnavailableException)
+        {
+            // A connection reset or a body cut short while reading it: .NET reports those as
+            // HttpIOException, an IOException and not an HttpRequestException.
+            return Fail(friend, PresenceFetchStatus.Unreachable, exception.Message, connectivity: true);
+        }
     }
 
     private async Task<PresenceFetchOutcome> FetchFromNetworkAsync(
@@ -247,8 +282,13 @@ public sealed class PresenceFetcher : IDisposable
         _friends.Update(friend.PublicKey, entry =>
         {
             entry.SharesWithUs = true;
-            entry.ConsecutiveFailures = 0;
-            entry.NextAttemptAt = null;
+            // The backoff belongs to the https address. A friend who still has one keeps it: the
+            // network answering says nothing about whether that address came back.
+            if (string.IsNullOrWhiteSpace(entry.PresenceUrl))
+            {
+                entry.ConsecutiveFailures = 0;
+                entry.NextAttemptAt = null;
+            }
         });
         _friends.AdoptAddress(friend.PublicKey, snapshot.Address);
         _friends.AdoptMeshAddress(friend.PublicKey, snapshot.Mesh);

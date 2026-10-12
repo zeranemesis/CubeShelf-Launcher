@@ -69,8 +69,9 @@ public sealed partial class MainWindow
         await dialog.ShowDialog(this);
         if (!confirmed) return;
 
-        _friends.Block(new FriendCodePayload(
-            Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl), friend.DisplayName);
+        if (!TryChangeFriends(() => _friends.Block(new FriendCodePayload(
+                Convert.FromBase64String(friend.PublicKey), friend.PresenceUrl), friend.DisplayName)))
+            return;
 
         // Their last known presence goes with them: a blocked peer should not keep showing as
         // "in a game" from a document we will never refresh again.
@@ -83,7 +84,8 @@ public sealed partial class MainWindow
     {
         if (_friends is null || sender is not Button { Tag: FriendRow row }) return;
 
-        if (!_friends.Unblock(row.PublicKey)) return;
+        var unblocked = false;
+        if (!TryChangeFriends(() => unblocked = _friends.Unblock(row.PublicKey)) || !unblocked) return;
 
         RefreshFriendsView();
         OnFriendsListChanged();

@@ -20,7 +20,7 @@ public static class PresenceRecipients
         ArgumentNullException.ThrowIfNull(identity);
         ArgumentNullException.ThrowIfNull(friends);
 
-        var recipients = new List<byte[]>(friends.ActiveRecipients()) { identity.PublicKey };
+        var recipients = new List<byte[]>(friends.ActiveRecipientsForPublication()) { identity.PublicKey };
         return recipients;
     }
 

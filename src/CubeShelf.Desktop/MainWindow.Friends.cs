@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -47,6 +47,16 @@ public sealed partial class MainWindow
     /// <summary>Whether the running service publishes for the local network only, with no folder behind it.</summary>
     private bool _presenceLanOnly;
     private string _friendsFailure = "";
+
+    private PresenceSequence? _presenceSequence;
+
+    /// <summary>
+    /// The one counter for every document this profile writes -- the service's, the address test's,
+    /// the forwarding one's. Each used to open its own, which reserved numbers past the service's
+    /// and had friends reject the service's next documents as already seen.
+    /// </summary>
+    private PresenceSequence SharedPresenceSequence =>
+        _presenceSequence ??= new PresenceSequence(_paths.ConfigurationDirectory);
 
     private void InitializeFriends()
     {
@@ -116,7 +126,7 @@ public sealed partial class MainWindow
             _identity,
             _friends,
             new PresenceComposer(_paths),
-            new PresenceSequence(_paths.ConfigurationDirectory),
+            SharedPresenceSequence,
             publisher,
             new PresenceFetcher(_identity, _friends)
             {
@@ -266,7 +276,8 @@ public sealed partial class MainWindow
         foreach (var outcome in outcomes.Where(o => o.Snapshot is not null))
         {
             _friendPresence.TryGetValue(outcome.FriendPublicKey, out var previous);
-            _friendPresence[outcome.FriendPublicKey] = outcome.Snapshot!;
+            // A document overtaken on the way here by a newer one says nothing new.
+            if (!PresenceService.KeepNewest(_friendPresence, outcome.FriendPublicKey, outcome.Snapshot!)) continue;
             ReceiveNotes(outcome.FriendPublicKey, outcome.Snapshot!);
             AnnounceInvite(outcome.FriendPublicKey, outcome.Snapshot!);
             AnnounceComingOnline(outcome.FriendPublicKey, previous, outcome.Snapshot!);
@@ -372,9 +383,15 @@ public sealed partial class MainWindow
             : pending
             ? P7("Il ne t’a pas encore ajouté, ou ne partage plus sa présence avec toi. Envoie-lui ton code : dès qu’il t’aura ajouté, tu le verras ici.",
                  "They have not added you back yet, or stopped sharing their presence with you. Send them your code: once they add you, they show up here.")
-            : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && _meshFriends is null
+            : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && !_preferences.MeshEnabled
                 ? P7("Tu le verras sur le même réseau local, ou partout une fois le réseau CubeShelf activé (Mon profil).",
                      "You see them on the same local network, or anywhere once the CubeShelf network is on (My profile).")
+            : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && _meshFriends is null
+                ? (_meshFailure.Length > 0
+                    ? P7("Le réseau CubeShelf n’a pas pu démarrer (détails dans Mon profil) : en attendant, tu le verras sur le même réseau local.",
+                         "The CubeShelf network could not start (details in My profile): until then you see them on the same local network.")
+                    : P7("Le réseau CubeShelf démarre. Il apparaîtra dès qu’il sera en ligne.",
+                         "The CubeShelf network is starting. They show up as soon as they are online."))
             : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl)
                 ? P7("Pas encore vu sur le réseau CubeShelf. Il apparaîtra dès qu’il sera en ligne.",
                      "Not seen on the CubeShelf network yet. They show up as soon as they are online.")
@@ -501,6 +518,11 @@ public sealed partial class MainWindow
                 ? P7($"Réseau CubeShelf : {state}. Ajoute un ami avec son code.", $"CubeShelf network: {state}. Add a friend with their code.")
                 : P7($"Réseau CubeShelf : {state}. Tu publies pour {count} ami(s).", $"CubeShelf network: {state}. Publishing to {count} friend(s).");
         }
+        // Switched on but not running: it is starting, or it failed -- not "switch it on".
+        if (_preferences.MeshEnabled && HasIdentity && _meshFriends is null)
+            return _meshFailure.Length > 0
+                ? "⚠ " + DescribeMesh()
+                : P7("Réseau CubeShelf : démarrage…", "CubeShelf network: starting…");
         if (_presence is not null && _presenceLanOnly)
             return P7("Sans adresse publique, seuls tes amis sur le même réseau local te voient. Mon profil pour être vu de partout.",
                       "Without a public address, only friends on the same local network see you. My profile to be seen from anywhere.");

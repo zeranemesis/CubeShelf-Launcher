@@ -139,6 +139,16 @@ Run("mesh: friends find each other, strangers do not", MeshFriendsTests.FriendsF
 Run("mesh: online friends talk directly", MeshFriendsTests.OnlineFriendsTalkDirectly);
 Run("mesh: friend proofs cannot be forged or replayed", MeshFriendsTests.FriendProofsCannotBeForgedOrReplayed);
 Run("mesh: requests arrive and cannot be forged", MeshFriendsTests.RequestsArriveAndCannotBeForged);
+Run("friends: a failed publish does not end publishing", TestAFailedPublishDoesNotEndPublishing);
+Run("friends: a busy friends file is never read as empty", FriendsAuditTests.ABusyFriendsFileIsNeverReadAsEmpty);
+Run("friends: a busy message history is never overwritten", FriendsAuditTests.ABusyMessageHistoryIsNeverOverwritten);
+Run("friends: a connection cut mid-body stays with that friend", FriendsAuditTests.AConnectionCutMidBodyStaysWithThatFriend);
+Run("friends: a friend who moved to the network is found there", FriendsAuditTests.AFriendWhoMovedToTheNetworkIsFoundThere);
+Run("friends: an overtaken document does not come back", FriendsAuditTests.AnOvertakenDocumentDoesNotComeBack);
+Run("friends: a friend's clock is not trusted over ours", FriendsAuditTests.AFriendsClockIsNotTrustedOverOurs);
+Run("friends: achievements follow the boxes that cover them", FriendsAuditTests.AchievementsFollowTheBoxesThatCoverThem);
+Run("mesh: paused, invisible and declined mean what they say", FriendsAuditTests.PausedInvisibleAndDeclinedMeanWhatTheySay);
+Run("mesh: a request ends when they are added by code", FriendsAuditTests.ARequestEndsWhenTheyAreAddedByCode);
 Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
 Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
 Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);
@@ -1395,6 +1405,39 @@ void TestServiceCoalescesABurstIntoOnePublish()
         var document = File.ReadAllText(Path.Combine(folder, SyncedFolderTarget.DefaultFileName));
         Assert(SealedPresence.TryOpen(me, me.PublicKey, SealedPresence.FromJson(document), out var published));
         Assert(published!.Status == PresenceStatus.InGame);
+    });
+}
+
+void TestAFailedPublishDoesNotEndPublishing()
+{
+    WithTempRoot(root =>
+    {
+        var folder = Path.Combine(root, "synced");
+        Directory.CreateDirectory(folder);
+
+        using var me = PeerIdentity.Create();
+        var friends = new FriendStore(root);
+        var publisher = new SyncedFolderPresencePublisher(
+            new SyncedFolderTarget(folder, SyncedFolderTarget.DefaultFileName, "https://c.example.test/p.json"));
+        using var client = new HttpClient(new StatusHandler(System.Net.HttpStatusCode.NotFound));
+        var fetcher = new PresenceFetcher(me, friends, client);
+
+        // The first capture fails the way anything unexpected would; the ones after work.
+        var captures = 0;
+        var inputs = new PresenceInputs("Zera", SampleLibrary(), Array.Empty<string>(), new PresenceSharingOptions());
+        var options = new PresenceServiceOptions(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromMilliseconds(300), TimeSpan.FromHours(1));
+        var service = new PresenceService(me, friends, new PresenceComposer(new TestPaths(root)),
+            new PresenceSequence(root), publisher, fetcher,
+            _ => Interlocked.Increment(ref captures) == 1
+                ? throw new InvalidOperationException("capture failed")
+                : Task.FromResult(inputs), options);
+        service.Start(CancellationToken.None);
+
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (service.PublishCount == 0 && DateTime.UtcNow < deadline) Thread.Sleep(20);
+        Assert(service.FailedRounds >= 1);
+        Assert(service.PublishCount >= 1);   // the loop survived its failure and published
+        service.DisposeAsync().AsTask().Wait();
     });
 }
 

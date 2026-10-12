@@ -169,4 +169,25 @@ public sealed record PresenceSnapshot(
 
     public PresenceStatus EffectiveStatus(TimeSpan window, DateTimeOffset now) =>
         IsFresh(window, now) ? Status : PresenceStatus.Offline;
+
+    /// <summary>How far apart two clocks may be before ours is the one believed.</summary>
+    public static readonly TimeSpan ClockTolerance = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// The document as kept on arrival. Its date is the author's clock, and freshness is judged on
+    /// ours: a date ahead of our clock cannot be true, so it becomes the moment it arrived --
+    /// otherwise a friend whose clock runs fast was shown offline, every time, while publishing.
+    /// A date behind ours is kept: through a sync folder a late document and a slow clock look
+    /// the same, and taking the arrival would show someone gone for ten minutes as online.
+    /// </summary>
+    public PresenceSnapshot AsReceivedAt(DateTimeOffset receivedAt) =>
+        PublishedAt > receivedAt + ClockTolerance ? this with { PublishedAt = receivedAt } : this;
+
+    /// <summary>
+    /// The document as kept when it came straight from its author, over a direct session or the
+    /// local network: it was written a moment ago whatever the author's clock says, so a clock
+    /// running slow does not make them look gone either.
+    /// </summary>
+    public PresenceSnapshot AsDeliveredAt(DateTimeOffset receivedAt) =>
+        (PublishedAt - receivedAt).Duration() > ClockTolerance ? this with { PublishedAt = receivedAt } : this;
 }

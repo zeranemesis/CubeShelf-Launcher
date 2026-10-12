@@ -148,7 +148,8 @@ public static class InGameBridge
     /// and never returned; a request with a readable id but nonsense in it is answered as refused,
     /// so the game is not left waiting out its timeout.
     /// </summary>
-    public static IReadOnlyList<InGameRequest> ReadRequests(string directory, DateTimeOffset now)
+    /// <param name="unreadable">The answer to a request that cannot be read, in the player's language.</param>
+    public static IReadOnlyList<InGameRequest> ReadRequests(string directory, DateTimeOffset now, string unreadable = "Demande illisible.")
     {
         var folder = RequestsDirectory(directory);
         if (!Directory.Exists(folder)) return Array.Empty<InGameRequest>();
@@ -182,7 +183,7 @@ public static class InGameBridge
 
             if (info.Length > MaximumRequestBytes || !TryParse(file, id, out var request))
             {
-                Answer(directory, id, ok: false, "Demande illisible.");
+                Answer(directory, id, ok: false, unreadable);
                 TryDelete(file);
                 continue;
             }
