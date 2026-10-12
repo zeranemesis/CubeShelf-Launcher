@@ -141,7 +141,33 @@ public sealed partial class MainWindow
     // ----------------------------------------------------------------- the profile page
 
     /// <summary>One game on the profile page: how far along, and whether friends see it.</summary>
-    public sealed record AchievementProgressRow(string Title, string Percent, double Progress, string Counts, string Shared);
+    public sealed record AchievementProgressRow(string Title, string Percent, double Progress, string Counts, string Shared,
+        Avalonia.Media.Imaging.Bitmap? Cover = null);
+
+    /// <summary>The covers on the page now, released when the list is rebuilt.</summary>
+    private List<Avalonia.Media.Imaging.Bitmap> _progressCovers = new();
+
+    /// <summary>
+    /// A game's front cover from the library, decoded small: the card shows it at 64 pixels, and a
+    /// full-size scan per game would hold megabytes for a thumbnail.
+    /// </summary>
+    private Avalonia.Media.Imaging.Bitmap? ProgressCover(string catalogGameId)
+    {
+        var game = _catalogGames.FirstOrDefault(entry => string.Equals(entry.Id, catalogGameId, StringComparison.OrdinalIgnoreCase));
+        var path = ResolveCoverPath(game?.Covers.FirstOrDefault()?.Front);
+        if (path.Length == 0 || !File.Exists(path)) return null;
+        try
+        {
+            using var stream = File.OpenRead(path);
+            var bitmap = Avalonia.Media.Imaging.Bitmap.DecodeToWidth(stream, 128);
+            _progressCovers.Add(bitmap);
+            return bitmap;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>
     /// The player's own progress, game by game, on the profile page -- and for each one, whether
@@ -169,6 +195,8 @@ public sealed partial class MainWindow
         var shared = PresenceService.AchievementsToShare(inputs).Select(entry => entry.GameId).ToHashSet(StringComparer.Ordinal);
         var running = _sessions.RunningGameIds.ToHashSet(StringComparer.Ordinal);
 
+        var previousCovers = _progressCovers;
+        _progressCovers = new List<Avalonia.Media.Imaging.Bitmap>();
         RaProgressList.ItemsSource = entries.Select(entry =>
         {
             var percent = entry.Total == 0 ? 0 : (double)entry.Unlocked / entry.Total;
@@ -187,8 +215,11 @@ public sealed partial class MainWindow
                 percent,
                 P7($"{entry.Unlocked}/{entry.Total} succès · {entry.Points}/{entry.TotalPoints} pts{updated}",
                    $"{entry.Unlocked}/{entry.Total} achievements · {entry.Points}/{entry.TotalPoints} pts{updated}"),
-                sharedText);
+                sharedText,
+                ProgressCover(entry.GameId));
         }).ToArray();
+        // Only once the new list is in place: the old images were still on screen until now.
+        foreach (var cover in previousCovers) cover.Dispose();
 
         RaProgressStatusText.Text =
             session is null
