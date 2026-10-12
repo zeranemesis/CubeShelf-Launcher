@@ -9,7 +9,7 @@ public sealed record MeshDiscoveryOptions
     public TimeSpan Interval { get; init; } = TimeSpan.FromMinutes(20);
 
     /// <summary>How often while it knows almost nobody: sooner, but never in a tight loop.</summary>
-    public TimeSpan IntervalWhileAlone { get; init; } = TimeSpan.FromMinutes(3);
+    public TimeSpan IntervalWhileAlone { get; init; } = TimeSpan.FromMinutes(5);
 
     /// <summary>How many nodes count as "enough": below this the short interval applies.</summary>
     public int EnoughNodes { get; init; } = 8;
@@ -76,7 +76,7 @@ public sealed class MeshDiscovery : IAsyncDisposable
         using var rendezvous = _rendezvous();
         var lookup = await rendezvous.LookupAsync(cancellationToken).ConfigureAwait(false);
         var found = lookup.Peers.Where(peer => !IsSelf(peer)).ToArray();
-        if (found.Length > 0) _node.AddSeeds(found.OrderBy(_ => Random.Shared.Next()).Take(_options.SeedsPerLookup));
+        if (found.Length > 0) _node.AddDiscoveredSeeds(found.OrderBy(_ => Random.Shared.Next()).Take(_options.SeedsPerLookup));
 
         var announced = false;
         if (AnnouncePort() is { } port && lookup.Closest.Count > 0)
@@ -108,11 +108,16 @@ public sealed class MeshDiscovery : IAsyncDisposable
             {
                 try
                 {
-                    await RunOnceAsync(cancellationToken).ConfigureAwait(false);
+                    // Each lookup shows this PC's address to a few DHT nodes, so it is made only
+                    // when it is worth it: while the node knows almost nobody, or to say it is
+                    // reachable. A node already in the network, behind a closed router, stays quiet.
+                    if (_node.Table.Count < _options.EnoughNodes || _node.Reachability == MeshReachability.Public)
+                        await RunOnceAsync(cancellationToken).ConfigureAwait(false);
                 }
-                catch (Exception exception) when (exception is not OperationCanceledException and not OutOfMemoryException)
+                catch (Exception exception) when (!cancellationToken.IsCancellationRequested && exception is not OutOfMemoryException)
                 {
-                    // No network, no DNS, a router gone: the next round tries again.
+                    // No network, a DNS that never answers, a router gone, a budget run out: the
+                    // round failed, the loop does not. The next round tries again.
                 }
 
                 var wait = _node.Table.Count < _options.EnoughNodes ? _options.IntervalWhileAlone : _options.Interval;

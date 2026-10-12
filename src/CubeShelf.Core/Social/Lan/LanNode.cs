@@ -283,6 +283,28 @@ public sealed class LanNode : IAsyncDisposable
     }
 
     private const int MaximumMeshEntries = 4;
+    private static readonly TimeSpan MeshHintGap = TimeSpan.FromMinutes(1);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> _meshHints = new(StringComparer.Ordinal);
+
+    private bool MeshHintDue(IPAddress from, DateTimeOffset now)
+    {
+        var key = from.ToString();
+        if (_meshHints.TryGetValue(key, out var last) && now - last < MeshHintGap) return false;
+        if (_meshHints.Count > 256) _meshHints.Clear();
+        _meshHints[key] = now;
+        return true;
+    }
+
+    /// <summary>A sender on this network: private, link-local or loopback -- never a public address.</summary>
+    private static bool IsLocalSender(IPAddress from)
+    {
+        if (from.IsIPv4MappedToIPv6) from = from.MapToIPv4();
+        if (IPAddress.IsLoopback(from) || from.IsIPv6LinkLocal || from.IsIPv6UniqueLocal) return true;
+        if (from.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork) return false;
+        var bytes = from.GetAddressBytes();
+        return bytes[0] == 10 || (bytes[0] == 172 && bytes[1] is >= 16 and <= 31) ||
+               (bytes[0] == 192 && bytes[1] == 168) || (bytes[0] == 169 && bytes[1] == 254);
+    }
 
     /// <summary>Public ways into the CubeShelf network this node knows, to pass on to the local network. Null passes none.</summary>
     public Func<IReadOnlyList<IPEndPoint>>? MeshEntryPoints { get; set; }
@@ -315,7 +337,10 @@ public sealed class LanNode : IAsyncDisposable
         var now = _clock();
         var changed = false;
 
-        if (announcement.Mesh is { Count: > 0 } entries && MeshEntryPointsHeard is { } heard)
+        // Ways in, from the local network only -- a datagram from a public address is no
+        // neighbour -- and once a minute per sender, however often it broadcasts.
+        if (announcement.Mesh is { Count: > 0 } entries && MeshEntryPointsHeard is { } heard &&
+            IsLocalSender(from) && MeshHintDue(from, now))
         {
             var parsed = entries.Take(MaximumMeshEntries)
                 .Select(entry => IPEndPoint.TryParse(entry ?? "", out var parsedEndpoint) ? parsedEndpoint : null)

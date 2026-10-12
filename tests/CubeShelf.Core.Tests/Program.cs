@@ -156,6 +156,9 @@ Run("discovery: private and loopback addresses are never followed", DiscoveryTes
 Run("discovery: a newcomer joins through the meeting point", DiscoveryTests.ANewcomerJoinsThroughTheMeetingPoint);
 Run("discovery: a closed node only looks", DiscoveryTests.AClosedNodeOnlyLooks);
 Run("discovery: the local network passes ways in", DiscoveryTests.TheLocalNetworkPassesWaysIn);
+Run("discovery: a flood of planted addresses cannot lock the door", DiscoveryTests.AFloodOfPlantedAddressesCannotLockTheDoor);
+Run("discovery: a lookup survives names that never resolve", DiscoveryTests.ALookupSurvivesNamesThatNeverResolve);
+Run("discovery: only neighbours pass ways in, and not too often", DiscoveryTests.OnlyNeighboursPassWaysInAndNotTooOften);
 Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
 Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
 Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);

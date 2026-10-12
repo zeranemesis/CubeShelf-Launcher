@@ -39,13 +39,15 @@ public sealed partial class MainWindow
         node.Changed += () => Dispatcher.UIThread.Post(OnLanChanged);
         // Ways into the CubeShelf network, passed between CubeShelf installations on this network
         // whether they are friends or not -- when finding others without a code is allowed.
+        // Other nodes' addresses only, never this PC's own: those would go out in clear to everyone
+        // on a café or hotel network, and tie this machine to its address on the network.
         node.MeshEntryPoints = () => _preferences.MeshPublicDiscovery && _meshNode is { } mesh
-            ? mesh.EntryPoints(4)
+            ? mesh.Table.All().OrderBy(_ => Random.Shared.Next()).Select(contact => contact.Endpoint).Take(4).ToArray()
             : Array.Empty<System.Net.IPEndPoint>();
-        node.MeshEntryPointsHeard += seeds => Dispatcher.UIThread.Post(() =>
+        node.MeshEntryPointsHeard += seeds =>
         {
-            if (_preferences.MeshPublicDiscovery) _meshNode?.AddSeeds(seeds);
-        });
+            if (_preferences.MeshPublicDiscovery) _meshNode?.AddDiscoveredSeeds(seeds);
+        };
         node.FriendAdded += handle => Dispatcher.UIThread.Post(() =>
         {
             Notify(P7("Nouvel ami", "New friend"),

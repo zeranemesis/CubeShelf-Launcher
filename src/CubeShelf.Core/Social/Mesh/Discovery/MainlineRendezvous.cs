@@ -66,7 +66,6 @@ public sealed class MainlineRendezvous : IDisposable
     private readonly Dictionary<ushort, (IPEndPoint To, TaskCompletionSource<Dictionary<string, object>?> Answer)> _pending = new();
     private readonly CancellationTokenSource _lifetime = new();
     private readonly Task _receive;
-    private ushort _nextTransaction = (ushort)RandomNumberGenerator.GetInt32(ushort.MaxValue);
     private bool _disposed;
 
     public MainlineRendezvous(MainlineRendezvousOptions? options = null)
@@ -86,7 +85,16 @@ public sealed class MainlineRendezvous : IDisposable
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
         budget.CancelAfter(_options.LookupBudget);
 
-        var starting = await StartingNodesAsync(budget.Token).ConfigureAwait(false);
+        IReadOnlyList<IPEndPoint> starting;
+        try
+        {
+            starting = await StartingNodesAsync(budget.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            // Name resolution took the whole budget: nothing to ask this round.
+            return new MainlineLookup(Array.Empty<IPEndPoint>(), Array.Empty<(IPEndPoint, byte[])>(), 0);
+        }
         var candidates = new Dictionary<string, (IPEndPoint Endpoint, byte[] Distance)>(StringComparer.Ordinal);
         foreach (var node in starting) candidates.TryAdd(node.ToString(), (node, Array.Empty<byte>()));
         var asked = new HashSet<string>(StringComparer.Ordinal);
@@ -149,9 +157,11 @@ public sealed class MainlineRendezvous : IDisposable
             // The budget ran out: what was found so far is the answer.
         }
 
+        // One per address: a single machine answering on eight ports must not pass for the eight
+        // nodes nearest the meeting point and take every announcement.
         var closest = answered
-            .GroupBy(entry => entry.Node.ToString())
-            .Select(group => group.First())
+            .GroupBy(entry => entry.Node.Address.ToString())
+            .Select(group => group.OrderBy(entry => entry.Distance, DistanceOrder.Instance).First())
             .OrderBy(entry => entry.Distance, DistanceOrder.Instance)
             .Take(8)
             .Select(entry => (entry.Node, entry.Token))
@@ -173,18 +183,26 @@ public sealed class MainlineRendezvous : IDisposable
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
         budget.CancelAfter(_options.LookupBudget);
 
-        var replies = await Task.WhenAll(lookup.Closest.Select(entry => QueryAsync(entry.Node, new Dictionary<string, object>
+        Dictionary<string, object>?[] replies;
+        try
         {
-            ["q"] = "announce_peer",
-            ["a"] = new Dictionary<string, object>
+            replies = await Task.WhenAll(lookup.Closest.Select(entry => QueryAsync(entry.Node, new Dictionary<string, object>
             {
-                ["id"] = _id,
-                ["info_hash"] = MeetingPoint,
-                ["port"] = (long)port,
-                ["implied_port"] = 0L,
-                ["token"] = entry.Token
-            }
-        }, budget.Token))).ConfigureAwait(false);
+                ["q"] = "announce_peer",
+                ["a"] = new Dictionary<string, object>
+                {
+                    ["id"] = _id,
+                    ["info_hash"] = MeetingPoint,
+                    ["port"] = (long)port,
+                    ["implied_port"] = 0L,
+                    ["token"] = entry.Token
+                }
+            }, budget.Token))).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return 0;
+        }
         return replies.Count(reply => reply is not null && reply.ContainsKey("r"));
     }
 
@@ -220,7 +238,8 @@ public sealed class MainlineRendezvous : IDisposable
         var answer = new TaskCompletionSource<Dictionary<string, object>?>(TaskCreationOptions.RunContinuationsAsynchronously);
         lock (_gate)
         {
-            do transaction = _nextTransaction++; while (_pending.ContainsKey(transaction));
+            // Random each time: a node we asked must not be able to tell which ids come next.
+            do transaction = (ushort)RandomNumberGenerator.GetInt32(ushort.MaxValue + 1); while (_pending.ContainsKey(transaction));
             _pending[transaction] = (to, answer);
         }
 

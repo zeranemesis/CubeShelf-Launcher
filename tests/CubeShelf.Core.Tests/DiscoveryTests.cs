@@ -8,6 +8,16 @@ using CubeShelf.Core.Social.Mesh;
 using CubeShelf.Core.Social.Mesh.Discovery;
 using static MeshKit;
 
+/// <summary>A local network announcer whose datagrams come from whatever address the test says.</summary>
+sealed class SourcedAnnouncer : ILanAnnouncer
+{
+    public event Action<byte[], IPAddress>? Received;
+    public void Start() { }
+    public Task SendAsync(byte[] datagram, CancellationToken cancellationToken = default) => Task.CompletedTask;
+    public void Deliver(byte[] datagram, IPAddress from) => Received?.Invoke(datagram, from);
+    public void Dispose() { }
+}
+
 /// <summary>
 /// A BitTorrent DHT node on loopback, as much of one as a lookup meets: it answers get_peers with
 /// the nodes it was told about and the peers announced to it, hands out a token, and keeps
@@ -142,10 +152,11 @@ static class DiscoveryTests
         using var rendezvous = new MainlineRendezvous(Loopback(router));
         var lookup = Wait(rendezvous.LookupAsync(), 10000);
         Check(lookup.Peers.Count == 2, $"both CubeShelf nodes found ({lookup.Peers.Count})");
-        Check(lookup.Closest.Count >= 2 && lookup.Closest[0].Node.Equals(near.Endpoint), "the nearest node comes first, with its token");
+        // Every fake node shares 127.0.0.1: one machine counts once, the nearest of its ports.
+        Check(lookup.Closest.Count == 1 && lookup.Closest[0].Node.Equals(near.Endpoint), "the nearest node, once per address, with its token");
 
         var accepted = Wait(rendezvous.AnnounceAsync(lookup, 47914), 10000);
-        Check(accepted >= 2, $"announced at the nearest nodes ({accepted})");
+        Check(accepted == 1, $"announced at the nearest node ({accepted})");
         var said = near.Announced.Single();
         Check(said.InfoHash.AsSpan().SequenceEqual(MainlineRendezvous.MeetingPoint) && said.Port == 47914, "under the meeting point, with our port");
         Check(said.ReadOnly, "as a read-only node: never kept in anyone's table");
@@ -231,6 +242,79 @@ static class DiscoveryTests
             discovery.DisposeAsync().AsTask().Wait();
             closed.DisposeAsync().AsTask().Wait();
             foreach (var node in backbone) node.DisposeAsync().AsTask().Wait();
+        }
+    }
+
+    public static void AFloodOfPlantedAddressesCannotLockTheDoor()
+    {
+        var network = new SimulatedNetwork();
+        var lonely = MeshNodeTests.Node(network, network.BindPublic());
+        try
+        {
+            var friendSeed = new IPEndPoint(IPAddress.Parse("81.2.69.200"), 47914);
+            lonely.AddSeeds(new[] { friendSeed });
+
+            // Someone floods the meeting point or the local network with addresses of their choosing.
+            for (var batch = 0; batch < 20; batch++)
+                lonely.AddDiscoveredSeeds(Enumerable.Range(1, 16).Select(index => new IPEndPoint(IPAddress.Parse($"93.184.{batch}.{index}"), 1000 + index)));
+
+            var honest = new IPEndPoint(IPAddress.Parse("81.2.69.201"), 47914);
+            lonely.AddDiscoveredSeeds(new[] { honest });
+            var seeds = lonely.AllSeeds();
+            Check(seeds.Contains(friendSeed), "a way in we were given is never pushed out");
+            Check(seeds.Contains(honest), "a way in found after the flood still gets in");
+            Check(seeds.Length <= 33, $"the found ones stay few ({seeds.Length})");
+        }
+        finally
+        {
+            lonely.DisposeAsync().AsTask().Wait();
+        }
+    }
+
+    public static void ALookupSurvivesNamesThatNeverResolve()
+    {
+        using var rendezvous = new MainlineRendezvous(new MainlineRendezvousOptions
+        {
+            Routers = new[] { ("router.cubeshelf.invalid", 6881) },
+            LookupBudget = TimeSpan.FromMilliseconds(1)
+        });
+        var lookup = Wait(rendezvous.LookupAsync(), 10000);
+        Check(lookup.Peers.Count == 0 && lookup.Queries == 0, "an empty round, not an exception");
+    }
+
+    public static void OnlyNeighboursPassWaysInAndNotTooOften()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cubeshelf-lanhint-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        using var me = PeerIdentity.Create();
+        using var other = PeerIdentity.Create();
+        var announcer = new SourcedAnnouncer();
+        var node = new LanNode(me, new FriendStore(root), announcer, () => "Me", () => "");
+        var hints = 0;
+        node.MeshEntryPointsHeard += _ => Interlocked.Increment(ref hints);
+
+        var sender = new LanNode(other, new FriendStore(Path.Combine(root, "o")), new SourcedAnnouncer(), () => "Other", () => "")
+        {
+            MeshEntryPoints = () => new[] { new IPEndPoint(IPAddress.Parse("81.2.69.163"), 47914) }
+        };
+        // Started, so its announcement names a port, as a real one always does.
+        sender.Start();
+        var datagram = LanProtocol.Serialize(sender.BuildAnnouncements().First());
+        try
+        {
+            node.Start();
+            announcer.Deliver(datagram, IPAddress.Parse("81.2.69.99"));
+            Check(hints == 0, "a public sender is no neighbour: ignored");
+            announcer.Deliver(datagram, IPAddress.Parse("192.168.1.40"));
+            Check(hints == 1, "a neighbour is heard");
+            announcer.Deliver(datagram, IPAddress.Parse("192.168.1.40"));
+            Check(hints == 1, "but not again within the minute");
+        }
+        finally
+        {
+            node.DisposeAsync().AsTask().Wait();
+            sender.DisposeAsync().AsTask().Wait();
+            try { Directory.Delete(root, true); } catch (IOException) { }
         }
     }
 

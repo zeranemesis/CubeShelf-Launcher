@@ -72,7 +72,16 @@ public sealed class MeshNode : IAsyncDisposable
     private readonly Dictionary<string, TaskCompletionSource<bool>> _probes = new(StringComparer.Ordinal);
     private readonly RateBucket _dialBacks = new(20);
     private readonly HashSet<IPEndPoint> _seeds = new();
-    private const int MaximumSeeds = 64;
+
+    /// <summary>
+    /// Ways in found by looking -- the meeting point, the local network -- kept apart from the
+    /// ones we were given (friend codes, friends' documents, the nodes file). Anyone can put
+    /// addresses in front of a lookup, so this pool is small and the oldest leaves first: a flood
+    /// of planted addresses rotates through it and out, and never touches the trusted pool.
+    /// </summary>
+    private readonly LinkedList<IPEndPoint> _discovered = new();
+    private const int MaximumDiscovered = 32;
+    private int _joining;
 
     /// <summary>
     /// Callers we punched towards lately. A relay that holds our reservation tells us where to
@@ -215,13 +224,57 @@ public sealed class MeshNode : IAsyncDisposable
         {
             foreach (var seed in seeds.Where(seed => _options.IsRoutable(seed.Address)).Take(16))
                 added |= _seeds.Add(MeshAddresses.Normalize(seed));
-            // Ways in now arrive by themselves -- every lookup of the meeting point brings some --
-            // so the list is kept to a few dozen rather than growing for the life of the process.
-            if (_seeds.Count > MaximumSeeds)
-                foreach (var stale in _seeds.Take(_seeds.Count - MaximumSeeds).ToArray()) _seeds.Remove(stale);
         }
-        if (added && Table.Count < _options.Dht.K / 2 && _lifetime is { } lifetime)
-            _ = JoinAsync(lifetime.Token);
+        if (added) JoinIfThin();
+    }
+
+    /// <summary>
+    /// Ways in nobody vouched for: found at the meeting point or heard on the local network. Kept
+    /// in their own small pool, newest in and oldest out (<see cref="_discovered"/>).
+    /// </summary>
+    public void AddDiscoveredSeeds(IEnumerable<IPEndPoint> seeds)
+    {
+        var added = false;
+        lock (_gate)
+        {
+            foreach (var seed in seeds.Where(seed => _options.IsRoutable(seed.Address)).Take(16).Select(MeshAddresses.Normalize))
+            {
+                if (_seeds.Contains(seed) || _discovered.Contains(seed)) continue;
+                _discovered.AddLast(seed);
+                if (_discovered.Count > MaximumDiscovered) _discovered.RemoveFirst();
+                added = true;
+            }
+        }
+        if (added) JoinIfThin();
+    }
+
+    /// <summary>Joins now if the table is thin -- one join at a time, however many ways in arrive at once.</summary>
+    private void JoinIfThin()
+    {
+        if (Table.Count >= _options.Dht.K / 2 || _lifetime is not { } lifetime) return;
+        if (Interlocked.Exchange(ref _joining, 1) == 1) return;
+        _ = JoinOnceAsync(lifetime.Token);
+    }
+
+    private async Task JoinOnceAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await JoinAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is OperationCanceledException or ObjectDisposedException)
+        {
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _joining, 0);
+        }
+    }
+
+    /// <summary>Every way in, the vouched-for ones first.</summary>
+    internal IPEndPoint[] AllSeeds()
+    {
+        lock (_gate) return _seeds.Concat(_discovered.Reverse()).ToArray();
     }
 
     /// <summary>The network changed under us (another Wi-Fi, a cable): find out again how we are reached.</summary>
@@ -583,8 +636,7 @@ public sealed class MeshNode : IAsyncDisposable
 
     private async Task JoinAsync(CancellationToken cancellationToken)
     {
-        IPEndPoint[] seeds;
-        lock (_gate) seeds = _seeds.ToArray();
+        var seeds = AllSeeds();
         var before = Table.Count;
         await Dht.BootstrapAsync(seeds.Concat(Table.All().Select(contact => contact.Endpoint)).Distinct(), cancellationToken).ConfigureAwait(false);
         if (Table.Count != before) Changed?.Invoke();
@@ -629,8 +681,7 @@ public sealed class MeshNode : IAsyncDisposable
                 .ToList();
             if (helpers.Count == 0)
             {
-                IPEndPoint[] seeds;
-                lock (_gate) seeds = _seeds.ToArray();
+                var seeds = AllSeeds();
                 foreach (var endpoint in Table.Closest(Transport.LocalId, 4).Select(contact => contact.Endpoint).Concat(seeds).Distinct().Take(6))
                     if (await Transport.ConnectAsync(MeshRoute.Direct(endpoint), cancellationToken).ConfigureAwait(false) is { } session)
                         helpers.Add(session);
