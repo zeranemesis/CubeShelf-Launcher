@@ -247,6 +247,13 @@ public sealed class LanNode : IAsyncDisposable
         var chunks = tags.Chunk(LanProtocol.MaximumTagsPerAnnouncement).Select(chunk => chunk.ToList()).ToList();
         if (chunks.Count == 0) chunks.Add(new List<string>());
 
+        var mesh = MeshEntryPoints?.Invoke()
+            .Where(endpoint => Mesh.MeshAddresses.IsPublic(endpoint.Address))
+            .Take(MaximumMeshEntries)
+            .Select(endpoint => endpoint.ToString())
+            .ToList();
+        var first = true;
+
         foreach (var chunk in chunks)
         {
             // Padded and shuffled, like the lockboxes: the length says a range, not a count.
@@ -257,17 +264,56 @@ public sealed class LanNode : IAsyncDisposable
                 (chunk[index], chunk[swap]) = (chunk[swap], chunk[index]);
             }
 
-            yield return new LanAnnouncement
+            var announcement = new LanAnnouncement
             {
                 Instance = _instance,
                 Port = Port,
                 Sequence = Interlocked.Read(ref _sequence),
                 Tags = chunk,
                 PublicKey = discoverable ? _ownKey : null,
-                Name = discoverable ? PeerName.Sanitize(_displayName()) : null
+                Name = discoverable ? PeerName.Sanitize(_displayName()) : null,
+                Mesh = first && mesh is { Count: > 0 } ? mesh : null
             };
+            // Ways in ride along only where they fit: a full set of tags comes first.
+            if (announcement.Mesh is not null && LanProtocol.Serialize(announcement).Length > LanProtocol.MaximumAnnouncementBytes)
+                announcement.Mesh = null;
+            first = false;
+            yield return announcement;
         }
     }
+
+    private const int MaximumMeshEntries = 4;
+    private static readonly TimeSpan MeshHintGap = TimeSpan.FromMinutes(1);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> _meshHints = new(StringComparer.Ordinal);
+
+    private bool MeshHintDue(IPAddress from, DateTimeOffset now)
+    {
+        var key = from.ToString();
+        if (_meshHints.TryGetValue(key, out var last) && now - last < MeshHintGap) return false;
+        if (_meshHints.Count > 256) _meshHints.Clear();
+        _meshHints[key] = now;
+        return true;
+    }
+
+    /// <summary>A sender on this network: private, link-local or loopback -- never a public address.</summary>
+    private static bool IsLocalSender(IPAddress from)
+    {
+        if (from.IsIPv4MappedToIPv6) from = from.MapToIPv4();
+        if (IPAddress.IsLoopback(from) || from.IsIPv6LinkLocal || from.IsIPv6UniqueLocal) return true;
+        if (from.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork) return false;
+        var bytes = from.GetAddressBytes();
+        return bytes[0] == 10 || (bytes[0] == 172 && bytes[1] is >= 16 and <= 31) ||
+               (bytes[0] == 192 && bytes[1] == 168) || (bytes[0] == 169 && bytes[1] == 254);
+    }
+
+    /// <summary>Public ways into the CubeShelf network this node knows, to pass on to the local network. Null passes none.</summary>
+    public Func<IReadOnlyList<IPEndPoint>>? MeshEntryPoints { get; set; }
+
+    /// <summary>
+    /// Another CubeShelf on the local network -- friend or not -- passed on ways into the CubeShelf
+    /// network. Public addresses only, at most a handful; joining checks every one of them anyway.
+    /// </summary>
+    public event Action<IReadOnlyList<IPEndPoint>>? MeshEntryPointsHeard;
 
     private IEnumerable<(string Encoded, byte[] Raw)> ActiveFriendKeys() =>
         _friends.Load()
@@ -290,6 +336,19 @@ public sealed class LanNode : IAsyncDisposable
         var endpoint = new IPEndPoint(from, announcement.Port);
         var now = _clock();
         var changed = false;
+
+        // Ways in, from the local network only -- a datagram from a public address is no
+        // neighbour -- and once a minute per sender, however often it broadcasts.
+        if (announcement.Mesh is { Count: > 0 } entries && MeshEntryPointsHeard is { } heard &&
+            IsLocalSender(from) && MeshHintDue(from, now))
+        {
+            var parsed = entries.Take(MaximumMeshEntries)
+                .Select(entry => IPEndPoint.TryParse(entry ?? "", out var parsedEndpoint) ? parsedEndpoint : null)
+                .OfType<IPEndPoint>()
+                .Where(entry => entry.Port > 0 && Mesh.MeshAddresses.IsPublic(entry.Address))
+                .ToArray();
+            if (parsed.Length > 0) heard(parsed);
+        }
 
         // Someone asking to be found.
         if (LanProtocol.DecodeKey(announcement.PublicKey) is not null &&

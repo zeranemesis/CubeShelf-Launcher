@@ -24,7 +24,7 @@ public sealed class FirstRunWizardWindow : Window
     private string? _retroAchievementsUser;
     private int _page;
 
-    private const int PageCount = 5;
+    private const int PageCount = 6;
 
     /// <param name="retroAchievementsLogin">Logs in and keeps the session, as the settings page does; null hides the step.</param>
     /// <param name="retroAchievementsUser">Who is logged in already, when the wizard is run again.</param>
@@ -107,7 +107,8 @@ public sealed class FirstRunWizardWindow : Window
             0 => WelcomePage(),
             1 => PreferencesPage(),
             2 => StoragePage(),
-            3 => RetroAchievementsPage(),
+            3 => NetworkPage(),
+            4 => RetroAchievementsPage(),
             _ => GamePage()
         });
         _step.Text = English ? $"Step {_page + 1} of {PageCount}" : $"Étape {_page + 1} sur {PageCount}";
@@ -179,6 +180,32 @@ public sealed class FirstRunWizardWindow : Window
         panel.Children.Add(path);
         panel.Children.Add(open);
         stack.Children.Add(Card(English ? "CubeShelf data" : "Données CubeShelf", panel));
+        return stack;
+    }
+
+    /// <summary>
+    /// What finding other CubeShelf installations without a code involves, said before it ever
+    /// happens. The box is ticked; the page is where to untick it.
+    /// </summary>
+    private Control NetworkPage()
+    {
+        // Seen: from now on CubeShelf may look, as the box says.
+        Preferences = Preferences with { MeshDiscoveryNoticeSeen = true };
+        _store.Save(Preferences);
+
+        var stack = PageStack();
+        stack.Children.Add(Heading(MeshDiscoveryNotice.Title(English)));
+        stack.Children.Add(Body(MeshDiscoveryNotice.Body(English)));
+        var box = new CheckBox { Content = MeshDiscoveryNotice.Box(English), IsChecked = Preferences.MeshPublicDiscovery };
+        box.IsCheckedChanged += (_, _) =>
+        {
+            Preferences = Preferences with { MeshPublicDiscovery = box.IsChecked == true };
+            _store.Save(Preferences);
+        };
+        var panel = new StackPanel { Spacing = 10 };
+        panel.Children.Add(box);
+        panel.Children.Add(new TextBlock { Text = MeshDiscoveryNotice.Costs(English), TextWrapping = TextWrapping.Wrap, FontSize = 12, Opacity = 0.8 });
+        stack.Children.Add(Card(English ? "Without a code" : "Sans code", panel));
         return stack;
     }
 

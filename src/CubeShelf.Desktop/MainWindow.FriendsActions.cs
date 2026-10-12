@@ -438,6 +438,7 @@ public sealed partial class MainWindow
         MeshEnabledBox.IsChecked = _preferences.MeshEnabled;
         ShareAchievementsBox.IsChecked = _preferences.ShareAchievements;
         MeshMapPortBox.IsChecked = _preferences.MeshMapPort;
+        MeshPublicDiscoveryBox.IsChecked = _preferences.MeshPublicDiscovery;
         // The folder card is for whoever still has one set up; nobody else is shown a cloud.
         LegacyPresenceCard.IsVisible = _preferences.PresenceFolder.Length > 0 || _preferences.PresenceUrl.Length > 0;
         CloseToTrayBox.IsChecked = _preferences.CloseToTray;
@@ -466,6 +467,7 @@ public sealed partial class MainWindow
             MeshEnabled = MeshEnabledBox.IsChecked == true,
             ShareAchievements = ShareAchievementsBox.IsChecked == true,
             MeshMapPort = MeshMapPortBox.IsChecked == true,
+            MeshPublicDiscovery = MeshPublicDiscoveryBox.IsChecked == true,
             CloseToTray = CloseToTrayBox.IsChecked == true,
             NotifyFriendsOnline = NotifyOnlineBox.IsChecked == true,
             AutoAway = AutoAwayBox.IsChecked == true
@@ -481,6 +483,8 @@ public sealed partial class MainWindow
             StartPresenceService();
         else if (before != _preferences)
             _presence?.RequestPublish(PresencePublishReason.ProfileChanged);
+
+        if (before.MeshPublicDiscovery != _preferences.MeshPublicDiscovery) EnsureMeshDiscovery();
 
         RefreshOwnFriendCode();
         RefreshAchievementsProgressUi();

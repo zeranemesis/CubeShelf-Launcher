@@ -34,6 +34,41 @@ public sealed partial class MainWindow
             _wizardShown = true;
             await ShowFirstRunWizardAsync();
         }
+
+        // Someone who went through the wizard before its network page existed, or skipped it,
+        // hears about it once now -- before CubeShelf ever looks.
+        if (!_preferences.MeshDiscoveryNoticeSeen) await ShowMeshDiscoveryNoticeAsync();
+    }
+
+    private async Task ShowMeshDiscoveryNoticeAsync()
+    {
+        var english = UiLocalization.IsEnglish(_preferences.Language);
+        var dialog = CreatePhase7Dialog(MeshDiscoveryNotice.Title(english), 640, 420);
+        var box = new CheckBox { Content = MeshDiscoveryNotice.Box(english), IsChecked = _preferences.MeshPublicDiscovery };
+        var ok = new Button { Content = "OK", Classes = { "primary" }, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
+        ok.Click += (_, _) => dialog.Close();
+        dialog.Content = new ScrollViewer
+        {
+            Content = new StackPanel
+            {
+                Margin = new Avalonia.Thickness(20),
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock { Text = MeshDiscoveryNotice.Body(english), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    box,
+                    new TextBlock { Text = MeshDiscoveryNotice.Costs(english), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 12, Foreground = Avalonia.Media.Brushes.Gray },
+                    ok
+                }
+            }
+        };
+        await dialog.ShowDialog(this);
+
+        // Closed any way at all, the message was seen; what the box says is the answer.
+        _preferences = _preferences with { MeshDiscoveryNoticeSeen = true, MeshPublicDiscovery = box.IsChecked == true };
+        _preferencesStore.Save(_preferences);
+        ApplyPreferences();
+        EnsureMeshDiscovery();
     }
 
     private void OnParityWindowSizeChanged(object? sender, SizeChangedEventArgs args) =>
@@ -371,7 +406,19 @@ public sealed partial class MainWindow
         if (_raStore is not null && _raStore.Load(out var rejected) is { } session && !rejected) raUser = session.User;
         var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser);
         await wizard.ShowDialog(this);
-        if (!wizard.Completed) return;
+        // The network page decides on the spot, even in a wizard left half-way.
+        _preferences = _preferences with
+        {
+            MeshPublicDiscovery = wizard.Preferences.MeshPublicDiscovery,
+            MeshDiscoveryNoticeSeen = _preferences.MeshDiscoveryNoticeSeen || wizard.Preferences.MeshDiscoveryNoticeSeen
+        };
+        _preferencesStore.Save(_preferences);
+        if (!wizard.Completed)
+        {
+            ApplyPreferences();
+            EnsureMeshDiscovery();
+            return;
+        }
 
         _preferences = wizard.Preferences;
         ApplyPreferences();
