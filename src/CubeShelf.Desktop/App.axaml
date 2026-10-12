@@ -124,6 +124,8 @@
       <x:String x:Key="RaLogin">Se connecter</x:String>
       <x:String x:Key="RaLogout">Se déconnecter</x:String>
       <x:String x:Key="ShareAchievements">Mes succès RetroAchievements</x:String>
+      <x:String x:Key="RaProgressTitle">Mes succès RetroAchievements</x:String>
+      <x:String x:Key="RaProgressHelp">Ta progression dans chaque jeu joué depuis CubeShelf, telle que le jeu la rapporte. Elle se met à jour pendant que tu joues.</x:String>
       <x:String x:Key="PresenceHelp">Si tu publiais déjà dans un dossier synchronisé, CubeShelf continue pour les amis qui te lisent par ce lien. Le réseau CubeShelf ci-dessus n’en a plus besoin.</x:String>
       <x:String x:Key="PresenceDisplayName">Nom affiché</x:String>
       <x:String x:Key="PresenceDisplayNameHint">Le nom que tes amis verront</x:String>

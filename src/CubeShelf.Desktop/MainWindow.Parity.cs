@@ -98,6 +98,9 @@ public sealed partial class MainWindow
     {
         ShowSettings(sender, args);
         RefreshStorageParity();
+        // The network and RetroAchievements cards live here.
+        RefreshMeshUi();
+        RefreshRetroAchievementsUi();
     }
 
     private void ParityBackToGame(object? sender, RoutedEventArgs args)
