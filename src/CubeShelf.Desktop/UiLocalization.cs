@@ -212,6 +212,8 @@ internal static class UiLocalization
         ["RaLogin"] = "Se connecter",
         ["RaLogout"] = "Se déconnecter",
         ["ShareAchievements"] = "Mes succès RetroAchievements",
+        ["RaProgressTitle"] = "Mes succès RetroAchievements",
+        ["RaProgressHelp"] = "Ta progression dans chaque jeu joué depuis CubeShelf, telle que le jeu la rapporte. Elle se met à jour pendant que tu joues.",
     };
 
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -422,6 +424,8 @@ internal static class UiLocalization
         ["RaLogin"] = "Log in",
         ["RaLogout"] = "Log out",
         ["ShareAchievements"] = "My RetroAchievements progress",
+        ["RaProgressTitle"] = "My RetroAchievements progress",
+        ["RaProgressHelp"] = "Your progress in each game played from CubeShelf, as the game reports it. It updates while you play.",
     };
 
     public static bool IsEnglish(string? language) =>

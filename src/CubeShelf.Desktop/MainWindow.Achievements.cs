@@ -90,6 +90,7 @@ public sealed partial class MainWindow
             _raCache.Update(gameId, summary))
         {
             _presence?.RequestPublish(PresencePublishReason.ProfileChanged);
+            RefreshAchievementsProgressUi();
         }
     }
 
@@ -112,20 +113,108 @@ public sealed partial class MainWindow
         return entry is null ? null : new InGameAchievements(entry.User, entry.RaGameId, entry.Total, entry.Points, entry.TotalPoints, entry.UnlockedIds);
     }
 
-    /// <summary>"🏆 Mario Party 4 : 31/58 · 280 pts", for the friends list.</summary>
+    private const int FriendAchievementLines = 4;
+
+    /// <summary>
+    /// "🏆 Mario Party 4 : 31/58 (53 %) · 280 pts", one line per game the friend played, the most
+    /// recent first, for the friends list.
+    /// </summary>
     private string DescribeFriendAchievements(PresenceSnapshot? known)
     {
-        var entries = known?.Achievements?.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>().Take(2).ToArray();
+        var entries = known?.Achievements?.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>()
+            .OrderByDescending(entry => entry.UpdatedAt).ToArray();
         if (entries is not { Length: > 0 }) return "";
-        return string.Join(" • ", entries.Select(entry =>
-            P7($"🏆 {entry.Title} : {entry.Unlocked}/{entry.Total} · {entry.Points} pts",
-               $"🏆 {entry.Title}: {entry.Unlocked}/{entry.Total} · {entry.Points} pts")));
+        var lines = entries.Take(FriendAchievementLines).Select(entry =>
+        {
+            var percent = Math.Round(100.0 * entry.Unlocked / entry.Total);
+            return P7($"🏆 {entry.Title} : {entry.Unlocked}/{entry.Total} ({percent} %) · {entry.Points} pts",
+                      $"🏆 {entry.Title}: {entry.Unlocked}/{entry.Total} ({percent}%) · {entry.Points} pts");
+        }).ToList();
+        if (entries.Length > FriendAchievementLines)
+        {
+            var more = entries.Length - FriendAchievementLines;
+            lines.Add(P7($"… et {more} autre(s) jeu(x)", $"… and {more} more game(s)"));
+        }
+        return string.Join("\n", lines);
+    }
+
+    // ----------------------------------------------------------------- the profile page
+
+    /// <summary>One game on the profile page: how far along, and whether friends see it.</summary>
+    public sealed record AchievementProgressRow(string Title, string Percent, double Progress, string Counts, string Shared);
+
+    /// <summary>
+    /// The player's own progress, game by game, on the profile page -- and for each one, whether
+    /// friends see it right now, decided by the same rule that builds the document they read
+    /// (<see cref="PresenceService.AchievementsToShare"/>), so the page cannot say "shared" about
+    /// something that is not.
+    /// </summary>
+    private void RefreshAchievementsProgressUi()
+    {
+        if (RaProgressList is null || _raStore is null) return;
+        var session = _raStore.Load();
+        var mine = SharedAchievementsNow() ?? Array.Empty<SharedAchievements>();
+        var entries = mine.Select(SharedAchievements.Sanitized).OfType<SharedAchievements>()
+            .OrderByDescending(entry => entry.UpdatedAt).ToArray();
+
+        var inputs = new PresenceInputs(
+            _preferences.FriendsDisplayName,
+            Array.Empty<PresenceGame>(),
+            _sessions.RunningGameIds,
+            new PresenceSharingOptions(
+                _preferences.ShareLibrary, _preferences.SharePlayTime, _preferences.ShareCurrentGame,
+                _preferences.ShareMods, _preferences.ShareProfile, _preferences.ShareAchievements),
+            Availability: EffectiveAvailability,
+            Achievements: entries);
+        var shared = PresenceService.AchievementsToShare(inputs).Select(entry => entry.GameId).ToHashSet(StringComparer.Ordinal);
+        var running = _sessions.RunningGameIds.ToHashSet(StringComparer.Ordinal);
+
+        RaProgressList.ItemsSource = entries.Select(entry =>
+        {
+            var percent = entry.Total == 0 ? 0 : (double)entry.Unlocked / entry.Total;
+            var updated = entry.UpdatedAt.ToUnixTimeSeconds() > 0
+                ? P7($" · le {entry.UpdatedAt.ToLocalTime():dd/MM/yyyy HH:mm}", $" · {entry.UpdatedAt.ToLocalTime():dd/MM/yyyy HH:mm}")
+                : "";
+            var sharedText = shared.Contains(entry.GameId)
+                ? P7("👥 Vu par tes amis", "👥 Seen by your friends")
+                : running.Contains(entry.GameId) && _preferences.ShareAchievements && _preferences.ShareLibrary &&
+                  EffectiveAvailability != PresenceAvailability.Invisible
+                    ? P7("🔒 Caché pendant la partie", "🔒 Hidden while playing")
+                    : P7("🔒 Pas partagé", "🔒 Not shared");
+            return new AchievementProgressRow(
+                entry.Title.Length > 0 ? entry.Title : entry.GameId,
+                $"{Math.Round(percent * 100)} %",
+                percent,
+                P7($"{entry.Unlocked}/{entry.Total} succès · {entry.Points}/{entry.TotalPoints} pts{updated}",
+                   $"{entry.Unlocked}/{entry.Total} achievements · {entry.Points}/{entry.TotalPoints} pts{updated}"),
+                sharedText);
+        }).ToArray();
+
+        RaProgressStatusText.Text =
+            session is null
+                ? P7("Connecte-toi à RetroAchievements dans Paramètres pour voir ici ta progression dans chaque jeu.",
+                     "Log in to RetroAchievements in Settings to see your progress in each game here.")
+            : entries.Length == 0
+                ? P7("Aucun jeu joué pour l’instant. Lance un jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) : ta progression apparaîtra ici.",
+                     "No game played yet. Start a game that supports RetroAchievements (Mario Party 4 with PartyBoard): your progress shows up here.")
+            : !_preferences.ShareAchievements
+                ? P7("Tes amis ne voient pas ta progression : la case « Mes succès RetroAchievements » est décochée plus bas.",
+                     "Your friends do not see your progress: the “My RetroAchievements progress” box below is unticked.")
+            : !_preferences.ShareLibrary
+                ? P7("Tes amis ne voient pas ta progression : elle nomme tes jeux, et ta bibliothèque n’est pas partagée.",
+                     "Your friends do not see your progress: it names your games, and your library is not shared.")
+            : EffectiveAvailability == PresenceAvailability.Invisible
+                ? P7("Tu es invisible : tes amis ne voient pas ta progression pour l’instant.",
+                     "You are invisible: your friends do not see your progress for now.")
+                : P7($"Ta session : {session.User}. Chaque jeu joué est partagé avec tes amis, jeu par jeu.",
+                     $"Your account: {session.User}. Each game you play is shared with your friends, game by game.");
     }
 
     // ----------------------------------------------------------------- the settings page
 
     private void RefreshRetroAchievementsUi()
     {
+        RefreshAchievementsProgressUi();
         if (RaStatusText is null || _raStore is null) return;
         var session = _raStore.Load(out var rejected);
         RaLoginPanel.IsVisible = session is null || rejected;

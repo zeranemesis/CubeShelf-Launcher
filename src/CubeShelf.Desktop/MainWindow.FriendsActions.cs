@@ -483,6 +483,7 @@ public sealed partial class MainWindow
             _presence?.RequestPublish(PresencePublishReason.ProfileChanged);
 
         RefreshOwnFriendCode();
+        RefreshAchievementsProgressUi();
         if (FriendsView.IsVisible) RefreshFriendsView();
     }
 }
