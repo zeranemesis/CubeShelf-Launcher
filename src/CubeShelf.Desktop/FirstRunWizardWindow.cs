@@ -26,7 +26,7 @@ public sealed class FirstRunWizardWindow : Window
 
     private const int PageCount = 5;
 
-    /// <param name="retroAchievementsLogin">Logs in and keeps the session, as the profile page does; null hides the step.</param>
+    /// <param name="retroAchievementsLogin">Logs in and keeps the session, as the settings page does; null hides the step.</param>
     /// <param name="retroAchievementsUser">Who is logged in already, when the wizard is run again.</param>
     public FirstRunWizardWindow(
         IPlatformPaths paths,
@@ -184,15 +184,15 @@ public sealed class FirstRunWizardWindow : Window
 
     /// <summary>
     /// One RetroAchievements login for every game, asked for right away so the first game already
-    /// starts logged in. Optional: continuing without it is fine, and the profile page has it too.
+    /// starts logged in. Optional: continuing without it is fine, and the settings page has it too.
     /// </summary>
     private Control RetroAchievementsPage()
     {
         var stack = PageStack();
         stack.Children.Add(Heading("RetroAchievements"));
         stack.Children.Add(Body(English
-            ? "Log in once here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: CubeShelf keeps only the token the site returns, encrypted for your Windows account. No account? Continue: you can log in later on the My profile page."
-            : "Connecte-toi une fois ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarrera connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows. Pas de compte ? Continue : tu pourras te connecter plus tard sur la page Mon profil."));
+            ? "Log in once here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: CubeShelf keeps only the token the site returns, encrypted for your Windows account. No account? Continue: you can log in later in Settings."
+            : "Connecte-toi une fois ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarrera connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows. Pas de compte ? Continue : tu pourras te connecter plus tard dans Paramètres."));
 
         var status = new TextBlock { TextWrapping = TextWrapping.Wrap };
         var user = new TextBox { MaxLength = 64, Watermark = English ? "RetroAchievements user name" : "Nom d’utilisateur RetroAchievements" };

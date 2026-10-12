@@ -78,8 +78,8 @@ public sealed partial class MainWindow
                 case RetroAchievementsEventKind.Rejected:
                     _raStore.MarkRejected();
                     Notify("RetroAchievements", P7(
-                        "RetroAchievements n’accepte plus ta session : reconnecte-toi sur la page Mon profil.",
-                        "RetroAchievements no longer accepts your session: log in again on the My profile page."), showFriends: false);
+                        "RetroAchievements n’accepte plus ta session : reconnecte-toi dans Paramètres.",
+                        "RetroAchievements no longer accepts your session: log in again in Settings."), showFriends: false);
                     break;
             }
             RefreshRetroAchievementsUi();
@@ -122,7 +122,7 @@ public sealed partial class MainWindow
                $"🏆 {entry.Title}: {entry.Unlocked}/{entry.Total} · {entry.Points} pts")));
     }
 
-    // ----------------------------------------------------------------- the profile page
+    // ----------------------------------------------------------------- the settings page
 
     private void RefreshRetroAchievementsUi()
     {
@@ -170,7 +170,7 @@ public sealed partial class MainWindow
     }
 
     /// <summary>
-    /// Logs in and keeps the session: the profile page and the first-start wizard both come here.
+    /// Logs in and keeps the session: the settings page and the first-start wizard both come here.
     /// Another account than the one before starts from an empty progress cache.
     /// </summary>
     private async Task<RetroAchievementsLoginResult> SignInRetroAchievementsAsync(string user, string password)

@@ -271,7 +271,7 @@ public sealed partial class MainWindow
         RefreshMeshRequests();
     }
 
-    // ----------------------------------------------------------------- the profile page
+    // ----------------------------------------------------------------- the settings page
 
     private void RefreshMeshUi()
     {

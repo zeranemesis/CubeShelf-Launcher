@@ -384,12 +384,12 @@ public sealed partial class MainWindow
             ? P7("Il ne t’a pas encore ajouté, ou ne partage plus sa présence avec toi. Envoie-lui ton code : dès qu’il t’aura ajouté, tu le verras ici.",
                  "They have not added you back yet, or stopped sharing their presence with you. Send them your code: once they add you, they show up here.")
             : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && !_preferences.MeshEnabled
-                ? P7("Tu le verras sur le même réseau local, ou partout une fois le réseau CubeShelf activé (Mon profil).",
-                     "You see them on the same local network, or anywhere once the CubeShelf network is on (My profile).")
+                ? P7("Tu le verras sur le même réseau local, ou partout une fois le réseau CubeShelf activé (Paramètres).",
+                     "You see them on the same local network, or anywhere once the CubeShelf network is on (Settings).")
             : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl) && _meshFriends is null
                 ? (_meshFailure.Length > 0
-                    ? P7("Le réseau CubeShelf n’a pas pu démarrer (détails dans Mon profil) : en attendant, tu le verras sur le même réseau local.",
-                         "The CubeShelf network could not start (details in My profile): until then you see them on the same local network.")
+                    ? P7("Le réseau CubeShelf n’a pas pu démarrer (détails dans Paramètres) : en attendant, tu le verras sur le même réseau local.",
+                         "The CubeShelf network could not start (details in Settings): until then you see them on the same local network.")
                     : P7("Le réseau CubeShelf démarre. Il apparaîtra dès qu’il sera en ligne.",
                          "The CubeShelf network is starting. They show up as soon as they are online."))
             : known is null && string.IsNullOrWhiteSpace(friend.PresenceUrl)
@@ -524,8 +524,8 @@ public sealed partial class MainWindow
                 ? "⚠ " + DescribeMesh()
                 : P7("Réseau CubeShelf : démarrage…", "CubeShelf network: starting…");
         if (_presence is not null && _presenceLanOnly)
-            return P7("Sans adresse publique, seuls tes amis sur le même réseau local te voient. Mon profil pour être vu de partout.",
-                      "Without a public address, only friends on the same local network see you. My profile to be seen from anywhere.");
+            return P7("Sans adresse publique, seuls tes amis sur le même réseau local te voient. Active le réseau CubeShelf dans Paramètres pour être vu de partout.",
+                      "Without a public address, only friends on the same local network see you. Turn on the CubeShelf network in Settings to be seen from anywhere.");
         if (!_preferences.PresencePublishEnabled)
             return P7("Tu ne publies pas ta présence. Tes amis ne te verront pas.",
                       "You are not publishing your presence. Your friends will not see you.");
