@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using System.Text.Json;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Releases;
@@ -149,6 +149,13 @@ Run("friends: a friend's clock is not trusted over ours", FriendsAuditTests.AFri
 Run("friends: achievements follow the boxes that cover them", FriendsAuditTests.AchievementsFollowTheBoxesThatCoverThem);
 Run("mesh: paused, invisible and declined mean what they say", FriendsAuditTests.PausedInvisibleAndDeclinedMeanWhatTheySay);
 Run("mesh: a request ends when they are added by code", FriendsAuditTests.ARequestEndsWhenTheyAreAddedByCode);
+Run("discovery: bencode refuses what is not exactly bencode", DiscoveryTests.BencodeRefusesWhatIsNotExactlyBencode);
+Run("discovery: a lookup finds CubeShelf nodes and announces where it should", DiscoveryTests.ALookupFindsCubeShelfNodesAndAnnouncesWhereItShould);
+Run("discovery: answers from elsewhere are ignored", DiscoveryTests.AnswersFromElsewhereAreIgnored);
+Run("discovery: private and loopback addresses are never followed", DiscoveryTests.PrivateAndLoopbackAddressesAreNeverFollowed);
+Run("discovery: a newcomer joins through the meeting point", DiscoveryTests.ANewcomerJoinsThroughTheMeetingPoint);
+Run("discovery: a closed node only looks", DiscoveryTests.AClosedNodeOnlyLooks);
+Run("discovery: the local network passes ways in", DiscoveryTests.TheLocalNetworkPassesWaysIn);
 Run("NAT-PMP maps, renews the same port and removes with lifetime 0", PortMapperTests.NatPmpMapsRenewsAndRemoves);
 Run("PCP maps and ignores truncated, oversized, wrong-nonce and wrong-source answers", PortMapperTests.PcpMapsAndIgnoresForgeries);
 Run("PCP unsupported version falls back to NAT-PMP at once", PortMapperTests.PcpUnsupportedVersionFallsBackToNatPmp);

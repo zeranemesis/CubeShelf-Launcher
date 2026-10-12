@@ -72,6 +72,7 @@ public sealed class MeshNode : IAsyncDisposable
     private readonly Dictionary<string, TaskCompletionSource<bool>> _probes = new(StringComparer.Ordinal);
     private readonly RateBucket _dialBacks = new(20);
     private readonly HashSet<IPEndPoint> _seeds = new();
+    private const int MaximumSeeds = 64;
 
     /// <summary>
     /// Callers we punched towards lately. A relay that holds our reservation tells us where to
@@ -214,6 +215,10 @@ public sealed class MeshNode : IAsyncDisposable
         {
             foreach (var seed in seeds.Where(seed => _options.IsRoutable(seed.Address)).Take(16))
                 added |= _seeds.Add(MeshAddresses.Normalize(seed));
+            // Ways in now arrive by themselves -- every lookup of the meeting point brings some --
+            // so the list is kept to a few dozen rather than growing for the life of the process.
+            if (_seeds.Count > MaximumSeeds)
+                foreach (var stale in _seeds.Take(_seeds.Count - MaximumSeeds).ToArray()) _seeds.Remove(stale);
         }
         if (added && Table.Count < _options.Dht.K / 2 && _lifetime is { } lifetime)
             _ = JoinAsync(lifetime.Token);

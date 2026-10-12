@@ -347,6 +347,8 @@
               <TextBlock x:Name="MeshStatusText" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
               <CheckBox x:Name="MeshEnabledBox" Content="{DynamicResource MeshEnabled}" Checked="SaveSettings" Unchecked="SaveSettings" />
               <CheckBox x:Name="MeshMapPortBox" Content="{DynamicResource MeshMapPort}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="MeshPublicDiscoveryBox" Content="{DynamicResource MeshPublicDiscovery}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <TextBlock Text="{DynamicResource MeshPublicDiscoveryHelp}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
               <TextBlock Text="{DynamicResource MeshPrivacy}" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
             </StackPanel>
           </Border>

@@ -754,7 +754,8 @@ public sealed partial class MainWindow : Window
         ShareAchievements = current.ShareAchievements,
         MeshEnabled = current.MeshEnabled,
         MeshMapPort = current.MeshMapPort,
-        MeshPort = current.MeshPort
+        MeshPort = current.MeshPort,
+        MeshPublicDiscovery = current.MeshPublicDiscovery
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)

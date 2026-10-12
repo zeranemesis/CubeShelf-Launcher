@@ -247,6 +247,13 @@ public sealed class LanNode : IAsyncDisposable
         var chunks = tags.Chunk(LanProtocol.MaximumTagsPerAnnouncement).Select(chunk => chunk.ToList()).ToList();
         if (chunks.Count == 0) chunks.Add(new List<string>());
 
+        var mesh = MeshEntryPoints?.Invoke()
+            .Where(endpoint => Mesh.MeshAddresses.IsPublic(endpoint.Address))
+            .Take(MaximumMeshEntries)
+            .Select(endpoint => endpoint.ToString())
+            .ToList();
+        var first = true;
+
         foreach (var chunk in chunks)
         {
             // Padded and shuffled, like the lockboxes: the length says a range, not a count.
@@ -257,17 +264,34 @@ public sealed class LanNode : IAsyncDisposable
                 (chunk[index], chunk[swap]) = (chunk[swap], chunk[index]);
             }
 
-            yield return new LanAnnouncement
+            var announcement = new LanAnnouncement
             {
                 Instance = _instance,
                 Port = Port,
                 Sequence = Interlocked.Read(ref _sequence),
                 Tags = chunk,
                 PublicKey = discoverable ? _ownKey : null,
-                Name = discoverable ? PeerName.Sanitize(_displayName()) : null
+                Name = discoverable ? PeerName.Sanitize(_displayName()) : null,
+                Mesh = first && mesh is { Count: > 0 } ? mesh : null
             };
+            // Ways in ride along only where they fit: a full set of tags comes first.
+            if (announcement.Mesh is not null && LanProtocol.Serialize(announcement).Length > LanProtocol.MaximumAnnouncementBytes)
+                announcement.Mesh = null;
+            first = false;
+            yield return announcement;
         }
     }
+
+    private const int MaximumMeshEntries = 4;
+
+    /// <summary>Public ways into the CubeShelf network this node knows, to pass on to the local network. Null passes none.</summary>
+    public Func<IReadOnlyList<IPEndPoint>>? MeshEntryPoints { get; set; }
+
+    /// <summary>
+    /// Another CubeShelf on the local network -- friend or not -- passed on ways into the CubeShelf
+    /// network. Public addresses only, at most a handful; joining checks every one of them anyway.
+    /// </summary>
+    public event Action<IReadOnlyList<IPEndPoint>>? MeshEntryPointsHeard;
 
     private IEnumerable<(string Encoded, byte[] Raw)> ActiveFriendKeys() =>
         _friends.Load()
@@ -290,6 +314,16 @@ public sealed class LanNode : IAsyncDisposable
         var endpoint = new IPEndPoint(from, announcement.Port);
         var now = _clock();
         var changed = false;
+
+        if (announcement.Mesh is { Count: > 0 } entries && MeshEntryPointsHeard is { } heard)
+        {
+            var parsed = entries.Take(MaximumMeshEntries)
+                .Select(entry => IPEndPoint.TryParse(entry ?? "", out var parsedEndpoint) ? parsedEndpoint : null)
+                .OfType<IPEndPoint>()
+                .Where(entry => entry.Port > 0 && Mesh.MeshAddresses.IsPublic(entry.Address))
+                .ToArray();
+            if (parsed.Length > 0) heard(parsed);
+        }
 
         // Someone asking to be found.
         if (LanProtocol.DecodeKey(announcement.PublicKey) is not null &&

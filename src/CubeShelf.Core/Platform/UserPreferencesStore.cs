@@ -108,7 +108,13 @@ public sealed record UserPreferences(
     int MeshPort = 47914,
 
     /// <summary>Friends see where we stand in each game's RetroAchievements set.</summary>
-    bool ShareAchievements = true);
+    bool ShareAchievements = true,
+
+    /// <summary>
+    /// Find other CubeShelf installations with no code, through BitTorrent's DHT, and say there
+    /// that this one is reachable when it is (<see cref="Social.Mesh.Discovery.MeshDiscovery"/>).
+    /// </summary>
+    bool MeshPublicDiscovery = true);
 
 public sealed class UserPreferencesStore
 {

@@ -34,6 +34,13 @@ public sealed class LanAnnouncement
 
     [JsonPropertyName("k")] public string? PublicKey { get; set; }
     [JsonPropertyName("n")] public string? Name { get; set; }
+
+    /// <summary>
+    /// A few public addresses of the CubeShelf network the sender knows, as "ip:port": a way in for
+    /// a CubeShelf on the same network that knows nobody yet. Addresses of a public network, never
+    /// of this one, and only ever used to join it.
+    /// </summary>
+    [JsonPropertyName("m")] public List<string>? Mesh { get; set; }
 }
 
 /// <summary>One line of the TCP exchange, in either direction. Unused fields stay null.</summary>

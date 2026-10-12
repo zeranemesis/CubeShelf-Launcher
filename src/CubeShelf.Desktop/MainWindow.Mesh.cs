@@ -21,6 +21,8 @@ public sealed partial class MainWindow
 
     private MeshNode? _meshNode;
     private MeshFriends? _meshFriends;
+    private CubeShelf.Core.Social.Mesh.Discovery.MeshDiscovery? _meshDiscovery;
+    private MeshReachability _lastReachability = MeshReachability.Starting;
     private Task? _meshStarting;
     private CancellationTokenSource? _meshLifetime;
     private string _meshFailure = "";
@@ -73,6 +75,7 @@ public sealed partial class MainWindow
             friends.Start();
             _meshNode = node;
             _meshFriends = friends;
+            EnsureMeshDiscovery();
             WatchNetworkChanges();
 
             // The presence service starts again with the network as a way to publish and to read.
@@ -120,12 +123,16 @@ public sealed partial class MainWindow
         _meshLifetime?.Cancel();
         var friends = _meshFriends;
         var node = _meshNode;
+        var discovery = _meshDiscovery;
         _meshFriends = null;
         _meshNode = null;
+        _meshDiscovery = null;
+        _lastReachability = MeshReachability.Starting;
         try
         {
             // Bounded: removing the router's port mapping is worth a moment, not a window that hangs.
             Task.WhenAll(
+                    discovery?.DisposeAsync().AsTask() ?? Task.CompletedTask,
                     friends?.DisposeAsync().AsTask() ?? Task.CompletedTask,
                     node?.DisposeAsync().AsTask() ?? Task.CompletedTask)
                 .WaitAsync(TimeSpan.FromSeconds(3)).GetAwaiter().GetResult();
@@ -175,8 +182,34 @@ public sealed partial class MainWindow
             IsAddressVerified() ? _preferences.PresenceUrl : null);
     }
 
+    /// <summary>Finding other CubeShelf installations with no code: runs with the network when the box allows it.</summary>
+    private void EnsureMeshDiscovery()
+    {
+        if (_meshNode is { } node && _preferences.MeshPublicDiscovery)
+        {
+            if (_meshDiscovery is not null) return;
+            var discovery = new CubeShelf.Core.Social.Mesh.Discovery.MeshDiscovery(node);
+            discovery.Changed += () => Dispatcher.UIThread.Post(RefreshMeshUi);
+            discovery.Start();
+            _meshDiscovery = discovery;
+        }
+        else if (_meshDiscovery is { } running)
+        {
+            _meshDiscovery = null;
+            _ = running.DisposeAsync().AsTask();
+            RefreshMeshUi();
+        }
+    }
+
     private void OnMeshChanged()
     {
+        // Just became reachable: say so at the meeting point now, not at the next round.
+        if (_meshNode is { } current && current.Reachability != _lastReachability)
+        {
+            if (current.Reachability == MeshReachability.Public) _meshDiscovery?.Kick();
+            _lastReachability = current.Reachability;
+        }
+
         RefreshOwnFriendCode();
         RefreshMeshUi();
         // Where friends can reach us is inside our document: a new relay, a newly opened port, and
@@ -301,6 +334,7 @@ public sealed partial class MainWindow
             MeshReachability.Relayed => P7(
                 $"Connecté, joignable par {node.RelayContacts.Count} relais : ta box ne laisse rien entrer, d’autres CubeShelf te mettent en contact. {known} nœud(s) connu(s), {_meshFriends?.ConnectedCount ?? 0} ami(s) en direct.",
                 $"Connected, reachable through {node.RelayContacts.Count} relay(s): your router lets nothing in, other CubeShelf nodes put friends in touch. {known} node(s) known, {_meshFriends?.ConnectedCount ?? 0} friend(s) connected directly."),
+            _ when _meshDiscovery is not null => DescribeLonelyDiscovery(node),
             _ when node.Mapping is not null => P7(
                 "Aucun autre CubeShelf connu pour l’instant, mais ta box a ouvert le port : ton code ami permettra à un ami d’entrer dans le réseau par ton PC. Envoie-le-lui.",
                 "No other CubeShelf known yet, but your router opened the port: your friend code will let a friend into the network through your PC. Send it to them."),
@@ -308,5 +342,22 @@ public sealed partial class MainWindow
                 "Aucun autre CubeShelf connu pour l’instant, et ta box n’a pas ouvert le port. Le code ami d’un ami sert de porte d’entrée : ajoute-en un. Si ni toi ni lui n’êtes joignables, vous ne vous verrez que sur le même réseau local.",
                 "No other CubeShelf known yet, and your router did not open the port. A friend’s code is a way in: add one. If neither of you is reachable, you only see each other on the same local network.")
         };
+    }
+
+    /// <summary>Alone, but looking: what the last look found, and what would help.</summary>
+    private string DescribeLonelyDiscovery(MeshNode node)
+    {
+        var last = _meshDiscovery?.Last;
+        var searched = last is { } done
+            ? P7($" Dernière recherche à {done.At.ToLocalTime():HH:mm} : {done.Found} adresse(s) à essayer, chacune vérifiée avant d’être utilisée.",
+                 $" Last search at {done.At.ToLocalTime():HH:mm}: {done.Found} address(es) to try, each checked before use.")
+            : "";
+        var port = node.Mapping is not null
+            ? ""
+            : P7(" Ta box n’a pas ouvert le port : d’autres CubeShelf joignables te serviront de relais.",
+                 " Your router did not open the port: other reachable CubeShelf nodes will relay for you.");
+        return P7("Aucun autre CubeShelf connu pour l’instant. CubeShelf en cherche tout seul, dans le réseau BitTorrent et sur ton réseau local ; le code d’un ami marche aussi.",
+                  "No other CubeShelf known yet. CubeShelf looks for some by itself, in the BitTorrent network and on your local network; a friend’s code works too.")
+               + searched + port;
     }
 }
