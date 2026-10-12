@@ -41,12 +41,12 @@ public sealed partial class MainWindow
         // whether they are friends or not -- when finding others without a code is allowed.
         // Other nodes' addresses only, never this PC's own: those would go out in clear to everyone
         // on a café or hotel network, and tie this machine to its address on the network.
-        node.MeshEntryPoints = () => _preferences.MeshPublicDiscovery && _meshNode is { } mesh
+        node.MeshEntryPoints = () => _preferences.MeshPublicDiscovery && _preferences.MeshDiscoveryNoticeSeen && _meshNode is { } mesh
             ? mesh.Table.All().OrderBy(_ => Random.Shared.Next()).Select(contact => contact.Endpoint).Take(4).ToArray()
             : Array.Empty<System.Net.IPEndPoint>();
         node.MeshEntryPointsHeard += seeds =>
         {
-            if (_preferences.MeshPublicDiscovery) _meshNode?.AddDiscoveredSeeds(seeds);
+            if (_preferences.MeshPublicDiscovery && _preferences.MeshDiscoveryNoticeSeen) _meshNode?.AddDiscoveredSeeds(seeds);
         };
         node.FriendAdded += handle => Dispatcher.UIThread.Post(() =>
         {

@@ -185,7 +185,7 @@ public sealed partial class MainWindow
     /// <summary>Finding other CubeShelf installations with no code: runs with the network when the box allows it.</summary>
     private void EnsureMeshDiscovery()
     {
-        if (_meshNode is { } node && _preferences.MeshPublicDiscovery)
+        if (_meshNode is { } node && _preferences.MeshPublicDiscovery && _preferences.MeshDiscoveryNoticeSeen)
         {
             if (_meshDiscovery is not null) return;
             var discovery = new CubeShelf.Core.Social.Mesh.Discovery.MeshDiscovery(node);

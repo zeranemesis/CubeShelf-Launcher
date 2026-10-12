@@ -114,7 +114,13 @@ public sealed record UserPreferences(
     /// Find other CubeShelf installations with no code, through BitTorrent's DHT, and say there
     /// that this one is reachable when it is (<see cref="Social.Mesh.Discovery.MeshDiscovery"/>).
     /// </summary>
-    bool MeshPublicDiscovery = true);
+    bool MeshPublicDiscovery = true,
+
+    /// <summary>
+    /// The user was told what finding others without a code involves (the wizard's network page, or
+    /// the one-time message). Until then CubeShelf does not look, whatever the box says.
+    /// </summary>
+    bool MeshDiscoveryNoticeSeen = false);
 
 public sealed class UserPreferencesStore
 {

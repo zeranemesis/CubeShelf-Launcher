@@ -755,7 +755,8 @@ public sealed partial class MainWindow : Window
         MeshEnabled = current.MeshEnabled,
         MeshMapPort = current.MeshMapPort,
         MeshPort = current.MeshPort,
-        MeshPublicDiscovery = current.MeshPublicDiscovery
+        MeshPublicDiscovery = current.MeshPublicDiscovery,
+        MeshDiscoveryNoticeSeen = current.MeshDiscoveryNoticeSeen
     };
 
     private void ResetSettings(object? sender, RoutedEventArgs args)
