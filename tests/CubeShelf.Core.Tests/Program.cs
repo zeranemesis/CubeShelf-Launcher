@@ -10,6 +10,11 @@ using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
+Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
+Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
+Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
+Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
+Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);
@@ -256,7 +261,8 @@ void TestDiscRevision()
     WithTempRoot(root =>
     {
         var image = Path.Combine(root, "disc.iso");
-        var header = new byte[8];
+        var header = new byte[0x440];
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(0x1c, 4), 0xc2339f3d);
         System.Text.Encoding.ASCII.GetBytes("GMPE01").CopyTo(header, 0);
         header[7] = 1;
         File.WriteAllBytes(image, header);
@@ -718,6 +724,7 @@ void TestGameDataPreparation()
         File.WriteAllText(executable, "runtime");
         var iso = Path.Combine(root, "game.iso");
         var bytes = new byte[0x500];
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(bytes.AsSpan(0x1c, 4), 0xc2339f3d);
         System.Text.Encoding.ASCII.GetBytes("GMPE01").CopyTo(bytes, 0);
         bytes[7] = 1;
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(bytes.AsSpan(0x424, 4), 0x440);
@@ -2693,7 +2700,8 @@ PresenceSnapshot SampleSnapshot(long sequence) => new(
 string WriteDiscHeader(string root, string name, string discId, byte revision)
 {
     var path = Path.Combine(root, name);
-    var header = new byte[8];
+    var header = new byte[0x440];
+    System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(0x1c, 4), 0xc2339f3d);
     System.Text.Encoding.ASCII.GetBytes(discId).CopyTo(header, 0);
     header[7] = revision;
     File.WriteAllBytes(path, header);

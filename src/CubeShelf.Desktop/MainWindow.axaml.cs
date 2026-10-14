@@ -167,11 +167,10 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            var environment = new Dictionary<string, string?>
-            {
-                ["PARTYBOARD_DISC_IMAGE"] = _selectedGame.DiscImage,
-                ["PARTYBOARD_MOD_LIST"] = _modManager?.PrepareActiveList()
-            };
+            var launch = GameLaunchConfiguration.Create(_selectedGame,
+                _selectedGame.LaunchEnvironment.Values.Any(value => value.Contains("{mods}", StringComparison.Ordinal))
+                    ? _modManager?.PrepareActiveList() : null);
+            var environment = launch.Environment;
             // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
             // tab exists, with its name in the player's language, from the first frame.
             foreach (var pair in InGameEnvironment(_selectedGame)) environment[pair.Key] = pair.Value;
@@ -183,18 +182,20 @@ public sealed partial class MainWindow : Window
                 _selectedGame.Id,
                 _selectedGame.Executable,
                 Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-                environment);
+                environment, launch.Arguments);
 
             _selectedGame.PlayCount++;
             _selectedGame.LastPlayedAt = DateTimeOffset.Now;
             PersistCatalog();
             WindowState = WindowState.Minimized;
-            ActionStatus.Text = "PartyBoard démarré avec l’image sélectionnée.";
+            ActionStatus.Text = P7($"{_selectedGame.RuntimeName} démarré avec l’image sélectionnée.",
+                $"{_selectedGame.RuntimeName} started with the selected disc image.");
             RefreshGameState();
         }
         catch (Exception exception)
         {
-            ActionStatus.Text = $"Impossible de démarrer PartyBoard : {exception.Message}";
+            ActionStatus.Text = P7($"Impossible de démarrer {_selectedGame.RuntimeName} : {exception.Message}",
+                $"Unable to start {_selectedGame.RuntimeName}: {exception.Message}");
         }
     }
 
@@ -207,13 +208,13 @@ public sealed partial class MainWindow : Window
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("Images GameCube") { Patterns = new[] { "*.iso", "*.gcm", "*.rvz" } }
+                new FilePickerFileType("Images GameCube") { Patterns = _selectedGame.DiscFormats.Select(format => "*" + format).ToArray() }
             }
         });
         var path = files.FirstOrDefault()?.TryGetLocalPath();
         if (string.IsNullOrWhiteSpace(path)) return;
 
-        var compatibility = DiscImageService.Inspect(path, _selectedGame.SupportedDiscIds);
+        var compatibility = DiscImageService.Inspect(path, _selectedGame, UiLocalization.IsEnglish(_preferences.Language));
         if (!compatibility.Supported)
         {
             ActionStatus.Text = compatibility.Message;
@@ -361,7 +362,7 @@ public sealed partial class MainWindow : Window
             ExecutablePathText.Text = "Installation gérée incomplète — réparation nécessaire";
         }
 
-        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game, UiLocalization.IsEnglish(_preferences.Language));
         DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
             DiscImageService.DescribeSupported(game.SupportedDiscIds);
 
@@ -396,7 +397,7 @@ public sealed partial class MainWindow : Window
     private bool CanPlay()
     {
         if (_selectedGame is null || !File.Exists(_selectedGame.Executable)) return false;
-        if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame.SupportedDiscIds).Supported) return false;
+        if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame).Supported) return false;
 
         // A runtime-managed disc has nothing for CubeShelf to prepare and nothing to wait for
         // before enabling Play: Ring Out extracts and recompiles on its own first launch, and
@@ -613,8 +614,9 @@ public sealed partial class MainWindow : Window
         RefreshModItems();
     }
 
-    private async Task<bool> ConfirmModPlanAsync(ModInstallPlan plan)
+    private async Task<bool> ConfirmModPlanAsync(ModInstallPlan plan, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var details = string.Join("\n", plan.Packages.Select(item => $"• {item.Mod.Name} (#{item.Mod.Id})"));
         if (plan.Warnings.Count > 0) details += "\n\nAvertissements :\n" + string.Join("\n", plan.Warnings.Select(item => "• " + item));
         if (plan.IncompatibleInstalledModIds.Count > 0)
@@ -640,7 +642,9 @@ public sealed partial class MainWindow : Window
                     }
                 }
             };
-        return await dialog.ShowDialog<bool>(this);
+        var confirmation = dialog.ShowDialog<bool>(this);
+        using var registration = cancellationToken.Register(() => Dispatcher.UIThread.Post(() => dialog.Close(false)));
+        return await confirmation;
     }
 
     private static Button CreateDialogButton(string text, EventHandler<RoutedEventArgs> click)

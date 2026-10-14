@@ -148,9 +148,10 @@ public sealed class PortableDownloadQueueItem : INotifyPropertyChanged
 
     public bool CanCancel => _cancellable && !IsTerminal;
     public bool CanRetry => IsTerminal && State != DownloadActivityState.Completed && Work is not null;
-    public bool CanResume => Work is null && IsTerminal && !string.IsNullOrWhiteSpace(ReferenceId) &&
+    public bool CanResume => Work is null && IsTerminal && State != DownloadActivityState.Completed && !string.IsNullOrWhiteSpace(ReferenceId) &&
         (Kind.Equals("RUNTIME", StringComparison.OrdinalIgnoreCase) ||
-         Kind.Equals("GAME DATA", StringComparison.OrdinalIgnoreCase));
+         Kind.Equals("GAME DATA", StringComparison.OrdinalIgnoreCase) ||
+         (Kind.Equals("MOD", StringComparison.OrdinalIgnoreCase) && ModDownloadReference.TryParse(ReferenceId, out _)));
     public bool CanRemove => IsTerminal;
 
     internal Func<IProgress<double>, CancellationToken, Task>? Work { get; }

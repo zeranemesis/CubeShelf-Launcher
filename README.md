@@ -1,6 +1,6 @@
 ﻿# CubeShelf Launcher
 
-CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. La préversion 0.9 utilise une interface Avalonia commune à Windows, macOS et Linux : elle installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II, Strikers pour Super Mario Strikers), prépare les images fournies légalement par l’utilisateur, gère les mods GameBanana, et propose un système d’amis pair-à-pair sans serveur.
+CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’interface Avalonia commune à Windows, macOS et Linux installe et met à jour les runtimes des jeux portés sur PC (PartyBoard pour Mario Party 4, Ring Out pour Soulcalibur II, Strikers pour Super Mario Strikers), leur transmet les images fournies légalement par l’utilisateur, gère les mods GameBanana et propose un système d’amis pair-à-pair sans serveur. La version du code est définie dans `VERSION` ; la disponibilité des binaires dépend des releases publiées.
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
@@ -25,6 +25,8 @@ Chaque release stable publie :
 Plus `checksums.txt` et `release-manifest-v2.json`, que CubeShelf utilise pour ses propres mises à jour.
 
 Les binaires ne sont **pas encore signés** : aucun certificat Authenticode n'est configuré, et les archives macOS ne sont ni signées ni notarisées. Windows affichera un avertissement SmartScreen, et macOS bloquera l'application tant que la quarantaine n'est pas levée (`xattr -d com.apple.quarantine CubeShelf`). C'est suivi dans la ROADMAP.
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour contribuer, exécuter les tests et signaler un problème. Les évolutions non publiées sont décrites dans [CHANGELOG.md](CHANGELOG.md).
+
 ## Compiler et créer l’installateur
 
 Prérequis : SDK .NET 8 et Inno Setup 6.
@@ -41,11 +43,25 @@ Le catalogue est piloté par les données : `src/CubeShelf.Desktop/games.json` d
 
 | Jeu | Runtime | Disques acceptés | Acquisition | Préparation du disque |
 | --- | --- | --- | --- | --- |
-| Mario Party 4 | PartyBoard | `GMPE01_00`, `GMPE01_01` | manifeste CubeShelf | par CubeShelf |
+| Mario Party 4 | PartyBoard | `GMPE01_00`, `GMPE01_01` | manifeste CubeShelf | par le runtime |
 | Soulcalibur II | [Ring Out](https://github.com/jackpoison-prog/RingOut) | `GRSEAF`, `GRSPAF`, `GRSJAF`, `GRSEPS` | asset de release GitHub | par le runtime |
 | Super Mario Strikers | [Strikers](https://github.com/new-coke/strikers) | `G4QE01`, `G4QP01`, `G4QJ01` | asset de release GitHub | par le runtime |
 
 Une entrée de `SupportedDiscIds` est soit un identifiant de révision complet (`GMPE01_00`, cette révision uniquement), soit un identifiant de disque sur six caractères (`GRSEAF`, toutes les révisions).
+
+### Lancement et formats de disque
+
+Le catalogue déclare `LaunchArguments` (liste d’arguments), `LaunchEnvironment` (variables du processus enfant) et `DiscFormats` (extensions proposées et acceptées). Les jetons `{disc}` et `{mods}` sont remplacés sans interprétation par un shell ; un chemin contenant des espaces reste un seul argument. Ces métadonnées sont actualisées depuis le catalogue livré sans effacer les chemins, favoris ou statistiques du profil.
+
+| Runtime | Transmission du disque | Formats proposés |
+| --- | --- | --- |
+| PartyBoard | `PARTYBOARD_DISC_IMAGE` ; mods via `PARTYBOARD_MOD_LIST` | ISO, GCM, RVZ |
+| Ring Out | argument positionnel, y compris pour son installation initiale | ISO, GCM, RVZ |
+| Strikers | `STRIKERS_DATA`, prioritaire sur la configuration du jeu | ISO, GCM, CISO, GCZ |
+
+Les contrats de lancement suivent les sources amont : [Ring Out Windows](https://github.com/jackpoison-prog/RingOut/blob/main/dist/RingOut-1.0-dist/windows/launcher/RingOut.c), [Ring Out Linux](https://github.com/jackpoison-prog/RingOut#readme) et [chargement des données Strikers](https://github.com/new-coke/strikers/blob/main/smstrikers-port/src/platform/dvd.c).
+
+Pour ISO/GCM, CubeShelf contrôle la taille minimale de l’en-tête, la signature GameCube, l’identifiant et la révision. Ce contrôle n’est pas une vérification de l’intégrité de tout le disque. Pour RVZ/CISO/GCZ, le jeu et la révision restent **non vérifiés par CubeShelf** : le runtime doit les valider à l’ouverture. Un RVZ n’est pas proposé à Strikers.
 
 ### Deux modes d’acquisition du runtime
 
@@ -69,7 +85,7 @@ Dans ce dernier cas l’installation n’est pas bloquée, elle est **enregistr�
 
 `DataPreparation` vaut `CubeShelf` ou `Runtime`.
 
-PartyBoard attend que CubeShelf extraie le disque (conversion RVZ via DolphinTool, puis l’arborescence). Ring Out fait l’inverse : il extrait et **recompile** le jeu depuis le disque à son premier lancement, ce que CubeShelf ne peut ni ne doit refaire. Pour ces jeux, le bouton « Préparer les données » n’est pas proposé et Jouer est disponible dès que le runtime est installé et le disque compatible.
+Les trois jeux du catalogue utilisent `DataPreparation: Runtime`. PartyBoard et Strikers ouvrent leur image directement ; Ring Out extrait et **recompile** le jeu depuis le disque à son premier lancement. Le bouton « Préparer les données » n’est donc pas proposé pour ces jeux. Le mode `CubeShelf` reste disponible pour un runtime qui demanderait une arborescence extraite : il convertit alors le RVZ avec DolphinTool avant extraction.
 
 Ring Out cible Windows x64 et Linux x86-64. Prévois plusieurs minutes et environ 1,5 Go d’espace libre au premier lancement.
 
@@ -329,6 +345,8 @@ La page Mods de l’aperçu charge le catalogue GameBanana, installe les archive
 
 La page Téléchargements conserve l’historique et la progression des installations de runtimes et de mods dans le profil utilisateur. Une opération arrêtée par la fermeture de l’application est marquée comme interrompue au prochain démarrage. Le bouton Reprendre réutilise le fichier partiel avec HTTP Range ; si le serveur ne prend pas cette fonction en charge, CubeShelf recommence proprement le paquet concerné.
 
+Pour un mod, l’opération est enregistrée avant le téléchargement et l’analyse des dépendances. Après redémarrage, Reprendre retrouve son jeu et son identifiant GameBanana, reconstitue le plan et redemande confirmation avant activation. Si le mod a changé depuis l’interruption, sa version actuelle est téléchargée. Une archive déjà complète dont le serveur refuse la requête Range (HTTP 416) est retéléchargée. La pause explicite et la reprise automatique de toutes les tâches au démarrage restent à réaliser.
+
 Avalonia est désormais l’exécutable `CubeShelf.exe` livré par l’installateur Windows. Il comprend l’installation/réparation de PartyBoard, la préparation ISO/GCM/RVZ, la reprise des téléchargements, les paramètres, la mise à jour intégrée Windows, ainsi que la migration non destructive des données de l’ancien launcher WPF.
 
 Les mods peuvent fournir un manifeste `cubeshelf-mod.json` conforme à `schemas/cubeshelf-mod-v1.schema.json`. CubeShelf résout au plus 32 mods et 8 niveaux, refuse les cycles, affiche le plan avant confirmation, prépare tous les paquets puis les active dans une transaction avec rollback.
@@ -370,7 +388,7 @@ Sous Windows, `CubeShelfLauncher.sln` construit toujours l’ensemble, updater c
 - installation issue d’un éditeur sans manifeste ni checksum marquée comme non vérifiée et tracée dans l’état du runtime ;
 - releases stables signées obligatoirement, sauf dérogation manuelle explicite ;
 - téléchargement de l’outil AppImage épinglé et vérifié par SHA-256 ;
-- présence des amis chiffrée de bout en bout par paire, sans service central ni secret stocké ;
+- présence des amis chiffrée de bout en bout par paire, sans service central ; clé privée protégée par DPAPI sous Windows et par les permissions du fichier ailleurs ;
 - adresse de publication vérifiée par un aller-retour réel avant qu’un code ami ne soit délivré.
 
 ## Séparation des responsabilités

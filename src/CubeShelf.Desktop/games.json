@@ -11,6 +11,11 @@
     "GameRoot": "",
     "GameBananaGameId": 7096,
     "RuntimeName": "PartyBoard",
+    "LaunchEnvironment": {
+      "PARTYBOARD_DISC_IMAGE": "{disc}",
+      "PARTYBOARD_MOD_LIST": "{mods}"
+    },
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
     "SupportedDiscIds": [
       "GMPE01_00",
       "GMPE01_01"
@@ -46,6 +51,8 @@
     "GameRoot": "",
     "GameBananaGameId": 0,
     "RuntimeName": "Ring Out",
+    "LaunchArguments": ["{disc}"],
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
     "SupportedDiscIds": [
       "GRSEAF",
       "GRSPAF",
@@ -91,6 +98,8 @@
     "GameRoot": "",
     "GameBananaGameId": 0,
     "RuntimeName": "Strikers",
+    "LaunchEnvironment": { "STRIKERS_DATA": "{disc}" },
+    "DiscFormats": [".iso", ".gcm", ".ciso", ".gcz"],
     "SupportedDiscIds": [
       "G4QE01",
       "G4QP01",

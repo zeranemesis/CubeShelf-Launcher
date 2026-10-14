@@ -336,7 +336,7 @@ public sealed partial class MainWindow
                 ? (english ? "✓ Game data ready" : "✓ Données prêtes")
                 : (english ? "○ Game data to prepare" : "○ Données à préparer");
         SetupProgressText.Text = runtimeManagesDisc
-            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ"
+            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} {string.Join("/", game.DiscFormats.Select(format => format.TrimStart('.').ToUpperInvariant()))}"
             : english
                 ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
                 : $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
@@ -458,7 +458,7 @@ public sealed partial class MainWindow
 
         var game = _selectedGame;
         var runtime = _installer.GetStatus(game.Id);
-        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game, UiLocalization.IsEnglish(_preferences.Language));
         builder.AppendLine($"Jeu            : {game.Title} ({game.Id})");
         builder.AppendLine($"Favori         : {(game.IsFavorite ? "Oui" : "Non")}");
         builder.AppendLine($"Lancements     : {game.PlayCount}");

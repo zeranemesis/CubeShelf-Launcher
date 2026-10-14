@@ -1,4 +1,5 @@
 using System.Text;
+using System.Buffers.Binary;
 
 namespace CubeShelf.Core.Library;
 
@@ -13,6 +14,10 @@ public sealed record DiscCompatibility(string VersionId, bool Recognized, bool S
 /// </summary>
 public static class DiscImageService
 {
+    public static DiscCompatibility Inspect(string path, GameCatalogEntry game, bool english = false) =>
+        Inspect(path, game.SupportedDiscIds, english,
+            game.DataPreparation == GameDataPreparation.Runtime ? game.DiscFormats : new[] { ".iso", ".gcm", ".rvz" });
+
     /// <summary>Accepted by PartyBoard. Used by the legacy WPF launcher, which is single-game.</summary>
     public static readonly IReadOnlyList<string> MarioParty4DiscIds = new[] { "GMPE01_00", "GMPE01_01" };
 
@@ -33,7 +38,8 @@ public static class DiscImageService
     public static DiscCompatibility Inspect(
         string path,
         IReadOnlyCollection<string> supportedDiscIds,
-        bool english = false)
+        bool english = false,
+        IReadOnlyCollection<string>? acceptedFormats = null)
     {
         ArgumentNullException.ThrowIfNull(supportedDiscIds);
 
@@ -41,19 +47,30 @@ public static class DiscImageService
             return new("", false, false, english ? "No disc image selected." : "Aucune image de disque sélectionnée.");
 
         var extension = Path.GetExtension(path).ToLowerInvariant();
-        if (extension == ".rvz")
-            return new("", false, true, english
-                ? "RVZ selected. Exact revision validation requires Dolphin decoding."
-                : "RVZ sélectionné. La validation exacte nécessite le décodage Dolphin.");
-
-        if (extension is not ".iso" and not ".gcm")
-            return new("", false, false, english ? "Unsupported file format." : "Format de fichier non pris en charge.");
+        acceptedFormats ??= new[] { ".iso", ".gcm", ".rvz" };
+        if (!acceptedFormats.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            return new("", false, false, english ? "File format not supported by this runtime." : "Format de fichier non pris en charge par ce runtime.");
 
         try
         {
+            if (extension is ".rvz" or ".ciso" or ".gcz")
+            {
+                if (new FileInfo(path).Length < 32)
+                    return Unreadable(english);
+                return new("", false, true, english
+                    ? "Compressed image selected. Game and revision are unverified; the runtime must validate them when opening it."
+                    : "Image compressée sélectionnée. Jeu et révision non vérifiés ; le runtime doit les valider à l’ouverture.");
+            }
+
+            if (extension is not ".iso" and not ".gcm")
+                return new("", false, false, english ? "Unsupported file format." : "Format de fichier non pris en charge.");
             using var stream = File.OpenRead(path);
-            Span<byte> header = stackalloc byte[8];
-            if (stream.Read(header) != header.Length) throw new InvalidDataException();
+            Span<byte> header = stackalloc byte[0x20];
+            if (stream.Length < 0x440) return Unreadable(english);
+            stream.ReadExactly(header);
+            if (BinaryPrimitives.ReadUInt32BigEndian(header[0x1c..]) != 0xc2339f3d ||
+                header[..6].ToArray().Any(value => !char.IsAsciiLetterOrDigit((char)value)))
+                return Unreadable(english);
 
             var gameId = Encoding.ASCII.GetString(header[..6]);
             var versionId = $"{gameId}_{header[7]:00}";
@@ -111,5 +128,5 @@ public static class DiscImageService
         KnownLabels.TryGetValue(id, out var label) ? label : null;
 
     private static DiscCompatibility Unreadable(bool english) => new("", false, false,
-        english ? "Unable to read the GameCube ISO/GCM header." : "Impossible de lire l’en-tête GameCube de l’ISO/GCM.");
+        english ? "Image unreadable, truncated or missing its GameCube header." : "Image illisible, tronquée ou sans en-tête GameCube valide.");
 }
