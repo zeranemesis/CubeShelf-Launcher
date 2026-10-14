@@ -50,6 +50,11 @@ public sealed class GameCatalogEntry
     public string GameRoot { get; set; } = "";
     public string DiscImage { get; set; } = "";
 
+    // Each argument remains a separate ProcessStartInfo.ArgumentList item, including paths with spaces.
+    public List<string> LaunchArguments { get; set; } = new();
+    public Dictionary<string, string> LaunchEnvironment { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public List<string> DiscFormats { get; set; } = new() { ".iso", ".gcm", ".rvz" };
+
     public int GameBananaGameId { get; set; }
 
     public string GitHubOwner { get; set; } = "";
@@ -252,6 +257,9 @@ public sealed class GameCatalogService
             target.DataPreparation = source.DataPreparation;
             target.HomepageUrl = source.HomepageUrl;
             target.OnlineCompanion = source.OnlineCompanion;
+            target.LaunchArguments = source.LaunchArguments.ToList();
+            target.LaunchEnvironment = new Dictionary<string, string>(source.LaunchEnvironment, StringComparer.OrdinalIgnoreCase);
+            target.DiscFormats = source.DiscFormats.ToList();
 
             // Executable/GameRoot/DiscImage and all play statistics are intentionally preserved.
         }
@@ -269,6 +277,9 @@ public sealed class GameCatalogService
         Executable = source.Executable,
         GameRoot = source.GameRoot,
         DiscImage = source.DiscImage,
+        LaunchArguments = source.LaunchArguments.ToList(),
+        LaunchEnvironment = new Dictionary<string, string>(source.LaunchEnvironment, StringComparer.OrdinalIgnoreCase),
+        DiscFormats = source.DiscFormats.ToList(),
         GameBananaGameId = source.GameBananaGameId,
         GitHubOwner = source.GitHubOwner,
         GitHubRepo = source.GitHubRepo,

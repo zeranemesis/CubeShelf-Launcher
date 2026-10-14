@@ -11,7 +11,8 @@ string currentRoot = "";
 Run("Disc USA 1.1 reconnu", () =>
 {
     var path = Path.Combine(TestRoot(), "disc.iso");
-    var header = new byte[8];
+    var header = new byte[0x440];
+    System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(0x1c, 4), 0xc2339f3d);
     Encoding.ASCII.GetBytes("GMPE01").CopyTo(header, 0);
     header[7] = 1;
     File.WriteAllBytes(path, header);

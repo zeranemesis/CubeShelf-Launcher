@@ -115,8 +115,16 @@ public sealed class GameBananaClient
         using var request = new HttpRequestMessage(HttpMethod.Get, mod.ArchiveUrl);
         if (existing > 0) request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(existing, null);
         using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-        response.EnsureSuccessStatusCode();
         EnsureTrusted(response.RequestMessage?.RequestUri?.ToString() ?? "");
+        // An interrupted install can leave an already complete archive. Some servers reject
+        // its end-of-file Range with 416; restart once rather than making Retry fail forever.
+        if (existing > 0 && response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+        {
+            File.Delete(destination);
+            await DownloadAsync(mod, destination, progress, cancellationToken);
+            return;
+        }
+        response.EnsureSuccessStatusCode();
         var append = existing > 0 && response.StatusCode == System.Net.HttpStatusCode.PartialContent &&
             response.Content.Headers.ContentRange?.From == existing;
         if (!append) existing = 0;

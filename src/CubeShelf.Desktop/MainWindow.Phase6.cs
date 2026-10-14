@@ -226,7 +226,7 @@ public sealed partial class MainWindow
         var game = _selectedGame;
         HydrateGamePathsPhase3(game);
         var runtime = _installer.GetStatus(game.Id);
-        var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds, english);
+        var compatibility = DiscImageService.Inspect(game.DiscImage, game, english);
         lines.Add($"{L("Titre", "Title"),-16}: {game.Title}");
         lines.Add($"ID              : {game.Id}");
         lines.Add($"{L("Favori", "Favorite"),-16}: {(game.IsFavorite ? L("Oui", "Yes") : L("Non", "No"))}");
@@ -291,26 +291,36 @@ public sealed partial class MainWindow
         var game = _selectedGame;
         HydrateGamePathsPhase3(game);
         var runtime = _installer.GetStatus(game.Id);
-        Add(runtime.IsInstalled, P6("PartyBoard présent", "PartyBoard present"));
+        Add(runtime.IsInstalled || File.Exists(game.Executable), P6($"{game.RuntimeName} présent", $"{game.RuntimeName} present"));
         var exeDir = runtime.IsInstalled ? Path.GetDirectoryName(runtime.ExecutablePath)! : "";
-        Add(runtime.IsInstalled && Directory.Exists(Path.Combine(exeDir, "res")), P6("Ressources PartyBoard (res) présentes", "PartyBoard resources (res) present"));
-        var prepared = _gameData.IsPrepared(game.Id, game.Executable);
-        Add(prepared || _phase6PreparedData?.HasData(game.Id) == true,
-            prepared ? P6("Données de jeu préparées présentes", "Prepared game data present") : P6("Données préparées conservées pour réinstallation", "Prepared game data preserved for reinstall"));
+        if (game.LaunchEnvironment.ContainsKey("PARTYBOARD_DISC_IMAGE"))
+            Add(runtime.IsInstalled && Directory.Exists(Path.Combine(exeDir, "res")), P6("Ressources PartyBoard (res) présentes", "PartyBoard resources (res) present"));
+        if (game.DataPreparation == GameDataPreparation.CubeShelf)
+        {
+            var prepared = _gameData.IsPrepared(game.Id, game.Executable);
+            Add(prepared || _phase6PreparedData?.HasData(game.Id) == true,
+                prepared ? P6("Données de jeu préparées présentes", "Prepared game data present") : P6("Données préparées conservées pour réinstallation", "Prepared game data preserved for reinstall"));
+        }
+        else
+            lines.Add(P6($"INFO Disque ouvert par {game.RuntimeName} ; aucune extraction requise par CubeShelf.",
+                $"INFO Disc opened by {game.RuntimeName}; CubeShelf extraction is not required."));
         Add(File.Exists(game.DiscImage), File.Exists(game.DiscImage)
             ? P6($"Image disque présente : {Path.GetFileName(game.DiscImage)}", $"Disc image present: {Path.GetFileName(game.DiscImage)}")
-            : P6("Aucune image ISO/GCM/RVZ sélectionnée", "No ISO/GCM/RVZ selected"));
+            : P6("Aucune image disque sélectionnée", "No disc image selected"));
         if (File.Exists(game.DiscImage))
         {
-            var compatibility = DiscImageService.Inspect(game.DiscImage, game.SupportedDiscIds);
-            Add(compatibility.Recognized && compatibility.Supported, P6("Compatibilité disque : ", "Disc compatibility: ") + compatibility.Message);
-            if (Path.GetExtension(game.DiscImage).Equals(".rvz", StringComparison.OrdinalIgnoreCase))
+            var compatibility = DiscImageService.Inspect(game.DiscImage, game);
+            if (!compatibility.Recognized && compatibility.Supported)
+                lines.Add(P6("À VÉRIFIER par le runtime : ", "TO CHECK in the runtime: ") + compatibility.Message);
+            else
+                Add(compatibility.Recognized && compatibility.Supported, P6("Compatibilité disque : ", "Disc compatibility: ") + compatibility.Message);
+            if (game.DataPreparation == GameDataPreparation.CubeShelf && Path.GetExtension(game.DiscImage).Equals(".rvz", StringComparison.OrdinalIgnoreCase))
                 Add(_dolphinToolService?.IsAvailable() == true, P6("DolphinTool disponible pour le RVZ", "DolphinTool available for RVZ"));
         }
         try
         {
             var release = _gameUpdateService is null ? null : await _gameUpdateService.GetRuntimeReleaseAsync(game);
-            Add(release?.Available == true, P6("Release PartyBoard compatible disponible", "Compatible PartyBoard release available"));
+            Add(release?.Available == true, P6($"Release {game.RuntimeName} compatible disponible", $"Compatible {game.RuntimeName} release available"));
         }
         catch (Exception ex) { Add(false, P6("Accès release : ", "Release access: ") + ex.Message); }
 

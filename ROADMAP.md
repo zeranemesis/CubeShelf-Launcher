@@ -1,5 +1,27 @@
 ﻿# Roadmap
 
+## Consolidation du launcher 0.12
+
+- [x] contrat de lancement déclaré par runtime : arguments et variables d’environnement
+- [x] disque transmis à Ring Out en argument et à Strikers via `STRIKERS_DATA`
+- [x] formats de disque déclarés par jeu, sans RVZ proposé à Strikers
+- [x] rejet des ISO/GCM tronqués ou sans signature GameCube
+- [x] distinction entre révision identifiée et image compressée à valider par le runtime
+- [x] installation des mods inscrite dans la file avant téléchargement et analyse
+- [x] reprise manuelle des mods interrompus après redémarrage, avec nouvelle confirmation du plan
+- [x] récupération après un HTTP 416 sur une archive de mod déjà complète
+- [x] tests des contrats du catalogue, migration des profils, formats et reprise des mods
+- [ ] pause explicite et reprise automatique de la file au redémarrage
+- [ ] test réel de lancement des trois runtimes avec disques fournis par l’utilisateur
+- [ ] essais Internet entre deux box avec résultat consigné dans `TEST_DEUX_PC.md`
+- [ ] tests graphiques automatisés des parcours installation → lancement → mise à jour
+- [ ] navigation du launcher à la manette et validation Steam Deck en mode Jeu
+- [ ] signatures des manifestes vérifiées avec une clé de confiance embarquée
+- [ ] activation des certificats Windows et de la signature/notarisation macOS
+- [ ] choix et ajout d’une licence par le détenteur des droits
+
+Les sections suivantes conservent l’historique des versions ; cette section décrit la consolidation actuelle.
+
 ## v0.6
 - [x] Français / English
 - [x] thème sombre / clair
@@ -21,7 +43,7 @@
 - [x] installateur Windows sans droits administrateur
 - [x] extraction sécurisée des archives et limites de téléchargement
 - [x] vérification SHA-256 du paquet Dolphin épinglé
-- [x] pipeline CI et releases stables signées
+- [x] pipeline CI et contrôle de signature avant publication stable (certificat restant à configurer)
 - [x] publication Windows PartyBoard indépendante de Linux/macOS
 - [x] chargement ISO/RVZ via PartyBoard et Dolphin
 - [ ] pause/reprise/annulation de la file

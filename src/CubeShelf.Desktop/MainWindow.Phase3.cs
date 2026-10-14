@@ -251,8 +251,11 @@ public sealed partial class MainWindow
         if (sender is not Button { Tag: PortableDownloadQueueItem item } ||
             _portableQueue is null || !item.CanResume) return;
 
+        ModDownloadReference? modReference = null;
+        if (item.Kind.Equals("MOD", StringComparison.OrdinalIgnoreCase) &&
+            !ModDownloadReference.TryParse(item.ReferenceId, out modReference)) return;
         var game = _catalogGames.FirstOrDefault(candidate =>
-            candidate.Id.Equals(item.ReferenceId, StringComparison.OrdinalIgnoreCase));
+            candidate.Id.Equals(modReference?.GameId ?? item.ReferenceId, StringComparison.OrdinalIgnoreCase));
         if (game is null)
         {
             ShowToastParity(P7("Reprise impossible", "Unable to resume"), P7("Le jeu associé à cette opération n’est plus dans la bibliothèque.", "The game associated with this operation is no longer in the library."));
@@ -264,65 +267,61 @@ public sealed partial class MainWindow
             replacement = EnqueueRuntimeInstallationPhase3(repair: false, game);
         else if (item.Kind.Equals("GAME DATA", StringComparison.OrdinalIgnoreCase))
             replacement = EnqueueGameDataPreparationPhase3(game);
+        else if (modReference is not null)
+            replacement = EnqueueModInstallationPhase3(game, modReference.ModId, item.Title);
 
         if (replacement is null) return;
         _portableQueue.Remove(item);
         RefreshPortableQueueView();
     }
 
-    private async Task QueueModInstallationPhase3Async()
+    private Task QueueModInstallationPhase3Async()
     {
-        if (_selectedMod?.Remote is null || _modManager is null || _portableQueue is null) return;
-        var selected = _selectedMod;
-        var manager = _modManager;
+        if (_selectedMod?.Remote is not null && _selectedGame is not null)
+            EnqueueModInstallationPhase3(_selectedGame, _selectedMod.Remote.Id, _selectedMod.Name, _selectedMod.Remote);
+        return Task.CompletedTask;
+    }
 
-        ModInstallPlan plan;
-        try
-        {
-            ModsStatus.Text = P7("Analyse des dépendances…", "Analyzing dependencies…");
-            plan = await manager.PlanInstallAsync(selected.Remote, _gameBanana);
-        }
-        catch (Exception exception)
-        {
-            ModsStatus.Text = P7($"Plan impossible : {exception.Message}", $"Unable to create install plan: {exception.Message}");
-            return;
-        }
-
-        if (!await ConfirmModPlanAsync(plan))
-        {
-            ModsStatus.Text = P7("Installation annulée avant toute modification.", "Installation cancelled before any changes were made.");
-            return;
-        }
-
+    private PortableDownloadQueueItem? EnqueueModInstallationPhase3(
+        GameCatalogEntry game, int modId, string title, GameBananaMod? selected = null)
+    {
+        if (_portableQueue is null) return null;
+        var manager = new PortableModManager(_paths, game.Id);
         var item = _portableQueue.Enqueue(
-            $"mod:{plan.RootModId}",
-            selected.Name,
+            $"mod:{game.Id}:{modId}",
+            title,
             "MOD",
-            P7($"Installation transactionnelle • {plan.Packages.Count} paquet(s)", $"Transactional installation • {plan.Packages.Count} package(s)"),
+            P7("Téléchargement, vérification des dépendances et installation transactionnelle", "Download, dependency checks and transactional installation"),
             async (progress, cancellationToken) =>
             {
+                var root = selected ?? await _gameBanana.GetAsync(modId, cancellationToken);
+                var plan = await manager.PlanInstallAsync(root, _gameBanana, progress, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                var confirmation = await Dispatcher.UIThread.InvokeAsync(() => ConfirmModPlanAsync(plan, cancellationToken));
+                if (!confirmation) throw new OperationCanceledException();
+                cancellationToken.ThrowIfCancellationRequested();
                 await manager.InstallPlanAsync(plan, allowIncompatible: true, progress, cancellationToken);
             },
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ModsStatus.Text = P7($"{plan.Packages.Count} mod(s) installé(s) et activé(s).", $"{plan.Packages.Count} mod(s) installed and enabled.");
-                    RefreshModItems();
-                    ShowToastParity("Mods", ModsStatus.Text);
+                    if (_selectedGame?.Id == game.Id) RefreshModItems();
+                    ShowToastParity("Mods", P7($"{title} installé pour {game.Title}.", $"{title} installed for {game.Title}."));
                 });
                 return Task.CompletedTask;
             },
-            referenceId: $"{plan.GameId}:{plan.RootModId}");
+            referenceId: new ModDownloadReference(game.Id, modId).ToString());
 
         if (item is null)
         {
             ModsStatus.Text = P7("Ce mod est déjà dans la file.", "This mod is already queued.");
-            return;
+            return null;
         }
 
         ModsStatus.Text = P7("Installation ajoutée à la file de téléchargements.", "Installation added to the download queue.");
         RefreshPortableQueueView();
+        return item;
     }
 
     private async void CheckGameUpdatePhase3(object? sender, RoutedEventArgs args) =>
