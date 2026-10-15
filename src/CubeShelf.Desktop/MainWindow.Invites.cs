@@ -163,9 +163,10 @@ public sealed partial class MainWindow
     /// Opens a lobby. The companion creates it and writes the invitation where we told it to; we
     /// watch that file and publish what lands there, to everyone or to the one friend named.
     /// </summary>
-    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false)
+    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false, bool lan = false)
     {
-        if (HostingBlocker(game, publicRoom) is { } blocker) return (false, blocker);
+        // A LAN game is found on the network: like a public room, it needs no friend to tell.
+        if (HostingBlocker(game, publicRoom || lan) is { } blocker) return (false, blocker);
         if (_hostWatch is { IsCancellationRequested: false })
             return (false, P7("Un salon est déjà en préparation.", "A lobby is already being prepared."));
 
@@ -175,11 +176,13 @@ public sealed partial class MainWindow
         var environment = CompanionEnvironment(game);
         environment["PARTYBOARD_ONLINE_INVITE_OUT"] = PendingInviteFile;
         if (publicRoom) environment[RoomSyncClient.VisibilityVariable] = "public";
+        if (lan) environment[RoomSyncClient.ModeVariable] = "lan";
         AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--host" }, out var error)) return (false, error);
 
-        // A public room with no friend to tell: the list is how players find it.
-        if (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0))
+        // A LAN game has no invitation to send; a public room with no friend to tell is found
+        // on the list.
+        if (lan || (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0)))
         {
             WriteInGameState();
             return (true, "");

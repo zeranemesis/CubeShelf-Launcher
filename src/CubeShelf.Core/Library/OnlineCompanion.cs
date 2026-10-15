@@ -84,6 +84,12 @@ public static class OnlineCompanion
     /// room. Both together: the Online page needs the one to show rooms and the other to follow
     /// the player's own.
     /// </summary>
+    /// <summary>Games on the local network: <c>--lan-games</c> and PARTYBOARD_ONLINE_MODE=lan.</summary>
+    public const string LanGamesCapability = "lan-games";
+
+    public static bool SupportsLanGames(string? companionPath) =>
+        RuntimeManifest.HasCapability(companionPath, LanGamesCapability);
+
     public static bool SupportsPublicRooms(string? companionPath) =>
         RuntimeManifest.HasCapability(companionPath, PublicRoomsCapability) &&
         RuntimeManifest.HasCapability(companionPath, RoomSyncCapability);

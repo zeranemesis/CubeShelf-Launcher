@@ -22,6 +22,7 @@ Run("online: the companion's room, followed and asked", OnlineRoomsTests.Follows
 Run("online: the relay's directory over HTTP", OnlineRoomsTests.TalksToTheDirectory);
 Run("online: a friend's invitation carries the room's mods", TestInviteCarriesMods);
 Run("online: rooms in the game's F1 tab", TestInGameRooms);
+Run("online: games on the local network", OnlineRoomsTests.ReadsLanGames);
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);

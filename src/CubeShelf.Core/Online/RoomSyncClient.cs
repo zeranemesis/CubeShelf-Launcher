@@ -33,6 +33,7 @@ public sealed class RoomSyncClient(string directory)
     public const string DirectoryVariable = "PARTYBOARD_ONLINE_STATE_DIR";
     public const string VisibilityVariable = "PARTYBOARD_ONLINE_VISIBILITY";
     public const string ModsVariable = "PARTYBOARD_ONLINE_MODS";
+    public const string ModeVariable = "PARTYBOARD_ONLINE_MODE";
     private const int MaximumBytes = 64 * 1024;
 
     public string Directory => directory;

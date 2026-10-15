@@ -7,6 +7,15 @@ using CubeShelf.Core.Online;
 
 namespace CubeShelf.Desktop;
 
+/// <summary>One game on the local network, worded for display.</summary>
+public sealed class LanRow
+{
+    public required LanGame Game { get; init; }
+    public string Title { get; init; } = "";
+    public string Line { get; init; } = "";
+    public bool CanJoin { get; init; }
+}
+
 /// <summary>One room on the Online page, worded for display.</summary>
 public sealed class RoomRow
 {
@@ -144,6 +153,7 @@ public sealed partial class MainWindow
             PlayingRoomsEmpty.IsVisible = !rows.Any(r => !r.Room.IsJoinable);
             PlayingRoomsEmpty.Text = P7("Aucune partie publique en cours.", "No public game under way.");
             OnlineStatusText.Text = P7($"Mis à jour à {DateTime.Now:HH:mm:ss}.", $"Updated at {DateTime.Now:HH:mm:ss}.");
+            await RefreshLanGamesAsync(game);
         }
         catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
                                               or FormatException or System.Text.Json.JsonException or UnauthorizedAccessException
@@ -175,6 +185,62 @@ public sealed partial class MainWindow
         _roomTags = await RoomTags.ReadAsync(companion, disc, modList);
         _roomTagsKey = key;
         return _roomTags;
+    }
+
+    /// <summary>The games on this network, asked through the companion.</summary>
+    private async Task RefreshLanGamesAsync(GameCatalogEntry game)
+    {
+        var supported = OnlineBlocker(out _, out var companion, out var disc) is null && OnlineCompanion.SupportsLanGames(companion);
+        LanSection.IsVisible = supported;
+        if (!supported) return;
+        CreateLanButton.IsEnabled = _myRoom is null;
+        try
+        {
+            var games = await LanGames.ReadAsync(companion, disc);
+            LanGamesList.ItemsSource = games.Select(g => new LanRow
+            {
+                Game = g,
+                Title = P7($"Partie de {g.Host}", $"{g.Host}'s game"),
+                Line = $"{game.Title} · {RegionName(g.Region == "eu" ? "GMPP01" : "GMPE01")} · {LanguageName(g.Language)} · " +
+                       P7("Joueurs", "Players") + $" {g.Players}/{g.MaxPlayers}",
+                CanJoin = g.HasSeat && _myRoom is null
+            }).ToList();
+            LanGamesEmpty.Text = games.Count == 0
+                ? P7("Aucune partie sur ton réseau pour ton disque. Rien ne passe par Internet ici.",
+                     "No game on your network for your disc. Nothing here goes through the Internet.")
+                : "";
+        }
+        catch (Exception exception) when (exception is IOException or TaskCanceledException or InvalidOperationException
+                                              or System.ComponentModel.Win32Exception or System.Text.Json.JsonException)
+        {
+            LanGamesEmpty.Text = P7($"Recherche sur le réseau impossible : {exception.Message}", $"Could not search the network: {exception.Message}");
+        }
+    }
+
+    private void CreateLanGame(object? sender, RoutedEventArgs args)
+    {
+        if (OnlineGame() is not { } game) return;
+        var (started, message) = StartHosting(game, null, publicRoom: false, lan: true);
+        ShowToastParity(P7("Réseau local", "Local network"), started
+            ? P7("Le compagnon ouvre ta partie LAN : les joueurs de ton réseau la verront ici. Windows peut te demander l’autorisation.",
+                 "The companion is opening your LAN game: players on your network see it here. Windows may ask for permission.")
+            : message);
+        RefreshMyRoom();
+    }
+
+    private void JoinLanGame(object? sender, RoutedEventArgs args)
+    {
+        if (sender is not Button { Tag: LanRow row } || OnlineGame() is not { } game) return;
+        if (_myRoom is not null)
+        {
+            ShowToastParity(P7("Réseau local", "Local network"), P7("Ferme d’abord ta room.", "Close your room first."));
+            return;
+        }
+        var extra = new Dictionary<string, string?> { [RoomSyncClient.ModeVariable] = "lan" };
+        var (started, message) = StartJoining(game, row.Game.Host, row.Game.Invite, extra);
+        ShowToastParity(P7("Réseau local", "Local network"), message.Length > 0 ? message
+            : P7($"Tu rejoins la partie de {row.Game.Host} sur ton réseau.", $"Joining {row.Game.Host}'s game on your network."));
+        if (started) RefreshMyRoom();
     }
 
     private RoomRow ToRow(GameCatalogEntry game, PublicRoom room, IReadOnlyList<PortableInstalledMod> installed)

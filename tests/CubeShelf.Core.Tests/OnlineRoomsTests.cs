@@ -50,6 +50,20 @@ internal static class OnlineRoomsTests
         Check(PublicRoom.IdOfInvite("PB4.short") is null && PublicRoom.IdOfInvite(null) is null, "anything else names none");
     }
 
+    public static void ReadsLanGames()
+    {
+        var games = LanGames.Parse("""
+            {"schema":1,"games":[
+            {"name":"Zera","lang":"fr","region":"eu","players":1,"max":2,"invite":"PB4.wKgBDtrt3MvQaqBYIvvrQovy4BEE8qacQ_asctzv4ffjFDVbrbTLxVGywKgBDtrtAg=="},
+            {"name":"Full","lang":"en","region":"us","players":2,"max":2,"invite":"PB4.wKgBDtrt3MvQaqBYIvvrQovy4BEE8qacQ_asctzv4ffjFDVbrbTLxVGywKgBDtrtAg=="},
+            {"name":"Bad","invite":"not an invitation"}]}
+            """);
+        Check(games.Count == 2, "a game without a usable invitation is dropped");
+        Check(games[0] is { Host: "Zera", Language: "fr", Region: "eu", Players: 1, MaxPlayers: 2, HasSeat: true }, "host, language, region and seats");
+        Check(!games[1].HasSeat, "a full game has no seat");
+        Check(LanGames.Parse("{}").Count == 0, "nothing found reads as nothing");
+    }
+
     public static void ReadsTheCompanionTags()
     {
         var tags = RoomTags.Parse("""{"schema":1,"build":"57057c1c8bf2b2b9","disc":"703d77caf79b40cb","game":"GMPE01","mods":[{"id":7,"name":"M","fp":"0909090909090909"}],"relay":"https://relay.example"}""");
