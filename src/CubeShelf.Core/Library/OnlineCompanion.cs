@@ -72,4 +72,19 @@ public static class OnlineCompanion
     /// </summary>
     public static bool SupportsLauncherInvites(string? companionPath) =>
         RuntimeManifest.HasCapability(companionPath, LauncherInvitesCapability);
+
+    /// <summary>Public rooms: the relay's list, <c>--room-tags</c> and PARTYBOARD_ONLINE_VISIBILITY.</summary>
+    public const string PublicRoomsCapability = "public-rooms";
+
+    /// <summary>The room's state shared with CubeShelf (PARTYBOARD_ONLINE_STATE_DIR) and its requests.</summary>
+    public const string RoomSyncCapability = "room-sync";
+
+    /// <summary>
+    /// Whether the companion can list and join public rooms and keep CubeShelf in step with its
+    /// room. Both together: the Online page needs the one to show rooms and the other to follow
+    /// the player's own.
+    /// </summary>
+    public static bool SupportsPublicRooms(string? companionPath) =>
+        RuntimeManifest.HasCapability(companionPath, PublicRoomsCapability) &&
+        RuntimeManifest.HasCapability(companionPath, RoomSyncCapability);
 }

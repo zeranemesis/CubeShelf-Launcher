@@ -36,6 +36,9 @@
           <Button x:Name="NavFriendsButton" Classes="nav" TabIndex="5" Click="ParityShowFriends">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="☺" Width="18" /><TextBlock Text="{DynamicResource AppFriends}" /></StackPanel>
           </Button>
+          <Button x:Name="NavOnlineButton" Classes="nav" TabIndex="6" Click="ParityShowOnline">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="◉" Width="18" /><TextBlock Text="{DynamicResource AppOnline}" /></StackPanel>
+          </Button>
           <Button x:Name="NavSettingsButton" Classes="nav" TabIndex="6" Click="ParityShowSettings">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⚙" Width="18" /><TextBlock Text="{DynamicResource AppSettings}" /></StackPanel>
           </Button>
@@ -467,6 +470,102 @@
             </Grid>
           </Grid>
         </Border>
+      </Grid>
+
+      <!-- ONLINE: rooms to join now, games under way, and the player's own room, kept in step
+           with the companion that hosts it (room.json). -->
+      <Grid x:Name="OnlineView" Classes="view" IsVisible="False" RowDefinitions="132,*">
+        <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+          <Grid Margin="34,24" ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource OnlineEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" />
+              <TextBlock Text="{DynamicResource OnlineTitle}" Foreground="{DynamicResource Text}" FontSize="32" FontWeight="Bold" Margin="0,5,0,0" />
+              <TextBlock x:Name="OnlineSubtitleText" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="OnlineRefreshButton" Content="{DynamicResource OnlineRefresh}" Click="RefreshOnlineNow" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <StackPanel Margin="28,20,28,28" Spacing="14">
+            <Border x:Name="OnlineGate" IsVisible="False" Padding="16" CornerRadius="12" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Warning}" BorderThickness="1">
+              <TextBlock x:Name="OnlineGateText" TextWrapping="Wrap" />
+            </Border>
+            <Border x:Name="MyRoomPanel" IsVisible="False" Padding="16" CornerRadius="14" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{DynamicResource OnlineMyRoom}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" />
+                  <TextBlock x:Name="MyRoomTitle" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                  <TextBlock x:Name="MyRoomPlayers" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                  <TextBlock x:Name="MyRoomMods" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                  <TextBlock x:Name="MyRoomMessage" Foreground="{DynamicResource Muted}" FontSize="12" FontStyle="Italic" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                  <Button x:Name="MyRoomVisibilityButton" Click="ToggleMyRoomVisibility" />
+                  <Button x:Name="MyRoomInviteButton" Content="{DynamicResource OnlineInviteFriends}" Click="InviteFriendsToMyRoom" />
+                  <Button x:Name="MyRoomCloseButton" Classes="danger" Content="{DynamicResource OnlineCloseRoom}" Click="CloseMyRoom" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Border x:Name="CreateRoomPanel" Padding="16" CornerRadius="14" Background="{DynamicResource Panel}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{DynamicResource OnlineCreateTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
+                  <TextBlock x:Name="CreateRoomMods" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                  <ComboBox x:Name="RoomVisibilityPicker" MinWidth="200" VerticalAlignment="Center" Margin="0,0,8,0" />
+                  <Button Content="{DynamicResource OnlineManageMods}" Click="OpenRoomMods" />
+                  <Button x:Name="CreateRoomButton" Classes="primary" Content="{DynamicResource OnlineCreate}" Click="CreateRoom" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <TextBlock Text="{DynamicResource OnlineAvailable}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" Margin="2,6,0,0" />
+            <ItemsControl x:Name="AvailableRoomsList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Spacing="3">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
+                        <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock x:Name="AvailableRoomsEmpty" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" IsVisible="False" />
+            <TextBlock Text="{DynamicResource OnlinePlaying}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" Margin="2,6,0,0" />
+            <ItemsControl x:Name="PlayingRoomsList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Spacing="3">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
+                        <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock x:Name="PlayingRoomsEmpty" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" IsVisible="False" />
+            <TextBlock x:Name="OnlineStatusText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+          </StackPanel>
+        </ScrollViewer>
       </Grid>
 
       <!-- PROFILE: who you are to your friends, and how they get your code -->

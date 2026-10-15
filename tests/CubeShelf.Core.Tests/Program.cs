@@ -15,6 +15,11 @@ Run("runtime: launch metadata is refreshed without losing user state", RuntimeIn
 Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
 Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
 Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);
+Run("online: the public list is read and bounded", OnlineRoomsTests.ParsesTheList);
+Run("online: the companion's room tags", OnlineRoomsTests.ReadsTheCompanionTags);
+Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);
+Run("online: the companion's room, followed and asked", OnlineRoomsTests.FollowsTheCompanionRoom);
+Run("online: the relay's directory over HTTP", OnlineRoomsTests.TalksToTheDirectory);
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);
