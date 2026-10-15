@@ -191,6 +191,34 @@ cliquée pendant que CubeShelf était fermé, elle n'ouvrira pas un salon une he
 Deux amis qui liraient pareil — même pseudo, même numéro, une chance sur dix mille — apparaissent
 avec six chiffres au lieu de quatre, les quatre premiers inchangés.
 
+### Onglet En ligne : rooms et parties en LAN
+
+L'onglet **En ligne** réunit tout ce qui se joue à plusieurs, pour Mario Party 4 :
+
+- **Disponibles maintenant** : les rooms publiques qui attendent un joueur, pour ton disque et ta
+  version de PartyBoard. Chaque carte montre l'hôte, la langue du jeu, le disque, les joueurs et les
+  mods de la room, et dit si tu as les mêmes mods. **Rejoindre**, ou **Installer et rejoindre** :
+  les mods manquants viennent de GameBanana avec la même confirmation que la page Mods, et ne
+  servent qu'à cette partie (ils restent désactivés ensuite ; ton choix de mods n'est pas modifié).
+- **En jeu** : les rooms publiques complètes ou en cours de partie, avec leurs joueurs.
+- **Réseau local (LAN)** : les parties ouvertes sur ton réseau, trouvées sans passer par Internet,
+  et **Créer une partie LAN**.
+- **Ta room** : la room que le compagnon a ouverte, d'où qu'elle vienne (cet onglet, la page Amis,
+  le menu F1 du jeu). État, joueurs, ping et mods suivent la fenêtre du compagnon ; **Rendre
+  publique** ou **privée**, **Inviter des amis**, **Fermer la room**.
+- **Créer une room** : **privée** (tes amis, par invitation) ou **publique** (dans la liste de tous
+  ceux qui ont le même disque). Une room publique est à deux joueurs et passe toujours par le relais
+  en ligne de PartyBoard : la liste ne dit jamais où se trouve l'hôte.
+
+Les invitations d'amis portent aussi les mods de la room : « Rejoindre » sur la page Amis les
+installe de la même façon. Dans le jeu, **F1 → Amis** montre ta room et les rooms publiques, et
+rejoint directement celles dont tu as déjà les mods.
+
+CubeShelf et le compagnon partagent l'état de la room par deux fichiers dans
+`%LOCALAPPDATA%\CubeShelf\online-room` (`room.json`, et les demandes de CubeShelf) : ni réseau,
+ni port. Il faut un PartyBoard qui déclare `public-rooms`, `room-sync` et `lan-games` ; avec un plus
+ancien, l'onglet invite à le mettre à jour.
+
 ### Réseau local
 
 Deux CubeShelf sur le même réseau se trouvent seuls, et **un ami trouvé là se lit directement** :
