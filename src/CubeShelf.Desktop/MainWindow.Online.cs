@@ -125,21 +125,9 @@ public sealed partial class MainWindow
                 return;
             }
 
-            var manager = new PortableModManager(_paths, game.Id);
-            var installed = manager.GetInstalled();
-            // The tags hold this PC's mods too, so a change on the Mods page asks again.
-            var key = disc + "|" + string.Join(";", installed.Select(m => $"{m.Id}:{m.Sha256}:{m.Enabled}"));
-            if (_roomTags is null || key != _roomTagsKey)
-            {
-                OnlineStatusText.Text = P7("Lecture de ton disque (une seule fois)…", "Reading your disc (once)…");
-                string? modList = null;
-                try { modList = manager.PrepareActiveList(); }
-                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
-                _roomTags = await RoomTags.ReadAsync(companion, disc, modList);
-                _roomTagsKey = key;
-            }
-
-            var tags = _roomTags;
+            var installed = new PortableModManager(_paths, game.Id).GetInstalled();
+            if (_roomTags is null) OnlineStatusText.Text = P7("Lecture de ton disque (une seule fois)…", "Reading your disc (once)…");
+            if (await EnsureRoomTagsAsync(game) is not { } tags) return;
             OnlineSubtitleText.Text = P7($"{game.Title} · disque {RegionName(tags.Game)} · seules les rooms de ton disque et de ta version s’affichent.",
                                          $"{game.Title} · {RegionName(tags.Game)} disc · only rooms for your disc and version are shown.");
             CreateRoomMods.Text = ModsSummary(tags.Mods, P7("Tes mods actifs : ", "Your active mods: "));
@@ -168,6 +156,25 @@ public sealed partial class MainWindow
         {
             _onlineBusy = false;
         }
+    }
+
+    /// <summary>
+    /// The companion's tags for the public list, asked once and again only when the disc or the
+    /// installed mods change (the tags hold this PC's mods too). Null when rooms are not possible.
+    /// </summary>
+    private async Task<RoomTags?> EnsureRoomTagsAsync(GameCatalogEntry game)
+    {
+        if (OnlineBlocker(out _, out var companion, out var disc) is not null) return null;
+        var manager = new PortableModManager(_paths, game.Id);
+        var installed = manager.GetInstalled();
+        var key = disc + "|" + string.Join(";", installed.Select(m => $"{m.Id}:{m.Sha256}:{m.Enabled}"));
+        if (_roomTags is not null && key == _roomTagsKey) return _roomTags;
+        string? modList = null;
+        try { modList = manager.PrepareActiveList(); }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
+        _roomTags = await RoomTags.ReadAsync(companion, disc, modList);
+        _roomTagsKey = key;
+        return _roomTags;
     }
 
     private RoomRow ToRow(GameCatalogEntry game, PublicRoom room, IReadOnlyList<PortableInstalledMod> installed)

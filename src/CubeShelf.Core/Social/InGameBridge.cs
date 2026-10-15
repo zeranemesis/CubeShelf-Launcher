@@ -21,6 +21,26 @@ public sealed record InGameFriend(
 /// </summary>
 public sealed record InGameAchievements(string User, long RaGameId, int Total, int Points, int TotalPoints, IReadOnlyList<int> Ids);
 
+/// <summary>The player's own room, as the companion's room.json says, worded for the tab.</summary>
+public sealed record InGameRoom(
+    string State,
+    string Label,
+    bool IsHost,
+    bool Public,
+    IReadOnlyList<string> Players,
+    int MaxPlayers,
+    bool CanChangeVisibility);
+
+/// <summary>One public room for the tab: who hosts, what it is, and whether this PC can join it now.</summary>
+public sealed record InGamePublicRoom(
+    string Id,
+    string Host,
+    string Label,
+    IReadOnlyList<string> Players,
+    int MaxPlayers,
+    bool Joinable,
+    bool ModsReady);
+
 /// <summary>What the game's Friends tab (F1) needs, already worded in the player's language.</summary>
 public sealed record InGameState(
     string Me,
@@ -29,14 +49,27 @@ public sealed record InGameState(
     bool CanHost,
     bool Hosting,
     IReadOnlyList<InGameFriend> Friends,
-    IReadOnlyDictionary<string, string> Text);
+    IReadOnlyDictionary<string, string> Text,
+    // Rooms (schema 1 still: a game that does not know these fields ignores them).
+    InGameRoom? Room = null,
+    IReadOnlyList<InGamePublicRoom>? Rooms = null,
+    bool CanHostPublic = false);
 
 public enum InGameAction
 {
     Host,
     Invite,
     Join,
-    Cancel
+    Cancel,
+    /// <summary>Open a public room.</summary>
+    HostPublic,
+    /// <summary>Join the public room the key names (its 32-hex id).</summary>
+    JoinRoom,
+    /// <summary>Put the player's own room on the public list, or take it off.</summary>
+    RoomPublic,
+    RoomPrivate,
+    /// <summary>Close the player's own room.</summary>
+    RoomClose
 }
 
 /// <summary>Something the player asked for from inside the game.</summary>
@@ -103,6 +136,7 @@ public static class InGameBridge
     private const int MaximumRequestsPerRead = 32;
 
     private static readonly Regex IdPattern = new("^[A-Za-z0-9-]{1,64}$", RegexOptions.CultureInvariant);
+    private static readonly Regex RoomIdPattern = new("^[0-9a-f]{32}$", RegexOptions.CultureInvariant);
 
     private static readonly JsonSerializerOptions Json = new()
     {
@@ -241,6 +275,11 @@ public static class InGameBridge
                 "invite" => InGameAction.Invite,
                 "join" => InGameAction.Join,
                 "cancel" => InGameAction.Cancel,
+                "host-public" => InGameAction.HostPublic,
+                "join-room" => InGameAction.JoinRoom,
+                "room-public" => InGameAction.RoomPublic,
+                "room-private" => InGameAction.RoomPrivate,
+                "room-close" => InGameAction.RoomClose,
                 _ => (InGameAction?)null
             };
             if (action is null) return false;
@@ -258,6 +297,11 @@ public static class InGameBridge
                 {
                     return false;
                 }
+            }
+            else if (action is InGameAction.JoinRoom)
+            {
+                // A room is named by its relay id, 32 lowercase hex digits, and nothing else.
+                if (!RoomIdPattern.IsMatch(key)) return false;
             }
             else
             {
