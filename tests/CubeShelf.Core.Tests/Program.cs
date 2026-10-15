@@ -20,6 +20,7 @@ Run("online: the companion's room tags", OnlineRoomsTests.ReadsTheCompanionTags)
 Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);
 Run("online: the companion's room, followed and asked", OnlineRoomsTests.FollowsTheCompanionRoom);
 Run("online: the relay's directory over HTTP", OnlineRoomsTests.TalksToTheDirectory);
+Run("online: a friend's invitation carries the room's mods", TestInviteCarriesMods);
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);
@@ -2562,6 +2563,33 @@ void TestFriendCodeRoundTrip()
     // downgrade on the user behalf. Refuse it at the door.
     AssertThrows<ArgumentException>(() =>
         FriendCode.Encode(identity.PublicKey, "http://example.test/presence.json"));
+}
+
+void TestInviteCarriesMods()
+{
+    using var author = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var mods = new[] { new CubeShelf.Core.Online.RoomMod(4242, "Board Pack", "0102030405060708") };
+    var invite = new PresenceInvite("GMPE01_00", "Mario Party 4", "PB4.code", DateTimeOffset.UtcNow.AddMinutes(15), "", mods);
+    var envelope = SealedPresence.Seal(author, SampleSnapshot(3) with { Invite = invite }, new[] { friend.PublicKey });
+    Assert(SealedPresence.TryOpen(friend, author.PublicKey, SealedPresence.FromJson(SealedPresence.ToJson(envelope)), out var opened));
+    var carried = opened!.Invite!.SafeMods();
+    Assert(carried is { Count: 1 } && carried[0] == mods[0]);
+
+    // An invitation from an older CubeShelf says nothing about mods: null, not "none".
+    var old = SealedPresence.Seal(author, SampleSnapshot(4) with { Invite = invite with { Mods = null } }, new[] { friend.PublicKey });
+    Assert(SealedPresence.TryOpen(friend, author.PublicKey, old, out var openedOld) && openedOld!.Invite!.SafeMods() is null);
+
+    // Whatever a friend's document claims is bounded before use.
+    var hostile = invite with
+    {
+        Mods = Enumerable.Range(1, 40).Select(i => new CubeShelf.Core.Online.RoomMod(i, "n" + new string('x', 90), "ABCDEF0123456789"))
+            .Append(new CubeShelf.Core.Online.RoomMod(-5, "bad", "0000000000000000"))
+            .Append(new CubeShelf.Core.Online.RoomMod(7, "bad", "zz"))
+            .ToArray()
+    };
+    var safe = hostile.SafeMods()!;
+    Assert(safe.Count == 24 && safe.All(m => m.Id > 0 && m.Name.Length <= 48 && !m.Name.Any(char.IsControl) && m.Fingerprint == "abcdef0123456789"));
 }
 
 void TestSealedPresenceReachesOnlyFriends()

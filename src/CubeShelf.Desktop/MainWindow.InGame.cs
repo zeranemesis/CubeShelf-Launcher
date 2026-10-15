@@ -266,7 +266,8 @@ public sealed partial class MainWindow
             return (false, P7("Cette invitation n’est plus valable : le salon a été fermé ou a expiré.",
                               "That invitation is no longer valid: the lobby was closed or has expired."));
 
-        var joining = StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload);
+        var joining = StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload,
+            SessionModsIfReady(game, invite.SafeMods()));
         if (joining.Started) AnswerInvite(friend.PublicKey, invite, InviteReply.Joined);
         return joining;
     }

@@ -324,39 +324,16 @@ public sealed partial class MainWindow
         button.IsEnabled = false;
         try
         {
-            var manager = new PortableModManager(_paths, game.Id);
-            var report = row.Mods;
-            foreach (var mod in report.Missing.Concat(report.Outdated))
+            var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, row.Room.Mods, text => OnlineStatusText.Text = text);
+            if (!ready)
             {
-                var wasInstalled = manager.GetInstalled().Any(m => m.Id == mod.Id);
-                var playerEnabled = manager.GetInstalled().FirstOrDefault(m => m.Id == mod.Id)?.Enabled ?? false;
-                OnlineStatusText.Text = P7($"Installation de {Named(mod)}…", $"Installing {Named(mod)}…");
-                var progress = new Progress<double>(p => OnlineStatusText.Text = P7($"Installation de {Named(mod)} : {p:0} %", $"Installing {Named(mod)}: {p:0}%"));
-                var remote = await _gameBanana.GetAsync(mod.Id);
-                var plan = await manager.PlanInstallAsync(remote, _gameBanana, progress);
-                if (!await ConfirmModPlanAsync(plan, CancellationToken.None))
-                {
-                    OnlineStatusText.Text = P7("Installation annulée : tu n’as pas rejoint la room.", "Installation cancelled: you did not join the room.");
-                    return;
-                }
-                await manager.InstallPlanAsync(plan, allowIncompatible: true, progress);
-                // Joining a room does not change which mods this player plays with otherwise:
-                // a mod installed for it stays off outside that session.
-                if (!wasInstalled || !playerEnabled) manager.SetEnabled(mod.Id, false);
-            }
-
-            report = RoomModCheck.Compare(row.Room.Mods, manager.GetInstalled());
-            if (report.Status != RoomModStatus.Compatible)
-            {
-                var differing = string.Join(", ", report.Missing.Concat(report.Outdated).Select(Named));
-                OnlineStatusText.Text = P7($"La version sur GameBanana de {differing} n’est pas celle de l’hôte : la room refuserait le lancement.",
-                                           $"GameBanana's version of {differing} is not the host's: the room would refuse to start.");
+                OnlineStatusText.Text = problem;
                 return;
             }
 
             OnlineStatusText.Text = P7("Connexion à la room…", "Joining the room…");
             var invite = await new PublicRoomDirectory(OnlineHttp, _roomTags.Relay).InviteAsync(row.Room.Room);
-            var extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = report.SessionMods };
+            var extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = sessionMods };
             var (started, message) = StartJoining(game, row.Room.Host, invite, extra);
             ShowToastParity(P7("Room", "Room"), message.Length > 0 ? message
                 : P7($"Tu rejoins la room de {row.Room.Host}.", $"Joining {row.Room.Host}'s room."));
@@ -376,6 +353,51 @@ public sealed partial class MainWindow
         {
             button.IsEnabled = true;
         }
+    }
+
+    /// <summary>
+    /// Makes this PC's mods match a room's: what is missing or in another version comes from
+    /// GameBanana through the Mods page's own plan and confirmation. A mod installed for a room
+    /// stays off outside it, so joining never changes what this player plays with otherwise.
+    /// Returns the list to hand the companion for that session, or why it cannot be had.
+    /// </summary>
+    private async Task<(bool Ready, string SessionMods, string Problem)> PrepareRoomModsAsync(
+        GameCatalogEntry game, IReadOnlyList<RoomMod> mods, Action<string> progressText)
+    {
+        var manager = new PortableModManager(_paths, game.Id);
+        var report = RoomModCheck.Compare(mods, manager.GetInstalled());
+        foreach (var mod in report.Missing.Concat(report.Outdated))
+        {
+            var before = manager.GetInstalled().FirstOrDefault(m => m.Id == mod.Id);
+            progressText(P7($"Installation de {Named(mod)}…", $"Installing {Named(mod)}…"));
+            var progress = new Progress<double>(p => progressText(P7($"Installation de {Named(mod)} : {p:0} %", $"Installing {Named(mod)}: {p:0}%")));
+            var remote = await _gameBanana.GetAsync(mod.Id);
+            var plan = await manager.PlanInstallAsync(remote, _gameBanana, progress);
+            if (!await ConfirmModPlanAsync(plan, CancellationToken.None))
+                return (false, "", P7("Installation annulée : tu n’as pas rejoint la room.", "Installation cancelled: you did not join the room."));
+            await manager.InstallPlanAsync(plan, allowIncompatible: true, progress);
+            if (before is not { Enabled: true }) manager.SetEnabled(mod.Id, false);
+        }
+
+        report = RoomModCheck.Compare(mods, manager.GetInstalled());
+        if (report.Status == RoomModStatus.Compatible) return (true, report.SessionMods, "");
+        var differing = string.Join(", ", report.Missing.Concat(report.Outdated).Select(Named));
+        return (false, "", P7($"La version sur GameBanana de {differing} n’est pas celle de l’hôte : la room refuserait le lancement.",
+                              $"GameBanana's version of {differing} is not the host's: the room would refuse to start."));
+    }
+
+    /// <summary>
+    /// For a join that cannot stop to install anything (the game's F1 menu): the room's mods for
+    /// the session when they are all here already, nothing otherwise -- the companion then shows
+    /// what is missing, as it always has.
+    /// </summary>
+    private IReadOnlyDictionary<string, string?>? SessionModsIfReady(GameCatalogEntry game, IReadOnlyList<RoomMod>? mods)
+    {
+        if (mods is null) return null;
+        var report = RoomModCheck.Compare(mods, new PortableModManager(_paths, game.Id).GetInstalled());
+        return report.Status == RoomModStatus.Compatible
+            ? new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = report.SessionMods }
+            : null;
     }
 
     private static string Named(RoomMod mod) => mod.Name.Length > 0 ? $"{mod.Name} (#{mod.Id})" : $"#{mod.Id}";

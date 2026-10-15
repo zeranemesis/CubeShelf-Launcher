@@ -249,8 +249,10 @@ public sealed partial class MainWindow
 
     private void PublishInvitation(GameCatalogEntry game, string payload, string forFriendKey)
     {
+        // The room's mods go with it, as the companion announced them in room.json.
+        var mods = new RoomSyncClient(RoomStateDirectory).Read() is { IsOpen: true } room ? room.Mods : null;
         var candidate = new PresenceInvite(
-            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime), forFriendKey);
+            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime), forFriendKey, mods);
 
         // The only checks CubeShelf can make on a payload it deliberately does not read: that
         // there is one, and that it is not large enough to bloat every heartbeat from here on.
@@ -335,9 +337,9 @@ public sealed partial class MainWindow
     }
 
     /// <summary>The Friends page's Join button.</summary>
-    private void JoinFriendInvite(object? sender, RoutedEventArgs args)
+    private async void JoinFriendInvite(object? sender, RoutedEventArgs args)
     {
-        if (sender is not Button { Tag: FriendRow row } || row.JoinPayload.Length == 0) return;
+        if (sender is not Button { Tag: FriendRow row } button || row.JoinPayload.Length == 0) return;
 
         var game = _catalogGames.FirstOrDefault(entry =>
             string.Equals(entry.Id, row.InviteGameId, StringComparison.OrdinalIgnoreCase));
@@ -349,7 +351,29 @@ public sealed partial class MainWindow
             return;
         }
 
-        var (started, message) = StartJoining(game, row.Name, row.JoinPayload);
+        // The room's mods first, when the invitation says which: installed if needed, and handed
+        // to the companion for that session only.
+        IReadOnlyDictionary<string, string?>? extra = null;
+        if (_friendPresence.TryGetValue(row.PublicKey, out var inviting) && inviting.Invite?.SafeMods() is { } mods)
+        {
+            button.IsEnabled = false;
+            try
+            {
+                var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, mods, text => FriendsSubtitleText.Text = text);
+                if (!ready)
+                {
+                    ShowToastParity(P7("Invitation", "Invitation"), problem);
+                    return;
+                }
+                extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = sessionMods };
+            }
+            finally
+            {
+                button.IsEnabled = true;
+            }
+        }
+
+        var (started, message) = StartJoining(game, row.Name, row.JoinPayload, extra);
         if (started && _friendPresence.TryGetValue(row.PublicKey, out var known) && known.Invite is { } accepted)
             AnswerInvite(row.PublicKey, accepted, InviteReply.Joined);
         ShowToastParity(P7("Invitation", "Invitation"),
