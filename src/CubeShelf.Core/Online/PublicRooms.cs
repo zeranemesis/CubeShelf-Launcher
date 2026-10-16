@@ -28,6 +28,8 @@ public sealed record PublicRoom(
 {
     /// <summary>The name its host gave the room, or empty.</summary>
     public string Title { get; init; } = "";
+    /// <summary>What the game says is happening (board, turn, minigame), while it plays.</summary>
+    public string Activity { get; init; } = "";
 
     /// <summary>Waiting for players: the only state in which a room can be joined.</summary>
     public bool IsJoinable => State == "waiting";
@@ -201,7 +203,7 @@ public sealed class PublicRoomDirectory(HttpClient http, Uri relay)
                 r.TryGetProperty("mods", out var m) ? ReadMods(m) : Array.Empty<RoomMod>(),
                 TimeSpan.FromSeconds(Math.Max(0, Number(r, "age"))),
                 TimeSpan.FromSeconds(Math.Max(0, Number(r, "playing"))))
-            { Title = Text(r, "title", 32) });
+            { Title = Text(r, "title", 32), Activity = Text(r, "activity", 120) });
         }
         return result;
     }

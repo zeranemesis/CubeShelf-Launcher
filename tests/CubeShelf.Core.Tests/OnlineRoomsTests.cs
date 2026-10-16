@@ -19,7 +19,7 @@ internal static class OnlineRoomsTests
           {"room":"{{Room}}","name":"Zera","lang":"fr","region":"eu","game":"GMPP01","state":"waiting",
            "players":["Zera"],"max":2,"mods":[{"id":4242,"name":"Board Pack","fp":"0102030405060708"}],"age":75,"playing":0},
           {"room":"fedcba9876543210fedcba9876543210","name":"Luigi","lang":"en","region":"us","game":"GMPE01","state":"playing",
-           "players":["Luigi","Daisy"],"max":2,"mods":[],"age":900,"playing":600},
+           "players":["Luigi","Daisy"],"max":2,"mods":[],"age":900,"playing":600,"title":"Soirée","activity":"Plateau Jardin de Toad, tour 5/20"},
           {"room":"not-a-room","name":"x"},
           {"room":"{{Room}}","name":"Bad\u202Ename\u0007","state":"hacked","max":99,
            "players":["a","b","c","d","e","f"],"mods":[{"id":-1,"fp":"zz"},{"id":5,"fp":"0011223344556677"}]}
@@ -32,6 +32,7 @@ internal static class OnlineRoomsTests
         Check(zera.IsJoinable && !zera.IsPlaying && zera.Open == TimeSpan.FromSeconds(75), "a waiting room, open for 75 s");
         Check(zera.Mods.Count == 1 && zera.Mods[0] == new RoomMod(4242, "Board Pack", "0102030405060708"), "its mod");
         var luigi = rooms[1];
+        Check(luigi.Title == "Soirée" && luigi.Activity == "Plateau Jardin de Toad, tour 5/20", "the room's name and what its game says");
         Check(luigi.IsPlaying && !luigi.IsJoinable && luigi.Players.SequenceEqual(new[] { "Luigi", "Daisy" }) && luigi.Playing == TimeSpan.FromMinutes(10), "a game under way, with its players");
         var hostile = rooms[2];
         Check(hostile.Host == "Badname", "control and direction characters are removed from names");

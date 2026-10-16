@@ -90,6 +90,8 @@ public sealed partial class MainWindow
         try
         {
             WriteInGameState(force: false);
+            // What the game says is happening, for the room's status on the public list.
+            _ = PumpRoomActivityAsync();
             // The public list for the tab, every twenty seconds while the game runs.
             if (DateTimeOffset.UtcNow - _inGameRoomsFetched > TimeSpan.FromSeconds(20)) _ = RefreshInGameRoomsAsync(game);
 
@@ -300,7 +302,8 @@ public sealed partial class MainWindow
     private string RoomLabel(GameCatalogEntry game, PublicRoom room) =>
         $"{LanguageName(room.Language)} · " + room.State switch
         {
-            "playing" => P7($"en jeu depuis {Duration(room.Playing)}", $"playing for {Duration(room.Playing)}"),
+            "playing" => P7($"en jeu depuis {Duration(room.Playing)}", $"playing for {Duration(room.Playing)}")
+                         + (room.Activity.Length > 0 ? " · " + room.Activity : ""),
             "full" => P7("complète", "full"),
             _ => P7($"ouverte depuis {Duration(room.Open)}", $"open for {Duration(room.Open)}")
         };

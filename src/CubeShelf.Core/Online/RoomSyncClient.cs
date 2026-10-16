@@ -37,6 +37,9 @@ public sealed record RoomState(
     public bool DiffersFromHost { get; init; }
     /// <summary>Why the room ended, when it has.</summary>
     public string Ending { get; init; } = "";
+    /// <summary>What the game says is happening, as the companion last heard it.</summary>
+    public string Activity { get; init; } = "";
+
     /// <summary>The companion process that writes this room, to tell a live room from a stale file.</summary>
     public int? Pid { get; init; }
 
@@ -136,7 +139,8 @@ public sealed class RoomSyncClient(string directory)
             DiffersFromHost = B("differsFromHost"),
             Ending = S("ending"),
             RoomId = S("roomId"),
-            Pid = N("pid")
+            Pid = N("pid"),
+            Activity = S("activity")
         };
     }
 

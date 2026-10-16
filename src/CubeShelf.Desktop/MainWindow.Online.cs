@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Mods;
 using CubeShelf.Core.Online;
+using CubeShelf.Core.Social;
 
 namespace CubeShelf.Desktop;
 
@@ -32,7 +33,10 @@ public sealed class RoomRow
     public required PublicRoom Room { get; init; }
     public required RoomModReport Mods { get; init; }
     public string Title { get; init; } = "";
+    public Avalonia.Media.Imaging.Bitmap? Cover { get; init; }
     public string GameLine { get; init; } = "";
+    public string ActivityLine { get; init; } = "";
+    public bool HasActivity => ActivityLine.Length > 0;
     public string PlayersLine { get; init; } = "";
     public IReadOnlyList<RoomModItem> ModItems { get; init; } = Array.Empty<RoomModItem>();
     public string NoModsLine { get; init; } = "";
@@ -233,6 +237,8 @@ public sealed partial class MainWindow
             Room = room,
             Mods = report,
             Title = room.Title.Length > 0 ? room.Title : P7($"Room de {room.Host}", $"{room.Host}'s room"),
+            Cover = CoverOf(game),
+            ActivityLine = room.IsPlaying && room.Activity.Length > 0 ? "▶ " + room.Activity : "",
             GameLine = $"{game.Title} · {RegionName(room.Game)} · {LanguageName(room.Language)} · {state}",
             PlayersLine = P7("Joueurs", "Players") + $" ({room.Players.Count}/{room.MaxPlayers}) : " + string.Join(", ", room.Players),
             ModItems = room.Mods.Select(mod =>
@@ -292,6 +298,9 @@ public sealed partial class MainWindow
         var visibility = room.IsHost ? (room.Public ? P7(" · publique", " · public") : P7(" · privée", " · private")) : "";
         MyRoomTitle.Text = $"{game?.Title ?? ""} · {(room.IsHost ? P7("tu héberges", "you host") : P7("tu as rejoint", "you joined"))}{visibility} · {what}";
 
+        MyRoomCover.Source = game is null ? null : CoverOf(game);
+        MyRoomActivity.Text = room.State == "playing" && room.Activity.Length > 0 ? "▶ " + room.Activity : "";
+        MyRoomActivity.IsVisible = MyRoomActivity.Text.Length > 0;
         MyRoomSeats.ItemsSource = room.Seats.Select(seat => new SeatRow
         {
             Name = seat.Name + (seat.You ? P7(" (toi)", " (you)") : ""),
@@ -770,6 +779,42 @@ public sealed partial class MainWindow
         finally
         {
             _watchingOnline = false;
+        }
+    }
+
+    // The game's front cover, as the library shows it, loaded once per game.
+    private readonly Dictionary<string, Avalonia.Media.Imaging.Bitmap?> _covers = new(StringComparer.OrdinalIgnoreCase);
+
+    private Avalonia.Media.Imaging.Bitmap? CoverOf(GameCatalogEntry game)
+    {
+        if (_covers.TryGetValue(game.Id, out var cover)) return cover;
+        cover = LoadBitmap(ResolveCoverPath(game.Covers.FirstOrDefault()?.Front));
+        _covers[game.Id] = cover;
+        return cover;
+    }
+
+    // What the running game says is happening, passed on to the companion so the room's status
+    // carries it -- the list shows it under games in progress. Checked with the in-game bridge's
+    // own tick; sent only when it changes.
+    private string _sentActivity = "";
+    private bool _sendingActivity;
+
+    private async Task PumpRoomActivityAsync()
+    {
+        if (_sendingActivity) return;
+        var room = RoomSync.Read();
+        if (room is not { State: "playing" } || !CompanionAlive(room)) { _sentActivity = ""; return; }
+        var activity = InGameBridge.ReadActivity(InGameDirectory, DateTimeOffset.UtcNow) ?? "";
+        if (activity == _sentActivity) return;
+        _sendingActivity = true;
+        try
+        {
+            var (ok, _) = await RoomSync.AskAsync("set-activity", activity);
+            if (ok) _sentActivity = activity;
+        }
+        finally
+        {
+            _sendingActivity = false;
         }
     }
 

@@ -498,12 +498,16 @@
                  headless and room.json says what its window would have shown. -->
             <Border x:Name="MyRoomPanel" IsVisible="False" Padding="16" CornerRadius="14" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
               <StackPanel Spacing="10">
-                <Grid ColumnDefinitions="*,Auto">
-                  <StackPanel Spacing="2">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <Border Width="66" Height="92" CornerRadius="6" ClipToBounds="True" Margin="0,0,14,0" VerticalAlignment="Top" Background="{DynamicResource Panel2}">
+                    <Image x:Name="MyRoomCover" Stretch="UniformToFill" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Spacing="2">
                     <TextBlock Text="{DynamicResource OnlineMyRoom}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" />
                     <TextBlock x:Name="MyRoomTitle" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                    <TextBlock x:Name="MyRoomActivity" Foreground="{DynamicResource Accent2}" FontStyle="Italic" TextWrapping="Wrap" IsVisible="False" />
                   </StackPanel>
-                  <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                  <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
                     <Button x:Name="MyRoomVisibilityButton" Click="ToggleMyRoomVisibility" />
                     <Button x:Name="MyRoomInviteButton" Content="{DynamicResource OnlineInviteFriends}" Click="InviteFriendsToMyRoom" />
                     <Button x:Name="MyRoomCloseButton" Classes="danger" Content="{DynamicResource OnlineCloseRoom}" Click="CloseMyRoom" />
@@ -552,10 +556,14 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
-                    <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Spacing="3">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <Border Width="66" Height="92" CornerRadius="6" ClipToBounds="True" Margin="0,0,14,0" VerticalAlignment="Top" Background="{DynamicResource Panel}">
+                        <Image Source="{Binding Cover}" Stretch="UniformToFill" />
+                      </Border>
+                      <StackPanel Grid.Column="1" Spacing="3">
                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ActivityLine}" Foreground="{DynamicResource Text}" FontSize="12" FontStyle="Italic" TextWrapping="Wrap" IsVisible="{Binding HasActivity}" />
                         <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <ItemsControl ItemsSource="{Binding ModItems}" Margin="0,2,0,0">
                           <ItemsControl.ItemTemplate>
@@ -571,7 +579,7 @@
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
                       </StackPanel>
-                      <Button Grid.Column="1" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
+                      <Button Grid.Column="2" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
                     </Grid>
                   </Border>
                 </DataTemplate>
@@ -583,10 +591,14 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
-                    <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Spacing="3">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <Border Width="66" Height="92" CornerRadius="6" ClipToBounds="True" Margin="0,0,14,0" VerticalAlignment="Top" Background="{DynamicResource Panel}">
+                        <Image Source="{Binding Cover}" Stretch="UniformToFill" />
+                      </Border>
+                      <StackPanel Grid.Column="1" Spacing="3">
                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ActivityLine}" Foreground="{DynamicResource Text}" FontSize="12" FontStyle="Italic" TextWrapping="Wrap" IsVisible="{Binding HasActivity}" />
                         <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <ItemsControl ItemsSource="{Binding ModItems}" Margin="0,2,0,0">
                           <ItemsControl.ItemTemplate>
@@ -602,7 +614,7 @@
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
                       </StackPanel>
-                      <Button Grid.Column="1" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
+                      <Button Grid.Column="2" Classes="primary" VerticalAlignment="Center" Content="{Binding JoinLabel}" Tag="{Binding}" IsVisible="{Binding CanJoin}" IsEnabled="{Binding JoinEnabled}" Click="JoinPublicRoom" />
                     </Grid>
                   </Border>
                 </DataTemplate>
