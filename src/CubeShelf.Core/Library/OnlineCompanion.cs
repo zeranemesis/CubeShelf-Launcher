@@ -84,11 +84,11 @@ public static class OnlineCompanion
     /// room. Both together: the Online page needs the one to show rooms and the other to follow
     /// the player's own.
     /// </summary>
-    /// <summary>Games on the local network: <c>--lan-games</c> and PARTYBOARD_ONLINE_MODE=lan.</summary>
-    public const string LanGamesCapability = "lan-games";
+    /// <summary>No window of its own: CubeShelf shows the room (PARTYBOARD_ONLINE_HEADLESS).</summary>
+    public const string RoomUiCapability = "room-ui";
 
-    public static bool SupportsLanGames(string? companionPath) =>
-        RuntimeManifest.HasCapability(companionPath, LanGamesCapability);
+    public static bool SupportsRoomUi(string? companionPath) =>
+        RuntimeManifest.HasCapability(companionPath, RoomUiCapability);
 
     public static bool SupportsPublicRooms(string? companionPath) =>
         RuntimeManifest.HasCapability(companionPath, PublicRoomsCapability) &&

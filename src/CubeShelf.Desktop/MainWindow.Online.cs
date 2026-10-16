@@ -7,13 +7,14 @@ using CubeShelf.Core.Online;
 
 namespace CubeShelf.Desktop;
 
-/// <summary>One game on the local network, worded for display.</summary>
-public sealed class LanRow
+/// <summary>One player of the player's own room, worded for display.</summary>
+public sealed class SeatRow
 {
-    public required LanGame Game { get; init; }
-    public string Title { get; init; } = "";
-    public string Line { get; init; } = "";
-    public bool CanJoin { get; init; }
+    public string Name { get; init; } = "";
+    public string Role { get; init; } = "";
+    public string Disc { get; init; } = "";
+    public string Mods { get; init; } = "";
+    public string Ping { get; init; } = "";
 }
 
 /// <summary>One room on the Online page, worded for display.</summary>
@@ -65,6 +66,17 @@ public sealed partial class MainWindow
                 RoomLanguageFilter.Items.Add(new ComboBoxItem { Content = LanguageName(code), Tag = code });
             RoomLanguageFilter.SelectedIndex = 0;
         }
+        // Every game on the shelf that plays online; the page is about the one picked.
+        var games = OnlineGames().ToList();
+        if (OnlineGamePicker.Items.Count != games.Count)
+        {
+            _choosingGame = true;
+            OnlineGamePicker.Items.Clear();
+            foreach (var g in games) OnlineGamePicker.Items.Add(new ComboBoxItem { Content = g.Title, Tag = g.Id });
+            OnlineGamePicker.SelectedIndex = Math.Max(0, games.FindIndex(g => g.Id == OnlineGame()?.Id));
+            _choosingGame = false;
+        }
+        OnlineGamePicker.IsEnabled = games.Count > 1;
         if (RoomVisibilityPicker.Items.Count == 0)
         {
             RoomVisibilityPicker.Items.Add(P7("Privée (amis invités)", "Private (invited friends)"));
@@ -156,7 +168,7 @@ public sealed partial class MainWindow
 
             var rooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
             // The player's own room is on the list too; it is shown above, not offered to join.
-            var mine = PublicRoom.IdOfInvite(_myRoom?.Invite);
+            var mine = _myRoom?.RelayRoom;
             var language = (RoomLanguageFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
             var rows = rooms.Where(room => room.Room != mine && (language.Length == 0 || room.Language == language))
                 .Select(room => ToRow(game, room, installed)).ToList();
@@ -169,7 +181,6 @@ public sealed partial class MainWindow
             PlayingRoomsEmpty.IsVisible = !rows.Any(r => !r.Room.IsJoinable);
             PlayingRoomsEmpty.Text = P7("Aucune partie publique en cours.", "No public game under way.");
             OnlineStatusText.Text = P7($"Mis à jour à {DateTime.Now:HH:mm:ss}.", $"Updated at {DateTime.Now:HH:mm:ss}.");
-            await RefreshLanGamesAsync(game);
         }
         catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
                                               or FormatException or System.Text.Json.JsonException or UnauthorizedAccessException
@@ -201,62 +212,6 @@ public sealed partial class MainWindow
         _roomTags = await RoomTags.ReadAsync(companion, disc, modList);
         _roomTagsKey = key;
         return _roomTags;
-    }
-
-    /// <summary>The games on this network, asked through the companion.</summary>
-    private async Task RefreshLanGamesAsync(GameCatalogEntry game)
-    {
-        var supported = OnlineBlocker(out _, out var companion, out var disc) is null && OnlineCompanion.SupportsLanGames(companion);
-        LanSection.IsVisible = supported;
-        if (!supported) return;
-        CreateLanButton.IsEnabled = _myRoom is null;
-        try
-        {
-            var games = await LanGames.ReadAsync(companion, disc);
-            LanGamesList.ItemsSource = games.Select(g => new LanRow
-            {
-                Game = g,
-                Title = P7($"Partie de {g.Host}", $"{g.Host}'s game"),
-                Line = $"{game.Title} · {RegionName(g.Region == "eu" ? "GMPP01" : "GMPE01")} · {LanguageName(g.Language)} · " +
-                       P7("Joueurs", "Players") + $" {g.Players}/{g.MaxPlayers}",
-                CanJoin = g.HasSeat && _myRoom is null
-            }).ToList();
-            LanGamesEmpty.Text = games.Count == 0
-                ? P7("Aucune partie sur ton réseau pour ton disque. Rien ne passe par Internet ici.",
-                     "No game on your network for your disc. Nothing here goes through the Internet.")
-                : "";
-        }
-        catch (Exception exception) when (exception is IOException or TaskCanceledException or InvalidOperationException
-                                              or System.ComponentModel.Win32Exception or System.Text.Json.JsonException)
-        {
-            LanGamesEmpty.Text = P7($"Recherche sur le réseau impossible : {exception.Message}", $"Could not search the network: {exception.Message}");
-        }
-    }
-
-    private void CreateLanGame(object? sender, RoutedEventArgs args)
-    {
-        if (OnlineGame() is not { } game) return;
-        var (started, message) = StartHosting(game, null, publicRoom: false, lan: true);
-        ShowToastParity(P7("Réseau local", "Local network"), started
-            ? P7("Le compagnon ouvre ta partie LAN : les joueurs de ton réseau la verront ici. Windows peut te demander l’autorisation.",
-                 "The companion is opening your LAN game: players on your network see it here. Windows may ask for permission.")
-            : message);
-        RefreshMyRoom();
-    }
-
-    private void JoinLanGame(object? sender, RoutedEventArgs args)
-    {
-        if (sender is not Button { Tag: LanRow row } || OnlineGame() is not { } game) return;
-        if (_myRoom is not null)
-        {
-            ShowToastParity(P7("Réseau local", "Local network"), P7("Ferme d’abord ta room.", "Close your room first."));
-            return;
-        }
-        var extra = new Dictionary<string, string?> { [RoomSyncClient.ModeVariable] = "lan" };
-        var (started, message) = StartJoining(game, row.Game.Host, row.Game.Invite, extra);
-        ShowToastParity(P7("Réseau local", "Local network"), message.Length > 0 ? message
-            : P7($"Tu rejoins la partie de {row.Game.Host} sur ton réseau.", $"Joining {row.Game.Host}'s game on your network."));
-        if (started) RefreshMyRoom();
     }
 
     private RoomRow ToRow(GameCatalogEntry game, PublicRoom room, IReadOnlyList<PortableInstalledMod> installed)
@@ -301,6 +256,7 @@ public sealed partial class MainWindow
             state = null;
         var before = _myRoom;
         _myRoom = state is { IsOpen: true } ? state : null;
+        AnnounceRoomEnd(before, state);
         // The list changes with this room (it fills, it starts, it closes): read it again now
         // rather than at the next ten-second tick.
         if (before?.State != _myRoom?.State || before?.Public != _myRoom?.Public) _roomsFetched = DateTimeOffset.MinValue;
@@ -315,23 +271,196 @@ public sealed partial class MainWindow
             "creating" => P7("Création de la room…", "Creating the room…"),
             "joining" => P7("Connexion à la room…", "Joining the room…"),
             "waiting" => P7("En attente d’un joueur", "Waiting for a player"),
-            "full" => P7("Complète", "Full"),
+            "full" => room.Phase == "waiting" ? P7("Complète", "Full") : P7("Lancement…", "Starting…"),
             "playing" => P7("En jeu", "Playing"),
             _ => room.State
         };
         // Only the host knows whether its room is on the list.
         var visibility = room.IsHost ? (room.Public ? P7(" · publique", " · public") : P7(" · privée", " · private")) : "";
-        MyRoomTitle.Text = $"{game?.Title ?? "Mario Party 4"} · {(room.IsHost ? P7("tu héberges", "you host") : P7("tu as rejoint", "you joined"))}{visibility} · {what}";
-        MyRoomPlayers.Text = room.Players.Count == 0 ? "" :
-            P7("Joueurs", "Players") + $" ({room.Players.Count}/{room.MaxPlayers}) : " + string.Join(", ", room.Players) +
-            (room.Ping is { } ping ? $" · {ping} ms" : "");
-        MyRoomMods.Text = ModsSummary(room.Mods, P7("Mods : ", "Mods: "));
+        MyRoomTitle.Text = $"{game?.Title ?? ""} · {(room.IsHost ? P7("tu héberges", "you host") : P7("tu as rejoint", "you joined"))}{visibility} · {what}";
+
+        MyRoomSeats.ItemsSource = room.Seats.Select(seat => new SeatRow
+        {
+            Name = seat.Name + (seat.You ? P7(" (toi)", " (you)") : ""),
+            Role = seat.Host ? P7("Hôte", "Host") : P7("Invité", "Guest"),
+            Disc = seat.Disc switch
+            {
+                "same" => P7("✓ Même disque (SHA-256 vérifié)", "✓ Same disc (SHA-256 verified)"),
+                "different" => P7("✗ DISQUE DIFFÉRENT", "✗ DIFFERENT DISC"),
+                "pending" => P7("Disque vérifié, comparaison en cours", "Disc verified, being compared"),
+                _ => P7("Disque non vérifié", "Disc not verified")
+            },
+            Mods = ModsSummary(seat.Mods, P7("Mods : ", "Mods: ")),
+            Ping = seat.You ? "" : seat.Ping is { } ms ? $"{ms} ms" : "—"
+        }).ToList();
+        MyRoomSeats.IsVisible = room.Seats.Count > 0;
+        MyRoomMods.Text = room.Seats.Count > 0 ? "" : ModsSummary(room.Mods, P7("Mods : ", "Mods: "));
+        MyRoomMods.IsVisible = MyRoomMods.Text.Length > 0;
         MyRoomMessage.Text = room.Message;
 
+        var waiting = room.Phase is "" or "waiting";
         var canChange = room.IsHost && room.Mode == "online" && room.State == "waiting" && room.MaxPlayers == 2;
         MyRoomVisibilityButton.IsVisible = canChange;
         MyRoomVisibilityButton.Content = room.Public ? P7("Rendre privée", "Make private") : P7("Rendre publique", "Make public");
         MyRoomInviteButton.IsVisible = room.IsHost && room.State == "waiting" && room.Invite.Length > 0;
+        MyRoomStartButton.IsVisible = room.IsHost && waiting;
+        MyRoomStartButton.IsEnabled = room.CanStart;
+        MyRoomModsButton.IsVisible = room.IsHost && waiting;
+        MyRoomInstallButton.IsVisible = !room.IsHost && waiting && room.MissingMods.Count > 0;
+        MyRoomAlignButton.IsVisible = !room.IsHost && waiting && room.DiffersFromHost && room.MissingMods.Count == 0;
+    }
+
+    /// <summary>A room that ended while CubeShelf watched it: said once, with the companion's reason.</summary>
+    private void AnnounceRoomEnd(RoomState? before, RoomState? now)
+    {
+        if (before is not { IsOpen: true } || now is not { State: "closed" } closed || closed.Message.Length == 0) return;
+        ShowToastParity(P7("Room", "Room"), closed.Message);
+    }
+
+    private async void StartMyRoom(object? sender, RoutedEventArgs args) =>
+        await AskRoomAsync(MyRoomStartButton, "start", null);
+
+    private async void AlignMyRoomOnHost(object? sender, RoutedEventArgs args) =>
+        await AskRoomAsync(MyRoomAlignButton, "align-host", null);
+
+    /// <summary>A guest missing some of the host's mods: installed from GameBanana, then the room aligns.</summary>
+    private async void InstallMyRoomMissing(object? sender, RoutedEventArgs args)
+    {
+        if (_myRoom is not { } room || OnlineGame() is not { } game) return;
+        var hostMods = room.Seats.FirstOrDefault(seat => seat.Host)?.Mods ?? room.MissingMods;
+        MyRoomInstallButton.IsEnabled = false;
+        try
+        {
+            var (ready, _, problem) = await PrepareRoomModsAsync(game, hostMods, text => MyRoomMessage.Text = text);
+            if (!ready)
+            {
+                MyRoomMessage.Text = problem;
+                return;
+            }
+            await AskRoomAsync(MyRoomAlignButton, "align-host", null);
+        }
+        finally
+        {
+            MyRoomInstallButton.IsEnabled = true;
+        }
+    }
+
+    private async void ChooseMyRoomMods(object? sender, RoutedEventArgs args)
+    {
+        if (_myRoom is not { } room || OnlineGame() is not { } game) return;
+        var current = room.Seats.FirstOrDefault(seat => seat.You)?.Mods ?? room.Mods;
+        if (await ChooseRoomModsAsync(game, current.Select(m => m.Id).ToList()) is { } ids)
+            await AskRoomAsync(MyRoomModsButton, "set-mods", ids);
+    }
+
+    /// <summary>The mods the next room is created with, chosen here; null means CubeShelf's own selection.</summary>
+    private string? _createModIds;
+
+    private async void ChooseCreateMods(object? sender, RoutedEventArgs args)
+    {
+        if (OnlineGame() is not { } game) return;
+        var installed = new PortableModManager(_paths, game.Id).GetInstalled();
+        var current = _createModIds is null
+            ? installed.Where(m => m.Enabled).Select(m => m.Id).ToList()
+            : _createModIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+        if (await ChooseRoomModsAsync(game, current) is not { } ids) return;
+        _createModIds = ids;
+        var names = installed.Where(m => ids.Split(',').Contains(m.Id.ToString())).Select(m => m.Name).ToList();
+        CreateRoomMods.Text = P7("Mods de la room : ", "Room mods: ") + (names.Count == 0 ? P7("aucun", "none") : string.Join(", ", names));
+    }
+
+    /// <summary>
+    /// The room's mods, picked among those installed on this PC, in CubeShelf's load order; or more
+    /// from GameBanana through the Mods page. The player's own selection is not changed by this.
+    /// Returns the ids for the companion ("12,345"), or null when cancelled.
+    /// </summary>
+    private async Task<string?> ChooseRoomModsAsync(GameCatalogEntry game, IReadOnlyList<int> current)
+    {
+        var installed = new PortableModManager(_paths, game.Id).GetInstalled()
+            .OrderByDescending(m => m.Priority).ThenBy(m => m.Id).ToList();
+        var boxes = installed.Select(m => new CheckBox { Content = m.Name.Length > 0 ? $"{m.Name} (#{m.Id})" : $"#{m.Id}", IsChecked = current.Contains(m.Id), Tag = m.Id }).ToList();
+        var list = new StackPanel { Spacing = 4 };
+        foreach (var box in boxes) list.Children.Add(box);
+        if (boxes.Count == 0)
+            list.Children.Add(new TextBlock { Text = P7("Aucun mod installé pour ce jeu.", "No mod installed for this game."), TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+
+        var dialog = new Window
+        {
+            Title = P7("Mods de la room", "Room mods"),
+            Width = 520, Height = 520, WindowStartupLocation = WindowStartupLocation.CenterOwner, CanResize = false
+        };
+        string? result = null;
+        var apply = new Button { Content = P7("Appliquer", "Apply"), Classes = { "primary" } };
+        var cancel = new Button { Content = P7("Annuler", "Cancel") };
+        var gameBanana = new Button { Content = P7("Ajouter depuis GameBanana…", "Add from GameBanana…") };
+        apply.Click += (_, _) =>
+        {
+            result = string.Join(",", boxes.Where(b => b.IsChecked == true).Select(b => (int)b.Tag!));
+            dialog.Close();
+        };
+        cancel.Click += (_, _) => dialog.Close();
+        gameBanana.Click += (_, _) =>
+        {
+            dialog.Close();
+            _selectedGame = game;
+            ParityOpenMods(this, new RoutedEventArgs());
+            ShowToastParity(P7("Mods", "Mods"), P7("Installe le mod ici, puis reviens dans En ligne et rouvre « Mods de la room… ».",
+                                                   "Install the mod here, then come back to Online and open “Room mods…” again."));
+        };
+        dialog.Content = new DockPanel
+        {
+            Margin = new Avalonia.Thickness(18),
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = P7("Les mods cochés sont ceux de la room. Tous les joueurs doivent avoir les mêmes : un invité qui en manque les installe en un clic. Ta sélection habituelle n’est pas modifiée.",
+                              "The ticked mods are the room's. Every player must have the same: a guest missing one installs it in one click. Your usual selection is not changed."),
+                    TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Avalonia.Thickness(0, 0, 0, 12),
+                    [DockPanel.DockProperty] = Dock.Top
+                },
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Margin = new Avalonia.Thickness(0, 12, 0, 0),
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                    [DockPanel.DockProperty] = Dock.Bottom,
+                    Children = { gameBanana, cancel, apply }
+                },
+                new ScrollViewer { Content = list }
+            }
+        };
+        await dialog.ShowDialog(this);
+        return result;
+    }
+
+    /// <summary>Asks the companion, with the button held while it answers, and says what it answered.</summary>
+    private async Task AskRoomAsync(Button button, string action, string? value)
+    {
+        button.IsEnabled = false;
+        try
+        {
+            var (ok, message) = await RoomSync.AskAsync(action, value);
+            if (!ok || message.Length > 0)
+                ShowToastParity(P7("Room", "Room"), message.Length > 0 ? message : P7("Le compagnon n’a pas répondu.", "The companion did not answer."));
+        }
+        finally
+        {
+            button.IsEnabled = true;
+            RefreshMyRoom();
+        }
+    }
+
+    private bool _choosingGame;
+
+    private void OnlineGameChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        if (_choosingGame || (OnlineGamePicker.SelectedItem as ComboBoxItem)?.Tag is not string id) return;
+        _onlineGameId = id;
+        _roomTags = null;
+        _createModIds = null;
+        CreateRoomMods.Text = "";
+        _roomsFetched = DateTimeOffset.MinValue;
+        if (OnlineView.IsVisible) OnlineTick(null, EventArgs.Empty);
     }
 
     private async void ToggleMyRoomVisibility(object? sender, RoutedEventArgs args)
@@ -374,24 +503,19 @@ public sealed partial class MainWindow
         PublishInvitation(game, room.Invite, "");
     }
 
-    private void OpenRoomMods(object? sender, RoutedEventArgs args)
-    {
-        if (OnlineGame() is { } game) _selectedGame = game;
-        ParityOpenMods(sender, args);
-    }
-
     private void CreateRoom(object? sender, RoutedEventArgs args)
     {
         if (OnlineGame() is not { } game) return;
         var isPublic = RoomVisibilityPicker.SelectedIndex == 1;
-        var (started, message) = StartHosting(game, null, isPublic);
+        var extra = _createModIds is null ? null : new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = _createModIds };
+        var (started, message) = StartHosting(game, null, isPublic, extra);
         ShowToastParity(P7("Room", "Room"),
             started
                 ? isPublic
-                    ? P7("Le compagnon ouvre ta room publique. Elle apparaîtra ici dès qu’elle sera prête.",
-                         "The companion is opening your public room. It shows here as soon as it is ready.")
-                    : P7("Le compagnon ouvre ta room privée. Tes amis recevront l’invitation dès qu’elle sera prête.",
-                         "The companion is opening your private room. Your friends get the invitation as soon as it is ready.")
+                    ? P7("Ta room publique s’ouvre : elle apparaît ici dans un instant.",
+                         "Your public room is opening: it shows here in a moment.")
+                    : P7("Ta room privée s’ouvre. Tes amis recevront l’invitation dès qu’elle sera prête.",
+                         "Your private room is opening. Your friends get the invitation as soon as it is ready.")
                 : message);
         RefreshMyRoom();
     }
@@ -525,7 +649,7 @@ public sealed partial class MainWindow
 
             if (await EnsureRoomTagsAsync(game) is not { } tags) return;
             var rooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
-            var mine = PublicRoom.IdOfInvite(room?.Invite);
+            var mine = room?.RelayRoom;
             var fresh = rooms.Where(r => r.IsJoinable && r.Room != mine && !_seenRooms.Contains(r.Room)).ToList();
             // The first read only learns what is already there: a dot means something new since.
             if (fresh.Count > 0 && _seenRooms.Count > 0) NavOnlineBadge.IsVisible = true;

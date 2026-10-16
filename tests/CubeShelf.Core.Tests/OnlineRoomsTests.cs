@@ -50,20 +50,6 @@ internal static class OnlineRoomsTests
         Check(PublicRoom.IdOfInvite("PB4.short") is null && PublicRoom.IdOfInvite(null) is null, "anything else names none");
     }
 
-    public static void ReadsLanGames()
-    {
-        var games = LanGames.Parse("""
-            {"schema":1,"games":[
-            {"name":"Zera","lang":"fr","region":"eu","players":1,"max":2,"invite":"PB4.wKgBDtrt3MvQaqBYIvvrQovy4BEE8qacQ_asctzv4ffjFDVbrbTLxVGywKgBDtrtAg=="},
-            {"name":"Full","lang":"en","region":"us","players":2,"max":2,"invite":"PB4.wKgBDtrt3MvQaqBYIvvrQovy4BEE8qacQ_asctzv4ffjFDVbrbTLxVGywKgBDtrtAg=="},
-            {"name":"Bad","invite":"not an invitation"}]}
-            """);
-        Check(games.Count == 2, "a game without a usable invitation is dropped");
-        Check(games[0] is { Host: "Zera", Language: "fr", Region: "eu", Players: 1, MaxPlayers: 2, HasSeat: true }, "host, language, region and seats");
-        Check(!games[1].HasSeat, "a full game has no seat");
-        Check(LanGames.Parse("{}").Count == 0, "nothing found reads as nothing");
-    }
-
     public static void ReadsTheCompanionTags()
     {
         var tags = RoomTags.Parse("""{"schema":1,"build":"57057c1c8bf2b2b9","disc":"703d77caf79b40cb","game":"GMPE01","mods":[{"id":7,"name":"M","fp":"0909090909090909"}],"relay":"https://relay.example"}""");
@@ -106,10 +92,18 @@ internal static class OnlineRoomsTests
             sync.Reset();
             Check(sync.Read() is null, "no room yet");
             File.WriteAllText(Path.Combine(dir, "room.json"),
-                """{"schema":1,"revision":4,"state":"full","role":"host","mode":"online","visibility":"public","public":true,"game":"GMPE01","players":["Zera","Ami"],"max":2,"mods":[{"id":4242,"name":"Board Pack","fp":"0102030405060708"}],"ping":31,"message":"ok"}""");
+                """
+                {"schema":1,"revision":4,"state":"full","role":"host","mode":"online","visibility":"public","public":true,"game":"GMPE01","players":["Zera","Ami"],"max":2,"mods":[{"id":4242,"name":"Board Pack","fp":"0102030405060708"}],"ping":31,"message":"ok",
+                  "seats":[{"name":"Zera","host":true,"you":true,"disc":"same","mods":[],"ping":null},{"name":"Ami","host":false,"you":false,"disc":"different","mods":[{"id":7,"name":"M","fp":"0909090909090909"}],"ping":31}],
+                  "phase":"waiting","canStart":false,"discsMatch":false,"modsMatch":false,"modAdvice":"Ami : 7","missingMods":[{"id":7,"name":"M","fp":"0909090909090909"}],"differsFromHost":true}
+                """);
             var state = sync.Read()!;
             Check(state.Revision == 4 && state.State == "full" && state.IsHost && state.IsOpen && state.Public, "state, role and visibility");
             Check(state.Players.SequenceEqual(new[] { "Zera", "Ami" }) && state.Mods.Single().Id == 4242 && state.Ping == 31, "players, mods and ping");
+            Check(state.Seats.Count == 2 && state.Seats[0] is { Name: "Zera", Host: true, You: true, Disc: "same", Ping: null } &&
+                  state.Seats[1] is { Disc: "different", Ping: 31 } && state.Seats[1].Mods.Single().Id == 7, "every seat with its disc, mods and ping");
+            Check(state.Phase == "waiting" && !state.CanStart && !state.DiscsMatch && !state.ModsMatch && state.ModAdvice == "Ami : 7", "the lobby's verdicts");
+            Check(state.MissingMods.Single().Id == 7 && state.DiffersFromHost, "what a guest is missing");
             File.WriteAllText(Path.Combine(dir, "room.json"), "{half");
             Check(sync.Read() is null, "a half-written file reads as nothing rather than throwing");
 

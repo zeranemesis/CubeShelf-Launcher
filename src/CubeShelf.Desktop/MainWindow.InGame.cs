@@ -230,7 +230,7 @@ public sealed partial class MainWindow
             .ToList();
 
         var room = InGameRoomOf(new RoomSyncClient(RoomStateDirectory).Read());
-        var mine = PublicRoom.IdOfInvite(new RoomSyncClient(RoomStateDirectory).Read()?.Invite);
+        var mine = new RoomSyncClient(RoomStateDirectory).Read()?.RelayRoom;
         var installed = new CubeShelf.Core.Mods.PortableModManager(_paths, game.Id).GetInstalled();
         var rooms = _inGameRooms
             .Where(r => r.Room != mine)

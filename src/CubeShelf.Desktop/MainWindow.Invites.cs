@@ -31,7 +31,14 @@ public sealed partial class MainWindow
         Path.Combine(_paths.ConfigurationDirectory, "pending-invite.txt");
 
     /// <summary>The game that can be played together, if the catalog has one. Today, Mario Party 4.</summary>
-    private GameCatalogEntry? OnlineGame() => _catalogGames.FirstOrDefault(OnlineCompanion.IsSupported);
+    /// <summary>Every game on the shelf that can be played together.</summary>
+    private IEnumerable<GameCatalogEntry> OnlineGames() => _catalogGames.Where(OnlineCompanion.IsSupported);
+
+    /// <summary>The game the Online page is about: the one picked there, else the first that plays online.</summary>
+    private string? _onlineGameId;
+    private GameCatalogEntry? OnlineGame() =>
+        OnlineGames().FirstOrDefault(game => string.Equals(game.Id, _onlineGameId, StringComparison.OrdinalIgnoreCase))
+        ?? OnlineGames().FirstOrDefault();
 
     private bool IsHosting =>
         _hostWatch is { IsCancellationRequested: false } ||
@@ -133,6 +140,8 @@ public sealed partial class MainWindow
         if (!TryResolveCompanion(game, out var companion) || !OnlineCompanion.SupportsPublicRooms(companion)) return;
         new RoomSyncClient(RoomStateDirectory).Reset();
         environment[RoomSyncClient.DirectoryVariable] = RoomStateDirectory;
+        // The room is shown here, in the Online page: no window of the companion's own.
+        if (OnlineCompanion.SupportsRoomUi(companion)) environment[RoomSyncClient.HeadlessVariable] = "1";
     }
 
     private bool TryStartCompanion(
@@ -167,10 +176,10 @@ public sealed partial class MainWindow
     /// Opens a lobby. The companion creates it and writes the invitation where we told it to; we
     /// watch that file and publish what lands there, to everyone or to the one friend named.
     /// </summary>
-    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false, bool lan = false)
+    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false,
+        IReadOnlyDictionary<string, string?>? extra = null)
     {
-        // A LAN game is found on the network: like a public room, it needs no friend to tell.
-        if (HostingBlocker(game, publicRoom || lan) is { } blocker) return (false, blocker);
+        if (HostingBlocker(game, publicRoom) is { } blocker) return (false, blocker);
         if (_hostWatch is { IsCancellationRequested: false })
             return (false, P7("Un salon est déjà en préparation.", "A lobby is already being prepared."));
 
@@ -180,13 +189,12 @@ public sealed partial class MainWindow
         var environment = CompanionEnvironment(game);
         environment["PARTYBOARD_ONLINE_INVITE_OUT"] = PendingInviteFile;
         if (publicRoom) environment[RoomSyncClient.VisibilityVariable] = "public";
-        if (lan) environment[RoomSyncClient.ModeVariable] = "lan";
+        if (extra is not null) foreach (var pair in extra) environment[pair.Key] = pair.Value;
         AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--host" }, out var error)) return (false, error);
 
-        // A LAN game has no invitation to send; a public room with no friend to tell is found
-        // on the list.
-        if (lan || (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0)))
+        // A public room with no friend to tell is found on the list.
+        if (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0))
         {
             WriteInGameState();
             return (true, "");
