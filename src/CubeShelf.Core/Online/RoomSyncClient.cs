@@ -66,6 +66,7 @@ public sealed class RoomSyncClient(string directory)
     public const string ModsVariable = "PARTYBOARD_ONLINE_MODS";
     public const string HeadlessVariable = "PARTYBOARD_ONLINE_HEADLESS";
     public const string RoomNameVariable = "PARTYBOARD_ONLINE_ROOM_NAME";
+    public const string PlayersVariable = "PARTYBOARD_ONLINE_PLAYERS";
     private const int MaximumBytes = 64 * 1024;
 
     public string Directory => directory;

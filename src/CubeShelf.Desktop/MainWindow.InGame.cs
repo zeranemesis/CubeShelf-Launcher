@@ -296,7 +296,7 @@ public sealed partial class MainWindow
         };
         var visibility = state.IsHost ? (state.Public ? P7("publique", "public") : P7("privée", "private")) + " · " : "";
         return new InGameRoom(state.State, visibility + what, state.IsHost, state.Public, state.Players, state.MaxPlayers,
-            state.IsHost && state.Mode == "online" && state.State == "waiting" && state.MaxPlayers == 2);
+            state.IsHost && state.Mode == "online" && state.State == "waiting");
     }
 
     private string RoomLabel(GameCatalogEntry game, PublicRoom room) =>

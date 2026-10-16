@@ -321,7 +321,7 @@ public sealed partial class MainWindow
         MyRoomMessage.Text = room.Message;
 
         var waiting = room.Phase is "" or "waiting";
-        var canChange = room.IsHost && room.Mode == "online" && room.State == "waiting" && room.MaxPlayers == 2;
+        var canChange = room.IsHost && room.Mode == "online" && room.State == "waiting";
         MyRoomVisibilityButton.IsVisible = canChange;
         MyRoomVisibilityButton.Content = room.Public ? P7("Rendre privée", "Make private") : P7("Rendre publique", "Make public");
         MyRoomInviteButton.IsVisible = room.IsHost && room.State == "waiting" && room.Invite.Length > 0;
@@ -591,7 +591,8 @@ public sealed partial class MainWindow
         var extra = new Dictionary<string, string?>
         {
             [RoomSyncClient.ModsVariable] = mods,
-            [RoomSyncClient.RoomNameVariable] = (RoomNameBox.Text ?? "").Trim()
+            [RoomSyncClient.RoomNameVariable] = (RoomNameBox.Text ?? "").Trim(),
+            [RoomSyncClient.PlayersVariable] = RoomPlayers4Radio.IsChecked == true ? "4" : RoomPlayers3Radio.IsChecked == true ? "3" : "2"
         };
         var (started, message) = StartHosting(game, null, isPublic, extra);
         if (!started)

@@ -642,17 +642,28 @@
           <StackPanel Margin="28,20,28,28" Spacing="14" MaxWidth="860" HorizontalAlignment="Left">
             <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
               <StackPanel Spacing="8">
-                <TextBlock Text="{DynamicResource OnlineSetupName}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
-                <TextBox x:Name="RoomNameBox" MaxLength="32" MinWidth="420" HorizontalAlignment="Left" />
-                <TextBlock Text="{DynamicResource OnlineSetupNameHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
-              </StackPanel>
-            </Border>
-            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
-              <StackPanel Spacing="8">
                 <TextBlock Text="{DynamicResource OnlineSetupVisibility}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
                 <RadioButton x:Name="RoomPublicRadio" GroupName="RoomVisibility" IsChecked="True" Content="{DynamicResource OnlineSetupPublic}" />
                 <RadioButton x:Name="RoomPrivateRadio" GroupName="RoomVisibility" Content="{DynamicResource OnlineSetupPrivate}" />
                 <TextBlock Text="{DynamicResource OnlineSetupVisibilityHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource OnlineSetupPlayers}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                  <RadioButton x:Name="RoomPlayers2Radio" GroupName="RoomPlayers" IsChecked="True" Content="2" />
+                  <RadioButton x:Name="RoomPlayers3Radio" GroupName="RoomPlayers" Content="3" />
+                  <RadioButton x:Name="RoomPlayers4Radio" GroupName="RoomPlayers" Content="4" />
+                </StackPanel>
+                <TextBlock Text="{DynamicResource OnlineSetupPlayersHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource OnlineSetupName}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
+                <TextBox x:Name="RoomNameBox" MaxLength="32" MinWidth="420" HorizontalAlignment="Left" />
+                <TextBlock Text="{DynamicResource OnlineSetupNameHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
             <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
