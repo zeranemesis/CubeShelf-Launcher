@@ -692,7 +692,7 @@ public sealed partial class MainWindow : Window
     private void ApplyPreferences()
     {
         _loadingSettings = true;
-        LanguagePicker.SelectedIndex = _preferences.Language.Equals("en", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+        LanguagePicker.SelectedIndex = _preferences.Language.ToLowerInvariant() switch { "fr" => 1, "en" => 2, _ => 0 };
         ThemePicker.SelectedIndex = _preferences.Theme.Equals("light", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
@@ -708,7 +708,7 @@ public sealed partial class MainWindow : Window
     private void SaveSettings(object? sender, RoutedEventArgs args)
     {
         if (_loadingSettings) return;
-        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "fr";
+        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? UiLocalization.Automatic;
         var theme = (ThemePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "dark";
         _preferences = _preferences with
         {
@@ -722,9 +722,7 @@ public sealed partial class MainWindow : Window
         _preferencesStore.Save(_preferences);
         if (Avalonia.Application.Current is { } application)
             application.RequestedThemeVariant = theme == "light" ? ThemeVariant.Light : ThemeVariant.Dark;
-        SettingsStatus.Text = language == "en"
-            ? "Settings saved. Full English interface resources are being finalized for v0.8."
-            : "Paramètres enregistrés.";
+        SettingsStatus.Text = UiLocalization.IsEnglish(language) ? "Settings saved." : "Paramètres enregistrés.";
     }
 
     /// <summary>

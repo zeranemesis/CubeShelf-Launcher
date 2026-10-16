@@ -92,6 +92,10 @@ public sealed partial class MainWindow
         var name = (_preferences.FriendsDisplayName ?? "").Trim();
         if (name.Length > 0) environment["PARTYBOARD_ONLINE_NICKNAME"] = name;
 
+        // The companion speaks the language CubeShelf shows (itself following Windows unless
+        // the player chose), so the two windows never disagree.
+        environment["PARTYBOARD_ONLINE_UI_LANGUAGE"] = UiLocalization.Resolve(_preferences.Language);
+
         var disc = ResolveApplicationPath(game.DiscImage);
         if (!string.IsNullOrWhiteSpace(disc) && File.Exists(disc))
             environment["PARTYBOARD_ONLINE_DISC"] = disc;

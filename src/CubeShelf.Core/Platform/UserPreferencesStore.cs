@@ -3,7 +3,9 @@
 namespace CubeShelf.Core.Platform;
 
 public sealed record UserPreferences(
-    string Language = "fr",
+    // "auto": the language of Windows (French when Windows is in French, English otherwise);
+    // "fr" or "en" when the player chose one.
+    string Language = "auto",
     string Theme = "dark",
     bool CheckGamesOnStartup = true,
     bool ShowGameUpdatePopup = true,

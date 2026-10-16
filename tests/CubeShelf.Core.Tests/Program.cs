@@ -686,7 +686,8 @@ void TestPreferences()
         var loaded = store.Load();
         Assert(loaded.Language == "en" && loaded.Theme == "light" && !loaded.RefreshModsOnOpen);
         store.Reset();
-        Assert(store.Load().Language == "fr");
+        // Nothing chosen: follow the language of Windows.
+        Assert(store.Load().Language == "auto");
     });
 }
 

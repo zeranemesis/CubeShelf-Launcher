@@ -12,6 +12,7 @@ internal static class UiLocalization
         ["AppDownloads"] = "Téléchargements",
         ["AppFriends"] = "Amis",
         ["AppOnline"] = "En ligne",
+        ["LanguageAuto"] = "Automatique (Windows)",
         ["OnlineEyebrow"] = "EN LIGNE",
         ["OnlineTitle"] = "Rooms",
         ["OnlineRefresh"] = "Actualiser",
@@ -241,6 +242,7 @@ internal static class UiLocalization
         ["AppDownloads"] = "Downloads",
         ["AppFriends"] = "Friends",
         ["AppOnline"] = "Online",
+        ["LanguageAuto"] = "Automatic (Windows)",
         ["OnlineEyebrow"] = "ONLINE",
         ["OnlineTitle"] = "Rooms",
         ["OnlineRefresh"] = "Refresh",
@@ -462,8 +464,24 @@ internal static class UiLocalization
         ["RaProgressHelp"] = "Your progress in each game played from CubeShelf, as the game reports it. It updates while you play.",
     };
 
-    public static bool IsEnglish(string? language) =>
-        string.Equals(language, "en", StringComparison.OrdinalIgnoreCase);
+    /// <summary>Follow Windows: the stored value when the player has not picked a language.</summary>
+    public const string Automatic = "auto";
+
+    /// <summary>
+    /// The language actually shown: the player's choice, or for <see cref="Automatic"/> (and anything
+    /// unknown) the language of Windows -- French when Windows is in French, English otherwise,
+    /// English being the one CubeShelf has for every other language.
+    /// </summary>
+    public static string Resolve(string? language) =>
+        string.Equals(language, "fr", StringComparison.OrdinalIgnoreCase) ? "fr"
+        : string.Equals(language, "en", StringComparison.OrdinalIgnoreCase) ? "en"
+        : SystemLanguage();
+
+    public static string SystemLanguage() =>
+        string.Equals(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, "fr", StringComparison.OrdinalIgnoreCase)
+            ? "fr" : "en";
+
+    public static bool IsEnglish(string? language) => Resolve(language) == "en";
 
     public static string Get(string? language, string key)
     {

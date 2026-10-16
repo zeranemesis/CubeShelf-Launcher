@@ -60,7 +60,7 @@ public sealed partial class MainWindow
     private void Phase5LanguageChanged(object? sender, SelectionChangedEventArgs args)
     {
         if (_phase5LoadingSettings) return;
-        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "fr";
+        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? UiLocalization.Automatic;
         UiLocalization.Apply(language);
         RefreshLocalizedPhase5State(language);
     }

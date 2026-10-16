@@ -65,6 +65,15 @@ public sealed class MeshDht
     private readonly Dictionary<IPEndPoint, long> _unreachable = new();
 
     /// <summary>
+    /// Lookup handshakes under way, by address, guarded by the lock on <see cref="_unreachable"/>.
+    /// A lookup can finish while one of its handshakes still runs -- closer nodes answered and
+    /// pushed that one out of the window -- so it is the handshake, not the lookup waiting on it,
+    /// that records the address as unreachable; and a later lookup meeting the same address in the
+    /// meantime joins it rather than paying for a second one.
+    /// </summary>
+    private readonly Dictionary<IPEndPoint, Task<MeshSession?>> _connecting = new();
+
+    /// <summary>
     /// How the contacts each node handed out turned out. A node whose referrals keep leading
     /// nowhere is lying, or hopelessly out of date; either way it stops being asked.
     /// </summary>
@@ -360,6 +369,39 @@ public sealed class MeshDht
         }
     }
 
+    private Task<MeshSession?> ConnectForLookupAsync(IPEndPoint endpoint)
+    {
+        lock (_unreachable)
+        {
+            if (_connecting.TryGetValue(endpoint, out var running)) return running;
+            if (IsUnreachable(endpoint)) return Task.FromResult<MeshSession?>(null);
+            // Still under the lock: a handshake that ends at once has already left nothing behind,
+            // and one that ends later waits for this entry before it removes it.
+            var attempt = HandshakeAsync(endpoint);
+            if (!attempt.IsCompleted) _connecting[endpoint] = attempt;
+            return attempt;
+        }
+    }
+
+    private async Task<MeshSession?> HandshakeAsync(IPEndPoint endpoint)
+    {
+        MeshSession? session = null;
+        try
+        {
+            // Not cancelled with the lookup: the transport finishes the handshake either way.
+            session = await _transport.ConnectAsync(MeshRoute.Direct(endpoint)).ConfigureAwait(false);
+            return session;
+        }
+        finally
+        {
+            lock (_unreachable)
+            {
+                _connecting.Remove(endpoint);
+                if (session is null) MarkUnreachable(endpoint);
+            }
+        }
+    }
+
     private bool IsDistrusted(NodeId id)
     {
         lock (_referrals)
@@ -476,7 +518,15 @@ public sealed class MeshDht
     {
         try
         {
-            var session = await _transport.ConnectAsync(MeshRoute.Direct(contact.Endpoint), cancellationToken).ConfigureAwait(false);
+            MeshSession? session;
+            try
+            {
+                session = await ConnectForLookupAsync(contact.Endpoint).WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return QueryResult.Failure;
+            }
             // Whoever answers at that address has to be the node we were told about.
             if (session is null || session.RemoteId != contact.Id) return QueryResult.Failure;
             Table.Observe(contact);
