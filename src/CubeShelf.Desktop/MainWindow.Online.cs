@@ -104,6 +104,11 @@ public sealed partial class MainWindow
         disc = "";
         if (game is null)
             return P7("Aucun jeu de ta bibliothèque ne se joue en ligne.", "No game on your shelf plays online.");
+        // The companion that hosts and joins rooms is a Windows program; elsewhere there is
+        // nothing to install that would make this page work, so say that rather than "install".
+        if (!OperatingSystem.IsWindows())
+            return P7("Les rooms en ligne passent par le compagnon Windows de PartyBoard : elles ne sont pas encore disponibles sur ce système. Tes amis restent joignables depuis la page Amis.",
+                      "Online rooms go through PartyBoard's Windows companion: they are not available on this system yet. Your friends are still on the Friends page.");
         if (!TryResolveCompanion(game, out companion))
             return P7($"Installe {game.RuntimeName} depuis CubeShelf : son compagnon en ligne vient avec.",
                       $"Install {game.RuntimeName} from CubeShelf: its online companion comes with it.");
