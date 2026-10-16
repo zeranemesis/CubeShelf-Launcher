@@ -517,7 +517,7 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
                       <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="10" Padding="12,8" Margin="0,0,0,6">
-                        <Grid ColumnDefinitions="1.2*,1.4*,Auto">
+                        <Grid ColumnDefinitions="1.2*,1.4*,Auto,Auto">
                           <StackPanel>
                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                             <TextBlock Text="{Binding Role}" Foreground="{DynamicResource Accent2}" FontSize="12" />
@@ -527,12 +527,17 @@
                             <TextBlock Text="{Binding Mods}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
                           </StackPanel>
                           <TextBlock Grid.Column="2" Text="{Binding Ping}" Foreground="{DynamicResource Muted}" VerticalAlignment="Center" />
+                          <Button Grid.Column="3" Margin="10,0,0,0" VerticalAlignment="Center" Content="{DynamicResource OnlineKick}" Tag="{Binding Seat}" IsVisible="{Binding CanKick}" Click="KickFromMyRoom" />
                         </Grid>
                       </Border>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <TextBlock x:Name="MyRoomMods" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                <StackPanel x:Name="MyRoomRenamePanel" Orientation="Horizontal" Spacing="8" IsVisible="False">
+                  <TextBox x:Name="MyRoomNameBox" MaxLength="32" MinWidth="280" Watermark="{DynamicResource OnlineRenameHint}" />
+                  <Button x:Name="MyRoomRenameButton" Content="{DynamicResource OnlineRename}" Click="RenameMyRoom" />
+                </StackPanel>
                 <TextBlock x:Name="MyRoomMessage" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <Button x:Name="MyRoomStartButton" Classes="primary" Content="{DynamicResource OnlineStart}" Click="StartMyRoom" />

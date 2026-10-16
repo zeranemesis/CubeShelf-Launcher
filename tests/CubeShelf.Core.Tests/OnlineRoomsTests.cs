@@ -95,14 +95,14 @@ internal static class OnlineRoomsTests
             File.WriteAllText(Path.Combine(dir, "room.json"),
                 """
                 {"schema":1,"revision":4,"state":"full","role":"host","mode":"online","visibility":"public","public":true,"game":"GMPE01","players":["Zera","Ami"],"max":2,"mods":[{"id":4242,"name":"Board Pack","fp":"0102030405060708"}],"ping":31,"message":"ok",
-                  "seats":[{"name":"Zera","host":true,"you":true,"disc":"same","mods":[],"ping":null},{"name":"Ami","host":false,"you":false,"disc":"different","mods":[{"id":7,"name":"M","fp":"0909090909090909"}],"ping":31}],
+                  "seats":[{"seat":0,"name":"Zera","host":true,"you":true,"disc":"same","mods":[],"ping":null},{"seat":1,"name":"Ami","host":false,"you":false,"disc":"different","mods":[{"id":7,"name":"M","fp":"0909090909090909"}],"ping":31}],
                   "phase":"waiting","canStart":false,"discsMatch":false,"modsMatch":false,"modAdvice":"Ami : 7","missingMods":[{"id":7,"name":"M","fp":"0909090909090909"}],"differsFromHost":true}
                 """);
             var state = sync.Read()!;
             Check(state.Revision == 4 && state.State == "full" && state.IsHost && state.IsOpen && state.Public, "state, role and visibility");
             Check(state.Players.SequenceEqual(new[] { "Zera", "Ami" }) && state.Mods.Single().Id == 4242 && state.Ping == 31, "players, mods and ping");
             Check(state.Seats.Count == 2 && state.Seats[0] is { Name: "Zera", Host: true, You: true, Disc: "same", Ping: null } &&
-                  state.Seats[1] is { Disc: "different", Ping: 31 } && state.Seats[1].Mods.Single().Id == 7, "every seat with its disc, mods and ping");
+                  state.Seats[1] is { Disc: "different", Ping: 31, Seat: 1 } && state.Seats[0].Seat == 0 && state.Seats[1].Mods.Single().Id == 7, "every seat with its disc, mods and ping");
             Check(state.Phase == "waiting" && !state.CanStart && !state.DiscsMatch && !state.ModsMatch && state.ModAdvice == "Ami : 7", "the lobby's verdicts");
             Check(state.MissingMods.Single().Id == 7 && state.DiffersFromHost, "what a guest is missing");
             File.WriteAllText(Path.Combine(dir, "room.json"), "{half");
@@ -128,6 +128,29 @@ internal static class OnlineRoomsTests
             var (ok, message) = sync.AskAsync("set-visibility", "public").GetAwaiter().GetResult();
             answer.GetAwaiter().GetResult();
             Check(ok && message == "Room publique.", "the answer comes back");
+        }
+        finally
+        {
+            try { Directory.Delete(dir, true); } catch (IOException) { }
+        }
+    }
+
+    public static void ReadsWhoPlaysWhom()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "cs-chars-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var now = DateTimeOffset.UtcNow;
+            void Write(string extra) => File.WriteAllText(Path.Combine(dir, "activity.json"),
+                $$"""{"schema":1,"text":"Plateau","updatedAt":{{now.ToUnixTimeSeconds()}}{{extra}}}""");
+            Write("");
+            Check(CubeShelf.Core.Social.InGameBridge.ReadCharacters(dir, now) is null, "the menus say nobody yet");
+            Write(""","characters":[1,6,-1,42]""");
+            var picked = CubeShelf.Core.Social.InGameBridge.ReadCharacters(dir, now)!;
+            Check(picked.SequenceEqual(new[] { 1, 6, -1, -1 }), "Luigi and Daisy; an empty pad and a nonsense value are nobody");
+            Check(CubeShelf.Core.Social.InGameBridge.CharacterName(picked[1]) == "Daisy", "named as on the disc");
+            Check(CubeShelf.Core.Social.InGameBridge.ReadCharacters(dir, now.AddMinutes(5)) is null, "a stale file says nothing");
         }
         finally
         {

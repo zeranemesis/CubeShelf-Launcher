@@ -4,7 +4,8 @@ namespace CubeShelf.Core.Online;
 
 /// <summary>One player of the room as the companion sees them.</summary>
 /// <param name="Disc">same, different, pending (not compared yet) or unknown.</param>
-public sealed record RoomSeat(string Name, bool Host, bool You, string Disc, IReadOnlyList<RoomMod> Mods, int? Ping);
+/// <summary>One seat of the room. Seat is its number in the companion (0 is the host), -1 when an older one did not say.</summary>
+public sealed record RoomSeat(string Name, bool Host, bool You, string Disc, IReadOnlyList<RoomMod> Mods, int? Ping, int Seat = -1);
 
 /// <summary>The room the companion has open, as its room.json says.</summary>
 public sealed record RoomState(
@@ -120,7 +121,8 @@ public sealed class RoomSyncClient(string directory)
                     seat.TryGetProperty("you", out var y) && y.ValueKind == JsonValueKind.True,
                     SS("disc"),
                     seat.TryGetProperty("mods", out var sm) ? PublicRoomDirectory.ReadMods(sm) : Array.Empty<RoomMod>(),
-                    seat.TryGetProperty("ping", out var p2) && p2.ValueKind == JsonValueKind.Number && p2.TryGetInt32(out var ms) ? ms : null));
+                    seat.TryGetProperty("ping", out var p2) && p2.ValueKind == JsonValueKind.Number && p2.TryGetInt32(out var ms) ? ms : null,
+                    seat.TryGetProperty("seat", out var n) && n.ValueKind == JsonValueKind.Number && n.TryGetInt32(out var index) && index is >= 0 and < 4 ? index : -1));
             }
         return new RoomState(
             r.TryGetProperty("revision", out var rev) && rev.TryGetInt64(out var revision) ? revision : 0,

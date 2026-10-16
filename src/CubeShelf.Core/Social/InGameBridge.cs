@@ -123,6 +123,39 @@ public static class InGameBridge
             return null;
         }
     }
+    /// <summary>
+    /// Who plays whom, by pad (the seat online): 0..7 in the game's order (Mario, Luigi, Peach,
+    /// Yoshi, Wario, Donkey Kong, Daisy, Waluigi), -1 for none. Null in the menus, before anyone
+    /// has chosen, or when the game said nothing recently -- the same freshness as the activity.
+    /// </summary>
+    public static int[]? ReadCharacters(string directory, DateTimeOffset now)
+    {
+        try
+        {
+            var path = Path.Combine(directory, ActivityFile);
+            var file = new FileInfo(path);
+            if (!file.Exists || file.Length > 4096) return null;
+            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            var root = document.RootElement;
+            if (root.ValueKind != System.Text.Json.JsonValueKind.Object) return null;
+            if (!root.TryGetProperty("updatedAt", out var updated) || !updated.TryGetInt64(out var seconds)) return null;
+            if (now - DateTimeOffset.FromUnixTimeSeconds(seconds) > ActivityLifetime) return null;
+            if (!root.TryGetProperty("characters", out var list) || list.ValueKind != System.Text.Json.JsonValueKind.Array || list.GetArrayLength() != 4) return null;
+            return list.EnumerateArray().Select(c => c.TryGetInt32(out var n) && n is >= 0 and <= 7 ? n : -1).ToArray();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    public static string CharacterName(int character) => character switch
+    {
+        0 => "Mario", 1 => "Luigi", 2 => "Peach", 3 => "Yoshi",
+        4 => "Wario", 5 => "Donkey Kong", 6 => "Daisy", 7 => "Waluigi",
+        _ => ""
+    };
+
     public const int Schema = 1;
 
     /// <summary>

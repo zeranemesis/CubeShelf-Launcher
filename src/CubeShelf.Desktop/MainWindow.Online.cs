@@ -16,6 +16,8 @@ public sealed class SeatRow
     public string Disc { get; init; } = "";
     public string Mods { get; init; } = "";
     public string Ping { get; init; } = "";
+    public int Seat { get; init; } = -1;
+    public bool CanKick { get; init; }
 }
 
 /// <summary>One mod of a listed room: here already, or one click away.</summary>
@@ -301,10 +303,15 @@ public sealed partial class MainWindow
         MyRoomCover.Source = game is null ? null : CoverOf(game);
         MyRoomActivity.Text = room.State == "playing" && room.Activity.Length > 0 ? "▶ " + room.Activity : "";
         MyRoomActivity.IsVisible = MyRoomActivity.Text.Length > 0;
+        // Once a party is under way the game says who plays whom; the seat is the pad.
+        var characters = room.State == "playing" ? InGameBridge.ReadCharacters(InGameDirectory, DateTimeOffset.UtcNow) : null;
+        string Plays(RoomSeat seat) =>
+            characters is { } picked && seat.Seat is >= 0 and < 4 && InGameBridge.CharacterName(picked[seat.Seat]) is { Length: > 0 } who
+                ? P7($" · joue {who}", $" · plays {who}") : "";
         MyRoomSeats.ItemsSource = room.Seats.Select(seat => new SeatRow
         {
             Name = seat.Name + (seat.You ? P7(" (toi)", " (you)") : ""),
-            Role = seat.Host ? P7("Hôte", "Host") : P7("Invité", "Guest"),
+            Role = (seat.Host ? P7("Hôte", "Host") : P7("Invité", "Guest")) + Plays(seat),
             Disc = seat.Disc switch
             {
                 "same" => P7("✓ Même disque (SHA-256 vérifié)", "✓ Same disc (SHA-256 verified)"),
@@ -313,7 +320,10 @@ public sealed partial class MainWindow
                 _ => P7("Disque non vérifié", "Disc not verified")
             },
             Mods = ModsSummary(seat.Mods, P7("Mods : ", "Mods: ")),
-            Ping = seat.You ? "" : seat.Ping is { } ms ? $"{ms} ms" : "—"
+            Ping = seat.You ? "" : seat.Ping is { } ms ? $"{ms} ms" : "—",
+            Seat = seat.Seat,
+            // The host takes a guest out while the room waits; a game under way keeps everyone.
+            CanKick = room.IsHost && !seat.You && !seat.Host && seat.Seat > 0 && room.Mode == "online" && room.Phase is "" or "waiting"
         }).ToList();
         MyRoomSeats.IsVisible = room.Seats.Count > 0;
         MyRoomMods.Text = room.Seats.Count > 0 ? "" : ModsSummary(room.Mods, P7("Mods : ", "Mods: "));
@@ -328,6 +338,7 @@ public sealed partial class MainWindow
         MyRoomStartButton.IsVisible = room.IsHost && waiting;
         MyRoomStartButton.IsEnabled = room.CanStart;
         MyRoomModsButton.IsVisible = room.IsHost && waiting;
+        MyRoomRenamePanel.IsVisible = room.IsHost && room.Mode == "online" && waiting;
         MyRoomInstallButton.IsVisible = !room.IsHost && waiting && room.MissingMods.Count > 0;
         MyRoomAlignButton.IsVisible = !room.IsHost && waiting && room.DiffersFromHost && room.MissingMods.Count == 0;
     }
@@ -495,6 +506,43 @@ public sealed partial class MainWindow
         {
             MyRoomVisibilityButton.IsEnabled = true;
             RefreshMyRoom();
+            _roomsFetched = DateTimeOffset.MinValue;
+        }
+    }
+
+    private async void KickFromMyRoom(object? sender, RoutedEventArgs args)
+    {
+        if (sender is not Button { Tag: int seat } button || seat <= 0) return;
+        button.IsEnabled = false;
+        try
+        {
+            var (ok, message) = await RoomSync.AskAsync("kick", seat.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            ShowToastParity(P7("Room", "Room"), message.Length > 0 ? message
+                : ok ? "" : P7("Le compagnon n’a pas répondu.", "The companion did not answer."));
+        }
+        finally
+        {
+            button.IsEnabled = true;
+            RefreshMyRoom();
+            _roomsFetched = DateTimeOffset.MinValue;
+        }
+    }
+
+    private async void RenameMyRoom(object? sender, RoutedEventArgs args)
+    {
+        var name = (MyRoomNameBox.Text ?? "").Trim();
+        if (name.Length == 0) return;
+        MyRoomRenameButton.IsEnabled = false;
+        try
+        {
+            var (ok, message) = await RoomSync.AskAsync("set-name", name);
+            if (ok) MyRoomNameBox.Text = "";
+            ShowToastParity(P7("Room", "Room"), message.Length > 0 ? message
+                : ok ? "" : P7("Le compagnon n’a pas répondu.", "The companion did not answer."));
+        }
+        finally
+        {
+            MyRoomRenameButton.IsEnabled = true;
             _roomsFetched = DateTimeOffset.MinValue;
         }
     }
