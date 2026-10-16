@@ -37,7 +37,7 @@
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="☺" Width="18" /><TextBlock Text="{DynamicResource AppFriends}" /></StackPanel>
           </Button>
           <Button x:Name="NavOnlineButton" Classes="nav" TabIndex="6" Click="ParityShowOnline">
-            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="◉" Width="18" /><TextBlock Text="{DynamicResource AppOnline}" /></StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="◉" Width="18" /><TextBlock Text="{DynamicResource AppOnline}" /><TextBlock x:Name="NavOnlineBadge" Text="●" Foreground="{DynamicResource Accent}" FontSize="10" VerticalAlignment="Center" IsVisible="False" /></StackPanel>
           </Button>
           <Button x:Name="NavSettingsButton" Classes="nav" TabIndex="6" Click="ParityShowSettings">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⚙" Width="18" /><TextBlock Text="{DynamicResource AppSettings}" /></StackPanel>
@@ -483,6 +483,7 @@
               <TextBlock x:Name="OnlineSubtitleText" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <ComboBox x:Name="RoomLanguageFilter" MinWidth="170" VerticalAlignment="Center" Margin="0,0,8,0" SelectionChanged="RoomLanguageFilterChanged" />
               <Button x:Name="OnlineRefreshButton" Content="{DynamicResource OnlineRefresh}" Click="RefreshOnlineNow" />
             </StackPanel>
           </Grid>

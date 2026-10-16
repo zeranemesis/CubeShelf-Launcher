@@ -112,6 +112,7 @@ public sealed partial class MainWindow : Window
         ShowRunningVersion();
         // Feeds the F1 Friends tab inside Mario Party 4, only while the game runs.
         StartInGameBridge();
+        StartOnlineWatch();
         // Near the clock, so closing the window does not mean leaving every friend.
         InitializeTray();
         // Copy a friend's message in any chat app, come back to the Friends page: it is found.

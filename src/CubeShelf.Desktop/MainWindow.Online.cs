@@ -57,6 +57,14 @@ public sealed partial class MainWindow
     private void ParityShowOnline(object? sender, RoutedEventArgs args)
     {
         ShowParityView(OnlineView);
+        NavOnlineBadge.IsVisible = false;
+        if (RoomLanguageFilter.Items.Count == 0)
+        {
+            RoomLanguageFilter.Items.Add(new ComboBoxItem { Content = P7("Toutes les langues", "All languages"), Tag = "" });
+            foreach (var code in new[] { "fr", "en", "de", "es", "it" })
+                RoomLanguageFilter.Items.Add(new ComboBoxItem { Content = LanguageName(code), Tag = code });
+            RoomLanguageFilter.SelectedIndex = 0;
+        }
         if (RoomVisibilityPicker.Items.Count == 0)
         {
             RoomVisibilityPicker.Items.Add(P7("Privée (amis invités)", "Private (invited friends)"));
@@ -149,7 +157,10 @@ public sealed partial class MainWindow
             var rooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
             // The player's own room is on the list too; it is shown above, not offered to join.
             var mine = PublicRoom.IdOfInvite(_myRoom?.Invite);
-            var rows = rooms.Where(room => room.Room != mine).Select(room => ToRow(game, room, installed)).ToList();
+            var language = (RoomLanguageFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
+            var rows = rooms.Where(room => room.Room != mine && (language.Length == 0 || room.Language == language))
+                .Select(room => ToRow(game, room, installed)).ToList();
+            foreach (var room in rooms) _seenRooms.Add(room.Room);
             AvailableRoomsList.ItemsSource = rows.Where(r => r.Room.IsJoinable).ToList();
             PlayingRoomsList.ItemsSource = rows.Where(r => !r.Room.IsJoinable).ToList();
             AvailableRoomsEmpty.IsVisible = !rows.Any(r => r.Room.IsJoinable);
@@ -476,6 +487,61 @@ public sealed partial class MainWindow
         return report.Status == RoomModStatus.Compatible
             ? new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = report.SessionMods }
             : null;
+    }
+
+    private void RoomLanguageFilterChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        _roomsFetched = DateTimeOffset.MinValue;
+        if (OnlineView.IsVisible) OnlineTick(null, EventArgs.Empty);
+    }
+
+    // The sidebar's dot on "Online": something there the player has not seen -- a public room
+    // that opened for their disc, or a player who came into their room -- while the page was
+    // closed. Read once a minute (the room is a local file; the list one request a minute), only
+    // with a companion that has rooms, and cleared by opening the page.
+    private readonly HashSet<string> _seenRooms = new(StringComparer.Ordinal);
+    private DispatcherTimer? _onlineWatch;
+    private int _seenPlayers;
+    private bool _watchingOnline;
+
+    private void StartOnlineWatch()
+    {
+        _onlineWatch ??= new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+        _onlineWatch.Tick -= OnlineWatchTick;
+        _onlineWatch.Tick += OnlineWatchTick;
+        _onlineWatch.Start();
+    }
+
+    private async void OnlineWatchTick(object? sender, EventArgs args)
+    {
+        if (_watchingOnline || OnlineView.IsVisible || OnlineGame() is not { } game) return;
+        _watchingOnline = true;
+        try
+        {
+            var room = RoomSync.Read();
+            var players = room is { IsOpen: true } ? room.Players.Count : 0;
+            if (players > _seenPlayers && _seenPlayers > 0) NavOnlineBadge.IsVisible = true;
+            _seenPlayers = players;
+
+            if (await EnsureRoomTagsAsync(game) is not { } tags) return;
+            var rooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
+            var mine = PublicRoom.IdOfInvite(room?.Invite);
+            var fresh = rooms.Where(r => r.IsJoinable && r.Room != mine && !_seenRooms.Contains(r.Room)).ToList();
+            // The first read only learns what is already there: a dot means something new since.
+            if (fresh.Count > 0 && _seenRooms.Count > 0) NavOnlineBadge.IsVisible = true;
+            foreach (var r in rooms) _seenRooms.Add(r.Room);
+            if (_seenRooms.Count == 0) _seenRooms.Add("");
+        }
+        catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
+                                              or FormatException or System.Text.Json.JsonException or UnauthorizedAccessException
+                                              or System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            // The next minute tries again; the dot is a nicety.
+        }
+        finally
+        {
+            _watchingOnline = false;
+        }
     }
 
     private static string Named(RoomMod mod) => mod.Name.Length > 0 ? $"{mod.Name} (#{mod.Id})" : $"#{mod.Id}";
