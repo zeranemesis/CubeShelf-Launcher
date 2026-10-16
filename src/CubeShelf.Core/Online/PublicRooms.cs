@@ -26,6 +26,9 @@ public sealed record PublicRoom(
     TimeSpan Open,
     TimeSpan Playing)
 {
+    /// <summary>The name its host gave the room, or empty.</summary>
+    public string Title { get; init; } = "";
+
     /// <summary>Waiting for players: the only state in which a room can be joined.</summary>
     public bool IsJoinable => State == "waiting";
     public bool IsPlaying => State == "playing";
@@ -197,7 +200,8 @@ public sealed class PublicRoomDirectory(HttpClient http, Uri relay)
                 Number(r, "max") is >= 2 and <= 4 and var max ? max : 2,
                 r.TryGetProperty("mods", out var m) ? ReadMods(m) : Array.Empty<RoomMod>(),
                 TimeSpan.FromSeconds(Math.Max(0, Number(r, "age"))),
-                TimeSpan.FromSeconds(Math.Max(0, Number(r, "playing")))));
+                TimeSpan.FromSeconds(Math.Max(0, Number(r, "playing"))))
+            { Title = Text(r, "title", 32) });
         }
         return result;
     }

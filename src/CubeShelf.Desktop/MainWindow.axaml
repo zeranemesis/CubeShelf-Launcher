@@ -542,13 +542,9 @@
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="4">
                   <TextBlock Text="{DynamicResource OnlineCreateTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
-                  <TextBlock x:Name="CreateRoomMods" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                  <TextBlock Text="{DynamicResource OnlineCreateHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                  <ComboBox x:Name="RoomVisibilityPicker" MinWidth="200" VerticalAlignment="Center" Margin="0,0,8,0" />
-                  <Button Content="{DynamicResource OnlineManageMods}" Click="ChooseCreateMods" />
-                  <Button x:Name="CreateRoomButton" Classes="primary" Content="{DynamicResource OnlineCreate}" Click="CreateRoom" />
-                </StackPanel>
+                <Button Grid.Column="1" x:Name="CreateRoomButton" Classes="primary" VerticalAlignment="Center" Content="{DynamicResource OnlineCreateOpen}" Click="OpenRoomSetup" />
               </Grid>
             </Border>
             <TextBlock Text="{DynamicResource OnlineAvailable}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Muted}" Margin="2,6,0,0" />
@@ -561,7 +557,17 @@
                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
-                        <TextBlock Text="{Binding ModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding ModItems}" Margin="0,2,0,0">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                                <TextBlock Text="{Binding Text}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="{Binding Action}" Tag="{Binding}" IsVisible="{Binding CanDownload}" Padding="10,2" FontSize="12" Click="DownloadRoomMod" />
+                              </Grid>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="{Binding NoModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" IsVisible="{Binding HasNoMods}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
                       </StackPanel>
@@ -582,7 +588,17 @@
                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding GameLine}" Foreground="{DynamicResource Accent2}" FontSize="12" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding PlayersLine}" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
-                        <TextBlock Text="{Binding ModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding ModItems}" Margin="0,2,0,0">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                                <TextBlock Text="{Binding Text}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="{Binding Action}" Tag="{Binding}" IsVisible="{Binding CanDownload}" Padding="10,2" FontSize="12" Click="DownloadRoomMod" />
+                              </Grid>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="{Binding NoModsLine}" Foreground="{DynamicResource Muted}" FontSize="12" IsVisible="{Binding HasNoMods}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Accent}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatOk}" />
                         <TextBlock Text="{Binding CompatText}" Foreground="{DynamicResource Warning}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding CompatWarn}" />
                       </StackPanel>
@@ -594,6 +610,54 @@
             </ItemsControl>
             <TextBlock x:Name="PlayingRoomsEmpty" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" IsVisible="False" />
             <TextBlock x:Name="OnlineStatusText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+
+      <!-- ROOM SETUP: the page a room is configured on before it opens. -->
+      <Grid x:Name="RoomSetupView" Classes="view" IsVisible="False" RowDefinitions="132,*">
+        <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+          <Grid Margin="34,24" ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource OnlineEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" />
+              <TextBlock Text="{DynamicResource OnlineSetupTitle}" Foreground="{DynamicResource Text}" FontSize="32" FontWeight="Bold" Margin="0,5,0,0" />
+              <TextBlock x:Name="RoomSetupSubtitle" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="1" VerticalAlignment="Center" Content="{DynamicResource OnlineSetupBack}" Click="CloseRoomSetup" />
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <StackPanel Margin="28,20,28,28" Spacing="14" MaxWidth="860" HorizontalAlignment="Left">
+            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource OnlineSetupName}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
+                <TextBox x:Name="RoomNameBox" MaxLength="32" MinWidth="420" HorizontalAlignment="Left" />
+                <TextBlock Text="{DynamicResource OnlineSetupNameHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource OnlineSetupVisibility}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" />
+                <RadioButton x:Name="RoomPublicRadio" GroupName="RoomVisibility" IsChecked="True" Content="{DynamicResource OnlineSetupPublic}" />
+                <RadioButton x:Name="RoomPrivateRadio" GroupName="RoomVisibility" Content="{DynamicResource OnlineSetupPrivate}" />
+                <TextBlock Text="{DynamicResource OnlineSetupVisibilityHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Padding="18" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="{DynamicResource OnlineSetupMods}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Content="{DynamicResource OnlineSetupAddMods}" Click="RoomSetupAddMods" />
+                </Grid>
+                <TextBlock Text="{DynamicResource OnlineSetupModsHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                <StackPanel x:Name="RoomSetupModsList" Spacing="4" />
+              </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button x:Name="RoomSetupCreateButton" Classes="primary" Content="{DynamicResource OnlineSetupCreate}" Click="ConfirmCreateRoom" />
+              <Button Content="{DynamicResource OnlineSetupCancel}" Click="CloseRoomSetup" />
+            </StackPanel>
+            <TextBlock x:Name="RoomSetupStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
           </StackPanel>
         </ScrollViewer>
       </Grid>

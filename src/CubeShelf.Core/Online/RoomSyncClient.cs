@@ -37,6 +37,9 @@ public sealed record RoomState(
     public bool DiffersFromHost { get; init; }
     /// <summary>Why the room ended, when it has.</summary>
     public string Ending { get; init; } = "";
+    /// <summary>The companion process that writes this room, to tell a live room from a stale file.</summary>
+    public int? Pid { get; init; }
+
     /// <summary>The relay room this is, host or guest: never to be listed as someone else's.</summary>
     public string RoomId { get; init; } = "";
 
@@ -59,6 +62,7 @@ public sealed class RoomSyncClient(string directory)
     public const string VisibilityVariable = "PARTYBOARD_ONLINE_VISIBILITY";
     public const string ModsVariable = "PARTYBOARD_ONLINE_MODS";
     public const string HeadlessVariable = "PARTYBOARD_ONLINE_HEADLESS";
+    public const string RoomNameVariable = "PARTYBOARD_ONLINE_ROOM_NAME";
     private const int MaximumBytes = 64 * 1024;
 
     public string Directory => directory;
@@ -131,7 +135,8 @@ public sealed class RoomSyncClient(string directory)
             MissingMods = r.TryGetProperty("missingMods", out var mm) ? PublicRoomDirectory.ReadMods(mm) : Array.Empty<RoomMod>(),
             DiffersFromHost = B("differsFromHost"),
             Ending = S("ending"),
-            RoomId = S("roomId")
+            RoomId = S("roomId"),
+            Pid = N("pid")
         };
     }
 
