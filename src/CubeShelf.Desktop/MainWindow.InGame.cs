@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
+using CubeShelf.Core.Online;
 using CubeShelf.Core.Social;
 
 namespace CubeShelf.Desktop;
@@ -89,10 +90,22 @@ public sealed partial class MainWindow
         try
         {
             WriteInGameState(force: false);
+            // What the game says is happening, for the room's status on the public list.
+            _ = PumpRoomActivityAsync();
+            // The public list for the tab, every twenty seconds while the game runs.
+            if (DateTimeOffset.UtcNow - _inGameRoomsFetched > TimeSpan.FromSeconds(20)) _ = RefreshInGameRoomsAsync(game);
 
             var now = DateTimeOffset.UtcNow;
             foreach (var request in InGameBridge.ReadRequests(InGameDirectory, now, P7("Demande illisible.", "Unreadable request.")))
             {
+                // Rooms go through the network or the companion: answered when that is done, not
+                // here, so the timer never waits on either.
+                if (request.Action is InGameAction.JoinRoom or InGameAction.RoomPublic or InGameAction.RoomPrivate or InGameAction.RoomClose)
+                {
+                    _ = CompleteRoomRequestAsync(game, request);
+                    continue;
+                }
+
                 (bool Ok, string Message) outcome;
                 try
                 {
@@ -102,6 +115,7 @@ public sealed partial class MainWindow
                         InGameAction.Invite => StartHosting(game, request.FriendKey),
                         InGameAction.Join => JoinFromGame(game, request.FriendKey),
                         InGameAction.Cancel => (true, CancelHosting()),
+                        InGameAction.HostPublic => StartHosting(game, null, publicRoom: true),
                         _ => (false, "")
                     };
                 }
@@ -217,14 +231,139 @@ public sealed partial class MainWindow
             .ThenBy(friend => friend.Handle, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
 
+        var room = InGameRoomOf(new RoomSyncClient(RoomStateDirectory).Read());
+        var mine = new RoomSyncClient(RoomStateDirectory).Read()?.RelayRoom;
+        var installed = new CubeShelf.Core.Mods.PortableModManager(_paths, game.Id).GetInstalled();
+        var rooms = _inGameRooms
+            .Where(r => r.Room != mine)
+            .Select(r => new InGamePublicRoom(
+                r.Room, r.Host, RoomLabel(game, r), r.Players, r.MaxPlayers, r.IsJoinable,
+                RoomModCheck.Compare(r.Mods, installed).Status == RoomModStatus.Compatible))
+            .ToList();
+
         return new InGameState(
             HasIdentity ? OwnHandle() : P7("Pas encore d’identité", "No identity yet"),
             blocker is null,
             notice,
-            blocker is null && !preparing,
+            // One room at a time: with one open, the tab offers what can be done with it instead.
+            blocker is null && !preparing && room is null,
             IsHosting,
             ordered,
-            InGameText());
+            InGameText(),
+            room,
+            rooms,
+            room is null && !preparing && HostingBlocker(game, publicRoom: true) is null);
+    }
+
+    private IReadOnlyList<PublicRoom> _inGameRooms = Array.Empty<PublicRoom>();
+    private DateTimeOffset _inGameRoomsFetched = DateTimeOffset.MinValue;
+    private bool _fetchingInGameRooms;
+
+    private async Task RefreshInGameRoomsAsync(GameCatalogEntry game)
+    {
+        if (_fetchingInGameRooms) return;
+        _fetchingInGameRooms = true;
+        _inGameRoomsFetched = DateTimeOffset.UtcNow;
+        try
+        {
+            if (await EnsureRoomTagsAsync(game) is not { } tags) return;
+            _inGameRooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
+            WriteInGameState(force: false);
+        }
+        catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
+                                              or FormatException or System.Text.Json.JsonException or UnauthorizedAccessException
+                                              or System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            // The tab keeps the last list; the next tick tries again.
+        }
+        finally
+        {
+            _fetchingInGameRooms = false;
+        }
+    }
+
+    private InGameRoom? InGameRoomOf(RoomState? state)
+    {
+        if (state is not { IsOpen: true }) return null;
+        var what = state.State switch
+        {
+            "creating" => P7("Création de la room…", "Creating the room…"),
+            "joining" => P7("Connexion à la room…", "Joining the room…"),
+            "waiting" => P7("En attente d’un joueur", "Waiting for a player"),
+            "full" => P7("Complète", "Full"),
+            "playing" => P7("En jeu", "Playing"),
+            _ => state.State
+        };
+        var visibility = state.IsHost ? (state.Public ? P7("publique", "public") : P7("privée", "private")) + " · " : "";
+        return new InGameRoom(state.State, visibility + what, state.IsHost, state.Public, state.Players, state.MaxPlayers,
+            state.IsHost && state.Mode == "online" && state.State == "waiting");
+    }
+
+    private string RoomLabel(GameCatalogEntry game, PublicRoom room) =>
+        $"{LanguageName(room.Language)} · " + room.State switch
+        {
+            "playing" => P7($"en jeu depuis {Duration(room.Playing)}", $"playing for {Duration(room.Playing)}")
+                         + (room.Activity.Length > 0 ? " · " + room.Activity : ""),
+            "full" => P7("complète", "full"),
+            _ => P7($"ouverte depuis {Duration(room.Open)}", $"open for {Duration(room.Open)}")
+        };
+
+    /// <summary>The room requests from the game, answered once the network or the companion has.</summary>
+    private async Task CompleteRoomRequestAsync(GameCatalogEntry game, InGameRequest request)
+    {
+        (bool Ok, string Message) outcome;
+        try
+        {
+            outcome = request.Action switch
+            {
+                InGameAction.JoinRoom => await JoinRoomFromGameAsync(game, request.FriendKey),
+                InGameAction.RoomPublic => await RoomSync.AskAsync("set-visibility", "public"),
+                InGameAction.RoomPrivate => await RoomSync.AskAsync("set-visibility", "private"),
+                InGameAction.RoomClose => await CloseRoomFromGameAsync(),
+                _ => (false, "")
+            };
+            if (!outcome.Ok && outcome.Message.Length == 0)
+                outcome = (false, P7("Le compagnon n’a pas répondu.", "The companion did not answer."));
+        }
+        catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
+                                              or InvalidOperationException or UnauthorizedAccessException)
+        {
+            outcome = (false, exception.Message);
+        }
+        InGameBridge.Complete(InGameDirectory, request, outcome.Ok, outcome.Message);
+        WriteInGameState();
+    }
+
+    private async Task<(bool, string)> CloseRoomFromGameAsync()
+    {
+        var answer = await RoomSync.AskAsync("close", null);
+        if (answer.Ok) CancelHosting();
+        return answer;
+    }
+
+    /// <summary>
+    /// A public room joined from the game: only when every mod it needs is already here -- the
+    /// game cannot stop to confirm an installation; the Online page can.
+    /// </summary>
+    private async Task<(bool, string)> JoinRoomFromGameAsync(GameCatalogEntry game, string roomId)
+    {
+        var room = _inGameRooms.FirstOrDefault(r => r.Room == roomId);
+        if (room is null || !room.IsJoinable)
+            return (false, P7("Cette room n’attend plus de joueur.", "That room is no longer waiting for a player."));
+        if (SessionModsIfReady(game, room.Mods) is not { } extra)
+            return (false, P7("Il te manque des mods de cette room : ouvre CubeShelf, onglet En ligne, pour les installer et la rejoindre.",
+                              "You are missing some of this room's mods: open CubeShelf, Online tab, to install them and join."));
+        if (await EnsureRoomTagsAsync(game) is not { } tags)
+            return (false, P7("Le relais en ligne n’est pas disponible.", "The online relay is not available."));
+        try
+        {
+            var invite = await new PublicRoomDirectory(OnlineHttp, tags.Relay).InviteAsync(roomId);
+            return StartJoining(game, room.Host, invite, extra);
+        }
+        catch (RoomGoneException)
+        {
+            return (false, P7("Cette room vient d’être prise ou fermée.", "That room was just taken or closed."));
+        }
     }
 
     /// <summary>A lobby's identity for the toast: changes when a friend opens a new one.</summary>
@@ -266,7 +405,8 @@ public sealed partial class MainWindow
             return (false, P7("Cette invitation n’est plus valable : le salon a été fermé ou a expiré.",
                               "That invitation is no longer valid: the lobby was closed or has expired."));
 
-        var joining = StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload);
+        var joining = StartJoining(game, PeerName.Handle(friend.DisplayName, friend.PublicKey), invite.JoinPayload,
+            SessionModsIfReady(game, invite.SafeMods()));
         if (joining.Started) AnswerInvite(friend.PublicKey, invite, InviteReply.Joined);
         return joining;
     }
@@ -279,8 +419,18 @@ public sealed partial class MainWindow
         ["cubeshelfClosed"] = P7("CubeShelf n’est pas ouvert. Les amis et les invitations passent par lui : ouvre-le et reviens ici.",
                                  "CubeShelf is not running. Friends and invitations go through it: open it and come back."),
         ["pending"] = P7("En attente de CubeShelf…", "Waiting for CubeShelf…"),
-        ["host"] = P7("Créer un salon et inviter tout le monde", "Create a lobby and invite everyone"),
+        ["host"] = P7("Créer une room privée et inviter tes amis", "Create a private room and invite your friends"),
         ["cancel"] = P7("Retirer l’invitation", "Withdraw the invitation"),
+        ["roomSection"] = P7("Ta room", "Your room"),
+        ["roomsSection"] = P7("Rooms publiques", "Public rooms"),
+        ["noRooms"] = P7("Aucune room publique pour ton disque en ce moment.", "No public room for your disc right now."),
+        ["hostPublic"] = P7("Créer une room publique", "Create a public room"),
+        ["roomMakePublic"] = P7("Rendre la room publique", "Make the room public"),
+        ["roomMakePrivate"] = P7("Rendre la room privée", "Make the room private"),
+        ["roomClose"] = P7("Fermer la room", "Close the room"),
+        ["roomJoin"] = P7("Rejoindre", "Join"),
+        ["roomMissingMods"] = P7("mods manquants : CubeShelf, onglet En ligne", "missing mods: CubeShelf, Online tab"),
+        ["players"] = P7("Joueurs", "Players"),
         ["friendsSection"] = P7("Amis", "Friends"),
         ["noFriends"] = P7("Pas encore d’amis. Ajoute-les depuis la page Amis de CubeShelf.",
                            "No friends yet. Add them from the Friends page in CubeShelf."),

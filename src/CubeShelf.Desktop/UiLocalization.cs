@@ -11,6 +11,43 @@ internal static class UiLocalization
         ["AppMods"] = "Mods du jeu",
         ["AppDownloads"] = "Téléchargements",
         ["AppFriends"] = "Amis",
+        ["AppOnline"] = "En ligne",
+        ["LanguageAuto"] = "Automatique (Windows)",
+        ["OnlineEyebrow"] = "EN LIGNE",
+        ["OnlineTitle"] = "Rooms",
+        ["OnlineRefresh"] = "Actualiser",
+        ["OnlineMyRoom"] = "TA ROOM",
+        ["OnlineInviteFriends"] = "Inviter des amis",
+        ["OnlineCloseRoom"] = "Fermer la room",
+        ["OnlineKick"] = "Retirer",
+        ["OnlineRename"] = "Renommer",
+        ["OnlineRenameHint"] = "Nouveau nom de la room",
+        ["OnlineCreateTitle"] = "Créer une room",
+        ["OnlineCreateHint"] = "Choisis son nom, qui peut entrer et ses mods.",
+        ["OnlineCreateOpen"] = "Créer une room…",
+        ["OnlineSetupTitle"] = "Créer une room",
+        ["OnlineSetupBack"] = "← Retour aux rooms",
+        ["OnlineSetupName"] = "Nom de la room",
+        ["OnlineSetupNameHint"] = "C’est ce que les autres voient dans la liste. 32 caractères au plus.",
+        ["OnlineSetupVisibility"] = "Qui peut entrer",
+        ["OnlineSetupPublic"] = "Publique : visible par tous les joueurs qui ont le même disque",
+        ["OnlineSetupPrivate"] = "Privée : seulement tes amis, invités depuis CubeShelf",
+        ["OnlineSetupVisibilityHint"] = "Publique : tout le monde la voit dans la liste et peut la rejoindre tant qu’il reste une place. Privée : personne ne la voit, seuls tes amis invités entrent. Dans les deux cas, elle passe par le relais en ligne : ton adresse n’est jamais publiée.",
+        ["OnlineSetupPlayers"] = "Nombre de joueurs",
+        ["OnlineSetupPlayersHint"] = "La partie peut commencer quand toutes les places sont prises. À 3 ou 4, chaque joueur parle directement aux autres par le relais.",
+        ["OnlineSetupMods"] = "Mods de la room",
+        ["OnlineSetupAddMods"] = "Ajouter depuis GameBanana…",
+        ["OnlineSetupModsHint"] = "Les joueurs qui ne les ont pas pourront les télécharger en un clic depuis la room. Ta sélection habituelle n’est pas modifiée.",
+        ["OnlineSetupCreate"] = "Créer la room",
+        ["OnlineSetupCancel"] = "Annuler",
+        ["OnlineManageMods"] = "Mods…",
+        ["OnlineCreate"] = "Créer",
+        ["OnlineAvailable"] = "DISPONIBLES MAINTENANT",
+        ["OnlinePlaying"] = "EN JEU",
+        ["OnlineStart"] = "Lancer la partie",
+        ["OnlineRoomMods"] = "Mods de la room…",
+        ["OnlineAlignHost"] = "Utiliser les mods de l’hôte",
+        ["OnlineInstallMissing"] = "Installer les mods manquants",
         ["FriendsEyebrow"] = "AMIS",
         ["FriendsTitle"] = "Tes amis",
         ["FriendsEmpty"] = "Personne pour l'instant. Copie ton code ami depuis Mon profil et envoie-le, ou colle ici celui qu'on te donne.",
@@ -225,6 +262,43 @@ internal static class UiLocalization
         ["AppMods"] = "Game Mods",
         ["AppDownloads"] = "Downloads",
         ["AppFriends"] = "Friends",
+        ["AppOnline"] = "Online",
+        ["LanguageAuto"] = "Automatic (Windows)",
+        ["OnlineEyebrow"] = "ONLINE",
+        ["OnlineTitle"] = "Rooms",
+        ["OnlineRefresh"] = "Refresh",
+        ["OnlineMyRoom"] = "YOUR ROOM",
+        ["OnlineInviteFriends"] = "Invite friends",
+        ["OnlineCloseRoom"] = "Close the room",
+        ["OnlineKick"] = "Remove",
+        ["OnlineRename"] = "Rename",
+        ["OnlineRenameHint"] = "New room name",
+        ["OnlineCreateTitle"] = "Create a room",
+        ["OnlineCreateHint"] = "Pick its name, who can come in and its mods.",
+        ["OnlineCreateOpen"] = "Create a room…",
+        ["OnlineSetupTitle"] = "Create a room",
+        ["OnlineSetupBack"] = "← Back to rooms",
+        ["OnlineSetupName"] = "Room name",
+        ["OnlineSetupNameHint"] = "What the others see on the list. 32 characters at most.",
+        ["OnlineSetupVisibility"] = "Who can come in",
+        ["OnlineSetupPublic"] = "Public: visible to every player with the same disc",
+        ["OnlineSetupPrivate"] = "Private: only your friends, invited from CubeShelf",
+        ["OnlineSetupVisibilityHint"] = "Public: everyone sees it in the list and can join while a seat is free. Private: nobody sees it, only the friends you invite get in. Either way it goes through the online relay: your address is never published.",
+        ["OnlineSetupPlayers"] = "Number of players",
+        ["OnlineSetupPlayersHint"] = "The game can start once every seat is taken. With 3 or 4, every player talks to the others directly through the relay.",
+        ["OnlineSetupMods"] = "Room mods",
+        ["OnlineSetupAddMods"] = "Add from GameBanana…",
+        ["OnlineSetupModsHint"] = "Players who do not have them can download them in one click from the room. Your usual selection is not changed.",
+        ["OnlineSetupCreate"] = "Create the room",
+        ["OnlineSetupCancel"] = "Cancel",
+        ["OnlineManageMods"] = "Mods…",
+        ["OnlineCreate"] = "Create",
+        ["OnlineAvailable"] = "AVAILABLE NOW",
+        ["OnlinePlaying"] = "IN GAME",
+        ["OnlineStart"] = "Start the game",
+        ["OnlineRoomMods"] = "Room mods…",
+        ["OnlineAlignHost"] = "Use the host's mods",
+        ["OnlineInstallMissing"] = "Install the missing mods",
         ["FriendsEyebrow"] = "FRIENDS",
         ["FriendsTitle"] = "Your friends",
         ["FriendsEmpty"] = "Nobody yet. Copy your friend code from My profile and send it, or paste here the one you are given.",
@@ -432,8 +506,24 @@ internal static class UiLocalization
         ["RaProgressHelp"] = "Your progress in each game played from CubeShelf, as the game reports it. It updates while you play.",
     };
 
-    public static bool IsEnglish(string? language) =>
-        string.Equals(language, "en", StringComparison.OrdinalIgnoreCase);
+    /// <summary>Follow Windows: the stored value when the player has not picked a language.</summary>
+    public const string Automatic = "auto";
+
+    /// <summary>
+    /// The language actually shown: the player's choice, or for <see cref="Automatic"/> (and anything
+    /// unknown) the language of Windows -- French when Windows is in French, English otherwise,
+    /// English being the one CubeShelf has for every other language.
+    /// </summary>
+    public static string Resolve(string? language) =>
+        string.Equals(language, "fr", StringComparison.OrdinalIgnoreCase) ? "fr"
+        : string.Equals(language, "en", StringComparison.OrdinalIgnoreCase) ? "en"
+        : SystemLanguage();
+
+    public static string SystemLanguage() =>
+        string.Equals(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, "fr", StringComparison.OrdinalIgnoreCase)
+            ? "fr" : "en";
+
+    public static bool IsEnglish(string? language) => Resolve(language) == "en";
 
     public static string Get(string? language, string key)
     {

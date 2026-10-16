@@ -191,6 +191,42 @@ cliquée pendant que CubeShelf était fermé, elle n'ouvrira pas un salon une he
 Deux amis qui liraient pareil — même pseudo, même numéro, une chance sur dix mille — apparaissent
 avec six chiffres au lieu de quatre, les quatre premiers inchangés.
 
+### Onglet En ligne : les rooms, dans CubeShelf
+
+L'onglet **En ligne** réunit tout ce qui se joue à plusieurs en ligne, pour chaque jeu de la
+bibliothèque qui le permet (un sélecteur en haut quand il y en a plusieurs ; aujourd'hui, Mario
+Party 4). La room se joue entièrement ici : le compagnon du jeu tourne sans fenêtre et ne s'occupe
+que du réseau.
+
+- **Disponibles maintenant** : les rooms publiques qui attendent un joueur, pour ton disque et ta
+  version du jeu, avec un filtre par langue. Chaque carte montre l'hôte, la langue, le disque, les
+  joueurs et les mods de la room, et dit si tu as les mêmes mods. **Rejoindre**, ou **Installer et
+  rejoindre** : les mods manquants viennent de GameBanana avec la même confirmation que la page Mods.
+- **En jeu** : les rooms publiques complètes ou en cours de partie, avec leurs joueurs.
+- **Ta room** : le salon lui-même, d'où qu'il vienne (cet onglet, la page Amis, le menu F1 du jeu).
+  Chaque joueur avec son rôle, son disque (vérifié par SHA-256), ses mods et son ping ; l'état du
+  salon en clair. L'hôte a **Lancer la partie** (quand tout concorde) et **Mods de la room…** ;
+  un invité a **Utiliser les mods de l'hôte**, ou **Installer les mods manquants** quand il lui en
+  manque. **Rendre publique** ou **privée**, **Inviter des amis**, **Fermer la room**.
+- **Créer une room** : **privée** (tes amis, par invitation) ou **publique** (dans la liste de tous
+  ceux qui ont le même disque), avec ses mods choisis parmi ceux installés ou ajoutés depuis
+  GameBanana. Une room publique est à deux joueurs et passe toujours par le relais en ligne :
+  la liste ne dit jamais où se trouve l'hôte.
+
+Les mods d'une room ne changent pas ta sélection habituelle : un mod installé pour une room reste
+désactivé en dehors. Les invitations d'amis portent aussi les mods de la room, et leur
+notification dit ce qu'il faudra installer. Dans le jeu, **F1 → Amis** montre ta room et les rooms
+publiques, et rejoint directement celles dont tu as déjà les mods. Un point sur **En ligne** signale
+une room publique qui vient de s'ouvrir, ou un joueur entré dans la tienne.
+
+Les parties en **réseau local (LAN)** se créent depuis le jeu lui-même, pas depuis CubeShelf.
+
+CubeShelf et le compagnon partagent la room par deux fichiers dans
+`%LOCALAPPDATA%\CubeShelf\online-room` (`room.json`, et les demandes de CubeShelf) : ni réseau, ni
+port. Il faut un compagnon qui déclare `public-rooms`, `room-sync` et `room-ui` ; avec un plus
+ancien, l'onglet invite à le mettre à jour (et sans `room-ui`, le salon s'ouvre dans la fenêtre du
+compagnon, comme avant).
+
 ### Réseau local
 
 Deux CubeShelf sur le même réseau se trouvent seuls, et **un ami trouvé là se lit directement** :

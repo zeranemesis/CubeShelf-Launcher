@@ -5,6 +5,7 @@ using Avalonia.Layout;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CubeShelf.Core.Games;
+using CubeShelf.Core.Mods;
 using CubeShelf.Core.Social;
 
 namespace CubeShelf.Desktop;
@@ -313,7 +314,31 @@ public sealed partial class MainWindow
         Notify(
             P7($"{handle} t’invite", $"{handle} invites you"),
             P7($"{invite.GameTitle} — ouvre la page Amis pour rejoindre.",
-               $"{invite.GameTitle} — open the Friends page to join."));
+               $"{invite.GameTitle} — open the Friends page to join.") + InviteModsLine(invite));
+    }
+
+    /// <summary>
+    /// What the invitation's mods ask of this PC, in a few words for the toast: nothing when the
+    /// invitation says nothing about mods (an older CubeShelf), otherwise none, all here, or how
+    /// many joining will install.
+    /// </summary>
+    private string InviteModsLine(PresenceInvite invite)
+    {
+        if (invite.SafeMods() is not { } mods) return "";
+        if (mods.Count == 0) return P7(" Sans mods.", " No mods.");
+        try
+        {
+            var report = CubeShelf.Core.Online.RoomModCheck.Compare(mods, new PortableModManager(_paths, invite.GameId).GetInstalled());
+            var needed = report.Missing.Count + report.Outdated.Count;
+            return needed == 0
+                ? P7($" Tu as ses {mods.Count} mod(s).", $" You have its {mods.Count} mod(s).")
+                : P7($" {needed} mod(s) à installer : CubeShelf s’en charge en rejoignant.",
+                     $" {needed} mod(s) to install: CubeShelf does it when you join.");
+        }
+        catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException)
+        {
+            return "";
+        }
     }
 
     private void RefreshFriendsView()

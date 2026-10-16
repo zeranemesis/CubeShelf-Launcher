@@ -56,7 +56,7 @@ public sealed class FirstRunWizardWindow : Window
     public UserPreferences Preferences { get; private set; }
     public bool Completed { get; private set; }
     public bool OpenGameAfterFinish { get; private set; }
-    private bool English => Preferences.Language.Equals("en", StringComparison.OrdinalIgnoreCase);
+    private bool English => UiLocalization.IsEnglish(Preferences.Language);
 
     private void BuildUi()
     {
@@ -136,12 +136,15 @@ public sealed class FirstRunWizardWindow : Window
         stack.Children.Add(Heading(English ? "Language and appearance" : "Langue et apparence"));
         var language = new ComboBox
         {
-            ItemsSource = new[] { "Français", "English" },
-            SelectedIndex = English ? 1 : 0
+            ItemsSource = new[] { English ? "Automatic (Windows)" : "Automatique (Windows)", "Français", "English" },
+            SelectedIndex = Preferences.Language.ToLowerInvariant() switch { "fr" => 1, "en" => 2, _ => 0 }
         };
         language.SelectionChanged += (_, _) =>
         {
-            Preferences = Preferences with { Language = language.SelectedIndex == 1 ? "en" : "fr" };
+            Preferences = Preferences with
+            {
+                Language = language.SelectedIndex switch { 1 => "fr", 2 => "en", _ => UiLocalization.Automatic }
+            };
             _store.Save(Preferences);
             UiLocalization.Apply(Preferences.Language);
             ShowPage(_page);

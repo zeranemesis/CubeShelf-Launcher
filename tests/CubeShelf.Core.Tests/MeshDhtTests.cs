@@ -233,12 +233,20 @@ static class MeshDhtTests
         var asker = new TestNode(network, network.BindPublic(), server: true);
         try
         {
+            // Every lie lies farther from the asker than any honest node, so the honest answers
+            // push it out of the asker's first lookup.
+            var distance = NodeId.ByDistanceTo(asker.Id);
+            var farthestHonest = nodes.Select(node => node.Id).Append(liar.Id).OrderBy(id => id, distance).Last();
             var fakes = Enumerable.Range(0, 8).Select(index =>
             {
-                using var key = MeshCrypto.NewAgreementKey();
-                var publicKey = MeshCrypto.PublicKeyOf(key);
                 var address = index < 4 ? new IPAddress(new byte[] { 11, 250, (byte)index, 1 }) : new IPAddress(new byte[] { 192, 168, 1, (byte)(10 + index) });
-                return new NodeContact(publicKey, NodeProof.Solve(publicKey, Difficulty), new IPEndPoint(address, 40000));
+                while (true)
+                {
+                    using var key = MeshCrypto.NewAgreementKey();
+                    var publicKey = MeshCrypto.PublicKeyOf(key);
+                    var fake = new NodeContact(publicKey, NodeProof.Solve(publicKey, Difficulty), new IPEndPoint(address, 40000));
+                    if (distance.Compare(fake.Id, farthestHonest) > 0) return fake;
+                }
             }).ToList();
 
             liar.Transport.RequestHandler = (session, message, _) =>
@@ -249,6 +257,16 @@ static class MeshDhtTests
                 writer.U8((byte)fakes.Count);
                 foreach (var fake in fakes) fake.WriteTo(writer);
                 return Task.FromResult<byte[]?>(writer.ToArray());
+            };
+            // The liar answers first and the honest seed late, so the lies are being tried when
+            // closer, honest contacts push them out of the lookup's window: the lookup ends with
+            // those handshakes still under way -- the case in which a lie used to be tried twice,
+            // left to the scheduler before.
+            var honest = nodes[0];
+            honest.Transport.RequestHandler = async (session, message, _) =>
+            {
+                if (message.Op is MeshOps.FindNode or MeshOps.FindValue) await Task.Delay(300);
+                return await honest.Dht.HandleAsync(session, message);
             };
 
             var privateTouched = false;

@@ -60,7 +60,7 @@ public sealed partial class MainWindow
     private void Phase5LanguageChanged(object? sender, SelectionChangedEventArgs args)
     {
         if (_phase5LoadingSettings) return;
-        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "fr";
+        var language = (LanguagePicker.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? UiLocalization.Automatic;
         UiLocalization.Apply(language);
         RefreshLocalizedPhase5State(language);
     }
@@ -228,6 +228,7 @@ public sealed partial class MainWindow
         SetNavSelectedPhase5(NavModsButton, ModsView.IsVisible);
         SetNavSelectedPhase5(NavDownloadsButton, DownloadsView.IsVisible);
         SetNavSelectedPhase5(NavFriendsButton, FriendsView.IsVisible);
+        SetNavSelectedPhase5(NavOnlineButton, OnlineView.IsVisible || RoomSetupView.IsVisible);
         SetNavSelectedPhase5(NavSettingsButton, SettingsView.IsVisible);
         SetNavSelectedPhase5(ProfileChipButton, ProfileView.IsVisible);
     }

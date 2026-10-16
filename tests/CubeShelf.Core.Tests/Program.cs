@@ -15,6 +15,14 @@ Run("runtime: launch metadata is refreshed without losing user state", RuntimeIn
 Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
 Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
 Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);
+Run("online: the public list is read and bounded", OnlineRoomsTests.ParsesTheList);
+Run("online: the companion's room tags", OnlineRoomsTests.ReadsTheCompanionTags);
+Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);
+Run("online: the companion's room, followed and asked", OnlineRoomsTests.FollowsTheCompanionRoom);
+Run("online: the relay's directory over HTTP", OnlineRoomsTests.TalksToTheDirectory);
+Run("online: who plays whom, from the game", OnlineRoomsTests.ReadsWhoPlaysWhom);
+Run("online: a friend's invitation carries the room's mods", TestInviteCarriesMods);
+Run("online: rooms in the game's F1 tab", TestInGameRooms);
 Run("valid archive", TestValidArchive);
 Run("path traversal rejected", TestTraversal);
 Run("expanded size rejected", TestExpansionLimit);
@@ -678,7 +686,8 @@ void TestPreferences()
         var loaded = store.Load();
         Assert(loaded.Language == "en" && loaded.Theme == "light" && !loaded.RefreshModsOnOpen);
         store.Reset();
-        Assert(store.Load().Language == "fr");
+        // Nothing chosen: follow the language of Windows.
+        Assert(store.Load().Language == "auto");
     });
 }
 
@@ -2356,6 +2365,54 @@ void TestInGameStateIsWhatTheGameReads()
     });
 }
 
+void TestInGameRooms()
+{
+    WithTempRoot(root =>
+    {
+        var now = DateTimeOffset.UtcNow;
+        var room = new InGameRoom("waiting", "publique · En attente d’un joueur", true, true, new[] { "Zera" }, 2, true);
+        var rooms = new[] { new InGamePublicRoom("0123456789abcdef0123456789abcdef", "Luigi", "English · ouverte depuis 2 min", new[] { "Luigi" }, 2, true, false) };
+        var state = new InGameState("Zera#6024", true, "", true, false, Array.Empty<InGameFriend>(), new Dictionary<string, string>(), room, rooms, false);
+        InGameBridge.WriteState(root, state, now);
+        var json = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(InGameBridge.StateFile(root)))!.AsObject();
+
+        // The names src/port/ui/cubeshelf.cpp reads for the Rooms part of the tab.
+        var r = json["room"]!;
+        Assert(r["state"]!.GetValue<string>() == "waiting" && r["label"]!.GetValue<string>().StartsWith("publique", StringComparison.Ordinal));
+        Assert(r["isHost"]!.GetValue<bool>() && r["public"]!.GetValue<bool>() && r["canChangeVisibility"]!.GetValue<bool>());
+        Assert(r["players"]![0]!.GetValue<string>() == "Zera" && r["maxPlayers"]!.GetValue<int>() == 2);
+        var listed = json["rooms"]![0]!;
+        Assert(listed["id"]!.GetValue<string>() == "0123456789abcdef0123456789abcdef" && listed["host"]!.GetValue<string>() == "Luigi");
+        Assert(listed["joinable"]!.GetValue<bool>() && !listed["modsReady"]!.GetValue<bool>() && listed["label"] is not null);
+        Assert(!json["canHostPublic"]!.GetValue<bool>());
+
+        // A state written by code that knows nothing of rooms still reads.
+        InGameBridge.WriteState(root, new InGameState("Zera#6024", true, "", true, false, Array.Empty<InGameFriend>(), new Dictionary<string, string>()), now);
+        var bare = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(InGameBridge.StateFile(root)))!.AsObject();
+        Assert(bare["room"] is null && bare["rooms"] is null);
+
+        var requests = InGameBridge.RequestsDirectory(root);
+        Directory.CreateDirectory(requests);
+        void Write(string id, string action, string key) =>
+            File.WriteAllText(Path.Combine(requests, id + ".json"), $"{{\"schema\":1,\"id\":\"{id}\",\"action\":\"{action}\",\"key\":\"{key}\"}}");
+        Write("a1", "host-public", "ignored");
+        Write("a2", "join-room", "0123456789abcdef0123456789abcdef");
+        Write("a3", "room-public", "");
+        Write("a4", "room-private", "");
+        Write("a5", "room-close", "");
+        Write("a6", "join-room", "../../turn");
+        Write("a7", "join-room", "0123456789ABCDEF0123456789ABCDEF");
+        var found = InGameBridge.ReadRequests(root, now);
+        Assert(found.Count == 5);
+        Assert(found.Single(x => x.Id == "a1") is { Action: InGameAction.HostPublic, FriendKey: "" });
+        Assert(found.Single(x => x.Id == "a2") is { Action: InGameAction.JoinRoom, FriendKey: "0123456789abcdef0123456789abcdef" });
+        Assert(found.Any(x => x.Action == InGameAction.RoomPublic) && found.Any(x => x.Action == InGameAction.RoomPrivate) && found.Any(x => x.Action == InGameAction.RoomClose));
+        // Only a room id names a room: anything else is refused and answered.
+        foreach (var refused in new[] { "a6", "a7" })
+            Assert(!System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.Combine(requests, refused + ".done")))!["ok"]!.GetValue<bool>());
+    });
+}
+
 void TestInGameRequestsAreActedOnOnce()
 {
     WithTempRoot(root =>
@@ -2557,6 +2614,33 @@ void TestFriendCodeRoundTrip()
     // downgrade on the user behalf. Refuse it at the door.
     AssertThrows<ArgumentException>(() =>
         FriendCode.Encode(identity.PublicKey, "http://example.test/presence.json"));
+}
+
+void TestInviteCarriesMods()
+{
+    using var author = PeerIdentity.Create();
+    using var friend = PeerIdentity.Create();
+    var mods = new[] { new CubeShelf.Core.Online.RoomMod(4242, "Board Pack", "0102030405060708") };
+    var invite = new PresenceInvite("GMPE01_00", "Mario Party 4", "PB4.code", DateTimeOffset.UtcNow.AddMinutes(15), "", mods);
+    var envelope = SealedPresence.Seal(author, SampleSnapshot(3) with { Invite = invite }, new[] { friend.PublicKey });
+    Assert(SealedPresence.TryOpen(friend, author.PublicKey, SealedPresence.FromJson(SealedPresence.ToJson(envelope)), out var opened));
+    var carried = opened!.Invite!.SafeMods();
+    Assert(carried is { Count: 1 } && carried[0] == mods[0]);
+
+    // An invitation from an older CubeShelf says nothing about mods: null, not "none".
+    var old = SealedPresence.Seal(author, SampleSnapshot(4) with { Invite = invite with { Mods = null } }, new[] { friend.PublicKey });
+    Assert(SealedPresence.TryOpen(friend, author.PublicKey, old, out var openedOld) && openedOld!.Invite!.SafeMods() is null);
+
+    // Whatever a friend's document claims is bounded before use.
+    var hostile = invite with
+    {
+        Mods = Enumerable.Range(1, 40).Select(i => new CubeShelf.Core.Online.RoomMod(i, "n" + new string('x', 90), "ABCDEF0123456789"))
+            .Append(new CubeShelf.Core.Online.RoomMod(-5, "bad", "0000000000000000"))
+            .Append(new CubeShelf.Core.Online.RoomMod(7, "bad", "zz"))
+            .ToArray()
+    };
+    var safe = hostile.SafeMods()!;
+    Assert(safe.Count == 24 && safe.All(m => m.Id > 0 && m.Name.Length <= 48 && !m.Name.Any(char.IsControl) && m.Fingerprint == "abcdef0123456789"));
 }
 
 void TestSealedPresenceReachesOnlyFriends()

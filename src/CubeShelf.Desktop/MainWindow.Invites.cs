@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Mods;
+using CubeShelf.Core.Online;
 using CubeShelf.Core.Social;
 
 namespace CubeShelf.Desktop;
@@ -30,7 +31,14 @@ public sealed partial class MainWindow
         Path.Combine(_paths.ConfigurationDirectory, "pending-invite.txt");
 
     /// <summary>The game that can be played together, if the catalog has one. Today, Mario Party 4.</summary>
-    private GameCatalogEntry? OnlineGame() => _catalogGames.FirstOrDefault(OnlineCompanion.IsSupported);
+    /// <summary>Every game on the shelf that can be played together.</summary>
+    private IEnumerable<GameCatalogEntry> OnlineGames() => _catalogGames.Where(OnlineCompanion.IsSupported);
+
+    /// <summary>The game the Online page is about: the one picked there, else the first that plays online.</summary>
+    private string? _onlineGameId;
+    private GameCatalogEntry? OnlineGame() =>
+        OnlineGames().FirstOrDefault(game => string.Equals(game.Id, _onlineGameId, StringComparison.OrdinalIgnoreCase))
+        ?? OnlineGames().FirstOrDefault();
 
     private bool IsHosting =>
         _hostWatch is { IsCancellationRequested: false } ||
@@ -40,7 +48,7 @@ public sealed partial class MainWindow
     /// Why this player cannot host right now, in words, or null when they can. Every reason names
     /// the one thing to do about it, because it is read in the game, far from any setting.
     /// </summary>
-    private string? HostingBlocker(GameCatalogEntry game)
+    private string? HostingBlocker(GameCatalogEntry game, bool publicRoom = false)
     {
         if (!TryResolveCompanion(game, out var companion))
             return P7($"Installe {game.RuntimeName} depuis CubeShelf : son compagnon en ligne vient avec.",
@@ -49,6 +57,12 @@ public sealed partial class MainWindow
         if (!OnlineCompanion.SupportsLauncherInvites(companion))
             return P7($"Ton {game.RuntimeName} est trop ancien pour les invitations : mets-le à jour depuis CubeShelf.",
                       $"Your {game.RuntimeName} is too old for invitations: update it from CubeShelf.");
+
+        // A public room is found on the list: it needs neither friends nor a published presence.
+        if (publicRoom)
+            return OnlineCompanion.SupportsPublicRooms(companion) ? null
+                : P7($"Ton {game.RuntimeName} est trop ancien pour les rooms publiques : mets-le à jour depuis CubeShelf.",
+                     $"Your {game.RuntimeName} is too old for public rooms: update it from CubeShelf.");
 
         if (!HasIdentity)
             return P7("Crée d’abord ton identité : CubeShelf, page Mon profil.",
@@ -85,6 +99,10 @@ public sealed partial class MainWindow
         var name = (_preferences.FriendsDisplayName ?? "").Trim();
         if (name.Length > 0) environment["PARTYBOARD_ONLINE_NICKNAME"] = name;
 
+        // The companion speaks the language CubeShelf shows (itself following Windows unless
+        // the player chose), so the two windows never disagree.
+        environment["PARTYBOARD_ONLINE_UI_LANGUAGE"] = UiLocalization.Resolve(_preferences.Language);
+
         var disc = ResolveApplicationPath(game.DiscImage);
         if (!string.IsNullOrWhiteSpace(disc) && File.Exists(disc))
             environment["PARTYBOARD_ONLINE_DISC"] = disc;
@@ -110,6 +128,20 @@ public sealed partial class MainWindow
         AddRetroAchievementsEnvironment(game, environment);
 
         return environment;
+    }
+
+    /// <summary>
+    /// Has a companion that can keep CubeShelf in step with its room do so, whoever asked for the
+    /// room -- the Online page, the Friends page or the game's F1 menu -- so the Online page always
+    /// shows it. The directory is emptied first: one room at a time, and never a stale one.
+    /// </summary>
+    private void AddRoomSync(GameCatalogEntry game, Dictionary<string, string?> environment)
+    {
+        if (!TryResolveCompanion(game, out var companion) || !OnlineCompanion.SupportsPublicRooms(companion)) return;
+        new RoomSyncClient(RoomStateDirectory).Reset();
+        environment[RoomSyncClient.DirectoryVariable] = RoomStateDirectory;
+        // The room is shown here, in the Online page: no window of the companion's own.
+        if (OnlineCompanion.SupportsRoomUi(companion)) environment[RoomSyncClient.HeadlessVariable] = "1";
     }
 
     private bool TryStartCompanion(
@@ -144,9 +176,10 @@ public sealed partial class MainWindow
     /// Opens a lobby. The companion creates it and writes the invitation where we told it to; we
     /// watch that file and publish what lands there, to everyone or to the one friend named.
     /// </summary>
-    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey)
+    private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false,
+        IReadOnlyDictionary<string, string?>? extra = null)
     {
-        if (HostingBlocker(game) is { } blocker) return (false, blocker);
+        if (HostingBlocker(game, publicRoom) is { } blocker) return (false, blocker);
         if (_hostWatch is { IsCancellationRequested: false })
             return (false, P7("Un salon est déjà en préparation.", "A lobby is already being prepared."));
 
@@ -155,7 +188,17 @@ public sealed partial class MainWindow
 
         var environment = CompanionEnvironment(game);
         environment["PARTYBOARD_ONLINE_INVITE_OUT"] = PendingInviteFile;
+        if (publicRoom) environment[RoomSyncClient.VisibilityVariable] = "public";
+        if (extra is not null) foreach (var pair in extra) environment[pair.Key] = pair.Value;
+        AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--host" }, out var error)) return (false, error);
+
+        // A public room with no friend to tell is found on the list.
+        if (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0))
+        {
+            WriteInGameState();
+            return (true, "");
+        }
 
         _hostWatch?.Dispose();
         _hostWatch = CancellationTokenSource.CreateLinkedTokenSource(
@@ -221,8 +264,10 @@ public sealed partial class MainWindow
 
     private void PublishInvitation(GameCatalogEntry game, string payload, string forFriendKey)
     {
+        // The room's mods go with it, as the companion announced them in room.json.
+        var mods = new RoomSyncClient(RoomStateDirectory).Read() is { IsOpen: true } room ? room.Mods : null;
         var candidate = new PresenceInvite(
-            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime), forFriendKey);
+            game.Id, game.Title, payload, DateTimeOffset.UtcNow.Add(PresenceInvite.DefaultLifetime), forFriendKey, mods);
 
         // The only checks CubeShelf can make on a payload it deliberately does not read: that
         // there is one, and that it is not large enough to bloat every heartbeat from here on.
@@ -275,7 +320,8 @@ public sealed partial class MainWindow
     /// the disc, so there is nothing to paste and nothing to pick. Against a companion too old to
     /// be driven, the code goes to the clipboard and the message says so.
     /// </summary>
-    private (bool Started, string Message) StartJoining(GameCatalogEntry game, string friendHandle, string payload)
+    private (bool Started, string Message) StartJoining(GameCatalogEntry game, string friendHandle, string payload,
+        IReadOnlyDictionary<string, string?>? extra = null)
     {
         if (!TryResolveCompanion(game, out var companion))
             return (false, P7($"{friendHandle} t’invite sur {game.Title}, mais {game.RuntimeName} n’est pas installé ici.",
@@ -293,6 +339,8 @@ public sealed partial class MainWindow
         }
 
         environment["PARTYBOARD_ONLINE_INVITE"] = payload;
+        if (extra is not null) foreach (var pair in extra) environment[pair.Key] = pair.Value;
+        AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--join" }, out var error)) return (false, error);
 
         // Both sides need byte-identical files, and only the companion can say so -- but a disc
@@ -304,9 +352,9 @@ public sealed partial class MainWindow
     }
 
     /// <summary>The Friends page's Join button.</summary>
-    private void JoinFriendInvite(object? sender, RoutedEventArgs args)
+    private async void JoinFriendInvite(object? sender, RoutedEventArgs args)
     {
-        if (sender is not Button { Tag: FriendRow row } || row.JoinPayload.Length == 0) return;
+        if (sender is not Button { Tag: FriendRow row } button || row.JoinPayload.Length == 0) return;
 
         var game = _catalogGames.FirstOrDefault(entry =>
             string.Equals(entry.Id, row.InviteGameId, StringComparison.OrdinalIgnoreCase));
@@ -318,7 +366,29 @@ public sealed partial class MainWindow
             return;
         }
 
-        var (started, message) = StartJoining(game, row.Name, row.JoinPayload);
+        // The room's mods first, when the invitation says which: installed if needed, and handed
+        // to the companion for that session only.
+        IReadOnlyDictionary<string, string?>? extra = null;
+        if (_friendPresence.TryGetValue(row.PublicKey, out var inviting) && inviting.Invite?.SafeMods() is { } mods)
+        {
+            button.IsEnabled = false;
+            try
+            {
+                var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, mods, text => FriendsSubtitleText.Text = text);
+                if (!ready)
+                {
+                    ShowToastParity(P7("Invitation", "Invitation"), problem);
+                    return;
+                }
+                extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = sessionMods };
+            }
+            finally
+            {
+                button.IsEnabled = true;
+            }
+        }
+
+        var (started, message) = StartJoining(game, row.Name, row.JoinPayload, extra);
         if (started && _friendPresence.TryGetValue(row.PublicKey, out var known) && known.Invite is { } accepted)
             AnswerInvite(row.PublicKey, accepted, InviteReply.Joined);
         ShowToastParity(P7("Invitation", "Invitation"),

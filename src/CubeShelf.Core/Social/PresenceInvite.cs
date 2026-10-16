@@ -22,7 +22,14 @@ public sealed record PresenceInvite(
     DateTimeOffset ExpiresAt,
 
     /// <summary>Base64 public key of the one friend it is meant for, or empty for all of them.</summary>
-    string ForFriend = "")
+    string ForFriend = "",
+
+    /// <summary>
+    /// The mods the room plays with, so a friend can be told -- and given -- what to install
+    /// before joining. Optional: an invitation from an older CubeShelf has none, and an older
+    /// CubeShelf reading this one ignores the field.
+    /// </summary>
+    IReadOnlyList<CubeShelf.Core.Online.RoomMod>? Mods = null)
 {
     public static readonly TimeSpan DefaultLifetime = TimeSpan.FromMinutes(15);
 
@@ -41,6 +48,24 @@ public sealed record PresenceInvite(
     public const int MaximumPayloadLength = 2048;
 
     public bool IsLive(DateTimeOffset now) => now < ExpiresAt;
+
+    /// <summary>
+    /// The mods, bounded and checked as anything else a friend's document says: at most the 24 a
+    /// room can carry, positive ids, 16-hex fingerprints, short names without control characters.
+    /// Null when the invitation said nothing about mods.
+    /// </summary>
+    public IReadOnlyList<CubeShelf.Core.Online.RoomMod>? SafeMods()
+    {
+        if (Mods is null) return null;
+        return Mods
+            .Where(m => m is not null && m.Id > 0 && m.Fingerprint is { Length: 16 } fp && fp.All(Uri.IsHexDigit))
+            .Take(24)
+            .Select(m => new CubeShelf.Core.Online.RoomMod(m.Id,
+                new string((m.Name ?? "").Where(c => !char.IsControl(c)).Take(48).ToArray()).Trim(),
+                m.Fingerprint.ToLowerInvariant()))
+            .GroupBy(m => m.Id).Select(g => g.First())
+            .ToArray();
+    }
 
     public bool IsFor(string friendPublicKeyBase64) =>
         ForFriend.Length == 0 ||
