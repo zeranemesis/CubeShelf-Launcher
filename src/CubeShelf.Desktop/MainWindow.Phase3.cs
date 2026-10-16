@@ -486,10 +486,16 @@ public sealed partial class MainWindow
                     ? P7("La source locale peut être actualisée; le runtime jouable est déjà à jour.", "The local source can be updated; the playable runtime is already current.")
                     : P7("Runtime et source publiés vérifiés.", "Published runtime and source verified.");
 
-        GitHubChangesText.Text = snapshot.Changes.Count == 0
+        var commits = snapshot.Changes.Count == 0
             ? P7("Aucun changement récent à afficher.", "No recent changes to display.")
             : string.Join("\n", snapshot.Changes.Take(8).Select(change =>
                 $"• {ShortSha(change.Sha)}  {change.Message}"));
+        // What the release itself says is new comes first, in the reader's language.
+        var notes = P7(release.NotesFr, release.NotesEn);
+        GitHubChangesText.Text = notes.Length == 0 ? commits
+            : P7($"Nouveautés de {release.Version} :", $"New in {release.Version}:") + "\n"
+              + string.Join("\n", notes.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(line => "• " + line.Trim()))
+              + "\n\n" + P7("Derniers commits :", "Latest commits:") + "\n" + commits;
 
         DownloadSourceButton.Content = local.Present
             ? snapshot.SourceUpdateAvailable ? P7("Mettre à jour la source", "Update source") : P7("Source à jour", "Source up to date")

@@ -21,6 +21,7 @@ Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);
 Run("online: the companion's room, followed and asked", OnlineRoomsTests.FollowsTheCompanionRoom);
 Run("online: the relay's directory over HTTP", OnlineRoomsTests.TalksToTheDirectory);
 Run("online: who plays whom, from the game", OnlineRoomsTests.ReadsWhoPlaysWhom);
+Run("updates: a release's own notes", OnlineRoomsTests.ReadsReleaseNotes);
 Run("online: a friend's invitation carries the room's mods", TestInviteCarriesMods);
 Run("online: rooms in the game's F1 tab", TestInGameRooms);
 Run("valid archive", TestValidArchive);

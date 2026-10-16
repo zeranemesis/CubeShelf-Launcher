@@ -158,6 +158,19 @@ internal static class OnlineRoomsTests
         }
     }
 
+    public static void ReadsReleaseNotes()
+    {
+        (string Fr, string En) Notes(string json)
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(json);
+            return CubeShelf.Core.Updates.GitHubGameUpdateService.ReadNotes(document.RootElement);
+        }
+        Check(Notes("""{"notes":{"fr":"Rooms à 4\nPseudos","en":"Rooms for 4"}}""") == ("Rooms à 4\nPseudos", "Rooms for 4"), "both languages, lines kept");
+        Check(Notes("""{"notes":{"en":"Only English"}}""") == ("Only English", "Only English"), "one language stands in for the other");
+        Check(Notes("""{"notes":"Les deux\u0007"}""") == ("Les deux", "Les deux"), "one string for both, control characters removed");
+        Check(Notes("""{"changes":"abc"}""") == ("", ""), "a release without notes says nothing");
+    }
+
     public static void TalksToTheDirectory()
     {
         var handler = new StubHandler();
