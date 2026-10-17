@@ -441,6 +441,8 @@ void TestModLayoutWarning()
         ("Pack/GMPE01/tex1_128x128_3e7936174a209c24_14.png", PortableModLayoutKind.DolphinTextures),
         ("Pack/board_e.dat",                                 PortableModLayoutKind.LooseFiles),
         ("Pack/High res/bbattle.bin",                        PortableModLayoutKind.SeveralVariants),
+        // Super Mario Eclipse ships as an xdelta patch for the whole disc image.
+        ("Pack/Super Mario Eclipse.xdelta",                  PortableModLayoutKind.DiscPatch),
     };
 
     var id = 50;
@@ -474,6 +476,19 @@ void TestModLayoutWarning()
         using var client = new HttpClient(new StaticHttpHandler(_ =>
             CreateZipBytes("files/data/board.bin", new byte[] { 1 })));
         manager.InstallAsync(new GameBananaMod(60, "Disc layout", 1, "https://files.gamebanana.com/d.zip", "d.zip"),
+            new GameBananaClient(client)).GetAwaiter().GetResult();
+        Assert(manager.AnalyzeLayout().Count == 0);
+    });
+
+    // Nor is one laid out like Super Mario Sunshine's disc, whose root folders
+    // differ from Mario Party 4's.
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GMSP01");
+        using var client = new HttpClient(new StaticHttpHandler(_ =>
+            CreateZipBytes("files/AudioRes/Banks/smsbank.aw", new byte[] { 1 })));
+        manager.InstallAsync(new GameBananaMod(61, "Sunshine layout", 1, "https://files.gamebanana.com/s.zip", "s.zip"),
             new GameBananaClient(client)).GetAwaiter().GetResult();
         Assert(manager.AnalyzeLayout().Count == 0);
     });

@@ -40,6 +40,53 @@
     "GitHubReleaseTag": "cubeshelf-nightly"
   },
   {
+    "Id": "GMSP01",
+    "Title": "Super Mario Sunshine",
+    "Year": 2002,
+    "Genre": "Plateforme",
+    "Players": "1 joueur",
+    "Region": "PAL Europe",
+    "Description": "Super Mario Sunshine porté nativement sur PC (version PAL, rendu Aurora). CubeShelf prépare les données depuis ton propre disque européen et applique les mods de fichiers GameBanana à chaque lancement ; graphismes, audio et manettes se règlent dans le jeu avec F1. Les patchs de disque (xdelta, comme Super Mario Eclipse) ne sont pas pris en charge.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 5798,
+    "RuntimeName": "Sunshine PAL",
+    "LaunchEnvironment": {
+      "SMS_DISC_ROOT": "GMSP01/files",
+      "SMS_CUBESHELF_MOD_LIST": "{mods}",
+      "SMS_CUBESHELF": "1"
+    },
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
+    "SupportedDiscIds": [
+      "GMSP01"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "sms-pal-win-x64.zip"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "sms.exe"
+    },
+    "RuntimeChecksumAsset": "checksums.txt",
+    "RuntimeSha256": "",
+    "DataPreparation": "CubeShelf",
+    "HomepageUrl": "https://github.com/zeranemesis/sms-port",
+    "Covers": [
+      {
+        "Label": "Default",
+        "Front": "Assets\\Covers\\Common\\placeholder.png",
+        "Back": "Assets\\Covers\\Common\\placeholder.png",
+        "Spine": "Assets\\Covers\\Common\\placeholder.png"
+      }
+    ],
+    "GitHubOwner": "zeranemesis",
+    "GitHubRepo": "sms-port",
+    "GitHubBranch": "native-pal-menu",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
+  },
+  {
     "Id": "GRSEAF",
     "Title": "Soulcalibur II",
     "Year": 2003,

@@ -94,7 +94,7 @@ public sealed partial class MainWindow : Window
 
             _selectedGame.Executable = ResolveApplicationPath(_selectedGame.Executable);
             _selectedGame.DiscImage = ResolveApplicationPath(_selectedGame.DiscImage);
-            GameTitle.Text = $"{_selectedGame.Title} — PartyBoard";
+            GameTitle.Text = $"{_selectedGame.Title} — {_selectedGame.RuntimeName}";
             _modManager = new PortableModManager(paths, _selectedGame.Id);
             RefreshGameState();
             RefreshModItems();
@@ -449,12 +449,13 @@ public sealed partial class MainWindow : Window
         var layout = _modManager.AnalyzeLayout();
         var layoutIds = layout.Select(item => item.Id).ToHashSet();
         var playerDisabled = _modManager.GetPlayerDisabled().ToHashSet();
+        var runtime = _selectedGame?.RuntimeName is { Length: > 0 } runtimeName ? runtimeName : "le jeu";
         var items = ids.Select(id =>
         {
             var remote = _remoteMods.FirstOrDefault(item => item.Id == id);
             installed.TryGetValue(id, out var local);
             var status = local is null ? "Non installé"
-                : playerDisabled.Contains(id) ? "Installé • coupé dans PartyBoard"
+                : playerDisabled.Contains(id) ? $"Installé • coupé dans {runtime}"
                 : local.Enabled ? "Installé • activé" : "Installé • désactivé";
             if (conflictedIds.Contains(id)) status += " • conflit";
             if (layoutIds.Contains(id)) status += " • arborescence inattendue";
@@ -467,9 +468,11 @@ public sealed partial class MainWindow : Window
             report.Add("⚠ " + item.Name + " : " + item.Kind switch
             {
                 PortableModLayoutKind.DolphinTextures =>
-                    "pack de textures Dolphin. PartyBoard remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
+                    $"pack de textures Dolphin. {runtime} remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
                 PortableModLayoutKind.LooseFiles =>
-                    "fichiers livrés sans chemin. PartyBoard les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                    $"fichiers livrés sans chemin. {runtime} les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                PortableModLayoutKind.DiscPatch =>
+                    $"patch de l’image disque (xdelta, BPS, IPS…). Il fabrique un autre disque, alors que {runtime} applique des fichiers par-dessus le tien : ce mod ne peut pas fonctionner ici.",
                 PortableModLayoutKind.SeveralVariants =>
                     $"plusieurs variantes côte à côte ({string.Join(", ", item.TopLevelEntries.Take(3))}). Garde-en une seule à la racine du mod.",
                 _ => $"aucun dossier du disque à sa racine ({string.Join(", ", item.TopLevelEntries.Take(3))}), donc sans effet en jeu.",

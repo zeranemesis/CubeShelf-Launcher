@@ -53,6 +53,13 @@ internal static class RuntimeIntegrationTests
                     Check(launch.Arguments.Count == 0 && launch.Environment["STRIKERS_DATA"] == disc);
                     Check(launch.Environment["PARTYBOARD_DISC_IMAGE"] is null && launch.Environment["PARTYBOARD_MOD_LIST"] is null);
                     break;
+                case "Sunshine PAL":
+                    // CubeShelf extracts the disc beside sms.exe; the game reads that
+                    // folder, relative to its working directory, and the mod list.
+                    Check(launch.Arguments.Count == 0 && launch.Environment["SMS_DISC_ROOT"] == "GMSP01/files");
+                    Check(launch.Environment["SMS_CUBESHELF_MOD_LIST"] == "mods with spaces.txt" && launch.Environment["SMS_CUBESHELF"] == "1");
+                    Check(launch.Environment["PARTYBOARD_DISC_IMAGE"] is null && launch.Environment["STRIKERS_DATA"] is null);
+                    break;
                 default: throw new InvalidOperationException("Add a launch contract test for the new runtime.");
             }
         }
