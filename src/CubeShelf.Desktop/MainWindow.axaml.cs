@@ -446,7 +446,10 @@ public sealed partial class MainWindow : Window
         var ids = _remoteMods.Select(item => item.Id).Concat(installed.Keys).Distinct().ToArray();
         var conflicts = _modManager.AnalyzeConflicts();
         var conflictedIds = conflicts.SelectMany(item => item.ModIds).ToHashSet();
-        var layout = _modManager.AnalyzeLayout();
+        // A game played from a disc patch (Super Mario Eclipse) needs that mod as it is.
+        var discPatchGame = _selectedGame?.DataPreparation == GameDataPreparation.DiscPatch;
+        var layout = _modManager.AnalyzeLayout()
+            .Where(item => !(discPatchGame && item.Kind == PortableModLayoutKind.DiscPatch)).ToList();
         var layoutIds = layout.Select(item => item.Id).ToHashSet();
         var playerDisabled = _modManager.GetPlayerDisabled().ToHashSet();
         var runtime = _selectedGame?.RuntimeName is { Length: > 0 } runtimeName ? runtimeName : "le jeu";

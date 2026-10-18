@@ -295,7 +295,7 @@ public sealed partial class MainWindow
         var exeDir = runtime.IsInstalled ? Path.GetDirectoryName(runtime.ExecutablePath)! : "";
         if (game.LaunchEnvironment.ContainsKey("PARTYBOARD_DISC_IMAGE"))
             Add(runtime.IsInstalled && Directory.Exists(Path.Combine(exeDir, "res")), P6("Ressources PartyBoard (res) présentes", "PartyBoard resources (res) present"));
-        if (game.DataPreparation == GameDataPreparation.CubeShelf)
+        if (game.DataPreparation != GameDataPreparation.Runtime)
         {
             var prepared = _gameData.IsPrepared(game.Id, game.Executable);
             Add(prepared || _phase6PreparedData?.HasData(game.Id) == true,

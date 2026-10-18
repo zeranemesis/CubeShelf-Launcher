@@ -15,6 +15,8 @@ Run("runtime: launch metadata is refreshed without losing user state", RuntimeIn
 Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
 Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
 Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);
+Run("mods: xdelta disc patches apply exactly, and only to their disc", DiscPatchTests.XdeltaAppliesExactly);
+Run("runtime: a disc patch checks the user's image and the one it makes", DiscPatchTests.PreparationChecksBothImages);
 Run("online: the public list is read and bounded", OnlineRoomsTests.ParsesTheList);
 Run("online: the companion's room tags", OnlineRoomsTests.ReadsTheCompanionTags);
 Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);

@@ -20,6 +20,7 @@ public sealed record GameLaunchConfiguration(
             ["PARTYBOARD_MOD_LIST"] = null,
             ["STRIKERS_DATA"] = null,
             ["SMS_DISC_ROOT"] = null,
+            ["SMS_DISC_IMAGE"] = null,
             ["SMS_CUBESHELF_MOD_LIST"] = null,
             ["SMS_CUBESHELF"] = null
         };

@@ -33,7 +33,38 @@ public enum GameDataPreparation
     /// ciso, gcz, nfs, rvz, wbfs, wia and tgc, so there is nothing to convert and nothing to
     /// extract. Either way the answer to "what does CubeShelf prepare" is: nothing.
     /// </summary>
-    Runtime = 1
+    Runtime = 1,
+
+    /// <summary>
+    /// CubeShelf builds another disc from the user's: it checks the image is the exact one a
+    /// mod's disc patch (xdelta) was made against, applies the patch from that installed mod
+    /// and checks the result (<see cref="GameCatalogEntry.DiscPatch"/>). Super Mario Eclipse
+    /// is played this way: the North American disc, patched into Eclipse's.
+    /// </summary>
+    DiscPatch = 2
+}
+
+/// <summary>A mod that is a patch of the whole disc image, and the images it goes between.</summary>
+public sealed class GameDiscPatch
+{
+    /// <summary>The GameBanana mod that carries the patch, installed from the Mods tab.</summary>
+    public int GameBananaModId { get; set; }
+    public string ModName { get; set; } = "";
+
+    /// <summary>File name of the patch inside the mod (v1.1.0.xdelta).</summary>
+    public string PatchFile { get; set; } = "";
+
+    /// <summary>MD5 of the only image the patch applies to, and of the image it makes.</summary>
+    public string SourceMd5 { get; set; } = "";
+    public string ResultMd5 { get; set; } = "";
+
+    /// <summary>Human description of the source image, for the refusal message.</summary>
+    public string SourceDescription { get; set; } = "";
+
+    /// <summary>Where the patched image goes, relative to the runtime: {id}/disc.iso.</summary>
+    public string OutputImage { get; set; } = "";
+
+    public GameDiscPatch Clone() => (GameDiscPatch)MemberwiseClone();
 }
 
 public sealed class GameCatalogEntry
@@ -107,6 +138,9 @@ public sealed class GameCatalogEntry
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameDataPreparation DataPreparation { get; set; } = GameDataPreparation.CubeShelf;
+
+    /// <summary>The disc patch, for <see cref="GameDataPreparation.DiscPatch"/>.</summary>
+    public GameDiscPatch? DiscPatch { get; set; }
 
     /// <summary>Project page shown to the user, for runtimes CubeShelf cannot fully automate.</summary>
     public string HomepageUrl { get; set; } = "";
@@ -255,6 +289,7 @@ public sealed class GameCatalogService
             target.RuntimeSha256 = source.RuntimeSha256;
             target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
+            target.DiscPatch = source.DiscPatch?.Clone();
             target.HomepageUrl = source.HomepageUrl;
             target.OnlineCompanion = source.OnlineCompanion;
             target.LaunchArguments = source.LaunchArguments.ToList();
@@ -295,6 +330,7 @@ public sealed class GameCatalogService
         RuntimeSha256 = source.RuntimeSha256,
         RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
+        DiscPatch = source.DiscPatch?.Clone(),
         HomepageUrl = source.HomepageUrl,
         OnlineCompanion = source.OnlineCompanion,
         Covers = source.Covers.Select(Clone).ToList(),

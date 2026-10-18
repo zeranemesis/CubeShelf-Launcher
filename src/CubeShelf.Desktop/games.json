@@ -46,7 +46,7 @@
     "Genre": "Plateforme",
     "Players": "1 joueur",
     "Region": "PAL Europe",
-    "Description": "Super Mario Sunshine porté nativement sur PC (version PAL, rendu Aurora). CubeShelf prépare les données depuis ton propre disque européen et applique les mods de fichiers GameBanana à chaque lancement ; graphismes, audio et manettes se règlent dans le jeu avec F1. Les patchs de disque (xdelta, comme Super Mario Eclipse) ne sont pas pris en charge.",
+    "Description": "Super Mario Sunshine porté nativement sur PC (version PAL, rendu Aurora). CubeShelf prépare les données depuis ton propre disque européen et applique les mods de fichiers GameBanana à chaque lancement ; graphismes, audio et manettes se règlent dans le jeu avec F1. Super Mario Eclipse a sa propre entrée, fabriquée depuis le disque nord-américain.",
     "Executable": "",
     "GameRoot": "",
     "GameBananaGameId": 5798,
@@ -71,6 +71,60 @@
     "RuntimeSha256": "",
     "DataPreparation": "CubeShelf",
     "HomepageUrl": "https://github.com/zeranemesis/sms-port",
+    "Covers": [
+      {
+        "Label": "Default",
+        "Front": "Assets\\Covers\\Common\\placeholder.png",
+        "Back": "Assets\\Covers\\Common\\placeholder.png",
+        "Spine": "Assets\\Covers\\Common\\placeholder.png"
+      }
+    ],
+    "GitHubOwner": "zeranemesis",
+    "GitHubRepo": "sms-port",
+    "GitHubBranch": "native-pal-menu",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
+  },
+  {
+    "Id": "GMSE04",
+    "Title": "Super Mario Eclipse",
+    "Year": 2024,
+    "Genre": "Plateforme",
+    "Players": "1 joueur",
+    "Region": "USA (mod)",
+    "Description": "Super Mario Eclipse, le grand mod de Super Mario Sunshine (Eclipse Team), sur le port natif PC. Installe le mod « Super Mario Eclipse » depuis l’onglet Mods et choisis ta copie complète du disque nord-américain (GMSE01) : CubeShelf vérifie l’image, applique le patch xdelta d’Eclipse et vérifie le disque obtenu, sans jamais modifier le tien.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 5798,
+    "RuntimeName": "Sunshine Eclipse",
+    "LaunchEnvironment": {
+      "SMS_DISC_IMAGE": "GMSE04/disc.iso"
+    },
+    "DiscFormats": [".iso", ".gcm"],
+    "SupportedDiscIds": [
+      "GMSE01"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "sms-eclipse-win-x64.zip"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "sms.exe"
+    },
+    "RuntimeChecksumAsset": "checksums.txt",
+    "RuntimeSha256": "",
+    "DataPreparation": "DiscPatch",
+    "DiscPatch": {
+      "GameBananaModId": 536309,
+      "ModName": "Super Mario Eclipse",
+      "PatchFile": "v1.1.0.xdelta",
+      "SourceMd5": "0c6d2edae9fdf40dfc410ff1623e4119",
+      "ResultMd5": "caa546309e0443f7b47632b040a250d7",
+      "SourceDescription": "l’ISO nord-américain complet de Super Mario Sunshine (GMSE01)",
+      "OutputImage": "GMSE04/disc.iso"
+    },
+    "HomepageUrl": "https://gamebanana.com/mods/536309",
     "Covers": [
       {
         "Label": "Default",

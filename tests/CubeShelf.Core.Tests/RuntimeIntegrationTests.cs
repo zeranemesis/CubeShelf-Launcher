@@ -60,6 +60,14 @@ internal static class RuntimeIntegrationTests
                     Check(launch.Environment["SMS_CUBESHELF_MOD_LIST"] == "mods with spaces.txt" && launch.Environment["SMS_CUBESHELF"] == "1");
                     Check(launch.Environment["PARTYBOARD_DISC_IMAGE"] is null && launch.Environment["STRIKERS_DATA"] is null);
                     break;
+                case "Sunshine Eclipse":
+                    // CubeShelf builds Eclipse's disc beside sms.exe from the user's North
+                    // American one (DataPreparation DiscPatch); the game opens that image.
+                    Check(launch.Arguments.Count == 0 && launch.Environment["SMS_DISC_IMAGE"] == "GMSE04/disc.iso");
+                    Check(launch.Environment["SMS_DISC_ROOT"] is null && launch.Environment["SMS_CUBESHELF_MOD_LIST"] is null);
+                    Check(game.DataPreparation == GameDataPreparation.DiscPatch && game.DiscPatch is { PatchFile: "v1.1.0.xdelta" }
+                          && game.DiscPatch.SourceMd5 == "0c6d2edae9fdf40dfc410ff1623e4119");
+                    break;
                 default: throw new InvalidOperationException("Add a launch contract test for the new runtime.");
             }
         }

@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
+using CubeShelf.Core.Mods;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Releases;
 
@@ -19,7 +21,92 @@ public sealed class GameDataPreparer
 
     public bool IsPrepared(string gameId, string runtimeExecutable) =>
         File.Exists(runtimeExecutable) &&
-        Directory.Exists(Path.Combine(Path.GetDirectoryName(runtimeExecutable)!, gameId, "files"));
+        (Directory.Exists(Path.Combine(Path.GetDirectoryName(runtimeExecutable)!, gameId, "files")) ||
+         File.Exists(PatchedDiscMarker(gameId, runtimeExecutable)));
+
+    /// <summary>Where a disc patch's verified result goes (<see cref="GameDataPreparation.DiscPatch"/>).</summary>
+    public static string PatchedDiscPath(string gameId, string runtimeExecutable) =>
+        Path.Combine(Path.GetDirectoryName(runtimeExecutable)!, gameId, "disc.iso");
+
+    private static string PatchedDiscMarker(string gameId, string runtimeExecutable) =>
+        PatchedDiscPath(gameId, runtimeExecutable) + ".verified";
+
+    /// <summary>
+    /// Builds a mod's disc from the user's (<see cref="GameDataPreparation.DiscPatch"/>): only the
+    /// exact image the patch was made against is accepted, and the result must be the exact
+    /// image the mod's authors made. The user's image is never modified.
+    /// </summary>
+    public async Task<string> PrepareDiscPatchAsync(
+        string gameId,
+        string runtimeExecutable,
+        string discImage,
+        GameDiscPatch patch,
+        string deltaPath,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateGameId(gameId);
+        ArgumentNullException.ThrowIfNull(patch);
+        if (!File.Exists(runtimeExecutable))
+            throw new FileNotFoundException("Le runtime doit être installé avant la préparation.", runtimeExecutable);
+        if (!File.Exists(discImage))
+            throw new FileNotFoundException("L’image du jeu est introuvable.", discImage);
+        if (!File.Exists(deltaPath))
+            throw new FileNotFoundException("Le patch du mod est introuvable.", deltaPath);
+        var extension = Path.GetExtension(discImage).ToLowerInvariant();
+        if (extension is not ".iso" and not ".gcm")
+            throw new InvalidDataException(
+                $"{patch.ModName} se fabrique depuis une image ISO non compressée ({patch.SourceDescription}) : " +
+                "les images RVZ, CISO, NKit ou réduites ne conviennent pas.");
+
+        var sourceMd5 = await Md5Async(discImage, new Progress<double>(value => progress?.Report(value * .15)),
+            cancellationToken).ConfigureAwait(false);
+        if (!sourceMd5.Equals(patch.SourceMd5, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException(
+                $"{patch.ModName} se fabrique uniquement depuis {patch.SourceDescription} (MD5 {patch.SourceMd5}). " +
+                $"Cette image a le MD5 {sourceMd5} : une image tronquée, compressée, modifiée ou d’une autre " +
+                "région ne convient pas. Choisis une copie complète de ton disque.");
+
+        var output = PatchedDiscPath(gameId, runtimeExecutable);
+        var marker = PatchedDiscMarker(gameId, runtimeExecutable);
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+        var staging = Path.Combine(Path.GetDirectoryName(output)!, ".disc-staging-" + Guid.NewGuid().ToString("N") + ".iso");
+        try
+        {
+            await VcdiffDecoder.ApplyAsync(discImage, deltaPath, staging,
+                new Progress<double>(value => progress?.Report(.15 + value * .7)), cancellationToken).ConfigureAwait(false);
+            var resultMd5 = await Md5Async(staging, new Progress<double>(value => progress?.Report(.85 + value * .15)),
+                cancellationToken).ConfigureAwait(false);
+            if (!resultMd5.Equals(patch.ResultMd5, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException(
+                    $"L’image fabriquée n’est pas celle de {patch.ModName} (MD5 {resultMd5}, attendu {patch.ResultMd5}).");
+            if (File.Exists(marker)) File.Delete(marker);
+            File.Move(staging, output, true);
+            await File.WriteAllTextAsync(marker, resultMd5 + Environment.NewLine, cancellationToken).ConfigureAwait(false);
+            progress?.Report(1);
+            return output;
+        }
+        finally
+        {
+            try { if (File.Exists(staging)) File.Delete(staging); } catch { }
+        }
+    }
+
+    private static async Task<string> Md5Async(string path, IProgress<double>? progress, CancellationToken cancellationToken)
+    {
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 20, true);
+        using var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
+        var buffer = new byte[4 << 20];
+        long done = 0;
+        int read;
+        while ((read = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            md5.AppendData(buffer, 0, read);
+            done += read;
+            progress?.Report(stream.Length == 0 ? 1 : (double)done / stream.Length);
+        }
+        return Convert.ToHexString(md5.GetHashAndReset()).ToLowerInvariant();
+    }
 
     public async Task<string> PrepareAsync(
         string gameId,

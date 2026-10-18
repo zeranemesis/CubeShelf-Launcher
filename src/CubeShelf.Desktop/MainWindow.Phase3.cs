@@ -201,7 +201,7 @@ public sealed partial class MainWindow
             "GAME DATA",
             P7("Préparation transactionnelle ISO/GCM/RVZ", "Transactional ISO/GCM/RVZ preparation"),
             (progress, cancellationToken) =>
-                _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress, cancellationToken),
+                PrepareGameDataAsync(game, executable, discImage, progress, cancellationToken),
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>
@@ -227,6 +227,22 @@ public sealed partial class MainWindow
         ShowToastParity(P7("Préparation", "Preparation"), ActionStatus.Text);
         RefreshPortableQueueView();
         return item;
+    }
+
+    /// <summary>
+    /// Extracts the disc for the runtime, or, for a game played from a mod's disc patch
+    /// (Super Mario Eclipse), builds that mod's disc from the user's with the installed mod.
+    /// </summary>
+    private Task<string> PrepareGameDataAsync(GameCatalogEntry game, string executable, string discImage,
+        IProgress<double> progress, CancellationToken cancellationToken, bool allowDolphinDownload = false)
+    {
+        if (game.DataPreparation != GameDataPreparation.DiscPatch || game.DiscPatch is not { } patch)
+            return _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress,
+                cancellationToken, allowDolphinDownload);
+        var delta = DiscPatchSource.FindDelta(_paths, game.Id, patch) ?? throw new InvalidOperationException(P7(
+            $"Installe d’abord le mod « {patch.ModName} » depuis l’onglet Mods de {game.Title} : il contient le patch ({patch.PatchFile}) qui fabrique son disque à partir du tien.",
+            $"Install the “{patch.ModName}” mod from {game.Title}’s Mods tab first: it holds the patch ({patch.PatchFile}) that builds its disc from yours."));
+        return _gameData.PrepareDiscPatchAsync(game.Id, executable, discImage, patch, delta, progress, cancellationToken);
     }
 
     private void HydrateGamePathsPhase3(GameCatalogEntry game)
