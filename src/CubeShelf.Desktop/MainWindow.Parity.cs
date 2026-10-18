@@ -192,7 +192,9 @@ public sealed partial class MainWindow
         foreach (var card in _parityCards) card.Dispose();
         _parityCards.Clear();
 
-        IEnumerable<GameCatalogEntry> query = _catalogGames;
+        // Each game as it plays now: Super Mario Sunshine shows as Super Mario Eclipse, cover
+        // included, while the Eclipse mod is active.
+        IEnumerable<GameCatalogEntry> query = ShelfGames.Select(game => GameVariants.Resolve(_catalogGames, game, _paths));
         if (_favoritesOnly) query = query.Where(game => game.IsFavorite);
 
         var search = LibrarySearchBox?.Text?.Trim() ?? "";
@@ -269,8 +271,9 @@ public sealed partial class MainWindow
         SelectCatalogGame(card.Game);
     }
 
-    private void SelectCatalogGame(GameCatalogEntry game)
+    private void SelectCatalogGame(GameCatalogEntry game, bool showGameView = true)
     {
+        game = GameVariants.Resolve(_catalogGames, game, _paths);
         _selectedGame = game;
         var saved = _profileStore.Load(game.Id);
         if (saved is not null)
@@ -286,13 +289,14 @@ public sealed partial class MainWindow
         game.Executable = ResolveApplicationPath(game.Executable);
         game.DiscImage = ResolveApplicationPath(game.DiscImage);
         GameTitle.Text = $"{game.Title} • {game.Id}";
-        _modManager = new PortableModManager(_paths, game.Id);
+        _modManager = new PortableModManager(_paths, game.ModLibraryId);
         _remoteMods = Array.Empty<GameBananaMod>();
         _selectedMod = null;
         RefreshGameState();
         RefreshModItems();
         RefreshParityGameDetails();
-        ShowParityView(GameView);
+        if (showGameView) ShowParityView(GameView);
+        RefreshLibraryParity();
         _ = RefreshGameUpdatePhase3Async(game, forceUi: true);
     }
 

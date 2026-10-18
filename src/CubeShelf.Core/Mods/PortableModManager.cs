@@ -323,6 +323,11 @@ public sealed class PortableModManager
     // differently, so the panel says which. Seen across the fourteen packs
     // GameBanana lists for Mario Party 4: three are Dolphin texture packs, two
     // ship loose files, one offers several variants side by side.
+    private static bool IsDiscPatchOnly(string contentRoot) =>
+        !Directory.EnumerateFileSystemEntries(contentRoot)
+            .Any(entry => DiscRootEntries.Contains(Path.GetFileName(entry))) &&
+        ClassifyLayout(contentRoot) == PortableModLayoutKind.DiscPatch;
+
     private static PortableModLayoutKind ClassifyLayout(string contentRoot)
     {
         // A patch for the disc image itself (xdelta, BPS, IPS, PPF), such as
@@ -376,6 +381,9 @@ public sealed class PortableModManager
         var playerDisabled = GetPlayerDisabled();
         var active = GetInstalled()
             .Where(item => item.Enabled && !playerDisabled.Contains(item.Id) && Directory.Exists(item.ContentRoot))
+            // A disc patch (Super Mario Eclipse's xdelta) builds the disc during the data
+            // preparation; its files are nothing to overlay on it.
+            .Where(item => !IsDiscPatchOnly(item.ContentRoot))
             .OrderByDescending(item => item.Priority).ThenBy(item => item.Id)
             .Select(item => item with { ContentRoot = Path.GetFullPath(item.ContentRoot) })
             .ToArray();

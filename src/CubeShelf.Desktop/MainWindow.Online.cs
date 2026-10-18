@@ -170,7 +170,7 @@ public sealed partial class MainWindow
                 return;
             }
 
-            var installed = new PortableModManager(_paths, game.Id).GetInstalled();
+            var installed = new PortableModManager(_paths, game.ModLibraryId).GetInstalled();
             if (_roomTags is null) OnlineStatusText.Text = P7("Lecture de ton disque (une seule fois)…", "Reading your disc (once)…");
             if (await EnsureRoomTagsAsync(game) is not { } tags) return;
             OnlineSubtitleText.Text = P7($"{game.Title} · disque {RegionName(tags.Game)} · seules les rooms de ton disque et de ta version s’affichent.",
@@ -212,7 +212,7 @@ public sealed partial class MainWindow
     private async Task<RoomTags?> EnsureRoomTagsAsync(GameCatalogEntry game)
     {
         if (OnlineBlocker(out _, out var companion, out var disc) is not null) return null;
-        var manager = new PortableModManager(_paths, game.Id);
+        var manager = new PortableModManager(_paths, game.ModLibraryId);
         var installed = manager.GetInstalled();
         var key = disc + "|" + string.Join(";", installed.Select(m => $"{m.Id}:{m.Sha256}:{m.Enabled}"));
         if (_roomTags is not null && key == _roomTagsKey) return _roomTags;
@@ -407,7 +407,7 @@ public sealed partial class MainWindow
     /// </summary>
     private async Task<string?> ChooseRoomModsAsync(GameCatalogEntry game, IReadOnlyList<int> current)
     {
-        var installed = new PortableModManager(_paths, game.Id).GetInstalled()
+        var installed = new PortableModManager(_paths, game.ModLibraryId).GetInstalled()
             .OrderByDescending(m => m.Priority).ThenBy(m => m.Id).ToList();
         var boxes = installed.Select(m => new CheckBox { Content = m.Name.Length > 0 ? $"{m.Name} (#{m.Id})" : $"#{m.Id}", IsChecked = current.Contains(m.Id), Tag = m.Id }).ToList();
         var list = new StackPanel { Spacing = 4 };
@@ -595,7 +595,7 @@ public sealed partial class MainWindow
 
     private void FillRoomSetupMods(GameCatalogEntry game, HashSet<int>? chosen)
     {
-        var installed = new PortableModManager(_paths, game.Id).GetInstalled()
+        var installed = new PortableModManager(_paths, game.ModLibraryId).GetInstalled()
             .OrderByDescending(m => m.Priority).ThenBy(m => m.Id).ToList();
         RoomSetupModsList.Children.Clear();
         _setupModBoxes.Clear();
@@ -739,7 +739,7 @@ public sealed partial class MainWindow
     private async Task<(bool Ready, string SessionMods, string Problem)> PrepareRoomModsAsync(
         GameCatalogEntry game, IReadOnlyList<RoomMod> mods, Action<string> progressText)
     {
-        var manager = new PortableModManager(_paths, game.Id);
+        var manager = new PortableModManager(_paths, game.ModLibraryId);
         var report = RoomModCheck.Compare(mods, manager.GetInstalled());
         foreach (var mod in report.Missing.Concat(report.Outdated))
         {
@@ -770,7 +770,7 @@ public sealed partial class MainWindow
     private IReadOnlyDictionary<string, string?>? SessionModsIfReady(GameCatalogEntry game, IReadOnlyList<RoomMod>? mods)
     {
         if (mods is null) return null;
-        var report = RoomModCheck.Compare(mods, new PortableModManager(_paths, game.Id).GetInstalled());
+        var report = RoomModCheck.Compare(mods, new PortableModManager(_paths, game.ModLibraryId).GetInstalled());
         return report.Status == RoomModStatus.Compatible
             ? new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = report.SessionMods }
             : null;

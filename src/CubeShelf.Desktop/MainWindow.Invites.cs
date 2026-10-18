@@ -114,7 +114,7 @@ public sealed partial class MainWindow
         // portable install found no mods at all.
         try
         {
-            environment["PARTYBOARD_MOD_LIST"] = new PortableModManager(_paths, game.Id).PrepareActiveList();
+            environment["PARTYBOARD_MOD_LIST"] = new PortableModManager(_paths, game.ModLibraryId).PrepareActiveList();
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

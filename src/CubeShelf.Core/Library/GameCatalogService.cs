@@ -51,6 +51,12 @@ public sealed class GameDiscPatch
     public int GameBananaModId { get; set; }
     public string ModName { get; set; } = "";
 
+    /// <summary>
+    /// The mod's file to install, when its page has several (one * wildcard): Super Mario
+    /// Eclipse's page lists its players guide first.
+    /// </summary>
+    public string ModArchive { get; set; } = "";
+
     /// <summary>File name of the patch inside the mod (v1.1.0.xdelta).</summary>
     public string PatchFile { get; set; } = "";
 
@@ -141,6 +147,18 @@ public sealed class GameCatalogEntry
 
     /// <summary>The disc patch, for <see cref="GameDataPreparation.DiscPatch"/>.</summary>
     public GameDiscPatch? DiscPatch { get; set; }
+
+    /// <summary>
+    /// A game played through a mod of another (Super Mario Eclipse, a mod of Super Mario
+    /// Sunshine): the base game's id. Such an entry is not shown in the library; the base game
+    /// becomes it while the mod <see cref="ActivatedByModId"/> is active (<see cref="GameVariants"/>).
+    /// </summary>
+    public string VariantOf { get; set; } = "";
+    public int ActivatedByModId { get; set; }
+
+    /// <summary>Whose mods this game uses: its base game's for a variant.</summary>
+    [JsonIgnore]
+    public string ModLibraryId => string.IsNullOrWhiteSpace(VariantOf) ? Id : VariantOf;
 
     /// <summary>Project page shown to the user, for runtimes CubeShelf cannot fully automate.</summary>
     public string HomepageUrl { get; set; } = "";
@@ -290,6 +308,8 @@ public sealed class GameCatalogService
             target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
             target.DiscPatch = source.DiscPatch?.Clone();
+            target.VariantOf = source.VariantOf;
+            target.ActivatedByModId = source.ActivatedByModId;
             target.HomepageUrl = source.HomepageUrl;
             target.OnlineCompanion = source.OnlineCompanion;
             target.LaunchArguments = source.LaunchArguments.ToList();
@@ -331,6 +351,8 @@ public sealed class GameCatalogService
         RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
         DiscPatch = source.DiscPatch?.Clone(),
+        VariantOf = source.VariantOf,
+        ActivatedByModId = source.ActivatedByModId,
         HomepageUrl = source.HomepageUrl,
         OnlineCompanion = source.OnlineCompanion,
         Covers = source.Covers.Select(Clone).ToList(),

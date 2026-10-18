@@ -145,6 +145,54 @@ internal static class DiscPatchTests
         Check(File.ReadAllBytes(made).SequenceEqual(Expected), "the verified disc is kept");
     });
 
+    public static void ModArchiveIsPicked()
+    {
+        var mod = new GameBananaMod(536309, "Super Mario Eclipse", 1, "https://gamebanana.com/dl/1717133",
+            "super_mario_eclipse_official_players_guide_922a3.7z", Files: new[]
+            {
+                new GameBananaFile("super_mario_eclipse_official_players_guide_922a3.7z", "https://gamebanana.com/dl/1717133", 224416707),
+                new GameBananaFile("super_mario_eclipse_v110_ac483.7z", "https://gamebanana.com/dl/1729332", 892257115),
+            });
+        var picked = mod.WithArchive("super_mario_eclipse_v*.7z");
+        Check(picked.ArchiveUrl == "https://gamebanana.com/dl/1729332" && picked.ArchiveName == "super_mario_eclipse_v110_ac483.7z",
+            "the patch's archive, not the first file");
+        Check(mod.WithArchive("nothing_*.zip") == mod, "no match keeps the mod as it is");
+    }
+
+    public static void VariantFollowsItsMod()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cubeshelf-variant-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var paths = new TestPaths(root);
+            var sunshine = new GameCatalogEntry { Id = "GMSP01", Title = "Super Mario Sunshine" };
+            var eclipse = new GameCatalogEntry { Id = "GMSE04", Title = "Super Mario Eclipse", VariantOf = "GMSP01", ActivatedByModId = 536309 };
+            var catalog = new[] { sunshine, eclipse };
+            Check(GameVariants.Resolve(catalog, sunshine, paths) == sunshine, "no mod: Sunshine");
+            Check(eclipse.ModLibraryId == "GMSP01" && sunshine.ModLibraryId == "GMSP01", "one mod library for both");
+
+            var mods = new PortableModManager(paths, "GMSP01");
+            void Write(bool enabled) => File.WriteAllText(Path.Combine(paths.DataDirectory, "Mods", "GMSP01", "installed.json"),
+                System.Text.Json.JsonSerializer.Serialize(new[]
+                {
+                    new PortableInstalledMod(536309, "Super Mario Eclipse", 1, enabled, 0, Path.Combine(root, "eclipse"), ""),
+                    new PortableInstalledMod(248171, "Skin", 1, true, 1, Path.Combine(root, "skin"), ""),
+                }));
+            Write(true);
+            Check(GameVariants.Resolve(catalog, sunshine, paths) == eclipse, "Eclipse enabled: Eclipse");
+            Check(GameVariants.Resolve(catalog, eclipse, paths) == eclipse, "from the variant too");
+            File.WriteAllText(Path.Combine(paths.DataDirectory, "Mods", "GMSP01", "player-disabled.json"), "[536309]");
+            Check(GameVariants.Resolve(catalog, eclipse, paths) == sunshine, "switched off in game: Sunshine");
+            mods.ClearPlayerDisabled(536309);
+            Write(false);
+            Check(GameVariants.Resolve(catalog, eclipse, paths) == sunshine, "Eclipse disabled: Sunshine");
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
     private sealed class TestPaths : CubeShelf.Core.Platform.IPlatformPaths
     {
         public TestPaths(string root) { DataDirectory = Path.Combine(root, "data"); CacheDirectory = Path.Combine(root, "cache"); }

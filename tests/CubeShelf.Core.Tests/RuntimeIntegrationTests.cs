@@ -64,7 +64,10 @@ internal static class RuntimeIntegrationTests
                     // CubeShelf builds Eclipse's disc beside sms.exe from the user's North
                     // American one (DataPreparation DiscPatch); the game opens that image.
                     Check(launch.Arguments.Count == 0 && launch.Environment["SMS_DISC_IMAGE"] == "GMSE04/disc.iso");
-                    Check(launch.Environment["SMS_DISC_ROOT"] is null && launch.Environment["SMS_CUBESHELF_MOD_LIST"] is null);
+                    // File mods go over Eclipse's disc as over Sunshine's (its own xdelta, in
+                    // the list too, is skipped by the game as a disc patch).
+                    Check(launch.Environment["SMS_DISC_ROOT"] is null && launch.Environment["SMS_CUBESHELF"] == "1");
+                    Check(launch.Environment["SMS_CUBESHELF_MOD_LIST"] == "mods with spaces.txt");
                     Check(game.DataPreparation == GameDataPreparation.DiscPatch && game.DiscPatch is { PatchFile: "v1.1.0.xdelta" }
                           && game.DiscPatch.SourceMd5 == "0c6d2edae9fdf40dfc410ff1623e4119");
                     break;
