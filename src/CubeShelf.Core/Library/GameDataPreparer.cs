@@ -43,7 +43,8 @@ public sealed class GameDataPreparer
         GameDiscPatch patch,
         string deltaPath,
         IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool allowDolphinToolDownload = false)
     {
         ValidateGameId(gameId);
         ArgumentNullException.ThrowIfNull(patch);
@@ -54,12 +55,44 @@ public sealed class GameDataPreparer
         if (!File.Exists(deltaPath))
             throw new FileNotFoundException("Le patch du mod est introuvable.", deltaPath);
         var extension = Path.GetExtension(discImage).ToLowerInvariant();
-        if (extension is not ".iso" and not ".gcm")
+        if (extension is not ".iso" and not ".gcm" and not ".rvz")
             throw new InvalidDataException(
-                $"{patch.ModName} se fabrique depuis une image ISO non compressée ({patch.SourceDescription}) : " +
-                "les images RVZ, CISO, NKit ou réduites ne conviennent pas.");
+                $"{patch.ModName} se fabrique depuis une image ISO, GCM ou RVZ ({patch.SourceDescription}) : " +
+                "les images CISO, NKit ou réduites ne conviennent pas.");
 
-        var sourceMd5 = await Md5Async(discImage, new Progress<double>(value => progress?.Report(value * .15)),
+        // An RVZ (Dolphin's lossless format) goes back to the exact ISO first; the MD5 check
+        // below is then on that image.
+        string? converted = null;
+        try
+        {
+            var source = discImage;
+            var start = 0.0;
+            if (extension == ".rvz")
+            {
+                var dolphin = await _dolphin.EnsureAvailableAsync(allowDolphinToolDownload,
+                    new Progress<double>(value => progress?.Report(value * .05)), cancellationToken).ConfigureAwait(false);
+                Directory.CreateDirectory(Path.Combine(_paths.CacheDirectory, "converted"));
+                converted = Path.Combine(_paths.CacheDirectory, "converted", $"{gameId}-{Guid.NewGuid():N}.iso");
+                await ConvertRvzAsync(dolphin, discImage, converted, cancellationToken).ConfigureAwait(false);
+                source = converted;
+                start = .15;
+                progress?.Report(start);
+            }
+            return await PatchDiscAsync(gameId, runtimeExecutable, source, patch, deltaPath, start, progress,
+                cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            try { if (converted is not null && File.Exists(converted)) File.Delete(converted); } catch { }
+        }
+    }
+
+    private static async Task<string> PatchDiscAsync(string gameId, string runtimeExecutable, string source,
+        GameDiscPatch patch, string deltaPath, double start, IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        double At(double fraction) => start + (1 - start) * fraction;
+        var sourceMd5 = await Md5Async(source, new Progress<double>(value => progress?.Report(At(value * .15))),
             cancellationToken).ConfigureAwait(false);
         if (!sourceMd5.Equals(patch.SourceMd5, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException(
@@ -73,9 +106,9 @@ public sealed class GameDataPreparer
         var staging = Path.Combine(Path.GetDirectoryName(output)!, ".disc-staging-" + Guid.NewGuid().ToString("N") + ".iso");
         try
         {
-            await VcdiffDecoder.ApplyAsync(discImage, deltaPath, staging,
-                new Progress<double>(value => progress?.Report(.15 + value * .7)), cancellationToken).ConfigureAwait(false);
-            var resultMd5 = await Md5Async(staging, new Progress<double>(value => progress?.Report(.85 + value * .15)),
+            await VcdiffDecoder.ApplyAsync(source, deltaPath, staging,
+                new Progress<double>(value => progress?.Report(At(.15 + value * .7))), cancellationToken).ConfigureAwait(false);
+            var resultMd5 = await Md5Async(staging, new Progress<double>(value => progress?.Report(At(.85 + value * .15))),
                 cancellationToken).ConfigureAwait(false);
             if (!resultMd5.Equals(patch.ResultMd5, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException(

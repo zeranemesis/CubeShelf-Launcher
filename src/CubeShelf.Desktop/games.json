@@ -93,7 +93,7 @@
     "Genre": "Plateforme",
     "Players": "1 joueur",
     "Region": "USA (mod)",
-    "Description": "Super Mario Eclipse, le grand mod de Super Mario Sunshine (Eclipse Team), sur le port natif PC. Installe le mod « Super Mario Eclipse » depuis l’onglet Mods et choisis ta copie complète du disque nord-américain (GMSE01) : CubeShelf vérifie l’image, applique le patch xdelta d’Eclipse et vérifie le disque obtenu, sans jamais modifier le tien.",
+    "Description": "Super Mario Eclipse, le grand mod de Super Mario Sunshine (Eclipse Team), sur le port natif PC. Installe le mod « Super Mario Eclipse » depuis l’onglet Mods et choisis ta copie complète du disque nord-américain (GMSE01, en ISO, GCM ou RVZ) : CubeShelf vérifie l’image, applique le patch xdelta d’Eclipse et vérifie le disque obtenu, sans jamais modifier le tien.",
     "Executable": "",
     "GameRoot": "",
     "GameBananaGameId": 5798,
@@ -101,7 +101,7 @@
     "LaunchEnvironment": {
       "SMS_DISC_IMAGE": "GMSE04/disc.iso"
     },
-    "DiscFormats": [".iso", ".gcm"],
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
     "SupportedDiscIds": [
       "GMSE01"
     ],

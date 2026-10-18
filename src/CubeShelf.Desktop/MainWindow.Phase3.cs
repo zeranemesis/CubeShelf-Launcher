@@ -242,7 +242,8 @@ public sealed partial class MainWindow
         var delta = DiscPatchSource.FindDelta(_paths, game.Id, patch) ?? throw new InvalidOperationException(P7(
             $"Installe d’abord le mod « {patch.ModName} » depuis l’onglet Mods de {game.Title} : il contient le patch ({patch.PatchFile}) qui fabrique son disque à partir du tien.",
             $"Install the “{patch.ModName}” mod from {game.Title}’s Mods tab first: it holds the patch ({patch.PatchFile}) that builds its disc from yours."));
-        return _gameData.PrepareDiscPatchAsync(game.Id, executable, discImage, patch, delta, progress, cancellationToken);
+        return _gameData.PrepareDiscPatchAsync(game.Id, executable, discImage, patch, delta, progress, cancellationToken,
+            allowDolphinDownload);
     }
 
     private void HydrateGamePathsPhase3(GameCatalogEntry game)
