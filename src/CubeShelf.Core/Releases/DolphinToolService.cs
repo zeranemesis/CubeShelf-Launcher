@@ -212,6 +212,18 @@ public sealed class DolphinToolService
             catch { }
         }
 
+        // The official package installs below its own folder (Dolphin-x64/DolphinTool.exe).
+        try
+        {
+            if (Directory.Exists(ManagedToolsRoot))
+                foreach (var name in names)
+                {
+                    var path = Directory.EnumerateFiles(ManagedToolsRoot, name, SearchOption.AllDirectories).FirstOrDefault();
+                    if (path is not null) return (path, "Cache CubeShelf");
+                }
+        }
+        catch { }
+
         foreach (var directory in (Environment.GetEnvironmentVariable("PATH") ?? "")
                      .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
         foreach (var name in names)
