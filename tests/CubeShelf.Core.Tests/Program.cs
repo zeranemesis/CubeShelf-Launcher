@@ -49,6 +49,7 @@ Run("transactional mod dependencies", TestModDependencies);
 Run("mod dependency cycle rejected", TestModDependencyCycle);
 Run("mod transaction rollback", TestModRollback);
 Run("GameBanana media cache", TestMediaCache);
+Run("GameBanana catalogue tiles", TestGameBananaTiles);
 Run("preferences persistence", TestPreferences);
 Run("non-destructive WPF migration", TestLegacyMigration);
 Run("transactional GameCube preparation", TestGameDataPreparation);
@@ -679,6 +680,27 @@ void TestModRollback()
         Assert(!Directory.Exists(Path.Combine(paths.DataDirectory, "Mods", "GAME", "2")));
         Assert(manager.GetInstalled().Count == 0);
     });
+}
+
+void TestGameBananaTiles()
+{
+    using var document = System.Text.Json.JsonDocument.Parse("""
+        {"_aMetadata":{"_bIsComplete":true},"_aRecords":[
+          {"_idRow":727237,"_sModelName":"Mod","_sName":"Reimagined","_sProfileUrl":"https://gamebanana.com/mods/727237",
+           "_tsDateAdded":10,"_tsDateModified":20,"_nViewCount":241,
+           "_aSubmitter":{"_sName":"Orlando"},"_aRootCategory":{"_sName":"Textures"},
+           "_aPreviewMedia":{"_aImages":[
+             {"_sBaseUrl":"https://images.gamebanana.com/img/ss/mods","_sFile":"a.jpg","_sFile530":"530-90_a.jpg"},
+             {"_sBaseUrl":"https://evil.example/img","_sFile":"b.jpg"}]}},
+          {"_idRow":5,"_sModelName":"Wip","_sName":"Not a mod"}]}
+        """);
+    var (mods, complete) = GameBananaClient.ParseSubfeed(document.RootElement);
+    Assert(complete && mods.Count == 1);
+    var mod = mods[0];
+    Assert(mod.Id == 727237 && mod.Name == "Reimagined" && mod.Category == "Textures" && mod.Author == "Orlando");
+    Assert(mod.Views == 241 && mod.Updated == 20 && mod.IsSummary);
+    Assert(mod.ThumbnailUrl == "https://images.gamebanana.com/img/ss/mods/530-90_a.jpg");
+    Assert(mod.ImageUrls!.SequenceEqual(new[] { "https://images.gamebanana.com/img/ss/mods/a.jpg" }));
 }
 
 void TestMediaCache()

@@ -17,8 +17,14 @@ public sealed record GameBananaMod(
     string InstallInstructions = "",
     string ThumbnailUrl = "",
     IReadOnlyList<string>? ImageUrls = null,
-    IReadOnlyList<GameBananaFile>? Files = null)
+    IReadOnlyList<GameBananaFile>? Files = null,
+    string Category = "",
+    string Author = "",
+    long Views = 0)
 {
+    /// <summary>A catalogue entry (<see cref="GameBananaClient.BrowseAsync"/>): no archive until its page is read.</summary>
+    public bool IsSummary => string.IsNullOrEmpty(ArchiveUrl);
+
     /// <summary>
     /// This mod with the archive of its file whose name matches <paramref name="pattern"/>
     /// (one * wildcard), or as it is when none does. A mod page can carry several files, and
@@ -67,6 +73,73 @@ public sealed class GameBananaClient
         return (await Task.WhenAll(tasks)).OfType<GameBananaMod>()
             .OrderByDescending(mod => mod.Updated).ToArray();
     }
+
+    /// <summary>
+    /// The game's mods as tiles: name, picture, category, author and views, 15 per page, newest
+    /// first, those whose name contains <paramref name="search"/> when one is given. Installing
+    /// needs <see cref="GetAsync"/> for the archive.
+    /// </summary>
+    public async Task<IReadOnlyList<GameBananaMod>> BrowseAsync(int gameBananaGameId, string search = "",
+        int maxPages = 10, CancellationToken cancellationToken = default)
+    {
+        if (gameBananaGameId <= 0) return Array.Empty<GameBananaMod>();
+        var mods = new List<GameBananaMod>();
+        for (var page = 1; page <= maxPages; page++)
+        {
+            var url = $"https://gamebanana.com/apiv11/Game/{gameBananaGameId}/Subfeed?_sSort=new&_nPage={page}&_csvModelInclusions=Mod" +
+                      (string.IsNullOrWhiteSpace(search) ? "" : "&_sName=" + Uri.EscapeDataString(search.Trim()));
+            using var document = JsonDocument.Parse(await _http.GetStringAsync(url, cancellationToken));
+            var (records, complete) = ParseSubfeed(document.RootElement);
+            mods.AddRange(records.Where(mod => mods.All(known => known.Id != mod.Id)));
+            if (complete || records.Count == 0) break;
+        }
+        return mods;
+    }
+
+    /// <summary>One page of apiv11's Subfeed, and whether it was the last.</summary>
+    public static (IReadOnlyList<GameBananaMod> Mods, bool Complete) ParseSubfeed(JsonElement root)
+    {
+        string Text(JsonElement element, string name) => element.ValueKind == JsonValueKind.Object &&
+            element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() ?? "" : "";
+        long Number(JsonElement element, string name) => element.ValueKind == JsonValueKind.Object &&
+            element.TryGetProperty(name, out var value) && value.TryGetInt64(out var number) ? number : 0;
+        var complete = root.TryGetProperty("_aMetadata", out var metadata) &&
+                       metadata.TryGetProperty("_bIsComplete", out var flag) && flag.ValueKind == JsonValueKind.True;
+        var mods = new List<GameBananaMod>();
+        if (!root.TryGetProperty("_aRecords", out var records) || records.ValueKind != JsonValueKind.Array)
+            return (mods, true);
+        foreach (var record in records.EnumerateArray())
+        {
+            var id = Number(record, "_idRow");
+            if (Text(record, "_sModelName") != "Mod" || id is <= 0 or > int.MaxValue) continue;
+            var images = new List<string>();
+            var thumbnail = "";
+            if (record.TryGetProperty("_aPreviewMedia", out var media) && media.ValueKind == JsonValueKind.Object &&
+                media.TryGetProperty("_aImages", out var list) && list.ValueKind == JsonValueKind.Array)
+                foreach (var image in list.EnumerateArray())
+                {
+                    var baseUrl = Text(image, "_sBaseUrl");
+                    if (!IsTrustedImage(baseUrl)) continue;
+                    if (Text(image, "_sFile").Length > 0) AddImage(images, baseUrl + "/" + Text(image, "_sFile"));
+                    if (thumbnail.Length == 0)
+                    {
+                        var small = FirstNonEmpty(Text(image, "_sFile530"), Text(image, "_sFile220"), Text(image, "_sFile"));
+                        if (small.Length > 0) thumbnail = baseUrl + "/" + small;
+                    }
+                }
+            var category = record.TryGetProperty("_aRootCategory", out var root2) ? Text(root2, "_sName") : "";
+            var author = record.TryGetProperty("_aSubmitter", out var submitter) ? Text(submitter, "_sName") : "";
+            var updated = Math.Max(Number(record, "_tsDateModified"), Number(record, "_tsDateAdded"));
+            mods.Add(new GameBananaMod((int)id, FirstNonEmpty(Text(record, "_sName"), $"Mod {id}"), updated, "", "",
+                VersionLabel: Text(record, "_sVersion"), ProfileUrl: Text(record, "_sProfileUrl"),
+                ThumbnailUrl: thumbnail, ImageUrls: images, Category: category, Author: author,
+                Views: Number(record, "_nViewCount")));
+        }
+        return (mods, complete);
+    }
+
+    private static bool IsTrustedImage(string value) => Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        uri.Scheme == Uri.UriSchemeHttps && uri.Host.Equals("images.gamebanana.com", StringComparison.OrdinalIgnoreCase);
 
     public async Task<GameBananaMod> GetAsync(int id, CancellationToken cancellationToken = default)
     {

@@ -454,9 +454,12 @@ public sealed partial class MainWindow : Window
         ModsStatus.Text = "Chargement du catalogue GameBanana…";
         try
         {
-            _remoteMods = await _gameBanana.GetLatestAsync(_selectedGame.GameBananaGameId);
+            var search = ModSearchBox.Text?.Trim() ?? "";
+            _remoteMods = await _gameBanana.BrowseAsync(_selectedGame.GameBananaGameId, search);
             RefreshModItems();
-            ModsStatus.Text = $"{_remoteMods.Count} mods récupérés.";
+            ModsStatus.Text = search.Length > 0
+                ? $"{_remoteMods.Count} mod(s) GameBanana pour « {search} »."
+                : $"{_remoteMods.Count} mods récupérés.";
         }
         catch (Exception exception)
         {
@@ -485,7 +488,7 @@ public sealed partial class MainWindow : Window
         var runtime = _selectedGame?.RuntimeName is { Length: > 0 } runtimeName ? runtimeName : "le jeu";
         var items = ids.Select(id =>
         {
-            var remote = _remoteMods.FirstOrDefault(item => item.Id == id);
+            var remote = _modDetails.TryGetValue(id, out var detailed) ? detailed : _remoteMods.FirstOrDefault(item => item.Id == id);
             installed.TryGetValue(id, out var local);
             var status = local is null ? "Non installé"
                 : playerDisabled.Contains(id) ? $"Installé • coupé dans {runtime}"
@@ -494,8 +497,8 @@ public sealed partial class MainWindow : Window
             if (layoutIds.Contains(id)) status += " • arborescence inattendue";
             return new DesktopModItem(id, remote?.Name ?? local?.Name ?? $"Mod {id}", status,
                 local?.Priority ?? 100, local?.Enabled ?? false, local is not null, remote);
-        }).OrderBy(item => item.Name).ToArray();
-        ModsList.ItemsSource = items;
+        }).ToArray();
+        ShowModItems(items);
         var report = new List<string>();
         foreach (var item in layout.Take(4))
             report.Add("⚠ " + item.Name + " : " + item.Kind switch
@@ -518,9 +521,30 @@ public sealed partial class MainWindow : Window
         ConflictsStatus.Text = string.Join(Environment.NewLine, report);
     }
 
-    private void SelectMod(object? sender, SelectionChangedEventArgs args)
+    private async void SelectMod(object? sender, SelectionChangedEventArgs args)
     {
         _selectedMod = ModsList.SelectedItem as DesktopModItem;
+        if (_selectedMod is null) return;
+        ShowSelectedMod();
+        if (_selectedMod.Remote is not { IsSummary: true }) return;
+        var item = _selectedMod;
+        InstallModButton.IsEnabled = false;
+        ModDescription.Text = "Chargement de la page du mod…";
+        try
+        {
+            var full = await EnsureModDetailsAsync(item);
+            if (_selectedMod?.Id != item.Id || full is null) return;
+            _selectedMod = item with { Remote = full };
+            ShowSelectedMod();
+        }
+        catch (Exception exception)
+        {
+            if (_selectedMod?.Id == item.Id) ModDescription.Text = $"Page GameBanana indisponible : {exception.Message}";
+        }
+    }
+
+    private void ShowSelectedMod()
+    {
         if (_selectedMod is null) return;
         ModTitle.Text = _selectedMod.Name;
         ModDetailStatus.Text = _selectedMod.Status;
@@ -531,7 +555,7 @@ public sealed partial class MainWindow : Window
         OpenModPageButton.IsEnabled = !string.IsNullOrWhiteSpace(_selectedMod.Remote?.ProfileUrl);
         OpenModImageButton.IsEnabled = (_selectedMod.Remote?.ImageUrls?.Count ?? 0) > 0;
         ModPriority.Text = _selectedMod.Priority.ToString();
-        InstallModButton.IsEnabled = _selectedMod.Remote is not null;
+        InstallModButton.IsEnabled = _selectedMod.Remote is { IsSummary: false };
         InstallModButton.Content = _selectedMod.Installed ? "Réinstaller" : "Installer";
         ToggleModButton.IsEnabled = _selectedMod.Installed;
         ToggleModButton.Content = _selectedMod.Enabled ? "Désactiver" : "Activer";
@@ -576,7 +600,7 @@ public sealed partial class MainWindow : Window
     private void SetModActions(bool enabled)
     {
         RefreshModsButton.IsEnabled = enabled;
-        InstallModButton.IsEnabled = enabled && _selectedMod?.Remote is not null;
+        InstallModButton.IsEnabled = enabled && _selectedMod?.Remote is { IsSummary: false };
         ToggleModButton.IsEnabled = enabled && _selectedMod?.Installed == true;
         DeleteModButton.IsEnabled = enabled && _selectedMod?.Installed == true;
     }
@@ -593,7 +617,25 @@ public sealed partial class MainWindow : Window
 
 
     public sealed record DesktopModItem(int Id, string Name, string Status, int Priority, bool Enabled,
-        bool Installed, GameBananaMod? Remote);
+        bool Installed, GameBananaMod? Remote) : System.ComponentModel.INotifyPropertyChanged
+    {
+        public string Category => Remote?.Category is { Length: > 0 } category ? category : "Mod";
+        public string Byline => string.Join("  •  ", new[]
+        {
+            Remote?.Category,
+            Remote?.Author is { Length: > 0 } author ? "par " + author : null,
+            Remote?.Views > 0 ? $"{Remote.Views:N0} vues" : null
+        }.Where(part => !string.IsNullOrEmpty(part)));
+        public string Badge => Enabled ? "ACTIVÉ" : "INSTALLÉ";
+
+        private Bitmap? _thumbnail;
+        public Bitmap? Thumbnail
+        {
+            get => _thumbnail;
+            set { _thumbnail = value; PropertyChanged?.Invoke(this, new(nameof(Thumbnail))); }
+        }
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    }
 
     /// <summary>One row of the game page's mod list: what it is, and the one thing to do with it.</summary>
     public sealed record GameModRow(int Id, string Name, string Detail, string Action);
