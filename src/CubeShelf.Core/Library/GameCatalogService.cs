@@ -33,7 +33,44 @@ public enum GameDataPreparation
     /// ciso, gcz, nfs, rvz, wbfs, wia and tgc, so there is nothing to convert and nothing to
     /// extract. Either way the answer to "what does CubeShelf prepare" is: nothing.
     /// </summary>
-    Runtime = 1
+    Runtime = 1,
+
+    /// <summary>
+    /// CubeShelf builds another disc from the user's: it checks the image is the exact one a
+    /// mod's disc patch (xdelta) was made against, applies the patch from that installed mod
+    /// and checks the result (<see cref="GameCatalogEntry.DiscPatch"/>). Super Mario Eclipse
+    /// is played this way: the North American disc, patched into Eclipse's.
+    /// </summary>
+    DiscPatch = 2
+}
+
+/// <summary>A mod that is a patch of the whole disc image, and the images it goes between.</summary>
+public sealed class GameDiscPatch
+{
+    /// <summary>The GameBanana mod that carries the patch, installed from the Mods tab.</summary>
+    public int GameBananaModId { get; set; }
+    public string ModName { get; set; } = "";
+
+    /// <summary>
+    /// The mod's file to install, when its page has several (one * wildcard): Super Mario
+    /// Eclipse's page lists its players guide first.
+    /// </summary>
+    public string ModArchive { get; set; } = "";
+
+    /// <summary>File name of the patch inside the mod (v1.1.0.xdelta).</summary>
+    public string PatchFile { get; set; } = "";
+
+    /// <summary>MD5 of the only image the patch applies to, and of the image it makes.</summary>
+    public string SourceMd5 { get; set; } = "";
+    public string ResultMd5 { get; set; } = "";
+
+    /// <summary>Human description of the source image, for the refusal message.</summary>
+    public string SourceDescription { get; set; } = "";
+
+    /// <summary>Where the patched image goes, relative to the runtime: {id}/disc.iso.</summary>
+    public string OutputImage { get; set; } = "";
+
+    public GameDiscPatch Clone() => (GameDiscPatch)MemberwiseClone();
 }
 
 public sealed class GameCatalogEntry
@@ -107,6 +144,38 @@ public sealed class GameCatalogEntry
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameDataPreparation DataPreparation { get; set; } = GameDataPreparation.CubeShelf;
+
+    /// <summary>
+    /// The variable through which the runtime opens an ISO or GCM image itself (SMS_DISC_IMAGE):
+    /// such an image is then given as it is, with nothing extracted. An RVZ is still prepared.
+    /// </summary>
+    public string DirectDiscVariable { get; set; } = "";
+
+    /// <summary>
+    /// A console runtime whose output CubeShelf writes to Logs/{id}.log, with no console window
+    /// beside the game (Super Mario Sunshine logs every frame while its menu is open).
+    /// </summary>
+    public bool LogOutput { get; set; }
+
+    [JsonIgnore]
+    public bool ReadsDiscDirectly =>
+        DirectDiscVariable.Length > 0 &&
+        Path.GetExtension(DiscImage).ToLowerInvariant() is ".iso" or ".gcm";
+
+    /// <summary>The disc patch, for <see cref="GameDataPreparation.DiscPatch"/>.</summary>
+    public GameDiscPatch? DiscPatch { get; set; }
+
+    /// <summary>
+    /// A game played through a mod of another (Super Mario Eclipse, a mod of Super Mario
+    /// Sunshine): the base game's id. Such an entry is not shown in the library; the base game
+    /// becomes it while the mod <see cref="ActivatedByModId"/> is active (<see cref="GameVariants"/>).
+    /// </summary>
+    public string VariantOf { get; set; } = "";
+    public int ActivatedByModId { get; set; }
+
+    /// <summary>Whose mods this game uses: its base game's for a variant.</summary>
+    [JsonIgnore]
+    public string ModLibraryId => string.IsNullOrWhiteSpace(VariantOf) ? Id : VariantOf;
 
     /// <summary>Project page shown to the user, for runtimes CubeShelf cannot fully automate.</summary>
     public string HomepageUrl { get; set; } = "";
@@ -255,6 +324,11 @@ public sealed class GameCatalogService
             target.RuntimeSha256 = source.RuntimeSha256;
             target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
+            target.DirectDiscVariable = source.DirectDiscVariable;
+            target.LogOutput = source.LogOutput;
+            target.DiscPatch = source.DiscPatch?.Clone();
+            target.VariantOf = source.VariantOf;
+            target.ActivatedByModId = source.ActivatedByModId;
             target.HomepageUrl = source.HomepageUrl;
             target.OnlineCompanion = source.OnlineCompanion;
             target.LaunchArguments = source.LaunchArguments.ToList();
@@ -295,6 +369,11 @@ public sealed class GameCatalogService
         RuntimeSha256 = source.RuntimeSha256,
         RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
+        DirectDiscVariable = source.DirectDiscVariable,
+        LogOutput = source.LogOutput,
+        DiscPatch = source.DiscPatch?.Clone(),
+        VariantOf = source.VariantOf,
+        ActivatedByModId = source.ActivatedByModId,
         HomepageUrl = source.HomepageUrl,
         OnlineCompanion = source.OnlineCompanion,
         Covers = source.Covers.Select(Clone).ToList(),

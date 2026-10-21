@@ -95,7 +95,7 @@ public sealed partial class MainWindow
         _processLauncher.OpenDirectory(_dolphinToolService.ManagedToolsRoot);
     }
 
-    private async Task QueueGameDataPreparationPhase4Async()
+    private async Task QueueGameDataPreparationPhase4Async(bool launchWhenReady = false)
     {
         var game = _selectedGame;
         if (game is null || _portableQueue is null || _dolphinToolService is null) return;
@@ -137,13 +137,15 @@ public sealed partial class MainWindow
             "GAME DATA",
             P7("Préparation transactionnelle ISO/GCM/RVZ", "Transactional ISO/GCM/RVZ preparation"),
             (progress, cancellationToken) =>
-                _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress, cancellationToken, allowDolphinDownload),
+                PrepareGameDataAsync(game, executable, discImage, progress, cancellationToken, allowDolphinDownload),
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>
                 {
                     RefreshGameState();
                     RefreshDolphinStatusPhase4Core();
+                    if (launchWhenReady && _selectedGame?.Id == game.Id && !_sessions.IsRunning(game.Id))
+                        PlayGame(null, new Avalonia.Interactivity.RoutedEventArgs());
                     ShowToastParity(P7("Données prêtes", "Game data ready"), P7("Les données sont prêtes. L’image ISO/GCM/RVZ originale est conservée.", "Game data is ready. The original ISO/GCM/RVZ image was preserved."));
                 });
                 return Task.CompletedTask;

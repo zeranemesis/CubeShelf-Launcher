@@ -10,7 +10,7 @@ public sealed record PortableInstalledMod(int Id, string Name, long Updated, boo
 public sealed record PortableModConflict(string RelativePath, IReadOnlyList<int> ModIds);
 /// <summary>One line of active-mods.json: what the game needs to name a mod and report it back.</summary>
 public sealed record PortableActiveMod(int Id, string Name, int Priority, string ContentRoot);
-public enum PortableModLayoutKind { Unknown, DolphinTextures, LooseFiles, SeveralVariants }
+public enum PortableModLayoutKind { Unknown, DolphinTextures, LooseFiles, SeveralVariants, DiscPatch }
 public sealed record PortableModLayoutWarning(int Id, string Name, PortableModLayoutKind Kind,
     IReadOnlyList<string> TopLevelEntries);
 
@@ -323,8 +323,20 @@ public sealed class PortableModManager
     // differently, so the panel says which. Seen across the fourteen packs
     // GameBanana lists for Mario Party 4: three are Dolphin texture packs, two
     // ship loose files, one offers several variants side by side.
+    private static bool IsDiscPatchOnly(string contentRoot) =>
+        !Directory.EnumerateFileSystemEntries(contentRoot)
+            .Any(entry => DiscRootEntries.Contains(Path.GetFileName(entry))) &&
+        ClassifyLayout(contentRoot) == PortableModLayoutKind.DiscPatch;
+
     private static PortableModLayoutKind ClassifyLayout(string contentRoot)
     {
+        // A patch for the disc image itself (xdelta, BPS, IPS, PPF), such as
+        // Super Mario Eclipse: it builds a different disc, so overlaying files on
+        // the original one cannot carry it.
+        if (Directory.EnumerateFiles(contentRoot, "*", SearchOption.AllDirectories)
+            .Any(file => DiscPatchExtensions.Contains(Path.GetExtension(file))))
+            return PortableModLayoutKind.DiscPatch;
+
         // Dolphin dumps textures as <GameId>/tex1_<hash>.png and replaces them at
         // render time. Nothing about that reaches the disc, so no overlay can
         // carry it.
@@ -369,6 +381,9 @@ public sealed class PortableModManager
         var playerDisabled = GetPlayerDisabled();
         var active = GetInstalled()
             .Where(item => item.Enabled && !playerDisabled.Contains(item.Id) && Directory.Exists(item.ContentRoot))
+            // A disc patch (Super Mario Eclipse's xdelta) builds the disc during the data
+            // preparation; its files are nothing to overlay on it.
+            .Where(item => !IsDiscPatchOnly(item.ContentRoot))
             .OrderByDescending(item => item.Priority).ThenBy(item => item.Id)
             .Select(item => item with { ContentRoot = Path.GetFullPath(item.ContentRoot) })
             .ToArray();
@@ -395,8 +410,13 @@ public sealed class PortableModManager
         File.Move(temporary, path, true);
     }
 
+    // The disc root folders of the games this manager installs for: Mario Party
+    // 4 (data, dll, mess, movie, sound) and Super Mario Sunshine (AudioRes, data).
     private static readonly HashSet<string> DiscRootEntries =
-        new(new[] { "data", "dll", "mess", "movie", "sound", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
+        new(new[] { "data", "dll", "mess", "movie", "sound", "AudioRes", "opening.bnr" }, StringComparer.OrdinalIgnoreCase);
+
+    private static readonly HashSet<string> DiscPatchExtensions =
+        new(new[] { ".xdelta", ".vcdiff", ".bps", ".ips", ".ppf" }, StringComparer.OrdinalIgnoreCase);
 
     // Mod archives bury the disc root under whatever folder names the author
     // felt like: seen in the wild are "files/" at the top, "<mod>/<variant>/files/"

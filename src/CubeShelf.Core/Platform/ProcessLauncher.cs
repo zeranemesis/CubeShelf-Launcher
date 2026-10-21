@@ -8,7 +8,8 @@ public interface IProcessLauncher
         string executable,
         string workingDirectory,
         IReadOnlyDictionary<string, string?>? environment = null,
-        IReadOnlyList<string>? arguments = null);
+        IReadOnlyList<string>? arguments = null,
+        string? outputLog = null);
 
     void OpenDirectory(string directory);
 }
@@ -19,7 +20,8 @@ public sealed class ProcessLauncher : IProcessLauncher
         string executable,
         string workingDirectory,
         IReadOnlyDictionary<string, string?>? environment = null,
-        IReadOnlyList<string>? arguments = null)
+        IReadOnlyList<string>? arguments = null,
+        string? outputLog = null)
     {
         if (!File.Exists(executable))
             throw new FileNotFoundException("Executable not found.", executable);
@@ -41,8 +43,45 @@ public sealed class ProcessLauncher : IProcessLauncher
                 info.Environment[pair.Key] = pair.Value;
         }
 
-        return Process.Start(info) ??
+        // A console program's output goes to outputLog instead of a console window: a terminal
+        // that falls behind blocks the game's writes, and closing it would end the game.
+        if (outputLog is not null)
+        {
+            info.CreateNoWindow = true;
+            info.RedirectStandardOutput = true;
+            info.RedirectStandardError = true;
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputLog))!);
+        }
+
+        var process = Process.Start(info) ??
             throw new InvalidOperationException("The process could not be started.");
+        if (outputLog is not null) WriteOutput(process, outputLog);
+        return process;
+    }
+
+    private static void WriteOutput(Process process, string outputLog)
+    {
+        // Readable while the game runs.
+        var log = new StreamWriter(new FileStream(outputLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+            { AutoFlush = true };
+        void Write(object _, DataReceivedEventArgs line)
+        {
+            if (line.Data is null) return;
+            lock (log)
+                try { log.WriteLine(line.Data); } catch (ObjectDisposedException) { }
+        }
+        process.OutputDataReceived += Write;
+        process.ErrorDataReceived += Write;
+        // Reading starts first: a program that has already ended raises Exited at once, and
+        // WaitForExit only waits for the last lines of streams that are being read.
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        process.Exited += (_, _) =>
+        {
+            process.WaitForExit();
+            lock (log) log.Dispose();
+        };
+        process.EnableRaisingEvents = true;
     }
 
     public void OpenDirectory(string directory)

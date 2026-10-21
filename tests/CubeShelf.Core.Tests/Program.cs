@@ -12,9 +12,14 @@ var failures = new List<string>();
 var executed = 0;
 Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
 Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
+Run("runtime: a console game's output goes to its log, not a window", RuntimeIntegrationTests.OutputLog);
 Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
 Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
 Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);
+Run("mods: xdelta disc patches apply exactly, and only to their disc", DiscPatchTests.XdeltaAppliesExactly);
+Run("runtime: a disc patch checks the user's image and the one it makes", DiscPatchTests.PreparationChecksBothImages);
+Run("mods: the file a disc patch needs is picked among the mod's files", DiscPatchTests.ModArchiveIsPicked);
+Run("library: Super Mario Sunshine plays as Super Mario Eclipse while its mod is active", DiscPatchTests.VariantFollowsItsMod);
 Run("online: the public list is read and bounded", OnlineRoomsTests.ParsesTheList);
 Run("online: the companion's room tags", OnlineRoomsTests.ReadsTheCompanionTags);
 Run("online: a room's mods against ours", OnlineRoomsTests.ComparesMods);
@@ -441,6 +446,8 @@ void TestModLayoutWarning()
         ("Pack/GMPE01/tex1_128x128_3e7936174a209c24_14.png", PortableModLayoutKind.DolphinTextures),
         ("Pack/board_e.dat",                                 PortableModLayoutKind.LooseFiles),
         ("Pack/High res/bbattle.bin",                        PortableModLayoutKind.SeveralVariants),
+        // Super Mario Eclipse ships as an xdelta patch for the whole disc image.
+        ("Pack/Super Mario Eclipse.xdelta",                  PortableModLayoutKind.DiscPatch),
     };
 
     var id = 50;
@@ -474,6 +481,19 @@ void TestModLayoutWarning()
         using var client = new HttpClient(new StaticHttpHandler(_ =>
             CreateZipBytes("files/data/board.bin", new byte[] { 1 })));
         manager.InstallAsync(new GameBananaMod(60, "Disc layout", 1, "https://files.gamebanana.com/d.zip", "d.zip"),
+            new GameBananaClient(client)).GetAwaiter().GetResult();
+        Assert(manager.AnalyzeLayout().Count == 0);
+    });
+
+    // Nor is one laid out like Super Mario Sunshine's disc, whose root folders
+    // differ from Mario Party 4's.
+    WithTempRoot(root =>
+    {
+        var paths = new TestPaths(root);
+        var manager = new PortableModManager(paths, "GMSP01");
+        using var client = new HttpClient(new StaticHttpHandler(_ =>
+            CreateZipBytes("files/AudioRes/Banks/smsbank.aw", new byte[] { 1 })));
+        manager.InstallAsync(new GameBananaMod(61, "Sunshine layout", 1, "https://files.gamebanana.com/s.zip", "s.zip"),
             new GameBananaClient(client)).GetAwaiter().GetResult();
         Assert(manager.AnalyzeLayout().Count == 0);
     });

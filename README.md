@@ -58,6 +58,7 @@ Le catalogue déclare `LaunchArguments` (liste d’arguments), `LaunchEnvironmen
 | PartyBoard | `PARTYBOARD_DISC_IMAGE` ; mods via `PARTYBOARD_MOD_LIST` | ISO, GCM, RVZ |
 | Ring Out | argument positionnel, y compris pour son installation initiale | ISO, GCM, RVZ |
 | Strikers | `STRIKERS_DATA`, prioritaire sur la configuration du jeu | ISO, GCM, CISO, GCZ |
+| Sunshine PAL | CubeShelf extrait le disque dans `GMSP01/files` à côté de `sms.exe`, transmis par `SMS_DISC_ROOT` ; mods de fichiers via `SMS_CUBESHELF_MOD_LIST` (les patchs xdelta comme Super Mario Eclipse ne s’appliquent pas) | ISO, GCM, RVZ (converti par DolphinTool) |
 
 Les contrats de lancement suivent les sources amont : [Ring Out Windows](https://github.com/jackpoison-prog/RingOut/blob/main/dist/RingOut-1.0-dist/windows/launcher/RingOut.c), [Ring Out Linux](https://github.com/jackpoison-prog/RingOut#readme) et [chargement des données Strikers](https://github.com/new-coke/strikers/blob/main/smstrikers-port/src/platform/dvd.c).
 

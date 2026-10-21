@@ -192,7 +192,8 @@ public sealed partial class MainWindow
         foreach (var card in _parityCards) card.Dispose();
         _parityCards.Clear();
 
-        IEnumerable<GameCatalogEntry> query = _catalogGames;
+        // Keep the original game on the shelf; active mods only select its launch configuration.
+        IEnumerable<GameCatalogEntry> query = ShelfGames;
         if (_favoritesOnly) query = query.Where(game => game.IsFavorite);
 
         var search = LibrarySearchBox?.Text?.Trim() ?? "";
@@ -231,7 +232,7 @@ public sealed partial class MainWindow
         var disc = ResolveApplicationPath(game.DiscImage);
         var executable = runtime.IsInstalled ? runtime.ExecutablePath : ResolveApplicationPath(game.Executable);
         var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
-        var prepared = !runtimeManagesDisc && File.Exists(executable) && _gameData.IsPrepared(game.Id, executable);
+        var prepared = !runtimeManagesDisc && File.Exists(executable) && _gameData.IsPrepared(game, executable);
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var last = game.LastPlayedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (english ? "Never" : "Jamais");
         var update = _gameUpdateSnapshots.TryGetValue(game.Id, out var snapshot)
@@ -269,8 +270,9 @@ public sealed partial class MainWindow
         SelectCatalogGame(card.Game);
     }
 
-    private void SelectCatalogGame(GameCatalogEntry game)
+    private void SelectCatalogGame(GameCatalogEntry game, bool showGameView = true)
     {
+        game = GameVariants.Resolve(_catalogGames, game, _paths);
         _selectedGame = game;
         var saved = _profileStore.Load(game.Id);
         if (saved is not null)
@@ -285,14 +287,15 @@ public sealed partial class MainWindow
 
         game.Executable = ResolveApplicationPath(game.Executable);
         game.DiscImage = ResolveApplicationPath(game.DiscImage);
-        GameTitle.Text = $"{game.Title} • {game.Id}";
-        _modManager = new PortableModManager(_paths, game.Id);
+        GameTitle.Text = GameVariants.BaseOf(_catalogGames, game).Title;
+        _modManager = new PortableModManager(_paths, game.ModLibraryId);
         _remoteMods = Array.Empty<GameBananaMod>();
         _selectedMod = null;
         RefreshGameState();
         RefreshModItems();
         RefreshParityGameDetails();
-        ShowParityView(GameView);
+        if (showGameView) ShowParityView(GameView);
+        RefreshLibraryParity();
         _ = RefreshGameUpdatePhase3Async(game, forceUi: true);
     }
 
@@ -300,7 +303,8 @@ public sealed partial class MainWindow
     {
         if (_selectedGame is null || SelectedTitleText is null) return;
         var game = _selectedGame;
-        SelectedTitleText.Text = game.Title;
+        var baseGame = GameVariants.BaseOf(_catalogGames, game);
+        SelectedTitleText.Text = baseGame.Title;
         SelectedMetaText.Text = string.Join("  •  ", new[]
         {
             game.Year > 0 ? game.Year.ToString() : null,
@@ -309,7 +313,8 @@ public sealed partial class MainWindow
             string.IsNullOrWhiteSpace(game.Region) ? null : game.Region,
             game.Id
         }.Where(value => !string.IsNullOrWhiteSpace(value)));
-        SelectedDescriptionText.Text = game.Description;
+        SelectedDescriptionText.Text = baseGame.Description +
+            (GameVariants.IsVariant(game) ? "\n\n" + P7($"Mod actif : {game.Title}", $"Active mod: {game.Title}") : "");
 
         var runtime = _installer.GetStatus(game.Id);
         var discPath = ResolveApplicationPath(game.DiscImage);
@@ -317,7 +322,7 @@ public sealed partial class MainWindow
         var hasRuntime = runtime.IsInstalled || File.Exists(executable);
         var hasDisc = File.Exists(discPath);
         var runtimeManagesDisc = game.DataPreparation == GameDataPreparation.Runtime;
-        var prepared = !runtimeManagesDisc && hasRuntime && _gameData.IsPrepared(game.Id, executable);
+        var prepared = !runtimeManagesDisc && hasRuntime && _gameData.IsPrepared(game, executable);
 
         var english = UiLocalization.IsEnglish(_preferences.Language);
         OriginalGameStateText.Text = hasDisc
@@ -344,7 +349,7 @@ public sealed partial class MainWindow
         FavoriteButton.Content = game.IsFavorite
             ? (english ? "★ Favorite" : "★ Favori")
             : (english ? "☆ Add to favorites" : "☆ Ajouter aux favoris");
-        var cover = game.Covers.FirstOrDefault();
+        var cover = baseGame.Covers.FirstOrDefault();
         GameCase.SetCover(
             ResolveCoverPath(cover?.Front),
             ResolveCoverPath(cover?.Back),
@@ -468,7 +473,7 @@ public sealed partial class MainWindow
         builder.AppendLine($"Executable     : {game.Executable}");
         builder.AppendLine($"Image disque   : {game.DiscImage}");
         builder.AppendLine($"Compatibilité  : {compatibility.Message}");
-        builder.AppendLine($"Données prêtes : {_gameData.IsPrepared(game.Id, game.Executable)}");
+        builder.AppendLine($"Données prêtes : {_gameData.IsPrepared(game, game.Executable)}");
         builder.AppendLine($"Mods installés : {_modManager?.GetInstalled().Count ?? 0}");
         builder.AppendLine($"Queue en attente: {_portableQueue?.PendingCount ?? 0}");
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var update))

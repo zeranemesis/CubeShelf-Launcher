@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Library;
 using Avalonia.Interactivity;
@@ -78,7 +78,9 @@ public sealed partial class MainWindow : Window
             Path.Combine(AppContext.BaseDirectory, "games.json"),
             paths.DataDirectory);
         _catalogGames.AddRange(_catalogService.Load());
-        _selectedGame = _catalogGames.FirstOrDefault();
+        _selectedGame = ShelfGames.FirstOrDefault() is { } firstGame
+            ? GameVariants.Resolve(_catalogGames, firstGame, paths)
+            : null;
         if (_selectedGame is not null)
         {
             var saved = _profileStore.Load(_selectedGame.Id);
@@ -94,8 +96,8 @@ public sealed partial class MainWindow : Window
 
             _selectedGame.Executable = ResolveApplicationPath(_selectedGame.Executable);
             _selectedGame.DiscImage = ResolveApplicationPath(_selectedGame.DiscImage);
-            GameTitle.Text = $"{_selectedGame.Title} — PartyBoard";
-            _modManager = new PortableModManager(paths, _selectedGame.Id);
+            GameTitle.Text = GameVariants.BaseOf(_catalogGames, _selectedGame).Title;
+            _modManager = new PortableModManager(paths, _selectedGame.ModLibraryId);
             RefreshGameState();
             RefreshModItems();
         }
@@ -165,6 +167,12 @@ public sealed partial class MainWindow : Window
         }
 
         if (!CanPlay()) return;
+        if (_selectedGame.DataPreparation != GameDataPreparation.Runtime &&
+            !_gameData.IsPrepared(_selectedGame, _selectedGame.Executable))
+        {
+            await QueueGameDataPreparationPhase4Async(launchWhenReady: true);
+            return;
+        }
 
         try
         {
@@ -183,7 +191,8 @@ public sealed partial class MainWindow : Window
                 _selectedGame.Id,
                 _selectedGame.Executable,
                 Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-                environment, launch.Arguments);
+                environment, launch.Arguments,
+                _selectedGame.LogOutput ? Path.Combine(_paths.DataDirectory, "Logs", _selectedGame.Id + ".log") : null);
 
             _selectedGame.PlayCount++;
             _selectedGame.LastPlayedAt = DateTimeOffset.Now;
@@ -205,7 +214,9 @@ public sealed partial class MainWindow : Window
         if (_selectedGame is null) return;
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = $"Sélectionner l’image de {_selectedGame.Title}",
+            Title = _selectedGame.DiscPatch is { SourceDescription.Length: > 0 } patch
+                ? $"{_selectedGame.Title} : sélectionner {patch.SourceDescription}"
+                : $"Sélectionner l’image de {_selectedGame.Title}",
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
@@ -292,6 +303,20 @@ public sealed partial class MainWindow : Window
 
     private void PersistCatalog() => _catalogService.Save(_catalogGames);
 
+    /// <summary>The library's games: variants (Super Mario Eclipse) are reached through their base game.</summary>
+    private IEnumerable<GameCatalogEntry> ShelfGames => _catalogGames.Where(game => !GameVariants.IsVariant(game));
+
+    /// <summary>
+    /// After the selected game's mods change: Super Mario Sunshine becomes Super Mario Eclipse
+    /// while the Eclipse mod is active, and back when it is not.
+    /// </summary>
+    private void SyncVariantSelection()
+    {
+        if (_selectedGame is null) return;
+        var effective = GameVariants.Resolve(_catalogGames, _selectedGame, _paths);
+        if (!ReferenceEquals(effective, _selectedGame)) SelectCatalogGame(effective, showGameView: false);
+    }
+
     private void ToggleFavorite(object? sender, RoutedEventArgs args)
     {
         if (_selectedGame is null) return;
@@ -367,7 +392,7 @@ public sealed partial class MainWindow : Window
         DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
             DiscImageService.DescribeSupported(game.SupportedDiscIds);
 
-        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game.Id, game.Executable);
+        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game, game.Executable);
         PrepareDataButton.IsVisible = !runtimeManagesDisc;
         PrepareDataButton.Content = prepared ? "Repréparer les données" : "Préparer les données";
         PrepareDataButton.IsEnabled = !runtimeManagesDisc && File.Exists(game.Executable) && compatibility.Supported;
@@ -403,8 +428,9 @@ public sealed partial class MainWindow : Window
         // A runtime-managed disc has nothing for CubeShelf to prepare and nothing to wait for
         // before enabling Play: Ring Out extracts and recompiles on its own first launch, and
         // PartyBoard opens the image directly from PARTYBOARD_DISC_IMAGE.
-        return _selectedGame.DataPreparation == GameDataPreparation.Runtime ||
-            _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+        return _selectedGame.DataPreparation != GameDataPreparation.DiscPatch ||
+            (_selectedGame.DiscPatch is { } patch &&
+             DiscPatchSource.FindDelta(_paths, _selectedGame.ModLibraryId, patch) is not null);
     }
 
     private static string ResolveApplicationPath(string path) =>
@@ -446,15 +472,23 @@ public sealed partial class MainWindow : Window
         var ids = _remoteMods.Select(item => item.Id).Concat(installed.Keys).Distinct().ToArray();
         var conflicts = _modManager.AnalyzeConflicts();
         var conflictedIds = conflicts.SelectMany(item => item.ModIds).ToHashSet();
-        var layout = _modManager.AnalyzeLayout();
+        // A mod that makes the game another (Super Mario Eclipse) carries a disc patch, which
+        // is no layout problem: activating it switches the game over.
+        var variantMods = _selectedGame is null ? new HashSet<int>() : _catalogGames
+            .Where(game => GameVariants.IsVariant(game) &&
+                           game.VariantOf.Equals(_selectedGame.ModLibraryId, StringComparison.OrdinalIgnoreCase))
+            .Select(game => game.ActivatedByModId).ToHashSet();
+        var layout = _modManager.AnalyzeLayout()
+            .Where(item => !(item.Kind == PortableModLayoutKind.DiscPatch && variantMods.Contains(item.Id))).ToList();
         var layoutIds = layout.Select(item => item.Id).ToHashSet();
         var playerDisabled = _modManager.GetPlayerDisabled().ToHashSet();
+        var runtime = _selectedGame?.RuntimeName is { Length: > 0 } runtimeName ? runtimeName : "le jeu";
         var items = ids.Select(id =>
         {
             var remote = _remoteMods.FirstOrDefault(item => item.Id == id);
             installed.TryGetValue(id, out var local);
             var status = local is null ? "Non installé"
-                : playerDisabled.Contains(id) ? "Installé • coupé dans PartyBoard"
+                : playerDisabled.Contains(id) ? $"Installé • coupé dans {runtime}"
                 : local.Enabled ? "Installé • activé" : "Installé • désactivé";
             if (conflictedIds.Contains(id)) status += " • conflit";
             if (layoutIds.Contains(id)) status += " • arborescence inattendue";
@@ -467,13 +501,17 @@ public sealed partial class MainWindow : Window
             report.Add("⚠ " + item.Name + " : " + item.Kind switch
             {
                 PortableModLayoutKind.DolphinTextures =>
-                    "pack de textures Dolphin. PartyBoard remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
+                    $"pack de textures Dolphin. {runtime} remplace des fichiers du disque, pas des textures au rendu : ce mod ne peut pas fonctionner ici.",
                 PortableModLayoutKind.LooseFiles =>
-                    "fichiers livrés sans chemin. PartyBoard les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                    $"fichiers livrés sans chemin. {runtime} les placera lui-même si le disque porte ces noms ; sinon ils resteront sans effet.",
+                PortableModLayoutKind.DiscPatch =>
+                    $"patch de l’image disque (xdelta, BPS, IPS…). Il fabrique un autre disque, alors que {runtime} applique des fichiers par-dessus le tien : ce mod ne peut pas fonctionner ici.",
                 PortableModLayoutKind.SeveralVariants =>
                     $"plusieurs variantes côte à côte ({string.Join(", ", item.TopLevelEntries.Take(3))}). Garde-en une seule à la racine du mod.",
                 _ => $"aucun dossier du disque à sa racine ({string.Join(", ", item.TopLevelEntries.Take(3))}), donc sans effet en jeu.",
             });
+        if (_selectedGame is not null && GameVariants.IsVariant(_selectedGame))
+            report.Add($"▶ {_selectedGame.Title} : son mod est actif, « Jouer » lance {_selectedGame.Title}. Désactive-le pour revenir à {GameVariants.BaseOf(_catalogGames, _selectedGame).Title}.");
         report.Add(conflicts.Count == 0
             ? "Aucun conflit entre les mods actifs."
             : $"⚠ {conflicts.Count} fichier(s) en conflit : " + string.Join(", ", conflicts.Take(5).Select(item => item.RelativePath)));
@@ -515,6 +553,7 @@ public sealed partial class MainWindow : Window
         if (_selectedMod is null || _modManager is null) return;
         _modManager.SetEnabled(_selectedMod.Id, !_selectedMod.Enabled);
         RefreshModItems();
+        SyncVariantSelection();
     }
 
     private void DeleteMod(object? sender, RoutedEventArgs args)
@@ -523,6 +562,7 @@ public sealed partial class MainWindow : Window
         _modManager.Uninstall(_selectedMod.Id);
         ModsStatus.Text = $"{_selectedMod.Name} supprimé.";
         RefreshModItems();
+        SyncVariantSelection();
     }
 
     private void ApplyModPriority(object? sender, RoutedEventArgs args)
@@ -613,6 +653,7 @@ public sealed partial class MainWindow : Window
         _modManager.SetEnabled(id, !running);
         RefreshGameModsPanel();
         RefreshModItems();
+        SyncVariantSelection();
     }
 
     private async Task<bool> ConfirmModPlanAsync(ModInstallPlan plan, CancellationToken cancellationToken = default)

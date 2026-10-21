@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Net;
 using System.Text.RegularExpressions;
+using CubeShelf.Core.Releases;
 
 namespace CubeShelf.Core.Mods;
 
@@ -15,7 +16,23 @@ public sealed record GameBananaMod(
     string ProfileUrl = "",
     string InstallInstructions = "",
     string ThumbnailUrl = "",
-    IReadOnlyList<string>? ImageUrls = null);
+    IReadOnlyList<string>? ImageUrls = null,
+    IReadOnlyList<GameBananaFile>? Files = null)
+{
+    /// <summary>
+    /// This mod with the archive of its file whose name matches <paramref name="pattern"/>
+    /// (one * wildcard), or as it is when none does. A mod page can carry several files, and
+    /// the first is not always the one wanted: Super Mario Eclipse's is its players guide.
+    /// </summary>
+    public GameBananaMod WithArchive(string pattern)
+    {
+        var file = Files?.FirstOrDefault(candidate => ReleaseAssetPattern.Matches(candidate.Name, pattern));
+        return file is null ? this : this with { ArchiveUrl = file.Url, ArchiveName = file.Name };
+    }
+}
+
+/// <summary>One downloadable file of a GameBanana mod.</summary>
+public sealed record GameBananaFile(string Name, string Url, long Size);
 
 public sealed class GameBananaClient
 {
@@ -78,6 +95,20 @@ public sealed class GameBananaClient
         var archiveName = values.Select(pair => Path.GetFileName(pair.Value))
             .FirstOrDefault(value => IsArchiveName(value));
         archiveName ??= Path.GetFileName(new Uri(archiveUrl).AbsolutePath);
+        var fileList = new List<GameBananaFile>();
+        if (files.ValueKind == JsonValueKind.Object)
+            foreach (var entry in files.EnumerateObject())
+            {
+                if (entry.Value.ValueKind != JsonValueKind.Object) continue;
+                var fileName = entry.Value.TryGetProperty("_sFile", out var n) ? n.GetString() ?? "" : "";
+                var fileUrl = entry.Value.TryGetProperty("_sDownloadUrl", out var u) ? u.GetString() ?? "" : "";
+                var fileSize = entry.Value.TryGetProperty("_nFilesize", out var z) && z.TryGetInt64(out var size) ? size : 0;
+                if (fileName.Length > 0 && IsHttps(fileUrl))
+                {
+                    EnsureTrusted(fileUrl);
+                    fileList.Add(new(fileName, fileUrl, fileSize));
+                }
+            }
         string GetString(string key) => root.TryGetProperty(key, out var value) && value.ValueKind == JsonValueKind.String
             ? value.GetString() ?? "" : "";
         var images = new List<string>();
@@ -99,7 +130,7 @@ public sealed class GameBananaClient
             : "Version GameBanana";
         return new(id, name, updated, archiveUrl, archiveName, description, version,
             GetString("Url().sProfileUrl()"), CleanMarkup(GetString("install_instructions")),
-            FirstNonEmpty(thumbnail, images.FirstOrDefault() ?? ""), images);
+            FirstNonEmpty(thumbnail, images.FirstOrDefault() ?? ""), images, fileList);
     }
 
     public async Task DownloadAsync(GameBananaMod mod, string destination, IProgress<double>? progress = null,

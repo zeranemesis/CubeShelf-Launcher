@@ -201,7 +201,7 @@ public sealed partial class MainWindow
             "GAME DATA",
             P7("Préparation transactionnelle ISO/GCM/RVZ", "Transactional ISO/GCM/RVZ preparation"),
             (progress, cancellationToken) =>
-                _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress, cancellationToken),
+                PrepareGameDataAsync(game, executable, discImage, progress, cancellationToken),
             after: () =>
             {
                 Dispatcher.UIThread.Post(() =>
@@ -227,6 +227,23 @@ public sealed partial class MainWindow
         ShowToastParity(P7("Préparation", "Preparation"), ActionStatus.Text);
         RefreshPortableQueueView();
         return item;
+    }
+
+    /// <summary>
+    /// Extracts the disc for the runtime, or, for a game played from a mod's disc patch
+    /// (Super Mario Eclipse), builds that mod's disc from the user's with the installed mod.
+    /// </summary>
+    private Task<string> PrepareGameDataAsync(GameCatalogEntry game, string executable, string discImage,
+        IProgress<double> progress, CancellationToken cancellationToken, bool allowDolphinDownload = false)
+    {
+        if (game.DataPreparation != GameDataPreparation.DiscPatch || game.DiscPatch is not { } patch)
+            return _gameData.PrepareAsync(game.Id, executable, discImage, game.SupportedDiscIds, progress,
+                cancellationToken, allowDolphinDownload);
+        var delta = DiscPatchSource.FindDelta(_paths, game.ModLibraryId, patch) ?? throw new InvalidOperationException(P7(
+            $"Installe d’abord le mod « {patch.ModName} » depuis l’onglet Mods de {game.Title} : il contient le patch ({patch.PatchFile}) qui fabrique son disque à partir du tien.",
+            $"Install the “{patch.ModName}” mod from {game.Title}’s Mods tab first: it holds the patch ({patch.PatchFile}) that builds its disc from yours."));
+        return _gameData.PrepareDiscPatchAsync(game.Id, executable, discImage, patch, delta, progress, cancellationToken,
+            allowDolphinDownload);
     }
 
     private void HydrateGamePathsPhase3(GameCatalogEntry game)
@@ -286,7 +303,7 @@ public sealed partial class MainWindow
         GameCatalogEntry game, int modId, string title, GameBananaMod? selected = null)
     {
         if (_portableQueue is null) return null;
-        var manager = new PortableModManager(_paths, game.Id);
+        var manager = new PortableModManager(_paths, game.ModLibraryId);
         var item = _portableQueue.Enqueue(
             $"mod:{game.Id}:{modId}",
             title,
@@ -295,6 +312,13 @@ public sealed partial class MainWindow
             async (progress, cancellationToken) =>
             {
                 var root = selected ?? await _gameBanana.GetAsync(modId, cancellationToken);
+                // The mod that carries a disc patch (this game's, or a variant's such as
+                // Super Mario Eclipse for Sunshine): its file with the patch.
+                var archive = _catalogGames
+                    .Where(entry => entry.ModLibraryId.Equals(game.ModLibraryId, StringComparison.OrdinalIgnoreCase))
+                    .Select(entry => entry.DiscPatch)
+                    .FirstOrDefault(patch => patch is { ModArchive.Length: > 0 } && patch.GameBananaModId == root.Id);
+                if (archive is not null) root = root.WithArchive(archive.ModArchive);
                 var plan = await manager.PlanInstallAsync(root, _gameBanana, progress, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
                 var confirmation = await Dispatcher.UIThread.InvokeAsync(() => ConfirmModPlanAsync(plan, cancellationToken));
@@ -306,7 +330,11 @@ public sealed partial class MainWindow
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (_selectedGame?.Id == game.Id) RefreshModItems();
+                    if (_selectedGame?.ModLibraryId == game.ModLibraryId)
+                    {
+                        RefreshModItems();
+                        SyncVariantSelection();
+                    }
                     ShowToastParity("Mods", P7($"{title} installé pour {game.Title}.", $"{title} installed for {game.Title}."));
                 });
                 return Task.CompletedTask;

@@ -40,6 +40,115 @@
     "GitHubReleaseTag": "cubeshelf-nightly"
   },
   {
+    "Id": "GMSP01",
+    "Title": "Super Mario Sunshine",
+    "Year": 2002,
+    "Genre": "Plateforme",
+    "Players": "1 joueur",
+    "Region": "PAL Europe",
+    "Description": "Super Mario Sunshine porté nativement sur PC (version PAL, rendu Aurora). CubeShelf prépare les données depuis ton propre disque européen et applique les mods de fichiers GameBanana à chaque lancement ; graphismes, audio et manettes se règlent dans le jeu avec F1. Super Mario Eclipse est un mod : installe-le et active-le dans l’onglet Mods, et Super Mario Sunshine devient Super Mario Eclipse (avec ton disque nord-américain), tes autres mods par-dessus.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 5798,
+    "RuntimeName": "Sunshine PAL",
+    "LaunchEnvironment": {
+      "SMS_DISC_ROOT": "GMSP01/files",
+      "SMS_CUBESHELF_MOD_LIST": "{mods}",
+      "SMS_CUBESHELF": "1"
+    },
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
+    "SupportedDiscIds": [
+      "GMSP01"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "sms-pal-win-x64.zip"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "sms.exe"
+    },
+    "RuntimeChecksumAsset": "checksums.txt",
+    "RuntimeSha256": "",
+    "DataPreparation": "CubeShelf",
+    "DirectDiscVariable": "SMS_DISC_IMAGE",
+    "LogOutput": true,
+    "HomepageUrl": "https://github.com/zeranemesis/sms-port",
+    "Covers": [
+      {
+        "Label": "PAL Europe",
+        "Front": "Assets\\Covers\\SuperMarioSunshine\\pal_front.png",
+        "Back": "Assets\\Covers\\SuperMarioSunshine\\pal_back.png",
+        "Spine": "Assets\\Covers\\SuperMarioSunshine\\pal_spine.png"
+      }
+    ],
+    "GitHubOwner": "zeranemesis",
+    "GitHubRepo": "sms-port",
+    "GitHubBranch": "native-pal-menu",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
+  },
+  {
+    "Id": "GMSE04",
+    "Title": "Super Mario Eclipse",
+    "VariantOf": "GMSP01",
+    "ActivatedByModId": 536309,
+    "Year": 2024,
+    "Genre": "Plateforme",
+    "Players": "1 joueur",
+    "Region": "USA (mod)",
+    "Description": "Super Mario Eclipse, le grand mod de Super Mario Sunshine (Eclipse Team), sur le port natif PC. Installe le mod « Super Mario Eclipse » depuis l’onglet Mods et choisis ta copie complète du disque nord-américain (GMSE01, en ISO, GCM ou RVZ) : CubeShelf vérifie l’image, applique le patch xdelta d’Eclipse et vérifie le disque obtenu, sans jamais modifier le tien. Les mods de fichiers GameBanana s’appliquent ensuite par-dessus Eclipse à chaque lancement, comme pour Sunshine.",
+    "Executable": "",
+    "GameRoot": "",
+    "GameBananaGameId": 5798,
+    "RuntimeName": "Sunshine Eclipse",
+    "LaunchEnvironment": {
+      "SMS_DISC_IMAGE": "GMSE04/disc.iso",
+      "SMS_CUBESHELF_MOD_LIST": "{mods}",
+      "SMS_CUBESHELF": "1"
+    },
+    "DiscFormats": [".iso", ".gcm", ".rvz"],
+    "SupportedDiscIds": [
+      "GMSE01"
+    ],
+    "RuntimeSource": "GitHubReleaseAsset",
+    "RuntimeAssets": {
+      "win-x64": "sms-eclipse-win-x64.zip"
+    },
+    "RuntimeLaunchPaths": {
+      "win-x64": "sms.exe"
+    },
+    "RuntimeChecksumAsset": "checksums.txt",
+    "RuntimeSha256": "",
+    "DataPreparation": "DiscPatch",
+    "LogOutput": true,
+    "DiscPatch": {
+      "GameBananaModId": 536309,
+      "ModName": "Super Mario Eclipse",
+      "ModArchive": "super_mario_eclipse_v*.7z",
+      "PatchFile": "v1.1.0.xdelta",
+      "SourceMd5": "0c6d2edae9fdf40dfc410ff1623e4119",
+      "ResultMd5": "caa546309e0443f7b47632b040a250d7",
+      "SourceDescription": "l’ISO nord-américain complet de Super Mario Sunshine (GMSE01)",
+      "OutputImage": "GMSE04/disc.iso"
+    },
+    "HomepageUrl": "https://gamebanana.com/mods/536309",
+    "Covers": [
+      {
+        "Label": "Eclipse Team",
+        "Front": "Assets\\Covers\\SuperMarioEclipse\\front.png",
+        "Back": "Assets\\Covers\\SuperMarioEclipse\\back.png",
+        "Spine": "Assets\\Covers\\SuperMarioEclipse\\spine.png"
+      }
+    ],
+    "GitHubOwner": "zeranemesis",
+    "GitHubRepo": "sms-port",
+    "GitHubBranch": "native-pal-menu",
+    "GitHubReleaseAssetName": "",
+    "DiscImage": "",
+    "GitHubReleaseTag": "latest"
+  },
+  {
     "Id": "GRSEAF",
     "Title": "Soulcalibur II",
     "Year": 2003,

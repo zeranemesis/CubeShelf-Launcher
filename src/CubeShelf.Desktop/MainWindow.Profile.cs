@@ -46,12 +46,12 @@ public sealed partial class MainWindow
 
         var none = P7("Aucun", "None");
         var titles = new List<string> { none };
-        titles.AddRange(_catalogGames.Select(game => game.Title));
+        titles.AddRange(ShelfGames.Select(game => game.Title));
 
         var wasLoading = _loadingSettings;
         _loadingSettings = true;
         ProfilePinnedBox.ItemsSource = titles;
-        var pinned = _catalogGames.FirstOrDefault(game =>
+        var pinned = ShelfGames.FirstOrDefault(game =>
             string.Equals(game.Id, _preferences.ProfilePinnedGameId, StringComparison.OrdinalIgnoreCase));
         ProfilePinnedBox.SelectedIndex = pinned is null ? 0 : titles.IndexOf(pinned.Title);
         _loadingSettings = wasLoading;
@@ -102,7 +102,8 @@ public sealed partial class MainWindow
 
         // Index 0 is "None"; every other index is the game at that position on the shelf.
         var index = ProfilePinnedBox.SelectedIndex - 1;
-        var id = index >= 0 && index < _catalogGames.Count ? _catalogGames[index].Id : "";
+        var shelf = ShelfGames.ToList();
+        var id = index >= 0 && index < shelf.Count ? shelf[index].Id : "";
         if (string.Equals(id, _preferences.ProfilePinnedGameId, StringComparison.Ordinal)) return;
 
         _preferences = _preferences with { ProfilePinnedGameId = id };

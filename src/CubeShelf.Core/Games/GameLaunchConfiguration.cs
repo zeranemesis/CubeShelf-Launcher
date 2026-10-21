@@ -18,10 +18,15 @@ public sealed record GameLaunchConfiguration(
         {
             ["PARTYBOARD_DISC_IMAGE"] = null,
             ["PARTYBOARD_MOD_LIST"] = null,
-            ["STRIKERS_DATA"] = null
+            ["STRIKERS_DATA"] = null,
+            ["SMS_DISC_ROOT"] = null,
+            ["SMS_DISC_IMAGE"] = null,
+            ["SMS_CUBESHELF_MOD_LIST"] = null,
+            ["SMS_CUBESHELF"] = null
         };
         foreach (var pair in game.LaunchEnvironment)
             environment[pair.Key] = Expand(pair.Value);
+        if (game.ReadsDiscDirectly) environment[game.DirectDiscVariable] = game.DiscImage;
         return new(game.LaunchArguments.Select(Expand).ToArray(), environment);
     }
 }
