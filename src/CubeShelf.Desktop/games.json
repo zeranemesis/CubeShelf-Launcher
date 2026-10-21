@@ -70,6 +70,8 @@
     "RuntimeChecksumAsset": "checksums.txt",
     "RuntimeSha256": "",
     "DataPreparation": "CubeShelf",
+    "DirectDiscVariable": "SMS_DISC_IMAGE",
+    "LogOutput": true,
     "HomepageUrl": "https://github.com/zeranemesis/sms-port",
     "Covers": [
       {
@@ -119,6 +121,7 @@
     "RuntimeChecksumAsset": "checksums.txt",
     "RuntimeSha256": "",
     "DataPreparation": "DiscPatch",
+    "LogOutput": true,
     "DiscPatch": {
       "GameBananaModId": 536309,
       "ModName": "Super Mario Eclipse",

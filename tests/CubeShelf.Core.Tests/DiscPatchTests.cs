@@ -143,6 +143,8 @@ internal static class DiscPatchTests
         catch (InvalidDataException exception) { message = exception.Message; }
         Check(message.Contains("Test Eclipse"), "a wrong result is refused");
         Check(File.ReadAllBytes(made).SequenceEqual(Expected), "the verified disc is kept");
+        File.Delete(made);
+        Check(!preparer.IsPrepared("GMSE04", runtime), "a leftover marker without its disc is not prepared");
     });
 
     public static void ModArchiveIsPicked()
@@ -178,11 +180,18 @@ internal static class DiscPatchTests
                     new PortableInstalledMod(536309, "Super Mario Eclipse", 1, enabled, 0, Path.Combine(root, "eclipse"), ""),
                     new PortableInstalledMod(248171, "Skin", 1, true, 1, Path.Combine(root, "skin"), ""),
                 }));
+            Directory.CreateDirectory(Path.Combine(root, "eclipse"));
+            Directory.CreateDirectory(Path.Combine(root, "skin"));
+            File.WriteAllText(Path.Combine(root, "eclipse", "mod.xdelta"), "delta");
+            File.WriteAllText(Path.Combine(root, "skin", "mod.xdelta"), "unrelated");
+            var patch = new GameDiscPatch { GameBananaModId = 536309, PatchFile = "mod.xdelta" };
             Write(true);
+            Check(DiscPatchSource.FindDelta(paths, "GMSP01", patch) == Path.Combine(root, "eclipse", "mod.xdelta"), "required mod supplies the delta");
             Check(GameVariants.Resolve(catalog, sunshine, paths) == eclipse, "Eclipse enabled: Eclipse");
             Check(GameVariants.Resolve(catalog, eclipse, paths) == eclipse, "from the variant too");
             File.WriteAllText(Path.Combine(paths.DataDirectory, "Mods", "GMSP01", "player-disabled.json"), "[536309]");
             Check(GameVariants.Resolve(catalog, eclipse, paths) == sunshine, "switched off in game: Sunshine");
+            Check(DiscPatchSource.FindDelta(paths, "GMSP01", patch) is null, "player-disabled patch cannot fall back to another mod");
             mods.ClearPlayerDisabled(536309);
             Write(false);
             Check(GameVariants.Resolve(catalog, eclipse, paths) == sunshine, "Eclipse disabled: Sunshine");

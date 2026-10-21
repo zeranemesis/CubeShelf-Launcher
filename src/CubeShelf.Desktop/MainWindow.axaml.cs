@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Library;
 using Avalonia.Interactivity;
@@ -96,7 +96,7 @@ public sealed partial class MainWindow : Window
 
             _selectedGame.Executable = ResolveApplicationPath(_selectedGame.Executable);
             _selectedGame.DiscImage = ResolveApplicationPath(_selectedGame.DiscImage);
-            GameTitle.Text = $"{_selectedGame.Title} — {_selectedGame.RuntimeName}";
+            GameTitle.Text = GameVariants.BaseOf(_catalogGames, _selectedGame).Title;
             _modManager = new PortableModManager(paths, _selectedGame.ModLibraryId);
             RefreshGameState();
             RefreshModItems();
@@ -167,6 +167,12 @@ public sealed partial class MainWindow : Window
         }
 
         if (!CanPlay()) return;
+        if (_selectedGame.DataPreparation != GameDataPreparation.Runtime &&
+            !_gameData.IsPrepared(_selectedGame, _selectedGame.Executable))
+        {
+            await QueueGameDataPreparationPhase4Async(launchWhenReady: true);
+            return;
+        }
 
         try
         {
@@ -185,7 +191,8 @@ public sealed partial class MainWindow : Window
                 _selectedGame.Id,
                 _selectedGame.Executable,
                 Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-                environment, launch.Arguments);
+                environment, launch.Arguments,
+                _selectedGame.LogOutput ? Path.Combine(_paths.DataDirectory, "Logs", _selectedGame.Id + ".log") : null);
 
             _selectedGame.PlayCount++;
             _selectedGame.LastPlayedAt = DateTimeOffset.Now;
@@ -385,7 +392,7 @@ public sealed partial class MainWindow : Window
         DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
             DiscImageService.DescribeSupported(game.SupportedDiscIds);
 
-        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game.Id, game.Executable);
+        var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game, game.Executable);
         PrepareDataButton.IsVisible = !runtimeManagesDisc;
         PrepareDataButton.Content = prepared ? "Repréparer les données" : "Préparer les données";
         PrepareDataButton.IsEnabled = !runtimeManagesDisc && File.Exists(game.Executable) && compatibility.Supported;
@@ -421,8 +428,9 @@ public sealed partial class MainWindow : Window
         // A runtime-managed disc has nothing for CubeShelf to prepare and nothing to wait for
         // before enabling Play: Ring Out extracts and recompiles on its own first launch, and
         // PartyBoard opens the image directly from PARTYBOARD_DISC_IMAGE.
-        return _selectedGame.DataPreparation == GameDataPreparation.Runtime ||
-            _gameData.IsPrepared(_selectedGame.Id, _selectedGame.Executable);
+        return _selectedGame.DataPreparation != GameDataPreparation.DiscPatch ||
+            (_selectedGame.DiscPatch is { } patch &&
+             DiscPatchSource.FindDelta(_paths, _selectedGame.ModLibraryId, patch) is not null);
     }
 
     private static string ResolveApplicationPath(string path) =>

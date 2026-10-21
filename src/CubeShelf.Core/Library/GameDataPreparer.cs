@@ -19,10 +19,15 @@ public sealed class GameDataPreparer
 
     public DolphinToolStatus DolphinToolStatus => _dolphin.GetStatus();
 
+    /// <summary>An ISO or GCM the runtime opens itself needs nothing beyond the runtime.</summary>
+    public bool IsPrepared(GameCatalogEntry game, string runtimeExecutable) =>
+        game.ReadsDiscDirectly ? File.Exists(runtimeExecutable) : IsPrepared(game.Id, runtimeExecutable);
+
     public bool IsPrepared(string gameId, string runtimeExecutable) =>
         File.Exists(runtimeExecutable) &&
         (Directory.Exists(Path.Combine(Path.GetDirectoryName(runtimeExecutable)!, gameId, "files")) ||
-         File.Exists(PatchedDiscMarker(gameId, runtimeExecutable)));
+         (File.Exists(PatchedDiscPath(gameId, runtimeExecutable)) &&
+          File.Exists(PatchedDiscMarker(gameId, runtimeExecutable))));
 
     /// <summary>Where a disc patch's verified result goes (<see cref="GameDataPreparation.DiscPatch"/>).</summary>
     public static string PatchedDiscPath(string gameId, string runtimeExecutable) =>

@@ -49,7 +49,8 @@ public sealed class GameSessionTracker : IDisposable
         string executable,
         string workingDirectory,
         IReadOnlyDictionary<string, string?>? environment = null,
-        IReadOnlyList<string>? arguments = null)
+        IReadOnlyList<string>? arguments = null,
+        string? outputLog = null)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentException.ThrowIfNullOrWhiteSpace(gameId);
@@ -60,7 +61,7 @@ public sealed class GameSessionTracker : IDisposable
                 return existing.Process;
         }
 
-        var process = _launcher.Start(executable, workingDirectory, environment, arguments);
+        var process = _launcher.Start(executable, workingDirectory, environment, arguments, outputLog);
         var startedAt = DateTimeOffset.Now;
         process.EnableRaisingEvents = true;
         process.Exited += (_, _) => FinalizeSession(gameId, process);

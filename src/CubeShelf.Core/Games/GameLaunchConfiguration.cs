@@ -26,6 +26,7 @@ public sealed record GameLaunchConfiguration(
         };
         foreach (var pair in game.LaunchEnvironment)
             environment[pair.Key] = Expand(pair.Value);
+        if (game.ReadsDiscDirectly) environment[game.DirectDiscVariable] = game.DiscImage;
         return new(game.LaunchArguments.Select(Expand).ToArray(), environment);
     }
 }

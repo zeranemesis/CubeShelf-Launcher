@@ -59,6 +59,11 @@ internal static class RuntimeIntegrationTests
                     Check(launch.Arguments.Count == 0 && launch.Environment["SMS_DISC_ROOT"] == "GMSP01/files");
                     Check(launch.Environment["SMS_CUBESHELF_MOD_LIST"] == "mods with spaces.txt" && launch.Environment["SMS_CUBESHELF"] == "1");
                     Check(launch.Environment["PARTYBOARD_DISC_IMAGE"] is null && launch.Environment["STRIKERS_DATA"] is null);
+                    // An ISO is opened by the game itself, nothing extracted; an RVZ still is.
+                    Check(game.ReadsDiscDirectly && launch.Environment["SMS_DISC_IMAGE"] == disc && game.LogOutput);
+                    Check(new GameDataPreparer(new TestPaths(root)).IsPrepared(game, CatalogPath()));
+                    game.DiscImage = Path.ChangeExtension(disc, ".rvz");
+                    Check(!game.ReadsDiscDirectly && GameLaunchConfiguration.Create(game).Environment["SMS_DISC_IMAGE"] is null);
                     break;
                 case "Sunshine Eclipse":
                     // CubeShelf builds Eclipse's disc beside sms.exe from the user's North
@@ -74,6 +79,24 @@ internal static class RuntimeIntegrationTests
                 default: throw new InvalidOperationException("Add a launch contract test for the new runtime.");
             }
         }
+    });
+
+    public static void OutputLog() => WithRoot(root =>
+    {
+        var log = Path.Combine(root, "Logs", "game.log");
+        var (shell, arguments) = OperatingSystem.IsWindows()
+            ? (Path.Combine(Environment.SystemDirectory, "cmd.exe"), new[] { "/c", "echo out& echo err 1>&2" })
+            : ("/bin/sh", new[] { "-c", "echo out; echo err 1>&2" });
+        using var process = new CubeShelf.Core.Platform.ProcessLauncher().Start(shell, root, null, arguments, log);
+        process.WaitForExit();
+        for (var i = 0; i < 50; i++)
+        {
+            using (var reader = new StreamReader(new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                if (reader.ReadToEnd().Split(new[] { (char)13, (char)10 }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Order().SequenceEqual(new[] { "err", "out" })) return;
+            Thread.Sleep(100);
+        }
+        throw new InvalidOperationException("Both output streams reach the log.");
     });
 
     public static void CatalogMigration() => WithRoot(root =>

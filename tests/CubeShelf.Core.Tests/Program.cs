@@ -12,6 +12,7 @@ var failures = new List<string>();
 var executed = 0;
 Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
 Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
+Run("runtime: a console game's output goes to its log, not a window", RuntimeIntegrationTests.OutputLog);
 Run("runtime: disc formats and header validation", RuntimeIntegrationTests.DiscValidation);
 Run("runtime: interrupted mods can resume, completed operations cannot", RuntimeIntegrationTests.ModResumeHistory);
 Run("runtime: interrupted mod transfers resume with HTTP Range", RuntimeIntegrationTests.ModHttpResume);

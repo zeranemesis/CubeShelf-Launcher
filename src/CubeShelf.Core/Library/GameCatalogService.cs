@@ -145,6 +145,23 @@ public sealed class GameCatalogEntry
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameDataPreparation DataPreparation { get; set; } = GameDataPreparation.CubeShelf;
 
+    /// <summary>
+    /// The variable through which the runtime opens an ISO or GCM image itself (SMS_DISC_IMAGE):
+    /// such an image is then given as it is, with nothing extracted. An RVZ is still prepared.
+    /// </summary>
+    public string DirectDiscVariable { get; set; } = "";
+
+    /// <summary>
+    /// A console runtime whose output CubeShelf writes to Logs/{id}.log, with no console window
+    /// beside the game (Super Mario Sunshine logs every frame while its menu is open).
+    /// </summary>
+    public bool LogOutput { get; set; }
+
+    [JsonIgnore]
+    public bool ReadsDiscDirectly =>
+        DirectDiscVariable.Length > 0 &&
+        Path.GetExtension(DiscImage).ToLowerInvariant() is ".iso" or ".gcm";
+
     /// <summary>The disc patch, for <see cref="GameDataPreparation.DiscPatch"/>.</summary>
     public GameDiscPatch? DiscPatch { get; set; }
 
@@ -307,6 +324,8 @@ public sealed class GameCatalogService
             target.RuntimeSha256 = source.RuntimeSha256;
             target.RuntimeChecksumAsset = source.RuntimeChecksumAsset;
             target.DataPreparation = source.DataPreparation;
+            target.DirectDiscVariable = source.DirectDiscVariable;
+            target.LogOutput = source.LogOutput;
             target.DiscPatch = source.DiscPatch?.Clone();
             target.VariantOf = source.VariantOf;
             target.ActivatedByModId = source.ActivatedByModId;
@@ -350,6 +369,8 @@ public sealed class GameCatalogService
         RuntimeSha256 = source.RuntimeSha256,
         RuntimeChecksumAsset = source.RuntimeChecksumAsset,
         DataPreparation = source.DataPreparation,
+        DirectDiscVariable = source.DirectDiscVariable,
+        LogOutput = source.LogOutput,
         DiscPatch = source.DiscPatch?.Clone(),
         VariantOf = source.VariantOf,
         ActivatedByModId = source.ActivatedByModId,

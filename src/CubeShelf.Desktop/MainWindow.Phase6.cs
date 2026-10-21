@@ -234,7 +234,7 @@ public sealed partial class MainWindow
         lines.Add($"{L("Temps de jeu", "Play time"),-16}: {FormatPlayTime(game.TotalPlaySeconds)}");
         lines.Add($"{L("Dernier jeu", "Last played"),-16}: {game.LastPlayedAt?.ToLocalTime().ToString("g") ?? "—"}");
         lines.Add($"Runtime         : {(runtime.IsInstalled ? L("Installé", "Installed") : runtime.NeedsRepair ? L("À réparer", "Needs repair") : L("Non installé", "Not installed"))}");
-        lines.Add($"{L("Données jeu", "Game data"),-16}: {(_gameData.IsPrepared(game.Id, game.Executable) ? L("Prêtes", "Ready") : _phase6PreparedData?.HasData(game.Id) == true ? L("Conservées", "Preserved") : L("À préparer", "Not prepared"))}");
+        lines.Add($"{L("Données jeu", "Game data"),-16}: {(_gameData.IsPrepared(game, game.Executable) ? L("Prêtes", "Ready") : _phase6PreparedData?.HasData(game.Id) == true ? L("Conservées", "Preserved") : L("À préparer", "Not prepared"))}");
         lines.Add($"Executable      : {game.Executable}");
         lines.Add($"Runtime version : {runtime.Version}");
         lines.Add($"{L("Image disque", "Disc image"),-16}: {(File.Exists(game.DiscImage) ? game.DiscImage : L("Aucune", "None"))}");
@@ -297,7 +297,7 @@ public sealed partial class MainWindow
             Add(runtime.IsInstalled && Directory.Exists(Path.Combine(exeDir, "res")), P6("Ressources PartyBoard (res) présentes", "PartyBoard resources (res) present"));
         if (game.DataPreparation != GameDataPreparation.Runtime)
         {
-            var prepared = _gameData.IsPrepared(game.Id, game.Executable);
+            var prepared = _gameData.IsPrepared(game, game.Executable);
             Add(prepared || _phase6PreparedData?.HasData(game.Id) == true,
                 prepared ? P6("Données de jeu préparées présentes", "Prepared game data present") : P6("Données préparées conservées pour réinstallation", "Prepared game data preserved for reinstall"));
         }
@@ -538,7 +538,8 @@ public sealed partial class MainWindow
 
     private async Task MaybeShowRuntimeUpdatePopupPhase6Async()
     {
-        if (!_preferences.ShowGameUpdatePopup) return;
+        // Hidden in the tray, the window cannot own a dialog: the notice waits for the next check.
+        if (!_preferences.ShowGameUpdatePopup || !IsVisible) return;
         var candidate = _catalogGames
             .Select(game => (game, snapshot: _gameUpdateSnapshots.TryGetValue(game.Id, out var value) ? value : null))
             .FirstOrDefault(pair => pair.snapshot?.RuntimeUpdateAvailable == true && !_phase6UpdateNotices.Contains($"{pair.game.Id}:{pair.snapshot.RuntimeRelease.Version}"));
