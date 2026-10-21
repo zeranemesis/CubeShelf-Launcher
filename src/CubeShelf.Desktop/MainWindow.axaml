@@ -258,16 +258,48 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{DynamicResource BackGame}" Click="ParityBackToGame" /><Button x:Name="RefreshModsButton" Content="{DynamicResource RefreshGameBanana}" Click="RefreshMods" /></StackPanel>
           </Grid>
         </Border>
-        <Grid Grid.Row="1" Margin="24,18,24,24" ColumnDefinitions="430,18,*">
+        <Grid Grid.Row="1" Margin="24,18,24,24" ColumnDefinitions="*,18,440">
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="12">
-            <ListBox x:Name="ModsList" Background="Transparent" BorderThickness="0" SelectionChanged="SelectMod">
-              <ListBox.ItemTemplate><DataTemplate><Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,8"><StackPanel><TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{DynamicResource Text}" /><TextBlock Text="{Binding Status}" FontSize="11" Foreground="{DynamicResource Muted}" Margin="0,4,0,0" /></StackPanel></Border></DataTemplate></ListBox.ItemTemplate>
-            </ListBox>
+            <Grid RowDefinitions="Auto,Auto,*">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBox x:Name="ModSearchBox" Watermark="Rechercher un mod…" KeyUp="ModSearchKeyUp" />
+                <ComboBox x:Name="ModCategoryFilter" Grid.Column="1" MinWidth="150" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
+                <ComboBox x:Name="ModStateFilter" Grid.Column="2" MinWidth="140" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
+                <ComboBox x:Name="ModSortFilter" Grid.Column="3" MinWidth="130" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
+              </Grid>
+              <TextBlock x:Name="ModResultCount" Grid.Row="1" Margin="4,8,0,4" FontSize="11" Foreground="{DynamicResource Muted}" />
+              <ListBox x:Name="ModsList" Grid.Row="2" Background="Transparent" BorderThickness="0" SelectionChanged="SelectMod"
+                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border Width="232" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
+                      <StackPanel>
+                        <Border Height="130" Background="#090C13">
+                          <Grid>
+                            <TextBlock Text="{Binding Category}" Foreground="#66FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                            <Border IsVisible="{Binding Installed}" Background="{DynamicResource Accent}" CornerRadius="8" Padding="7,2" Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top">
+                              <TextBlock Text="{Binding Badge}" Foreground="White" FontSize="10" FontWeight="Bold" />
+                            </Border>
+                          </Grid>
+                        </Border>
+                        <StackPanel Margin="10,8,10,10" Spacing="2">
+                          <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="{DynamicResource Text}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Byline}" FontSize="11" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Status}" FontSize="10" Foreground="{DynamicResource Accent2}" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
           </Border>
           <Border Grid.Column="2" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
             <ScrollViewer><StackPanel Spacing="12">
-              <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="ModTitle" Text="{DynamicResource SelectMod}" FontSize="26" FontWeight="Bold" /><TextBlock x:Name="ModVersion" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="OpenModImageButton" Content="{DynamicResource ViewImage}" IsEnabled="False" Click="OpenCurrentModImagePhase6" /><Button x:Name="OpenModPageButton" Content="{DynamicResource GameBanana}" IsEnabled="False" Click="OpenModPage" /></StackPanel></Grid>
-              <Border Height="360" Background="#090C13" CornerRadius="14" ClipToBounds="True">
+              <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="ModTitle" Text="{DynamicResource SelectMod}" FontSize="22" FontWeight="Bold" TextWrapping="Wrap" /><TextBlock x:Name="ModVersion" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="OpenModImageButton" Content="{DynamicResource ViewImage}" IsEnabled="False" Click="OpenCurrentModImagePhase6" /><Button x:Name="OpenModPageButton" Content="{DynamicResource GameBanana}" IsEnabled="False" Click="OpenModPage" /></StackPanel></Grid>
+              <Border Height="240" Background="#090C13" CornerRadius="14" ClipToBounds="True">
                 <Grid>
                   <Image x:Name="ModPreview" Stretch="Uniform" />
                   <Button x:Name="PreviousModImageButton" Content="‹" Width="46" Height="46" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" IsEnabled="False" Click="PreviousModImagePhase6" />
