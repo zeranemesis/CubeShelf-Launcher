@@ -494,7 +494,9 @@ public sealed partial class MainWindow : Window
                 : playerDisabled.Contains(id) ? $"Installé • coupé dans {runtime}"
                 : local.Enabled ? "Installé • activé" : "Installé • désactivé";
             if (conflictedIds.Contains(id)) status += " • conflit";
-            if (layoutIds.Contains(id)) status += " • arborescence inattendue";
+            if (layout.FirstOrDefault(item => item.Id == id) is { } problem)
+                status += problem.Kind is PortableModLayoutKind.DiscPatch or PortableModLayoutKind.DolphinTextures
+                    ? " • incompatible avec " + runtime : " • arborescence inattendue";
             return new DesktopModItem(id, remote?.Name ?? local?.Name ?? $"Mod {id}", status,
                 local?.Priority ?? 100, local?.Enabled ?? false, local is not null, remote);
         }).ToArray();
@@ -547,7 +549,11 @@ public sealed partial class MainWindow : Window
     {
         if (_selectedMod is null) return;
         ModTitle.Text = _selectedMod.Name;
-        ModDetailStatus.Text = _selectedMod.Status;
+        ModDetailStatus.Text = _selectedMod.Status +
+            (!_selectedMod.Installed && LooksLikeDiscPatch(_selectedMod.Remote)
+                ? Environment.NewLine + "⚠ Ce mod semble être un patch du disque ou du code (xdelta, BPS, IPS, codes Gecko…) : " +
+                  "le port natif applique seulement des fichiers par-dessus ton disque, il ne fonctionnera probablement pas."
+                : "");
         ModVersion.Text = _selectedMod.Remote?.VersionLabel ?? "Version locale";
         ModDescription.Text = _selectedMod.Remote?.Description ?? "Métadonnées distantes indisponibles.";
         ModInstructions.Text = string.IsNullOrWhiteSpace(_selectedMod.Remote?.InstallInstructions)
@@ -635,6 +641,8 @@ public sealed partial class MainWindow : Window
             set { _thumbnail = value; PropertyChanged?.Invoke(this, new(nameof(Thumbnail))); }
         }
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+        // Screen readers and UI Automation name a tile by its mod.
+        public override string ToString() => Name;
     }
 
     /// <summary>One row of the game page's mod list: what it is, and the one thing to do with it.</summary>

@@ -111,4 +111,14 @@ public sealed partial class MainWindow
         }
         return full;
     }
+
+    /// <summary>A hint before installing: the archive's contents are only known once downloaded.</summary>
+    private static bool LooksLikeDiscPatch(GameBananaMod? mod)
+    {
+        if (mod is null || mod.IsSummary) return false;
+        var text = string.Join(" ", new[] { mod.Description, mod.InstallInstructions }
+            .Concat(mod.Files?.Select(file => file.Name) ?? Array.Empty<string>()));
+        return new[] { "xdelta", ".bps", ".ips", ".ppf", "gecko", ".gct", "riivolution", "delta patch", "patch your iso", "patch the iso" }
+            .Any(word => text.Contains(word, StringComparison.OrdinalIgnoreCase));
+    }
 }
