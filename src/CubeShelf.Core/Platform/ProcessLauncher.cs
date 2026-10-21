@@ -72,14 +72,16 @@ public sealed class ProcessLauncher : IProcessLauncher
         }
         process.OutputDataReceived += Write;
         process.ErrorDataReceived += Write;
-        process.EnableRaisingEvents = true;
-        process.Exited += (_, _) =>
-        {
-            process.WaitForExit(); // the last lines are read before the file closes
-            lock (log) log.Dispose();
-        };
+        // Reading starts first: a program that has already ended raises Exited at once, and
+        // WaitForExit only waits for the last lines of streams that are being read.
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
+        process.Exited += (_, _) =>
+        {
+            process.WaitForExit();
+            lock (log) log.Dispose();
+        };
+        process.EnableRaisingEvents = true;
     }
 
     public void OpenDirectory(string directory)
