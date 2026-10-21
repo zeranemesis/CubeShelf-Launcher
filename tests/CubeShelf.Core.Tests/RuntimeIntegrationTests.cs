@@ -89,14 +89,16 @@ internal static class RuntimeIntegrationTests
             : ("/bin/sh", new[] { "-c", "echo out; echo err 1>&2" });
         using var process = new CubeShelf.Core.Platform.ProcessLauncher().Start(shell, root, null, arguments, log);
         process.WaitForExit();
+        var text = "";
         for (var i = 0; i < 50; i++)
         {
             using (var reader = new StreamReader(new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
-                if (reader.ReadToEnd().Split(new[] { (char)13, (char)10 }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                    .Order().SequenceEqual(new[] { "err", "out" })) return;
+                text = reader.ReadToEnd();
+            if (text.Split(new[] { (char)13, (char)10 }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Order().SequenceEqual(new[] { "err", "out" })) return;
             Thread.Sleep(100);
         }
-        throw new InvalidOperationException("Both output streams reach the log.");
+        throw new InvalidOperationException($"Both output streams reach the log (exit {process.ExitCode}, log: [{text}]).");
     });
 
     public static void CatalogMigration() => WithRoot(root =>
