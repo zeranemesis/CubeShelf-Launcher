@@ -66,7 +66,11 @@ public sealed class GameShelfControl : Panel, IDisposable
             if (created)
             {
                 var item = _items[index];
-                cover = new GameCaseControl { MinWidth = 0, MinHeight = 0, ShadowOpacity = .8, RealisticShell = true };
+                cover = new GameCaseControl
+                {
+                    MinWidth = 0, MinHeight = 0, ShadowOpacity = .8,
+                    RealisticShell = true, UseImportedModel = true
+                };
                 cover.SetCover(item.Front, item.Back, item.Spine);
                 AutomationProperties.SetName(cover, item.Title);
                 cover.PointerPressed += (_, args) =>

@@ -39,10 +39,16 @@ de [Sly Launcher](https://github.com/ioncodes/sly) : fond clair à courbes discr
 jeu sélectionné au premier plan, voisins inclinés et fiche compacte à droite.
 Le rendu utilise le composant natif de CubeShelf, avec ses jaquettes avant,
 arrière et tranche ; aucun code ni visuel de Sly n’est embarqué.
-Les boîtiers de l’étagère présentent une coque noire, un insert en retrait,
-des coins arrondis, une charnière, des joints sur les bords, une légère inclinaison
-et des reflets de pochette transparente. Des ombres de contact douces remplacent
-les ombres rectangulaires. Ce rendu détaillé est propre à Big Picture.
+Les boîtiers de l’étagère utilisent le modèle fourni
+`Assets/Models/Jaquette_GameCube_3D_vierge.glb`, embarqué dans l’application.
+Sa coque, ses cadres, ses charnières, ses butées et ses bandes de film sont
+conservés. Les trois inserts reçoivent les jaquettes avant, arrière et tranche
+du jeu ; les textures vierges du fichier sont remplacées au rendu. L’orientation
+et les proportions du modèle sont adaptées à la caméra de CubeShelf.
+Le modèle est chargé une fois et partagé entre les boîtiers. Son rendu reste
+natif, avec éclairage simplifié et ombres de contact ; il ne nécessite pas de
+navigateur. Le lecteur prend en charge cet export précis, pas l’import de GLB
+arbitraires. Le boîtier précédent sert de secours si la ressource manque.
 Le jeu choisi utilise le même lancement
 automatique que la bibliothèque classique. Les options avancées restent dépliées
 par défaut sur sa fiche.

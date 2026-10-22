@@ -12,7 +12,7 @@ namespace CubeShelf.Desktop.Controls;
 /// front/back/spine faces and a damped 60 Hz interaction.  The renderer stays
 /// framework-native (no WPF Viewport3D and no Windows-only graphics API).
 /// </summary>
-public sealed class GameCaseControl : Control, IDisposable
+public sealed partial class GameCaseControl : Control, IDisposable
 {
     private const double CaseWidth = 2.08;
     private const double CaseHeight = 2.92;
@@ -49,6 +49,7 @@ public sealed class GameCaseControl : Control, IDisposable
     public bool IsInteractive { get; set; } = true;
     public double ShadowOpacity { get; set; } = 1;
     public bool RealisticShell { get; set; }
+    public bool UseImportedModel { get; set; }
     private double _restPitch;
     private double _hoverYaw;
     private double _hoverPitch;
@@ -148,6 +149,7 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         base.Render(context);
         if (Bounds.Width <= 2 || Bounds.Height <= 2) return;
+        if (UseImportedModel && RenderImportedModel(context)) return;
 
         var vertices = BuildProjectedVertices();
         var faces = BuildFaces(vertices)

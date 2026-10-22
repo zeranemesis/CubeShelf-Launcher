@@ -19,5 +19,6 @@
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
+    <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>
 </Project>
