@@ -44,6 +44,8 @@ internal sealed class BigPictureGamepad : IDisposable
             connected = true;
             if ((state.Buttons & 0x2000) != 0) return 6;
             if ((state.Buttons & 0x1000) != 0) return 5;
+            if ((state.Buttons & 0x4000) != 0) return 7;
+            if ((state.Buttons & 0x8000) != 0) return 8;
             if ((state.Buttons & 0x0004) != 0 || state.LeftX < -16000) return 1;
             if ((state.Buttons & 0x0008) != 0 || state.LeftX > 16000) return 2;
             if ((state.Buttons & 0x0001) != 0 || state.LeftY > 16000) return 3;

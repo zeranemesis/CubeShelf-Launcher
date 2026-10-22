@@ -34,15 +34,26 @@ ne récupère pas de disque de jeu.
 ## Big Picture
 
 Le bouton **Big Picture** de la barre latérale ou **F11** ouvre une bibliothèque
-plein écran avec de grandes jaquettes. Le jeu choisi utilise le même lancement
+plein écran avec une étagère de boîtiers GameCube en 3D. La présentation s’inspire
+de [Sly Launcher](https://github.com/ioncodes/sly) : fond clair à courbes discrètes,
+jeu sélectionné au premier plan, voisins inclinés et fiche compacte à droite.
+Le rendu utilise le composant natif de CubeShelf, avec ses jaquettes avant,
+arrière et tranche ; aucun code ni visuel de Sly n’est embarqué.
+Le jeu choisi utilise le même lancement
 automatique que la bibliothèque classique. Les options avancées restent dépliées
 par défaut sur sa fiche.
 
 - **Gauche / droite** : changer de jeu ; **haut / bas** : choisir une action.
 - **Entrée** : activer l’action sélectionnée ; **Échap / F11** : revenir au bureau.
-- Souris : jaquette, boutons de navigation et actions accessibles à l’écran.
+- **F** : retourner le boîtier ; **V** : alterner les vues **Ruban / Rangée**.
+- Souris : sélectionner un voisin, retourner le boîtier sélectionné, parcourir
+  l’étagère à la molette, ou utiliser les boutons de navigation.
 - Sous Windows, une manette compatible **XInput** peut utiliser la croix ou le
-  stick gauche, **A** pour valider et **B** pour revenir au bureau.
+  stick gauche, **A** pour valider, **X** pour retourner le boîtier, **Y** pour
+  changer de vue et **B** pour revenir au bureau.
+
+L’étagère garde au plus sept boîtiers chargés et libère leurs images en quittant
+Big Picture. La vue vide conserve le bouton de retour au bureau.
 
 La manette est lue uniquement lorsque Big Picture a le focus, hors des dialogues
 et des parties. Une pression maintenue ne déclenche pas plusieurs lancements.

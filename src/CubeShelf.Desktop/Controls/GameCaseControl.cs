@@ -45,6 +45,9 @@ public sealed class GameCaseControl : Control, IDisposable
     private bool _flipped;
     private bool _pointerInside;
     private double _baseYaw;
+    private double _restYaw;
+    public bool IsInteractive { get; set; } = true;
+    public double ShadowOpacity { get; set; } = 1;
     private double _hoverYaw;
     private double _hoverPitch;
     private double _yaw;
@@ -71,7 +74,7 @@ public sealed class GameCaseControl : Control, IDisposable
         };
         _animationTimer.Tick += AnimateFrame;
 
-        PointerEntered += (_, _) => _pointerInside = true;
+        PointerEntered += (_, _) => _pointerInside = IsInteractive;
         PointerMoved += OnPointerMoved;
         PointerExited += (_, _) =>
         {
@@ -80,7 +83,7 @@ public sealed class GameCaseControl : Control, IDisposable
             _hoverPitch = 0;
             UpdateAnimationTarget();
         };
-        PointerPressed += (_, _) => Flip();
+        PointerPressed += (_, _) => { if (IsInteractive) Flip(); };
         DetachedFromVisualTree += (_, _) => _animationTimer.Stop();
     }
 
@@ -93,6 +96,7 @@ public sealed class GameCaseControl : Control, IDisposable
         _flipped = false;
         _pointerInside = false;
         _baseYaw = 0;
+        _restYaw = 0;
         _hoverYaw = 0;
         _hoverPitch = 0;
         _yaw = 0;
@@ -110,16 +114,29 @@ public sealed class GameCaseControl : Control, IDisposable
     public void Flip()
     {
         _flipped = !_flipped;
-        _baseYaw = _flipped ? 180 : 0;
+        _baseYaw = _restYaw + (_flipped ? 180 : 0);
         UpdateAnimationTarget();
     }
 
     public void ShowFront()
     {
         _flipped = false;
-        _baseYaw = 0;
+        _baseYaw = _restYaw;
         _hoverYaw = 0;
         _hoverPitch = 0;
+        UpdateAnimationTarget();
+    }
+
+    /// <summary>Places a case on a shelf, preserving the renderer used on game details.</summary>
+    public void SetShelfPose(double yaw, bool selected, bool animate)
+    {
+        IsInteractive = selected;
+        _restYaw = yaw;
+        _baseYaw = yaw;
+        _flipped = false;
+        _pointerInside = false;
+        _hoverYaw = _hoverPitch = 0;
+        if (!animate) _yaw = yaw;
         UpdateAnimationTarget();
     }
 
@@ -138,7 +155,8 @@ public sealed class GameCaseControl : Control, IDisposable
         var yawRadians = _yaw * Math.PI / 180.0;
         var shadowOffset = new Vector(9 + Math.Sin(yawRadians) * 5, 14 + Math.Abs(_pitch) * .20);
         var shadow = shadowBounds.Translate(shadowOffset).Inflate(5 + 6 * _lift);
-        context.DrawRectangle(ShadowBrush, null, shadow, 20, 20);
+        using (context.PushOpacity(ShadowOpacity))
+            context.DrawRectangle(ShadowBrush, null, shadow, 20, 20);
 
         foreach (var face in faces)
             DrawFace(context, face, _pointerPosition, _glare);
@@ -424,6 +442,7 @@ public sealed class GameCaseControl : Control, IDisposable
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
+        if (!IsInteractive) return;
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
         _pointerInside = true;
         _pointerPosition = e.GetPosition(this);

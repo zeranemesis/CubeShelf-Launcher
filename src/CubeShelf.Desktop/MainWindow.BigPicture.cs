@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
 
@@ -15,7 +14,7 @@ public sealed partial class MainWindow
     private Control? _bigPicturePreviousView;
     private GameCatalogEntry[] _bigPictureGames = [];
     private int _bigPictureIndex;
-    private Bitmap? _bigPictureBitmap;
+    private bool _bigPictureRibbon = true;
     private DispatcherTimer? _bigPictureTimer;
     private readonly Controls.BigPictureGamepad _bigPictureGamepad = new();
     private int _bigPictureLastInput;
@@ -24,11 +23,11 @@ public sealed partial class MainWindow
     private void InitializeBigPicture()
     {
         AddHandler(KeyDownEvent, BigPictureKeyDown, RoutingStrategies.Tunnel);
+        BigPictureShelf.SelectionRequested += SelectBigPictureGame;
         Closed += (_, _) =>
         {
             _bigPictureTimer?.Stop();
-            BigPictureCover.Source = null;
-            _bigPictureBitmap?.Dispose();
+            BigPictureShelf.Dispose();
             _bigPictureGamepad.Dispose();
         };
     }
@@ -44,6 +43,12 @@ public sealed partial class MainWindow
         _bigPicturePreviousHeight = Height;
         _bigPicturePreviousView = ContentViews.FirstOrDefault(view => view.IsVisible);
         _bigPictureGames = ShelfGames.OrderBy(game => game.Title).ToArray();
+        BigPictureShelf.SetGames(_bigPictureGames.Select(game =>
+        {
+            var cover = game.Covers.FirstOrDefault();
+            return new Controls.GameShelfItem(game.Title, ResolveCoverPath(cover?.Front),
+                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine));
+        }).ToArray());
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
         _bigPictureActive = true;
@@ -53,6 +58,7 @@ public sealed partial class MainWindow
         ShowParityView(BigPictureView);
         WindowState = WindowState.FullScreen;
         RefreshBigPictureGame();
+        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
         BigPicturePlayButton.Focus();
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         _bigPictureTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(50),
@@ -72,19 +78,30 @@ public sealed partial class MainWindow
         WindowState = _bigPicturePreviousState;
         Width = _bigPicturePreviousWidth;
         Height = _bigPicturePreviousHeight;
-        BigPictureCover.Source = null;
-        _bigPictureBitmap?.Dispose();
-        _bigPictureBitmap = null;
+        BigPictureShelf.Clear();
         BigPictureEntryButton.Focus();
     }
 
     private void MoveBigPictureGame(int step)
     {
         if (_bigPictureGames.Length == 0) return;
-        _bigPictureIndex = (_bigPictureIndex + step + _bigPictureGames.Length) % _bigPictureGames.Length;
+        SelectBigPictureGame((_bigPictureIndex + step + _bigPictureGames.Length) % _bigPictureGames.Length);
+    }
+
+    private void SelectBigPictureGame(int index)
+    {
+        _bigPictureIndex = index;
         RefreshBigPictureGame();
         BigPicturePlayButton.Focus();
     }
+
+    private void ToggleBigPictureLayout(object? sender, RoutedEventArgs args)
+    {
+        _bigPictureRibbon = !_bigPictureRibbon;
+        RefreshBigPictureGame();
+    }
+
+    private void FlipBigPictureCase(object? sender, RoutedEventArgs args) => BigPictureShelf.FlipSelected();
 
     private void PreviousBigPictureGame(object? sender, RoutedEventArgs args) => MoveBigPictureGame(-1);
     private void NextBigPictureGame(object? sender, RoutedEventArgs args) => MoveBigPictureGame(1);
@@ -92,16 +109,17 @@ public sealed partial class MainWindow
     private void RefreshBigPictureGame()
     {
         var game = BigPictureGame;
-        BigPictureCover.Source = null;
-        _bigPictureBitmap?.Dispose();
-        _bigPictureBitmap = game is null ? null : LoadBitmap(ResolveCoverPath(game.Covers.FirstOrDefault()?.Front));
-        BigPictureCover.Source = _bigPictureBitmap;
+        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon);
         BigPictureTitle.Text = game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty");
         BigPictureMetadata.Text = game is null ? "" : string.Join("  •  ", new[] { game.Genre, game.Players, game.Year > 0 ? game.Year.ToString() : "" }.Where(value => value.Length > 0));
         BigPictureDescription.Text = game?.Description ?? P7("Ajoute un jeu depuis la bibliothèque pour commencer.", "Add a game from the library to get started.");
         BigPictureCount.Text = P7("Bibliothèque", "Library") + $" · {_bigPictureGames.Length}";
         BigPicturePosition.Text = _bigPictureGames.Length == 0 ? "0 / 0" : $"{_bigPictureIndex + 1} / {_bigPictureGames.Length}";
-        BigPictureExitButton.Content = P7("Retour au bureau · Échap", "Back to desktop · Esc");
+        BigPictureExitButton.Content = P7("Bureau · Échap", "Desktop · Esc");
+        BigPictureLayoutButton.Content = _bigPictureRibbon ? P7("Vue : Ruban · V", "View: Ribbon · V") : P7("Vue : Rangée · V", "View: Row · V");
+        BigPictureFlipButton.Content = P7("↻ Retourner le boîtier · F", "↻ Flip case · F");
+        BigPictureFlipButton.IsEnabled = game is not null;
+        BigPictureCollectionLabel.Text = P7("TA COLLECTION", "YOUR COLLECTION");
         BigPictureCancelButton.Content = P7("Annuler le lancement", "Cancel launch");
         BigPicturePreviousButton.IsEnabled = BigPictureNextButton.IsEnabled = _bigPictureGames.Length > 1;
         RefreshBigPictureStatus();
@@ -147,13 +165,15 @@ public sealed partial class MainWindow
             case Key.Down: FocusBigPictureAction(1); break;
             case Key.Escape: ExitBigPicture(this, new RoutedEventArgs()); break;
             case Key.Enter: ActivateBigPictureAction(); break;
+            case Key.F: FlipBigPictureCase(this, new RoutedEventArgs()); break;
+            case Key.V: ToggleBigPictureLayout(this, new RoutedEventArgs()); break;
             case Key.Tab: return; // Native focus traversal remains available.
             default: args.Handled = true; return;
         }
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureCancelButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureLayoutButton, BigPictureExitButton }
         .Where(button => button.IsVisible && button.IsEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -173,8 +193,8 @@ public sealed partial class MainWindow
     {
         var input = _bigPictureGamepad.Read(out var connected);
         BigPictureHelp.Text = connected
-            ? P7("← → / stick : choisir   •   ↑ ↓ : actions   •   A : valider   •   B : bureau", "← → / stick: browse   •   ↑ ↓: actions   •   A: select   •   B: desktop")
-            : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Jouer / valider   •   Échap Bureau   •   F11 Big Picture", "← → Browse   •   ↑ ↓ Actions   •   Enter Play / select   •   Esc Desktop   •   F11 Big Picture");
+            ? P7("← → Choisir   •   A Valider   •   X Retourner   •   Y Vue   •   B Bureau", "← → Browse   •   A Select   •   X Flip   •   Y View   •   B Desktop")
+            : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Valider   •   F Retourner   •   V Vue   •   F11 Bureau", "← → Browse   •   ↑ ↓ Actions   •   Enter Select   •   F Flip   •   V View   •   F11 Desktop");
         if (!IsActive || WindowState == WindowState.Minimized || OwnedWindows.Any(window => window.IsVisible))
         {
             _bigPictureLastInput = -1;
@@ -195,6 +215,8 @@ public sealed partial class MainWindow
             case 4: FocusBigPictureAction(1); break;
             case 5: ActivateBigPictureAction(); break;
             case 6: ExitBigPicture(this, new RoutedEventArgs()); break;
+            case 7: FlipBigPictureCase(this, new RoutedEventArgs()); break;
+            case 8: ToggleBigPictureLayout(this, new RoutedEventArgs()); break;
         }
     }
 }
