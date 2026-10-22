@@ -3,7 +3,7 @@
 CubeShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-Cet aperçu porte la version affichée `0.15.0` et le code de version Android `1`.
+Cet aperçu porte la version affichée `0.15.0` et le code de version Android `2`.
 
 ## Produire les APK
 
@@ -67,6 +67,9 @@ capacités réseau déterminent les fonctions disponibles.
   s’adapte au portrait et au paysage ; les images sont libérées quand
   l’application passe en arrière-plan. La file de téléchargements, les amis
   CubeShelf et les profils de mods PC ne sont pas encore portés dans cet aperçu.
+- Aucun bouton fléché : parcourir les jaquettes par balayage horizontal ou à la
+  manette. Toucher une voisine la sélectionne ; toucher la sélection la retourne.
+  Un mouvement vertical reste réservé au défilement de la page.
 - L’APK PartyBoard publié est ARM64 uniquement. Sur x86-64, CubeShelf masque son
   installation et explique cette limite ; un port installé séparément peut
   être ouvert s’il expose les mêmes activités.

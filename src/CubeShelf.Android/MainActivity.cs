@@ -13,6 +13,27 @@ namespace CubeShelf.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
 {
+    private int _stickDirection;
+    private long _nextStickBrowse;
+
+    public override bool OnGenericMotionEvent(global::Android.Views.MotionEvent? motion)
+    {
+        if (motion is not null && (motion.Source & global::Android.Views.InputSourceType.Joystick) != 0)
+        {
+            var horizontal = motion.GetAxisValue(global::Android.Views.Axis.HatX);
+            if (Math.Abs(horizontal) < .5f) horizontal = motion.GetAxisValue(global::Android.Views.Axis.X);
+            var direction = Math.Abs(horizontal) < .55f ? 0 : horizontal < 0 ? -1 : 1;
+            var now = SystemClock.UptimeMillis();
+            if (direction != 0 && (direction != _stickDirection || now >= _nextStickBrowse))
+            {
+                View?.BrowseFromController(direction);
+                _nextStickBrowse = now + (direction == _stickDirection ? 180 : 450);
+            }
+            _stickDirection = direction;
+            if (direction != 0) return true;
+        }
+        return base.OnGenericMotionEvent(motion);
+    }
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         NativeGameService.CurrentActivity = this;
@@ -34,6 +55,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
 
     protected override void OnPause()
     {
+        _stickDirection = 0;
         View?.SetActive(false);
         base.OnPause();
     }

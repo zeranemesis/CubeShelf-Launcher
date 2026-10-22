@@ -100,6 +100,11 @@ public sealed class GameShelfControl : Panel, IDisposable
 
     public void FlipSelected() { if (_cases.TryGetValue(_selected, out var cover)) cover.Flip(); }
 
+    public int? GameAtPoint(Point position) => _cases
+        .Where(pair => pair.Value.Bounds.Contains(position))
+        .OrderByDescending(pair => pair.Value.ZIndex)
+        .Select(pair => (int?)pair.Key).FirstOrDefault();
+
     private int IndexAt(int offset) => (_selected + offset + _items.Count) % _items.Count;
     private IEnumerable<int> VisibleOffsets()
     {
