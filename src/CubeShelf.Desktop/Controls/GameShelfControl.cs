@@ -116,6 +116,9 @@ public sealed class GameShelfControl : Panel, IDisposable
         foreach (var offset in VisibleOffsets())
         {
             var index = IndexAt(offset);
+            // A native resize may arrange between SetGames and SetSelection,
+            // or while selection is realizing a different set of neighbors.
+            if (!_cases.TryGetValue(index, out var cover)) continue;
             var scale = offset == 0 ? 1 : .79 - Math.Abs(offset) * .025;
             var spacing = _ribbon ? width * .39 : width * .77;
             var target = new Rect(center + offset * spacing - width * scale / 2,
@@ -127,7 +130,7 @@ public sealed class GameShelfControl : Panel, IDisposable
                 current.Width + (target.Width - current.Width) * .22, current.Height + (target.Height - current.Height) * .22);
             moving |= next != target;
             _positions[index] = next;
-            _cases[index].Arrange(next);
+            cover.Arrange(next);
         }
         if (!moving) _timer.Stop();
         else if (!_timer.IsEnabled) _timer.Start();
@@ -137,11 +140,11 @@ public sealed class GameShelfControl : Panel, IDisposable
     public void Clear()
     {
         _timer.Stop();
+        _items = [];
         foreach (var cover in _cases.Values) cover.Dispose();
         _cases.Clear();
         _positions.Clear();
         Children.Clear();
-        _items = [];
     }
     public void Dispose() => Clear();
 }

@@ -52,13 +52,15 @@ public sealed partial class MainWindow
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
         _bigPictureActive = true;
+        // Win32 can arrange synchronously when visibility or fullscreen changes.
+        // Realize the cases before exposing the shelf to either operation.
+        RefreshBigPictureGame();
+        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
         DesktopSidebar.IsVisible = false;
         Grid.SetColumn(ViewHost, 0);
         Grid.SetColumnSpan(ViewHost, 2);
         ShowParityView(BigPictureView);
         WindowState = WindowState.FullScreen;
-        RefreshBigPictureGame();
-        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
         BigPicturePlayButton.Focus();
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         _bigPictureTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(50),
