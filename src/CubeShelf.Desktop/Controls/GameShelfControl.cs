@@ -66,7 +66,7 @@ public sealed class GameShelfControl : Panel, IDisposable
             if (created)
             {
                 var item = _items[index];
-                cover = new GameCaseControl { MinWidth = 0, MinHeight = 0, ShadowOpacity = .35 };
+                cover = new GameCaseControl { MinWidth = 0, MinHeight = 0, ShadowOpacity = .8, RealisticShell = true };
                 cover.SetCover(item.Front, item.Back, item.Spine);
                 AutomationProperties.SetName(cover, item.Title);
                 cover.PointerPressed += (_, args) =>
@@ -79,7 +79,7 @@ public sealed class GameShelfControl : Panel, IDisposable
             }
             cover!.ZIndex = 20 - Math.Abs(offset);
             cover.Opacity = offset == 0 ? 1 : .82;
-            cover.SetShelfPose(offset == 0 ? -8 : ribbon ? Math.Sign(offset) * -66 : -12,
+            cover.SetShelfPose(offset == 0 ? -18 : ribbon ? Math.Sign(offset) * -66 : -18,
                 offset == 0, animate && !created);
         }
         InvalidateMeasure();

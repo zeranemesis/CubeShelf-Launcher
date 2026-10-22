@@ -39,6 +39,10 @@ de [Sly Launcher](https://github.com/ioncodes/sly) : fond clair à courbes discr
 jeu sélectionné au premier plan, voisins inclinés et fiche compacte à droite.
 Le rendu utilise le composant natif de CubeShelf, avec ses jaquettes avant,
 arrière et tranche ; aucun code ni visuel de Sly n’est embarqué.
+Les boîtiers de l’étagère présentent une coque noire, un insert en retrait,
+des coins arrondis, une charnière, des joints sur les bords, une légère inclinaison
+et des reflets de pochette transparente. Des ombres de contact douces remplacent
+les ombres rectangulaires. Ce rendu détaillé est propre à Big Picture.
 Le jeu choisi utilise le même lancement
 automatique que la bibliothèque classique. Les options avancées restent dépliées
 par défaut sur sa fiche.
