@@ -4,6 +4,13 @@ CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’inte
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
+## Jouer
+
+Le bouton de chaque jaquette permet aussi de **jouer directement depuis la
+bibliothèque** : choisir son fichier une fois, puis laisser CubeShelf installer et
+préparer ce qui manque avant le lancement automatique. Les réglages manuels restent
+dans les **Options avancées** de la fiche du jeu. Voir [QUICKPLAY.md](QUICKPLAY.md).
+
 ## Gestion des téléchargements
 
 La page Téléchargements (Ctrl+4) affiche le transfert actif avec sa jaquette,

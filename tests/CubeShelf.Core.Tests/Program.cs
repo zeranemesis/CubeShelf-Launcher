@@ -10,6 +10,12 @@ using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
+Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
+Run("quick play: install and prepare finish before launch", GamePlayFlowTests.PreparationIsOrderedAndAwaited);
+Run("quick play: double clicks keep one request", GamePlayFlowTests.DoubleClickDoesNotQueueTwoGames);
+Run("quick play: cancellation prevents delayed launch", GamePlayFlowTests.CancellationPreventsDelayedLaunch);
+Run("quick play: failed setup can be tried again", GamePlayFlowTests.FailureAllowsAnotherAttempt);
+Run("quick play: cancelling a launch leaves its installation available", GamePlayFlowTests.QueueWaitCancellationDoesNotCancelInstallation);
 Run("downloads: queue order and local pause", DownloadQueueTests.OrderAndLocalPause);
 Run("downloads: active pause, resume and cancellation", DownloadQueueTests.ActivePauseResumeAndCancellation);
 Run("downloads: global suspension survives active cancellation", DownloadQueueTests.SuspendedQueueSurvivesActiveCancellation);

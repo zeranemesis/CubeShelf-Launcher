@@ -281,6 +281,29 @@ public sealed class PortableDownloadQueue : IDisposable
 
     public event EventHandler? Changed;
 
+    /// <summary>Wait for an existing or newly queued prerequisite without polling or restarting it.</summary>
+    public async Task<DownloadActivityState> WaitForCompletionAsync(PortableDownloadQueueItem item,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
+        cancellationToken = lifetime.Token;
+        while (true)
+        {
+            var changed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            void OnChanged(object? sender, EventArgs args) => changed.TrySetResult();
+            Changed += OnChanged;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.IsTerminal) return item.State;
+                await changed.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            finally { Changed -= OnChanged; }
+        }
+    }
+
     public IReadOnlyList<PortableDownloadQueueItem> Items
     {
         get

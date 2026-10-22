@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:CubeShelf.Desktop.Controls"
         x:Class="CubeShelf.Desktop.MainWindow"
@@ -109,9 +109,10 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" Margin="10">
+                  <StackPanel Margin="10">
                     <Border Width="260" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="13">
                       <StackPanel>
+                        <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                         <Grid>
                           <Border Height="330" Background="#090C13" CornerRadius="11" ClipToBounds="True">
                             <Image Source="{Binding Cover}" Stretch="UniformToFill" />
@@ -120,18 +121,22 @@
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
                           </Border>
                         </Grid>
+                        </Button>
                         <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" Margin="3,13,3,0" />
                         <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="3,4,3,0" />
-                        <WrapPanel Margin="3,8,3,0">
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Disc}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Runtime}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Data}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                        </WrapPanel>
+                        <TextBlock Text="{Binding PlayHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" MinHeight="36" Margin="3,10,3,4" />
                         <TextBlock Text="{Binding Stats}" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" Margin="3,6,3,1" />
                         <TextBlock Text="{Binding Update}" Foreground="{DynamicResource Accent2}" FontSize="10" FontWeight="SemiBold" TextWrapping="Wrap" Margin="3,4,3,1" />
+                        <Button Classes="primary" Tag="{Binding}" Click="QuickPlayLibraryGame" IsEnabled="{Binding CanQuickPlay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,5" AutomationProperties.Name="{Binding PlayLabel}">
+                          <TextBlock Text="{Binding PlayLabel}" TextWrapping="Wrap" TextAlignment="Center" />
+                        </Button>
+                        <WrapPanel>
+                          <Button Content="{DynamicResource GameDetails}" Tag="{Binding}" Click="SelectLibraryGame" Padding="10,5" Margin="0,0,5,0" />
+                          <Button Content="{DynamicResource CancelGameLaunch}" Tag="{Binding}" Click="CancelQuickPlay" IsVisible="{Binding IsPreparing}" Padding="10,5" />
+                        </WrapPanel>
                       </StackPanel>
                     </Border>
-                  </Button>
+                  </StackPanel>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -158,22 +163,26 @@
                   <TextBlock x:Name="SelectedDescriptionText" Foreground="{DynamicResource Text}" Opacity="0.82" FontSize="15" LineHeight="23" TextWrapping="Wrap" />
                   <TextBlock x:Name="GameStatsText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
                   <TextBlock x:Name="SetupProgressText" Foreground="{DynamicResource Accent2}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                  <WrapPanel>
+                    <Button x:Name="PlayButton" Classes="primary" Content="{DynamicResource Play}" IsEnabled="False" Click="PlayGame" Margin="0,0,8,6" />
+                    <Button x:Name="CancelPlayLaunchButton" Content="{DynamicResource CancelGameLaunch}" IsVisible="False" Click="CancelQuickPlay" Margin="0,0,8,6" />
+                    <Button x:Name="FavoriteButton" Content="{DynamicResource FavoriteAdd}" Click="ToggleFavoriteParity" Margin="0,0,8,6" />
+                    <Button Content="{DynamicResource Mods}" Click="ParityOpenMods" Margin="0,0,8,6" />
+                  </WrapPanel>
+                </StackPanel>
+                <controls:GameCaseControl x:Name="GameCase" Grid.Column="1" Width="430" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+
+            <Expander x:Name="GameAdvancedOptions" Header="{DynamicResource AdvancedGameOptions}" IsExpanded="False" HorizontalAlignment="Stretch" Foreground="{DynamicResource Text}">
+              <StackPanel Spacing="18" Margin="0,12,0,0">
                   <WrapPanel>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="OriginalGameStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="RuntimeStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="DataStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="GameUpdateStateText" Text="{DynamicResource GameUpdateUnknown}" FontSize="11" /></Border>
                   </WrapPanel>
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button x:Name="PlayButton" Classes="primary" Content="{DynamicResource Play}" IsEnabled="False" Click="PlayGame" />
-                    <Button x:Name="FavoriteButton" Content="{DynamicResource FavoriteAdd}" Click="ToggleFavoriteParity" />
-                    <Button Classes="primary" Content="{DynamicResource Mods}" Click="ParityOpenMods" />
-                  </StackPanel>
-                </StackPanel>
-                <controls:GameCaseControl x:Name="GameCase" Grid.Column="1" Width="430" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" />
-              </Grid>
-            </Border>
-
             <Grid ColumnDefinitions="*,18,*">
               <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
                 <StackPanel Spacing="9">
@@ -244,6 +253,8 @@
                 </StackPanel>
               </Grid>
             </Border>
+              </StackPanel>
+            </Expander>
             <ProgressBar x:Name="InstallProgress" Minimum="0" Maximum="100" IsVisible="False" Height="9" />
             <TextBlock x:Name="ActionStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
           </StackPanel>

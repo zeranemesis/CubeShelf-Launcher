@@ -7,6 +7,9 @@ internal static class UiLocalization
     private static readonly IReadOnlyDictionary<string, string> French = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["AppLibrary"] = "Bibliothèque",
+        ["GameDetails"] = "Détails",
+        ["AdvancedGameOptions"] = "Options avancées",
+        ["CancelGameLaunch"] = "Annuler le lancement",
         ["AppFavorites"] = "Favoris",
         ["AppMods"] = "Mods du jeu",
         ["AppDownloads"] = "Téléchargements",
@@ -114,7 +117,7 @@ internal static class UiLocalization
         ["LibraryEyebrow"] = "BIBLIOTHÈQUE",
         ["LibraryTitle"] = "Tes jeux GameCube",
         ["AddGame"] = "+ Ajouter un jeu",
-        ["LibrarySubtitle"] = "Les mises à jour GitHub sont vérifiées automatiquement. Sélectionne un jeu pour continuer.",
+        ["LibrarySubtitle"] = "Clique sur Jouer. CubeShelf prépare ce qui manque.",
         ["SearchGame"] = "Rechercher un jeu…",
         ["SortName"] = "Nom A-Z",
         ["SortRecent"] = "Récemment joué",
@@ -258,6 +261,9 @@ internal static class UiLocalization
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["AppLibrary"] = "Library",
+        ["GameDetails"] = "Details",
+        ["AdvancedGameOptions"] = "Advanced options",
+        ["CancelGameLaunch"] = "Cancel launch",
         ["AppFavorites"] = "Favorites",
         ["AppMods"] = "Game Mods",
         ["AppDownloads"] = "Downloads",
@@ -365,7 +371,7 @@ internal static class UiLocalization
         ["LibraryEyebrow"] = "LIBRARY",
         ["LibraryTitle"] = "Your GameCube games",
         ["AddGame"] = "+ Add a game",
-        ["LibrarySubtitle"] = "GitHub updates are checked automatically. Select a game to continue.",
+        ["LibrarySubtitle"] = "Choose Play. CubeShelf prepares what is missing.",
         ["SearchGame"] = "Search games…",
         ["SortName"] = "Name A-Z",
         ["SortRecent"] = "Recently played",
