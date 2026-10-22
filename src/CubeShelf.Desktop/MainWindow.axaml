@@ -9,7 +9,7 @@
         SizeChanged="OnParityWindowSizeChanged">
   <Grid ColumnDefinitions="225,*">
     <!-- SIDEBAR -->
-    <Border Grid.Column="0" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
+    <Border x:Name="DesktopSidebar" Grid.Column="0" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
       <DockPanel Margin="16">
         <StackPanel DockPanel.Dock="Top">
           <StackPanel Orientation="Horizontal" Margin="0,4,0,28" Spacing="12">
@@ -44,6 +44,7 @@
           </Button>
         </StackPanel>
         <StackPanel DockPanel.Dock="Bottom" Spacing="8">
+          <Button x:Name="BigPictureEntryButton" Content="▣ Big Picture · F11" Click="EnterBigPicture" HorizontalAlignment="Stretch" />
           <!-- You, the way your friends see you. Clicking it opens your profile. -->
           <Button x:Name="ProfileChipButton" Classes="nav" TabIndex="7" Click="ParityShowProfile" HorizontalAlignment="Stretch">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
@@ -73,6 +74,36 @@
     </Border>
 
     <Grid x:Name="ViewHost" Grid.Column="1">
+      <Grid x:Name="BigPictureView" Classes="view" IsVisible="False" Background="#0C1424" RowDefinitions="Auto,*,Auto">
+        <Grid Margin="40,24" ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="4">
+            <TextBlock Text="CUBESHELF / BIG PICTURE" Foreground="#8CB8FF" FontSize="16" FontWeight="Bold" />
+            <TextBlock x:Name="BigPictureCount" Foreground="#B9C8DF" FontSize="14" />
+          </StackPanel>
+          <Button Grid.Column="1" x:Name="BigPictureExitButton" Click="ExitBigPicture" FontSize="17" Padding="22,12" />
+        </Grid>
+        <Grid Grid.Row="1" Margin="40,12,40,24" ColumnDefinitions="2*,3*" ColumnSpacing="45">
+          <Border CornerRadius="20" Background="#16233B" ClipToBounds="True">
+            <Image x:Name="BigPictureCover" Stretch="Uniform" />
+          </Border>
+          <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel VerticalAlignment="Center" Spacing="18" Margin="0,8">
+            <TextBlock x:Name="BigPictureTitle" Foreground="White" FontSize="42" FontWeight="Bold" TextWrapping="Wrap" />
+            <TextBlock x:Name="BigPictureMetadata" Foreground="#8CB8FF" FontSize="18" TextWrapping="Wrap" />
+            <TextBlock x:Name="BigPictureDescription" Foreground="#B9C8DF" FontSize="18" TextWrapping="Wrap" MaxHeight="120" />
+            <Button x:Name="BigPicturePlayButton" Classes="primary" Click="PlayBigPicture" FontSize="24" Padding="30,18" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+            <TextBlock x:Name="BigPictureStatus" Foreground="#B9C8DF" FontSize="16" TextWrapping="Wrap" />
+            <Button x:Name="BigPictureCancelButton" Click="CancelBigPictureLaunch" IsVisible="False" FontSize="18" Padding="22,12" />
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+              <Button x:Name="BigPicturePreviousButton" Content="❮" Click="PreviousBigPictureGame" FontSize="26" Padding="24,10" />
+              <TextBlock x:Name="BigPicturePosition" Grid.Column="1" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <Button x:Name="BigPictureNextButton" Grid.Column="2" Content="❯" Click="NextBigPictureGame" FontSize="26" Padding="24,10" />
+            </Grid>
+          </StackPanel>
+          </ScrollViewer>
+        </Grid>
+        <TextBlock x:Name="BigPictureHelp" Grid.Row="2" Margin="40,0,40,24" Foreground="#B9C8DF" FontSize="16" TextWrapping="Wrap" />
+      </Grid>
       <!-- LIBRARY -->
       <Grid x:Name="LibraryView" Classes="view" RowDefinitions="155,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
@@ -175,7 +206,7 @@
               </Grid>
             </Border>
 
-            <Expander x:Name="GameAdvancedOptions" Header="{DynamicResource AdvancedGameOptions}" IsExpanded="False" HorizontalAlignment="Stretch" Foreground="{DynamicResource Text}">
+            <Expander x:Name="GameAdvancedOptions" Header="{DynamicResource AdvancedGameOptions}" IsExpanded="True" HorizontalAlignment="Stretch" Foreground="{DynamicResource Text}">
               <StackPanel Spacing="18" Margin="0,12,0,0">
                   <WrapPanel>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="OriginalGameStateText" FontSize="11" /></Border>

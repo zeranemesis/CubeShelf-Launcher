@@ -12,7 +12,7 @@ Le bouton principal de chaque jaquette donne accès directement au jeu :
 
 La même action est disponible sur la fiche du jeu. Les sélecteurs manuels de
 disque et d’exécutable, réparation, préparation manuelle et sources sont regroupés
-dans **Options avancées**, repliées par défaut.
+dans **Options avancées**, dépliées par défaut.
 
 Une opération d’installation/préparation déjà dans Téléchargements est réutilisée.
 Deux clics ne créent pas deux installations ni deux lancements. On peut consulter
@@ -30,6 +30,25 @@ Un jeu personnalisé sans source d’installation demande une fois son programme
 
 Seuls les fichiers de jeu fournis par l’utilisateur sont utilisés ; le launcher
 ne récupère pas de disque de jeu.
+
+## Big Picture
+
+Le bouton **Big Picture** de la barre latérale ou **F11** ouvre une bibliothèque
+plein écran avec de grandes jaquettes. Le jeu choisi utilise le même lancement
+automatique que la bibliothèque classique. Les options avancées restent dépliées
+par défaut sur sa fiche.
+
+- **Gauche / droite** : changer de jeu ; **haut / bas** : choisir une action.
+- **Entrée** : activer l’action sélectionnée ; **Échap / F11** : revenir au bureau.
+- Souris : jaquette, boutons de navigation et actions accessibles à l’écran.
+- Sous Windows, une manette compatible **XInput** peut utiliser la croix ou le
+  stick gauche, **A** pour valider et **B** pour revenir au bureau.
+
+La manette est lue uniquement lorsque Big Picture a le focus, hors des dialogues
+et des parties. Une pression maintenue ne déclenche pas plusieurs lancements.
+La fenêtre retrouve son état et ses dimensions précédents en quittant le mode ;
+le retour après une partie conserve le plein écran. La configuration initiale
+du fichier de jeu utilise toujours le sélecteur de fichiers du système.
 
 Tests du parcours :
 

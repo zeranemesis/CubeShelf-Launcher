@@ -64,6 +64,7 @@ public sealed partial class MainWindow : Window
         InitializePhase5Polish();
         InitializePhase6Parity();
         InitializePhase7Finalization();
+        InitializeBigPicture();
         PlatformStatus.Text = OperatingSystem.IsWindows()
             ? "Plateforme détectée : Windows"
             : OperatingSystem.IsLinux()
@@ -132,7 +133,11 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
+            _preferences = _preferences with
+            {
+                WindowWidth = _bigPictureActive ? _bigPicturePreviousWidth : Width,
+                WindowHeight = _bigPictureActive ? _bigPicturePreviousHeight : Height
+            };
             _preferencesStore.Save(_preferences);
             // Before the tracker is disposed: the farewell document has to still know whether
             // a game is running, or a friend is left looking at a stale "in a game".
@@ -322,7 +327,7 @@ public sealed partial class MainWindow : Window
 
         if (_sessions.RunningGameIds.Count == 0)
         {
-            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+            if (WindowState == WindowState.Minimized) WindowState = _bigPictureActive ? WindowState.FullScreen : WindowState.Normal;
             Show();
             Activate();
         }

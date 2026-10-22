@@ -156,7 +156,7 @@ public sealed partial class MainWindow
     private void FitWindowToCurrentScreenPhase5(bool force)
     {
         if (_phase5ApplyingWindowFit || (!force && !_preferences.AutoFitWindowToScreen)) return;
-        if (WindowState == WindowState.Maximized)
+        if (WindowState is WindowState.Maximized or WindowState.FullScreen)
         {
             UpdateResponsiveParity();
             return;
