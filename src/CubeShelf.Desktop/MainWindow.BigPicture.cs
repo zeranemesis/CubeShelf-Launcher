@@ -54,18 +54,19 @@ public sealed partial class MainWindow
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
         _bigPictureActive = true;
-        // Start with the light home page. The 3D shelf is realized on demand,
-        // before OpenBigPictureCollection exposes it to native fullscreen layout.
+        // Realize the cases before exposing them to synchronous fullscreen layout.
+        RefreshBigPictureGame();
+        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
         DesktopSidebar.IsVisible = false;
         Grid.SetColumn(ViewHost, 0);
         Grid.SetColumnSpan(ViewHost, 2);
-        ShowParityView(BigPictureHomeView);
+        ShowParityView(BigPictureView);
         WindowState = WindowState.FullScreen;
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         _bigPictureTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(50),
             DispatcherPriority.Input, (_, _) => PollBigPictureGamepad());
         _bigPictureTimer.Start();
-        OpenBigPictureHome(this, new RoutedEventArgs());
+        BigPicturePlayButton.Focus();
     }
 
     private void ExitBigPicture(object? sender, RoutedEventArgs args)

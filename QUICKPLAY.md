@@ -109,7 +109,8 @@ Aucune partie entre deux machines n’a été validée dans cette modification.
 
 ### Accueil et navigation à la manette
 
-Big Picture démarre sur **Reprendre** : derniers jeux joués, lancement direct,
+Big Picture démarre sur **l’étagère 3D**. Le bouton **Accueil** donne accès à
+**Reprendre** : derniers jeux joués, lancement direct,
 recherche, bibliothèque 3D, amis et paramètres. Les variantes sont regroupées
 avec leur jeu de base pour le classement par dernière partie. Les invitations
 réellement reçues d’amis apparaissent sur l’accueil et utilisent le même parcours
