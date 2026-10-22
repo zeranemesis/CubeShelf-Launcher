@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.16.0 — 22 octobre 2026
+
+- Gestionnaire de téléchargements illustré : file, pause/reprise, priorités et limite de débit.
+- Lancement direct depuis les jaquettes, préparation automatique et options avancées dépliées.
+- Big Picture avec étagère 3D par défaut et modèle GLB fourni, tranche visible, rendu mis en cache et animations à la demande.
+- Accueil Reprendre, profils de mods, clavier à l’écran et parcours de salons avec vérification avant connexion.
+- Premier aperçu Android natif : mêmes jaquettes 3D, navigation tactile/manette sans boutons fléchés, lancement de PartyBoard installé séparément. Les autres jeux, amis et téléchargements PC ne sont pas encore portés ; jeu croisé Android/PC non disponible.
+- Génération d’archives PC Windows/Linux/macOS x64 et ARM64.
+- Correction d’un délai NAT-PMP devenu négatif à expiration, susceptible d’interrompre le repli UPnP.
+
+Les binaires PC ne sont pas signés avec un certificat de distribution. Android reste un aperçu signé avec une clé de développement ; aucun essai physique de ce launcher mobile ni partie réelle Android n’a été effectué ici.
+
 ## Non publié — consolidation du launcher
 
 - Le disque sélectionné est transmis selon le runtime : variables PartyBoard, argument Ring Out, `STRIKERS_DATA` pour Strikers. Les chemins contenant des espaces restent un seul argument.
