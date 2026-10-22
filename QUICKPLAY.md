@@ -49,6 +49,9 @@ Le modèle est chargé une fois et partagé entre les boîtiers. Son rendu reste
 natif, avec éclairage simplifié et ombres de contact ; il ne nécessite pas de
 navigateur. Le lecteur prend en charge cet export précis, pas l’import de GLB
 arbitraires. Le boîtier précédent sert de secours si la ressource manque.
+La tranche du GLB étant orientée vers l’intérieur, sa visibilité utilise sa
+normale physique extérieure. Les poses et le retournement gardent le côté portant
+la tranche vers la caméra, y compris au survol.
 Le jeu choisi utilise le même lancement
 automatique que la bibliothèque classique. Les options avancées restent dépliées
 par défaut sur sa fiche.
@@ -70,6 +73,39 @@ et des parties. Une pression maintenue ne déclenche pas plusieurs lancements.
 La fenêtre retrouve son état et ses dimensions précédents en quittant le mode ;
 le retour après une partie conserve le plein écran. La configuration initiale
 du fichier de jeu utilise toujours le sélecteur de fichiers du système.
+
+### Fluidité et optimisation
+
+Les animations utilisent les images du compositeur, avec une cible maximale de
+120 mises à jour par seconde. L’interpolation dépend du temps écoulé : sa durée
+reste cohérente sur les écrans 60, 120 ou 144 Hz. Les boucles s’arrêtent au repos,
+hors de la vue ou pendant la minimisation. Les projections des modèles stables
+sont mises en cache ; le maillage des textures des boîtiers voisins est allégé.
+La cible ne garantit pas 120 images affichées : l’écran, son réglage Windows,
+le moteur graphique et les performances de la machine déterminent le résultat.
+Aucune mesure de débit réel à 120 Hz n’a été réalisée sur la machine utilisateur.
+
+### Mods et Mario Party 4 en ligne
+
+**Choisir les mods** affiche les mods installés du jeu sélectionné. Les boutons
+activent/désactivent les mêmes mods que la bibliothèque classique, y compris les
+mods coupés dans PartyBoard. Les formats incompatibles ne peuvent pas être
+activés ; un mod incompatible déjà actif peut être désactivé. Les conflits sont
+signalés et l’accès à l’installation passe par le catalogue existant.
+
+**Jouer en ligne**, sur Mario Party 4, prépare le disque, le moteur et les données
+manquantes puis ouvre la page des salons en plein écran, sans lancer une partie
+locale. **Créer une room** permet de choisir les mods de cette room ; les salons
+publics peuvent être rejoints depuis la liste avec le contrôle existant des mods.
+La barre de retour, Échap ou B ramène à la collection. Les actions des sous-pages
+sont accessibles à la manette ; les champs texte peuvent nécessiter un clavier.
+
+Le compagnon Windows PartyBoard doit déclarer les capacités nécessaires. Les
+messages existants indiquent un moteur trop ancien, un disque absent ou un relais
+indisponible. Une room privée avec invitations utilise les réglages d’identité,
+de présence et d’amis existants ; une room publique ne nécessite pas d’ajouter un
+ami. Les participants doivent disposer de disques et versions compatibles.
+Aucune partie entre deux machines n’a été validée dans cette modification.
 
 Tests du parcours :
 

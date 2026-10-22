@@ -104,6 +104,8 @@
                 </StackPanel>
               </Border>
               <Button x:Name="BigPicturePlayButton" Classes="primary" Click="PlayBigPicture" FontSize="20" Padding="24,16" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <Button x:Name="BigPictureOnlineButton" Click="OpenBigPictureOnline" FontSize="18" Padding="20,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <Button x:Name="BigPictureModsButton" Click="OpenBigPictureMods" FontSize="17" Padding="18,12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
               <TextBlock x:Name="BigPictureStatus" Foreground="#706671" FontSize="14" TextWrapping="Wrap" />
               <Button x:Name="BigPictureFlipButton" Click="FlipBigPictureCase" FontSize="14" Padding="16,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
               <Button x:Name="BigPictureCancelButton" Click="CancelBigPictureLaunch" IsVisible="False" FontSize="16" Padding="18,12" />
@@ -120,6 +122,16 @@
         </Grid>
       </Grid>
       </ThemeVariantScope>
+      <Grid x:Name="BigPictureModsView" Classes="view" IsVisible="False" RowDefinitions="Auto,*,Auto" Background="{DynamicResource Bg}">
+        <StackPanel Margin="40,28" Spacing="10">
+          <TextBlock x:Name="BigPictureModsTitle" FontSize="30" FontWeight="Bold" />
+          <TextBlock x:Name="BigPictureModsSummary" FontSize="17" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Margin="40,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel x:Name="BigPictureModChoices" Spacing="12" />
+        </ScrollViewer>
+        <Button Grid.Row="2" x:Name="BigPictureBrowseModsButton" Click="BrowseBigPictureMods" FontSize="19" Padding="24,16" Margin="40,24" HorizontalAlignment="Left" />
+      </Grid>
       <!-- LIBRARY -->
       <Grid x:Name="LibraryView" Classes="view" RowDefinitions="155,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
@@ -955,6 +967,12 @@
         </Grid>
       </Border>
 
+      <Border x:Name="BigPictureSubnav" IsVisible="False" VerticalAlignment="Top" Height="64" Background="{DynamicResource Panel}" Padding="24,8">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock x:Name="BigPictureSubnavTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+          <Button x:Name="BigPictureReturnButton" Grid.Column="1" Click="ReturnToBigPicture" Padding="18,10" />
+        </Grid>
+      </Border>
       <!-- THEME TRANSITION -->
       <Border x:Name="ThemeTransitionOverlay" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource OverlayBrush}">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.14" /></Transitions></Border.Transitions>

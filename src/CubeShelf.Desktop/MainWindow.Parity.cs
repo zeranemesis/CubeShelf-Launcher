@@ -167,6 +167,7 @@ public sealed partial class MainWindow
     {
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
+        UpdateBigPictureSubnav(view);
     }
 
     /// <summary>

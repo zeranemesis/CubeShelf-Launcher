@@ -123,6 +123,9 @@ public sealed partial class MainWindow
         BigPictureFlipButton.IsEnabled = game is not null;
         BigPictureCollectionLabel.Text = P7("TA COLLECTION", "YOUR COLLECTION");
         BigPictureCancelButton.Content = P7("Annuler le lancement", "Cancel launch");
+        BigPictureModsButton.Content = P7("◈ Choisir les mods", "◈ Choose mods");
+        BigPictureOnlineButton.Content = P7("◉ Jouer en ligne", "◉ Play online");
+        BigPictureOnlineButton.IsVisible = OnlineCompanion.IsSupported(game);
         BigPicturePreviousButton.IsEnabled = BigPictureNextButton.IsEnabled = _bigPictureGames.Length > 1;
         RefreshBigPictureStatus();
     }
@@ -135,6 +138,8 @@ public sealed partial class MainWindow
         BigPicturePlayButton.Content = game is null ? P7("Aucun jeu", "No games") : QuickPlayLabel(game);
         BigPicturePlayButton.IsEnabled = game is not null && PlayIntentFor(game) is null;
         BigPictureCancelButton.IsVisible = game is not null && PlayIntentFor(game) is not null;
+        BigPictureModsButton.IsEnabled = game is not null && PlayIntentFor(game) is null && RunningGameFor(game) is null;
+        BigPictureOnlineButton.IsEnabled = game is not null && PlayIntentFor(game) is null;
         BigPictureStatus.Text = game is null ? "" : QuickPlayHint(game);
     }
 
@@ -159,6 +164,16 @@ public sealed partial class MainWindow
             return;
         }
         if (!_bigPictureActive) return;
+        if (!BigPictureView.IsVisible)
+        {
+            if (args.Key == Key.Escape) { ReturnToBigPicture(this, new RoutedEventArgs()); args.Handled = true; }
+            else if (args.Key is Key.Up or Key.Down && !BigPicturePageHasTextFocus())
+            {
+                HandleBigPicturePageInput(args.Key == Key.Up ? 3 : 4);
+                args.Handled = true;
+            }
+            return;
+        }
         switch (args.Key)
         {
             case Key.Left: MoveBigPictureGame(-1); break;
@@ -175,7 +190,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureLayoutButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureLayoutButton, BigPictureExitButton }
         .Where(button => button.IsVisible && button.IsEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -209,6 +224,7 @@ public sealed partial class MainWindow
         if (input == _bigPictureLastInput && (!direction || now < _bigPictureNextRepeat)) return;
         _bigPictureNextRepeat = now + (input == _bigPictureLastInput ? 180 : 450);
         _bigPictureLastInput = input;
+        if (!BigPictureView.IsVisible) { HandleBigPicturePageInput(input); return; }
         switch (input)
         {
             case 1: MoveBigPictureGame(-1); break;

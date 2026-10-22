@@ -26,13 +26,16 @@ public sealed partial class MainWindow
             await RequestPlayAsync(GameVariants.Resolve(_catalogGames, card.Game, _paths));
     }
 
-    private async Task RequestPlayAsync(GameCatalogEntry game)
+    private Task RequestPlayAsync(GameCatalogEntry game) => PrepareForPlayAsync(game, null);
+
+    private async Task PrepareForPlayAsync(GameCatalogEntry game, Func<Task>? readyAction)
     {
         if (_quickPlayClosing || _portableQueue is null) return;
         var key = PlayKey(game);
         if (_playIntents.ContainsKey(key)) return;
         if (RunningGameFor(game) is { } running)
         {
+            if (readyAction is not null) { await readyAction(); return; }
             try { await _sessions.StopAsync(running.Id); }
             catch (Exception ex) { ShowToastParity(P7("Jeu", "Game"), ex.Message); }
             RefreshQuickPlayUi();
@@ -54,6 +57,7 @@ public sealed partial class MainWindow
                     if (!CanPlay(game)) throw new InvalidOperationException(P7(
                         "Le jeu n’est plus prêt. Vérifie son image dans les options avancées.",
                         "The game is no longer ready. Check its disc image in advanced options."));
+                    if (readyAction is not null) return readyAction();
                     LaunchReadyGame(game);
                     return Task.CompletedTask;
                 }), intent.Cancellation.Token);

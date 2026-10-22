@@ -14,7 +14,9 @@ public sealed class GameShelfControl : Panel, IDisposable
     private IReadOnlyList<GameShelfItem> _items = [];
     private readonly Dictionary<int, GameCaseControl> _cases = new();
     private readonly Dictionary<int, Rect> _positions = new();
-    private readonly DispatcherTimer _timer;
+    private readonly DemandAnimation _animation;
+    private double _layoutResponse = 1;
+    private bool _moving;
     private int _selected;
     private bool _ribbon = true;
     private bool _animate;
@@ -24,9 +26,13 @@ public sealed class GameShelfControl : Panel, IDisposable
     public GameShelfControl()
     {
         ClipToBounds = true;
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-        _timer.Tick += (_, _) => InvalidateArrange();
-        DetachedFromVisualTree += (_, _) => _timer.Stop();
+        _animation = new DemandAnimation(this, elapsed =>
+        {
+            _layoutResponse = DemandAnimation.Response(.22, elapsed);
+            InvalidateArrange();
+            return _moving;
+        });
+        DetachedFromVisualTree += (_, _) => _animation.Stop();
         PointerWheelChanged += (_, args) =>
         {
             if (_items.Count == 0) return;
@@ -83,11 +89,13 @@ public sealed class GameShelfControl : Panel, IDisposable
             }
             cover!.ZIndex = 20 - Math.Abs(offset);
             cover.Opacity = offset == 0 ? 1 : .82;
-            cover.SetShelfPose(offset == 0 ? -18 : ribbon ? Math.Sign(offset) * -66 : -18,
+            cover.SetShelfPose(offset == 0 ? 28 : ribbon ? 68 : 35,
                 offset == 0, animate && !created);
         }
         InvalidateMeasure();
-        if (animate) _timer.Start();
+        _moving = animate;
+        _layoutResponse = animate ? DemandAnimation.Response(.22, 1d / 120) : 1;
+        if (animate) _animation.Start();
     }
 
     public void FlipSelected() { if (_cases.TryGetValue(_selected, out var cover)) cover.Flip(); }
@@ -130,20 +138,20 @@ public sealed class GameShelfControl : Panel, IDisposable
             var current = _positions.GetValueOrDefault(index, target);
             var distance = Math.Abs(current.X - target.X) + Math.Abs(current.Width - target.Width) + Math.Abs(current.Y - target.Y);
             var next = !_animate || distance < .8 ? target : new Rect(
-                current.X + (target.X - current.X) * .22, current.Y + (target.Y - current.Y) * .22,
-                current.Width + (target.Width - current.Width) * .22, current.Height + (target.Height - current.Height) * .22);
+                current.X + (target.X - current.X) * _layoutResponse, current.Y + (target.Y - current.Y) * _layoutResponse,
+                current.Width + (target.Width - current.Width) * _layoutResponse, current.Height + (target.Height - current.Height) * _layoutResponse);
             moving |= next != target;
             _positions[index] = next;
             cover.Arrange(next);
         }
-        if (!moving) _timer.Stop();
-        else if (!_timer.IsEnabled) _timer.Start();
+        _moving = moving;
+        if (moving) _animation.Start();
         return finalSize;
     }
 
     public void Clear()
     {
-        _timer.Stop();
+        _animation.Stop();
         _items = [];
         foreach (var cover in _cases.Values) cover.Dispose();
         _cases.Clear();

@@ -9,7 +9,7 @@ namespace CubeShelf.Desktop.Controls;
 
 /// <summary>
 /// Portable GameCube case renderer with a real projected cuboid, textured
-/// front/back/spine faces and a damped 60 Hz interaction.  The renderer stays
+/// front/back/spine faces and time-based, compositor-paced interaction. The renderer stays
 /// framework-native (no WPF Viewport3D and no Windows-only graphics API).
 /// </summary>
 public sealed partial class GameCaseControl : Control, IDisposable
@@ -38,7 +38,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private static readonly IPen EdgePen = new Pen(new SolidColorBrush(Color.FromArgb(145, 120, 150, 200)), 1);
     private static readonly IBrush ShadowBrush = new SolidColorBrush(Color.FromArgb(54, 0, 0, 0));
 
-    private readonly DispatcherTimer _animationTimer;
+    private readonly DemandAnimation _animation;
     private Bitmap? _front;
     private Bitmap? _back;
     private Bitmap? _spine;
@@ -71,11 +71,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         ClipToBounds = false;
         Cursor = new Cursor(StandardCursorType.Hand);
 
-        _animationTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(16)
-        };
-        _animationTimer.Tick += AnimateFrame;
+        _animation = new DemandAnimation(this, AnimateFrame);
 
         PointerEntered += (_, _) => _pointerInside = IsInteractive;
         PointerMoved += OnPointerMoved;
@@ -87,7 +83,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
             UpdateAnimationTarget();
         };
         PointerPressed += (_, _) => { if (IsInteractive) Flip(); };
-        DetachedFromVisualTree += (_, _) => _animationTimer.Stop();
+        DetachedFromVisualTree += (_, _) => _animation.Stop();
     }
 
     public void SetCover(string? front, string? back, string? spine)
@@ -111,14 +107,14 @@ public sealed partial class GameCaseControl : Control, IDisposable
         _targetGlare = 0;
         _lift = 0;
         _targetLift = 0;
-        _animationTimer.Stop();
+        _animation.Stop();
         InvalidateVisual();
     }
 
     public void Flip()
     {
         _flipped = !_flipped;
-        _baseYaw = _restYaw + (_flipped ? 180 : 0);
+        _baseYaw = UseImportedModel ? (_flipped ? 180 - _restYaw : _restYaw) : _restYaw + (_flipped ? 180 : 0);
         UpdateAnimationTarget();
     }
 
@@ -566,18 +562,18 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private void UpdateAnimationTarget()
     {
         _targetYaw = _baseYaw + (_pointerInside ? _hoverYaw : 0);
+        if (UseImportedModel) _targetYaw = Math.Clamp(_targetYaw, 12, 168);
         _targetPitch = _restPitch + (_pointerInside ? _hoverPitch : 0);
         _targetGlare = _pointerInside ? 1 : 0;
         _targetLift = _pointerInside ? 1 : 0;
-        if (!_animationTimer.IsEnabled)
-            _animationTimer.Start();
+        _animation.Start();
     }
 
-    private void AnimateFrame(object? sender, EventArgs args)
+    private bool AnimateFrame(double elapsed)
     {
-        const double positionResponse = .17;
-        const double pitchResponse = .20;
-        const double surfaceResponse = .12;
+        var positionResponse = DemandAnimation.Response(.17, elapsed);
+        var pitchResponse = DemandAnimation.Response(.20, elapsed);
+        var surfaceResponse = DemandAnimation.Response(.12, elapsed);
 
         var yawDelta = _targetYaw - _yaw;
         var pitchDelta = _targetPitch - _pitch;
@@ -598,9 +594,11 @@ public sealed partial class GameCaseControl : Control, IDisposable
             _pitch = _targetPitch;
             _glare = _targetGlare;
             _lift = _targetLift;
-            _animationTimer.Stop();
+            InvalidateVisual();
+            return false;
         }
         InvalidateVisual();
+        return true;
     }
 
     private static Vec3 Rotate(Vec3 point, double yawDegrees, double pitchDegrees)
@@ -637,6 +635,8 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private void DisposeBitmaps()
     {
+        _modelCommands = null;
+        _modelDrawingKey = default;
         _front?.Dispose();
         _back?.Dispose();
         _spine?.Dispose();
@@ -647,8 +647,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     {
         if (_disposed) return;
         _disposed = true;
-        _animationTimer.Stop();
-        _animationTimer.Tick -= AnimateFrame;
+        _animation.Stop();
         DisposeBitmaps();
     }
 

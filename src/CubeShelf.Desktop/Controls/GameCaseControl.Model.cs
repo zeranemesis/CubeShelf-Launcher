@@ -12,10 +12,26 @@ public sealed partial class GameCaseControl
     // This is a reader for the bundled, known model, not an arbitrary GLTF importer.
     // Geometry and material colors are shared; every case owns only its game textures.
     private static readonly Lazy<ImportedCase?> ImportedModel = new(LoadImportedCase);
+    private ModelDraw[]? _modelCommands;
+    private Rect _modelShadowBounds;
+    private (double Width, double Height, double Yaw, double Pitch, double Lift, double Glare, Point Pointer, Bitmap? Front, Bitmap? Back, Bitmap? Spine, bool Detail) _modelDrawingKey;
 
     private bool RenderImportedModel(DrawingContext context)
     {
         if (ImportedModel.Value is not { } model) return false;
+        var key = (Bounds.Width, Bounds.Height, _yaw, _pitch, _lift, _glare,
+            _glare > .01 ? _pointerPosition : default, _front, _back, _spine, IsInteractive);
+        if (_modelCommands is null || key != _modelDrawingKey)
+        {
+            BuildImportedCommands(model);
+            _modelDrawingKey = key;
+        }
+        DrawImportedGeometry(context);
+        return true;
+    }
+
+    private void BuildImportedCommands(ImportedCase model)
+    {
         var commands = new List<ModelDraw>();
         var boundsPoints = new List<Point>();
         foreach (var mesh in model.Meshes)
@@ -27,7 +43,9 @@ public sealed partial class GameCaseControl
             if (mesh.Overlay && Rotate(new Vec3(0, 0, 1), _yaw, _pitch).Z <= 0) continue;
             if (mesh.TextureQuad is { } quad)
             {
-                var normal = Rotate(mesh.Triangles[0].Normal, _yaw, _pitch);
+                // The supplied spine insert is double-sided and its triangles
+                // wind inward. Use its physical outward normal for visibility.
+                var normal = Rotate(mesh.TextureSlot == "spine" ? new Vec3(-1, 0, 0) : mesh.Triangles[0].Normal, _yaw, _pitch);
                 if (normal.Z <= .00001) continue;
                 var vertices = quad.Select(index => projected[index]).ToArray();
                 commands.Add(new ModelDraw(1, vertices.Average(vertex => vertex.World.Z),
@@ -46,12 +64,18 @@ public sealed partial class GameCaseControl
                     vertices.Select(vertex => vertex.Screen).ToArray(), mesh.Palette[shade], null));
             }
         }
-        DrawContactShadow(context, ComputeBounds(boundsPoints));
+        _modelShadowBounds = ComputeBounds(boundsPoints);
         // Inserts lie outside the shell; latches and clear film lie outside the
         // inserts. Respect those model layers before painter sorting. Sorting a
         // whole insert against individual shell triangles by average Z alone
         // would incorrectly cover portions of the insert at oblique angles.
-        foreach (var command in commands.OrderBy(command => command.Layer).ThenBy(command => command.Depth))
+        _modelCommands = commands.OrderBy(command => command.Layer).ThenBy(command => command.Depth).ToArray();
+    }
+
+    private void DrawImportedGeometry(DrawingContext context)
+    {
+        DrawContactShadow(context, _modelShadowBounds);
+        foreach (var command in _modelCommands!)
         {
             if (command.TextureSlot is { } slot)
             {
@@ -63,12 +87,13 @@ public sealed partial class GameCaseControl
                 }
                 var outline = BuildGeometry(command.Points);
                 using (context.PushGeometryClip(outline))
-                    DrawTexturedQuadMesh(context, texture, command.Points, slot == "spine" ? 2 : 8, slot == "spine" ? 10 : 12);
+                    DrawTexturedQuadMesh(context, texture, command.Points,
+                        slot == "spine" ? 2 : IsInteractive ? 8 : 3,
+                        slot == "spine" ? 6 : IsInteractive ? 12 : 4);
                 DrawPointerGlare(context, outline, command.Points, _pointerPosition, _glare * .45);
             }
             else context.DrawGeometry(command.Brush, null, BuildGeometry(command.Points));
         }
-        return true;
     }
 
     private static ImportedCase? LoadImportedCase()
