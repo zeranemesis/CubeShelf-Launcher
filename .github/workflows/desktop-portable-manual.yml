@@ -2,6 +2,9 @@ name: Build portable desktop previews (manual)
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "desktop-build-*"
 
 permissions:
   contents: read
