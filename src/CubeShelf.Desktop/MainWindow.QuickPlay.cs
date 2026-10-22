@@ -42,7 +42,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        var intent = new PlayIntent(game, P7("Préparation…", "Getting ready…"));
+        var intent = new PlayIntent(game, P7("Préparation…", "Getting ready…"), readyAction is not null);
         _playIntents.Add(key, intent);
         RefreshQuickPlayUi();
         try
@@ -223,7 +223,9 @@ public sealed partial class MainWindow
     private string QuickPlayHint(GameCatalogEntry game)
     {
         if (RunningGameFor(game) is not null) return P7("En cours de jeu", "Playing now");
-        if (PlayIntentFor(game) is { } intent) return intent.Status + P7(" Le jeu se lancera automatiquement.", " The game will start automatically.");
+        if (PlayIntentFor(game) is { } intent) return intent.Status + (intent.OpensOnline
+            ? P7(" Les salons s’ouvriront automatiquement.", " The room list will open automatically.")
+            : P7(" Le jeu se lancera automatiquement.", " The game will start automatically."));
         if (!DiscImageService.Inspect(game.DiscImage, game).Supported)
             return P7("Choisis ton fichier de jeu une fois. CubeShelf s’occupe de la suite.", "Choose your game file once. CubeShelf handles the rest.");
         if (!CanPlay(game))
@@ -266,8 +268,9 @@ public sealed partial class MainWindow
         foreach (var intent in _playIntents.Values) intent.Cancellation.Cancel();
     }
 
-    private sealed class PlayIntent(GameCatalogEntry game, string status)
+    private sealed class PlayIntent(GameCatalogEntry game, string status, bool opensOnline = false)
     {
+        public bool OpensOnline { get; } = opensOnline;
         public GameCatalogEntry Game { get; } = game;
         public string Status { get; set; } = status;
         public CancellationTokenSource Cancellation { get; } = new();
