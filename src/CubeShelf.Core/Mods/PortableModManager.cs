@@ -141,7 +141,7 @@ public sealed class PortableModManager
         return new ModInstallPlan(rootMod.Id, _gameId, packages, warnings, incompatible);
     }
 
-    public Task<IReadOnlyList<PortableInstalledMod>> InstallPlanAsync(ModInstallPlan plan,
+    public async Task<IReadOnlyList<PortableInstalledMod>> InstallPlanAsync(ModInstallPlan plan,
         bool allowIncompatible = false, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
         if (!string.Equals(plan.GameId, _gameId, StringComparison.OrdinalIgnoreCase) || plan.Packages.Count == 0)
@@ -150,6 +150,7 @@ public sealed class PortableModManager
             throw new InvalidOperationException("Le plan entre en conflit avec des mods actifs et requiert une confirmation explicite.");
 
         var transaction = Path.Combine(_root, ".transaction-" + Guid.NewGuid().ToString("N"));
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
         var stagedRoot = Path.Combine(transaction, "staged");
         var backupRoot = Path.Combine(transaction, "backups");
         var priorState = File.Exists(_state) ? File.ReadAllBytes(_state) : null;
@@ -197,7 +198,7 @@ public sealed class PortableModManager
             foreach (var package in plan.Packages)
                 if (File.Exists(package.ArchivePath)) File.Delete(package.ArchivePath);
             progress?.Report(1);
-            return Task.FromResult<IReadOnlyList<PortableInstalledMod>>(installed);
+            return installed;
         }
         catch
         {
@@ -228,6 +229,7 @@ public sealed class PortableModManager
         try
         {
             await client.DownloadAsync(mod, temporary, progress, cancellationToken);
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
             string sha;
             await using (var stream = File.OpenRead(temporary))
                 sha = Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken)).ToLowerInvariant();

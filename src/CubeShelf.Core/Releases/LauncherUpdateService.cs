@@ -64,6 +64,7 @@ public sealed class LauncherUpdateService
         var destination = Path.Combine(directory,
             $"CubeShelf-{update.LatestVersion}-{CurrentOs()}-{CurrentArchitecture()}{suffix}");
         var temporary = destination + ".part";
+        DownloadTransfer.Current?.BeginDownload(artifact.Size);
         using var response = await _http.GetAsync(artifact.Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
@@ -81,18 +82,22 @@ public sealed class LauncherUpdateService
                 long total = 0;
                 while (true)
                 {
+                    if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken).ConfigureAwait(false);
                     var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                     if (read == 0) break;
+                    if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken).ConfigureAwait(false);
                     total += read;
                     if (total > artifact.Size)
                         throw new InvalidDataException("La mise à jour dépasse la taille annoncée.");
                     await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                    DownloadTransfer.Current?.RecordDisk(read);
                     progress?.Report((double)total / artifact.Size);
                 }
                 if (total != artifact.Size)
                     throw new InvalidDataException("Téléchargement de mise à jour incomplet.");
             }
             string hash;
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
             await using (var file = File.OpenRead(temporary))
                 hash = Convert.ToHexString(await SHA256.HashDataAsync(file, cancellationToken).ConfigureAwait(false));
             if (!hash.Equals(artifact.Sha256, StringComparison.OrdinalIgnoreCase))

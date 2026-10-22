@@ -212,12 +212,22 @@ public sealed partial class MainWindow
             };
             if (!await dialog.ShowDialog<bool>(this)) return;
 
-            var progress = new Progress<double>(value =>
-                LauncherUpdateStatusText.Text = P7($"Téléchargement vérifié… {value:P0}", $"Verified download… {value:P0}"));
-            var archive = await _launcherUpdates.DownloadAsync(update, progress, cancellationToken);
-            var result = _launcherUpdateInstaller.Launch(archive, update.LatestVersion, Environment.ProcessId);
-            LauncherUpdateStatusText.Text = result.Message;
-            if (result.ShutdownRequired) Close();
+            if (_portableQueue is null) return;
+            string? archive = null;
+            var queued = _portableQueue.Enqueue("launcher-update", $"CubeShelf {update.LatestVersion}", "LAUNCHER",
+                P7("Mise à jour du logiciel · CubeShelf redémarrera pour terminer l’installation.",
+                   "Launcher update · CubeShelf will restart to finish installation."),
+                async (progress, token) => archive = await _launcherUpdates.DownloadAsync(update, progress, token),
+                after: async () => await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    var result = _launcherUpdateInstaller.Launch(archive!, update.LatestVersion, Environment.ProcessId);
+                    LauncherUpdateStatusText.Text = result.Message;
+                    if (result.ShutdownRequired) QuitCompletely();
+                }), referenceId: "CubeShelf");
+            LauncherUpdateStatusText.Text = queued is null
+                ? P7("La mise à jour est déjà dans la file.", "The update is already queued.")
+                : P7("Mise à jour ajoutée aux téléchargements.", "Update added to downloads.");
+            ParityShowDownloads(this, new RoutedEventArgs());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exception)

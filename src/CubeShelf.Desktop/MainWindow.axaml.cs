@@ -784,6 +784,11 @@ public sealed partial class MainWindow : Window
     private void ApplyPreferences()
     {
         _loadingSettings = true;
+        if (_portableQueue is not null)
+        {
+            _portableQueue.BandwidthLimitBytesPerSecond = _preferences.DownloadBandwidthLimit;
+            DownloadManager.Refresh();
+        }
         LanguagePicker.SelectedIndex = _preferences.Language.ToLowerInvariant() switch { "fr" => 1, "en" => 2, _ => 0 };
         ThemePicker.SelectedIndex = _preferences.Theme.Equals("light", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;

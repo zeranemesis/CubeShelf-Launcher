@@ -374,6 +374,7 @@ public sealed class GitHubGameUpdateService : IDisposable
             {
                 response.EnsureSuccessStatusCode();
                 var total = response.Content.Headers.ContentLength;
+                DownloadTransfer.Current?.BeginDownload(total);
                 if (total > MaximumSourceArchiveBytes)
                     throw new InvalidDataException("L’archive source dépasse la taille autorisée.");
 
@@ -383,9 +384,12 @@ public sealed class GitHubGameUpdateService : IDisposable
                 long done = 0;
                 while (true)
                 {
+                    if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken).ConfigureAwait(false);
                     var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                     if (read <= 0) break;
+                    if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken).ConfigureAwait(false);
                     await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                    DownloadTransfer.Current?.RecordDisk(read);
                     done += read;
                     if (done > MaximumSourceArchiveBytes)
                         throw new InvalidDataException("L’archive source dépasse la taille autorisée.");
@@ -396,6 +400,7 @@ public sealed class GitHubGameUpdateService : IDisposable
 
             if (Directory.Exists(staging)) Directory.Delete(staging, true);
             Directory.CreateDirectory(staging);
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
             progress?.Report(.76);
             SecureArchiveExtractor.Extract(zip, staging, SourceExtractionLimits);
             cancellationToken.ThrowIfCancellationRequested();

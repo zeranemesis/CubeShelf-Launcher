@@ -235,6 +235,7 @@ public sealed class GameBananaClient
         var expected = response.Content.Headers.ContentRange?.Length ??
             (response.Content.Headers.ContentLength is long length ? existing + length : null);
         if (expected > MaximumBytes) throw new InvalidDataException("L’archive du mod dépasse 2 Gio.");
+        DownloadTransfer.Current?.BeginDownload(expected, existing);
         await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
         await using var output = new FileStream(destination, append ? FileMode.Append : FileMode.Create,
             FileAccess.Write, FileShare.None, 128 * 1024, true);
@@ -242,11 +243,14 @@ public sealed class GameBananaClient
         long total = existing;
         while (true)
         {
+            if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken);
             var read = await input.ReadAsync(buffer, cancellationToken);
             if (read == 0) break;
+            if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken);
             total += read;
             if (total > MaximumBytes) throw new InvalidDataException("L’archive du mod dépasse 2 Gio.");
             await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+            DownloadTransfer.Current?.RecordDisk(read);
             if (expected is > 0) progress?.Report(Math.Clamp((double)total / expected.Value, 0, 1));
         }
     }

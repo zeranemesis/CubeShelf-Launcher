@@ -4,6 +4,13 @@ CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’inte
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
+## Gestion des téléchargements
+
+La page Téléchargements (Ctrl+4) affiche le transfert actif avec sa jaquette,
+les débits réseau et disque, une file réorganisable, la pause/reprise et une limite
+de débit sauvegardée. Les étapes de vérification et d’installation restent visibles
+jusqu’à la fin réelle de l’opération. Voir [DOWNLOADS.md](DOWNLOADS.md).
+
 ## Installation Windows
 
 L’artefact recommandé est `CubeShelf-Setup-x64.exe`. L’installation est effectuée sans droits administrateur dans `%LOCALAPPDATA%\Programs\CubeShelf`, crée une entrée de désinstallation et peut ajouter un raccourci Bureau.
