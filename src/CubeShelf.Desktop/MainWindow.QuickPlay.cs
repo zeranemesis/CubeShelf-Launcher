@@ -240,6 +240,7 @@ public sealed partial class MainWindow
         if (_quickPlayClosing) return;
         foreach (var card in _parityCards) ApplyQuickPlayCard(card);
         RefreshBigPictureStatus();
+        RefreshBigPictureResumeStatus();
         if (_selectedGame is not { } game) return;
         var busy = PlayIntentFor(game) is not null;
         PlayButton.Content = QuickPlayLabel(game);

@@ -273,6 +273,19 @@ public sealed class PortableModManager
         Update(id, item => item with { Enabled = enabled });
     }
 
+    public void SetActiveSelection(IEnumerable<int> enabledIds)
+    {
+        ArgumentNullException.ThrowIfNull(enabledIds);
+        var selected = enabledIds.ToHashSet();
+        var installed = GetInstalled();
+        var missing = selected.Except(installed.Where(mod => Directory.Exists(mod.ContentRoot)).Select(mod => mod.Id)).ToArray();
+        if (missing.Length > 0) throw new InvalidOperationException("Mods absents du profil : " + string.Join(", ", missing));
+        var disabled = GetPlayerDisabled().Where(id => !selected.Contains(id)).Order().ToArray();
+        Save(installed.Select(mod => mod with { Enabled = selected.Contains(mod.Id) }).ToArray());
+        AtomicWrite(_playerDisabled, JsonSerializer.Serialize(disabled));
+        WriteActiveList();
+    }
+
     public void SetPriority(int id, int priority) => Update(id, item => item with { Priority = priority });
 
     public void Uninstall(int id)
@@ -307,10 +320,10 @@ public sealed class PortableModManager
     // Dolphin-style texture packs land here, and so does an archive with one
     // level too many. Reported, never blocked - the disc may gain new files, and
     // only the player knows what they meant to install.
-    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout()
+    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout(bool includeDisabled = false)
     {
         var warnings = new List<PortableModLayoutWarning>();
-        foreach (var mod in GetInstalled().Where(item => item.Enabled && Directory.Exists(item.ContentRoot)))
+        foreach (var mod in GetInstalled().Where(item => (includeDisabled || item.Enabled) && Directory.Exists(item.ContentRoot)))
         {
             var entries = Directory.EnumerateFileSystemEntries(mod.ContentRoot)
                 .Select(Path.GetFileName).OfType<string>().ToArray();

@@ -327,6 +327,7 @@ public sealed partial class MainWindow : Window
 
         if (_sessions.RunningGameIds.Count == 0)
         {
+            RefreshBigPictureResume();
             if (WindowState == WindowState.Minimized) WindowState = _bigPictureActive ? WindowState.FullScreen : WindowState.Normal;
             Show();
             Activate();

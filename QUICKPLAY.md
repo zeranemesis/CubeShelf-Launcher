@@ -68,8 +68,8 @@ par défaut sur sa fiche.
 L’étagère garde au plus sept boîtiers chargés et libère leurs images en quittant
 Big Picture. La vue vide conserve le bouton de retour au bureau.
 
-La manette est lue uniquement lorsque Big Picture a le focus, hors des dialogues
-et des parties. Une pression maintenue ne déclenche pas plusieurs lancements.
+La manette est lue uniquement lorsque CubeShelf ou un de ses dialogues Big Picture
+a le focus, hors des parties. Une pression maintenue ne déclenche pas plusieurs lancements.
 La fenêtre retrouve son état et ses dimensions précédents en quittant le mode ;
 le retour après une partie conserve le plein écran. La configuration initiale
 du fichier de jeu utilise toujours le sélecteur de fichiers du système.
@@ -95,10 +95,10 @@ signalés et l’accès à l’installation passe par le catalogue existant.
 
 **Jouer en ligne**, sur Mario Party 4, prépare le disque, le moteur et les données
 manquantes puis ouvre la page des salons en plein écran, sans lancer une partie
-locale. **Créer une room** permet de choisir les mods de cette room ; les salons
+locale. **Créer une partie** permet de choisir les mods de cette room ; les salons
 publics peuvent être rejoints depuis la liste avec le contrôle existant des mods.
 La barre de retour, Échap ou B ramène à la collection. Les actions des sous-pages
-sont accessibles à la manette ; les champs texte peuvent nécessiter un clavier.
+sont accessibles à la manette ; les champs texte disposent du clavier à l’écran.
 
 Le compagnon Windows PartyBoard doit déclarer les capacités nécessaires. Les
 messages existants indiquent un moteur trop ancien, un disque absent ou un relais
@@ -106,6 +106,54 @@ indisponible. Une room privée avec invitations utilise les réglages d’identi
 de présence et d’amis existants ; une room publique ne nécessite pas d’ajouter un
 ami. Les participants doivent disposer de disques et versions compatibles.
 Aucune partie entre deux machines n’a été validée dans cette modification.
+
+### Accueil et navigation à la manette
+
+Big Picture démarre sur **Reprendre** : derniers jeux joués, lancement direct,
+recherche, bibliothèque 3D, amis et paramètres. Les variantes sont regroupées
+avec leur jeu de base pour le classement par dernière partie. Les invitations
+réellement reçues d’amis apparaissent sur l’accueil et utilisent le même parcours
+de connexion que la page Amis. Aucun ami ou salon fictif n’est ajouté.
+
+Dans les pages et les dialogues de CubeShelf : haut/bas parcourt les commandes,
+gauche/droite modifie listes, choix et curseurs, A valide et B revient ou ferme
+le dialogue. A sur un champ texte ouvre le clavier à l’écran ; le bouton
+**Clavier** permet aussi de l’ouvrir. AZERTY, majuscules/minuscules, chiffres,
+symboles, accents, espace et effacement sont disponibles. Le texte n’est appliqué
+qu’avec **Valider** ; les mots de passe restent masqués. Les fenêtres système de
+fichiers et les fenêtres externes de PartyBoard restent gérées par leur système.
+
+### Profils de mods
+
+Dans **Choisir les mods**, nommer puis enregistrer la sélection permet de créer
+des profils tels que **Mes plateaux** et **Entre amis**, séparés pour chaque
+bibliothèque de mods. **Jeu original** est disponible sans création de profil.
+**Appliquer** remplace la sélection active ; un profil qui référence des mods
+absents ou incompatibles est refusé avant l’application. Supprimer un profil ne
+désinstalle aucun mod. Les profils n’altèrent pas les priorités des mods et ne
+remplacent pas la sélection spécifique d’un salon en ligne.
+
+### Salons simplifiés et vérification avant connexion
+
+L’hôte d’un **salon public** peut copier un code de huit caractères, par exemple
+`ABCD-1234`. Le code recherche ce salon dans l’annuaire des disques et moteurs
+compatibles ; il ne publie ni ne rend accessible un salon privé. Les collisions
+sont refusées et la liste permet alors de choisir le salon. Un salon privé garde
+son invitation complète, reçue dans Amis.
+
+Avant de rejoindre un salon public, un récapitulatif présente les mods présents,
+absents et d’une autre version. **Installer les mods requis et rejoindre** utilise
+le parcours existant puis recompare les empreintes. Disque, moteur et état du
+salon sont relus avant et après cette préparation ; un salon fermé, modifié ou
+incompatible ne déclenche pas la connexion. Fermer le récapitulatif annule la
+tentative et les opérations qui acceptent l’annulation. Les invitations privées
+ont également un récapitulatif ; PartyBoard compare leurs disques et versions
+lors de la connexion, avant d’autoriser le lancement.
+
+L’état « joueurs prêts » vient de PartyBoard, après ses contrôles de compatibilité.
+CubeShelf n’invente aucun état de disponibilité et ne démarre pas automatiquement
+une partie. Les aperçus du dialogue de vérification utilisent un salon d’exemple ;
+aucun salon n’a été créé pour les captures et aucune partie à deux PC n’a été validée.
 
 Tests du parcours :
 

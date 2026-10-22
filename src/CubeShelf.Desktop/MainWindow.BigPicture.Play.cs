@@ -13,10 +13,13 @@ public sealed partial class MainWindow
 {
     private readonly Dictionary<Control, Thickness> _bigPicturePageMargins = new();
     private GameCatalogEntry? _bigPictureModsGame;
+    private bool _bigPictureReturnHome;
 
     private void UpdateBigPictureSubnav(Control view)
     {
         if (BigPictureSubnav is null) return;
+        if (view == BigPictureHomeView) _bigPictureReturnHome = true;
+        else if (view == BigPictureView) _bigPictureReturnHome = false;
         var show = _bigPictureActive && view != BigPictureView;
         BigPictureSubnav.IsVisible = show;
         foreach (var (page, margin) in _bigPicturePageMargins) page.Margin = margin;
@@ -25,12 +28,17 @@ public sealed partial class MainWindow
         _bigPicturePageMargins[view] = view.Margin;
         view.Margin = new Thickness(view.Margin.Left, view.Margin.Top + 64, view.Margin.Right, view.Margin.Bottom);
         BigPictureSubnavTitle.Text = "CubeShelf · " + P7("Big Picture", "Big Picture");
-        BigPictureReturnButton.Content = P7("← Retour à la collection · Échap / B", "← Back to collection · Esc / B");
+        BigPictureReturnButton.Content = view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
+            : _bigPictureReturnHome ? P7("← Accueil · Échap / B", "← Home · Esc / B")
+            : P7("← Collection · Échap / B", "← Collection · Esc / B");
+        BigPictureKeyboardButton.Content = P7("Clavier", "Keyboard");
     }
 
     private void ReturnToBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        if (BigPictureHomeView.IsVisible) { ExitBigPicture(this, args); return; }
+        if (_bigPictureReturnHome) { OpenBigPictureHome(this, args); return; }
         RefreshBigPictureGame();
         ShowParityView(BigPictureView);
         BigPicturePlayButton.Focus();
@@ -51,12 +59,15 @@ public sealed partial class MainWindow
         if (_bigPictureModsGame is not { } game) return;
         var manager = new PortableModManager(_paths, game.ModLibraryId);
         var disabled = manager.GetPlayerDisabled().ToHashSet();
-        var unreachable = manager.AnalyzeLayout().Select(item => item.Id).ToHashSet();
+        var unreachable = manager.AnalyzeLayout(includeDisabled: true).Select(item => item.Id).ToHashSet();
+        unreachable.ExceptWith(_catalogGames.Where(item => item.DiscPatch is not null)
+            .Select(item => item.DiscPatch!.GameBananaModId));
         var mods = manager.GetInstalled().OrderByDescending(mod => mod.Priority).ThenBy(mod => mod.Name).ToArray();
         BigPictureModsTitle.Text = game.Title + " · Mods";
         BigPictureBrowseModsButton.Content = P7("Trouver et installer des mods", "Find and install mods");
         BigPictureModsSummary.Text = P7("Choisis les mods actifs pour tes prochaines parties. La création d’un salon propose aussi sa propre sélection.",
             "Choose active mods for your next games. Room creation also offers its own selection.");
+        RefreshBigPictureProfiles();
         BigPictureModChoices.Children.Clear();
         foreach (var mod in mods)
         {
@@ -122,22 +133,44 @@ public sealed partial class MainWindow
 
     private void HandleBigPicturePageInput(int input)
     {
-        if (input == 6) { ReturnToBigPicture(this, new RoutedEventArgs()); return; }
-        var page = ContentViews.FirstOrDefault(view => view.IsVisible);
-        if (page is null) return;
-        var controls = page.GetVisualDescendants().OfType<Control>()
-            .Where(control => control.IsEffectivelyVisible && control.IsEnabled && control.Focusable
-                && control is Button or TextBox or ComboBox).Append(BigPictureReturnButton).ToArray();
-        var focused = Array.FindIndex(controls, control => control.IsFocused || control.IsKeyboardFocusWithin);
+        if (_bigPictureKeyboardWindow is not null) { HandleBigPictureKeyboardInput(input); return; }
+        var window = BigPictureInputWindow();
+        if (input == 6)
+        {
+            if (window != this) window.Close();
+            else if (BigPictureHomeView.IsVisible) ExitBigPicture(this, new RoutedEventArgs());
+            else ReturnToBigPicture(this, new RoutedEventArgs());
+            return;
+        }
+        var controls = BigPicturePageControls();
+        var focused = Array.FindIndex(controls, control => control.IsFocused);
+        if (focused < 0) focused = Array.FindIndex(controls, control => control.IsKeyboardFocusWithin);
+        if (focused < 0 && input == 5 && controls.Length > 0)
+        {
+            focused = 0;
+            controls[focused].Focus();
+            controls[focused].BringIntoView();
+        }
         if (input is >= 1 and <= 4 && controls.Length > 0)
         {
+            if (focused >= 0 && input is 1 or 2)
+            {
+                var change = input == 1 ? -1 : 1;
+                if (controls[focused] is ComboBox combo && combo.ItemCount > 0) { combo.SelectedIndex = (combo.SelectedIndex + change + combo.ItemCount) % combo.ItemCount; return; }
+                if (controls[focused] is ListBox list && list.ItemCount > 0) { list.SelectedIndex = (list.SelectedIndex + change + list.ItemCount) % list.ItemCount; return; }
+                if (controls[focused] is Slider slider) { slider.Value = Math.Clamp(slider.Value + change * slider.SmallChange, slider.Minimum, slider.Maximum); return; }
+            }
             var step = input is 1 or 3 ? -1 : 1;
-            controls[(Math.Max(0, focused) + step + controls.Length) % controls.Length].Focus();
+            var next = focused < 0 ? step < 0 ? controls.Length - 1 : 0
+                : (focused + step + controls.Length) % controls.Length;
+            controls[next].Focus();
+            controls[next].BringIntoView();
         }
         else if (input == 5 && focused >= 0)
         {
             if (controls[focused] is CheckBox check) check.IsChecked = check.IsChecked != true;
             else if (controls[focused] is RadioButton radio) radio.IsChecked = true;
+            else if (controls[focused] is TextBox text) OpenBigPictureKeyboard(text);
             else if (controls[focused] is Button button) button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             else if (controls[focused] is ComboBox combo && combo.ItemCount > 0)
                 combo.SelectedIndex = (combo.SelectedIndex + 1) % combo.ItemCount;

@@ -74,6 +74,26 @@
     </Border>
 
     <Grid x:Name="ViewHost" Grid.Column="1">
+      <Grid x:Name="BigPictureHomeView" Classes="view" IsVisible="False" RowDefinitions="Auto,*" Background="{DynamicResource Bg}">
+        <StackPanel Margin="36,24" Spacing="18">
+          <TextBlock x:Name="BigPictureHomeTitle" FontSize="34" FontWeight="Bold" />
+          <WrapPanel>
+            <Button x:Name="BigPictureCollectionButton" Click="OpenBigPictureCollection" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <Button x:Name="BigPictureHomeFriendsButton" Click="OpenBigPictureFriends" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <Button x:Name="BigPictureHomeSettingsButton" Click="OpenBigPictureSettings" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <TextBox x:Name="BigPictureHomeSearch" Width="280" TextChanged="BigPictureHomeSearchChanged" Margin="0,0,10,8" FontSize="18" />
+          </WrapPanel>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Margin="36,0,36,24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="18">
+            <TextBlock x:Name="BigPictureResumeTitle" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock x:Name="BigPictureResumeHint" FontSize="16" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" />
+            <WrapPanel x:Name="BigPictureResumeCards" />
+            <TextBlock x:Name="BigPictureHomeInvitesTitle" FontSize="24" FontWeight="SemiBold" />
+            <StackPanel x:Name="BigPictureHomeInvites" Spacing="12" />
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
       <ThemeVariantScope x:Name="BigPictureView" Classes="view" RequestedThemeVariant="Light" IsVisible="False">
       <Grid Background="#F5F0EE" RowDefinitions="Auto,*,Auto">
         <controls:ShelfContourBackground Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0.55" />
@@ -87,6 +107,7 @@
           </StackPanel>
           <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="BigPictureHomeButton" Click="OpenBigPictureHome" FontSize="14" Padding="16,10" />
             <Button x:Name="BigPictureLayoutButton" Click="ToggleBigPictureLayout" FontSize="14" Padding="16,10" />
             <Button x:Name="BigPictureExitButton" Click="ExitBigPicture" FontSize="14" Padding="16,10" />
           </StackPanel>
@@ -126,6 +147,14 @@
         <StackPanel Margin="40,28" Spacing="10">
           <TextBlock x:Name="BigPictureModsTitle" FontSize="30" FontWeight="Bold" />
           <TextBlock x:Name="BigPictureModsSummary" FontSize="17" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" />
+          <WrapPanel>
+            <ComboBox x:Name="BigPictureProfilePicker" Width="250" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureApplyProfileButton" Click="ApplyBigPictureProfile" Margin="0,4,8,4" />
+            <TextBox x:Name="BigPictureProfileNameBox" Width="220" MaxLength="80" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureSaveProfileButton" Click="SaveBigPictureProfile" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureDeleteProfileButton" Click="DeleteBigPictureProfile" Margin="0,4,8,4" />
+          </WrapPanel>
+          <TextBlock x:Name="BigPictureProfileStatus" TextWrapping="Wrap" Foreground="{DynamicResource Accent}" />
         </StackPanel>
         <ScrollViewer Grid.Row="1" Margin="40,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel x:Name="BigPictureModChoices" Spacing="12" />
@@ -562,6 +591,16 @@
             <Border x:Name="OnlineGate" IsVisible="False" Padding="16" CornerRadius="12" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Warning}" BorderThickness="1">
               <TextBlock x:Name="OnlineGateText" TextWrapping="Wrap" />
             </Border>
+            <Border Padding="16" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="10">
+                <TextBlock x:Name="RoomCodeHeading" FontSize="19" FontWeight="SemiBold" />
+                <TextBlock x:Name="RoomCodeHelp" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                <WrapPanel>
+                  <TextBox x:Name="RoomCodeBox" Width="280" MaxLength="80" Margin="0,0,10,8" />
+                  <Button x:Name="JoinRoomCodeButton" Click="JoinRoomByCode" Margin="0,0,10,8" />
+                </WrapPanel>
+              </StackPanel>
+            </Border>
             <!-- The room itself, shown here rather than in a window of its own: the companion runs
                  headless and room.json says what its window would have shown. -->
             <Border x:Name="MyRoomPanel" IsVisible="False" Padding="16" CornerRadius="14" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
@@ -607,6 +646,11 @@
                   <Button x:Name="MyRoomRenameButton" Content="{DynamicResource OnlineRename}" Click="RenameMyRoom" />
                 </StackPanel>
                 <TextBlock x:Name="MyRoomMessage" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                <TextBlock x:Name="MyRoomReadySummary" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <WrapPanel>
+                  <TextBlock x:Name="MyRoomJoinCode" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,8" />
+                  <Button x:Name="CopyMyRoomCodeButton" Click="CopyMyRoomJoinCode" Margin="0,0,0,8" />
+                </WrapPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <Button x:Name="MyRoomStartButton" Classes="primary" Content="{DynamicResource OnlineStart}" Click="StartMyRoom" />
                   <Button x:Name="MyRoomModsButton" Content="{DynamicResource OnlineRoomMods}" Click="ChooseMyRoomMods" />
@@ -970,7 +1014,10 @@
       <Border x:Name="BigPictureSubnav" IsVisible="False" VerticalAlignment="Top" Height="64" Background="{DynamicResource Panel}" Padding="24,8">
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock x:Name="BigPictureSubnavTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
-          <Button x:Name="BigPictureReturnButton" Grid.Column="1" Click="ReturnToBigPicture" Padding="18,10" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Button x:Name="BigPictureKeyboardButton" Click="OpenFocusedBigPictureKeyboard" Padding="16,10" />
+            <Button x:Name="BigPictureReturnButton" Click="ReturnToBigPicture" Padding="18,10" />
+          </StackPanel>
         </Grid>
       </Border>
       <!-- THEME TRANSITION -->

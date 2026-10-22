@@ -24,10 +24,12 @@ public sealed partial class MainWindow
     {
         AddHandler(KeyDownEvent, BigPictureKeyDown, RoutingStrategies.Tunnel);
         BigPictureShelf.SelectionRequested += SelectBigPictureGame;
+        InitializeBigPictureTextFocus();
         Closed += (_, _) =>
         {
             _bigPictureTimer?.Stop();
             BigPictureShelf.Dispose();
+            DisposeBigPictureHomeImages();
             _bigPictureGamepad.Dispose();
         };
     }
@@ -52,20 +54,18 @@ public sealed partial class MainWindow
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
         _bigPictureActive = true;
-        // Win32 can arrange synchronously when visibility or fullscreen changes.
-        // Realize the cases before exposing the shelf to either operation.
-        RefreshBigPictureGame();
-        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
+        // Start with the light home page. The 3D shelf is realized on demand,
+        // before OpenBigPictureCollection exposes it to native fullscreen layout.
         DesktopSidebar.IsVisible = false;
         Grid.SetColumn(ViewHost, 0);
         Grid.SetColumnSpan(ViewHost, 2);
-        ShowParityView(BigPictureView);
+        ShowParityView(BigPictureHomeView);
         WindowState = WindowState.FullScreen;
-        BigPicturePlayButton.Focus();
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         _bigPictureTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(50),
             DispatcherPriority.Input, (_, _) => PollBigPictureGamepad());
         _bigPictureTimer.Start();
+        OpenBigPictureHome(this, new RoutedEventArgs());
     }
 
     private void ExitBigPicture(object? sender, RoutedEventArgs args)
@@ -81,6 +81,7 @@ public sealed partial class MainWindow
         Width = _bigPicturePreviousWidth;
         Height = _bigPicturePreviousHeight;
         BigPictureShelf.Clear();
+        DisposeBigPictureHomeImages();
         BigPictureEntryButton.Focus();
     }
 
@@ -166,7 +167,7 @@ public sealed partial class MainWindow
         if (!_bigPictureActive) return;
         if (!BigPictureView.IsVisible)
         {
-            if (args.Key == Key.Escape) { ReturnToBigPicture(this, new RoutedEventArgs()); args.Handled = true; }
+            if (args.Key == Key.Escape) { HandleBigPicturePageInput(6); args.Handled = true; }
             else if (args.Key is Key.Up or Key.Down && !BigPicturePageHasTextFocus())
             {
                 HandleBigPicturePageInput(args.Key == Key.Up ? 3 : 4);
@@ -190,7 +191,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureLayoutButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureHomeButton, BigPictureLayoutButton, BigPictureExitButton }
         .Where(button => button.IsVisible && button.IsEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -212,7 +213,8 @@ public sealed partial class MainWindow
         BigPictureHelp.Text = connected
             ? P7("← → Choisir   •   A Valider   •   X Retourner   •   Y Vue   •   B Bureau", "← → Browse   •   A Select   •   X Flip   •   Y View   •   B Desktop")
             : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Valider   •   F Retourner   •   V Vue   •   F11 Bureau", "← → Browse   •   ↑ ↓ Actions   •   Enter Select   •   F Flip   •   V View   •   F11 Desktop");
-        if (!IsActive || WindowState == WindowState.Minimized || OwnedWindows.Any(window => window.IsVisible))
+        var inputWindow = BigPictureInputWindow();
+        if (!inputWindow.IsActive || WindowState == WindowState.Minimized)
         {
             _bigPictureLastInput = -1;
             return;
@@ -224,7 +226,7 @@ public sealed partial class MainWindow
         if (input == _bigPictureLastInput && (!direction || now < _bigPictureNextRepeat)) return;
         _bigPictureNextRepeat = now + (input == _bigPictureLastInput ? 180 : 450);
         _bigPictureLastInput = input;
-        if (!BigPictureView.IsVisible) { HandleBigPicturePageInput(input); return; }
+        if (!BigPictureView.IsVisible || inputWindow != this) { HandleBigPicturePageInput(input); return; }
         switch (input)
         {
             case 1: MoveBigPictureGame(-1); break;
