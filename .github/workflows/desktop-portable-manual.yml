@@ -1,0 +1,68 @@
+name: Build portable desktop previews (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cubeshelf-desktop-portable-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  desktop:
+    name: Portable ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            runner: windows-latest
+          - rid: win-arm64
+            runner: windows-latest
+          - rid: linux-x64
+            runner: ubuntu-24.04
+          - rid: linux-arm64
+            runner: ubuntu-24.04
+          - rid: osx-x64
+            runner: macos-15
+          - rid: osx-arm64
+            runner: macos-15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Publish self-contained launcher
+        run: >-
+          dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained true
+          -p:DebugType=None -p:DebugSymbols=false
+          -o publish/${{ matrix.rid }}
+      - name: Publish Windows updater for the same architecture
+        if: startsWith(matrix.rid, 'win-')
+        run: |
+          dotnet publish src/CubeShelf.Updater/CubeShelf.Updater.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish/updater-${{ matrix.rid }}
+          if ($LASTEXITCODE -ne 0) { throw 'Updater publish failed.' }
+          Copy-Item -LiteralPath publish/updater-${{ matrix.rid }}/CubeShelf.Updater.exe -Destination publish/${{ matrix.rid }}/CubeShelf.Updater.exe
+      - name: Assemble portable archive and checksum
+        run: >-
+          ./packaging/Package-Desktop.ps1
+          -RuntimeIdentifier ${{ matrix.rid }}
+          -PublishDirectory publish/${{ matrix.rid }}
+          -OutputDirectory dist/${{ matrix.rid }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeShelf-${{ matrix.rid }}-portable-preview
+          path: |
+            dist/${{ matrix.rid }}/*.zip
+            dist/${{ matrix.rid }}/*.tar.gz
+            dist/${{ matrix.rid }}/*.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
