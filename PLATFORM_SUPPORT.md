@@ -1,5 +1,12 @@
 # Compatibilité PC et Android — audit du 22 octobre 2026
 
+**Suite de l’audit :** la branche de travail contient maintenant un premier
+projet `CubeShelf.Android` et une bibliothèque visuelle `CubeShelf.Mobile`.
+Ils réutilisent le catalogue et le renderer 3D, détectent PartyBoard installé,
+ouvrent son activité locale ou son salon et proposent le téléchargement officiel
+sur ARM64. Les constats d’absence ci-dessous décrivent l’état initial audité.
+Voir `packaging/ANDROID.md` pour les limites de l’aperçu et sa compilation.
+
 Audit des sources GitHub, workflows, releases et du catalogue CubeShelf. Aucun jeu,
 APK ni appareil Android n’a été exécuté. La présence d’une décompilation, d’un
 projet Android ou même d’un APK compilé ne prouve pas qu’un jeu est jouable.

@@ -4,6 +4,26 @@ CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’inte
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
+## Aperçu Android natif
+
+Le projet `src/CubeShelf.Android` propose un premier launcher pour Android 8+
+(ARM64 et x86-64), avec l’étagère 3D et les mêmes jaquettes que sur PC. Le bouton
+Jouer ouvre le port **natif** de Mario Party 4 / PartyBoard installé séparément,
+sans émulateur. Le choix du disque, les sauvegardes et les mods restent dans le
+jeu. Les salons et invitations privées ouvrent son interface Android existante.
+L’APK officiel de PartyBoard est actuellement ARM64 ; CubeShelf masque son
+installation sur les appareils incompatibles.
+
+Les autres jeux apparaissent avec leur disponibilité réelle. Cette première
+version mobile ne reprend pas encore les amis, profils de mods et la file de
+téléchargements du launcher PC. Elle n’a pas été validée sur téléphone ; le jeu
+croisé avec le PC est bloqué par le port PartyBoard actuel. Compilation et
+installation : [packaging/ANDROID.md](packaging/ANDROID.md).
+
+Pour les archives PC Windows/Linux/macOS x64 et ARM64, voir
+[packaging/DESKTOP-PORTABLE.md](packaging/DESKTOP-PORTABLE.md). La disponibilité
+des moteurs de jeu reste distincte de celle du launcher.
+
 ## Jouer
 
 Le bouton de chaque jaquette permet aussi de **jouer directement depuis la

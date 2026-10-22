@@ -100,7 +100,8 @@ public sealed partial class GameCaseControl
     {
         try
         {
-            using var resource = AssetLoader.Open(new Uri("avares://CubeShelf/Assets/Models/Jaquette_GameCube_3D_vierge.glb"));
+            var assembly = typeof(GameCaseControl).Assembly.GetName().Name;
+            using var resource = AssetLoader.Open(new Uri($"avares://{assembly}/Assets/Models/Jaquette_GameCube_3D_vierge.glb"));
             using var memory = new MemoryStream();
             resource.CopyTo(memory);
             var bytes = memory.ToArray();

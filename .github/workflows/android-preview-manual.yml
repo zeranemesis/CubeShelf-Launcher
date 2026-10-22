@@ -1,0 +1,84 @@
+name: Build Android previews (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cubeshelf-android-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android:
+    name: APK ${{ matrix.abi }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: android-arm64
+            abi: arm64-v8a
+          - rid: android-x64
+            abi: x86_64
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        id: dotnet
+        with:
+          dotnet-version: "8.0.x"
+      - name: Select the installed .NET 8 SDK
+        env:
+          PREVIEW_DOTNET_VERSION: ${{ steps.dotnet.outputs.dotnet-version }}
+        run: dotnet new globaljson --sdk-version "$PREVIEW_DOTNET_VERSION" --roll-forward latestPatch
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+      - name: Install the .NET Android workload
+        run: dotnet workload install android --skip-manifest-update
+      - name: Create a temporary preview signing key
+        run: |
+          keytool -genkeypair -noprompt \
+            -keystore "$RUNNER_TEMP/cubeshelf-preview.keystore" \
+            -alias androiddebugkey -storepass android -keypass android \
+            -keyalg RSA -keysize 2048 -validity 30 \
+            -dname "CN=CubeShelf Preview, O=CubeShelf, C=FR"
+      - name: Publish the signed preview APK
+        run: |
+          dotnet publish src/CubeShelf.Android/CubeShelf.Android.csproj \
+            -f net8.0-android -c Release -r "${{ matrix.rid }}" \
+            -p:AndroidPackageFormats=apk \
+            -p:AndroidKeyStore=true \
+            -p:AndroidSigningKeyStore="$RUNNER_TEMP/cubeshelf-preview.keystore" \
+            -p:AndroidSigningKeyAlias=androiddebugkey \
+            -p:AndroidSigningStorePass=android -p:AndroidSigningKeyPass=android \
+            -p:AndroidSdkDirectory="$ANDROID_HOME" \
+            -p:JavaSdkDirectory="$JAVA_HOME" \
+            -o "publish/${{ matrix.abi }}"
+      - name: Collect APK and checksum
+        run: |
+          mapfile -t packages < <(find "publish/${{ matrix.abi }}" -maxdepth 1 -type f -name '*-Signed.apk')
+          if [ "${#packages[@]}" -ne 1 ]; then
+            echo "Expected exactly one signed APK, found ${#packages[@]}." >&2
+            exit 1
+          fi
+          mkdir -p dist
+          cp "${packages[0]}" "dist/CubeShelf-android-${{ matrix.abi }}-preview.apk"
+          (cd dist && sha256sum "CubeShelf-android-${{ matrix.abi }}-preview.apk" > "CubeShelf-android-${{ matrix.abi }}-preview.apk.sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeShelf-android-${{ matrix.abi }}-preview
+          path: |
+            dist/*.apk
+            dist/*.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
