@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.0-preview.2 — correction du rendu 3D, non publié
+
+- Correction du crash `DrawingGroupDrawingContext.DrawBitmap` lors du rendu des jaquettes GLB : les textures sont dessinées directement par le compositeur ; seuls les clips et matrices du maillage sont mis en cache. Le modèle 3D et le partage des bitmaps sont conservés.
+- Démarrage direct en Big Picture avec `CubeShelf.exe --big-picture`.
+
 ## 0.17.0-preview.1 — améliorations du launcher, non publié
 
 - Big Picture : retour à la page précédente et à son focus ; navigation manette suspendue quand la fenêtre est masquée ou réduite ou pendant une session de jeu ; recherche des manettes débranchées espacée.

@@ -417,9 +417,15 @@ public sealed partial class GameCaseControl : Control, IDisposable
         IReadOnlyList<Point> quad,
         int columns,
         int rows)
+        => DrawPreparedTextureMesh(context, image, PrepareTexturedQuadMesh(image, quad, columns, rows));
+
+    private static TexturedTriangle[] PrepareTexturedQuadMesh(
+        Bitmap image, IReadOnlyList<Point> quad, int columns, int rows)
     {
         var width = Math.Max(1d, image.Size.Width);
         var height = Math.Max(1d, image.Size.Height);
+        var mesh = new TexturedTriangle[columns * rows * 2];
+        var next = 0;
 
         for (var row = 0; row < rows; row++)
         {
@@ -440,10 +446,11 @@ public sealed partial class GameCaseControl : Control, IDisposable
                 var s11 = new Point(width * u1, height * v1);
                 var s01 = new Point(width * u0, height * v1);
 
-                DrawTexturedTriangle(context, image, s00, s10, s01, d00, d10, d01);
-                DrawTexturedTriangle(context, image, s10, s11, s01, d10, d11, d01);
+                mesh[next++] = PrepareTexturedTriangle(image, s00, s10, s01, d00, d10, d01);
+                mesh[next++] = PrepareTexturedTriangle(image, s10, s11, s01, d10, d11, d01);
             }
         }
+        return mesh;
     }
 
     private static Point Bilinear(IReadOnlyList<Point> quad, double u, double v)
@@ -456,8 +463,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private static Point Lerp(Point a, Point b, double t) =>
         new(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t);
 
-    private static void DrawTexturedTriangle(
-        DrawingContext context,
+    private static TexturedTriangle PrepareTexturedTriangle(
         Bitmap image,
         Point source0,
         Point source1,
@@ -474,13 +480,18 @@ public sealed partial class GameCaseControl : Control, IDisposable
         // overlap instead of leaving a hairline seam. The sub-pixel overlap is redrawn by the
         // later cell with its own correct texture, which is invisible at this scale.
         var clip = BuildGeometry(Expand(destination0, destination1, destination2, CellClipBleed));
-        using (context.PushGeometryClip(clip))
-        using (context.PushTransform(transform))
-        {
-            var imageRect = new Rect(0, 0, image.Size.Width, image.Size.Height);
-            context.DrawImage(image, imageRect, imageRect);
-        }
+        return new TexturedTriangle(transform, clip, new Rect(0, 0, image.Size.Width, image.Size.Height));
     }
+
+    private static void DrawPreparedTextureMesh(DrawingContext context, Bitmap image, TexturedTriangle[] mesh)
+    {
+        foreach (var triangle in mesh)
+            using (context.PushGeometryClip(triangle.Clip))
+            using (context.PushTransform(triangle.Transform))
+                context.DrawImage(image, triangle.ImageRect, triangle.ImageRect);
+    }
+
+    private readonly record struct TexturedTriangle(Matrix Transform, StreamGeometry Clip, Rect ImageRect);
 
     private static Matrix AffineFromTriangles(
         Point s0, Point s1, Point s2,

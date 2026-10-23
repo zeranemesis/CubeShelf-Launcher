@@ -87,17 +87,11 @@ public sealed partial class GameCaseControl
                     continue;
                 }
                 var outline = command.Outline;
-                if (command.TextureDrawing is null)
-                {
-                    var drawing = new DrawingGroup();
-                    using (var recording = drawing.Open())
-                        DrawTexturedQuadMesh(recording, texture, command.Points,
-                            slot == "spine" ? 2 : IsInteractive ? 8 : 3,
-                            slot == "spine" ? 6 : IsInteractive ? 12 : 4);
-                    command.TextureDrawing = drawing;
-                }
+                command.TextureMesh ??= PrepareTexturedQuadMesh(texture, command.Points,
+                    slot == "spine" ? 2 : IsInteractive ? 8 : 3,
+                    slot == "spine" ? 6 : IsInteractive ? 12 : 4);
                 using (context.PushGeometryClip(outline))
-                    command.TextureDrawing.Draw(context);
+                    DrawPreparedTextureMesh(context, texture, command.TextureMesh);
                 DrawPointerGlare(context, outline, command.Points, _pointerPosition, _glare * .45);
             }
             else context.DrawGeometry(command.Brush, null, command.Outline);
@@ -271,6 +265,6 @@ public sealed partial class GameCaseControl
     private sealed record ModelDraw(int Layer, double Depth, Point[] Points, IBrush Brush, string? TextureSlot)
     {
         public StreamGeometry Outline { get; } = BuildGeometry(Points);
-        public DrawingGroup? TextureDrawing { get; set; }
+        public TexturedTriangle[]? TextureMesh { get; set; }
     }
 }

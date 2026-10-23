@@ -1,4 +1,4 @@
-# CubeShelf 0.17.0-preview.1 : améliorations du launcher
+# CubeShelf 0.17.0-preview.2 : améliorations du launcher
 
 Cette passe applique le plan au launcher. Les moteurs, leurs capacités réseau,
 leurs ports et les fichiers des jeux restent hors périmètre.
@@ -11,6 +11,7 @@ leurs ports et les fichiers des jeux restent hors périmètre.
 - **Big Picture** : Retour remonte le parcours et replace le focus. Les
   manettes ne sont plus interrogées pendant une session ou quand la fenêtre est
   masquée/réduite. Les jaquettes GLB et les commandes tactile/manette sont conservées.
+  Le paramètre `--big-picture` permet d’ouvrir directement cette vue.
 - **Téléchargements** : pause, reprise, priorité, limite de débit et phases
   restent dans la page illustrée. Les vues masquées ne rafraîchissent plus leurs
   listes, graphiques ou lectures de stockage. Les transferts eux-mêmes continuent.
@@ -68,6 +69,12 @@ images inutilisées ; les images encore affichées restent en mémoire. Le modè
 réutilise les contours et maillages tant que la pose ne change pas, même quand
 le reflet du pointeur change. Les animations restent pilotées par le compositeur,
 à la demande, avec le plafond existant de 120 mises à jour/s.
+
+La préversion 1 utilisait `DrawingGroup.Open()` pour enregistrer des bitmaps,
+mais Avalonia 11.3.21 lève `NotImplementedException` sur ce chemin. La préversion
+2 conserve plutôt les matrices et clips des triangles, puis soumet les images
+au contexte de rendu normal du compositeur. Aucune exception de rendu n’est
+ignorée pour masquer le défaut.
 
 « Mesurer la consommation » mesure le processus CubeShelf pendant deux secondes,
 avec CPU moyen, mémoire résidente, threads et taille estimée des bitmaps partagés.
