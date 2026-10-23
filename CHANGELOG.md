@@ -10,6 +10,7 @@
 - Point de restauration du profil avant mise à jour, accès aux notes de version et conservation d’une version précédente du launcher : Windows après une mise à jour avec ce nouvel updater, Linux pour les AppImages mises à jour avec ce nouveau helper. L’installation macOS reste manuelle.
 - Une fermeture inattendue propose de réessayer, d’ouvrir les journaux ou de revenir à la bibliothèque. Les arrêts demandés par l’utilisateur ne sont pas présentés comme des plantages.
 - Mobile : partage du cache des jaquettes et mémorisation de la dernière sélection et de la vue.
+- Lecture facultative des manettes SDL2 sur Linux/macOS lorsque cette bibliothèque est installée ; XInput conservé sur Windows.
 
 Aucun moteur ni fichier de jeu modifié. Compilation PC, interface mobile et updater effectuée ; pas de test automatisé ni d’essai physique de manette ou de téléphone dans cette passe. Les gains de performances ne constituent pas une mesure de FPS.
 

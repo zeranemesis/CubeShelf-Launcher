@@ -20,10 +20,11 @@ internal sealed class BigPictureGamepad : IDisposable
     private uint? _controllerIndex;
     private long _nextDiscovery;
     private bool _disposed;
+    private readonly SdlGamepad? _sdl;
 
     public BigPictureGamepad()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows()) { _sdl = SdlGamepad.TryCreate(); return; }
         foreach (var name in new[] { "xinput1_4.dll", "xinput1_3.dll", "xinput9_1_0.dll" })
         {
             if (!NativeLibrary.TryLoad(name, typeof(BigPictureGamepad).Assembly, DllImportSearchPath.System32, out var library)) continue;
@@ -40,6 +41,7 @@ internal sealed class BigPictureGamepad : IDisposable
     public int Read(out bool connected)
     {
         connected = false;
+        if (!_disposed && _sdl is not null) return _sdl.Read(out connected);
         if (_disposed || _getState is null) return 0;
         State state;
         if (_controllerIndex is { } current && _getState(current, out state) == 0)
@@ -80,6 +82,7 @@ internal sealed class BigPictureGamepad : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _sdl?.Dispose();
         if (_library != 0) NativeLibrary.Free(_library);
     }
 }

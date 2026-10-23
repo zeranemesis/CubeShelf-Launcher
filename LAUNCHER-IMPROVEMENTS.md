@@ -51,6 +51,13 @@ par CubeShelf doivent être fermées avant une restauration.
 - macOS et distributions Linux installées autrement : installation manuelle
   conservée. Le profil peut être sauvegardé/restauré, mais aucun remplacement
   automatique de paquet système ou de bundle macOS n’est annoncé.
+- Manette PC : XInput sur Windows ; lecture SDL2 facultative sur Linux/macOS
+  lorsqu’une bibliothèque SDL2 compatible est installée (`libSDL2-2.0.so.0`
+  ou `libSDL2.dylib`). L’absence de cette bibliothèque laisse le clavier et
+  le tactile/souris utilisables. La lecture suit l’API native de
+  [SDL_GameControllerUpdate](https://wiki.libsdl.org/SDL2/SDL_GameControllerUpdate),
+  sans créer de fenêtre SDL ni accumuler une file d’événements inutilisée.
+  Aucun appareil Linux/macOS n’a validé cette lecture dans cette passe.
 - Mobile : optimisation partagée du rendu, dernière jaquette et disposition
   mémorisées. Cet aperçu ne devient pas une copie complète des fonctions PC.
 

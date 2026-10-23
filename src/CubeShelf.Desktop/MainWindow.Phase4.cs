@@ -208,9 +208,15 @@ public sealed partial class MainWindow
                     new TextBlock { Text = P7("Le paquet sera téléchargé en HTTPS et vérifié avec le SHA-256 du manifeste avant toute installation.", "The package will be downloaded over HTTPS and verified against the manifest SHA-256 before installation."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     new TextBlock { Text = P7("Un point de restauration de ton profil sera créé avant la mise à jour.", "A restore point for your profile will be created before the update."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     CreateDialogButton(P7("Voir les nouveautés", "View release notes"), (_, _) =>
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                            "https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/" + Uri.EscapeDataString("v" + update.LatestVersion.TrimStart('v')))
-                            { UseShellExecute = true })),
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                                "https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/" + Uri.EscapeDataString("v" + update.LatestVersion.TrimStart('v')))
+                                { UseShellExecute = true });
+                        }
+                        catch (Exception error) { LauncherUpdateStatusText.Text = error.Message; }
+                    }),
                     CreateDialogButton(P7("Télécharger", "Download"), (_, _) => dialog.Close(true)),
                     CreateDialogButton(P7("Plus tard", "Later"), (_, _) => dialog.Close(false))
                 }

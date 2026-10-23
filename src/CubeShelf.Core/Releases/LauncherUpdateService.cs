@@ -60,10 +60,10 @@ public sealed class LauncherUpdateService
             throw new InvalidDataException("Taille de mise à jour invalide.");
         var directory = Path.Combine(_paths.CacheDirectory, "Updates");
         Directory.CreateDirectory(directory);
+        Storage.DiskSpaceGuard.Require(directory, artifact.Size);
         // Snapshot the launcher profile before any updater can replace files.
         await Task.Run(() => new Storage.ProfileBackupService(_paths).Create(
             "Avant mise à jour CubeShelf " + update.LatestVersion), cancellationToken).ConfigureAwait(false);
-        Storage.DiskSpaceGuard.Require(directory, artifact.Size);
         var suffix = ArtifactSuffix(artifact.Url);
         var destination = Path.Combine(directory,
             $"CubeShelf-{update.LatestVersion}-{CurrentOs()}-{CurrentArchitecture()}{suffix}");
