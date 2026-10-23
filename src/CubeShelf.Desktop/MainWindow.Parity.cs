@@ -393,6 +393,7 @@ public sealed partial class MainWindow
     private string ResolveCoverPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return "";
+        path = path.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar);
         return Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
