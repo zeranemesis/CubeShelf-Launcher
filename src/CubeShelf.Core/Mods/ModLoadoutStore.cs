@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace CubeShelf.Core.Mods;
 
-public sealed record ModLoadout(string Name, int[] EnabledIds);
+public sealed record ModLoadout(string Name, int[] EnabledIds, Dictionary<int, int>? Priorities = null);
 
 /// <summary>Named mod selections, scoped to a game's existing mod library.</summary>
 public sealed class ModLoadoutStore
@@ -23,11 +23,12 @@ public sealed class ModLoadoutStore
         var profiles = JsonSerializer.Deserialize<ModLoadout[]>(File.ReadAllText(_file)) ?? [];
         return profiles.Where(profile => profile is not null && !string.IsNullOrWhiteSpace(profile.Name)
             && profile.Name.Length <= 80 && profile.EnabledIds is not null)
-            .Select(profile => profile with { Name = profile.Name.Trim(), EnabledIds = profile.EnabledIds.Where(id => id > 0).Distinct().ToArray() })
+            .Select(profile => profile with { Name = profile.Name.Trim(), EnabledIds = profile.EnabledIds.Where(id => id > 0).Distinct().ToArray(),
+                Priorities = profile.Priorities?.Where(pair => profile.EnabledIds.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value) })
             .DistinctBy(profile => profile.Name, StringComparer.OrdinalIgnoreCase).Take(100).ToArray();
     }
 
-    public void Save(string name, IEnumerable<int> enabledIds)
+    public void Save(string name, IEnumerable<int> enabledIds, IReadOnlyDictionary<int, int>? priorities = null)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(enabledIds);
@@ -35,8 +36,16 @@ public sealed class ModLoadoutStore
         if (name.Length is < 1 or > 80) throw new ArgumentException("Profile name must contain 1–80 characters.", nameof(name));
         var profiles = Load().Where(profile => !profile.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToList();
         if (profiles.Count >= 100) throw new InvalidOperationException("Too many mod profiles.");
-        profiles.Add(new ModLoadout(name, enabledIds.Where(id => id > 0).Distinct().ToArray()));
+        var ids = enabledIds.Where(id => id > 0).Distinct().ToArray();
+        profiles.Add(new ModLoadout(name, ids, priorities?.Where(pair => ids.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value)));
         Write(profiles);
+    }
+
+    /// <summary>Capture the effective selection and its actual load order; old ID-only profiles remain readable.</summary>
+    public void SaveSelection(string name, IEnumerable<PortableInstalledMod> installed, IReadOnlyCollection<int> playerDisabled)
+    {
+        var selected = installed.Where(mod => mod.Enabled && !playerDisabled.Contains(mod.Id)).ToArray();
+        Save(name, selected.Select(mod => mod.Id), selected.ToDictionary(mod => mod.Id, mod => mod.Priority));
     }
 
     public void Delete(string name) => Write(Load().Where(profile => !profile.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray());

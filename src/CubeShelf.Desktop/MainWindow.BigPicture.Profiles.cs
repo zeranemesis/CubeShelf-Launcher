@@ -44,7 +44,7 @@ public sealed partial class MainWindow
             // A known game variant's disc patch is intentional, unlike an arbitrary unsupported pack.
             var variants = _catalogGames.Where(item => item.DiscPatch is not null).Select(item => item.DiscPatch!.GameBananaModId).ToHashSet();
             if (incompatible.Any(id => !variants.Contains(id))) throw new InvalidOperationException(P7("Ce profil contient un mod incompatible avec ce moteur.", "This profile contains a mod incompatible with this runtime."));
-            manager.SetActiveSelection(profile.EnabledIds);
+            manager.SetActiveSelection(profile.EnabledIds, profile.Priorities);
             RefreshBigPictureModChoices();
             RefreshBigPictureStatus();
             BigPictureProfileStatus.Text = P7("Profil appliqué : ", "Profile applied: ") + (profile.Name.Length == 0 ? P7("Jeu original", "Original game") : profile.Name);
@@ -60,11 +60,10 @@ public sealed partial class MainWindow
             var manager = new PortableModManager(_paths, game.ModLibraryId);
             var disabled = manager.GetPlayerDisabled();
             var name = BigPictureProfileNameBox.Text ?? "";
-            new ModLoadoutStore(_paths.ConfigurationDirectory, game.ModLibraryId).Save(name,
-                manager.GetInstalled().Where(mod => mod.Enabled && !disabled.Contains(mod.Id)).Select(mod => mod.Id));
+            new ModLoadoutStore(_paths.ConfigurationDirectory, game.ModLibraryId).SaveSelection(name, manager.GetInstalled(), disabled);
             RefreshBigPictureProfiles();
             BigPictureProfilePicker.SelectedItem = BigPictureProfilePicker.Items.OfType<ComboBoxItem>().FirstOrDefault(item => (item.Tag as ModLoadout)?.Name == name.Trim());
-            BigPictureProfileStatus.Text = P7("Profil enregistré.", "Profile saved.");
+            BigPictureProfileStatus.Text = P7("Profil enregistré avec l’ordre de chargement.", "Profile saved with its load order.");
         }
         catch (Exception exception) { BigPictureProfileStatus.Text = exception.Message; }
     }

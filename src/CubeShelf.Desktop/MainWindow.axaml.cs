@@ -42,6 +42,17 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         var paths = new PlatformPaths();
         _paths = paths;
+        string? restoredProfileMessage = null;
+        var profileBackups = new CubeShelf.Core.Storage.ProfileBackupService(paths);
+        try
+        {
+            if (profileBackups.ApplyPendingRestore()) restoredProfileMessage = "Profil restauré. / Profile restored.";
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException or AggregateException)
+        {
+            restoredProfileMessage = "Restauration du profil annulée / Profile restore cancelled: " + error.Message;
+            try { profileBackups.DiscardPendingRestore(); } catch (Exception discardError) when (discardError is IOException or UnauthorizedAccessException) { }
+        }
         _mediaCache = new MediaCacheService(paths);
         var migration = new LegacyDataMigrator(paths, AppContext.BaseDirectory).Run();
         _preferencesStore = new UserPreferencesStore(paths);
@@ -65,6 +76,7 @@ public sealed partial class MainWindow : Window
         InitializePhase6Parity();
         InitializePhase7Finalization();
         InitializeBigPicture();
+        RefreshMaintenanceLabels();
         PlatformStatus.Text = OperatingSystem.IsWindows()
             ? "Plateforme détectée : Windows"
             : OperatingSystem.IsLinux()
@@ -72,6 +84,7 @@ public sealed partial class MainWindow : Window
                 : "Plateforme détectée : macOS (expérimental)";
         DataPath.Text = $"Profil : {paths.DataDirectory}";
         SettingsDataPath.Text = paths.DataDirectory;
+        if (restoredProfileMessage is not null) SettingsStatus.Text = restoredProfileMessage;
         if (!migration.AlreadyCompleted && (migration.RuntimesCopied > 0 || migration.ModLibrariesCopied > 0))
             SettingsStatus.Text = $"Migration terminée : {migration.RuntimesCopied} runtime(s), {migration.ModLibrariesCopied} bibliothèque(s) de mods copiés. Sources conservées.";
 
@@ -332,6 +345,7 @@ public sealed partial class MainWindow : Window
             Show();
             Activate();
         }
+        ShowLaunchRecovery(session);
     }
 
     private static string FormatPlayTime(long seconds)

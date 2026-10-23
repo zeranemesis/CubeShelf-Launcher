@@ -198,7 +198,7 @@ public sealed partial class MainWindow
                 return;
             }
 
-            var dialog = CreatePhase7Dialog(P7("Mise à jour CubeShelf", "CubeShelf update"), 500, 250);
+            var dialog = CreatePhase7Dialog(P7("Mise à jour CubeShelf", "CubeShelf update"), 540, 355);
             dialog.Content = new StackPanel
             {
                 Margin = new Avalonia.Thickness(24), Spacing = 14,
@@ -206,6 +206,11 @@ public sealed partial class MainWindow
                 {
                     new TextBlock { Text = P7($"Installer CubeShelf {update.LatestVersion} ?", $"Install CubeShelf {update.LatestVersion}?"), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold },
                     new TextBlock { Text = P7("Le paquet sera téléchargé en HTTPS et vérifié avec le SHA-256 du manifeste avant toute installation.", "The package will be downloaded over HTTPS and verified against the manifest SHA-256 before installation."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new TextBlock { Text = P7("Un point de restauration de ton profil sera créé avant la mise à jour.", "A restore point for your profile will be created before the update."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    CreateDialogButton(P7("Voir les nouveautés", "View release notes"), (_, _) =>
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                            "https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/" + Uri.EscapeDataString("v" + update.LatestVersion.TrimStart('v')))
+                            { UseShellExecute = true })),
                     CreateDialogButton(P7("Télécharger", "Download"), (_, _) => dialog.Close(true)),
                     CreateDialogButton(P7("Plus tard", "Later"), (_, _) => dialog.Close(false))
                 }

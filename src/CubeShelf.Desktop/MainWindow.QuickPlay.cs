@@ -31,6 +31,12 @@ public sealed partial class MainWindow
     private async Task PrepareForPlayAsync(GameCatalogEntry game, Func<Task>? readyAction)
     {
         if (_quickPlayClosing || _portableQueue is null) return;
+        if (_maintenanceBusy)
+        {
+            ShowToastParity(P7("Récupération en cours", "Recovery in progress"),
+                P7("Attends la fin de la sauvegarde ou de la restauration avant de lancer un jeu.", "Wait for backup or restore to finish before starting a game."));
+            return;
+        }
         var key = PlayKey(game);
         if (_playIntents.ContainsKey(key)) return;
         if (RunningGameFor(game) is { } running)

@@ -9,6 +9,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.cs" Link="Controls/GameCaseControl.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Model.cs" Link="Controls/GameCaseControl.Model.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/CoverBitmapCache.cs" Link="Controls/CoverBitmapCache.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameShelfControl.cs" Link="Controls/GameShelfControl.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/DemandAnimation.cs" Link="Controls/DemandAnimation.cs" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />

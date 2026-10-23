@@ -18,6 +18,7 @@ public sealed partial class MainWindow
     private void UpdateBigPictureSubnav(Control view)
     {
         if (BigPictureSubnav is null) return;
+        RecordBigPictureNavigation(view);
         if (view == BigPictureHomeView) _bigPictureReturnHome = true;
         else if (view == BigPictureView) _bigPictureReturnHome = false;
         var show = _bigPictureActive && view != BigPictureView;
@@ -29,6 +30,8 @@ public sealed partial class MainWindow
         view.Margin = new Thickness(view.Margin.Left, view.Margin.Top + 64, view.Margin.Right, view.Margin.Bottom);
         BigPictureSubnavTitle.Text = "CubeShelf · " + P7("Big Picture", "Big Picture");
         BigPictureReturnButton.Content = view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
+            : _bigPictureBackStack.TryPeek(out var previous) && previous.View != BigPictureView && previous.View != BigPictureHomeView
+                ? P7("← Retour · Échap / B", "← Back · Esc / B")
             : _bigPictureReturnHome ? P7("← Accueil · Échap / B", "← Home · Esc / B")
             : P7("← Collection · Échap / B", "← Collection · Esc / B");
         BigPictureKeyboardButton.Content = P7("Clavier", "Keyboard");
@@ -38,6 +41,7 @@ public sealed partial class MainWindow
     {
         if (!_bigPictureActive) return;
         if (BigPictureHomeView.IsVisible) { ExitBigPicture(this, args); return; }
+        if (TryReturnBigPicturePage()) return;
         if (_bigPictureReturnHome) { OpenBigPictureHome(this, args); return; }
         RefreshBigPictureGame();
         ShowParityView(BigPictureView);
@@ -51,7 +55,8 @@ public sealed partial class MainWindow
         _bigPictureModsGame = game;
         RefreshBigPictureModChoices();
         ShowParityView(BigPictureModsView);
-        (BigPictureModChoices.Children.OfType<Button>().FirstOrDefault() ?? BigPictureBrowseModsButton).Focus();
+        (BigPictureModChoices.Children.OfType<Button>().FirstOrDefault(button => button.IsEffectivelyEnabled)
+            ?? BigPictureBrowseModsButton).Focus();
     }
 
     private void RefreshBigPictureModChoices()
@@ -137,7 +142,7 @@ public sealed partial class MainWindow
         var window = BigPictureInputWindow();
         if (input == 6)
         {
-            if (window != this) window.Close();
+            if (window != this) { window.Close(); _bigPictureLastInput = -1; }
             else if (BigPictureHomeView.IsVisible) ExitBigPicture(this, new RoutedEventArgs());
             else ReturnToBigPicture(this, new RoutedEventArgs());
             return;

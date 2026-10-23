@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using CubeShelf.Core.Downloads;
 
 namespace CubeShelf.Desktop.Controls;
@@ -23,6 +24,7 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
     private string _dataDirectory = "";
     private readonly Dictionary<string, Bitmap> _covers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, TransferRow> _rows = new();
+    private readonly List<Visual> _visibilityObservers = new();
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private double _lastSample, _peak, _networkRate;
@@ -30,7 +32,12 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
     private PortableDownloadQueueItem? _dragged;
     private string _activeId = "", _queueIds = "", _historyIds = "", _languageStamp = "";
     private TransferRow? _activeRow;
-    private bool _disposed, _settingBandwidth;
+    private bool _disposed, _settingBandwidth, _attached, _sampling, _idleSampled, _visibilityRefreshQueued;
+    private DownloadTransfer? _sampledTransfer;
+    private double _lastStorage = double.NegativeInfinity;
+    private string _storageStamp = "";
+    private readonly Dictionary<string, int> _pendingPositions = new();
+    private int _pendingCount;
     private long _displayedLimit = -1;
     private static readonly long[] Limits = [0, 1024 * 1024, 5 * 1024 * 1024, 10 * 1024 * 1024,
         20 * 1024 * 1024, 50 * 1024 * 1024];
@@ -39,8 +46,20 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
     {
         InitializeComponent();
         _timer.Tick += (_, _) => Refresh();
-        AttachedToVisualTree += (_, _) => { if (!_disposed) _timer.Start(); };
-        DetachedFromVisualTree += (_, _) => _timer.Stop();
+        AttachedToVisualTree += (_, _) =>
+        {
+            if (_disposed) return;
+            _attached = true;
+            ObserveVisibility();
+            Refresh();
+        };
+        DetachedFromVisualTree += (_, _) =>
+        {
+            _attached = false;
+            _timer.Stop();
+            _sampling = false;
+            StopObservingVisibility();
+        };
     }
 
     public void Configure(PortableDownloadQueue queue, string dataDirectory,
@@ -58,12 +77,55 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
 
     private string L(string fr, string en) => _translate(fr, en);
 
+    private bool CanRefresh => _attached && IsEffectivelyVisible
+        && TopLevel.GetTopLevel(this) is Window { IsVisible: true, WindowState: not WindowState.Minimized };
+
+    private void ObserveVisibility()
+    {
+        StopObservingVisibility();
+        foreach (var visual in this.GetVisualAncestors().Prepend(this))
+        {
+            _visibilityObservers.Add(visual);
+            visual.PropertyChanged += VisibilityChanged;
+        }
+    }
+
+    private void StopObservingVisibility()
+    {
+        foreach (var visual in _visibilityObservers) visual.PropertyChanged -= VisibilityChanged;
+        _visibilityObservers.Clear();
+    }
+
+    private void VisibilityChanged(object? sender, AvaloniaPropertyChangedEventArgs args)
+    {
+        if (args.Property == IsVisibleProperty || args.Property == Window.WindowStateProperty)
+        {
+            // A hidden/minimized view does no timer work, chart updates or filesystem reads.
+            _timer.Stop();
+            _sampling = false;
+            _lastStorage = double.NegativeInfinity;
+            // Read effective visibility after Avalonia has propagated the ancestor change.
+            if (_visibilityRefreshQueued) return;
+            _visibilityRefreshQueued = true;
+            Dispatcher.UIThread.Post(() => { _visibilityRefreshQueued = false; Refresh(); });
+        }
+    }
+
     public void Refresh()
     {
         if (_queue is null || _disposed) return;
+        if (!CanRefresh)
+        {
+            _timer.Stop();
+            _sampling = false;
+            return;
+        }
         var items = _queue.Items;
         var active = items.FirstOrDefault(i => i.State == DownloadActivityState.Running);
         var pending = _queue.PendingItems;
+        _pendingPositions.Clear();
+        for (var index = 0; index < pending.Count; index++) _pendingPositions[pending[index].Id] = index;
+        _pendingCount = pending.Count;
         var history = items.Where(i => i.IsTerminal).OrderByDescending(i => i.UpdatedAt).ToArray();
         var stamp = L("fr", "en");
         if (stamp != _languageStamp || _displayedLimit != _queue.BandwidthLimitBytesPerSecond)
@@ -91,23 +153,46 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
         }
 
         var seconds = _clock.Elapsed.TotalSeconds;
-        if (seconds - _lastSample >= .95)
+        var moving = active is { IsPaused: false };
+        _timer.IsEnabled = moving;
+        if (!_sampling || !ReferenceEquals(_sampledTransfer, active?.Transfer))
         {
-            var network = items.Sum(i => i.Transfer.NetworkBytes);
-            var disk = items.Sum(i => i.Transfer.DiskBytes);
+            if (!_sampling) SpeedChart.ResetSamples();
+            _sampledTransfer = active?.Transfer;
+            _lastNetwork = _sampledTransfer?.NetworkBytes ?? 0;
+            _lastDisk = _sampledTransfer?.DiskBytes ?? 0;
+            _lastSample = seconds;
+            _sampling = true;
+            _idleSampled = false;
+            _networkRate = 0;
+            NetworkRate.Text = DiskRate.Text = Rate(0);
+            ChartScale.Text = L("Échelle : ", "Scale: ") + Rate(SpeedChart.Ceiling);
+        }
+        if (seconds - _lastSample >= .95 || (!moving && !_idleSampled))
+        {
+            var network = active?.Transfer.NetworkBytes ?? 0;
+            var disk = active?.Transfer.DiskBytes ?? 0;
             var elapsed = seconds - _lastSample;
-            _networkRate = Math.Max(0, network - _lastNetwork) / elapsed;
-            var diskRate = Math.Max(0, disk - _lastDisk) / elapsed;
+            _networkRate = moving && elapsed > 0 ? Math.Max(0, network - _lastNetwork) / elapsed : 0;
+            var diskRate = moving && elapsed > 0 ? Math.Max(0, disk - _lastDisk) / elapsed : 0;
             _lastSample = seconds; _lastNetwork = network; _lastDisk = disk;
             _peak = Math.Max(_peak, _networkRate);
             SpeedChart.AddSample(_networkRate, diskRate);
+            _idleSampled = !moving;
             NetworkRate.Text = Rate(_networkRate); DiskRate.Text = Rate(diskRate); PeakRate.Text = Rate(_peak);
             ChartScale.Text = L("Échelle : ", "Scale: ") + Rate(SpeedChart.Ceiling);
+        }
+
+        var storageStamp = stamp + "|" + active?.Id + "|" + history.FirstOrDefault()?.Id;
+        if (double.IsNegativeInfinity(_lastStorage) || _storageStamp != storageStamp || (moving && seconds - _lastStorage >= 15))
+        {
+            _storageStamp = storageStamp;
+            _lastStorage = seconds;
             RefreshStorage();
         }
 
         GlobalPause.Content = _queue.IsSuspended ? L("▶  Tout reprendre", "▶  Resume all") : L("Ⅱ  Tout suspendre", "Ⅱ  Pause all");
-        GlobalPause.IsEnabled = _queue.PendingCount > 0;
+        GlobalPause.IsEnabled = _queue.IsSuspended || _queue.PendingCount > 0;
         QueueHeading.Text = L($"En attente · {pending.Count}", $"Queued · {pending.Count}");
         HistoryHeading.Text = L($"Terminés et interrompus · {history.Length}", $"Completed and interrupted · {history.Length}");
         ClearHistory.IsEnabled = history.Any(i => i.State == DownloadActivityState.Completed);
@@ -124,7 +209,16 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
         Reconcile(QueueContent, pending, ref _queueIds, L("Aucun téléchargement en attente.", "No downloads queued."));
         Reconcile(HistoryContent, history, ref _historyIds, L("Tes téléchargements terminés apparaîtront ici.", "Completed downloads will appear here."));
         var retained = items.Select(i => i.Id).ToHashSet();
-        foreach (var id in _rows.Keys.Where(id => !retained.Contains(id)).ToArray()) _rows.Remove(id);
+        var removed = _rows.Keys.Where(id => !retained.Contains(id)).ToArray();
+        foreach (var id in removed) _rows.Remove(id);
+        if (removed.Length > 0)
+        {
+            // Clearing history also releases covers that no remaining row uses.
+            var used = _rows.Values.Select(row => row.Cover.Source).OfType<Bitmap>().ToHashSet();
+            if (_activeRow?.Cover.Source is Bitmap activeCover) used.Add(activeCover);
+            foreach (var entry in _covers.Where(entry => !used.Contains(entry.Value)).ToArray())
+            { entry.Value.Dispose(); _covers.Remove(entry.Key); }
+        }
     }
 
     private void Reconcile(StackPanel host, IReadOnlyList<PortableDownloadQueueItem> items, ref string previous, string empty)
@@ -147,6 +241,7 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
 
     private TransferRow CreateRow(PortableDownloadQueueItem item, bool active)
     {
+        var nextCoverCheck = double.NegativeInfinity;
         var cover = new Image { Width = active ? 100 : 48, Height = active ? 142 : 68, Stretch = Stretch.Uniform };
         var placeholder = Text("▣", active ? 38 : 25, "Muted");
         placeholder.HorizontalAlignment = HorizontalAlignment.Center;
@@ -216,19 +311,22 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
             var pending = item.State == DownloadActivityState.Queued;
             var running = item.State == DownloadActivityState.Running;
             var phase = transfer.Phase;
-            var path = _coverPath?.Invoke(item) ?? "";
-            if (cover.Source is null && File.Exists(path))
+            if (cover.Source is null && _clock.Elapsed.TotalSeconds >= nextCoverCheck)
             {
+                nextCoverCheck = _clock.Elapsed.TotalSeconds + 10;
+                var path = _coverPath?.Invoke(item) ?? "";
                 try
                 {
-                    if (!_covers.TryGetValue(path, out var bitmap))
+                    if (!_covers.TryGetValue(path, out var bitmap) && File.Exists(path))
                     { using var stream = File.OpenRead(path); _covers[path] = bitmap = Bitmap.DecodeToWidth(stream, 200); }
-                    cover.Source = bitmap; placeholder.IsVisible = false;
+                    if (bitmap is not null) { cover.Source = bitmap; placeholder.IsVisible = false; }
                 }
                 catch (Exception ex) when (ex is IOException or ArgumentException or NotSupportedException) { }
             }
+            var position = _pendingPositions.GetValueOrDefault(item.Id, -1);
             status.Text = item.IsPaused ? L("En pause · progression conservée", "Paused · progress saved")
-                : pending ? (_queue?.IsSuspended == true ? L("File suspendue", "Queue suspended") : L("En attente", "Queued"))
+                : pending ? (_queue?.IsSuspended == true ? L("File suspendue", "Queue suspended")
+                    : L($"En attente · priorité {position + 1}", $"Queued · priority {position + 1}"))
                 : running ? (item.Kind.Contains("UNINSTALL", StringComparison.OrdinalIgnoreCase)
                     ? L("Suppression en cours", "Removing files") : PhaseName(phase)) : item.State switch
                 {
@@ -263,14 +361,13 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
             pause.IsEnabled = item.CanPause || item.IsPaused;
             pause.Content = item.IsPaused ? (active ? L("▶  Reprendre", "▶  Resume") : "▶") : (active ? L("Ⅱ  Suspendre", "Ⅱ  Pause") : "Ⅱ");
             ToolTip.SetTip(pause, pause.IsEnabled ? L("Suspendre ou reprendre", "Pause or resume") : L("Cette étape doit se terminer avant la pause de la file.", "This step must finish before the queue pauses."));
-            var position = _queue?.PendingItems.ToList().IndexOf(item) ?? -1;
             first.IsVisible = up.IsVisible = down.IsVisible = pending;
             first.IsEnabled = up.IsEnabled = position > 0;
-            down.IsEnabled = position >= 0 && position < (_queue?.PendingItems.Count ?? 0) - 1;
+            down.IsEnabled = position >= 0 && position < _pendingCount - 1;
             retry.IsVisible = item.CanRetry; resume.IsVisible = item.CanResume;
             cancel.IsVisible = !item.IsTerminal; cancel.IsEnabled = item.CanCancel;
             remove.IsVisible = item.CanRemove;
-        });
+        }, cover);
     }
 
     private void Move(PortableDownloadQueueItem item, int direction)
@@ -348,10 +445,11 @@ public sealed partial class DownloadsManager : UserControl, IDisposable
     public void Dispose()
     {
         _disposed = true; _timer.Stop();
+        StopObservingVisibility();
         ActiveContent.Children.Clear(); QueueContent.Children.Clear(); HistoryContent.Children.Clear();
         foreach (var bitmap in _covers.Values) bitmap.Dispose();
         _covers.Clear(); _rows.Clear();
     }
 
-    private sealed record TransferRow(Control View, Action Update);
+    private sealed record TransferRow(Control View, Action Update, Image Cover);
 }

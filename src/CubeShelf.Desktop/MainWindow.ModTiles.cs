@@ -26,6 +26,7 @@ public sealed partial class MainWindow
 
     private void ShowModItems(IReadOnlyList<DesktopModItem> items)
     {
+        EnsureDesktopModTools();
         if (!_modFiltersReady) InitializeModFilters();
         _allModItems = items;
         var all = P7("Toutes les catégories", "All categories");
@@ -43,7 +44,8 @@ public sealed partial class MainWindow
     {
         var search = ModSearchBox.Text?.Trim() ?? "";
         var category = ModCategoryFilter.SelectedIndex > 0 ? ModCategoryFilter.SelectedItem as string : null;
-        IEnumerable<DesktopModItem> query = _allModItems;
+        var disabled = _selectedGame is { } game ? PortableModState.ReadPlayerDisabled(_paths, game.ModLibraryId) : Array.Empty<int>();
+        IEnumerable<DesktopModItem> query = _allModItems.Select(item => item with { Enabled = item.Enabled && !disabled.Contains(item.Id) });
         if (search.Length > 0)
             query = query.Where(item => item.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
                                         (item.Remote?.Author ?? "").Contains(search, StringComparison.CurrentCultureIgnoreCase));

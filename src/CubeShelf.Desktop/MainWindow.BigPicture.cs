@@ -19,14 +19,32 @@ public sealed partial class MainWindow
     private readonly Controls.BigPictureGamepad _bigPictureGamepad = new();
     private int _bigPictureLastInput;
     private long _bigPictureNextRepeat;
+    private string? _bigPictureHelpText;
+    private bool _bigPictureClosed;
+    private bool _bigPictureGameRunning;
+    private bool _bigPictureControllerConnected;
 
     private void InitializeBigPicture()
     {
         AddHandler(KeyDownEvent, BigPictureKeyDown, RoutingStrategies.Tunnel);
         BigPictureShelf.SelectionRequested += SelectBigPictureGame;
         InitializeBigPictureTextFocus();
+        Activated += (_, _) => UpdateBigPictureGamepadPolling();
+        Deactivated += (_, _) =>
+        {
+            _bigPictureLastInput = -1;
+            if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(250);
+        };
+        PropertyChanged += (_, change) =>
+        {
+            if (change.Property == IsVisibleProperty || change.Property == WindowStateProperty)
+                UpdateBigPictureGamepadPolling();
+        };
+        _sessions.Started += _ => Dispatcher.UIThread.Post(UpdateBigPictureGamepadPolling);
+        _sessions.Ended += _ => Dispatcher.UIThread.Post(UpdateBigPictureGamepadPolling);
         Closed += (_, _) =>
         {
+            _bigPictureClosed = true;
             _bigPictureTimer?.Stop();
             BigPictureShelf.Dispose();
             DisposeBigPictureHomeImages();
@@ -63,10 +81,24 @@ public sealed partial class MainWindow
         ShowParityView(BigPictureView);
         WindowState = WindowState.FullScreen;
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
+        UpdateBigPictureGamepadPolling();
+        FocusBigPictureAction(0);
+    }
+
+    private void UpdateBigPictureGamepadPolling()
+    {
+        _bigPictureLastInput = -1;
+        if (!_bigPictureClosed) _bigPictureGameRunning = _sessions.RunningGameIds.Count > 0;
+        if (_bigPictureClosed || !_bigPictureActive || !IsVisible || WindowState == WindowState.Minimized
+            || _bigPictureGameRunning)
+        {
+            _bigPictureTimer?.Stop();
+            return;
+        }
         _bigPictureTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(50),
             DispatcherPriority.Input, (_, _) => PollBigPictureGamepad());
+        _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(IsActive ? 50 : 250);
         _bigPictureTimer.Start();
-        BigPicturePlayButton.Focus();
     }
 
     private void ExitBigPicture(object? sender, RoutedEventArgs args)
@@ -94,9 +126,12 @@ public sealed partial class MainWindow
 
     private void SelectBigPictureGame(int index)
     {
+        if (_bigPictureGames.Length == 0) return;
+        index = Math.Clamp(index, 0, _bigPictureGames.Length - 1);
+        if (_bigPictureIndex == index) return;
         _bigPictureIndex = index;
         RefreshBigPictureGame();
-        BigPicturePlayButton.Focus();
+        FocusBigPictureAction(0);
     }
 
     private void ToggleBigPictureLayout(object? sender, RoutedEventArgs args)
@@ -193,13 +228,17 @@ public sealed partial class MainWindow
     }
 
     private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureHomeButton, BigPictureLayoutButton, BigPictureExitButton }
-        .Where(button => button.IsVisible && button.IsEnabled).ToArray();
+        .Where(button => button.IsEffectivelyVisible && button.IsEffectivelyEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
     {
         var actions = BigPictureActions;
+        if (actions.Length == 0) return;
         var index = Array.FindIndex(actions, button => button.IsFocused);
-        actions[(Math.Max(0, index) + step + actions.Length) % actions.Length].Focus();
+        var next = index < 0 ? step < 0 ? actions.Length - 1 : 0
+            : (index + step + actions.Length) % actions.Length;
+        actions[next].Focus();
+        actions[next].BringIntoView();
     }
 
     private void ActivateBigPictureAction()
@@ -210,16 +249,29 @@ public sealed partial class MainWindow
 
     private void PollBigPictureGamepad()
     {
-        var input = _bigPictureGamepad.Read(out var connected);
-        BigPictureHelp.Text = connected
-            ? P7("← → Choisir   •   A Valider   •   X Retourner   •   Y Vue   •   B Bureau", "← → Browse   •   A Select   •   X Flip   •   Y View   •   B Desktop")
-            : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Valider   •   F Retourner   •   V Vue   •   F11 Bureau", "← → Browse   •   ↑ ↓ Actions   •   Enter Select   •   F Flip   •   V View   •   F11 Desktop");
-        var inputWindow = BigPictureInputWindow();
-        if (!inputWindow.IsActive || WindowState == WindowState.Minimized)
+        if (!_bigPictureActive || !IsVisible || WindowState == WindowState.Minimized || _bigPictureGameRunning)
         {
-            _bigPictureLastInput = -1;
+            UpdateBigPictureGamepadPolling();
             return;
         }
+        var inputWindow = BigPictureInputWindow();
+        if (!inputWindow.IsActive)
+        {
+            _bigPictureLastInput = -1;
+            if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(250);
+            return;
+        }
+        if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(50);
+        var input = _bigPictureGamepad.Read(out var connected);
+        if (connected != _bigPictureControllerConnected)
+        {
+            _bigPictureControllerConnected = connected;
+            _bigPictureLastInput = -1;
+        }
+        var help = connected
+            ? P7("← → Choisir   •   A Valider   •   X Retourner   •   Y Vue   •   B Retour", "← → Browse   •   A Select   •   X Flip   •   Y View   •   B Back")
+            : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Valider   •   F Retourner   •   V Vue   •   F11 Bureau", "← → Browse   •   ↑ ↓ Actions   •   Enter Select   •   F Flip   •   V View   •   F11 Desktop");
+        if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;
         var now = Environment.TickCount64;

@@ -14,13 +14,14 @@ public sealed partial class GameCaseControl
     private static readonly Lazy<ImportedCase?> ImportedModel = new(LoadImportedCase);
     private ModelDraw[]? _modelCommands;
     private Rect _modelShadowBounds;
-    private (double Width, double Height, double Yaw, double Pitch, double Lift, double Glare, Point Pointer, Bitmap? Front, Bitmap? Back, Bitmap? Spine, bool Detail) _modelDrawingKey;
+    private (double Width, double Height, double Yaw, double Pitch, double Lift, Bitmap? Front, Bitmap? Back, Bitmap? Spine, bool Detail) _modelDrawingKey;
 
     private bool RenderImportedModel(DrawingContext context)
     {
         if (ImportedModel.Value is not { } model) return false;
-        var key = (Bounds.Width, Bounds.Height, _yaw, _pitch, _lift, _glare,
-            _glare > .01 ? _pointerPosition : default, _front, _back, _spine, IsInteractive);
+        // Pointer glare is drawn over the mesh and does not change its projection.
+        var key = (Bounds.Width, Bounds.Height, _yaw, _pitch, _lift,
+            _front, _back, _spine, IsInteractive);
         if (_modelCommands is null || key != _modelDrawingKey)
         {
             BuildImportedCommands(model);
@@ -82,17 +83,24 @@ public sealed partial class GameCaseControl
                 Bitmap? texture = slot switch { "front" => _front, "back" => _back, _ => _spine };
                 if (texture is null)
                 {
-                    context.DrawGeometry(command.Brush, null, BuildGeometry(command.Points));
+                    context.DrawGeometry(command.Brush, null, command.Outline);
                     continue;
                 }
-                var outline = BuildGeometry(command.Points);
+                var outline = command.Outline;
+                if (command.TextureDrawing is null)
+                {
+                    var drawing = new DrawingGroup();
+                    using (var recording = drawing.Open())
+                        DrawTexturedQuadMesh(recording, texture, command.Points,
+                            slot == "spine" ? 2 : IsInteractive ? 8 : 3,
+                            slot == "spine" ? 6 : IsInteractive ? 12 : 4);
+                    command.TextureDrawing = drawing;
+                }
                 using (context.PushGeometryClip(outline))
-                    DrawTexturedQuadMesh(context, texture, command.Points,
-                        slot == "spine" ? 2 : IsInteractive ? 8 : 3,
-                        slot == "spine" ? 6 : IsInteractive ? 12 : 4);
+                    command.TextureDrawing.Draw(context);
                 DrawPointerGlare(context, outline, command.Points, _pointerPosition, _glare * .45);
             }
-            else context.DrawGeometry(command.Brush, null, BuildGeometry(command.Points));
+            else context.DrawGeometry(command.Brush, null, command.Outline);
         }
     }
 
@@ -260,5 +268,9 @@ public sealed partial class GameCaseControl
     private sealed record ModelMesh(Vec3[] Positions, ModelTriangle[] Triangles, IBrush[] Palette,
         double Roughness, string? TextureSlot, int[]? TextureQuad, bool Overlay);
     private readonly record struct ModelTriangle(int A, int B, int C, Vec3 Normal);
-    private sealed record ModelDraw(int Layer, double Depth, Point[] Points, IBrush Brush, string? TextureSlot);
+    private sealed record ModelDraw(int Layer, double Depth, Point[] Points, IBrush Brush, string? TextureSlot)
+    {
+        public StreamGeometry Outline { get; } = BuildGeometry(Points);
+        public DrawingGroup? TextureDrawing { get; set; }
+    }
 }

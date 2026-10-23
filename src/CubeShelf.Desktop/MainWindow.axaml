@@ -467,6 +467,20 @@
             </StackPanel>
           </Border>
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="5"><TextBlock Text="{DynamicResource Presence}" FontSize="18" FontWeight="Bold" /><TextBlock Text="{DynamicResource PresenceMovedHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" /></StackPanel><Button Grid.Column="1" Content="{DynamicResource OpenProfile}" Click="ParityShowProfile" VerticalAlignment="Center" /></Grid></Border>
+          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+            <StackPanel Spacing="10">
+              <TextBlock x:Name="MaintenanceTitle" FontSize="18" FontWeight="Bold" />
+              <TextBlock x:Name="MaintenanceHelp" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+              <WrapPanel>
+                <Button x:Name="BackupProfileButton" Click="BackupLauncherProfile" Margin="0,0,8,8" />
+                <Button x:Name="RestoreProfileButton" Click="RestoreLauncherProfile" Margin="0,0,8,8" />
+                <Button x:Name="RestoreCardsButton" Click="RestoreMemoryCards" Margin="0,0,8,8" />
+                <Button x:Name="PreviousLauncherButton" Click="RestorePreviousLauncher" Margin="0,0,8,8" />
+                <Button x:Name="MeasureLauncherButton" Click="MeasureLauncherPerformance" Margin="0,0,8,8" />
+              </WrapPanel>
+              <TextBlock x:Name="MaintenanceStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
           <StackPanel Orientation="Horizontal"><Button Content="{DynamicResource ResetSettings}" Click="ResetSettings" /></StackPanel>
           <TextBlock x:Name="SettingsStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
         </StackPanel>

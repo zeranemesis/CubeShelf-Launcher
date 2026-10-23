@@ -3,7 +3,8 @@
 CubeShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-Cet aperçu porte la version affichée `0.16.0` et le code de version Android `3`.
+La source de cet aperçu porte la version affichée `0.17.0-preview.1` et le code
+de version Android `4`. Cela ne signifie pas qu’un nouvel APK a été publié.
 
 ## Produire les APK
 

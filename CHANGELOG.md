@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.17.0-preview.1 — améliorations du launcher, non publié
+
+- Big Picture : retour à la page précédente et à son focus ; navigation manette suspendue quand la fenêtre est masquée ou réduite ou pendant une session de jeu ; recherche des manettes débranchées espacée.
+- Téléchargements : aucun rafraîchissement de la vue cachée ; timer arrêté au repos ou en pause ; contrôle d’espace disque avant les transferts ; priorité visible et débit indépendant de l’historique.
+- Jaquettes 3D conservées : images partagées entre vues, décodage adapté et cache inactif plafonné à 24 Mio ; géométries et maillages texturés réutilisés lorsque la pose ne change pas.
+- Profils de mods avec ordre de priorité, aperçu des fichiers en conflit et accès direct au profil original, sans supprimer les mods installés.
+- Paramètres : points de restauration du profil, restauration au prochain démarrage, restauration des cartes mémoire déjà sauvegardées par les transferts téléphone, mesure CPU/mémoire du launcher à la demande.
+- Point de restauration du profil avant mise à jour, accès aux notes de version et conservation d’une version précédente du launcher : Windows après une mise à jour avec ce nouvel updater, Linux pour les AppImages mises à jour avec ce nouveau helper. L’installation macOS reste manuelle.
+- Une fermeture inattendue propose de réessayer, d’ouvrir les journaux ou de revenir à la bibliothèque. Les arrêts demandés par l’utilisateur ne sont pas présentés comme des plantages.
+- Mobile : partage du cache des jaquettes et mémorisation de la dernière sélection et de la vue.
+
+Aucun moteur ni fichier de jeu modifié. Compilation PC, interface mobile et updater effectuée ; pas de test automatisé ni d’essai physique de manette ou de téléphone dans cette passe. Les gains de performances ne constituent pas une mesure de FPS.
+
 ## 0.16.0 — 22 octobre 2026
 
 - Gestionnaire de téléchargements illustré : file, pause/reprise, priorités et limite de débit.

@@ -22,8 +22,20 @@ public sealed class DownloadSpeedChart : Control
 
     public void AddSample(double network, double disk)
     {
+        network = double.IsFinite(network) ? Math.Max(0, network) : 0;
+        disk = double.IsFinite(disk) ? Math.Max(0, disk) : 0;
+        if (_samples.All(sample => sample.Network == network && sample.Disk == disk)) return;
         _samples.Dequeue();
-        _samples.Enqueue((Math.Max(0, network), Math.Max(0, disk)));
+        _samples.Enqueue((network, disk));
+        InvalidateVisual();
+    }
+
+    /// <summary>Hidden time is not sampled; discard that old timeline when the view returns.</summary>
+    public void ResetSamples()
+    {
+        if (_samples.All(sample => sample.Network == 0 && sample.Disk == 0)) return;
+        _samples.Clear();
+        for (var index = 0; index < 60; index++) _samples.Enqueue((0, 0));
         InvalidateVisual();
     }
 

@@ -104,6 +104,7 @@ public sealed class PartyBoardInstaller
 
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "downloads");
         Directory.CreateDirectory(cacheDirectory);
+        Storage.DiskSpaceGuard.Require(cacheDirectory, artifact.Size);
         var package = Path.Combine(cacheDirectory, artifact.Name);
         if (resolved.LegacyDownload)
             await DownloadLegacyVerifiedAsync(resolved.DownloadUri, package, artifact.Sha256, progress, cancellationToken)
@@ -115,6 +116,7 @@ public sealed class PartyBoardInstaller
         await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
         progress?.Report(.82);
         Directory.CreateDirectory(versionsRoot);
+        Storage.DiskSpaceGuard.Require(versionsRoot, new FileInfo(package).Length);
         var staging = Path.Combine(versionsRoot, ".staging-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
         try

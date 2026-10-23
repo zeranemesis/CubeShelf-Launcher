@@ -623,9 +623,8 @@ public sealed partial class GameCaseControl : Control, IDisposable
     {
         try
         {
-            return !string.IsNullOrWhiteSpace(path) && File.Exists(path)
-                ? new Bitmap(path)
-                : null;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return null;
+            return CoverBitmapCache.Acquire(path);
         }
         catch
         {
@@ -637,9 +636,9 @@ public sealed partial class GameCaseControl : Control, IDisposable
     {
         _modelCommands = null;
         _modelDrawingKey = default;
-        _front?.Dispose();
-        _back?.Dispose();
-        _spine?.Dispose();
+        CoverBitmapCache.Release(_front);
+        CoverBitmapCache.Release(_back);
+        CoverBitmapCache.Release(_spine);
         _front = _back = _spine = null;
     }
 

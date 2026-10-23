@@ -20,6 +20,7 @@ public sealed partial class MainWindow
     {
         AddHandler(GotFocusEvent, (_, args) =>
         {
+            if (_bigPictureActive && args.Source is Control focused) _bigPictureLastFocusedControl = focused;
             if (args.Source is TextBox text && !text.IsReadOnly) _bigPictureLastTextBox = text;
         }, RoutingStrategies.Bubble, handledEventsToo: true);
     }
@@ -47,7 +48,9 @@ public sealed partial class MainWindow
         if (root is null) return [];
         var controls = root.GetVisualDescendants().OfType<Control>()
             .Where(control => control.IsEffectivelyVisible && control.IsEffectivelyEnabled && control.Focusable
-                && control is Button or TextBox or ComboBox or ListBox or Slider).ToList();
+                && control is Button or TextBox or ComboBox or ListBox or Slider)
+            .Where(control => control is not TextBox { IsReadOnly: true }
+                && !control.GetVisualAncestors().Any(ancestor => ancestor is ComboBox or Slider)).ToList();
         if (window == this && BigPictureReturnButton.IsEffectivelyVisible)
         {
             if (BigPictureKeyboardButton.IsEffectivelyEnabled) controls.Add(BigPictureKeyboardButton);

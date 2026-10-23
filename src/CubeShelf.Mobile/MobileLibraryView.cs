@@ -40,6 +40,8 @@ public sealed class MobileLibraryView : UserControl
     private Point _touchStart;
     private int _touchSelection;
     private bool _horizontalDrag;
+    private bool _stateLoaded;
+    private string _rememberedGame = "";
 
     public MobileLibraryView(IMobileGameService games)
     {
@@ -52,7 +54,7 @@ public sealed class MobileLibraryView : UserControl
         _details.Children.Add(_title); _details.Children.Add(_info);
         var navigation = _navigation;
         AddAction(navigation, "Retourner", () => _shelf.FlipSelected());
-        AddAction(navigation, "Vue", () => { _ribbon = !_ribbon; _shelf.SetSelection(_selected, _ribbon); });
+        AddAction(navigation, "Vue", () => { _ribbon = !_ribbon; _shelf.SetSelection(_selected, _ribbon); SaveLibraryState(); });
         _details.Children.Add(navigation);
         _details.Children.Add(_availability);
         _play.Background = new SolidColorBrush(Color.Parse("#8B70F7"));
@@ -75,10 +77,10 @@ public sealed class MobileLibraryView : UserControl
         _shelf.AddHandler(PointerMovedEvent, ShelfTouchMoved, RoutingStrategies.Tunnel);
         _shelf.AddHandler(PointerReleasedEvent, ShelfTouchReleased, RoutingStrategies.Tunnel);
         _shelf.PointerCaptureLost += (_, _) => ResetTouch();
-        _picker.SelectionChanged += (_, _) => { if (_picker.SelectedIndex >= 0 && _picker.SelectedIndex != _selected) Select(_picker.SelectedIndex); };
+        _picker.SelectionChanged += (_, _) => { if (_realized && _picker.SelectedIndex >= 0 && _picker.SelectedIndex != _selected) Select(_picker.SelectedIndex); };
         _invite.TextChanged += (_, _) => _join.IsEnabled = _invite.Text?.Trim().Length == 72 && _games.IsInstalled();
         AttachedToVisualTree += (_, _) => InitializeShelf();
-        DetachedFromVisualTree += (_, _) => { ResetTouch(); _shelf.Clear(); _realized = false; };
+        DetachedFromVisualTree += (_, _) => { ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
@@ -106,7 +108,7 @@ public sealed class MobileLibraryView : UserControl
     public void SetActive(bool active)
     {
         if (active) { InitializeShelf(); RefreshAvailability(); }
-        else { ResetTouch(); _shelf.Clear(); _realized = false; }
+        else { ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
     }
 
     private void ShelfTouchPressed(object? sender, PointerPressedEventArgs args)
@@ -179,6 +181,23 @@ public sealed class MobileLibraryView : UserControl
             Directory.CreateDirectory(_cache);
             using var source = AssetLoader.Open(Resource("games.json"));
             _catalog = (JsonSerializer.Deserialize<MobileGame[]>(source) ?? []).Where(game => string.IsNullOrWhiteSpace(game.VariantOf)).ToArray();
+            if (!_stateLoaded)
+            {
+                _stateLoaded = true;
+                try
+                {
+                    var statePath = Path.Combine(_games.DataDirectory, "library-view.json");
+                    if (File.Exists(statePath) && new FileInfo(statePath).Length <= 16384)
+                    {
+                        var state = JsonSerializer.Deserialize<LibraryState>(File.ReadAllText(statePath));
+                        _rememberedGame = state?.SelectedGame ?? "";
+                        _ribbon = state?.Ribbon ?? true;
+                    }
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
+            }
+            var remembered = Array.FindIndex(_catalog, game => game.Id == _rememberedGame);
+            if (remembered >= 0) _selected = remembered;
             _picker.ItemsSource = _catalog.Select(game => game.Title).ToArray();
             _shelf.SetGames(_catalog.Select(game =>
             {
@@ -203,7 +222,25 @@ public sealed class MobileLibraryView : UserControl
         _status.Text = "";
         _shelf.SetSelection(_selected, _ribbon, animate);
         RefreshAvailability();
+        SaveLibraryState();
     }
+
+    private void SaveLibraryState()
+    {
+        if (_catalog.Length == 0) return;
+        _rememberedGame = _catalog[_selected].Id;
+        try
+        {
+            Directory.CreateDirectory(_games.DataDirectory);
+            var path = Path.Combine(_games.DataDirectory, "library-view.json");
+            File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(new LibraryState(_rememberedGame, _ribbon)));
+            File.Move(path + ".tmp", path, true);
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        { _status.Text = "Impossible de mémoriser la bibliothèque : " + error.Message; }
+    }
+
+    private sealed record LibraryState(string SelectedGame, bool Ribbon);
 
     private string Cover(string? relative)
     {
