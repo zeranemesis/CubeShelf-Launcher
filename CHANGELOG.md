@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.0-preview.3 — jaquettes et plein écran, non publié
+
+- Copie explicite de toutes les jaquettes dans le dossier publié, hors bundle single-file ; la publication échoue si une image de couverture est absente.
+- Big Picture applique son plein écran sans décoration après l’ouverture native et suspend l’ajustement de taille du bureau tant qu’il est actif. Les réglages de fenêtre sont restaurés en quittant ce mode.
+- État du plein écran et nombre de fichiers de jaquettes manquants dans `Logs/BigPicture-display.log`.
+
 ## 0.17.0-preview.2 — correction du rendu 3D, non publié
 
 - Correction du crash `DrawingGroupDrawingContext.DrawBitmap` lors du rendu des jaquettes GLB : les textures sont dessinées directement par le compositeur ; seuls les clips et matrices du maillage sont mis en cache. Le modèle 3D et le partage des bitmaps sont conservés.

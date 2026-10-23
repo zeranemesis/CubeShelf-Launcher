@@ -23,6 +23,10 @@ public sealed partial class MainWindow
     private bool _bigPictureClosed;
     private bool _bigPictureGameRunning;
     private bool _bigPictureControllerConnected;
+    private SystemDecorations _bigPicturePreviousDecorations;
+    private bool _bigPicturePreviousCanResize;
+    private bool _bigPictureFullscreenQueued;
+    private bool _bigPictureApplyingFullscreen;
 
     private void InitializeBigPicture()
     {
@@ -39,6 +43,9 @@ public sealed partial class MainWindow
         {
             if (change.Property == IsVisibleProperty || change.Property == WindowStateProperty)
                 UpdateBigPictureGamepadPolling();
+            if (change.Property == WindowStateProperty && _bigPictureActive && !_bigPictureApplyingFullscreen &&
+                WindowState is WindowState.Normal or WindowState.Maximized)
+                QueueBigPictureFullscreen();
         };
         _sessions.Started += _ => Dispatcher.UIThread.Post(UpdateBigPictureGamepadPolling);
         _sessions.Ended += _ => Dispatcher.UIThread.Post(UpdateBigPictureGamepadPolling);
@@ -59,6 +66,8 @@ public sealed partial class MainWindow
     {
         if (_bigPictureActive) return;
         _bigPicturePreviousState = WindowState;
+        _bigPicturePreviousDecorations = SystemDecorations;
+        _bigPicturePreviousCanResize = CanResize;
         _bigPicturePreviousWidth = Width;
         _bigPicturePreviousHeight = Height;
         _bigPicturePreviousView = ContentViews.FirstOrDefault(view => view.IsVisible);
@@ -79,10 +88,50 @@ public sealed partial class MainWindow
         Grid.SetColumn(ViewHost, 0);
         Grid.SetColumnSpan(ViewHost, 2);
         ShowParityView(BigPictureView);
-        WindowState = WindowState.FullScreen;
+        QueueBigPictureFullscreen();
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         UpdateBigPictureGamepadPolling();
         FocusBigPictureAction(0);
+    }
+
+    private void QueueBigPictureFullscreen()
+    {
+        if (_bigPictureFullscreenQueued || !_bigPictureActive || _bigPictureClosed) return;
+        _bigPictureFullscreenQueued = true;
+        // The Opened handler can still be inside the platform's initial sizing.
+        // Apply after that transition and prevent desktop auto-fit from competing.
+        Dispatcher.UIThread.Post(() =>
+        {
+            _bigPictureFullscreenQueued = false;
+            if (!_bigPictureActive || _bigPictureClosed || !IsVisible || WindowState == WindowState.Minimized ||
+                _sessions.RunningGameIds.Count > 0) return;
+            _bigPictureApplyingFullscreen = true;
+            try
+            {
+                SystemDecorations = SystemDecorations.None;
+                CanResize = false;
+                WindowState = WindowState.FullScreen;
+            }
+            finally { _bigPictureApplyingFullscreen = false; }
+            Dispatcher.UIThread.Post(WriteBigPictureDisplayState, DispatcherPriority.Background);
+        }, DispatcherPriority.Background);
+    }
+
+    private void WriteBigPictureDisplayState()
+    {
+        if (!_bigPictureActive || _bigPictureClosed) return;
+        try
+        {
+            var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+            var missing = _bigPictureGames.SelectMany(game => game.Covers.Take(1))
+                .SelectMany(cover => new[] { cover.Front, cover.Back, cover.Spine })
+                .Count(path => string.IsNullOrWhiteSpace(path) || !File.Exists(ResolveCoverPath(path)));
+            var folder = Path.Combine(_paths.DataDirectory, "Logs");
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(Path.Combine(folder, "BigPicture-display.log"),
+                $"{DateTimeOffset.Now:O}\nState={WindowState}\nDecorations={SystemDecorations}\nClient={ClientSize}\nPosition={Position}\nScreen={screen?.Bounds}\nScaling={screen?.Scaling}\nMissingCoverFiles={missing}\n");
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
     }
 
     private void UpdateBigPictureGamepadPolling()
@@ -105,6 +154,8 @@ public sealed partial class MainWindow
     {
         if (!_bigPictureActive) return;
         _bigPictureActive = false;
+        SystemDecorations = _bigPicturePreviousDecorations;
+        CanResize = _bigPicturePreviousCanResize;
         _bigPictureTimer?.Stop();
         DesktopSidebar.IsVisible = true;
         Grid.SetColumn(ViewHost, 1);

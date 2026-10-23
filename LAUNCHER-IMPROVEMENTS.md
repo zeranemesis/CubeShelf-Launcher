@@ -1,4 +1,4 @@
-# CubeShelf 0.17.0-preview.2 : améliorations du launcher
+# CubeShelf 0.17.0-preview.3 : améliorations du launcher
 
 Cette passe applique le plan au launcher. Les moteurs, leurs capacités réseau,
 leurs ports et les fichiers des jeux restent hors périmètre.
@@ -12,6 +12,8 @@ leurs ports et les fichiers des jeux restent hors périmètre.
   manettes ne sont plus interrogées pendant une session ou quand la fenêtre est
   masquée/réduite. Les jaquettes GLB et les commandes tactile/manette sont conservées.
   Le paramètre `--big-picture` permet d’ouvrir directement cette vue.
+  Le plein écran est appliqué après l’ouverture de la fenêtre, sans décoration ;
+  l’ajustement du bureau est suspendu jusqu’à la sortie de Big Picture.
 - **Téléchargements** : pause, reprise, priorité, limite de débit et phases
   restent dans la page illustrée. Les vues masquées ne rafraîchissent plus leurs
   listes, graphiques ou lectures de stockage. Les transferts eux-mêmes continuent.
@@ -75,6 +77,11 @@ mais Avalonia 11.3.21 lève `NotImplementedException` sur ce chemin. La prévers
 2 conserve plutôt les matrices et clips des triangles, puis soumet les images
 au contexte de rendu normal du compositeur. Aucune exception de rendu n’est
 ignorée pour masquer le défaut.
+
+La préversion 3 impose la présence physique de toutes les images de jaquette
+dans le dossier publié, y compris en publication single-file. Le journal
+`Logs/BigPicture-display.log` conserve l’état de fenêtre, sa taille client,
+l’écran sélectionné et le nombre de fichiers de couverture manquants.
 
 « Mesurer la consommation » mesure le processus CubeShelf pendant deux secondes,
 avec CPU moyen, mémoire résidente, threads et taille estimée des bitmaps partagés.
