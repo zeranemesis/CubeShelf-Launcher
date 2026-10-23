@@ -183,6 +183,7 @@ public sealed partial class MainWindow : Window
             game.LaunchEnvironment.Values.Any(value => value.Contains("{mods}", StringComparison.Ordinal))
                 ? new PortableModManager(_paths, game.ModLibraryId).PrepareActiveList() : null);
         var environment = launch.Environment;
+        GameFullscreenLaunch.Apply(game, launch);
         // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
         // tab exists, with its name in the player's language, from the first frame.
         foreach (var pair in InGameEnvironment(game)) environment[pair.Key] = pair.Value;
@@ -200,7 +201,7 @@ public sealed partial class MainWindow : Window
         game.PlayCount++;
         game.LastPlayedAt = DateTimeOffset.Now;
         PersistCatalog();
-        WindowState = WindowState.Minimized;
+        if (!_bigPictureActive) WindowState = WindowState.Minimized;
         ActionStatus.Text = P7($"{game.RuntimeName} démarré avec l’image sélectionnée.",
             $"{game.RuntimeName} started with the selected disc image.");
         if (_selectedGame?.Id == game.Id) RefreshGameState();
@@ -325,6 +326,7 @@ public sealed partial class MainWindow : Window
 
     private void OnGameSessionEnded(GameSessionEndedEventArgs session)
     {
+        LaunchTransition.Stop();
         var game = _catalogGames.FirstOrDefault(item =>
             item.Id.Equals(session.GameId, StringComparison.OrdinalIgnoreCase));
         if (game is not null)

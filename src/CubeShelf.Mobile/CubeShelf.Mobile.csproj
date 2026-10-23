@@ -12,6 +12,7 @@
     <Compile Include="../CubeShelf.Desktop/Controls/CoverBitmapCache.cs" Link="Controls/CoverBitmapCache.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameShelfControl.cs" Link="Controls/GameShelfControl.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/DemandAnimation.cs" Link="Controls/DemandAnimation.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/GameLaunchTransition.cs" Link="Controls/GameLaunchTransition.cs" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/**/*" Link="Assets/Covers/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/games.json" Link="games.json" />

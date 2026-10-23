@@ -17,6 +17,9 @@ public sealed class MobileLibraryView : UserControl
 {
     private const string PartyBoardId = "GMPE01_00";
     private readonly IMobileGameService _games;
+    private readonly GameLaunchTransition _launchTransition = new() { ZIndex = 90 };
+    private bool _launching;
+    private CancellationTokenSource? _launchCancellation;
     private readonly GameShelfControl _shelf = new() { Height = 320 };
     private readonly TextBlock _title = new() { FontSize = 27, FontWeight = FontWeight.Bold, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _info = new() { FontSize = 15, TextWrapping = TextWrapping.Wrap };
@@ -47,6 +50,7 @@ public sealed class MobileLibraryView : UserControl
     public MobileLibraryView(IMobileGameService games)
     {
         _games = games;
+        _launchTransition.DismissRequested += CancelLaunchTransition;
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
         var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(24, 16) };
         var brand = new StackPanel { Spacing = 2 };
@@ -59,7 +63,7 @@ public sealed class MobileLibraryView : UserControl
         AddAction(navigation, "Retourner", () => _shelf.FlipSelected());
         _details.Children.Add(_availability);
         _play.Background = new SolidColorBrush(Color.Parse("#8B70F7"));
-        _play.Click += (_, _) => Run(_games.OpenGame);
+        _play.Click += async (_, _) => await LaunchSelectedGameAsync();
         _online.Click += (_, _) => Run(() => _games.OpenOnline());
         _download.Click += (_, _) => Run(_games.OpenDownloadPage);
         _join.Click += (_, _) => Run(() => _games.OpenOnline(_invite.Text?.Trim()));
@@ -79,6 +83,7 @@ public sealed class MobileLibraryView : UserControl
         var hint = new TextBlock { Text = "Balaye les jaquettes pour choisir · A : sélectionner · X : retourner · Y : en ligne",
             FontSize = 12, Foreground = Brushes.LightGray, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(24, 10) };
         Grid.SetRow(hint, 2); content.Children.Add(hint);
+        Grid.SetRowSpan(_launchTransition, 3); content.Children.Add(_launchTransition);
         Content = content;
         _shelf.SelectionRequested += Select;
         _shelf.AddHandler(PointerPressedEvent, ShelfTouchPressed, RoutingStrategies.Tunnel);
@@ -87,7 +92,7 @@ public sealed class MobileLibraryView : UserControl
         _shelf.PointerCaptureLost += (_, _) => ResetTouch();
         _invite.TextChanged += (_, _) => _join.IsEnabled = _invite.Text?.Trim().Length == 72 && _games.IsInstalled();
         AttachedToVisualTree += (_, _) => InitializeShelf();
-        DetachedFromVisualTree += (_, _) => { ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
+        DetachedFromVisualTree += (_, _) => { CancelLaunchTransition(); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
@@ -101,6 +106,7 @@ public sealed class MobileLibraryView : UserControl
 
     public void ActivateFromController()
     {
+        if (_launching) return;
         if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is Button button
             && button.IsEffectivelyVisible && button.IsEnabled)
             button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -109,12 +115,12 @@ public sealed class MobileLibraryView : UserControl
 
     public void ActivatePrimaryAction()
     {
-        if (_play.IsVisible) Run(_games.OpenGame);
+        if (_play.IsVisible) _ = LaunchSelectedGameAsync();
         else if (_download.IsVisible) Run(_games.OpenDownloadPage);
     }
 
-    public void FlipFromController() => _shelf.FlipSelected();
-    public void OpenOnlineFromController() { if (_onlinePanel.IsVisible) Run(() => _games.OpenOnline()); }
+    public void FlipFromController() { if (!_launching) _shelf.FlipSelected(); }
+    public void OpenOnlineFromController() { if (!_launching && _onlinePanel.IsVisible) Run(() => _games.OpenOnline()); }
 
     public void FocusPrimaryAction()
     {
@@ -124,6 +130,7 @@ public sealed class MobileLibraryView : UserControl
 
     public void MoveActionFocus(int step)
     {
+        if (_launching) return;
         var actions = _details.GetVisualDescendants().OfType<Control>()
             .Where(control => (control is Button or TextBox) && control.IsEffectivelyVisible && control.IsEnabled).ToArray();
         if (actions.Length == 0) return;
@@ -149,7 +156,7 @@ public sealed class MobileLibraryView : UserControl
     public void SetActive(bool active)
     {
         if (active) { InitializeShelf(); RefreshAvailability(); }
-        else { ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
+        else { CancelLaunchTransition(); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
     }
 
     private void ShelfTouchPressed(object? sender, PointerPressedEventArgs args)
@@ -209,6 +216,7 @@ public sealed class MobileLibraryView : UserControl
 
     public void BrowseFromController(int step)
     {
+        if (_launching) return;
         if (_invite.IsKeyboardFocusWithin) return;
         Select(_selected + step);
         FocusPrimaryAction();
@@ -254,6 +262,7 @@ public sealed class MobileLibraryView : UserControl
     private void Select(int index) => Select(index, true);
     private void Select(int index, bool animate)
     {
+        if (_launching) return;
         if (_catalog.Length == 0) return;
         _selected = (index % _catalog.Length + _catalog.Length) % _catalog.Length;
         var game = _catalog[_selected];
@@ -302,6 +311,34 @@ public sealed class MobileLibraryView : UserControl
     }
 
     private static Uri Resource(string path) => new($"avares://CubeShelf.Mobile/{path}");
+    private void CancelLaunchTransition()
+    {
+        _launchCancellation?.Cancel();
+        _launchTransition.Stop();
+    }
+
+    private async Task LaunchSelectedGameAsync()
+    {
+        if (_launching || !_play.IsVisible || _catalog.Length == 0) return;
+        _launching = true;
+        using var cancellation = new CancellationTokenSource();
+        _launchCancellation = cancellation;
+        try
+        {
+            var game = _catalog[_selected];
+            var cover = game.Covers.FirstOrDefault();
+            _launchTransition.Start(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine), "Lancement…");
+            await Task.Delay(500, cancellation.Token);
+            Run(_games.OpenGame);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception error) { _status.Text = error.Message; }
+        finally
+        {
+            _launchTransition.Stop(); _launchCancellation = null; _launching = false;
+        }
+    }
+
     private void Run(Func<bool> action)
     {
         try

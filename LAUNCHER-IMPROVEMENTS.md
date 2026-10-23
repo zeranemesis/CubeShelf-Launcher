@@ -105,3 +105,23 @@ réappliqué au retour du jeu et à la reprise du focus. A active le bouton cibl
 ou l’action principale, B cible l’action principale, X retourne le boîtier,
 Y ouvre les salons du jeu compatible. La croix verticale parcourt les actions.
 Les moteurs natifs continuent de s’ouvrir dans leur propre application.
+
+### Transition vers le jeu et plein écran
+
+En Big Picture PC, CubeShelf reste en plein écran derrière le jeu. La transition
+de 0,5 seconde est suivie d’une image statique pendant que la fenêtre native du
+jeu arrive ; elle s’arrête à la perte du focus. Le processus démarre immédiatement.
+Le bouton de retour et Échap permettent de retrouver la bibliothèque sans arrêter
+le jeu. La fermeture de la session réactive le launcher déjà en plein écran.
+Cette continuité visuelle ne constitue pas un hébergement du moteur dans Avalonia.
+
+Les contrats natifs examinés sont `SMS_WINDOW_MODE` et `SMS_FULLSCREEN_MODE` pour
+Sunshine/Eclipse, `STRIKERS_FULLSCREEN` pour Strikers v1.3.0, `video.enableFullscreen`
+dans les préférences SDL PartyBoard et `[Display] Fullscreen` dans le profil livré
+avec RingOut v1.6.10. Les modifications de fichiers préservent les autres options
+et créent une copie `.cubeshelf-before-fullscreen` au premier changement.
+Les moteurs personnalisés sans contrat reconnu gardent leurs réglages habituels.
+
+Android conserve son ouverture d’activité native après la transition ; le launcher
+ne peut pas lire les préférences privées de PartyBoard ni intégrer son moteur
+dans sa fenêtre. Le retour tactile annule la transition avant l’ouverture du jeu.

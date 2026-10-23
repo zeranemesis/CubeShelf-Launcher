@@ -36,6 +36,7 @@ public sealed partial class MainWindow
         Activated += (_, _) => UpdateBigPictureGamepadPolling();
         Deactivated += (_, _) =>
         {
+            LaunchTransition.Stop();
             _bigPictureLastInput = -1;
             if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(250);
         };
@@ -52,6 +53,7 @@ public sealed partial class MainWindow
         Closed += (_, _) =>
         {
             _bigPictureClosed = true;
+            LaunchTransition.Dispose();
             _bigPictureTimer?.Stop();
             BigPictureShelf.Dispose();
             DisposeBigPictureHomeImages();
@@ -243,6 +245,11 @@ public sealed partial class MainWindow
 
     private void BigPictureKeyDown(object? sender, KeyEventArgs args)
     {
+        if (LaunchTransition.IsVisible)
+        {
+            if (args.Key == Key.Escape) LaunchTransition.Stop();
+            args.Handled = true; return;
+        }
         if (OwnedWindows.Any(window => window.IsVisible)) return;
         if (args.Key == Key.F11)
         {
@@ -300,6 +307,7 @@ public sealed partial class MainWindow
 
     private void PollBigPictureGamepad()
     {
+        if (LaunchTransition.IsVisible) return;
         if (!_bigPictureActive || !IsVisible || WindowState == WindowState.Minimized || _bigPictureGameRunning)
         {
             UpdateBigPictureGamepadPolling();

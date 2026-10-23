@@ -1040,6 +1040,7 @@
       </Border>
 
       <!-- TOAST -->
+      <controls:GameLaunchTransition x:Name="LaunchTransition" ZIndex="90" />
       <Border x:Name="ToastHost" IsVisible="False" Opacity="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="390" Margin="24" Padding="16" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="14">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.16" /></Transitions></Border.Transitions>
         <Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="4"><TextBlock x:Name="ToastTitle" FontWeight="Bold" FontSize="15" /><TextBlock x:Name="ToastMessage" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" /></StackPanel><Button Grid.Column="1" Content="×" Click="HideToastParity" /></Grid>

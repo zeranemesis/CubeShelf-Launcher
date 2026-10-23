@@ -64,8 +64,7 @@ public sealed partial class MainWindow
                         "Le jeu n’est plus prêt. Vérifie son image dans les options avancées.",
                         "The game is no longer ready. Check its disc image in advanced options."));
                     if (readyAction is not null) return readyAction();
-                    LaunchReadyGame(game);
-                    return Task.CompletedTask;
+                    return LaunchWithBigPictureTransitionAsync(game);
                 }), intent.Cancellation.Token);
         }
         catch (OperationCanceledException)

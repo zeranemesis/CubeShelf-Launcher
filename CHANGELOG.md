@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.0-preview.5 — continuité Big Picture et jeux en plein écran, non publié
+
+- Big Picture reste en plein écran derrière le jeu : aucune réduction automatique du launcher, retour direct à CubeShelf à la fermeture du jeu.
+- La transition reste affichée jusqu’à la perte du focus au profit du jeu ; après 0,5 seconde elle reste statique. Retour à la bibliothèque possible par bouton ou Échap.
+- Plein écran natif au démarrage : Sunshine/Eclipse via `SMS_WINDOW_MODE=fullscreen` et résolution du bureau, Strikers via `STRIKERS_FULLSCREEN=1`, PartyBoard via `video.enableFullscreen`, RingOut via `[Display] Fullscreen=True`.
+- Les fichiers de préférences modifiés sont sauvegardés avec le suffixe `.cubeshelf-before-fullscreen` avant le premier changement ; les autres options sont conservées. Aucun moteur recompilé.
+
+## 0.17.0-preview.4 — transition de lancement, non publié
+
+- Big Picture PC et Android : jaquette 3D agrandie au centre, fond assombri et titre du jeu avec « Lancement… » pendant une transition de 0,5 seconde.
+- Animation à la demande via le compositeur, plafonnée à 120 mises à jour/s ; aucune animation continue après la transition et libération des textures au masquage.
+- PC : le processus démarre immédiatement ; seule la réduction du launcher attend la fin de la transition. L’animation s’arrête si le launcher perd le focus.
+- Android : transition de 0,5 seconde avant ouverture de l’activité native ; annulation si le launcher passe en arrière-plan avant le lancement. Les échecs rendent la bibliothèque accessible.
+- Code Android 8. Aucun moteur de jeu modifié.
+
 ## Android — Big Picture permanent, en préparation
 
 - Une seule interface Big Picture, directement au démarrage : jaquettes 3D et commandes tactiles, sans sélecteur déroulant ni changement vers une vue classique.
