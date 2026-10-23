@@ -141,7 +141,7 @@ public sealed class PortableModManager
         return new ModInstallPlan(rootMod.Id, _gameId, packages, warnings, incompatible);
     }
 
-    public Task<IReadOnlyList<PortableInstalledMod>> InstallPlanAsync(ModInstallPlan plan,
+    public async Task<IReadOnlyList<PortableInstalledMod>> InstallPlanAsync(ModInstallPlan plan,
         bool allowIncompatible = false, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
         if (!string.Equals(plan.GameId, _gameId, StringComparison.OrdinalIgnoreCase) || plan.Packages.Count == 0)
@@ -150,6 +150,7 @@ public sealed class PortableModManager
             throw new InvalidOperationException("Le plan entre en conflit avec des mods actifs et requiert une confirmation explicite.");
 
         var transaction = Path.Combine(_root, ".transaction-" + Guid.NewGuid().ToString("N"));
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
         var stagedRoot = Path.Combine(transaction, "staged");
         var backupRoot = Path.Combine(transaction, "backups");
         var priorState = File.Exists(_state) ? File.ReadAllBytes(_state) : null;
@@ -197,7 +198,7 @@ public sealed class PortableModManager
             foreach (var package in plan.Packages)
                 if (File.Exists(package.ArchivePath)) File.Delete(package.ArchivePath);
             progress?.Report(1);
-            return Task.FromResult<IReadOnlyList<PortableInstalledMod>>(installed);
+            return installed;
         }
         catch
         {
@@ -228,6 +229,7 @@ public sealed class PortableModManager
         try
         {
             await client.DownloadAsync(mod, temporary, progress, cancellationToken);
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
             string sha;
             await using (var stream = File.OpenRead(temporary))
                 sha = Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken)).ToLowerInvariant();
@@ -271,6 +273,34 @@ public sealed class PortableModManager
         Update(id, item => item with { Enabled = enabled });
     }
 
+    public void SetActiveSelection(IEnumerable<int> enabledIds, IReadOnlyDictionary<int, int>? priorities = null)
+    {
+        ArgumentNullException.ThrowIfNull(enabledIds);
+        var selected = enabledIds.ToHashSet();
+        var installed = GetInstalled();
+        var missing = selected.Except(installed.Where(mod => Directory.Exists(mod.ContentRoot)).Select(mod => mod.Id)).ToArray();
+        if (missing.Length > 0) throw new InvalidOperationException("Mods absents du profil : " + string.Join(", ", missing));
+        var disabled = GetPlayerDisabled().Where(id => !selected.Contains(id)).Order().ToArray();
+        var snapshots = new[] { _state, _playerDisabled, _active, _activeDetails }
+            .ToDictionary(path => path, path => File.Exists(path) ? File.ReadAllText(path) : null);
+        try
+        {
+            Save(installed.Select(mod => mod with { Enabled = selected.Contains(mod.Id),
+                Priority = selected.Contains(mod.Id) && priorities is not null && priorities.TryGetValue(mod.Id, out var priority) ? priority : mod.Priority }).ToArray());
+            AtomicWrite(_playerDisabled, JsonSerializer.Serialize(disabled));
+            WriteActiveList();
+        }
+        catch (Exception failure)
+        {
+            var failures = new List<Exception> { failure };
+            foreach (var (path, content) in snapshots)
+                try { if (content is null) File.Delete(path); else AtomicWrite(path, content); }
+                catch (Exception rollbackFailure) { failures.Add(rollbackFailure); }
+            if (failures.Count > 1) throw new AggregateException("Impossible de restaurer complètement la sélection précédente des mods.", failures);
+            throw;
+        }
+    }
+
     public void SetPriority(int id, int priority) => Update(id, item => item with { Priority = priority });
 
     public void Uninstall(int id)
@@ -284,11 +314,13 @@ public sealed class PortableModManager
         WriteActiveList();
     }
 
-    public IReadOnlyList<PortableModConflict> AnalyzeConflicts()
+    public IReadOnlyList<PortableModConflict> AnalyzeConflicts(IEnumerable<int>? enabledIds = null)
     {
         var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         var owners = new Dictionary<string, HashSet<int>>(comparer);
-        foreach (var mod in GetInstalled().Where(item => item.Enabled && Directory.Exists(item.ContentRoot)))
+        var selected = enabledIds?.ToHashSet();
+        var disabled = GetPlayerDisabled();
+        foreach (var mod in GetInstalled().Where(item => (selected is null ? item.Enabled && !disabled.Contains(item.Id) : selected.Contains(item.Id)) && Directory.Exists(item.ContentRoot)))
             foreach (var file in Directory.EnumerateFiles(mod.ContentRoot, "*", SearchOption.AllDirectories))
             {
                 var relative = Path.GetRelativePath(mod.ContentRoot, file).Replace(Path.DirectorySeparatorChar, '/');
@@ -305,10 +337,10 @@ public sealed class PortableModManager
     // Dolphin-style texture packs land here, and so does an archive with one
     // level too many. Reported, never blocked - the disc may gain new files, and
     // only the player knows what they meant to install.
-    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout()
+    public IReadOnlyList<PortableModLayoutWarning> AnalyzeLayout(bool includeDisabled = false)
     {
         var warnings = new List<PortableModLayoutWarning>();
-        foreach (var mod in GetInstalled().Where(item => item.Enabled && Directory.Exists(item.ContentRoot)))
+        foreach (var mod in GetInstalled().Where(item => (includeDisabled || item.Enabled) && Directory.Exists(item.ContentRoot)))
         {
             var entries = Directory.EnumerateFileSystemEntries(mod.ContentRoot)
                 .Select(Path.GetFileName).OfType<string>().ToArray();

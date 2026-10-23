@@ -383,6 +383,7 @@ public sealed partial class MainWindow
         FriendsEmptyText.IsVisible = rows.Length == 0;
         FriendsSubtitleText.Text = DescribePublishingState();
         RefreshMeshRequests();
+        RefreshBigPictureHomeFriends();
     }
 
     private FriendRow BuildFriendRow(Friend friend, string handle, bool canHost, DateTimeOffset now)

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+  <queries>
+    <package android:name="com.mariopartyrd.partyboard" />
+    <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
+  </queries>
+  <application android:label="CubeShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" />
+</manifest>

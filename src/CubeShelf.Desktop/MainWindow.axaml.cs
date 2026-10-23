@@ -42,6 +42,17 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         var paths = new PlatformPaths();
         _paths = paths;
+        string? restoredProfileMessage = null;
+        var profileBackups = new CubeShelf.Core.Storage.ProfileBackupService(paths);
+        try
+        {
+            if (profileBackups.ApplyPendingRestore()) restoredProfileMessage = "Profil restauré. / Profile restored.";
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException or AggregateException)
+        {
+            restoredProfileMessage = "Restauration du profil annulée / Profile restore cancelled: " + error.Message;
+            try { profileBackups.DiscardPendingRestore(); } catch (Exception discardError) when (discardError is IOException or UnauthorizedAccessException) { }
+        }
         _mediaCache = new MediaCacheService(paths);
         var migration = new LegacyDataMigrator(paths, AppContext.BaseDirectory).Run();
         _preferencesStore = new UserPreferencesStore(paths);
@@ -64,6 +75,8 @@ public sealed partial class MainWindow : Window
         InitializePhase5Polish();
         InitializePhase6Parity();
         InitializePhase7Finalization();
+        InitializeBigPicture();
+        RefreshMaintenanceLabels();
         PlatformStatus.Text = OperatingSystem.IsWindows()
             ? "Plateforme détectée : Windows"
             : OperatingSystem.IsLinux()
@@ -71,6 +84,7 @@ public sealed partial class MainWindow : Window
                 : "Plateforme détectée : macOS (expérimental)";
         DataPath.Text = $"Profil : {paths.DataDirectory}";
         SettingsDataPath.Text = paths.DataDirectory;
+        if (restoredProfileMessage is not null) SettingsStatus.Text = restoredProfileMessage;
         if (!migration.AlreadyCompleted && (migration.RuntimesCopied > 0 || migration.ModLibrariesCopied > 0))
             SettingsStatus.Text = $"Migration terminée : {migration.RuntimesCopied} runtime(s), {migration.ModLibrariesCopied} bibliothèque(s) de mods copiés. Sources conservées.";
 
@@ -132,7 +146,11 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            _preferences = _preferences with { WindowWidth = Width, WindowHeight = Height };
+            _preferences = _preferences with
+            {
+                WindowWidth = _bigPictureActive ? _bigPicturePreviousWidth : Width,
+                WindowHeight = _bigPictureActive ? _bigPicturePreviousHeight : Height
+            };
             _preferencesStore.Save(_preferences);
             // Before the tracker is disposed: the farewell document has to still know whether
             // a game is running, or a friend is left looking at a stale "in a game".
@@ -140,6 +158,7 @@ public sealed partial class MainWindow : Window
             DisposeSocial();
             DisposeFriends();
             _sessions.Dispose();
+            DisposeQuickPlay();
             DisposePhase3Parity();
             DisposePhase4Parity();
             DisposePhase5Polish();
@@ -155,58 +174,38 @@ public sealed partial class MainWindow : Window
 
     private async void PlayGame(object? sender, RoutedEventArgs args)
     {
-        if (_selectedGame is null) return;
+        if (_selectedGame is { } game) await RequestPlayAsync(game);
+    }
 
-        if (_sessions.IsRunning(_selectedGame.Id))
-        {
-            PlayButton.IsEnabled = false;
-            PlayButton.Content = "Arrêt…";
-            try { await _sessions.StopAsync(_selectedGame.Id); }
-            finally { RefreshGameState(); }
-            return;
-        }
+    private void LaunchReadyGame(GameCatalogEntry game)
+    {
+        var launch = GameLaunchConfiguration.Create(game,
+            game.LaunchEnvironment.Values.Any(value => value.Contains("{mods}", StringComparison.Ordinal))
+                ? new PortableModManager(_paths, game.ModLibraryId).PrepareActiveList() : null);
+        var environment = launch.Environment;
+        GameFullscreenLaunch.Apply(game, launch);
+        // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
+        // tab exists, with its name in the player's language, from the first frame.
+        foreach (var pair in InGameEnvironment(game)) environment[pair.Key] = pair.Value;
+        // One RetroAchievements login for every game that can take it.
+        AddRetroAchievementsEnvironment(game, environment);
+        if (environment.ContainsKey(CubeShelf.Core.Social.InGameBridge.DirectoryVariable)) WriteInGameState();
 
-        if (!CanPlay()) return;
-        if (_selectedGame.DataPreparation != GameDataPreparation.Runtime &&
-            !_gameData.IsPrepared(_selectedGame, _selectedGame.Executable))
-        {
-            await QueueGameDataPreparationPhase4Async(launchWhenReady: true);
-            return;
-        }
+        _sessions.Start(
+            game.Id,
+            game.Executable,
+            Path.GetDirectoryName(game.Executable) ?? AppContext.BaseDirectory,
+            environment, launch.Arguments,
+            game.LogOutput ? Path.Combine(_paths.DataDirectory, "Logs", game.Id + ".log") : null);
 
-        try
-        {
-            var launch = GameLaunchConfiguration.Create(_selectedGame,
-                _selectedGame.LaunchEnvironment.Values.Any(value => value.Contains("{mods}", StringComparison.Ordinal))
-                    ? _modManager?.PrepareActiveList() : null);
-            var environment = launch.Environment;
-            // Tells the game where its F1 Friends tab can reach CubeShelf. Written first, so the
-            // tab exists, with its name in the player's language, from the first frame.
-            foreach (var pair in InGameEnvironment(_selectedGame)) environment[pair.Key] = pair.Value;
-            // One RetroAchievements login for every game that can take it.
-            AddRetroAchievementsEnvironment(_selectedGame, environment);
-            if (environment.ContainsKey(CubeShelf.Core.Social.InGameBridge.DirectoryVariable)) WriteInGameState();
-
-            _sessions.Start(
-                _selectedGame.Id,
-                _selectedGame.Executable,
-                Path.GetDirectoryName(_selectedGame.Executable) ?? AppContext.BaseDirectory,
-                environment, launch.Arguments,
-                _selectedGame.LogOutput ? Path.Combine(_paths.DataDirectory, "Logs", _selectedGame.Id + ".log") : null);
-
-            _selectedGame.PlayCount++;
-            _selectedGame.LastPlayedAt = DateTimeOffset.Now;
-            PersistCatalog();
-            WindowState = WindowState.Minimized;
-            ActionStatus.Text = P7($"{_selectedGame.RuntimeName} démarré avec l’image sélectionnée.",
-                $"{_selectedGame.RuntimeName} started with the selected disc image.");
-            RefreshGameState();
-        }
-        catch (Exception exception)
-        {
-            ActionStatus.Text = P7($"Impossible de démarrer {_selectedGame.RuntimeName} : {exception.Message}",
-                $"Unable to start {_selectedGame.RuntimeName}: {exception.Message}");
-        }
+        game.PlayCount++;
+        game.LastPlayedAt = DateTimeOffset.Now;
+        PersistCatalog();
+        if (!_bigPictureActive) WindowState = WindowState.Minimized;
+        ActionStatus.Text = P7($"{game.RuntimeName} démarré avec l’image sélectionnée.",
+            $"{game.RuntimeName} started with the selected disc image.");
+        if (_selectedGame?.Id == game.Id) RefreshGameState();
+        else RefreshLibraryParity();
     }
 
     private async void ChooseDisc(object? sender, RoutedEventArgs args)
@@ -327,6 +326,7 @@ public sealed partial class MainWindow : Window
 
     private void OnGameSessionEnded(GameSessionEndedEventArgs session)
     {
+        LaunchTransition.Stop();
         var game = _catalogGames.FirstOrDefault(item =>
             item.Id.Equals(session.GameId, StringComparison.OrdinalIgnoreCase));
         if (game is not null)
@@ -337,13 +337,17 @@ public sealed partial class MainWindow : Window
 
         if (_selectedGame?.Id.Equals(session.GameId, StringComparison.OrdinalIgnoreCase) == true)
             RefreshGameState();
+        else
+            RefreshQuickPlayUi();
 
         if (_sessions.RunningGameIds.Count == 0)
         {
-            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+            RefreshBigPictureResume();
+            if (WindowState == WindowState.Minimized) WindowState = _bigPictureActive ? WindowState.FullScreen : WindowState.Normal;
             Show();
             Activate();
         }
+        ShowLaunchRecovery(session);
     }
 
     private static string FormatPlayTime(long seconds)
@@ -402,7 +406,7 @@ public sealed partial class MainWindow : Window
             ExecutablePathText.Text += $"\n{game.RuntimeName} se charge du disque lui-même ; CubeShelf n’a rien à préparer.";
 
         var running = _sessions.IsRunning(game.Id);
-        PlayButton.IsEnabled = running || CanPlay();
+        PlayButton.IsEnabled = PlayIntentFor(game) is null;
         PlayButton.Content = running ? "■ Arrêter" : "▶ Jouer";
         FavoriteButton.Content = game.IsFavorite ? "★ Favori" : "☆ Ajouter aux favoris";
         var lastPlayed = game.LastPlayedAt is null
@@ -410,27 +414,25 @@ public sealed partial class MainWindow : Window
             : game.LastPlayedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
         GameStatsText.Text =
             $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • Dernier : {lastPlayed}";
-        ActionStatus.Text = running
-            ? $"{game.RuntimeName} est en cours d’exécution."
-            : PlayButton.IsEnabled
-                ? "Configuration prête."
-                : $"Sélectionne une image compatible et l’exécutable {game.RuntimeName}.";
+        ActionStatus.Text = QuickPlayHint(game);
 
         RefreshParityGameDetails();
         RefreshLibraryParity();
+        RefreshQuickPlayUi();
     }
 
-    private bool CanPlay()
+    private bool CanPlay(GameCatalogEntry? targetGame = null)
     {
-        if (_selectedGame is null || !File.Exists(_selectedGame.Executable)) return false;
-        if (!DiscImageService.Inspect(_selectedGame.DiscImage, _selectedGame).Supported) return false;
+        var game = targetGame ?? _selectedGame;
+        if (game is null || !File.Exists(game.Executable)) return false;
+        if (!DiscImageService.Inspect(game.DiscImage, game).Supported) return false;
 
         // A runtime-managed disc has nothing for CubeShelf to prepare and nothing to wait for
         // before enabling Play: Ring Out extracts and recompiles on its own first launch, and
         // PartyBoard opens the image directly from PARTYBOARD_DISC_IMAGE.
-        return _selectedGame.DataPreparation != GameDataPreparation.DiscPatch ||
-            (_selectedGame.DiscPatch is { } patch &&
-             DiscPatchSource.FindDelta(_paths, _selectedGame.ModLibraryId, patch) is not null);
+        return game.DataPreparation != GameDataPreparation.DiscPatch ||
+            (game.DiscPatch is { } patch &&
+             DiscPatchSource.FindDelta(_paths, game.ModLibraryId, patch) is not null);
     }
 
     private static string ResolveApplicationPath(string path) =>
@@ -784,6 +786,11 @@ public sealed partial class MainWindow : Window
     private void ApplyPreferences()
     {
         _loadingSettings = true;
+        if (_portableQueue is not null)
+        {
+            _portableQueue.BandwidthLimitBytesPerSecond = _preferences.DownloadBandwidthLimit;
+            DownloadManager.Refresh();
+        }
         LanguagePicker.SelectedIndex = _preferences.Language.ToLowerInvariant() switch { "fr" => 1, "en" => 2, _ => 0 };
         ThemePicker.SelectedIndex = _preferences.Theme.Equals("light", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;

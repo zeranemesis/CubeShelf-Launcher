@@ -89,7 +89,8 @@ public sealed partial class MainWindow
     private void RestoreFromTray(bool showFriends)
     {
         if (!IsVisible) Show();
-        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+        if (WindowState == WindowState.Minimized) WindowState = _bigPictureActive ? WindowState.FullScreen : WindowState.Normal;
+        if (showFriends && _bigPictureActive) ExitBigPicture(this, new RoutedEventArgs());
         Activate();
         if (showFriends) ParityShowFriends(null, new RoutedEventArgs());
     }

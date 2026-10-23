@@ -38,6 +38,8 @@ public sealed partial class MainWindow
         // Someone who went through the wizard before its network page existed, or skipped it,
         // hears about it once now -- before CubeShelf ever looks.
         if (!_preferences.MeshDiscoveryNoticeSeen) await ShowMeshDiscoveryNoticeAsync();
+        if (Environment.GetCommandLineArgs().Contains("--big-picture", StringComparer.OrdinalIgnoreCase))
+            EnterBigPicture(this, new RoutedEventArgs());
     }
 
     private async Task ShowMeshDiscoveryNoticeAsync()
@@ -167,6 +169,7 @@ public sealed partial class MainWindow
     {
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
+        UpdateBigPictureSubnav(view);
     }
 
     /// <summary>
@@ -215,7 +218,11 @@ public sealed partial class MainWindow
         };
 
         foreach (var game in query)
-            _parityCards.Add(BuildCard(game));
+        {
+            var card = BuildCard(game);
+            ApplyQuickPlayCard(card);
+            _parityCards.Add(card);
+        }
 
         LibraryCards.ItemsSource = _parityCards.ToArray();
         var english = UiLocalization.IsEnglish(_preferences.Language);
@@ -340,11 +347,7 @@ public sealed partial class MainWindow
             : prepared
                 ? (english ? "✓ Game data ready" : "✓ Données prêtes")
                 : (english ? "○ Game data to prepare" : "○ Données à préparer");
-        SetupProgressText.Text = runtimeManagesDisc
-            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} {string.Join("/", game.DiscFormats.Select(format => format.TrimStart('.').ToUpperInvariant()))}"
-            : english
-                ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
-                : $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
+        SetupProgressText.Text = QuickPlayHint(game);
 
         FavoriteButton.Content = game.IsFavorite
             ? (english ? "★ Favorite" : "★ Favori")
@@ -390,6 +393,7 @@ public sealed partial class MainWindow
     private string ResolveCoverPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return "";
+        path = path.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar);
         return Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
@@ -543,7 +547,7 @@ public sealed partial class MainWindow
         return $"{value:0.##} {units[unit]}";
     }
 
-    public sealed class DesktopGameCard : IDisposable
+    public sealed class DesktopGameCard : IDisposable, System.ComponentModel.INotifyPropertyChanged
     {
         public DesktopGameCard(GameCatalogEntry game, Bitmap? cover, string favorite, string disc, string runtime, string data, string stats, string update)
         {
@@ -567,6 +571,18 @@ public sealed partial class MainWindow
         public string Data { get; }
         public string Stats { get; }
         public string Update { get; }
+        public string PlayLabel { get; private set; } = "";
+        public string PlayHint { get; private set; } = "";
+        public bool CanQuickPlay { get; private set; } = true;
+        public bool IsPreparing => !CanQuickPlay;
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+        public void UpdatePlay(string label, string hint, bool enabled)
+        {
+            if (PlayLabel == label && PlayHint == hint && CanQuickPlay == enabled) return;
+            PlayLabel = label; PlayHint = hint; CanQuickPlay = enabled;
+            foreach (var property in new[] { nameof(PlayLabel), nameof(PlayHint), nameof(CanQuickPlay), nameof(IsPreparing) })
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(property));
+        }
         public void Dispose() => Cover?.Dispose();
     }
 }

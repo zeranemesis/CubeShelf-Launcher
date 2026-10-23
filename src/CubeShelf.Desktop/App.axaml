@@ -151,7 +151,7 @@
       <x:String x:Key="LibraryEyebrow">BIBLIOTHÈQUE</x:String>
       <x:String x:Key="LibraryTitle">Tes jeux GameCube</x:String>
       <x:String x:Key="AddGame">+ Ajouter un jeu</x:String>
-      <x:String x:Key="LibrarySubtitle">Les mises à jour GitHub sont vérifiées automatiquement. Sélectionne un jeu pour continuer.</x:String>
+      <x:String x:Key="LibrarySubtitle">Clique sur Jouer. CubeShelf prépare ce qui manque.</x:String>
       <x:String x:Key="SearchGame">Rechercher un jeu…</x:String>
       <x:String x:Key="SortName">Nom A-Z</x:String>
       <x:String x:Key="SortRecent">Récemment joué</x:String>
