@@ -90,3 +90,18 @@ Il ne mesure ni les FPS des jeux ni la mémoire GPU.
 Les composants PC, Mobile et Updater sont compilés. Aucun test automatisé,
 rollback réel d’installation, restauration de données utilisateur, essai de
 manette physique ou essai sur téléphone n’a été exécuté dans cette passe.
+
+### Android : Big Picture uniquement
+
+Le shell mobile ouvre directement la bibliothèque Big Picture avec ses jaquettes
+3D. Il ne propose plus de vue classique ni de sélecteur déroulant. En paysage,
+l’étagère et les actions occupent deux colonnes ; en portrait, deux rangées.
+Les actions restent défilantes indépendamment des jaquettes. La sélection
+du jeu est mémorisée, le ruban Big Picture reste actif.
+
+L’activité Android masque les barres système avec AndroidX WindowInsets ; un
+balayage depuis le bord permet de les révéler temporairement. Le mode est
+réappliqué au retour du jeu et à la reprise du focus. A active le bouton ciblé
+ou l’action principale, B cible l’action principale, X retourne le boîtier,
+Y ouvre les salons du jeu compatible. La croix verticale parcourt les actions.
+Les moteurs natifs continuent de s’ouvrir dans leur propre application.

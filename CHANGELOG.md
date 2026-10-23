@@ -1,5 +1,13 @@
 # Changelog
 
+## Android — Big Picture permanent, en préparation
+
+- Une seule interface Big Picture, directement au démarrage : jaquettes 3D et commandes tactiles, sans sélecteur déroulant ni changement vers une vue classique.
+- Plein écran immersif réappliqué au retour dans le launcher ; navigation système accessible par un geste depuis le bord.
+- Étagère et fiche côte à côte en paysage, superposées en portrait ; fiche défilante pour conserver l’accès aux actions sur petit écran.
+- Manette : A sélectionne, B revient au bouton principal, X retourne la jaquette, Y ouvre les salons ; croix verticale pour les actions et horizontale pour les jeux.
+- Code de version Android 7. Aucun moteur ni catalogue de jeux modifié.
+
 ## 0.17.0-preview.3 — jaquettes et plein écran, non publié
 
 - Copie explicite de toutes les jaquettes dans le dossier publié, hors bundle single-file ; la publication échoue si une image de couverture est absente.

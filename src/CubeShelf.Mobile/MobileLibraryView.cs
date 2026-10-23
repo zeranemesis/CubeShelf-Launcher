@@ -7,11 +7,12 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.VisualTree;
 using CubeShelf.Desktop.Controls;
 
 namespace CubeShelf.Mobile;
 
-/// <summary>Phone/tablet shell sharing the desktop case renderer and catalogue.</summary>
+/// <summary>Permanent Big Picture shell sharing the desktop case renderer and catalogue.</summary>
 public sealed class MobileLibraryView : UserControl
 {
     private const string PartyBoardId = "GMPE01_00";
@@ -22,14 +23,14 @@ public sealed class MobileLibraryView : UserControl
     private readonly TextBlock _availability = new() { FontSize = 16, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _status = new() { FontSize = 15, TextWrapping = TextWrapping.Wrap };
     private readonly TextBox _invite = new() { Watermark = "Invitation privée PB4…", MaxLength = 80, MinHeight = 48 };
-    private readonly ComboBox _picker = new() { MinHeight = 48, HorizontalAlignment = HorizontalAlignment.Stretch };
     private readonly Button _play = MakeButton("Jouer");
     private readonly Button _online = MakeButton("Salons en ligne");
     private readonly Button _download = MakeButton("Installer PartyBoard pour Android");
     private readonly Button _join = MakeButton("Rejoindre l’invitation");
     private readonly StackPanel _onlinePanel = new() { Spacing = 12 };
     private readonly Grid _body = new() { RowDefinitions = new RowDefinitions("Auto,Auto") };
-    private readonly UniformGrid _navigation = new() { Columns = 2 };
+    private readonly UniformGrid _navigation = new() { Columns = 1 };
+    private readonly TextBlock _position = new() { FontSize = 14, Foreground = Brushes.LightGray, VerticalAlignment = VerticalAlignment.Center };
     private readonly StackPanel _details = new() { Spacing = 16, Margin = new Thickness(20, 0, 20, 24) };
     private MobileGame[] _catalog = [];
     private int _selected;
@@ -47,15 +48,15 @@ public sealed class MobileLibraryView : UserControl
     {
         _games = games;
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
-        var heading = new StackPanel { Spacing = 6, Margin = new Thickness(20, 18, 20, 12) };
-        heading.Children.Add(new TextBlock { Text = "CubeShelf", FontSize = 24, FontWeight = FontWeight.Bold });
-        heading.Children.Add(new TextBlock { Text = "Tes jeux, en natif sur Android", FontSize = 14, Foreground = Brushes.LightGray });
-        heading.Children.Add(_picker);
+        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(24, 16) };
+        var brand = new StackPanel { Spacing = 2 };
+        brand.Children.Add(new TextBlock { Text = "CubeShelf", FontSize = 24, FontWeight = FontWeight.Bold });
+        brand.Children.Add(new TextBlock { Text = "BIBLIOTHÈQUE", FontSize = 12, Foreground = Brushes.LightGray });
+        heading.Children.Add(brand);
+        Grid.SetColumn(_position, 1); heading.Children.Add(_position);
         _details.Children.Add(_title); _details.Children.Add(_info);
         var navigation = _navigation;
         AddAction(navigation, "Retourner", () => _shelf.FlipSelected());
-        AddAction(navigation, "Vue", () => { _ribbon = !_ribbon; _shelf.SetSelection(_selected, _ribbon); SaveLibraryState(); });
-        _details.Children.Add(navigation);
         _details.Children.Add(_availability);
         _play.Background = new SolidColorBrush(Color.Parse("#8B70F7"));
         _play.Click += (_, _) => Run(_games.OpenGame);
@@ -63,31 +64,71 @@ public sealed class MobileLibraryView : UserControl
         _download.Click += (_, _) => Run(_games.OpenDownloadPage);
         _join.Click += (_, _) => Run(() => _games.OpenOnline(_invite.Text?.Trim()));
         _details.Children.Add(_play); _details.Children.Add(_download);
+        _details.Children.Add(navigation);
         _onlinePanel.Children.Add(_online);
         _onlinePanel.Children.Add(new TextBlock { Text = "Entre téléphones avec le même APK et un disque compatible. La connexion à un PC est bloquée par le port actuel.", FontSize = 14, TextWrapping = TextWrapping.Wrap });
         _onlinePanel.Children.Add(_invite); _onlinePanel.Children.Add(_join);
         _details.Children.Add(_onlinePanel);
         _details.Children.Add(_status);
         _details.Children.Add(new TextBlock { Text = "Pour Mario Party 4, le premier choix du disque, les réglages, les sauvegardes et les mods se font dans PartyBoard. Aucun fichier de jeu n’est fourni.", FontSize = 13, TextWrapping = TextWrapping.Wrap, Foreground = Brushes.LightGray });
-        _body.Children.Add(_shelf); Grid.SetRow(_details, 1); _body.Children.Add(_details);
-        var content = new StackPanel(); content.Children.Add(heading); content.Children.Add(_body);
-        Content = new ScrollViewer { Content = content, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
+        _body.Children.Add(_shelf);
+        _detailsScroll = new ScrollViewer { Content = _details, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        Grid.SetRow(_detailsScroll, 1); _body.Children.Add(_detailsScroll);
+        var content = new Grid { RowDefinitions = new RowDefinitions("Auto,*,Auto"), Margin = new Thickness(8) };
+        content.Children.Add(heading); Grid.SetRow(_body, 1); content.Children.Add(_body);
+        var hint = new TextBlock { Text = "Balaye les jaquettes pour choisir · A : sélectionner · X : retourner · Y : en ligne",
+            FontSize = 12, Foreground = Brushes.LightGray, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(24, 10) };
+        Grid.SetRow(hint, 2); content.Children.Add(hint);
+        Content = content;
         _shelf.SelectionRequested += Select;
         _shelf.AddHandler(PointerPressedEvent, ShelfTouchPressed, RoutingStrategies.Tunnel);
         _shelf.AddHandler(PointerMovedEvent, ShelfTouchMoved, RoutingStrategies.Tunnel);
         _shelf.AddHandler(PointerReleasedEvent, ShelfTouchReleased, RoutingStrategies.Tunnel);
         _shelf.PointerCaptureLost += (_, _) => ResetTouch();
-        _picker.SelectionChanged += (_, _) => { if (_realized && _picker.SelectedIndex >= 0 && _picker.SelectedIndex != _selected) Select(_picker.SelectedIndex); };
         _invite.TextChanged += (_, _) => _join.IsEnabled = _invite.Text?.Trim().Length == 72 && _games.IsInstalled();
         AttachedToVisualTree += (_, _) => InitializeShelf();
         DetachedFromVisualTree += (_, _) => { ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
-            if (_invite.IsKeyboardFocusWithin || _picker.IsKeyboardFocusWithin) return;
+            if (_invite.IsKeyboardFocusWithin) return;
             if (args.Key == Key.Left) { Select(_selected - 1); args.Handled = true; }
             else if (args.Key == Key.Right) { Select(_selected + 1); args.Handled = true; }
         };
+    }
+
+    private readonly ScrollViewer _detailsScroll;
+
+    public void ActivateFromController()
+    {
+        if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is Button button
+            && button.IsEffectivelyVisible && button.IsEnabled)
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        else if (!_invite.IsKeyboardFocusWithin) ActivatePrimaryAction();
+    }
+
+    public void ActivatePrimaryAction()
+    {
+        if (_play.IsVisible) Run(_games.OpenGame);
+        else if (_download.IsVisible) Run(_games.OpenDownloadPage);
+    }
+
+    public void FlipFromController() => _shelf.FlipSelected();
+    public void OpenOnlineFromController() { if (_onlinePanel.IsVisible) Run(() => _games.OpenOnline()); }
+
+    public void FocusPrimaryAction()
+    {
+        if (_play.IsVisible) _play.Focus();
+        else if (_download.IsVisible) _download.Focus();
+    }
+
+    public void MoveActionFocus(int step)
+    {
+        var actions = _details.GetVisualDescendants().OfType<Control>()
+            .Where(control => (control is Button or TextBox) && control.IsEffectivelyVisible && control.IsEnabled).ToArray();
+        if (actions.Length == 0) return;
+        var current = Array.IndexOf(actions, TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control);
+        actions[current < 0 ? (step > 0 ? 0 : actions.Length - 1) : (current + step + actions.Length) % actions.Length].Focus();
     }
 
     public void RefreshAvailability()
@@ -168,8 +209,9 @@ public sealed class MobileLibraryView : UserControl
 
     public void BrowseFromController(int step)
     {
-        if (_invite.IsKeyboardFocusWithin || _picker.IsKeyboardFocusWithin) return;
+        if (_invite.IsKeyboardFocusWithin) return;
         Select(_selected + step);
+        FocusPrimaryAction();
     }
 
     private void InitializeShelf()
@@ -191,14 +233,13 @@ public sealed class MobileLibraryView : UserControl
                     {
                         var state = JsonSerializer.Deserialize<LibraryState>(File.ReadAllText(statePath));
                         _rememberedGame = state?.SelectedGame ?? "";
-                        _ribbon = state?.Ribbon ?? true;
+                        _ribbon = true;
                     }
                 }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
             }
             var remembered = Array.FindIndex(_catalog, game => game.Id == _rememberedGame);
             if (remembered >= 0) _selected = remembered;
-            _picker.ItemsSource = _catalog.Select(game => game.Title).ToArray();
             _shelf.SetGames(_catalog.Select(game =>
             {
                 var cover = game.Covers.FirstOrDefault();
@@ -216,12 +257,13 @@ public sealed class MobileLibraryView : UserControl
         if (_catalog.Length == 0) return;
         _selected = (index % _catalog.Length + _catalog.Length) % _catalog.Length;
         var game = _catalog[_selected];
-        _picker.SelectedIndex = _selected;
+        _position.Text = $"{_selected + 1} / {_catalog.Length}";
         _title.Text = game.Title;
         _info.Text = $"{game.Year} · {game.Genre} · {game.Players}";
         _status.Text = "";
         _shelf.SetSelection(_selected, _ribbon, animate);
         RefreshAvailability();
+        _detailsScroll.Offset = default;
         SaveLibraryState();
     }
 
@@ -273,10 +315,13 @@ public sealed class MobileLibraryView : UserControl
 
     private void UpdateResponsiveLayout()
     {
-        var wide = Bounds.Width >= 700;
-        _body.ColumnDefinitions = new ColumnDefinitions(wide ? "*,*" : "*");
-        Grid.SetRow(_details, wide ? 0 : 1); Grid.SetColumn(_details, wide ? 1 : 0);
-        _shelf.Height = wide ? Math.Clamp(Bounds.Height - 120, 260, 500) : Math.Clamp(Bounds.Width * .85, 260, 410);
+        var wide = Bounds.Width >= 600 && Bounds.Width > Bounds.Height;
+        _body.ColumnDefinitions = new ColumnDefinitions(wide ? "3*,2*" : "*");
+        _body.RowDefinitions = new RowDefinitions(wide ? "*" : "*,*");
+        Grid.SetRow(_detailsScroll, wide ? 0 : 1); Grid.SetColumn(_detailsScroll, wide ? 1 : 0);
+        _shelf.Height = double.NaN;
+        _shelf.MinHeight = 0;
+        _title.FontSize = wide ? 30 : 24;
     }
 
     private static Button MakeButton(string text) => new() { Content = text, FontSize = 17, MinHeight = 52,
