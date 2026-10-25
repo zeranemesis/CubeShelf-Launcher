@@ -198,7 +198,7 @@ public sealed partial class MainWindow
                 return;
             }
 
-            var dialog = CreatePhase7Dialog(P7("Mise à jour CubeShelf", "CubeShelf update"), 500, 250);
+            var dialog = CreatePhase7Dialog(P7("Mise à jour CubeShelf", "CubeShelf update"), 540, 355);
             dialog.Content = new StackPanel
             {
                 Margin = new Avalonia.Thickness(24), Spacing = 14,
@@ -206,18 +206,39 @@ public sealed partial class MainWindow
                 {
                     new TextBlock { Text = P7($"Installer CubeShelf {update.LatestVersion} ?", $"Install CubeShelf {update.LatestVersion}?"), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold },
                     new TextBlock { Text = P7("Le paquet sera téléchargé en HTTPS et vérifié avec le SHA-256 du manifeste avant toute installation.", "The package will be downloaded over HTTPS and verified against the manifest SHA-256 before installation."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new TextBlock { Text = P7("Un point de restauration de ton profil sera créé avant la mise à jour.", "A restore point for your profile will be created before the update."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    CreateDialogButton(P7("Voir les nouveautés", "View release notes"), (_, _) =>
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                                "https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/" + Uri.EscapeDataString("v" + update.LatestVersion.TrimStart('v')))
+                                { UseShellExecute = true });
+                        }
+                        catch (Exception error) { LauncherUpdateStatusText.Text = error.Message; }
+                    }),
                     CreateDialogButton(P7("Télécharger", "Download"), (_, _) => dialog.Close(true)),
                     CreateDialogButton(P7("Plus tard", "Later"), (_, _) => dialog.Close(false))
                 }
             };
             if (!await dialog.ShowDialog<bool>(this)) return;
 
-            var progress = new Progress<double>(value =>
-                LauncherUpdateStatusText.Text = P7($"Téléchargement vérifié… {value:P0}", $"Verified download… {value:P0}"));
-            var archive = await _launcherUpdates.DownloadAsync(update, progress, cancellationToken);
-            var result = _launcherUpdateInstaller.Launch(archive, update.LatestVersion, Environment.ProcessId);
-            LauncherUpdateStatusText.Text = result.Message;
-            if (result.ShutdownRequired) Close();
+            if (_portableQueue is null) return;
+            string? archive = null;
+            var queued = _portableQueue.Enqueue("launcher-update", $"CubeShelf {update.LatestVersion}", "LAUNCHER",
+                P7("Mise à jour du logiciel · CubeShelf redémarrera pour terminer l’installation.",
+                   "Launcher update · CubeShelf will restart to finish installation."),
+                async (progress, token) => archive = await _launcherUpdates.DownloadAsync(update, progress, token),
+                after: async () => await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    var result = _launcherUpdateInstaller.Launch(archive!, update.LatestVersion, Environment.ProcessId);
+                    LauncherUpdateStatusText.Text = result.Message;
+                    if (result.ShutdownRequired) QuitCompletely();
+                }), referenceId: "CubeShelf");
+            LauncherUpdateStatusText.Text = queued is null
+                ? P7("La mise à jour est déjà dans la file.", "The update is already queued.")
+                : P7("Mise à jour ajoutée aux téléchargements.", "Update added to downloads.");
+            ParityShowDownloads(this, new RoutedEventArgs());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exception)

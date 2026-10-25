@@ -1,5 +1,186 @@
 # Changelog
 
+## 0.17.0-preview.19 — gestionnaire mobile inspiré du PC, non publié
+
+- Écran Téléchargements avec jaquette du jeu, carte du transfert actif, progression, débit réseau, pic de session et estimation du temps restant. Graphique des relevés réels sur une fenêtre de 60 secondes ; aucune activité réseau ou disque simulée.
+- File séquentielle indépendante de l'écran, pause/reprise globale, reprise et annulation par transfert, priorités des éléments en attente et mémorisation de leur ordre. Les travaux interrompus restent en pause jusqu'à une reprise explicite.
+- Historique persistant des 32 derniers téléchargements terminés, avec jaquettes, version, taille et date. Migration d'une installation existante à partir de la date réelle de son marqueur ; effacer l'historique ne retire pas les fichiers du jeu.
+- Parcours haut/bas/A/B dans les commandes du panneau, focus visible et défilement vers l'action ciblée. Commandes tactiles d'au moins 48 DIP, sans flèches ajoutées à l'écran.
+- Relevés bornés à 240 points, sans timer d'animation au repos. Décodage des miniatures limité à 256 pixels de large, cache propre au panneau et libération à sa fermeture. Les lignes de la file et de l'historique ne sont reconstruites que lors d'un changement structurel.
+- PartyBoard reste le seul moteur Android enregistré. Le gestionnaire ne propose pas le téléchargement des moteurs PC incompatibles ; les priorités multiples prendront effet lorsque d'autres moteurs Android seront enregistrés.
+- Compilation Mobile Release sans erreur ni avertissement, publication Android ARM64 réussie et APK code 40 installé sur le S20. Affichage de la jaquette, des sections et de l'historique existant observé ; aucun nouveau transfert ni scénario à plusieurs moteurs exécuté dans cette passe. Aucun test automatisé ajouté ou exécuté.
+
+## 0.17.0-preview.18 — PartyBoard intégré et téléchargements Android, non publié
+
+- Accès Téléchargements depuis la bibliothèque Big Picture : progression réelle, octets reçus, vitesse, pause, reprise, annulation, erreurs et préparation des ressources. Parcours tactile et commandes haut/bas/A/B ; notification de transfert ouvrant ce panneau.
+- Moteur ARM64 PartyBoard v0.20.0 embarqué dans l'APK CubeShelf. Sources Java/SDL adaptées et épinglées ; compilation Java 8 et extraction des bibliothèques natives intégrées à la publication Android. Aucun APK PartyBoard séparé à installer.
+- Téléchargement officiel épinglé à 52 716 096 octets avec vérification SHA256 avant extraction des seules ressources. Fichier partiel conservé après interruption, reprise HTTP Range et préparation dans le stockage privé ; les sauvegardes, réglages et disques ne sont pas supprimés.
+- Activités natives internes dans des processus privés ; redémarrages du jeu limités à son processus. Désactivation de l'ancien mécanisme de mise à jour de l'application PartyBoard séparée. Le disque personnel reste nécessaire, aucun disque fourni.
+- Correction de l'écran noir Vulkan au retour du moteur après changement d'orientation : Android recrée la vue native, tandis que la durée de vie Avalonia conserve la bibliothèque. Consommation unique de l'action de notification, pour ne pas rouvrir le panneau après rotation. Progression complète restaurée pour une installation déjà prête.
+- Sur Galaxy S20 Android 13 : téléchargement réel, vérification, préparation, ouverture de l'écran natif de sélection du disque et retour visible aux jaquettes 3D observés. Deuxième lancement depuis le paysage et retour également observés, dans le même processus principal CubeShelf. Aucune application PartyBoard séparée présente.
+- Partie complète, session en ligne, pause/reprise réseau et manette physique non validées dans cette passe. Aucun test automatisé ajouté ou exécuté. Documentation dans `docs/ANDROID-PARTYBOARD.md` ; aucune garantie nouvelle de 120 images/s dans le jeu.
+
+## 0.17.0-preview.17 — première évolution de l’interface mobile, non publié
+
+- Action principale Jouer/Installer fixe, hors de la zone défilante. En-tête plus compact, logo moins haut et état explicite Prêt/À installer/Port indisponible ; aucun lancement proposé pour un moteur Android absent.
+- Boutons Retourner et Informations retirés à la demande de l’utilisateur. Toucher court pour retourner ; maintien de 550 ms pour examiner une jaquette 3D agrandie, annulé dès qu’un déplacement est détecté. Fermeture explicite ou avec B ; R3 ouvre aussi l’agrandissement à la manette et X retourne le boîtier.
+- Boutons redessinés : dégradé violet pour l’action principale, actions secondaires sombres avec contour, angles arrondis, états pressé/survol et focus blanc de taille constante. Pictogrammes et zones tactiles d’au moins 48 DIP.
+- Aides tactiles ou de manette selon la dernière entrée, parcours de commandes ordonné. B ferme d’abord l’agrandissement ou l’invitation privée, puis revient à l’action principale. L’étagère est masquée pendant l’agrandissement, sans flou plein écran ni animation permanente ; les ressources de la vue agrandie sont libérées à sa fermeture et en arrière-plan.
+- Invitation privée regroupée dans un panneau repliable, disponible seulement quand PartyBoard est installé. Boîtiers, textures, moteur de rendu et lancement natif conservés.
+- APK Android arm64 code 34 installé sur le Galaxy S20. Appui long, retournement agrandi et retour Android contrôlés à l’écran ; R3/X/B exercés par événements Android injectés, sans validation sur une manette physique. Compilation Mobile et Android sans erreur ni avertissement, publication réussie. Aucun test automatisé ajouté ou exécuté.
+- Relevé court après utilisation du zoom : 667 intervalles, 113,21 images/s de moyenne, P99 16,73 ms ; 31 des 39 intervalles supérieurs à 12 ms pendant le premier défilement. Série trop courte pour établir une évolution de la cadence par rapport à preview.16. Présentations inchangées pendant deux secondes au repos ; 120 images/s constantes non validées.
+
+## 0.17.0-preview.16 — coût du rendu et diagnostic de cadence, non publié
+
+- Dessins GPU d’un même boîtier regroupés dans une seule opération native et un seul emprunt du contexte Skia, avec conservation de l’ordre des couches et des replis géométriques. Les sommets et paints restent propres à chaque opération de scène ; les ressources non soumises sont libérées en cas d’erreur. Modèle, maillages et résolution conservés.
+- Instrumentation Android facultative : durée CPU de construction des dessins, allocations de ce parcours, durée CPU des appels natifs et retard des callbacks Choreographer. Désactivée au lancement normal ; elle ne mesure pas la durée d’exécution GPU.
+- Sur deux séries instrumentées de 16 gestes, le regroupement divise approximativement par quatre le nombre d’opérations natives et réduit leur durée CPU cumulée par callback actif d’environ 0,28 à 0,20 ms après le premier bloc. Aucun gain d’images/s établi par cette comparaison.
+- Suppression expérimentale des passages de disposition retirée faute de gain mesuré. Comparaison OpenGL ES/Vulkan sur le S20 : environ 82,3 contre 117–118 images/s dans ces séries ; Vulkan reste prioritaire. Ces relevés séquentiels ne constituent pas une comparaison contrôlée de tous les appareils.
+- Publication Android arm64 code 31 installée sur le Galaxy S20. Série finale sans instrumentation : 16 défilements et 16 retournements, 2 796 intervalles sur 52,1 secondes, moyenne 8,48 ms (117,90 images/s), P99 16,59 ms, maximum retenu 33,29 ms. 51 intervalles supérieurs à 12 ms (1,82 %). La cadence reste comparable à preview.15 ; 120 images/s constantes non atteintes.
+- Présentations inchangées pendant deux secondes au repos ; statut thermique Android 0. Compilation Desktop Release sans erreur ni avertissement. Aucun test automatisé ajouté ou exécuté.
+- Proposition de hiérarchie Big Picture dans `docs/BIG-PICTURE-UX-NEXT.md` : action principale persistante, fiche plus courte, aides contextuelles tactile/manette et états propres aux moteurs compatibles. Ce document prépare la prochaine interface, sans annoncer ces changements comme déjà intégrés.
+
+## 0.17.0-preview.15 — cadence 120 Hz, non publié
+
+- Mode 120 Hz effectivement observé sur le Galaxy S20 après son activation dans les réglages Samsung : mode 3, période de présentation 8,33 ms. L’horloge native et le plafond de 120 mises à jour/s suivent déjà cette fréquence, sans changer la durée des animations.
+- Coordonnées UV du maillage conservées tant que les dimensions de l’image ne changent pas ; interpolation des sommets calculée par ligne au lieu de recalculer les quatre coins à chaque sommet. Maillage et résolution conservés.
+- Calcul du reflet spéculaire à puissance entière remplacé par des multiplications équivalentes. Calcul des limites géométriques en une passe, sans tableau ni séries de parcours LINQ.
+- Effets de survol réservés aux pointeurs souris/stylet ; un geste tactile ne déclenche plus ces effets supplémentaires. Navigation tactile, retournement et animations de sélection conservés.
+- Compilation Desktop Release sans avertissement ni erreur ; publication Android arm64 réussie. APK Android code 27 installé sur le S20. Mesures de présentation à 120 Hz conservées dans les fichiers `outputs/cubeshelf-s20-preview15-120hz-*` du workspace.
+- Série finale de 36 défilements et 36 retournements sur environ deux minutes : 6 304 intervalles retenus, moyenne 8,46 ms (118,15 images/s), P95 8,55 ms, P99 16,60 ms et maximum retenu 33,52 ms. Pauses supérieures à 100 ms exclues. Cible de 120 images/s effective avec des retards ponctuels ; aucun verrouillage permanent à 120 images/s revendiqué.
+- Statut thermique Android 0 pendant les relevés, température de surface finale rapportée de 30,9 °C. Présentations inchangées pendant deux secondes au repos ; aucune erreur AndroidRuntime observée dans le processus. Aucun test automatisé ajouté ou exécuté.
+
+## 0.17.0-preview.14 — navigation et consommation de ressources, non publié
+
+- Sauvegarde de la sélection mobile regroupée après 900 ms sans nouvelle sélection, uniquement si l’état diffère du dernier état enregistré ; écriture atomique du dernier choix à la mise en arrière-plan ou au détachement de la vue. La navigation rapide n’écrit plus chaque état intermédiaire.
+- Jaquettes voisines dont la pose ne change pas conservées sans relancer leur animation. Réutilisation des ensembles de visibilité et des listes de retrait ; boucles de disposition et recherche tactile sans itérateurs ni tri temporaires.
+- Shader natif partagé par image du cache, avec un paint propre à chaque opération de la scène. Libération du cache compatible avec les références natives des opérations de dessin en attente.
+- Contours GPU des faces créés seulement lorsqu’un reflet le nécessite ; pinceau des ombres réutilisé et courbes du fond de l’étagère conservées jusqu’au redimensionnement.
+- Nettoyage du cache sans tableaux ni tri LINQ intermédiaires, budget du cache inchangé. Qualité des images et modèle 3D conservés.
+- Compilation Desktop Release et publication Android arm64 réussies, sans avertissement de compilation ; APK Android code 25 installé sur le S20. Relevés prolongés dans `outputs/cubeshelf-s20-preview14-session*.txt` du workspace. Aucun test automatisé ajouté ou exécuté.
+- Session de 72 cycles (144 balayages et 144 retournements, environ 4 min 16 s de séquences) : 6 729 intervalles retenus, moyenne 16,76 ms (59,67 images/s), P99 17,19 ms, maximum retenu 33,57 ms. Pauses supérieures à 100 ms exclues ; ces résultats concernent le S20 à 60 Hz et ne garantissent pas l’absence de tout à-coup.
+- Trois derniers relevés de mémoire PSS entre 260,5 et 260,8 Mio ; statut thermique Android 0, température de surface finale rapportée de 27,8 °C. Aucune nouvelle présentation pendant deux secondes au repos ; passage en arrière-plan et reprise observés sans erreur AndroidRuntime. Téléphone en charge : autonomie non mesurée.
+
+## 0.17.0-preview.13 — préparation des jaquettes et allocations, non publié
+
+- Images du dos décodées et redimensionnées en arrière-plan avant leur premier retournement, avec une seule préparation simultanée. Publication des images préparées uniquement tant que leur entrée est utilisée ; annulation à l’éviction et en arrière-plan via la libération du cache.
+- Décodage synchrone de secours effectué hors du verrou global du cache ; les opérations de dessin conservent leur propre référence native à la texture.
+- Commandes et tableaux de points du modèle réutilisés ; tri sur place avec ordre stable explicite à profondeur égale, limites de l’ombre calculées sans liste temporaire. Tableaux de sommets/couleurs GPU conservés lorsque leur taille est inchangée et indices des textures construits une seule fois.
+- Un délégué d’animation par démarrage, au lieu d’une nouvelle fermeture à chaque image ; protection conservée contre les callbacks des animations arrêtées.
+- Qualité des images, maillages, modèle GLB et résolution inchangés. Compilation Desktop Release sans avertissement ni erreur ; APK Android code 24 installé et ouvert sur le Galaxy S20.
+- Relevés courts de la surface à 60 Hz : premier retournement à 17,33 ms en moyenne sur 46 intervalles (maximum 33,28 ms) ; défilement à 16,99 ms sur 44 intervalles (maximum 33,24 ms). Ces échantillons ne mesurent pas les octets alloués, l’autonomie ou les longues sessions et ne garantissent pas l’absence de tout à-coup.
+
+## 0.17.0-preview.12 — optimisation Android, non publié
+
+- Rendu des boîtiers mobiles avec des maillages Skia envoyés au GPU : une opération par face texturée et par couche du boîtier, au lieu des découpes d’image et dessins de triangles séparés. Modèle GLB, résolution des textures, faces et tranches conservés.
+- Déplacement et zoom mobiles par transformation graphique avec taille de géométrie fixe ; projections et trigonométrie communes à chaque pose, tableaux de sommets réutilisés.
+- Signal natif Android Choreographer partagé entre les animations actives ; arrêt à l’immobilité et en arrière-plan. Tolérance de 0,25 ms pour éviter de sauter une image à cause des arrondis temporels au plafond de 120 mises à jour/s.
+- Vulkan prioritaire avec replis EGL et logiciel ; demande de 120 Hz limitée à la fenêtre, sans modifier résolution ni réglages système.
+- Compilation AOT des versions Android Release ; cache des images GPU comptabilisé dans la limite mémoire et libéré en arrière-plan. Les opérations de dessin conservent leur texture pendant les traitements en cours.
+- Compilation Windows et Android ; mesures de présentation effectuées sur Galaxy S20 à 60 Hz. Le plafond de 120 mises à jour/s n’est pas une garantie de 120 images/s présentées.
+- APK Android code 23 installé sur le S20 : défilement à 17,03 ms en moyenne sur 40 intervalles (environ 59 images/s) ; retour et retournement à 17,39 ms sur 85 intervalles (environ 57,5 images/s), avec un maximum ponctuel de 66,66 ms. Mesures courtes de la surface de CubeShelf, pauses supérieures à 100 ms exclues ; aucune mesure à 120 Hz. Présentation inchangée pendant deux secondes au repos, faces avant/arrière et sélection tactile contrôlées.
+
+## 0.17.0-preview.11 — démarrage Android, non publié
+
+- Correction du crash observé sur Samsung Galaxy S20 sous Android 13 : le thème hérite désormais de Theme.AppCompat, requis par l’activité Avalonia Android.
+- Bibliothèque mobile bornée à la hauteur réellement disponible : étagère et fiche défilante restent dans l’écran en portrait et paysage ; logo adapté à la place disponible.
+- Plein écran déclaré aussi auprès du gestionnaire d’insets Avalonia, fond de fenêtre Android sombre et dimensions du shell dans le journal `CubeShelf.Layout`.
+- Capture tactile conservée pendant le transfert entre une jaquette et l’étagère, pour ne pas annuler le balayage.
+- Code Android 16 pour la mise à jour de l’installation de diagnostic.
+- Installation et lancement contrôlés sur Galaxy S20 (SM-G985F), Android 13 : rendu des jaquettes, vues portrait/paysage et balayage de sélection aller/retour. PartyBoard absent du téléphone ; aucun lancement de jeu ni essai de manette physique validé dans cette passe.
+
+## 0.17.0-preview.10 — parcours des mods à la manette, non publié
+
+- Navigation spatiale dans les cartes de mods avec défilement automatique et contour de sélection visible. A ouvre la fiche ; B revient d’abord à la grille, puis au jeu.
+- LB/RB : onglets Mes mods et GameBanana ; X : activer/désactiver ou installer selon la sélection ; Y : recherche avec clavier à l’écran, lancée à la validation.
+- Bandeau de commandes contextuelles, états vides explicites, sélection mémorisée par jeu et onglet pendant la session et retours visuels sur les actions.
+- Confirmation avant suppression, avec Annuler ciblé par défaut. Navigation conservée pour les profils, filtres et priorités.
+- Compilation Windows effectuée ; navigation physique à la manette à confirmer sur appareil.
+
+## 0.17.0-preview.9 — gestion complète des mods en Big Picture, non publié
+
+- Bouton Home retiré de la collection Big Picture. Amis et Paramètres restent accessibles directement dans sa barre supérieure.
+- Le bouton des mods ouvre la gestion complète en plein écran avec deux onglets : Mes mods et GameBanana, sans revenir au bureau.
+- Mes mods : filtre local, activation/désactivation, suppression, priorité, profils et conflits ; GameBanana : recherche, fiches et installation dans la file existante. Le catalogue n’est pas chargé en ouvrant seulement Mes mods.
+- Onglets et bouton de recherche accessibles à la manette avec le clavier à l’écran existant ; retour au jeu par B, Échap ou bouton.
+- Modifications de sélection, suppression et priorité bloquées pendant une partie ou sa préparation ; les réponses d’un catalogue chargé pour un autre jeu ne remplacent plus la liste courante.
+
+## 0.17.0-preview.8 — choix du mode au démarrage, non publié
+
+- Paramètres PC : choix mémorisé entre démarrage classique et démarrage directement en Big Picture plein écran, accessible depuis les deux modes. Aucun verrouillage : F11 reste disponible.
+- Le choix s’applique au prochain démarrage ; `--big-picture` force ce mode pour une ouverture et `--desktop` force le bureau sans modifier la préférence. Les anciens profils conservent le démarrage classique par défaut.
+- Android conserve son interface Big Picture unique.
+
+## 0.17.0-preview.7 — transparence du logo, non publié
+
+- Fond blanc retiré du logo Mario Party 4, remplacé par un PNG avec transparence.
+- Décodage des logos à une largeur de 640 pixels pour borner leur mémoire d’affichage.
+
+## 0.17.0-preview.6 — logos des jeux en Big Picture, non publié
+
+- Logos fournis pour Sunshine, Mario Party 4, Soulcalibur II et Mario Smash Football à la place du titre simple dans Big Picture et la transition de lancement, sur PC et Android.
+- Images embarquées et partagées entre les vues, proportions conservées et nom du jeu exposé aux lecteurs d’écran. Texte conservé lorsqu’aucun logo n’est disponible, notamment pour Eclipse.
+
+## 0.17.0-preview.5 — continuité Big Picture et jeux en plein écran, non publié
+
+- Big Picture reste en plein écran derrière le jeu : aucune réduction automatique du launcher, retour direct à CubeShelf à la fermeture du jeu.
+- La transition reste affichée jusqu’à la perte du focus au profit du jeu ; après 0,5 seconde elle reste statique. Retour à la bibliothèque possible par bouton ou Échap.
+- Plein écran natif au démarrage : Sunshine/Eclipse via `SMS_WINDOW_MODE=fullscreen` et résolution du bureau, Strikers via `STRIKERS_FULLSCREEN=1`, PartyBoard via `video.enableFullscreen`, RingOut via `[Display] Fullscreen=True`.
+- Les fichiers de préférences modifiés sont sauvegardés avec le suffixe `.cubeshelf-before-fullscreen` avant le premier changement ; les autres options sont conservées. Aucun moteur recompilé.
+
+## 0.17.0-preview.4 — transition de lancement, non publié
+
+- Big Picture PC et Android : jaquette 3D agrandie au centre, fond assombri et titre du jeu avec « Lancement… » pendant une transition de 0,5 seconde.
+- Animation à la demande via le compositeur, plafonnée à 120 mises à jour/s ; aucune animation continue après la transition et libération des textures au masquage.
+- PC : le processus démarre immédiatement ; seule la réduction du launcher attend la fin de la transition. L’animation s’arrête si le launcher perd le focus.
+- Android : transition de 0,5 seconde avant ouverture de l’activité native ; annulation si le launcher passe en arrière-plan avant le lancement. Les échecs rendent la bibliothèque accessible.
+- Code Android 8. Aucun moteur de jeu modifié.
+
+## Android — Big Picture permanent, en préparation
+
+- Une seule interface Big Picture, directement au démarrage : jaquettes 3D et commandes tactiles, sans sélecteur déroulant ni changement vers une vue classique.
+- Plein écran immersif réappliqué au retour dans le launcher ; navigation système accessible par un geste depuis le bord.
+- Étagère et fiche côte à côte en paysage, superposées en portrait ; fiche défilante pour conserver l’accès aux actions sur petit écran.
+- Manette : A sélectionne, B revient au bouton principal, X retourne la jaquette, Y ouvre les salons ; croix verticale pour les actions et horizontale pour les jeux.
+- Code de version Android 7. Aucun moteur ni catalogue de jeux modifié.
+
+## 0.17.0-preview.3 — jaquettes et plein écran, non publié
+
+- Copie explicite de toutes les jaquettes dans le dossier publié, hors bundle single-file ; la publication échoue si une image de couverture est absente.
+- Big Picture applique son plein écran sans décoration après l’ouverture native et suspend l’ajustement de taille du bureau tant qu’il est actif. Les réglages de fenêtre sont restaurés en quittant ce mode.
+- État du plein écran et nombre de fichiers de jaquettes manquants dans `Logs/BigPicture-display.log`.
+
+## 0.17.0-preview.2 — correction du rendu 3D, non publié
+
+- Correction du crash `DrawingGroupDrawingContext.DrawBitmap` lors du rendu des jaquettes GLB : les textures sont dessinées directement par le compositeur ; seuls les clips et matrices du maillage sont mis en cache. Le modèle 3D et le partage des bitmaps sont conservés.
+- Démarrage direct en Big Picture avec `CubeShelf.exe --big-picture`.
+
+## 0.17.0-preview.1 — améliorations du launcher, non publié
+
+- Big Picture : retour à la page précédente et à son focus ; navigation manette suspendue quand la fenêtre est masquée ou réduite ou pendant une session de jeu ; recherche des manettes débranchées espacée.
+- Téléchargements : aucun rafraîchissement de la vue cachée ; timer arrêté au repos ou en pause ; contrôle d’espace disque avant les transferts ; priorité visible et débit indépendant de l’historique.
+- Jaquettes 3D conservées : images partagées entre vues, décodage adapté et cache inactif plafonné à 24 Mio ; géométries et maillages texturés réutilisés lorsque la pose ne change pas.
+- Profils de mods avec ordre de priorité, aperçu des fichiers en conflit et accès direct au profil original, sans supprimer les mods installés.
+- Paramètres : points de restauration du profil, restauration au prochain démarrage, restauration des cartes mémoire déjà sauvegardées par les transferts téléphone, mesure CPU/mémoire du launcher à la demande.
+- Point de restauration du profil avant mise à jour, accès aux notes de version et conservation d’une version précédente du launcher : Windows après une mise à jour avec ce nouvel updater, Linux pour les AppImages mises à jour avec ce nouveau helper. L’installation macOS reste manuelle.
+- Une fermeture inattendue propose de réessayer, d’ouvrir les journaux ou de revenir à la bibliothèque. Les arrêts demandés par l’utilisateur ne sont pas présentés comme des plantages.
+- Mobile : partage du cache des jaquettes et mémorisation de la dernière sélection et de la vue.
+- Lecture facultative des manettes SDL2 sur Linux/macOS lorsque cette bibliothèque est installée ; XInput conservé sur Windows.
+
+Aucun moteur ni fichier de jeu modifié. Compilation PC, interface mobile et updater effectuée ; pas de test automatisé ni d’essai physique de manette ou de téléphone dans cette passe. Les gains de performances ne constituent pas une mesure de FPS.
+
+## 0.16.0 — 22 octobre 2026
+
+- Gestionnaire de téléchargements illustré : file, pause/reprise, priorités et limite de débit.
+- Lancement direct depuis les jaquettes, préparation automatique et options avancées dépliées.
+- Big Picture avec étagère 3D par défaut et modèle GLB fourni, tranche visible, rendu mis en cache et animations à la demande.
+- Accueil Reprendre, profils de mods, clavier à l’écran et parcours de salons avec vérification avant connexion.
+- Premier aperçu Android natif : mêmes jaquettes 3D, navigation tactile/manette sans boutons fléchés, lancement de PartyBoard installé séparément. Les autres jeux, amis et téléchargements PC ne sont pas encore portés ; jeu croisé Android/PC non disponible.
+- Génération d’archives PC Windows/Linux/macOS x64 et ARM64.
+- Correction d’un délai NAT-PMP devenu négatif à expiration, susceptible d’interrompre le repli UPnP.
+
+Les binaires PC ne sont pas signés avec un certificat de distribution. Android reste un aperçu signé avec une clé de développement ; aucun essai physique de ce launcher mobile ni partie réelle Android n’a été effectué ici.
+
 ## Non publié — consolidation du launcher
 
 - Le disque sélectionné est transmis selon le runtime : variables PartyBoard, argument Ring Out, `STRIKERS_DATA` pour Strikers. Les chemins contenant des espaces restent un seul argument.

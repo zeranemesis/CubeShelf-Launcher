@@ -151,7 +151,7 @@
       <x:String x:Key="LibraryEyebrow">BIBLIOTHÈQUE</x:String>
       <x:String x:Key="LibraryTitle">Tes jeux GameCube</x:String>
       <x:String x:Key="AddGame">+ Ajouter un jeu</x:String>
-      <x:String x:Key="LibrarySubtitle">Les mises à jour GitHub sont vérifiées automatiquement. Sélectionne un jeu pour continuer.</x:String>
+      <x:String x:Key="LibrarySubtitle">Clique sur Jouer. CubeShelf prépare ce qui manque.</x:String>
       <x:String x:Key="SearchGame">Rechercher un jeu…</x:String>
       <x:String x:Key="SortName">Nom A-Z</x:String>
       <x:String x:Key="SortRecent">Récemment joué</x:String>
@@ -399,6 +399,19 @@
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="0,0,0,2" />
       <Setter Property="CornerRadius" Value="14" />
+    </Style>
+    <Style Selector="Grid.controller-mods ListBoxItem">
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Margin" Value="3" />
+    </Style>
+    <Style Selector="Grid.controller-mods ListBoxItem:selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Grid.controller-mods TabItem:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="3" />
     </Style>
     <Style Selector="ListBoxItem:pointerover">
       <Setter Property="Background" Value="{DynamicResource HoverBg}" />

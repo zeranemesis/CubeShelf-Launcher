@@ -12,3 +12,5 @@ dist/
 node_modules/
 package-lock.json
 package.json
+/artifacts/
+/src/CubeShelf.Android/Generated/

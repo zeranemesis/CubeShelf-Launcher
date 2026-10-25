@@ -17,7 +17,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
+    <AvaloniaResource Include="Assets/Logos/*.png" />
+    <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>
+  <Target Name="VerifyPublishedCoverFiles" AfterTargets="Publish">
+    <ItemGroup>
+      <_CubeShelfCover Include="Assets/Covers/**/*" />
+    </ItemGroup>
+    <Error Condition="!Exists('$(PublishDir)Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)')"
+           Text="Missing published cover: Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)" />
+  </Target>
 </Project>

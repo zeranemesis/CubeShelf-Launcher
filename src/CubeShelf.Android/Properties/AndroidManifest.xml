@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.VIBRATE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+  <queries>
+    <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
+  </queries>
+  <application android:label="CubeShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true">
+    <activity android:name="com.mariopartyrd.partyboard.PartyBoardActivity"
+              android:process=":partyboard" android:taskAffinity="io.github.zeranemesis.cubeshelf.partyboard"
+              android:exported="false" android:launchMode="singleTask" android:label="PartyBoard · CubeShelf"
+              android:theme="@android:style/Theme.NoTitleBar" android:screenOrientation="userLandscape"
+              android:configChanges="layoutDirection|locale|fontScale|fontWeightAdjustment|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation|density|touchscreen|colorMode|mcc|mnc" />
+    <activity android:name="com.mariopartyrd.partyboard.online.LobbyActivity"
+              android:process=":partyboard_online" android:taskAffinity="io.github.zeranemesis.cubeshelf.partyboard.online"
+              android:exported="false" android:launchMode="singleTask" android:label="En ligne · CubeShelf"
+              android:theme="@android:style/Theme.Material.NoActionBar" android:windowSoftInputMode="adjustResize"
+              android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density" />
+    <activity android:name="com.mariopartyrd.partyboard.online.RestartActivity"
+              android:process=":partyboard_online" android:exported="false" android:noHistory="true"
+              android:excludeFromRecents="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    <service android:name="com.mariopartyrd.partyboard.online.OnlineService"
+             android:process=":partyboard_online" android:exported="false" android:foregroundServiceType="specialUse">
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="PartyBoard lobby and multiplayer relay while its game process runs" />
+    </service>
+  </application>
+</manifest>

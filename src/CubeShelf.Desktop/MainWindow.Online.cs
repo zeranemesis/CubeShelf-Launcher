@@ -74,6 +74,7 @@ public sealed partial class MainWindow
 
     private void ParityShowOnline(object? sender, RoutedEventArgs args)
     {
+        RefreshSimpleRoomLabels();
         ShowParityView(OnlineView);
         NavOnlineBadge.IsVisible = false;
         if (RoomLanguageFilter.Items.Count == 0)
@@ -85,7 +86,8 @@ public sealed partial class MainWindow
         }
         // Every game on the shelf that plays online; the page is about the one picked.
         var games = OnlineGames().ToList();
-        if (OnlineGamePicker.Items.Count != games.Count)
+        if (!OnlineGamePicker.Items.OfType<ComboBoxItem>().Select(item => item.Tag as string)
+                .SequenceEqual(games.Select(game => game.Id)))
         {
             _choosingGame = true;
             OnlineGamePicker.Items.Clear();
@@ -93,7 +95,10 @@ public sealed partial class MainWindow
             OnlineGamePicker.SelectedIndex = Math.Max(0, games.FindIndex(g => g.Id == OnlineGame()?.Id));
             _choosingGame = false;
         }
-        OnlineGamePicker.IsEnabled = games.Count > 1;
+        _choosingGame = true;
+        OnlineGamePicker.SelectedIndex = games.FindIndex(game => game.Id == OnlineGame()?.Id);
+        _choosingGame = false;
+        OnlineGamePicker.IsEnabled = _myRoom is null && games.Count > 1;
         _onlineTimer ??= new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _onlineTimer.Tick -= OnlineTick;
         _onlineTimer.Tick += OnlineTick;
@@ -128,9 +133,9 @@ public sealed partial class MainWindow
     }
 
     /// <summary>Why the page cannot list or open rooms, in words, or null when it can.</summary>
-    private string? OnlineBlocker(out GameCatalogEntry? game, out string companion, out string disc)
+    private string? OnlineBlocker(out GameCatalogEntry? game, out string companion, out string disc, GameCatalogEntry? targetGame = null)
     {
-        game = OnlineGame();
+        game = targetGame ?? OnlineGame();
         companion = "";
         disc = "";
         if (game is null)
@@ -177,6 +182,8 @@ public sealed partial class MainWindow
                                          $"{game.Title} · {RegionName(tags.Game)} disc · only rooms for your disc and version are shown.");
 
             var rooms = await new PublicRoomDirectory(OnlineHttp, tags.Relay).ListAsync(tags);
+            // A disc read or directory request may finish after the player picked another game.
+            if (OnlineGame()?.Id != game.Id) { _roomsFetched = DateTimeOffset.MinValue; return; }
             // The player's own room is on the list too; it is shown above, not offered to join.
             var mine = _myRoom?.RelayRoom;
             var language = (RoomLanguageFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
@@ -209,19 +216,27 @@ public sealed partial class MainWindow
     /// The companion's tags for the public list, asked once and again only when the disc or the
     /// installed mods change (the tags hold this PC's mods too). Null when rooms are not possible.
     /// </summary>
-    private async Task<RoomTags?> EnsureRoomTagsAsync(GameCatalogEntry game)
+    private async Task<RoomTags?> EnsureRoomTagsAsync(GameCatalogEntry game, CancellationToken cancellationToken = default)
     {
-        if (OnlineBlocker(out _, out var companion, out var disc) is not null) return null;
+        cancellationToken.ThrowIfCancellationRequested();
+        if (OnlineBlocker(out _, out var companion, out var disc, game) is not null) return null;
         var manager = new PortableModManager(_paths, game.ModLibraryId);
         var installed = manager.GetInstalled();
-        var key = disc + "|" + string.Join(";", installed.Select(m => $"{m.Id}:{m.Sha256}:{m.Enabled}"));
+        var key = game.Id + "|" + companion + "|" + File.GetLastWriteTimeUtc(companion).Ticks
+            + "|" + disc + "|" + new FileInfo(disc).Length + "|" + File.GetLastWriteTimeUtc(disc).Ticks
+            + "|" + string.Join(";", installed.Select(m => $"{m.Id}:{m.Sha256}:{m.Enabled}"));
         if (_roomTags is not null && key == _roomTagsKey) return _roomTags;
         string? modList = null;
         try { modList = manager.PrepareActiveList(); }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
-        _roomTags = await RoomTags.ReadAsync(companion, disc, modList);
-        _roomTagsKey = key;
-        return _roomTags;
+        var tags = await RoomTags.ReadAsync(companion, disc, modList, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (OnlineGame()?.Id == game.Id)
+        {
+            _roomTags = tags;
+            _roomTagsKey = key;
+        }
+        return tags;
     }
 
     private RoomRow ToRow(GameCatalogEntry game, PublicRoom room, IReadOnlyList<PortableInstalledMod> installed)
@@ -277,6 +292,7 @@ public sealed partial class MainWindow
         if (state is { IsOpen: true } && !CompanionAlive(state)) state = null;
         var before = _myRoom;
         _myRoom = state is { IsOpen: true } ? state : null;
+        OnlineGamePicker.IsEnabled = _myRoom is null && OnlineGames().Skip(1).Any();
         AnnounceRoomEnd(before, state);
         // The list changes with this room (it fills, it starts, it closes): read it again now
         // rather than at the next ten-second tick.
@@ -329,6 +345,7 @@ public sealed partial class MainWindow
         MyRoomMods.Text = room.Seats.Count > 0 ? "" : ModsSummary(room.Mods, P7("Mods : ", "Mods: "));
         MyRoomMods.IsVisible = MyRoomMods.Text.Length > 0;
         MyRoomMessage.Text = room.Message;
+        RefreshSimpleRoomState(room);
 
         var waiting = room.Phase is "" or "waiting";
         var canChange = room.IsHost && room.Mode == "online" && room.State == "waiting";
@@ -573,6 +590,11 @@ public sealed partial class MainWindow
     private void OpenRoomSetup(object? sender, RoutedEventArgs args)
     {
         if (OnlineGame() is not { } game) return;
+        if (_setupModsGameId != game.Id)
+        {
+            _setupMods = null;
+            _setupModsGameId = game.Id;
+        }
         if (_myRoom is not null)
         {
             ShowToastParity(P7("Room", "Room"), P7("Ferme d’abord ta room.", "Close your room first."));
@@ -591,6 +613,7 @@ public sealed partial class MainWindow
 
     /// <summary>The setup page's mod choice; null until the player touches it (then CubeShelf's own active mods).</summary>
     private HashSet<int>? _setupMods;
+    private string? _setupModsGameId;
     private readonly List<CheckBox> _setupModBoxes = new();
 
     private void FillRoomSetupMods(GameCatalogEntry game, HashSet<int>? chosen)
@@ -687,7 +710,7 @@ public sealed partial class MainWindow
     /// and confirmation as the Mods page; then its invitation, and the companion opens holding it,
     /// with the room's mods for that session only.
     /// </summary>
-    private async void JoinPublicRoom(object? sender, RoutedEventArgs args)
+    private void JoinPublicRoom(object? sender, RoutedEventArgs args)
     {
         if (sender is not Button { Tag: RoomRow row } button || OnlineGame() is not { } game || _roomTags is null) return;
         if (_myRoom is not null)
@@ -696,38 +719,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        button.IsEnabled = false;
-        try
-        {
-            var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, row.Room.Mods, text => OnlineStatusText.Text = text);
-            if (!ready)
-            {
-                OnlineStatusText.Text = problem;
-                return;
-            }
-
-            OnlineStatusText.Text = P7("Connexion à la room…", "Joining the room…");
-            var invite = await new PublicRoomDirectory(OnlineHttp, _roomTags.Relay).InviteAsync(row.Room.Room);
-            var extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = sessionMods };
-            var (started, message) = StartJoining(game, row.Room.Host, invite, extra);
-            ShowToastParity(P7("Room", "Room"), message.Length > 0 ? message
-                : P7($"Tu rejoins la room de {row.Room.Host}.", $"Joining {row.Room.Host}'s room."));
-            if (started) RefreshMyRoom();
-        }
-        catch (RoomGoneException)
-        {
-            OnlineStatusText.Text = P7("Cette room vient d’être prise ou fermée.", "That room was just taken or closed.");
-            _roomsFetched = DateTimeOffset.MinValue;
-        }
-        catch (Exception exception) when (exception is IOException or HttpRequestException or TaskCanceledException
-                                              or InvalidOperationException or UnauthorizedAccessException)
-        {
-            OnlineStatusText.Text = P7($"Impossible de rejoindre : {exception.Message}", $"Could not join: {exception.Message}");
-        }
-        finally
-        {
-            button.IsEnabled = true;
-        }
+        OpenRoomReview(game, row.Room);
     }
 
     /// <summary>
@@ -737,24 +729,32 @@ public sealed partial class MainWindow
     /// Returns the list to hand the companion for that session, or why it cannot be had.
     /// </summary>
     private async Task<(bool Ready, string SessionMods, string Problem)> PrepareRoomModsAsync(
-        GameCatalogEntry game, IReadOnlyList<RoomMod> mods, Action<string> progressText)
+        GameCatalogEntry game, IReadOnlyList<RoomMod> mods, Action<string> progressText, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var manager = new PortableModManager(_paths, game.ModLibraryId);
         var report = RoomModCheck.Compare(mods, manager.GetInstalled());
         foreach (var mod in report.Missing.Concat(report.Outdated))
         {
-            var before = manager.GetInstalled().FirstOrDefault(m => m.Id == mod.Id);
+            cancellationToken.ThrowIfCancellationRequested();
+            // An earlier mod's plan may already have supplied this dependency.
+            if (RoomModCheck.Compare(new[] { mod }, manager.GetInstalled()).Status == RoomModStatus.Compatible) continue;
+            var enabledBefore = manager.GetInstalled().ToDictionary(item => item.Id, item => item.Enabled);
             progressText(P7($"Installation de {Named(mod)}…", $"Installing {Named(mod)}…"));
             var progress = new Progress<double>(p => progressText(P7($"Installation de {Named(mod)} : {p:0} %", $"Installing {Named(mod)}: {p:0}%")));
-            var remote = await _gameBanana.GetAsync(mod.Id);
-            var plan = await manager.PlanInstallAsync(remote, _gameBanana, progress);
+            var remote = await _gameBanana.GetAsync(mod.Id, cancellationToken);
+            var plan = await manager.PlanInstallAsync(remote, _gameBanana, progress, cancellationToken);
             var plain = plan.Packages.Count <= 1 && plan.Warnings.Count == 0 && plan.IncompatibleInstalledModIds.Count == 0;
-            if (!plain && !await ConfirmModPlanAsync(plan, CancellationToken.None))
+            if (!plain && !await ConfirmModPlanAsync(plan, cancellationToken))
                 return (false, "", P7("Installation annulée : tu n’as pas rejoint la room.", "Installation cancelled: you did not join the room."));
-            await manager.InstallPlanAsync(plan, allowIncompatible: true, progress);
-            if (before is not { Enabled: true }) manager.SetEnabled(mod.Id, false);
+            var installedForRoom = await manager.InstallPlanAsync(plan, allowIncompatible: true, progress, cancellationToken);
+            // A plan may install dependencies as well as its root. Keep every package's previous
+            // personal selection, so joining a room does not silently enable those dependencies.
+            foreach (var package in installedForRoom)
+                if (!enabledBefore.GetValueOrDefault(package.Id)) manager.SetEnabled(package.Id, false);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         report = RoomModCheck.Compare(mods, manager.GetInstalled());
         if (report.Status == RoomModStatus.Compatible) return (true, report.SessionMods, "");
         var differing = string.Join(", ", report.Missing.Concat(report.Outdated).Select(Named));

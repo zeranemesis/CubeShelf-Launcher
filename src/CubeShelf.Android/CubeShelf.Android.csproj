@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationId>io.github.zeranemesis.cubeshelf</ApplicationId>
+    <ApplicationVersion>40</ApplicationVersion>
+    <ApplicationDisplayVersion>$(CubeShelfVersion)</ApplicationDisplayVersion>
+    <ApplicationTitle>CubeShelf</ApplicationTitle>
+    <AndroidPackageFormats>apk</AndroidPackageFormats>
+    <RuntimeIdentifiers Condition="'$(RuntimeIdentifier)' == ''">android-arm64;android-x64</RuntimeIdentifiers>
+    <RunAOTCompilation Condition="'$(Configuration)' == 'Release'">true</RunAOTCompilation>
+    <AndroidEnableProfiledAot Condition="'$(Configuration)' == 'Release'">false</AndroidEnableProfiledAot>
+    <AndroidLinkMode Condition="'$(Configuration)' == 'Release'">SdkOnly</AndroidLinkMode>
+    <AndroidLinkMode Condition="'$(Configuration)' != 'Release'">None</AndroidLinkMode>
+    <CheckEolWorkloads>false</CheckEolWorkloads>
+  </PropertyGroup>
+  <ItemGroup>
+    <AndroidLibrary Remove="**/*.jar" />
+    <AndroidLibrary Include="Generated/PartyBoard/partyboard-host.jar" Bind="false" />
+    <PackageReference Include="Avalonia.Android" Version="11.3.21" />
+    <ProjectReference Include="../CubeShelf.Mobile/CubeShelf.Mobile.csproj" />
+    <AndroidResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Resources/drawable/icon.png" />
+  </ItemGroup>
+  <Target Name="PreparePartyBoardEngine" BeforeTargets="PrepareForBuild" DependsOnTargets="_ResolveMonoAndroidSdks">
+    <PropertyGroup>
+      <PartyBoardPython Condition="'$(OS)' == 'Windows_NT'">python</PartyBoardPython>
+      <PartyBoardPython Condition="'$(PartyBoardPython)' == ''">python3</PartyBoardPython>
+    </PropertyGroup>
+    <Exec Command="&quot;$(PartyBoardPython)&quot; &quot;$(MSBuildProjectDirectory)/../../eng/prepare-partyboard-android.py&quot;" Condition="'$(RuntimeIdentifier)' == 'android-arm64'" />
+    <Exec Command="&quot;$(PartyBoardPython)&quot; &quot;$(MSBuildProjectDirectory)/../../eng/compile-partyboard-host.py&quot; --java-home &quot;$(_JavaSdkDirectory).&quot; --sdk &quot;$(_AndroidSdkDirectory).&quot;" />
+    <ItemGroup>
+      <AndroidNativeLibrary Remove="Generated/PartyBoard/arm64-v8a/*.so" />
+      <AndroidNativeLibrary Include="Generated/PartyBoard/arm64-v8a/*.so" Abi="arm64-v8a" Condition="'$(RuntimeIdentifier)' == 'android-arm64'" />
+    </ItemGroup>
+  </Target>
+</Project>
+
+

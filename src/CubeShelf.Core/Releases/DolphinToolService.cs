@@ -85,6 +85,7 @@ public sealed class DolphinToolService
                 new Progress<double>(value => progress?.Report(value * .80)), cancellationToken)
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
             if (Directory.Exists(staging)) Directory.Delete(staging, true);
             Directory.CreateDirectory(staging);
             SecureArchiveExtractor.Extract(archive, staging, ExtractionLimits,
@@ -130,6 +131,7 @@ public sealed class DolphinToolService
                           ?? (responseLength is > 0 ? existing + responseLength.Value : (long?)null);
         if (totalLength > MaximumDownloadBytes)
             throw new InvalidDataException("Le paquet Dolphin dépasse la taille autorisée.");
+        DownloadTransfer.Current?.BeginDownload(totalLength, existing);
 
         long total = existing;
         await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
@@ -139,17 +141,21 @@ public sealed class DolphinToolService
             var buffer = new byte[256 * 1024];
             while (true)
             {
+                if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken).ConfigureAwait(false);
                 var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                 if (read == 0) break;
+                if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken).ConfigureAwait(false);
                 total += read;
                 if (total > MaximumDownloadBytes) throw new InvalidDataException("Le paquet Dolphin dépasse la taille autorisée.");
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                DownloadTransfer.Current?.RecordDisk(read);
                 if (totalLength is > 0) progress?.Report(Math.Clamp((double)total / totalLength.Value, 0, 1));
             }
             await output.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         string actual;
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
         await using (var stream = File.OpenRead(temporary))
             actual = Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken).ConfigureAwait(false)).ToLowerInvariant();
         if (!actual.Equals(sha256, StringComparison.OrdinalIgnoreCase))

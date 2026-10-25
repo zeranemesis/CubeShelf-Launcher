@@ -4,6 +4,48 @@ CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’inte
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
+## Améliorations du launcher en préparation
+
+La version source `0.17.0-preview.3` améliore Big Picture, les profils de mods,
+les sauvegardes du profil, la récupération après mise à jour et la consommation
+de l’interface. Elle conserve les jaquettes 3D et ne modifie aucun moteur de jeu.
+Voir [les fonctions et leurs limites](LAUNCHER-IMPROVEMENTS.md). Cette version de
+prévisualisation n’est pas encore une release officielle.
+
+## Aperçu Android natif
+
+Le projet `src/CubeShelf.Android` propose un premier launcher pour Android 8+
+(ARM64 et x86-64), avec l’étagère 3D et les mêmes jaquettes que sur PC. Le bouton
+Jouer ouvre le port **natif** de Mario Party 4 / PartyBoard installé séparément,
+sans émulateur. Le choix du disque, les sauvegardes et les mods restent dans le
+jeu. Les salons et invitations privées ouvrent son interface Android existante.
+L’APK officiel de PartyBoard est actuellement ARM64 ; CubeShelf masque son
+installation sur les appareils incompatibles.
+
+Les autres jeux apparaissent avec leur disponibilité réelle. Cette première
+version mobile ne reprend pas encore les amis, profils de mods et la file de
+téléchargements du launcher PC. Elle n’a pas été validée sur téléphone ; le jeu
+croisé avec le PC est bloqué par le port PartyBoard actuel. Compilation et
+installation : [packaging/ANDROID.md](packaging/ANDROID.md).
+
+Pour les archives PC Windows/Linux/macOS x64 et ARM64, voir
+[packaging/DESKTOP-PORTABLE.md](packaging/DESKTOP-PORTABLE.md). La disponibilité
+des moteurs de jeu reste distincte de celle du launcher.
+
+## Jouer
+
+Le bouton de chaque jaquette permet aussi de **jouer directement depuis la
+bibliothèque** : choisir son fichier une fois, puis laisser CubeShelf installer et
+préparer ce qui manque avant le lancement automatique. Les réglages manuels restent
+dans les **Options avancées** de la fiche du jeu. Voir [QUICKPLAY.md](QUICKPLAY.md).
+
+## Gestion des téléchargements
+
+La page Téléchargements (Ctrl+4) affiche le transfert actif avec sa jaquette,
+les débits réseau et disque, une file réorganisable, la pause/reprise et une limite
+de débit sauvegardée. Les étapes de vérification et d’installation restent visibles
+jusqu’à la fin réelle de l’opération. Voir [DOWNLOADS.md](DOWNLOADS.md).
+
 ## Installation Windows
 
 L’artefact recommandé est `CubeShelf-Setup-x64.exe`. L’installation est effectuée sans droits administrateur dans `%LOCALAPPDATA%\Programs\CubeShelf`, crée une entrée de désinstallation et peut ajouter un raccourci Bureau.

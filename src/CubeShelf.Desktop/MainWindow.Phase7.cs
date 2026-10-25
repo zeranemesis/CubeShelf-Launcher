@@ -34,6 +34,7 @@ public sealed partial class MainWindow
         Dispatcher.UIThread.Post(() =>
         {
             ApplyPhase7Accessibility();
+            RefreshMaintenanceLabels();
             RefreshPhase7LocalizedState();
             RefreshPortableQueueView();
             RefreshDolphinStatusPhase4Core();

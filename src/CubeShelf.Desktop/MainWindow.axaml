@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:CubeShelf.Desktop.Controls"
         x:Class="CubeShelf.Desktop.MainWindow"
@@ -9,7 +9,7 @@
         SizeChanged="OnParityWindowSizeChanged">
   <Grid ColumnDefinitions="225,*">
     <!-- SIDEBAR -->
-    <Border Grid.Column="0" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
+    <Border x:Name="DesktopSidebar" Grid.Column="0" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
       <DockPanel Margin="16">
         <StackPanel DockPanel.Dock="Top">
           <StackPanel Orientation="Horizontal" Margin="0,4,0,28" Spacing="12">
@@ -44,6 +44,7 @@
           </Button>
         </StackPanel>
         <StackPanel DockPanel.Dock="Bottom" Spacing="8">
+          <Button x:Name="BigPictureEntryButton" Content="▣ Big Picture · F11" Click="EnterBigPicture" HorizontalAlignment="Stretch" />
           <!-- You, the way your friends see you. Clicking it opens your profile. -->
           <Button x:Name="ProfileChipButton" Classes="nav" TabIndex="7" Click="ParityShowProfile" HorizontalAlignment="Stretch">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
@@ -73,6 +74,94 @@
     </Border>
 
     <Grid x:Name="ViewHost" Grid.Column="1">
+      <Grid x:Name="BigPictureHomeView" Classes="view" IsVisible="False" RowDefinitions="Auto,*" Background="{DynamicResource Bg}">
+        <StackPanel Margin="36,24" Spacing="18">
+          <TextBlock x:Name="BigPictureHomeTitle" FontSize="34" FontWeight="Bold" />
+          <WrapPanel>
+            <Button x:Name="BigPictureCollectionButton" Click="OpenBigPictureCollection" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <Button x:Name="BigPictureHomeFriendsButton" Click="OpenBigPictureFriends" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <Button x:Name="BigPictureHomeSettingsButton" Click="OpenBigPictureSettings" Margin="0,0,10,8" FontSize="18" Padding="20,12" />
+            <TextBox x:Name="BigPictureHomeSearch" Width="280" TextChanged="BigPictureHomeSearchChanged" Margin="0,0,10,8" FontSize="18" />
+          </WrapPanel>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Margin="36,0,36,24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="18">
+            <TextBlock x:Name="BigPictureResumeTitle" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock x:Name="BigPictureResumeHint" FontSize="16" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" />
+            <WrapPanel x:Name="BigPictureResumeCards" />
+            <TextBlock x:Name="BigPictureHomeInvitesTitle" FontSize="24" FontWeight="SemiBold" />
+            <StackPanel x:Name="BigPictureHomeInvites" Spacing="12" />
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+      <ThemeVariantScope x:Name="BigPictureView" Classes="view" RequestedThemeVariant="Light" IsVisible="False">
+      <Grid Background="#F5F0EE" RowDefinitions="Auto,*,Auto">
+        <controls:ShelfContourBackground Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0.55" />
+        <Grid Margin="32,24" ColumnDefinitions="Auto,*,Auto">
+          <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+            <Image Source="avares://CubeShelf/Assets/Brand/gamecube_logo.png" Width="32" Height="32" />
+            <TextBlock Text="CubeShelf" Foreground="#302C35" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+            <Border Background="#EFDDD8" CornerRadius="9" Padding="14,8" Margin="10,0,0,0">
+              <TextBlock Text="GAMECUBE" Foreground="#80594E" FontSize="11" FontWeight="Bold" LetterSpacing="2" />
+            </Border>
+          </StackPanel>
+          <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="BigPictureFriendsButton" Click="OpenBigPictureFriends" FontSize="14" Padding="16,10" />
+            <Button x:Name="BigPictureSettingsButton" Click="OpenBigPictureSettings" FontSize="14" Padding="16,10" />
+            <Button x:Name="BigPictureLayoutButton" Click="ToggleBigPictureLayout" FontSize="14" Padding="16,10" />
+            <Button x:Name="BigPictureExitButton" Click="ExitBigPicture" FontSize="14" Padding="16,10" />
+          </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Margin="0,0,32,0" ColumnDefinitions="7*,3*" ColumnSpacing="12">
+          <controls:GameShelfControl x:Name="BigPictureShelf" />
+          <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Center" MaxHeight="620">
+            <StackPanel Spacing="14" Margin="0,20,0,20">
+              <TextBlock x:Name="BigPictureCollectionLabel" Foreground="#9B7066" FontSize="10" LetterSpacing="2" FontWeight="Bold" />
+              <Border Background="#EEDCD6" CornerRadius="16" Padding="24">
+                <StackPanel Spacing="14">
+                  <controls:GameTitleControl x:Name="BigPictureTitle" Foreground="#302C35" FontSize="30" />
+                  <TextBlock x:Name="BigPictureMetadata" Foreground="#80594E" FontSize="14" TextWrapping="Wrap" />
+                  <TextBlock x:Name="BigPictureDescription" Foreground="#6E6166" FontSize="14" TextWrapping="Wrap" MaxHeight="102" />
+                </StackPanel>
+              </Border>
+              <Button x:Name="BigPicturePlayButton" Classes="primary" Click="PlayBigPicture" FontSize="20" Padding="24,16" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <Button x:Name="BigPictureOnlineButton" Click="OpenBigPictureOnline" FontSize="18" Padding="20,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <Button x:Name="BigPictureModsButton" Click="OpenBigPictureMods" FontSize="17" Padding="18,12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <TextBlock x:Name="BigPictureStatus" Foreground="#706671" FontSize="14" TextWrapping="Wrap" />
+              <Button x:Name="BigPictureFlipButton" Click="FlipBigPictureCase" FontSize="14" Padding="16,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <Button x:Name="BigPictureCancelButton" Click="CancelBigPictureLaunch" IsVisible="False" FontSize="16" Padding="18,12" />
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="2" Margin="32,16,32,24" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="12">
+          <Button x:Name="BigPicturePreviousButton" Content="❮" Click="PreviousBigPictureGame" Padding="16,8" />
+          <Border Grid.Column="1" CornerRadius="8" Background="#EFDDD8" Padding="16,10">
+            <TextBlock x:Name="BigPicturePosition" Foreground="#80594E" FontSize="13" VerticalAlignment="Center" />
+          </Border>
+          <Button x:Name="BigPictureNextButton" Grid.Column="2" Content="❯" Click="NextBigPictureGame" Padding="16,8" />
+          <TextBlock x:Name="BigPictureHelp" Grid.Column="3" Foreground="#706671" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        </Grid>
+      </Grid>
+      </ThemeVariantScope>
+      <Grid x:Name="BigPictureModsView" Classes="view" IsVisible="False" RowDefinitions="Auto,*,Auto" Background="{DynamicResource Bg}">
+        <StackPanel Margin="40,28" Spacing="10">
+          <TextBlock x:Name="BigPictureModsTitle" FontSize="30" FontWeight="Bold" />
+          <TextBlock x:Name="BigPictureModsSummary" FontSize="17" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" />
+          <WrapPanel>
+            <ComboBox x:Name="BigPictureProfilePicker" Width="250" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureApplyProfileButton" Click="ApplyBigPictureProfile" Margin="0,4,8,4" />
+            <TextBox x:Name="BigPictureProfileNameBox" Width="220" MaxLength="80" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureSaveProfileButton" Click="SaveBigPictureProfile" Margin="0,4,8,4" />
+            <Button x:Name="BigPictureDeleteProfileButton" Click="DeleteBigPictureProfile" Margin="0,4,8,4" />
+          </WrapPanel>
+          <TextBlock x:Name="BigPictureProfileStatus" TextWrapping="Wrap" Foreground="{DynamicResource Accent}" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Margin="40,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel x:Name="BigPictureModChoices" Spacing="12" />
+        </ScrollViewer>
+        <Button Grid.Row="2" x:Name="BigPictureBrowseModsButton" Click="BrowseBigPictureMods" FontSize="19" Padding="24,16" Margin="40,24" HorizontalAlignment="Left" />
+      </Grid>
       <!-- LIBRARY -->
       <Grid x:Name="LibraryView" Classes="view" RowDefinitions="155,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
@@ -109,9 +198,10 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" Margin="10">
+                  <StackPanel Margin="10">
                     <Border Width="260" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="13">
                       <StackPanel>
+                        <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                         <Grid>
                           <Border Height="330" Background="#090C13" CornerRadius="11" ClipToBounds="True">
                             <Image Source="{Binding Cover}" Stretch="UniformToFill" />
@@ -120,18 +210,22 @@
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
                           </Border>
                         </Grid>
+                        </Button>
                         <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" Margin="3,13,3,0" />
                         <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="3,4,3,0" />
-                        <WrapPanel Margin="3,8,3,0">
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Disc}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Runtime}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8" Padding="7,3" Margin="0,0,5,4"><TextBlock Text="{Binding Data}" Foreground="{DynamicResource Muted}" FontSize="10" /></Border>
-                        </WrapPanel>
+                        <TextBlock Text="{Binding PlayHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" MinHeight="36" Margin="3,10,3,4" />
                         <TextBlock Text="{Binding Stats}" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" Margin="3,6,3,1" />
                         <TextBlock Text="{Binding Update}" Foreground="{DynamicResource Accent2}" FontSize="10" FontWeight="SemiBold" TextWrapping="Wrap" Margin="3,4,3,1" />
+                        <Button Classes="primary" Tag="{Binding}" Click="QuickPlayLibraryGame" IsEnabled="{Binding CanQuickPlay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,5" AutomationProperties.Name="{Binding PlayLabel}">
+                          <TextBlock Text="{Binding PlayLabel}" TextWrapping="Wrap" TextAlignment="Center" />
+                        </Button>
+                        <WrapPanel>
+                          <Button Content="{DynamicResource GameDetails}" Tag="{Binding}" Click="SelectLibraryGame" Padding="10,5" Margin="0,0,5,0" />
+                          <Button Content="{DynamicResource CancelGameLaunch}" Tag="{Binding}" Click="CancelQuickPlay" IsVisible="{Binding IsPreparing}" Padding="10,5" />
+                        </WrapPanel>
                       </StackPanel>
                     </Border>
-                  </Button>
+                  </StackPanel>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -158,22 +252,26 @@
                   <TextBlock x:Name="SelectedDescriptionText" Foreground="{DynamicResource Text}" Opacity="0.82" FontSize="15" LineHeight="23" TextWrapping="Wrap" />
                   <TextBlock x:Name="GameStatsText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
                   <TextBlock x:Name="SetupProgressText" Foreground="{DynamicResource Accent2}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                  <WrapPanel>
+                    <Button x:Name="PlayButton" Classes="primary" Content="{DynamicResource Play}" IsEnabled="False" Click="PlayGame" Margin="0,0,8,6" />
+                    <Button x:Name="CancelPlayLaunchButton" Content="{DynamicResource CancelGameLaunch}" IsVisible="False" Click="CancelQuickPlay" Margin="0,0,8,6" />
+                    <Button x:Name="FavoriteButton" Content="{DynamicResource FavoriteAdd}" Click="ToggleFavoriteParity" Margin="0,0,8,6" />
+                    <Button Content="{DynamicResource Mods}" Click="ParityOpenMods" Margin="0,0,8,6" />
+                  </WrapPanel>
+                </StackPanel>
+                <controls:GameCaseControl x:Name="GameCase" Grid.Column="1" Width="430" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+
+            <Expander x:Name="GameAdvancedOptions" Header="{DynamicResource AdvancedGameOptions}" IsExpanded="True" HorizontalAlignment="Stretch" Foreground="{DynamicResource Text}">
+              <StackPanel Spacing="18" Margin="0,12,0,0">
                   <WrapPanel>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="OriginalGameStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="RuntimeStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="DataStateText" FontSize="11" /></Border>
                     <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="9" Padding="9,5" Margin="0,0,6,6"><TextBlock x:Name="GameUpdateStateText" Text="{DynamicResource GameUpdateUnknown}" FontSize="11" /></Border>
                   </WrapPanel>
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button x:Name="PlayButton" Classes="primary" Content="{DynamicResource Play}" IsEnabled="False" Click="PlayGame" />
-                    <Button x:Name="FavoriteButton" Content="{DynamicResource FavoriteAdd}" Click="ToggleFavoriteParity" />
-                    <Button Classes="primary" Content="{DynamicResource Mods}" Click="ParityOpenMods" />
-                  </StackPanel>
-                </StackPanel>
-                <controls:GameCaseControl x:Name="GameCase" Grid.Column="1" Width="430" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" />
-              </Grid>
-            </Border>
-
             <Grid ColumnDefinitions="*,18,*">
               <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
                 <StackPanel Spacing="9">
@@ -244,6 +342,8 @@
                 </StackPanel>
               </Grid>
             </Border>
+              </StackPanel>
+            </Expander>
             <ProgressBar x:Name="InstallProgress" Minimum="0" Maximum="100" IsVisible="False" Height="9" />
             <TextBlock x:Name="ActionStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
           </StackPanel>
@@ -251,22 +351,36 @@
       </Grid>
 
       <!-- MODS -->
-      <Grid x:Name="ModsView" Classes="view" IsVisible="False" RowDefinitions="120,*">
+      <Grid x:Name="ModsView" Classes="view" IsVisible="False" RowDefinitions="Auto,*,Auto">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
-          <Grid Margin="34,22" ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="5"><TextBlock Text="{DynamicResource ModsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource AppMods}" FontSize="31" FontWeight="Bold" Foreground="{DynamicResource Text}" /></StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{DynamicResource BackGame}" Click="ParityBackToGame" /><Button x:Name="RefreshModsButton" Content="{DynamicResource RefreshGameBanana}" Click="RefreshMods" /></StackPanel>
-          </Grid>
+          <StackPanel Margin="34,18" Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ModsGameHeading" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ModsBackButton" Content="{DynamicResource BackGame}" Click="BackFromMods" />
+                <Button x:Name="RefreshModsButton" Content="{DynamicResource RefreshGameBanana}" Click="RefreshMods" />
+              </StackPanel>
+            </Grid>
+            <TabControl x:Name="ModsTabs" SelectedIndex="0" SelectionChanged="ModsTabChanged" Height="54">
+              <TabItem x:Name="InstalledModsTab" Header="Mes mods" FontSize="19" Focusable="True" />
+              <TabItem x:Name="GameBananaModsTab" Header="GameBanana" FontSize="19" Focusable="True" />
+            </TabControl>
+          </StackPanel>
         </Border>
         <Grid Grid.Row="1" Margin="24,18,24,24" ColumnDefinitions="*,18,440">
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="12">
             <Grid RowDefinitions="Auto,Auto,*">
-              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                <TextBox x:Name="ModSearchBox" Watermark="Rechercher un mod…" KeyUp="ModSearchKeyUp" />
-                <ComboBox x:Name="ModCategoryFilter" Grid.Column="1" MinWidth="150" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-                <ComboBox x:Name="ModStateFilter" Grid.Column="2" MinWidth="140" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-                <ComboBox x:Name="ModSortFilter" Grid.Column="3" MinWidth="130" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-              </Grid>
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBox x:Name="ModSearchBox" Watermark="Rechercher un mod…" KeyUp="ModSearchKeyUp" MinHeight="44" />
+                  <Button x:Name="SearchModsButton" Grid.Column="1" Content="Rechercher" Click="SearchModsTab" Margin="8,0,0,0" MinHeight="44" />
+                </Grid>
+                <WrapPanel>
+                  <ComboBox x:Name="ModCategoryFilter" MinWidth="150" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                  <ComboBox x:Name="ModStateFilter" MinWidth="140" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                  <ComboBox x:Name="ModSortFilter" MinWidth="130" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                </WrapPanel>
+              </StackPanel>
               <TextBlock x:Name="ModResultCount" Grid.Row="1" Margin="4,8,0,4" FontSize="11" Foreground="{DynamicResource Muted}" />
               <ListBox x:Name="ModsList" Grid.Row="2" Background="Transparent" BorderThickness="0" SelectionChanged="SelectMod"
                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -294,10 +408,12 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
+              <TextBlock x:Name="ModsEmptyState" Grid.Row="2" IsVisible="False" FontSize="19" Margin="24"
+                         TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
           </Border>
           <Border Grid.Column="2" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
-            <ScrollViewer><StackPanel Spacing="12">
+            <ScrollViewer><StackPanel x:Name="ModDetailsPanel" Spacing="12" Focusable="True">
               <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="ModTitle" Text="{DynamicResource SelectMod}" FontSize="22" FontWeight="Bold" TextWrapping="Wrap" /><TextBlock x:Name="ModVersion" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="OpenModImageButton" Content="{DynamicResource ViewImage}" IsEnabled="False" Click="OpenCurrentModImagePhase6" /><Button x:Name="OpenModPageButton" Content="{DynamicResource GameBanana}" IsEnabled="False" Click="OpenModPage" /></StackPanel></Grid>
               <Border Height="240" Background="#090C13" CornerRadius="14" ClipToBounds="True">
                 <Grid>
@@ -318,50 +434,26 @@
             </StackPanel></ScrollViewer>
           </Border>
         </Grid>
+        <Border x:Name="ModsControllerHint" Grid.Row="2" IsVisible="False" Background="{DynamicResource Panel2}" Padding="24,14">
+          <TextBlock x:Name="ModsControllerHelp" FontSize="16" TextWrapping="Wrap" Foreground="{DynamicResource Text}" />
+        </Border>
       </Grid>
 
       <!-- DOWNLOADS -->
-      <Grid x:Name="DownloadsView" Classes="view" IsVisible="False" RowDefinitions="132,*">
-        <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
-          <Grid Margin="34,24" ColumnDefinitions="*,Auto"><StackPanel><TextBlock Text="{DynamicResource DownloadsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource DownloadsTitle}" Foreground="{DynamicResource Text}" FontSize="32" FontWeight="Bold" Margin="0,5,0,0" /><TextBlock Text="{DynamicResource DownloadsSubtitle}" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{DynamicResource ClearFinished}" Click="ClearPortableDownloads" /></StackPanel></Grid>
-        </Border>
-        <Border Grid.Row="1" Margin="28,20,28,28" Background="{DynamicResource Panel}" CornerRadius="14" Padding="14">
-          <ListBox x:Name="DownloadsList" Background="Transparent" BorderThickness="0">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Border Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,0,0,9">
-                  <Grid ColumnDefinitions="1.2*,2*,Auto" RowDefinitions="Auto,Auto,Auto">
-                    <StackPanel>
-                      <TextBlock Text="{Binding Kind}" Foreground="{DynamicResource Accent2}" FontSize="10" FontWeight="Bold" />
-                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="18,0">
-                      <TextBlock Text="{Binding StateText}" Foreground="{DynamicResource Accent2}" FontWeight="SemiBold" />
-                      <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
-                      <TextBlock Text="{Binding ProgressEtaText}" Foreground="{DynamicResource Muted}" FontSize="10" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                      <Button Content="{DynamicResource CancelDownload}" Tag="{Binding}" IsEnabled="{Binding CanCancel}" Click="CancelPortableDownload" />
-                      <Button Content="{DynamicResource ResumeDownload}" Tag="{Binding}" IsEnabled="{Binding CanResume}" Click="ResumePortableDownload" />
-                      <Button Content="{DynamicResource RetryDownload}" Tag="{Binding}" IsEnabled="{Binding CanRetry}" Click="RetryPortableDownload" />
-                      <Button Content="{DynamicResource RemoveQueue}" Tag="{Binding}" IsEnabled="{Binding CanRemove}" Click="RemovePortableDownload" />
-                    </StackPanel>
-                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="3" Margin="0,10,0,0" Minimum="0" Maximum="1" Value="{Binding Progress}" Height="9" />
-                    <Grid Grid.Row="2" Grid.ColumnSpan="3" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
-                      <TextBlock Text="{Binding Changes}" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" />
-                      <TextBlock Grid.Column="1" Text="{Binding ProgressPercentText}" Foreground="{DynamicResource Text}" FontWeight="Bold" />
-                    </Grid>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </Border>
+      <Grid x:Name="DownloadsView" Classes="view" IsVisible="False">
+        <controls:DownloadsManager x:Name="DownloadManager" />
       </Grid>
 
       <!-- SETTINGS -->
       <ScrollViewer x:Name="SettingsView" Classes="view" IsVisible="False">
         <StackPanel Margin="34,26,34,34" Spacing="14">
+          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{DynamicResource StartupModeTitle}" FontSize="18" FontWeight="Bold" />
+              <CheckBox x:Name="StartInBigPictureBox" Content="{DynamicResource StartInBigPicture}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <TextBlock Text="{DynamicResource StartupModeHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
           <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="24" Margin="0,0,0,4">
             <StackPanel Spacing="5"><TextBlock Text="{DynamicResource SettingsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource SettingsTitle}" FontSize="32" FontWeight="Bold" /><TextBlock Text="{DynamicResource SettingsSubtitle}" Foreground="{DynamicResource Muted}" /></StackPanel>
           </Border>
@@ -402,6 +494,20 @@
             </StackPanel>
           </Border>
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20"><Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="5"><TextBlock Text="{DynamicResource Presence}" FontSize="18" FontWeight="Bold" /><TextBlock Text="{DynamicResource PresenceMovedHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" /></StackPanel><Button Grid.Column="1" Content="{DynamicResource OpenProfile}" Click="ParityShowProfile" VerticalAlignment="Center" /></Grid></Border>
+          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+            <StackPanel Spacing="10">
+              <TextBlock x:Name="MaintenanceTitle" FontSize="18" FontWeight="Bold" />
+              <TextBlock x:Name="MaintenanceHelp" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+              <WrapPanel>
+                <Button x:Name="BackupProfileButton" Click="BackupLauncherProfile" Margin="0,0,8,8" />
+                <Button x:Name="RestoreProfileButton" Click="RestoreLauncherProfile" Margin="0,0,8,8" />
+                <Button x:Name="RestoreCardsButton" Click="RestoreMemoryCards" Margin="0,0,8,8" />
+                <Button x:Name="PreviousLauncherButton" Click="RestorePreviousLauncher" Margin="0,0,8,8" />
+                <Button x:Name="MeasureLauncherButton" Click="MeasureLauncherPerformance" Margin="0,0,8,8" />
+              </WrapPanel>
+              <TextBlock x:Name="MaintenanceStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
           <StackPanel Orientation="Horizontal"><Button Content="{DynamicResource ResetSettings}" Click="ResetSettings" /></StackPanel>
           <TextBlock x:Name="SettingsStatus" Foreground="{DynamicResource Accent2}" TextWrapping="Wrap" />
         </StackPanel>
@@ -526,6 +632,16 @@
             <Border x:Name="OnlineGate" IsVisible="False" Padding="16" CornerRadius="12" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Warning}" BorderThickness="1">
               <TextBlock x:Name="OnlineGateText" TextWrapping="Wrap" />
             </Border>
+            <Border Padding="16" CornerRadius="14" Background="{DynamicResource Panel}">
+              <StackPanel Spacing="10">
+                <TextBlock x:Name="RoomCodeHeading" FontSize="19" FontWeight="SemiBold" />
+                <TextBlock x:Name="RoomCodeHelp" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+                <WrapPanel>
+                  <TextBox x:Name="RoomCodeBox" Width="280" MaxLength="80" Margin="0,0,10,8" />
+                  <Button x:Name="JoinRoomCodeButton" Click="JoinRoomByCode" Margin="0,0,10,8" />
+                </WrapPanel>
+              </StackPanel>
+            </Border>
             <!-- The room itself, shown here rather than in a window of its own: the companion runs
                  headless and room.json says what its window would have shown. -->
             <Border x:Name="MyRoomPanel" IsVisible="False" Padding="16" CornerRadius="14" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
@@ -571,6 +687,11 @@
                   <Button x:Name="MyRoomRenameButton" Content="{DynamicResource OnlineRename}" Click="RenameMyRoom" />
                 </StackPanel>
                 <TextBlock x:Name="MyRoomMessage" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+                <TextBlock x:Name="MyRoomReadySummary" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <WrapPanel>
+                  <TextBlock x:Name="MyRoomJoinCode" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,8" />
+                  <Button x:Name="CopyMyRoomCodeButton" Click="CopyMyRoomJoinCode" Margin="0,0,0,8" />
+                </WrapPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <Button x:Name="MyRoomStartButton" Classes="primary" Content="{DynamicResource OnlineStart}" Click="StartMyRoom" />
                   <Button x:Name="MyRoomModsButton" Content="{DynamicResource OnlineRoomMods}" Click="ChooseMyRoomMods" />
@@ -931,12 +1052,22 @@
         </Grid>
       </Border>
 
+      <Border x:Name="BigPictureSubnav" IsVisible="False" VerticalAlignment="Top" Height="64" Background="{DynamicResource Panel}" Padding="24,8">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock x:Name="BigPictureSubnavTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Button x:Name="BigPictureKeyboardButton" Click="OpenFocusedBigPictureKeyboard" Padding="16,10" />
+            <Button x:Name="BigPictureReturnButton" Click="ReturnToBigPicture" Padding="18,10" />
+          </StackPanel>
+        </Grid>
+      </Border>
       <!-- THEME TRANSITION -->
       <Border x:Name="ThemeTransitionOverlay" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource OverlayBrush}">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.14" /></Transitions></Border.Transitions>
       </Border>
 
       <!-- TOAST -->
+      <controls:GameLaunchTransition x:Name="LaunchTransition" ZIndex="90" />
       <Border x:Name="ToastHost" IsVisible="False" Opacity="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="390" Margin="24" Padding="16" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="14">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.16" /></Transitions></Border.Transitions>
         <Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="4"><TextBlock x:Name="ToastTitle" FontWeight="Bold" FontSize="15" /><TextBlock x:Name="ToastMessage" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" /></StackPanel><Button Grid.Column="1" Content="×" Click="HideToastParity" /></Grid>
