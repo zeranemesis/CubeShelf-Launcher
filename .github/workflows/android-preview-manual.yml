@@ -38,6 +38,8 @@ jobs:
         env:
           PREVIEW_DOTNET_VERSION: ${{ steps.dotnet.outputs.dotnet-version }}
         run: dotnet new globaljson --sdk-version "$PREVIEW_DOTNET_VERSION" --roll-forward latestPatch
+      - name: Test Android application updates
+        run: dotnet run --project tests/CubeShelf.AppUpdates.Tests/CubeShelf.AppUpdates.Tests.csproj -c Release
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -50,13 +52,13 @@ jobs:
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
       - name: Install the .NET Android workload
         run: dotnet workload install android --skip-manifest-update
-      - name: Create a temporary preview signing key
+      - name: Restore the persistent Android signing key
+        env:
+          CUBESHELF_ANDROID_KEYSTORE_BASE64: ${{ secrets.CUBESHELF_ANDROID_KEYSTORE_BASE64 }}
         run: |
-          keytool -genkeypair -noprompt \
-            -keystore "$RUNNER_TEMP/cubeshelf-preview.keystore" \
-            -alias androiddebugkey -storepass android -keypass android \
-            -keyalg RSA -keysize 2048 -validity 30 \
-            -dname "CN=CubeShelf Preview, O=CubeShelf, C=FR"
+          test -n "$CUBESHELF_ANDROID_KEYSTORE_BASE64" || { echo 'Persistent Android signing key is required for update compatibility.'; exit 1; }
+          printf '%s' "$CUBESHELF_ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/cubeshelf-preview.keystore"
+          chmod 600 "$RUNNER_TEMP/cubeshelf-preview.keystore"
       - name: Publish the signed preview APK
         run: |
           dotnet publish src/CubeShelf.Android/CubeShelf.Android.csproj \

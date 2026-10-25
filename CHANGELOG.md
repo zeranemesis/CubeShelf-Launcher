@@ -7,7 +7,8 @@
 - Rendu des boîtiers 3D et cache des jaquettes optimisés, animations à la demande et chemins d'images adaptés à chaque plateforme.
 - Android ARM64 : moteur natif PartyBoard intégré, téléchargement vérifié de ses ressources et retour à la bibliothèque après le jeu ; disque personnel toujours nécessaire.
 - Gestionnaire de téléchargements mobile avec progression et débit réels, graphique, pause/reprise, file persistante et historique illustré.
-- Version Android 41. Les APK restent des aperçus signés avec une clé de développement ; les paquets PC ne disposent pas de signature de distribution ni de notarisation macOS.
+- Mise à jour de l'application Android depuis GitHub : recherche au démarrage et toutes les cinq minutes au premier plan, téléchargement du bon APK, contrôle de taille et SHA-256, puis confirmation dans l'installateur Android. Accès depuis ↻ et Téléchargements, progression, annulation et reprise après erreur. Les brouillons, préversions, APK d'une autre architecture et paquets sans empreinte sont refusés.
+- Version Android 42. Signature persistante commune aux architectures pour permettre les mises à jour suivantes sans désinstallation ; contrôle du nom de paquet, du code de version et du certificat avant installation. Les APK restent des aperçus signés avec une clé de développement ; les paquets PC ne disposent pas de signature de distribution ni de notarisation macOS.
 - Les notes des aperçus ci-dessous détaillent les essais effectués. Aucune garantie de 120 images/s constantes ni de compatibilité réseau Android–PC ; les parties complètes et les manettes physiques restent à valider.
 
 ## 0.17.0-preview.19 — gestionnaire mobile inspiré du PC, non publié

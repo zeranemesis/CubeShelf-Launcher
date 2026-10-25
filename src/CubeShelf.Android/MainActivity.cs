@@ -212,6 +212,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
         public string DataDirectory => global::Android.App.Application.Context.FilesDir!.AbsolutePath;
         public string? LastError => NativeGameService.LastError;
         public IRuntimeDownloads Downloads => NativeGameService.Downloads;
+        public LauncherAppUpdates AppUpdates => AndroidAppUpdates.Instance;
         public bool IsInstalled() => NativeGameService.IsInstalled();
         public bool DeviceSupportsPublishedGame() => NativeGameService.DeviceSupportsPublishedGame();
         public bool OpenGame() => NativeGameService.OpenGame();

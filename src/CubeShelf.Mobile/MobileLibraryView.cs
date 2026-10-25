@@ -69,10 +69,11 @@ public sealed partial class MobileLibraryView : UserControl
         _launchTransition.DismissRequested += CancelLaunchTransition;
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
         ConfigureButtonStyles();
-        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto"), Margin = new Thickness(16, 10) };
+        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
         heading.Children.Add(new TextBlock { Text = "CubeShelf", FontSize = 21, FontWeight = FontWeight.Bold });
         Grid.SetColumn(_position, 1); heading.Children.Add(_position);
         Grid.SetColumn(_downloadsButton, 2); heading.Children.Add(_downloadsButton);
+        Grid.SetColumn(_appUpdatesButton, 3); heading.Children.Add(_appUpdatesButton);
         _summary.Children.Add(_title); _summary.Children.Add(_info); _summary.Children.Add(_availability);
         _play.Classes.Add("primary"); _download.Classes.Add("primary");
         _play.Content = ActionLabel("▶", "Jouer");
@@ -141,8 +142,9 @@ public sealed partial class MobileLibraryView : UserControl
             }
             InitializeShelf();
             SubscribeDownloads();
+            SetAppUpdatesActive(true);
         };
-        DetachedFromVisualTree += (_, _) => { UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
+        DetachedFromVisualTree += (_, _) => { SetAppUpdatesActive(false); UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         LayoutUpdated += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
@@ -214,7 +216,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
-        Control[] candidates = [_downloadsButton, _online, _invitationPanel, _invite, _join, _play, _download];
+        Control[] candidates = [_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download];
         var actions = candidates.Where(control => control.IsEffectivelyVisible && control.IsEnabled
             && (control != _invite && control != _join || _invitationPanel.IsExpanded)).ToArray();
         if (actions.Length == 0) return;
@@ -292,6 +294,7 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void SetActive(bool active)
     {
+        SetAppUpdatesActive(active);
         if (active) { InitializeShelf(); RefreshAvailability(); }
         else { FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
     }

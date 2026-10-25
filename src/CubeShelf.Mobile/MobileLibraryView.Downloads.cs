@@ -59,6 +59,7 @@ public sealed partial class MobileLibraryView
         _closeDownloads.Click += (_, _) => CloseDownloads();
         Grid.SetColumn(_closeDownloads, 1); header.Children.Add(_closeDownloads); _downloadsOverlay.Children.Add(header);
         var content = new StackPanel { Spacing = 18 };
+        content.Children.Add(BuildAppUpdateCard());
         var telemetry = new StackPanel { Spacing = 12 };
         var metrics = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*"), ColumnSpacing = 10 };
         var labels = new[] { "RÉSEAU", "PIC", "RESTANT" };

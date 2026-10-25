@@ -11,4 +11,5 @@ public interface IMobileGameService
     bool OpenDownloadPage();
     string? LastError { get; }
     IRuntimeDownloads? Downloads => null;
+    LauncherAppUpdates? AppUpdates => null;
 }
