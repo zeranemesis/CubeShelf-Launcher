@@ -3,8 +3,8 @@
 CubeShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-La source de cet aperçu porte la version affichée `0.17.0-preview.3` et le code
-de version Android `6`. Cela ne signifie pas qu’un nouvel APK a été publié.
+La version 0.17.0 porte le code Android `42` et comprend la mise à jour
+de l'application depuis les releases GitHub.
 
 ## Produire les APK
 
@@ -22,23 +22,41 @@ Chaque artefact comprend son SHA-256. Ce workflow compile et signe le launcher ;
 il ne lance aucun test, ne démarre aucun appareil et ne publie aucune release.
 Un APK compilé ne constitue pas une validation sur téléphone.
 
-La signature utilise une clé de développement temporaire créée dans le runner,
-avec le mot de passe public conventionnel `android`. Elle sert uniquement à
-installer cet aperçu ; ce n'est pas une signature de distribution. Aucun
-keystore n'est inclus dans les artefacts. La clé change entre les exécutions
-et les architectures : Android peut refuser une mise à jour d'un aperçu
-précédent. Il faut alors désinstaller l'ancien CubeShelf avant d'installer le
-nouvel APK ; cette désinstallation efface ses préférences locales.
+La signature utilise la clé de développement persistante conservée dans le
+secret GitHub `CUBESHELF_ANDROID_KEYSTORE_BASE64`, commune aux architectures
+et aux exécutions. Le build échoue si cette clé manque, au lieu de produire
+un APK incompatible avec les mises à jour. Aucun keystore n'est publié.
+Cette clé reste une clé de développement, pas une signature de distribution.
+Un ancien aperçu signé avec une autre clé ne peut pas être remplacé directement.
+Ne pas le désinstaller pour contourner ce refus sans sauvegarder ses données.
+
+## Mettre CubeShelf à jour
+
+La recherche de la dernière release stable est automatique au démarrage puis
+toutes les cinq minutes tant que l'application est au premier plan. Un point
+sur le bouton ↻ indique une version disponible. Ce bouton ouvre la carte
+**Application CubeShelf** dans **Téléchargements**, avec les actions Vérifier,
+Télécharger, Annuler et Installer.
+
+Le launcher choisit l'APK de son architecture, vérifie sa taille et son SHA-256
+contre `checksums.txt` et, lorsqu'elle est fournie, l'empreinte GitHub. Il vérifie
+ensuite l'identité de l'application, un code de version supérieur et la même
+signature avant d'ouvrir l'installateur Android. Android demande l'autorisation
+d'installer depuis CubeShelf, puis la confirmation de la mise à jour. Au retour
+des autorisations, toucher à nouveau Installer. Aucune installation silencieuse
+ni désinstallation automatique ; les données sont conservées par Android lors
+d'une mise à jour compatible. L'ancienne version doit être remplacée une première
+fois manuellement pour bénéficier de cette nouvelle fonction.
 
 ## Installer et démarrer un jeu
 
 1. Télécharger l'artefact adapté à l'architecture, extraire le ZIP et installer
    l'APK CubeShelf. Android peut demander d'autoriser cette source d'installation.
-2. Installer séparément l'APK **natif Android de Mario Party 4 / Party Board**
-   proposé par son projet amont. Le launcher et le jeu sont deux applications.
+2. Sur ARM64, préparer PartyBoard depuis CubeShelf : le moteur natif est inclus
+   et seules ses ressources officielles sont téléchargées puis vérifiées.
 3. Au premier démarrage de Party Board, sélectionner son propre disque de jeu
    depuis le jeu. Les fichiers du profil PC ne sont pas importés automatiquement.
-4. Utiliser CubeShelf pour ouvrir l'application du jeu déjà installée.
+4. Utiliser Jouer pour ouvrir l'activité native PartyBoard intégrée à CubeShelf.
 
 CubeShelf ne contient aucun disque, fichier extrait ou autre donnée de jeu.
 Le binaire Windows d'un runtime CubeShelf ne fonctionne pas sous Android.
@@ -53,8 +71,10 @@ capacités réseau déterminent les fonctions disponibles.
 
 ## Limites de cet aperçu
 
-- Aucun appareil physique n'a encore validé cet APK, sa navigation ou ses
-  performances. Aucune partie Android vers Android n'a été validée ici.
+- Les essais du moteur et de l'interface consignés dans le changelog concernent
+  un Galaxy S20. La nouvelle installation d'une mise à jour doit encore être
+  validée de bout en bout sur téléphone ; aucune partie Android vers Android
+  n'est annoncée comme validée ici.
 - Seul Mario Party 4 dispose du parcours de jeu Android prévu dans cet aperçu.
   Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule
   installation du launcher Android.
@@ -66,8 +86,8 @@ capacités réseau déterminent les fonctions disponibles.
   les écrans du système et de l'application du jeu.
 - Le catalogue et le renderer GLB sont partagés avec le PC. La disposition
   s’adapte au portrait et au paysage ; les images sont libérées quand
-  l’application passe en arrière-plan. La file de téléchargements, les amis
-  CubeShelf et les profils de mods PC ne sont pas encore portés dans cet aperçu.
+  l’application passe en arrière-plan. Une file de téléchargements mobile est
+  disponible ; les amis CubeShelf et profils de mods PC restent absents.
 - Aucun bouton fléché : parcourir les jaquettes par balayage horizontal ou à la
   manette. Toucher une voisine la sélectionne ; toucher la sélection la retourne.
   Un mouvement vertical reste réservé au défilement de la page.
