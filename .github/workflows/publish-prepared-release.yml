@@ -144,7 +144,9 @@ jobs:
           set -euo pipefail
           gh release view "$RELEASE_TAG" --json isDraft --jq '.isDraft' | grep -qx true
           gh release upload "$RELEASE_TAG" assets/* --clobber
-          gh api "repos/$GH_REPO/releases/tags/$RELEASE_TAG" > uploaded-release.json
+          gh api "repos/$GH_REPO/releases" > releases.json
+          release_id="$(python -c 'import json, os; print(next(r["id"] for r in json.load(open("releases.json")) if r["tag_name"] == os.environ["RELEASE_TAG"]))')"
+          gh api "repos/$GH_REPO/releases/$release_id" > uploaded-release.json
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
