@@ -43,6 +43,9 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install Android platform and build tools
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
       - name: Install the .NET Android workload
