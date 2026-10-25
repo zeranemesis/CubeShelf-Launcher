@@ -50,6 +50,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     public double ShadowOpacity { get; set; } = 1;
     public bool RealisticShell { get; set; }
     public bool UseImportedModel { get; set; }
+    public bool UseCompactTextureMesh { get; init; }
     private double _restPitch;
     private double _hoverYaw;
     private double _hoverPitch;
@@ -63,6 +64,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private double _lift;
     private double _targetLift;
     private bool _disposed;
+    private SolidColorBrush? _contactShadowBrush;
 
     public GameCaseControl()
     {
@@ -73,10 +75,14 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
         _animation = new DemandAnimation(this, AnimateFrame);
 
-        PointerEntered += (_, _) => _pointerInside = IsInteractive;
-        PointerMoved += OnPointerMoved;
-        PointerExited += (_, _) =>
+        PointerEntered += (_, args) =>
         {
+            if (args.Pointer.Type != PointerType.Touch) _pointerInside = IsInteractive;
+        };
+        PointerMoved += OnPointerMoved;
+        PointerExited += (_, args) =>
+        {
+            if (args.Pointer.Type == PointerType.Touch) return;
             _pointerInside = false;
             _hoverYaw = 0;
             _hoverPitch = 0;
@@ -92,6 +98,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         _front = Load(front);
         _back = Load(back);
         _spine = Load(spine);
+        if (PreferGpuTextures) CoverBitmapCache.PrepareTexture(_back);
         _flipped = false;
         _pointerInside = false;
         _baseYaw = 0;
@@ -130,9 +137,12 @@ public sealed partial class GameCaseControl : Control, IDisposable
     /// <summary>Places a case on a shelf, preserving the renderer used on game details.</summary>
     public void SetShelfPose(double yaw, bool selected, bool animate)
     {
+        var restPitch = RealisticShell ? (selected ? 3.5 : 2) : 0;
+        if (animate && _restYaw == yaw && _restPitch == restPitch && IsInteractive == selected && !_flipped
+            && !_pointerInside && _hoverYaw == 0 && _hoverPitch == 0) return;
         IsInteractive = selected;
         _restYaw = yaw;
-        _restPitch = RealisticShell ? (selected ? 3.5 : 2) : 0;
+        _restPitch = restPitch;
         _baseYaw = yaw;
         _flipped = false;
         _pointerInside = false;
@@ -145,6 +155,17 @@ public sealed partial class GameCaseControl : Control, IDisposable
     {
         base.Render(context);
         if (Bounds.Width <= 2 || Bounds.Height <= 2) return;
+        var timing = FrontendTiming;
+        if (timing is null) { RenderCase(context); return; }
+        var started = System.Diagnostics.Stopwatch.GetTimestamp();
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+        RenderCase(context);
+        timing(System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,
+            GC.GetAllocatedBytesForCurrentThread() - allocated);
+    }
+
+    private void RenderCase(DrawingContext context)
+    {
         if (UseImportedModel && RenderImportedModel(context)) return;
 
         var vertices = BuildProjectedVertices();
@@ -176,9 +197,12 @@ public sealed partial class GameCaseControl : Control, IDisposable
     {
         // Layered ellipses keep the shadow soft without a per-frame bitmap blur.
         var center = new Point(bounds.Center.X + 6, bounds.Bottom + 7 + _lift * 8);
+        var alpha = (byte)(9 * ShadowOpacity);
+        if (_contactShadowBrush is null || _contactShadowBrush.Color.A != alpha)
+            _contactShadowBrush = new SolidColorBrush(Color.FromArgb(alpha, 24, 20, 28));
+        var brush = _contactShadowBrush;
         for (var layer = 7; layer >= 0; layer--)
         {
-            var brush = new SolidColorBrush(Color.FromArgb((byte)(9 * ShadowOpacity), 24, 20, 28));
             context.DrawEllipse(brush, null, center,
                 Math.Max(12, bounds.Width * .42 + layer * 3), 3 + layer * 2.1);
         }
@@ -548,18 +572,22 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private static Rect ComputeBounds(IEnumerable<Point> points)
     {
-        var array = points.ToArray();
-        if (array.Length == 0) return default;
-        var minX = array.Min(point => point.X);
-        var minY = array.Min(point => point.Y);
-        var maxX = array.Max(point => point.X);
-        var maxY = array.Max(point => point.Y);
+        var minX = double.PositiveInfinity; var minY = double.PositiveInfinity;
+        var maxX = double.NegativeInfinity; var maxY = double.NegativeInfinity;
+        var any = false;
+        foreach (var point in points)
+        {
+            any = true;
+            minX = Math.Min(minX, point.X); minY = Math.Min(minY, point.Y);
+            maxX = Math.Max(maxX, point.X); maxY = Math.Max(maxY, point.Y);
+        }
+        if (!any) return default;
         return new Rect(minX, minY, Math.Max(0, maxX - minX), Math.Max(0, maxY - minY));
     }
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!IsInteractive) return;
+        if (!IsInteractive || e.Pointer.Type == PointerType.Touch) return;
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
         _pointerInside = true;
         _pointerPosition = e.GetPosition(this);

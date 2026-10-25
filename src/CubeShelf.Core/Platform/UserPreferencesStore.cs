@@ -125,7 +125,10 @@ public sealed record UserPreferences(
     bool MeshDiscoveryNoticeSeen = false,
 
     /// <summary>Payload bandwidth in bytes per second. Zero leaves it unlimited.</summary>
-    long DownloadBandwidthLimit = 0);
+    long DownloadBandwidthLimit = 0,
+
+    /// <summary>Open the desktop launcher directly in Big Picture on normal startup.</summary>
+    bool StartInBigPicture = false);
 
 public sealed class UserPreferencesStore
 {

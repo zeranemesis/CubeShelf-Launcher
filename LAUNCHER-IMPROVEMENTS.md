@@ -125,3 +125,33 @@ Les moteurs personnalisés sans contrat reconnu gardent leurs réglages habituel
 Android conserve son ouverture d’activité native après la transition ; le launcher
 ne peut pas lire les préférences privées de PartyBoard ni intégrer son moteur
 dans sa fenêtre. Le retour tactile annule la transition avant l’ouverture du jeu.
+
+### Mods dans Big Picture
+
+La collection n’affiche plus de bouton Home. Les boutons Amis et Paramètres
+ouvrent directement leurs pages en plein écran. « Mes mods · GameBanana » ouvre
+la gestion complète du jeu sélectionné en conservant Big Picture et son parcours
+de retour. Mes mods filtre les installations locales sans exiger de chargement
+du catalogue ; GameBanana permet de chercher et d’installer via la file existante.
+Les profils, priorités, conflits, activation et suppression sont accessibles dans
+la même vue. Le clavier à l’écran et la navigation manette incluent les onglets.
+
+La navigation dédiée utilise les positions réelles des cartes. A cible l’action
+de la fiche, B revient à la grille avant de quitter la page, LB/RB changent
+d’onglet, Y ouvre la recherche et X exécute l’action contextuelle. Les cartes
+sont ramenées dans la zone visible et le bandeau rappelle les commandes.
+Une suppression demande confirmation avec Annuler ciblé par défaut. Le clavier
+à l’écran lance effectivement la recherche GameBanana après validation.
+Ces parcours sont compilés ; ils n’ont pas été validés avec une manette physique.
+
+### Premier contrôle sur téléphone — 24 octobre 2026
+
+CubeShelf 0.17.0-preview.11 (code Android 16) a été installé sur un Samsung Galaxy
+S20 SM-G985F sous Android 13 par ADB sans fil. Le premier lancement a révélé un
+thème incompatible avec AppCompat ; l’héritage du thème a été corrigé. La mise
+en page mobile borne désormais l’étagère et la fiche défilante à l’écran, et la
+capture tactile reste sur l’étagère pendant les balayages.
+
+Lancement, jaquettes 3D, portrait/paysage et balayage aller/retour contrôlés sur
+ce téléphone. Rotation automatique rétablie après le contrôle. Aucun jeu lancé :
+PartyBoard n’y était pas installé. Aucun essai de manette physique effectué.

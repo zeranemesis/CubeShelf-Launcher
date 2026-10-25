@@ -48,7 +48,7 @@ public sealed partial class MainWindow
         if (root is null) return [];
         var controls = root.GetVisualDescendants().OfType<Control>()
             .Where(control => control.IsEffectivelyVisible && control.IsEffectivelyEnabled && control.Focusable
-                && control is Button or TextBox or ComboBox or ListBox or Slider)
+                && control is Button or TextBox or ComboBox or ListBox or Slider or TabItem)
             .Where(control => control is not TextBox { IsReadOnly: true }
                 && !control.GetVisualAncestors().Any(ancestor => ancestor is ComboBox or Slider)).ToList();
         if (window == this && BigPictureReturnButton.IsEffectivelyVisible)
@@ -76,6 +76,7 @@ public sealed partial class MainWindow
             PasswordChar = target.PasswordChar, TextWrapping = TextWrapping.Wrap, MinHeight = 54, MaxHeight = 90
         };
         var mode = 0;
+        var confirmed = false;
         var letters = new UniformGrid { Columns = 10, Rows = 5 };
         var keyLetters = new List<(Button Button, string Value)>();
         _bigPictureKeyboardKeys.Clear();
@@ -132,7 +133,7 @@ public sealed partial class MainWindow
         Action(P7("Valider", "Done"), () =>
         {
             target.Text = preview.Text;
-            if (ReferenceEquals(target, ModSearchBox)) ApplyModFilters();
+            confirmed = true;
             dialog.Close();
         });
         var panel = new StackPanel { Margin = new Thickness(24), Spacing = 12 };
@@ -151,6 +152,11 @@ public sealed partial class MainWindow
             _bigPictureKeyboardWindow = null; _bigPictureKeyboardKeys.Clear();
             if (target.IsEffectivelyVisible && target.IsEffectivelyEnabled) target.Focus();
             _bigPictureLastInput = -1;
+        }
+        if (confirmed && ReferenceEquals(target, ModSearchBox))
+        {
+            SearchModsTab(this, new RoutedEventArgs());
+            FocusModGrid();
         }
     }
 

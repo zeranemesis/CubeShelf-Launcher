@@ -53,10 +53,10 @@ public sealed partial class MainWindow
     {
         if (BigPictureGame is not { } game || PlayIntentFor(game) is not null || RunningGameFor(game) is not null) return;
         _bigPictureModsGame = game;
-        RefreshBigPictureModChoices();
-        ShowParityView(BigPictureModsView);
-        (BigPictureModChoices.Children.OfType<Button>().FirstOrDefault(button => button.IsEffectivelyEnabled)
-            ?? BigPictureBrowseModsButton).Focus();
+        SelectCatalogGame(game, showGameView: false);
+        ModsTabs.SelectedIndex = 0;
+        ShowMods(sender, args);
+        FocusModGrid();
     }
 
     private void RefreshBigPictureModChoices()
@@ -140,6 +140,7 @@ public sealed partial class MainWindow
     {
         if (_bigPictureKeyboardWindow is not null) { HandleBigPictureKeyboardInput(input); return; }
         var window = BigPictureInputWindow();
+        if (window == this && ModsView.IsVisible && HandleModControllerInput(input)) return;
         if (input == 6)
         {
             if (window != this) { window.Close(); _bigPictureLastInput = -1; }
@@ -173,7 +174,8 @@ public sealed partial class MainWindow
         }
         else if (input == 5 && focused >= 0)
         {
-            if (controls[focused] is CheckBox check) check.IsChecked = check.IsChecked != true;
+            if (controls[focused] is TabItem tab) tab.IsSelected = true;
+            else if (controls[focused] is CheckBox check) check.IsChecked = check.IsChecked != true;
             else if (controls[focused] is RadioButton radio) radio.IsChecked = true;
             else if (controls[focused] is TextBox text) OpenBigPictureKeyboard(text);
             else if (controls[focused] is Button button) button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

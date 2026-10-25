@@ -446,18 +446,25 @@ public sealed partial class MainWindow : Window
     {
         ShowParityView(ModsView);
         RefreshModItems();
-        if (_preferences.RefreshModsOnOpen && _remoteMods.Count == 0) RefreshMods(sender, args);
+        UpdateModTabs();
+        ApplyModFilters();
+        if (!InstalledModsSelected && _preferences.RefreshModsOnOpen && _remoteMods.Count == 0) RefreshMods(sender, args);
     }
 
     private async void RefreshMods(object? sender, RoutedEventArgs args)
     {
         if (_selectedGame is null) return;
+        if (!RefreshModsButton.IsEnabled) { _modSearchPending = true; return; }
         RefreshModsButton.IsEnabled = false;
+        var game = _selectedGame;
         ModsStatus.Text = "Chargement du catalogue GameBanana…";
         try
         {
             var search = ModSearchBox.Text?.Trim() ?? "";
-            _remoteMods = await _gameBanana.BrowseAsync(_selectedGame.GameBananaGameId, search);
+            var remote = await _gameBanana.BrowseAsync(game.GameBananaGameId, search);
+            if (_selectedGame?.ModLibraryId != game.ModLibraryId) return;
+            _remoteMods = remote;
+            _remoteModSearch = search;
             RefreshModItems();
             ModsStatus.Text = search.Length > 0
                 ? $"{_remoteMods.Count} mod(s) GameBanana pour « {search} »."
@@ -465,9 +472,16 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            ModsStatus.Text = $"Catalogue indisponible : {exception.Message}";
+            if (_selectedGame?.ModLibraryId == game.ModLibraryId)
+                ModsStatus.Text = $"Catalogue indisponible : {exception.Message}";
         }
-        finally { RefreshModsButton.IsEnabled = true; }
+        finally
+        {
+            RefreshModsButton.IsEnabled = true;
+            var retry = _modSearchPending;
+            _modSearchPending = false;
+            if (retry && ModsView.IsVisible && !InstalledModsSelected) RefreshMods(this, new RoutedEventArgs());
+        }
     }
 
     private void RefreshModItems()
@@ -528,7 +542,19 @@ public sealed partial class MainWindow : Window
     private async void SelectMod(object? sender, SelectionChangedEventArgs args)
     {
         _selectedMod = ModsList.SelectedItem as DesktopModItem;
-        if (_selectedMod is null) return;
+        if (_selectedMod is { } selected && _selectedGame is { } selectedGame)
+            _modSelectionByTab[(selectedGame.ModLibraryId, ModsTabs.SelectedIndex)] = selected.Id;
+        UpdateModControllerHelp();
+        if (_selectedMod is null)
+        {
+            ModTitle.Text = P7("Sélectionne un mod", "Select a mod");
+            ModVersion.Text = ModDescription.Text = ModInstructions.Text = ModDetailStatus.Text = "";
+            ModPreview.Source = null;
+            _modPreviewBitmap?.Dispose(); _modPreviewBitmap = null;
+            InstallModButton.IsEnabled = ToggleModButton.IsEnabled = DeleteModButton.IsEnabled = false;
+            OpenModPageButton.IsEnabled = OpenModImageButton.IsEnabled = false;
+            return;
+        }
         ShowSelectedMod();
         if (_selectedMod.Remote is not { IsSummary: true }) return;
         var item = _selectedMod;
@@ -571,6 +597,7 @@ public sealed partial class MainWindow : Window
         ModPreview.Source = null;
         _modPreviewBitmap?.Dispose();
         _modPreviewBitmap = null;
+        if (_bigPictureActive && ModDetailsPanel.IsFocused && (InstallModButton.IsEnabled || ToggleModButton.IsEnabled)) FocusModDetails();
     }
 
     private async void InstallMod(object? sender, RoutedEventArgs args)
@@ -578,31 +605,72 @@ public sealed partial class MainWindow : Window
 
     private async Task RunModInstallationAsync()
     {
-        await QueueModInstallationPhase3Async();
+        try
+        {
+            if (_selectedGame is { } game) EnsureModProfileChangeAllowed(game);
+            await QueueModInstallationPhase3Async();
+        }
+        catch (Exception error) { ModsStatus.Text = error.Message; }
+        if (_bigPictureActive && !string.IsNullOrWhiteSpace(ModsStatus.Text)) ShowToastParity("Mods", ModsStatus.Text);
     }
     private void ToggleMod(object? sender, RoutedEventArgs args)
     {
         if (_selectedMod is null || _modManager is null) return;
-        _modManager.SetEnabled(_selectedMod.Id, !_selectedMod.Enabled);
-        RefreshModItems();
-        SyncVariantSelection();
+        try
+        {
+            if (_selectedGame is { } game) EnsureModProfileChangeAllowed(game);
+            var name = _selectedMod.Name;
+            var enabled = !_selectedMod.Enabled;
+            _modManager.SetEnabled(_selectedMod.Id, !_selectedMod.Enabled);
+            RefreshModItems(); SyncVariantSelection(); RefreshBigPictureStatus();
+            ModsStatus.Text = name + (enabled ? P7(" activé.", " enabled.") : P7(" désactivé.", " disabled."));
+            if (_bigPictureActive) ShowToastParity("Mods", ModsStatus.Text);
+        }
+        catch (Exception error) { ModsStatus.Text = error.Message; }
     }
 
-    private void DeleteMod(object? sender, RoutedEventArgs args)
+    private async void DeleteMod(object? sender, RoutedEventArgs args)
     {
-        if (_selectedMod is null || _modManager is null) return;
-        _modManager.Uninstall(_selectedMod.Id);
-        ModsStatus.Text = $"{_selectedMod.Name} supprimé.";
-        RefreshModItems();
-        SyncVariantSelection();
+        if (_selectedMod is not { } mod || _modManager is not { } manager || _selectedGame is not { } game) return;
+        try
+        {
+            EnsureModProfileChangeAllowed(game);
+            var dialog = CreatePhase7Dialog(P7("Supprimer le mod", "Delete mod"), 580, 300);
+            var cancel = new Button { Content = P7("Annuler", "Cancel") };
+            var confirm = new Button { Content = P7("Supprimer", "Delete"), Classes = { "danger" } };
+            cancel.Click += (_, _) => dialog.Close(false);
+            confirm.Click += (_, _) => dialog.Close(true);
+            dialog.Content = new StackPanel
+            {
+                Margin = new Avalonia.Thickness(24), Spacing = 20,
+                Children =
+                {
+                    new TextBlock { Text = P7($"Supprimer « {mod.Name} » ? Tu pourras le télécharger à nouveau depuis GameBanana.",
+                        $"Delete “{mod.Name}”? You can download it again from GameBanana."), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 20 },
+                    new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 12, Children = { cancel, confirm } }
+                }
+            };
+            dialog.Opened += (_, _) => cancel.Focus();
+            if (!await dialog.ShowDialog<bool>(this)) return;
+            EnsureModProfileChangeAllowed(game);
+            manager.Uninstall(mod.Id);
+            ModsStatus.Text = $"{mod.Name} supprimé.";
+            RefreshModItems(); SyncVariantSelection(); RefreshBigPictureStatus();
+        }
+        catch (Exception error) { ModsStatus.Text = error.Message; }
+        finally { if (_bigPictureActive) { _bigPictureLastInput = -1; FocusModGrid(); } }
     }
 
     private void ApplyModPriority(object? sender, RoutedEventArgs args)
     {
         if (_selectedMod is null || _modManager is null || !int.TryParse(ModPriority.Text, out var priority)) return;
-        _modManager.SetPriority(_selectedMod.Id, priority);
-        ModsStatus.Text = "Priorité enregistrée.";
-        RefreshModItems();
+        try
+        {
+            if (_selectedGame is { } game) EnsureModProfileChangeAllowed(game);
+            _modManager.SetPriority(_selectedMod.Id, priority);
+            ModsStatus.Text = "Priorité enregistrée."; RefreshModItems();
+        }
+        catch (Exception error) { ModsStatus.Text = error.Message; }
     }
 
     private void SetModActions(bool enabled)
@@ -796,6 +864,7 @@ public sealed partial class MainWindow : Window
         CheckUpdatesBox.IsChecked = _preferences.CheckGamesOnStartup;
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
+        StartInBigPictureBox.IsChecked = _preferences.StartInBigPicture;
         ApplyPresencePreferences();
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
@@ -815,7 +884,8 @@ public sealed partial class MainWindow : Window
             Theme = theme,
             CheckGamesOnStartup = CheckUpdatesBox.IsChecked == true,
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
-            RefreshModsOnOpen = RefreshModsBox.IsChecked == true
+            RefreshModsOnOpen = RefreshModsBox.IsChecked == true,
+            StartInBigPicture = StartInBigPictureBox.IsChecked == true
         };
         SavePresencePreferences();
         _preferencesStore.Save(_preferences);

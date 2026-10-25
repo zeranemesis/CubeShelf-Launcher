@@ -1,6 +1,6 @@
 namespace CubeShelf.Mobile;
 
-/// <summary>Native games are separate installed applications, never desktop executables.</summary>
+/// <summary>Platform host for native engines and their resource downloads.</summary>
 public interface IMobileGameService
 {
     string DataDirectory { get; }
@@ -10,4 +10,5 @@ public interface IMobileGameService
     bool OpenOnline(string? invitation = null);
     bool OpenDownloadPage();
     string? LastError { get; }
+    IRuntimeDownloads? Downloads => null;
 }

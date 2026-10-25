@@ -14,6 +14,12 @@ public sealed class GameShelfControl : Panel, IDisposable
     private IReadOnlyList<GameShelfItem> _items = [];
     private readonly Dictionary<int, GameCaseControl> _cases = new();
     private readonly Dictionary<int, Rect> _positions = new();
+    private readonly Dictionary<int, MatrixTransform> _transforms = new();
+    private readonly HashSet<int> _visibleCases = new();
+    private readonly List<int> _obsoleteCases = new();
+    /// <summary>Keep case geometry at a stable size while the compositor moves and scales it.</summary>
+    public bool UseCompositorScaling { get; init; }
+    public bool UseCompactTextureMesh { get; init; }
     private readonly DemandAnimation _animation;
     private double _layoutResponse = 1;
     private bool _moving;
@@ -55,17 +61,22 @@ public sealed class GameShelfControl : Panel, IDisposable
         _selected = Math.Clamp(selected, 0, _items.Count - 1);
         _ribbon = ribbon;
         _animate = animate;
-        var offsets = VisibleOffsets().ToArray();
-        var visible = offsets.Select(IndexAt).ToHashSet();
-        foreach (var key in _cases.Keys.Where(key => !visible.Contains(key)).ToArray())
+        var count = Math.Min(7, _items.Count);
+        _visibleCases.Clear();
+        for (var offset = -(count / 2); offset < count - count / 2; offset++) _visibleCases.Add(IndexAt(offset));
+        _obsoleteCases.Clear();
+        foreach (var key in _cases.Keys)
+            if (!_visibleCases.Contains(key)) _obsoleteCases.Add(key);
+        foreach (var key in _obsoleteCases)
         {
             var obsolete = _cases[key];
             Children.Remove(obsolete);
             obsolete.Dispose();
             _cases.Remove(key);
             _positions.Remove(key);
+            _transforms.Remove(key);
         }
-        foreach (var offset in offsets)
+        for (var offset = -(count / 2); offset < count - count / 2; offset++)
         {
             var index = IndexAt(offset);
             var created = !_cases.TryGetValue(index, out var cover);
@@ -75,7 +86,8 @@ public sealed class GameShelfControl : Panel, IDisposable
                 cover = new GameCaseControl
                 {
                     MinWidth = 0, MinHeight = 0, ShadowOpacity = .8,
-                    RealisticShell = true, UseImportedModel = true
+                    RealisticShell = true, UseImportedModel = true,
+                    UseCompactTextureMesh = UseCompactTextureMesh
                 };
                 cover.SetCover(item.Front, item.Back, item.Spine);
                 AutomationProperties.SetName(cover, item.Title);
@@ -85,6 +97,13 @@ public sealed class GameShelfControl : Panel, IDisposable
                     args.Handled = true;
                 };
                 _cases[index] = cover;
+                if (UseCompositorScaling)
+                {
+                    var transform = new MatrixTransform();
+                    _transforms[index] = transform;
+                    cover.RenderTransformOrigin = RelativePoint.TopLeft;
+                    cover.RenderTransform = transform;
+                }
                 Children.Add(cover);
             }
             cover!.ZIndex = 20 - Math.Abs(offset);
@@ -100,17 +119,17 @@ public sealed class GameShelfControl : Panel, IDisposable
 
     public void FlipSelected() { if (_cases.TryGetValue(_selected, out var cover)) cover.Flip(); }
 
-    public int? GameAtPoint(Point position) => _cases
-        .Where(pair => pair.Value.Bounds.Contains(position))
-        .OrderByDescending(pair => pair.Value.ZIndex)
-        .Select(pair => (int?)pair.Key).FirstOrDefault();
+    public int? GameAtPoint(Point position)
+    {
+        int? hit = null;
+        var highest = int.MinValue;
+        foreach (var pair in _cases)
+            if ((hit is null || pair.Value.ZIndex > highest) && _positions.TryGetValue(pair.Key, out var bounds) && bounds.Contains(position))
+            { hit = pair.Key; highest = pair.Value.ZIndex; }
+        return hit;
+    }
 
     private int IndexAt(int offset) => (_selected + offset + _items.Count) % _items.Count;
-    private IEnumerable<int> VisibleOffsets()
-    {
-        var count = Math.Min(7, _items.Count);
-        for (var offset = -(count / 2); offset < count - count / 2; offset++) yield return offset;
-    }
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -130,7 +149,8 @@ public sealed class GameShelfControl : Panel, IDisposable
         var height = Math.Min(finalSize.Height * .94, finalSize.Width * .76);
         var width = height * .76;
         var center = finalSize.Width * .5;
-        foreach (var offset in VisibleOffsets())
+        var count = Math.Min(7, _items.Count);
+        for (var offset = -(count / 2); offset < count - count / 2; offset++)
         {
             var index = IndexAt(offset);
             // A native resize may arrange between SetGames and SetSelection,
@@ -147,7 +167,13 @@ public sealed class GameShelfControl : Panel, IDisposable
                 current.Width + (target.Width - current.Width) * _layoutResponse, current.Height + (target.Height - current.Height) * _layoutResponse);
             moving |= next != target;
             _positions[index] = next;
-            cover.Arrange(next);
+            if (UseCompositorScaling)
+            {
+                cover.Arrange(new Rect(0, 0, width, height));
+                var factor = width > 0 ? next.Width / width : 1;
+                _transforms[index].Matrix = new Matrix(factor, 0, 0, factor, next.X, next.Y);
+            }
+            else cover.Arrange(next);
         }
         _moving = moving;
         if (moving) _animation.Start();
@@ -161,6 +187,9 @@ public sealed class GameShelfControl : Panel, IDisposable
         foreach (var cover in _cases.Values) cover.Dispose();
         _cases.Clear();
         _positions.Clear();
+        _transforms.Clear();
+        _visibleCases.Clear();
+        _obsoleteCases.Clear();
         Children.Clear();
     }
     public void Dispose() => Clear();
@@ -169,20 +198,27 @@ public sealed class GameShelfControl : Panel, IDisposable
 /// <summary>Quiet contour lines drawn at the current resolution.</summary>
 public sealed class ShelfContourBackground : Control
 {
+    private static readonly IPen ContourPen = new Pen(new SolidColorBrush(Color.Parse("#DDD5D8")), 1.1);
+    private StreamGeometry? _geometry;
+    private Size _geometrySize;
     public override void Render(DrawingContext context)
     {
-        var pen = new Pen(new SolidColorBrush(Color.Parse("#DDD5D8")), 1.1);
-        for (var line = -8; line < 32; line++)
+        if (_geometry is null || _geometrySize != Bounds.Size)
         {
             var geometry = new StreamGeometry();
             using (var path = geometry.Open())
             {
-                path.BeginFigure(new Point(line * 72, -60), false);
-                path.CubicBezierTo(new Point(line * 72 + 360, Bounds.Height * .32),
-                    new Point(line * 72 - 380, Bounds.Height * .63), new Point(line * 72 + 100, Bounds.Height + 60));
-                path.EndFigure(false);
+                for (var line = -8; line < 32; line++)
+                {
+                    path.BeginFigure(new Point(line * 72, -60), false);
+                    path.CubicBezierTo(new Point(line * 72 + 360, Bounds.Height * .32),
+                        new Point(line * 72 - 380, Bounds.Height * .63), new Point(line * 72 + 100, Bounds.Height + 60));
+                    path.EndFigure(false);
+                }
             }
-            context.DrawGeometry(null, pen, geometry);
+            _geometry = geometry;
+            _geometrySize = Bounds.Size;
         }
+        context.DrawGeometry(null, ContourPen, _geometry);
     }
 }

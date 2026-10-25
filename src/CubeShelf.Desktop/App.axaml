@@ -400,6 +400,19 @@
       <Setter Property="Margin" Value="0,0,0,2" />
       <Setter Property="CornerRadius" Value="14" />
     </Style>
+    <Style Selector="Grid.controller-mods ListBoxItem">
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Margin" Value="3" />
+    </Style>
+    <Style Selector="Grid.controller-mods ListBoxItem:selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Grid.controller-mods TabItem:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
     <Style Selector="ListBoxItem:pointerover">
       <Setter Property="Background" Value="{DynamicResource HoverBg}" />
     </Style>

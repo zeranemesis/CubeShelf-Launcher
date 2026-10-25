@@ -38,7 +38,9 @@ public sealed partial class MainWindow
         // Someone who went through the wizard before its network page existed, or skipped it,
         // hears about it once now -- before CubeShelf ever looks.
         if (!_preferences.MeshDiscoveryNoticeSeen) await ShowMeshDiscoveryNoticeAsync();
-        if (Environment.GetCommandLineArgs().Contains("--big-picture", StringComparer.OrdinalIgnoreCase))
+        var startupArgs = Environment.GetCommandLineArgs();
+        if (!startupArgs.Contains("--desktop", StringComparer.OrdinalIgnoreCase) &&
+            (_preferences.StartInBigPicture || startupArgs.Contains("--big-picture", StringComparer.OrdinalIgnoreCase)))
             EnterBigPicture(this, new RoutedEventArgs());
     }
 

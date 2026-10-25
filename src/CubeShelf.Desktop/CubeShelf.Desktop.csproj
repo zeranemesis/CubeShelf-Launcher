@@ -19,6 +19,7 @@
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
+    <AvaloniaResource Include="Assets/Logos/*.png" />
     <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>
   <Target Name="VerifyPublishedCoverFiles" AfterTargets="Publish">

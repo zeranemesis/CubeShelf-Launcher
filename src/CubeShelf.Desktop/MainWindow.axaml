@@ -107,7 +107,8 @@
           </StackPanel>
           <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <Button x:Name="BigPictureHomeButton" Click="OpenBigPictureHome" FontSize="14" Padding="16,10" />
+            <Button x:Name="BigPictureFriendsButton" Click="OpenBigPictureFriends" FontSize="14" Padding="16,10" />
+            <Button x:Name="BigPictureSettingsButton" Click="OpenBigPictureSettings" FontSize="14" Padding="16,10" />
             <Button x:Name="BigPictureLayoutButton" Click="ToggleBigPictureLayout" FontSize="14" Padding="16,10" />
             <Button x:Name="BigPictureExitButton" Click="ExitBigPicture" FontSize="14" Padding="16,10" />
           </StackPanel>
@@ -119,7 +120,7 @@
               <TextBlock x:Name="BigPictureCollectionLabel" Foreground="#9B7066" FontSize="10" LetterSpacing="2" FontWeight="Bold" />
               <Border Background="#EEDCD6" CornerRadius="16" Padding="24">
                 <StackPanel Spacing="14">
-                  <TextBlock x:Name="BigPictureTitle" Foreground="#302C35" FontSize="30" FontWeight="Bold" TextWrapping="Wrap" />
+                  <controls:GameTitleControl x:Name="BigPictureTitle" Foreground="#302C35" FontSize="30" />
                   <TextBlock x:Name="BigPictureMetadata" Foreground="#80594E" FontSize="14" TextWrapping="Wrap" />
                   <TextBlock x:Name="BigPictureDescription" Foreground="#6E6166" FontSize="14" TextWrapping="Wrap" MaxHeight="102" />
                 </StackPanel>
@@ -350,22 +351,36 @@
       </Grid>
 
       <!-- MODS -->
-      <Grid x:Name="ModsView" Classes="view" IsVisible="False" RowDefinitions="120,*">
+      <Grid x:Name="ModsView" Classes="view" IsVisible="False" RowDefinitions="Auto,*,Auto">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
-          <Grid Margin="34,22" ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="5"><TextBlock Text="{DynamicResource ModsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource AppMods}" FontSize="31" FontWeight="Bold" Foreground="{DynamicResource Text}" /></StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{DynamicResource BackGame}" Click="ParityBackToGame" /><Button x:Name="RefreshModsButton" Content="{DynamicResource RefreshGameBanana}" Click="RefreshMods" /></StackPanel>
-          </Grid>
+          <StackPanel Margin="34,18" Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ModsGameHeading" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource Text}" TextWrapping="Wrap" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ModsBackButton" Content="{DynamicResource BackGame}" Click="BackFromMods" />
+                <Button x:Name="RefreshModsButton" Content="{DynamicResource RefreshGameBanana}" Click="RefreshMods" />
+              </StackPanel>
+            </Grid>
+            <TabControl x:Name="ModsTabs" SelectedIndex="0" SelectionChanged="ModsTabChanged" Height="54">
+              <TabItem x:Name="InstalledModsTab" Header="Mes mods" FontSize="19" Focusable="True" />
+              <TabItem x:Name="GameBananaModsTab" Header="GameBanana" FontSize="19" Focusable="True" />
+            </TabControl>
+          </StackPanel>
         </Border>
         <Grid Grid.Row="1" Margin="24,18,24,24" ColumnDefinitions="*,18,440">
           <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="12">
             <Grid RowDefinitions="Auto,Auto,*">
-              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                <TextBox x:Name="ModSearchBox" Watermark="Rechercher un mod…" KeyUp="ModSearchKeyUp" />
-                <ComboBox x:Name="ModCategoryFilter" Grid.Column="1" MinWidth="150" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-                <ComboBox x:Name="ModStateFilter" Grid.Column="2" MinWidth="140" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-                <ComboBox x:Name="ModSortFilter" Grid.Column="3" MinWidth="130" Margin="8,0,0,0" SelectionChanged="ModFiltersChanged" />
-              </Grid>
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBox x:Name="ModSearchBox" Watermark="Rechercher un mod…" KeyUp="ModSearchKeyUp" MinHeight="44" />
+                  <Button x:Name="SearchModsButton" Grid.Column="1" Content="Rechercher" Click="SearchModsTab" Margin="8,0,0,0" MinHeight="44" />
+                </Grid>
+                <WrapPanel>
+                  <ComboBox x:Name="ModCategoryFilter" MinWidth="150" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                  <ComboBox x:Name="ModStateFilter" MinWidth="140" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                  <ComboBox x:Name="ModSortFilter" MinWidth="130" Margin="0,0,8,6" SelectionChanged="ModFiltersChanged" />
+                </WrapPanel>
+              </StackPanel>
               <TextBlock x:Name="ModResultCount" Grid.Row="1" Margin="4,8,0,4" FontSize="11" Foreground="{DynamicResource Muted}" />
               <ListBox x:Name="ModsList" Grid.Row="2" Background="Transparent" BorderThickness="0" SelectionChanged="SelectMod"
                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -393,10 +408,12 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
+              <TextBlock x:Name="ModsEmptyState" Grid.Row="2" IsVisible="False" FontSize="19" Margin="24"
+                         TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
           </Border>
           <Border Grid.Column="2" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
-            <ScrollViewer><StackPanel Spacing="12">
+            <ScrollViewer><StackPanel x:Name="ModDetailsPanel" Spacing="12" Focusable="True">
               <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock x:Name="ModTitle" Text="{DynamicResource SelectMod}" FontSize="22" FontWeight="Bold" TextWrapping="Wrap" /><TextBlock x:Name="ModVersion" Foreground="{DynamicResource Muted}" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="OpenModImageButton" Content="{DynamicResource ViewImage}" IsEnabled="False" Click="OpenCurrentModImagePhase6" /><Button x:Name="OpenModPageButton" Content="{DynamicResource GameBanana}" IsEnabled="False" Click="OpenModPage" /></StackPanel></Grid>
               <Border Height="240" Background="#090C13" CornerRadius="14" ClipToBounds="True">
                 <Grid>
@@ -417,6 +434,9 @@
             </StackPanel></ScrollViewer>
           </Border>
         </Grid>
+        <Border x:Name="ModsControllerHint" Grid.Row="2" IsVisible="False" Background="{DynamicResource Panel2}" Padding="24,14">
+          <TextBlock x:Name="ModsControllerHelp" FontSize="16" TextWrapping="Wrap" Foreground="{DynamicResource Text}" />
+        </Border>
       </Grid>
 
       <!-- DOWNLOADS -->
@@ -427,6 +447,13 @@
       <!-- SETTINGS -->
       <ScrollViewer x:Name="SettingsView" Classes="view" IsVisible="False">
         <StackPanel Margin="34,26,34,34" Spacing="14">
+          <Border Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="16" Padding="20">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{DynamicResource StartupModeTitle}" FontSize="18" FontWeight="Bold" />
+              <CheckBox x:Name="StartInBigPictureBox" Content="{DynamicResource StartInBigPicture}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <TextBlock Text="{DynamicResource StartupModeHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
           <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="24" Margin="0,0,0,4">
             <StackPanel Spacing="5"><TextBlock Text="{DynamicResource SettingsEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" /><TextBlock Text="{DynamicResource SettingsTitle}" FontSize="32" FontWeight="Bold" /><TextBlock Text="{DynamicResource SettingsSubtitle}" Foreground="{DynamicResource Muted}" /></StackPanel>
           </Border>

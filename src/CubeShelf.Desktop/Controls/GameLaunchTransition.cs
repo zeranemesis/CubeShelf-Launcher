@@ -10,8 +10,8 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
 {
     private GameCaseControl _case = new() { Width = 210, Height = 250,
         RealisticShell = true, UseImportedModel = true, IsInteractive = false };
-    private readonly TextBlock _title = new() { FontSize = 26, FontWeight = FontWeight.Bold,
-        TextAlignment = TextAlignment.Center, TextWrapping = TextWrapping.Wrap, Foreground = Brushes.White };
+    private readonly GameTitleControl _title = new() { FontSize = 26, MaxHeight = 72, Foreground = Brushes.White,
+        HorizontalAlignment = HorizontalAlignment.Center };
     private readonly TextBlock _status = new() { FontSize = 18, TextAlignment = TextAlignment.Center, Foreground = Brushes.LightGray };
     private readonly ScaleTransform _scale = new(.82, .82);
     private readonly TranslateTransform _offset = new(0, 36);
@@ -49,13 +49,13 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
         DetachedFromVisualTree += (_, _) => Stop();
     }
 
-    public void Start(string title, string front, string back, string spine, string status)
+    public void Start(string title, string front, string back, string spine, string status, string? gameId = null)
     {
         Stop();
         _case = new GameCaseControl { Width = 210, Height = Math.Clamp(Bounds.Height * .48, 90, 250),
             RealisticShell = true, UseImportedModel = true, IsInteractive = false };
         _content.Children[0] = _case;
-        _title.Text = title; _status.Text = status;
+        _title.SetGame(gameId, title); _status.Text = status;
         _case.SetCover(front, back, spine);
         _case.SetShelfPose(28, false, false);
         _elapsed = 0;

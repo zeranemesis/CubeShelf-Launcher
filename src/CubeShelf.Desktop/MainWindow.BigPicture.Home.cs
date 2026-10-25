@@ -17,7 +17,6 @@ public sealed partial class MainWindow
     {
         if (!_bigPictureActive) return;
         BigPictureHomeTitle.Text = P7("CubeShelf · À toi de jouer", "CubeShelf · Time to play");
-        BigPictureHomeButton.Content = P7("Accueil", "Home");
         BigPictureCollectionButton.Content = P7("▦ Bibliothèque", "▦ Library");
         BigPictureHomeFriendsButton.Content = P7("Amis et invitations", "Friends and invites");
         BigPictureHomeSettingsButton.Content = P7("Paramètres", "Settings");

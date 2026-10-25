@@ -95,6 +95,8 @@ internal sealed class SdlGamepad : IDisposable
         if (Pressed(0)) return 5;
         if (Pressed(2)) return 7;
         if (Pressed(3)) return 8;
+        if (Pressed(9)) return 9;
+        if (Pressed(10)) return 10;
         if (Pressed(13) || _axis(_controller, 0) < -16000) return 1;
         if (Pressed(14) || _axis(_controller, 0) > 16000) return 2;
         if (Pressed(11) || _axis(_controller, 1) < -16000) return 3;

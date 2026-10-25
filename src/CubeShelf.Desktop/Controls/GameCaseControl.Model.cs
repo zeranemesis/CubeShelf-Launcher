@@ -13,6 +13,11 @@ public sealed partial class GameCaseControl
     // Geometry and material colors are shared; every case owns only its game textures.
     private static readonly Lazy<ImportedCase?> ImportedModel = new(LoadImportedCase);
     private ModelDraw[]? _modelCommands;
+    private readonly List<ModelDraw> _commandBuffer = new();
+    private readonly Dictionary<ModelMesh, ModelDraw[]> _meshDraws = new();
+    private int _nextDrawOrder;
+    private int _modelCommandCount;
+    private readonly Dictionary<ModelMesh, ProjectedVertex[]> _projectedMeshes = new();
     private Rect _modelShadowBounds;
     private (double Width, double Height, double Yaw, double Pitch, double Lift, Bitmap? Front, Bitmap? Back, Bitmap? Spine, bool Detail) _modelDrawingKey;
 
@@ -27,75 +32,198 @@ public sealed partial class GameCaseControl
             BuildImportedCommands(model);
             _modelDrawingKey = key;
         }
-        DrawImportedGeometry(context);
+        try { DrawImportedGeometry(context); }
+        finally { DiscardGpuDraws(); }
         return true;
     }
 
     private void BuildImportedCommands(ImportedCase model)
     {
-        var commands = new List<ModelDraw>();
-        var boundsPoints = new List<Point>();
+        var commands = _commandBuffer;
+        commands.Clear();
+        var minX = double.PositiveInfinity; var minY = double.PositiveInfinity;
+        var maxX = double.NegativeInfinity; var maxY = double.NegativeInfinity;
+        // The pose and camera are constant across the entire case for this frame.
+        var (sinX, cosX) = Math.SinCos(_pitch * Math.PI / 180);
+        var (sinY, cosY) = Math.SinCos(_yaw * Math.PI / 180);
+        var focal = 1 / Math.Tan(FieldOfViewDegrees * Math.PI / 360);
+        var fit = Math.Min(Bounds.Width / 2.67, Bounds.Height / 3.48) * focal * 1.72 * (1 + HoverLift * _lift);
+        var center = new Point(Bounds.Width / 2, Bounds.Height / 2);
+        Vec3 RotateFrame(Vec3 point)
+        {
+            var y = point.Y * cosX - point.Z * sinX;
+            var z = point.Y * sinX + point.Z * cosX;
+            return new Vec3(point.X * cosY + z * sinY, y, -point.X * sinY + z * cosY);
+        }
         foreach (var mesh in model.Meshes)
         {
-            var projected = mesh.Positions.Select(ProjectVertex).ToArray();
-            boundsPoints.AddRange(projected.Select(vertex => vertex.Screen));
+            if (!_meshDraws.TryGetValue(mesh, out var draws))
+            {
+                draws = new ModelDraw[mesh.TextureQuad is null ? mesh.Triangles.Length : 1];
+                for (var index = 0; index < draws.Length; index++)
+                    draws[index] = new ModelDraw(mesh.TextureQuad is null ? (mesh.Overlay ? 2 : 0) : 1,
+                        0, new Point[mesh.TextureQuad is null ? 3 : 4], mesh.Palette[48], mesh.TextureSlot,
+                        _nextDrawOrder++);
+                _meshDraws[mesh] = draws;
+            }
+            if (!_projectedMeshes.TryGetValue(mesh, out var projected))
+                _projectedMeshes[mesh] = projected = new ProjectedVertex[mesh.Positions.Length];
+            for (var index = 0; index < projected.Length; index++)
+            {
+                var rotated = RotateFrame(mesh.Positions[index]);
+                var scale = fit / Math.Max(.28, CameraDistance - rotated.Z);
+                var screen = new Point(center.X + rotated.X * scale, center.Y - rotated.Y * scale);
+                projected[index] = new ProjectedVertex(rotated, screen);
+                minX = Math.Min(minX, screen.X); minY = Math.Min(minY, screen.Y);
+                maxX = Math.Max(maxX, screen.X); maxY = Math.Max(maxY, screen.Y);
+            }
             // All film strips and latches in this supplied model are on the
             // front. The opaque shell occludes them when viewing the back.
-            if (mesh.Overlay && Rotate(new Vec3(0, 0, 1), _yaw, _pitch).Z <= 0) continue;
+            if (mesh.Overlay && RotateFrame(new Vec3(0, 0, 1)).Z <= 0) continue;
             if (mesh.TextureQuad is { } quad)
             {
                 // The supplied spine insert is double-sided and its triangles
                 // wind inward. Use its physical outward normal for visibility.
-                var normal = Rotate(mesh.TextureSlot == "spine" ? new Vec3(-1, 0, 0) : mesh.Triangles[0].Normal, _yaw, _pitch);
+                var normal = RotateFrame(mesh.TextureSlot == "spine" ? new Vec3(-1, 0, 0) : mesh.Triangles[0].Normal);
                 if (normal.Z <= .00001) continue;
-                var vertices = quad.Select(index => projected[index]).ToArray();
-                commands.Add(new ModelDraw(1, vertices.Average(vertex => vertex.World.Z),
-                    vertices.Select(vertex => vertex.Screen).ToArray(), mesh.Palette[48], mesh.TextureSlot));
+                var command = draws[0];
+                var depth = 0d;
+                for (var index = 0; index < quad.Length; index++)
+                {
+                    var vertex = projected[quad[index]];
+                    command.Points[index] = vertex.Screen;
+                    depth += vertex.World.Z;
+                }
+                command.Update(depth / quad.Length, mesh.Palette[48]);
+                commands.Add(command);
                 continue;
             }
-            foreach (var triangle in mesh.Triangles)
+            for (var triangleIndex = 0; triangleIndex < mesh.Triangles.Length; triangleIndex++)
             {
-                var normal = Rotate(triangle.Normal, _yaw, _pitch);
+                var triangle = mesh.Triangles[triangleIndex];
+                var normal = RotateFrame(triangle.Normal);
                 if (normal.Z <= .00001) continue;
-                var vertices = new[] { projected[triangle.A], projected[triangle.B], projected[triangle.C] };
+                var a = projected[triangle.A];
+                var b = projected[triangle.B];
+                var c = projected[triangle.C];
+                var z = Math.Max(0, normal.Z);
+                var z2 = z * z;
+                var z4 = z2 * z2;
+                var z8 = z4 * z4;
                 var light = Math.Clamp(.38 + .55 * Math.Max(0, -.4 * normal.X + .6 * normal.Y + .7 * normal.Z)
-                    + Math.Pow(Math.Max(0, normal.Z), 24) * .2 * (1 - mesh.Roughness), 0, 1.2);
+                    + z8 * z8 * z8 * .2 * (1 - mesh.Roughness), 0, 1.2);
                 var shade = Math.Clamp((int)Math.Round(light / 1.2 * 63), 0, 63);
-                commands.Add(new ModelDraw(mesh.Overlay ? 2 : 0, vertices.Average(vertex => vertex.World.Z),
-                    vertices.Select(vertex => vertex.Screen).ToArray(), mesh.Palette[shade], null));
+                var command = draws[triangleIndex];
+                command.Points[0] = a.Screen; command.Points[1] = b.Screen; command.Points[2] = c.Screen;
+                command.Update((a.World.Z + b.World.Z + c.World.Z) / 3, mesh.Palette[shade]);
+                commands.Add(command);
             }
         }
-        _modelShadowBounds = ComputeBounds(boundsPoints);
+        _modelShadowBounds = new Rect(minX, minY, Math.Max(0, maxX - minX), Math.Max(0, maxY - minY));
         // Inserts lie outside the shell; latches and clear film lie outside the
         // inserts. Respect those model layers before painter sorting. Sorting a
         // whole insert against individual shell triangles by average Z alone
         // would incorrectly cover portions of the insert at oblique angles.
-        _modelCommands = commands.OrderBy(command => command.Layer).ThenBy(command => command.Depth).ToArray();
+        commands.Sort(static (a, b) =>
+        {
+            var comparison = a.Layer.CompareTo(b.Layer);
+            if (comparison == 0) comparison = a.Depth.CompareTo(b.Depth);
+            return comparison == 0 ? a.Order.CompareTo(b.Order) : comparison;
+        });
+        if (PreferGpuTextures)
+        {
+            if (_modelCommands is null || _modelCommands.Length < commands.Count)
+                _modelCommands = new ModelDraw[Math.Max(commands.Count, _nextDrawOrder)];
+            commands.CopyTo(_modelCommands);
+            if (_modelCommandCount > commands.Count)
+                Array.Clear(_modelCommands, commands.Count, _modelCommandCount - commands.Count);
+            _modelCommandCount = commands.Count;
+            return;
+        }
+        var ordered = commands.ToArray();
+        var batches = new List<ModelDraw>(ordered.Length);
+        for (var start = 0; start < ordered.Length;)
+        {
+            var first = ordered[start];
+            var end = start + 1;
+            if (first.TextureSlot is null && first.Brush is ISolidColorBrush { Color: { A: 255 } })
+                while (end < ordered.Length && ordered[end].TextureSlot is null
+                    && ordered[end].Layer == first.Layer && ReferenceEquals(ordered[end].Brush, first.Brush)) end++;
+            if (end > start + 1)
+            {
+                // Batch adjacent equally shaded triangles without changing painter order.
+                // NonZero keeps shared triangle edges inside a single filled path.
+                var geometry = new StreamGeometry();
+                using (var path = geometry.Open())
+                {
+                    path.SetFillRule(FillRule.NonZero);
+                    for (var index = start; index < end; index++)
+                    {
+                        var points = ordered[index].Points;
+                        path.BeginFigure(points[0], true);
+                        for (var vertex = 1; vertex < points.Length; vertex++) path.LineTo(points[vertex]);
+                        path.EndFigure(true);
+                    }
+                }
+                first.Outline = geometry;
+            }
+            batches.Add(first);
+            start = end;
+        }
+        _modelCommands = batches.ToArray();
+        _modelCommandCount = _modelCommands.Length;
     }
 
     private void DrawImportedGeometry(DrawingContext context)
     {
         DrawContactShadow(context, _modelShadowBounds);
-        foreach (var command in _modelCommands!)
+        for (var index = 0; index < _modelCommandCount; index++)
         {
+            var command = _modelCommands![index];
+            if (PreferGpuTextures && command.TextureSlot is null)
+            {
+                var end = index + 1;
+                while (end < _modelCommandCount && _modelCommands[end].TextureSlot is null
+                    && _modelCommands[end].Layer == command.Layer) end++;
+                DrawGpuShell(context, _modelCommands, index, end);
+                index = end - 1;
+                continue;
+            }
             if (command.TextureSlot is { } slot)
             {
                 Bitmap? texture = slot switch { "front" => _front, "back" => _back, _ => _spine };
                 if (texture is null)
                 {
+                    FlushGpuDraws(context);
                     context.DrawGeometry(command.Brush, null, command.Outline);
                     continue;
                 }
+                if (PreferGpuTextures && DrawGpuTexture(context, texture, command.Points,
+                    slot == "spine" ? 2 : 8, slot == "spine" ? 6 : 12))
+                {
+                    if (_glare * .45 > .01)
+                    {
+                        FlushGpuDraws(context);
+                        DrawPointerGlare(context, command.Outline, command.Points, _pointerPosition, _glare * .45);
+                    }
+                    continue;
+                }
                 var outline = command.Outline;
+                FlushGpuDraws(context);
                 command.TextureMesh ??= PrepareTexturedQuadMesh(texture, command.Points,
-                    slot == "spine" ? 2 : IsInteractive ? 8 : 3,
-                    slot == "spine" ? 6 : IsInteractive ? 12 : 4);
+                    slot == "spine" ? 2 : IsInteractive ? (UseCompactTextureMesh ? 4 : 8) : 3,
+                    slot == "spine" ? 6 : IsInteractive ? (UseCompactTextureMesh ? 6 : 12) : 4);
                 using (context.PushGeometryClip(outline))
                     DrawPreparedTextureMesh(context, texture, command.TextureMesh);
                 DrawPointerGlare(context, outline, command.Points, _pointerPosition, _glare * .45);
             }
-            else context.DrawGeometry(command.Brush, null, command.Outline);
+            else
+            {
+                FlushGpuDraws(context);
+                context.DrawGeometry(command.Brush, null, command.Outline);
+            }
         }
+        FlushGpuDraws(context);
     }
 
     private static ImportedCase? LoadImportedCase()
@@ -262,9 +390,21 @@ public sealed partial class GameCaseControl
     private sealed record ModelMesh(Vec3[] Positions, ModelTriangle[] Triangles, IBrush[] Palette,
         double Roughness, string? TextureSlot, int[]? TextureQuad, bool Overlay);
     private readonly record struct ModelTriangle(int A, int B, int C, Vec3 Normal);
-    private sealed record ModelDraw(int Layer, double Depth, Point[] Points, IBrush Brush, string? TextureSlot)
+    private sealed class ModelDraw(int layer, double depth, Point[] points, IBrush brush, string? textureSlot, int order)
     {
-        public StreamGeometry Outline { get; } = BuildGeometry(Points);
+        public int Layer { get; } = layer;
+        public double Depth { get; private set; } = depth;
+        public Point[] Points { get; } = points;
+        public IBrush Brush { get; private set; } = brush;
+        public string? TextureSlot { get; } = textureSlot;
+        public int Order { get; } = order;
+        private StreamGeometry? _outline;
+        public StreamGeometry Outline { get => _outline ??= BuildGeometry(Points); set => _outline = value; }
         public TexturedTriangle[]? TextureMesh { get; set; }
+        public void Update(double depth, IBrush brush)
+        {
+            Depth = depth; Brush = brush;
+            _outline = null; TextureMesh = null;
+        }
     }
 }

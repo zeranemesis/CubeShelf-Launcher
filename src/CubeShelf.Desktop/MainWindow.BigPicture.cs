@@ -202,7 +202,7 @@ public sealed partial class MainWindow
     {
         var game = BigPictureGame;
         BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon);
-        BigPictureTitle.Text = game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty");
+        BigPictureTitle.SetGame(game?.Id, game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty"));
         BigPictureMetadata.Text = game is null ? "" : string.Join("  •  ", new[] { game.Genre, game.Players, game.Year > 0 ? game.Year.ToString() : "" }.Where(value => value.Length > 0));
         BigPictureDescription.Text = game?.Description ?? P7("Ajoute un jeu depuis la bibliothèque pour commencer.", "Add a game from the library to get started.");
         BigPictureCount.Text = P7("Bibliothèque", "Library") + $" · {_bigPictureGames.Length}";
@@ -213,7 +213,9 @@ public sealed partial class MainWindow
         BigPictureFlipButton.IsEnabled = game is not null;
         BigPictureCollectionLabel.Text = P7("TA COLLECTION", "YOUR COLLECTION");
         BigPictureCancelButton.Content = P7("Annuler le lancement", "Cancel launch");
-        BigPictureModsButton.Content = P7("◈ Choisir les mods", "◈ Choose mods");
+        BigPictureModsButton.Content = P7("Mes mods · GameBanana", "My mods · GameBanana");
+        BigPictureFriendsButton.Content = P7("Amis", "Friends");
+        BigPictureSettingsButton.Content = P7("Paramètres", "Settings");
         BigPictureOnlineButton.Content = P7("◉ Jouer en ligne", "◉ Play online");
         BigPictureOnlineButton.IsVisible = OnlineCompanion.IsSupported(game);
         BigPicturePreviousButton.IsEnabled = BigPictureNextButton.IsEnabled = _bigPictureGames.Length > 1;
@@ -259,6 +261,15 @@ public sealed partial class MainWindow
             return;
         }
         if (!_bigPictureActive) return;
+        if (ModsView.IsVisible && !BigPicturePageHasTextFocus())
+        {
+            var input = args.Key switch
+            {
+                Key.Left => 1, Key.Right => 2, Key.Up => 3, Key.Down => 4,
+                Key.Enter => 5, Key.Escape => 6, Key.F3 => 8, Key.PageUp => 9, Key.PageDown => 10, _ => 0
+            };
+            if (input != 0 && HandleModControllerInput(input)) { args.Handled = true; return; }
+        }
         if (!BigPictureView.IsVisible)
         {
             if (args.Key == Key.Escape) { HandleBigPicturePageInput(6); args.Handled = true; }
@@ -285,7 +296,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureHomeButton, BigPictureLayoutButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureExitButton }
         .Where(button => button.IsEffectivelyVisible && button.IsEffectivelyEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)

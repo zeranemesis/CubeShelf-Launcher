@@ -12,7 +12,7 @@ public sealed partial class MainWindow
         try
         {
             LaunchTransition.Start(game.Title, ResolveCoverPath(cover?.Front),
-                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), P7("Lancement…", "Launching…"));
+                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), P7("Lancement…", "Launching…"), game.Id);
             // Keep the fullscreen launcher behind the game's own fullscreen window.
             LaunchReadyGame(game);
             await Task.Delay(500);
