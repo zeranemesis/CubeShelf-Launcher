@@ -1,0 +1,172 @@
+name: Publish verified release artifacts
+
+on:
+  push:
+    branches: [release/0.17.0]
+    paths: [.github/workflows/publish-prepared-release.yml]
+  workflow_dispatch:
+    inputs:
+      desktop_run:
+        description: Successful portable desktop workflow run
+        required: true
+        default: '40219163710'
+      android_run:
+        description: Successful Android workflow run
+        required: true
+        default: '40219163889'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cubeshelf-publish-prepared
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DESKTOP_RUN: ${{ inputs.desktop_run || '40219163710' }}
+      ANDROID_RUN: ${{ inputs.android_run || '40219163889' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify build provenance and download packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DESKTOP_RUN" =~ ^[0-9]+$ && "$ANDROID_RUN" =~ ^[0-9]+$ ]]
+          version="$(cat VERSION)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          echo "RELEASE_TAG=v$version" >> "$GITHUB_ENV"
+          gh run view "$DESKTOP_RUN" --json conclusion,headSha,workflowName > desktop-run.json
+          gh run view "$ANDROID_RUN" --json conclusion,headSha,workflowName > android-run.json
+          python - <<'PY'
+          import json, subprocess
+          desktop = json.load(open('desktop-run.json'))
+          android = json.load(open('android-run.json'))
+          assert desktop['conclusion'] == android['conclusion'] == 'success'
+          assert desktop['workflowName'] == 'Build portable desktop previews (manual)'
+          assert android['workflowName'] == 'Build Android previews (manual)'
+          assert desktop['headSha'] == android['headSha']
+          subprocess.run(['git', 'diff', '--exit-code', desktop['headSha'], 'HEAD', '--',
+              'src', 'VERSION', 'Directory.Build.props', 'packaging/Package-Desktop.ps1',
+              'installer', 'eng', 'vendor'], check=True)
+          PY
+          gh run download "$DESKTOP_RUN" --dir artifacts/desktop
+          gh run download "$ANDROID_RUN" --dir artifacts/android
+      - name: Verify archives and assemble six-platform manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, shutil, tarfile, zipfile
+          version = Path('VERSION').read_text().strip()
+          files = [p for p in Path('artifacts').rglob('*') if p.is_file() and p.suffix != '.sha256']
+          assert len(files) == 12, f'Expected 12 packages, got {len(files)}'
+          output = Path('assets')
+          output.mkdir()
+          def digest(path):
+              with path.open('rb') as stream:
+                  return hashlib.file_digest(stream, 'sha256').hexdigest()
+          for file in files:
+              expected, original = Path(str(file) + '.sha256').read_text().split()
+              assert original == file.name and digest(file) == expected, file.name
+              name = file.name
+              for rid in ('linux-arm64', 'osx-x64', 'osx-arm64'):
+                  name = name.replace(f'{rid}-portable-preview.tar.gz', f'{rid}.tar.gz')
+              name = name.replace('android-arm64-v8a-preview.apk', 'Android-arm64-preview.apk')
+              name = name.replace('android-x86_64-preview.apk', 'Android-x86_64-preview.apk')
+              assert not (output / name).exists(), name
+              shutil.copyfile(file, output / name)
+          for architecture in ('x64', 'arm64'):
+              with zipfile.ZipFile(output / f'CubeShelf-win-{architecture}.zip') as archive:
+                  assert {'CubeShelf.exe', 'CubeShelf.dll', 'CubeShelf.Updater.exe'} <= set(archive.namelist())
+                  assert archive.testzip() is None
+              with tarfile.open(output / f'CubeShelf-osx-{architecture}.tar.gz') as archive:
+                  assert archive.getmember('CubeShelf.app/Contents/MacOS/CubeShelf').mode & 0o111
+                  assert archive.getmember('CubeShelf.app/Contents/Info.plist').size > 0
+          with tarfile.open(output / 'CubeShelf-linux-arm64.tar.gz') as archive:
+              assert archive.getmember('CubeShelf/CubeShelf').mode & 0o111
+          with (output / 'CubeShelf-linux-x64.AppImage').open('rb') as stream:
+              assert stream.read(4) == b'\x7fELF'
+          for architecture, abi in (('arm64', 'arm64-v8a'), ('x86_64', 'x86_64')):
+              with zipfile.ZipFile(output / f'CubeShelf-Android-{architecture}-preview.apk') as archive:
+                  names = set(archive.namelist())
+                  assert 'AndroidManifest.xml' in names and any(n.endswith('.dex') for n in names)
+                  assert any(n.startswith(f'lib/{abi}/') for n in names)
+                  assert archive.testzip() is None
+                  if architecture == 'arm64':
+                      assert {f'lib/{abi}/{n}' for n in ('libmain.so', 'libdol.so', 'libpartyboard_quest.so')} <= names
+          artifacts = []
+          for rid in ('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64'):
+              os, architecture = rid.split('-')
+              extension = '.zip' if os == 'win' else '.AppImage' if rid == 'linux-x64' else '.tar.gz'
+              file = output / f'CubeShelf-{rid}{extension}'
+              artifacts.append(dict(os={'win': 'windows', 'linux': 'linux', 'osx': 'macos'}[os],
+                  architecture=architecture, type='launcher', size=file.stat().st_size, sha256=digest(file),
+                  url=f'https://github.com/zeranemesis/CubeShelf-Launcher/releases/download/v{version}/{file.name}',
+                  minimumOsVersion='10.0.17763' if os == 'win' else None))
+          assert len({(a['os'], a['architecture']) for a in artifacts}) == 6
+          (output / 'release-manifest-v2.json').write_text(json.dumps(dict(schemaVersion=2,
+              version=version, signature=None, artifacts=artifacts), indent=2) + '\n')
+          checksums = ''.join(f'{digest(p)}  {p.name}\n' for p in sorted(output.iterdir()))
+          (output / 'checksums.txt').write_text(checksums)
+          print('Verified 12 packages, archive layout, executable permissions, APK ABIs and six-platform manifest.')
+          PY
+      - name: Verify persistent APK certificates and application identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          signer="$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)"
+          aapt="$(dirname "$signer")/aapt2"
+          for apk in assets/*.apk; do
+            "$signer" verify --print-certs "$apk" > certificate.txt
+            grep -q 'certificate SHA-256 digest: 3c5e62f4713b437cee47fca52246e1edff3b52252cf2472d8ad7695f184b8344' certificate.txt
+            "$aapt" dump badging "$apk" > badging.txt
+            grep -q "package: name='io.github.zeranemesis.cubeshelf' versionCode='42' versionName='$(cat VERSION)'" badging.txt
+            grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' badging.txt
+          done
+      - name: Upload packages to the existing draft and verify GitHub digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --json isDraft --jq '.isDraft' | grep -qx true
+          gh release upload "$RELEASE_TAG" assets/* --clobber
+          gh api "repos/$GH_REPO/releases" > releases.json
+          release_id="$(python -c 'import json, os; print(next(r["id"] for r in json.load(open("releases.json")) if r["tag_name"] == os.environ["RELEASE_TAG"]))')"
+          gh api "repos/$GH_REPO/releases/$release_id" > uploaded-release.json
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          release = json.load(open('uploaded-release.json'))
+          assert release['draft'] and not release['prerelease']
+          assets = {asset['name']: asset for asset in release['assets']}
+          files = list(Path('assets').iterdir())
+          assert len(files) == len(assets) == 14
+          for file in files:
+              asset = assets[file.name]
+              assert asset['state'] == 'uploaded' and asset['size'] == file.stat().st_size
+              with file.open('rb') as stream:
+                  digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+              assert asset['digest'] == 'sha256:' + digest, file.name
+          PY
+      - name: Publish the verified release
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release edit "$RELEASE_TAG" --draft=false --latest --target "$GITHUB_SHA"
+          gh release view "$RELEASE_TAG" --json url,isDraft,tagName --jq '{url,isDraft,tagName}'
+          echo "Published $RELEASE_TAG with 12 verified packages, SHA-256 checksums and a six-platform update manifest." >> "$GITHUB_STEP_SUMMARY"
+

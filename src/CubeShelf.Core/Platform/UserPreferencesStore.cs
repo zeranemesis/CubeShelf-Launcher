@@ -122,7 +122,13 @@ public sealed record UserPreferences(
     /// The user was told what finding others without a code involves (the wizard's network page, or
     /// the one-time message). Until then CubeShelf does not look, whatever the box says.
     /// </summary>
-    bool MeshDiscoveryNoticeSeen = false);
+    bool MeshDiscoveryNoticeSeen = false,
+
+    /// <summary>Payload bandwidth in bytes per second. Zero leaves it unlimited.</summary>
+    long DownloadBandwidthLimit = 0,
+
+    /// <summary>Open the desktop launcher directly in Big Picture on normal startup.</summary>
+    bool StartInBigPicture = false);
 
 public sealed class UserPreferencesStore
 {

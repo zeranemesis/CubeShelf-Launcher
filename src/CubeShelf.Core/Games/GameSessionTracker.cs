@@ -8,7 +8,8 @@ public sealed record GameSessionEndedEventArgs(
     DateTimeOffset StartedAt,
     DateTimeOffset EndedAt,
     TimeSpan Duration,
-    int? ExitCode);
+    int? ExitCode,
+    bool StopRequested = false);
 
 /// <summary>
 /// Tracks native game processes without depending on WPF or Avalonia.
@@ -16,7 +17,10 @@ public sealed record GameSessionEndedEventArgs(
 /// </summary>
 public sealed class GameSessionTracker : IDisposable
 {
-    private sealed record RunningSession(Process Process, DateTimeOffset StartedAt);
+    private sealed record RunningSession(Process Process, DateTimeOffset StartedAt)
+    {
+        public volatile bool StopRequested;
+    }
 
     private readonly object _gate = new();
     private readonly Dictionary<string, RunningSession> _running = new(StringComparer.OrdinalIgnoreCase);
@@ -63,13 +67,16 @@ public sealed class GameSessionTracker : IDisposable
 
         var process = _launcher.Start(executable, workingDirectory, environment, arguments, outputLog);
         var startedAt = DateTimeOffset.Now;
-        process.EnableRaisingEvents = true;
         process.Exited += (_, _) => FinalizeSession(gameId, process);
 
         lock (_gate)
             _running[gameId] = new RunningSession(process, startedAt);
 
         Started?.Invoke(gameId);
+        // Enabling events after registration also catches a process which exited
+        // immediately; otherwise its exit can arrive before it is in _running.
+        process.EnableRaisingEvents = true;
+        if (!IsAlive(process)) FinalizeSession(gameId, process);
         return process;
     }
 
@@ -83,6 +90,7 @@ public sealed class GameSessionTracker : IDisposable
             _running.TryGetValue(gameId, out session);
 
         if (session is null || !IsAlive(session.Process)) return false;
+        session.StopRequested = true;
         gracefulTimeout ??= TimeSpan.FromSeconds(2);
 
         try
@@ -126,7 +134,8 @@ public sealed class GameSessionTracker : IDisposable
             tracked.StartedAt,
             endedAt,
             endedAt - tracked.StartedAt,
-            exitCode));
+            exitCode,
+            tracked.StopRequested));
 
         try { process.Dispose(); } catch { }
     }

@@ -10,6 +10,18 @@ using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
+Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
+Run("quick play: install and prepare finish before launch", GamePlayFlowTests.PreparationIsOrderedAndAwaited);
+Run("quick play: double clicks keep one request", GamePlayFlowTests.DoubleClickDoesNotQueueTwoGames);
+Run("quick play: cancellation prevents delayed launch", GamePlayFlowTests.CancellationPreventsDelayedLaunch);
+Run("quick play: failed setup can be tried again", GamePlayFlowTests.FailureAllowsAnotherAttempt);
+Run("quick play: cancelling a launch leaves its installation available", GamePlayFlowTests.QueueWaitCancellationDoesNotCancelInstallation);
+Run("downloads: queue order and local pause", DownloadQueueTests.OrderAndLocalPause);
+Run("downloads: active pause, resume and cancellation", DownloadQueueTests.ActivePauseResumeAndCancellation);
+Run("downloads: global suspension survives active cancellation", DownloadQueueTests.SuspendedQueueSurvivesActiveCancellation);
+Run("downloads: bandwidth limits and cancellation", DownloadQueueTests.BandwidthAndCancellation);
+Run("downloads: payload telemetry and scope isolation", DownloadQueueTests.PayloadTelemetryAndScopeIsolation);
+Run("downloads: progress waits for installation and safe global pause", DownloadQueueTests.ProgressWaitsForInstallation);
 Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
 Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
 Run("runtime: a console game's output goes to its log, not a window", RuntimeIntegrationTests.OutputLog);
@@ -725,9 +737,11 @@ void TestPreferences()
     WithTempRoot(root =>
     {
         var store = new UserPreferencesStore(new TestPaths(root));
-        store.Save(new UserPreferences(Language: "en", Theme: "light", RefreshModsOnOpen: false));
+        store.Save(new UserPreferences(Language: "en", Theme: "light", RefreshModsOnOpen: false,
+            DownloadBandwidthLimit: 5 * 1024 * 1024));
         var loaded = store.Load();
         Assert(loaded.Language == "en" && loaded.Theme == "light" && !loaded.RefreshModsOnOpen);
+        Assert(loaded.DownloadBandwidthLimit == 5 * 1024 * 1024);
         store.Reset();
         // Nothing chosen: follow the language of Windows.
         Assert(store.Load().Language == "auto");

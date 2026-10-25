@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:CubeShelf.Desktop.Controls"
+             x:Class="CubeShelf.Desktop.Controls.DownloadsManager">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="DownloadAccent">#65B6FF</SolidColorBrush>
+          <SolidColorBrush x:Key="DownloadDisk">#BAA4DC</SolidColorBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="DownloadAccent">#156BC4</SolidColorBrush>
+          <SolidColorBrush x:Key="DownloadDisk">#6B5898</SolidColorBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="32,28,32,24" Spacing="20">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+        <StackPanel Spacing="5">
+          <TextBlock x:Name="Eyebrow" Foreground="{DynamicResource DownloadAccent}" FontSize="11" LetterSpacing="1.5" />
+          <TextBlock x:Name="Heading" Foreground="{DynamicResource Text}" FontSize="30" FontWeight="SemiBold" />
+        </StackPanel>
+        <Button x:Name="GlobalPause" Grid.Column="1" VerticalAlignment="Center" Click="ToggleGlobalPause" />
+      </Grid>
+      <Grid ColumnDefinitions="*,*,*,Auto" ColumnSpacing="20">
+        <StackPanel Spacing="5"><TextBlock x:Name="NetworkLabel" Foreground="{DynamicResource Muted}" FontSize="12" /><TextBlock x:Name="NetworkRate" Text="0 Mio/s" Foreground="{DynamicResource DownloadAccent}" FontSize="25" /></StackPanel>
+        <StackPanel Grid.Column="1" Spacing="5"><TextBlock x:Name="DiskLabel" Foreground="{DynamicResource Muted}" FontSize="12" /><TextBlock x:Name="DiskRate" Text="0 Mio/s" Foreground="{DynamicResource DownloadDisk}" FontSize="25" /></StackPanel>
+        <StackPanel Grid.Column="2" Spacing="5"><TextBlock x:Name="PeakLabel" Foreground="{DynamicResource Muted}" FontSize="12" /><TextBlock x:Name="PeakRate" Text="0 Mio/s" Foreground="{DynamicResource Muted}" FontSize="25" /></StackPanel>
+        <StackPanel Grid.Column="3" Spacing="5"><TextBlock x:Name="BandwidthLabel" Foreground="{DynamicResource Muted}" FontSize="12" /><ComboBox x:Name="Bandwidth" MinWidth="150" SelectionChanged="BandwidthChanged" /></StackPanel>
+      </Grid>
+      <StackPanel Spacing="7">
+        <local:DownloadSpeedChart x:Name="SpeedChart" Height="100" NetworkBrush="{DynamicResource DownloadAccent}" DiskBrush="{DynamicResource DownloadDisk}" GridBrush="{DynamicResource Border}" AutomationProperties.Name="Network and disk throughput" />
+        <Grid ColumnDefinitions="*,Auto,*"><TextBlock x:Name="ChartStart" Foreground="{DynamicResource Muted}" FontSize="11" /><TextBlock x:Name="ChartScale" Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="11" /><TextBlock x:Name="ChartEnd" Grid.Column="2" HorizontalAlignment="Right" Foreground="{DynamicResource Muted}" FontSize="11" /></Grid>
+      </StackPanel>
+      <Border x:Name="ActiveBorder" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="10" Padding="22">
+        <StackPanel x:Name="ActiveContent" />
+      </Border>
+      <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="QueueHeading" Foreground="{DynamicResource Text}" FontWeight="SemiBold" FontSize="15" /><TextBlock x:Name="ReorderHint" Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="11" VerticalAlignment="Center" /></Grid>
+        <StackPanel x:Name="QueueContent" />
+      </StackPanel>
+      <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="*,Auto"><TextBlock x:Name="HistoryHeading" Foreground="{DynamicResource Text}" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center" /><Button x:Name="ClearHistory" Grid.Column="1" Click="ClearCompleted" /></Grid>
+        <StackPanel x:Name="HistoryContent" />
+      </StackPanel>
+      <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
+        <TextBlock x:Name="StorageText" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

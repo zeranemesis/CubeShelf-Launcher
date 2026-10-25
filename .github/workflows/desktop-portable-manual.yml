@@ -1,0 +1,118 @@
+name: Build portable desktop previews (manual)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "desktop-build-*"
+      - "release-build-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cubeshelf-desktop-portable-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  desktop:
+    name: Portable ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            runner: windows-latest
+          - rid: win-arm64
+            runner: windows-latest
+          - rid: linux-x64
+            runner: ubuntu-24.04
+          - rid: linux-arm64
+            runner: ubuntu-24.04
+          - rid: osx-x64
+            runner: macos-15
+          - rid: osx-arm64
+            runner: macos-15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Publish self-contained launcher
+        run: >-
+          dotnet publish src/CubeShelf.Desktop/CubeShelf.Desktop.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained true
+          -p:DebugType=None -p:DebugSymbols=false
+          -o publish/${{ matrix.rid }}
+      - name: Publish Windows updater for the same architecture
+        if: startsWith(matrix.rid, 'win-')
+        run: |
+          dotnet publish src/CubeShelf.Updater/CubeShelf.Updater.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish/updater-${{ matrix.rid }}
+          if ($LASTEXITCODE -ne 0) { throw 'Updater publish failed.' }
+          Copy-Item -LiteralPath publish/updater-${{ matrix.rid }}/CubeShelf.Updater.exe -Destination publish/${{ matrix.rid }}/CubeShelf.Updater.exe
+      - name: Assemble portable archive and checksum
+        run: >-
+          ./packaging/Package-Desktop.ps1
+          -RuntimeIdentifier ${{ matrix.rid }}
+          -PublishDirectory publish/${{ matrix.rid }}
+          -OutputDirectory dist/${{ matrix.rid }}
+      - name: Build flat Windows update archive
+        if: startsWith(matrix.rid, 'win-')
+        run: |
+          $archivePath = 'dist/${{ matrix.rid }}/CubeShelf-${{ matrix.rid }}.zip'
+          Compress-Archive -Path 'publish/${{ matrix.rid }}/*' -DestinationPath $archivePath -Force
+          $hash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath ($archivePath + '.sha256') -Value "$hash  $([IO.Path]::GetFileName($archivePath))" -Encoding ascii
+      - name: Install Inno Setup for Windows x64 installer
+        if: matrix.rid == 'win-x64'
+        run: choco install innosetup --no-progress -y
+      - name: Build Windows x64 installer
+        if: matrix.rid == 'win-x64'
+        run: |
+          $version = (Get-Content -LiteralPath VERSION -Raw).Trim()
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Installer VERSION must use MAJOR.MINOR.PATCH.' }
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DMyAppVersion=$version" `
+            "/DMyAppNumericVersion=$version" `
+            "/DPublishDirectory=$((Resolve-Path -LiteralPath 'publish/${{ matrix.rid }}').Path)" `
+            "/DInstallerOutputDirectory=$((Resolve-Path -LiteralPath 'dist/${{ matrix.rid }}').Path)" `
+            installer/CubeShelf.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed.' }
+          $installer = Get-Item -LiteralPath 'dist/${{ matrix.rid }}/CubeShelf-Setup-x64.exe'
+          $hash = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath ($installer.FullName + '.sha256') -Value "$hash  $($installer.Name)" -Encoding ascii
+      - name: Build Linux x64 AppImage
+        if: matrix.rid == 'linux-x64'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(cat VERSION)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid VERSION"; exit 1; }
+          mkdir -p AppDir/usr/bin
+          cp -a publish/linux-x64/. AppDir/usr/bin/
+          cp packaging/linux/AppRun AppDir/AppRun
+          cp packaging/linux/cubeshelf.desktop AppDir/cubeshelf.desktop
+          cp src/CubeShelf.Desktop/Assets/Brand/gamecube_logo.png AppDir/cubeshelf.png
+          cp AppDir/cubeshelf.png AppDir/.DirIcon
+          chmod +x AppDir/AppRun AppDir/usr/bin/CubeShelf
+          curl --fail --location --retry 3 https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage --output appimagetool
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  appimagetool" | sha256sum --check --strict
+          chmod +x appimagetool
+          APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 VERSION="$version" ./appimagetool AppDir dist/linux-x64/CubeShelf-linux-x64.AppImage
+          (cd dist/linux-x64 && sha256sum CubeShelf-linux-x64.AppImage > CubeShelf-linux-x64.AppImage.sha256)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeShelf-${{ matrix.rid }}-portable-preview
+          path: |
+            dist/${{ matrix.rid }}/*.zip
+            dist/${{ matrix.rid }}/*.tar.gz
+            dist/${{ matrix.rid }}/*.sha256
+            dist/${{ matrix.rid }}/*.exe
+            dist/${{ matrix.rid }}/*.AppImage
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

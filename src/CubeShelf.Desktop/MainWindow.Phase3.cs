@@ -21,7 +21,15 @@ public sealed partial class MainWindow
     private void InitializePhase3Parity()
     {
         _portableQueue = new PortableDownloadQueue(_downloads, SynchronizationContext.Current);
+        _portableQueue.BandwidthLimitBytesPerSecond = _preferences.DownloadBandwidthLimit;
         _portableQueue.Changed += PortableQueueChanged;
+        DownloadManager.Configure(_portableQueue, _paths.DataDirectory, ResolveDownloadCover, P7,
+            item => ResumePortableDownload(new Button { Tag = item }, new RoutedEventArgs()),
+            limit =>
+            {
+                _preferences = _preferences with { DownloadBandwidthLimit = limit };
+                _preferencesStore.Save(_preferences);
+            });
         _gameUpdateService = new GitHubGameUpdateService(_paths);
         _phase3Lifetime = new CancellationTokenSource();
         RefreshPortableQueueView();
@@ -34,6 +42,7 @@ public sealed partial class MainWindow
 
     private void DisposePhase3Parity()
     {
+        DownloadManager.Dispose();
         if (_portableQueue is not null)
             _portableQueue.Changed -= PortableQueueChanged;
         _phase3Lifetime?.Cancel();
@@ -60,14 +69,29 @@ public sealed partial class MainWindow
         }
     }
 
-    private void PortableQueueChanged(object? sender, EventArgs args) =>
-        Dispatcher.UIThread.Post(RefreshPortableQueueView);
+    private int _downloadRefreshQueued;
+    private void PortableQueueChanged(object? sender, EventArgs args)
+    {
+        if (Interlocked.Exchange(ref _downloadRefreshQueued, 1) != 0) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            Interlocked.Exchange(ref _downloadRefreshQueued, 0);
+            RefreshPortableQueueView();
+        });
+    }
+
+    private string ResolveDownloadCover(PortableDownloadQueueItem item)
+    {
+        var id = ModDownloadReference.TryParse(item.ReferenceId, out var mod) && mod is not null ? mod.GameId : item.ReferenceId;
+        var game = _catalogGames.FirstOrDefault(g => g.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+        return ResolveCoverPath(game?.Covers.FirstOrDefault()?.Front);
+    }
 
     private void RefreshPortableQueueView()
     {
-        if (_portableQueue is null || DownloadsList is null) return;
+        if (_portableQueue is null) return;
         var items = _portableQueue.Items;
-        DownloadsList.ItemsSource = items;
+        DownloadManager.Refresh();
         var pending = _portableQueue.PendingCount;
         var failed = items.Count(item => item.State is DownloadActivityState.Failed or DownloadActivityState.Interrupted);
         QueueSidebarText.Text = pending > 0
