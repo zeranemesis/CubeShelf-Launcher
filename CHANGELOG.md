@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.17.0 — 2026-10-25
+
+- Regroupe les évolutions depuis la version 0.16.0 : récupération du launcher, sauvegardes de profils et de sauvegardes de jeux, reprise après mise à jour et contrôles d'espace disque.
+- Big Picture : démarrage plein écran, transition de lancement, logos des jeux, navigation des mods à la manette et prise en charge SDL facultative sur Linux et macOS.
+- Rendu des boîtiers 3D et cache des jaquettes optimisés, animations à la demande et chemins d'images adaptés à chaque plateforme.
+- Android ARM64 : moteur natif PartyBoard intégré, téléchargement vérifié de ses ressources et retour à la bibliothèque après le jeu ; disque personnel toujours nécessaire.
+- Gestionnaire de téléchargements mobile avec progression et débit réels, graphique, pause/reprise, file persistante et historique illustré.
+- Version Android 41. Les APK restent des aperçus signés avec une clé de développement ; les paquets PC ne disposent pas de signature de distribution ni de notarisation macOS.
+- Les notes des aperçus ci-dessous détaillent les essais effectués. Aucune garantie de 120 images/s constantes ni de compatibilité réseau Android–PC ; les parties complètes et les manettes physiques restent à valider.
+
 ## 0.17.0-preview.19 — gestionnaire mobile inspiré du PC, non publié
 
 - Écran Téléchargements avec jaquette du jeu, carte du transfert actif, progression, débit réseau, pic de session et estimation du temps restant. Graphique des relevés réels sur une fenêtre de 60 secondes ; aucune activité réseau ou disque simulée.

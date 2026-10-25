@@ -2,6 +2,9 @@ name: Build Android previews (manual)
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "release-build-*"
 
 permissions:
   contents: read

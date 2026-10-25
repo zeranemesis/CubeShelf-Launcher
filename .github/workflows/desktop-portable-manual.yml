@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - "desktop-build-*"
+      - "release-build-*"
 
 permissions:
   contents: read
