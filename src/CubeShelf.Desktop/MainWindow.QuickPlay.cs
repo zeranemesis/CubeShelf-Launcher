@@ -255,7 +255,8 @@ public sealed partial class MainWindow
     private void RefreshQuickPlayUi()
     {
         if (_quickPlayClosing) return;
-        foreach (var card in _parityCards) ApplyQuickPlayCard(card);
+        if (!_bigPictureActive)
+            foreach (var card in _parityCards) ApplyQuickPlayCard(card);
         RefreshBigPictureStatus();
         RefreshBigPictureResumeStatus();
         if (_selectedGame is not { } game) return;

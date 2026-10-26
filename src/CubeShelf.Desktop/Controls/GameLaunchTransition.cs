@@ -5,7 +5,7 @@ using Avalonia.Media;
 
 namespace CubeShelf.Desktop.Controls;
 
-/// <summary>A finite compositor-paced transition, shared by desktop and Android.</summary>
+/// <summary>A compositor-paced transition; Big Picture spins its disc until launch takes focus.</summary>
 public sealed class GameLaunchTransition : UserControl, IDisposable
 {
     private GameCaseControl _case = new() { Width = 210, Height = 250,
@@ -21,6 +21,7 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
     private double _elapsed;
     private bool _openCase;
     private TaskCompletionSource<bool>? _openingFinished;
+    internal const double OpeningDuration = 2.1;
     public event Action? DismissRequested;
 
     public GameLaunchTransition()
@@ -48,8 +49,9 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
         _openCase=openCase;
         _openingFinished=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         _case = new GameCaseControl { Width = openCase ? 540 : 210,
-            Height = openCase ? Math.Clamp((TopLevel.GetTopLevel(this)?.Bounds.Height??720)*.45,200,390) : Math.Clamp(Bounds.Height * .48, 90, 250),
-            CaseFormat=GameCaseControl.FormatForConsole(console),RealisticShell = true, UseImportedModel = true, IsInteractive = false };
+            Height = openCase ? Math.Clamp((TopLevel.GetTopLevel(this)?.Bounds.Height??720)*.48,200,430) : Math.Clamp(Bounds.Height * .48, 90, 250),
+            CaseFormat=GameCaseControl.FormatForConsole(console),RealisticShell = true, UseImportedModel = true, IsInteractive = false,
+            UseGpuTextures = openCase };
         _content.Children[0] = _case;
         _title.SetGame(gameId, title); _status.Text = status;
         _case.SetCover(front, back, spine);
@@ -71,9 +73,16 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
         _scale.ScaleX=_scale.ScaleY=.82+.22*eased;_offset.Y=36*(1-eased);
         if(!_openCase) return progress<1;
         static double Ease(double value) { var p=Math.Clamp(value,0,1);return p*p*(3-2*p); }
-        _case.SetOpeningProgress(Ease((_elapsed-.18)/.85),Ease((_elapsed-1)/.55));
-        if(_elapsed<1.6)return true;
-        _openingFinished?.TrySetResult(true);return false;
+        var spinTime=Math.Max(0,_elapsed-1.05);
+        var accelerating=Math.Min(spinTime,OpeningDuration-1.05);
+        var rotation=720*accelerating*accelerating+1440*(OpeningDuration-1.05)*Math.Max(0,_elapsed-OpeningDuration);
+        _case.SetOpeningProgress(Ease((_elapsed-.18)/.85),Ease((_elapsed-1)/.55),rotation);
+        if(_elapsed>=OpeningDuration)
+        {
+            _openingFinished?.TrySetResult(true);
+            if(_case.CaseFormat==GameCaseFormat.Switch)return false;
+        }
+        return IsVisible;
     }
 
     public Task<bool> WaitForOpeningAsync(CancellationToken cancellationToken) =>

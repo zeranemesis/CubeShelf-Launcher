@@ -174,6 +174,7 @@ public sealed partial class MainWindow
         Height = _bigPicturePreviousHeight;
         BigPictureShelf.Clear();
         DisposeBigPictureHomeImages();
+        RefreshQuickPlayUi();
         BigPictureEntryButton.Focus();
     }
 

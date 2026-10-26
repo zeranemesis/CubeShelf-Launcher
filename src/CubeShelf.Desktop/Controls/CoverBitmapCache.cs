@@ -86,14 +86,14 @@ internal static class CoverBitmapCache
 
     // Paints retain their native shader independently of the cache. Pending
     // scene operations remain valid when their case or cached image is released.
-    public static SKPaint? CreateTexturePaint(Bitmap bitmap)
+    public static SKPaint? CreateTexturePaint(Bitmap bitmap, bool highQuality = false)
     {
         Entry entry;
         lock (Gate)
         {
             if (!Bitmaps.TryGetValue(bitmap, out entry!)) return null;
             if (entry.GpuImage is not null)
-                return MakeTexturePaint(entry);
+                return MakeTexturePaint(entry,highQuality);
         }
         // Never hold the global cache lock during file IO or image decoding.
         var decoded = DecodeTexture(entry);
@@ -103,14 +103,14 @@ internal static class CoverBitmapCache
             if (entry.GpuImage is null) { entry.GpuImage = decoded; decoded = null; }
             decoded?.Dispose();
             if (entry.GpuImage is null) return null;
-            return MakeTexturePaint(entry);
+            return MakeTexturePaint(entry,highQuality);
         }
     }
 
-    private static SKPaint MakeTexturePaint(Entry entry)
+    private static SKPaint MakeTexturePaint(Entry entry,bool highQuality)
     {
         entry.GpuShader ??= entry.GpuImage!.ToShader(SKShaderTileMode.Clamp, SKShaderTileMode.Clamp);
-        return new SKPaint { Shader = entry.GpuShader, FilterQuality = SKFilterQuality.Low, IsAntialias = true };
+        return new SKPaint { Shader = entry.GpuShader, FilterQuality = highQuality ? SKFilterQuality.High : SKFilterQuality.Low, IsAntialias = true };
     }
 
     public static void PrepareTexture(Bitmap? bitmap)

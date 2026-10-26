@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.0-preview.5 — fluidité Big Picture et disque en rotation, non publiée
+
+- Ruban Big Picture déplacé et redimensionné par le compositeur sans recalculer la géométrie des boîtiers à chaque changement de taille. Dessins regroupés via Skia pour les modèles GameCube et les textures Wii/Switch, avec filtrage de qualité et préparation des textures en arrière-plan.
+- Le disque GameCube/Wii descend devant le boîtier et tourne sur son axe avec une accélération progressive. L'ouverture et le démarrage visuel durent environ 2,1 secondes ; B permet toujours d'annuler avant le lancement.
+- Calculs de caméra et points du cercle réutilisés pendant l'animation. Une sélection inchangée conserve son inspection ; les menus évitent les mises à jour de focus redondantes et les cartes bureau cachées ne relisent plus leurs profils à chaque rafraîchissement d'état Big Picture.
+- Banc de rendu hors écran reproductible : médianes de 46–52 ms à 14–22 ms selon la console sur la machine de test ; allocations par image réduites de 76–95 %. Ce sont des coûts de rendu à 1000 × 600, pas une garantie de FPS ni une mesure sur manette physique. Détails dans `docs/BIG-PICTURE-PERFORMANCE.md`.
+
 ## 0.18.0-preview.4 — navigation et lancement Big Picture, non publiée
 
 - Uniquement en Big Picture : stick gauche horizontal pour les jeux, vertical pour changer de console ; une impulsion verticale change d'une plateforme. Croix directionnelle pour les menus. START ouvre et ferme le menu principal, A valide, B revient en arrière.

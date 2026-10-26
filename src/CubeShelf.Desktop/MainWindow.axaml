@@ -123,7 +123,7 @@
           </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="0,0,32,0" ColumnDefinitions="7*,3*" ColumnSpacing="12">
-          <controls:GameShelfControl x:Name="BigPictureShelf" />
+          <controls:GameShelfControl x:Name="BigPictureShelf" UseCompositorScaling="True" UseGpuTextures="True" />
           <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Center" MaxHeight="620">
             <StackPanel Spacing="14" Margin="0,20,0,20">
               <TextBlock x:Name="BigPictureCollectionLabel" Foreground="#9B7066" FontSize="10" LetterSpacing="2" FontWeight="Bold" />

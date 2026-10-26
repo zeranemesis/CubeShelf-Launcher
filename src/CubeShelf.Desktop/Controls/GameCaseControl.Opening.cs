@@ -8,35 +8,48 @@ public sealed partial class GameCaseControl
 {
     private bool _openingEnabled;
     private double _opening, _mediaLift;
+    private double _mediaSpinDegrees;
+    internal double MediaVerticalOffset => (CaseFormat==GameCaseFormat.Switch?.82:-1.05)*_mediaLift;
+    internal double MediaRotationDegrees => _mediaSpinDegrees;
     private Bitmap? _mediaArtwork;
     private static readonly IBrush DiscSilver = Material("#E8EDF3","#879CB3","#FCFCFF","#9DA5B6");
     private static readonly IBrush InteriorDark = new SolidColorBrush(Color.Parse("#202126"));
     private static readonly IBrush InteriorLight = new SolidColorBrush(Color.Parse("#E7E8E4"));
     private static readonly IBrush CartridgeBlack = new SolidColorBrush(Color.Parse("#24272C"));
     private static readonly IBrush NeutralCartridgeLabel = new SolidColorBrush(Color.Parse("#D84D50"));
+    private static readonly Point[] CirclePoints = Enumerable.Range(0,64)
+        .Select(index=>new Point(Math.Cos(index*Math.PI/32),Math.Sin(index*Math.PI/32))).ToArray();
 
     public void SetOpeningMedia(string? path)
     {
         CoverBitmapCache.Release(_mediaArtwork);_mediaArtwork=Load(path);
+        if(UsesGpuTextures)CoverBitmapCache.PrepareTexture(_mediaArtwork);
     }
-    public void SetOpeningProgress(double opening,double mediaLift)
+    public void SetOpeningProgress(double opening,double mediaLift,double spinDegrees = 0)
     {
         _openingEnabled=true;
         _opening=Math.Clamp(opening,0,1);_mediaLift=Math.Clamp(mediaLift,0,1);
+        _mediaSpinDegrees=spinDegrees%360;
         InvalidateVisual();
     }
 
     private void RenderOpening(DrawingContext context)
     {
         var half=CaseWidth/2;var tall=CaseHeight/2;
+        var (sinYaw,cosYaw)=Math.SinCos(12*Math.PI/180);
+        var (sinPitch,cosPitch)=Math.SinCos(-4*Math.PI/180);
+        var shift=CaseWidth*.34*_opening;
+        var isDisc=CaseFormat!=GameCaseFormat.Switch;
+        var fit=Math.Min(Bounds.Width/(CaseWidth*2.4),Bounds.Height/(isDisc?4.5:3.8));
+        var centerY=Bounds.Height*(isDisc?.43:.5);
+        var projectionScale=fit*1.72/Math.Tan(FieldOfViewDegrees*Math.PI/360);
         Point Project(Vec3 point)
         {
-            point=point with { X=point.X+CaseWidth*.34*_opening };
-            var rotated=Rotate(point,12,-4);
-            var focal=1/Math.Tan(FieldOfViewDegrees*Math.PI/360);
-            var fit=Math.Min(Bounds.Width/(CaseWidth*2.4),Bounds.Height/3.8);
-            var scale=fit*focal*1.72/(CameraDistance-rotated.Z);
-            return new Point(Bounds.Width/2+rotated.X*scale,Bounds.Height/2-rotated.Y*scale);
+            var x=point.X+shift;
+            var y=point.Y*cosPitch-point.Z*sinPitch;
+            var z=point.Y*sinPitch+point.Z*cosPitch;
+            var scale=projectionScale/(CameraDistance-(-x*sinYaw+z*cosYaw));
+            return new Point(Bounds.Width/2+(x*cosYaw+z*sinYaw)*scale,centerY-y*scale);
         }
         Point[] Quad(double left,double top,double right,double bottom,double z) =>
             [Project(new(left,top,z)),Project(new(right,top,z)),Project(new(right,bottom,z)),Project(new(left,bottom,z))];
@@ -57,8 +70,8 @@ public sealed partial class GameCaseControl
             {
                 for(var n=0;n<64;n++)
                 {
-                    var angle=(reverse?-1:1)*n*Math.PI/32;
-                    var point=Project(new(x+Math.Cos(angle)*r,y+Math.Sin(angle)*r,z));
+                    var unit=CirclePoints[n];
+                    var point=Project(new(x+unit.X*r,y+(reverse?-unit.Y:unit.Y)*r,z));
                     if(n==0)path.BeginFigure(point,true);else path.LineTo(point);
                 }
                 path.EndFigure(true);
@@ -77,7 +90,8 @@ public sealed partial class GameCaseControl
 
         void Media()
         {
-            var x=.38*_mediaLift;var y=.82*_mediaLift;var z=.06+.65*_mediaLift;
+            var x=isDisc?0:.38*_mediaLift;
+            var y=MediaVerticalOffset;var z=.06+.65*_mediaLift;
             if(CaseFormat==GameCaseFormat.Switch)
             {
                 var card=Quad(x-.18,y+.27,x+.18,y-.27,z);
@@ -94,22 +108,33 @@ public sealed partial class GameCaseControl
             var ring=Circle(x,y,z,radius,.12);
             context.DrawGeometry(DiscSilver,CaseOutline,ring);
             if(_mediaArtwork is not null)
+            {
+                var (sin,cos)=Math.SinCos(_mediaSpinDegrees*Math.PI/180);
+                Point Rotated(double dx,double dy)=>Project(new(x+dx*cos-dy*sin,y+dx*sin+dy*cos,z));
+                var printed=new[]{Rotated(-radius,radius),Rotated(radius,radius),Rotated(radius,-radius),Rotated(-radius,-radius)};
                 using(context.PushGeometryClip(ring))
-                    DrawTexturedQuadMesh(context,_mediaArtwork,Quad(x-radius,y+radius,x+radius,y-radius,z),8,12);
+                    DrawTexturedQuadMesh(context,_mediaArtwork,printed,8,12);
+            }
+            else
+            {
+                var (sin,cos)=Math.SinCos(_mediaSpinDegrees*Math.PI/180);
+                context.DrawLine(CaseHighlight,Project(new(x+cos*radius*.45,y+sin*radius*.45,z)),
+                    Project(new(x+cos*radius*.92,y+sin*radius*.92,z)));
+            }
             context.DrawGeometry(null,CaseHighlight,Circle(x,y,z,radius*.98));
             context.DrawGeometry(null,CaseSeam,Circle(x,y,z,.18));
         }
         if(_mediaLift==0)Media();
 
+        var (sinLid,cosLid)=Math.SinCos(-140*_opening*Math.PI/180);
         Vec3 Lid(double x,double y)
         {
-            var rotated=Rotate(new(x+half,y,0),-140*_opening,0);
-            return rotated with { X=rotated.X-half,Z=rotated.Z+.07 };
+            return new Vec3((x+half)*cosLid-half,y,-(x+half)*sinLid+.07);
         }
         var lid=new[]{Project(Lid(-half,tall)),Project(Lid(half,tall)),Project(Lid(half,-tall)),Project(Lid(-half,-tall))};
         var lidShape=RoundedQuad(lid,.01);
         context.DrawGeometry(material,CaseOutline,lidShape);
-        if(Math.Cos((12-140*_opening)*Math.PI/180)>0)
+        if(cosYaw*cosLid-sinYaw*sinLid>0)
         {
             var printed=new[]{Bilinear(lid,.025,.014),Bilinear(lid,.985,.014),Bilinear(lid,.985,.986),Bilinear(lid,.025,.986)};
             if(_front is not null)using(context.PushGeometryClip(lidShape))DrawTexturedQuadMesh(context,_front,printed,8,12);

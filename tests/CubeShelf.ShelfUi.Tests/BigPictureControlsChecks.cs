@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.LogicalTree;
 using CubeShelf.Core.Platform;
 using CubeShelf.Desktop;
 using CubeShelf.Desktop.Controls;
@@ -24,6 +25,28 @@ static class BigPictureControlsChecks
         var consoles=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
         var position=window.FindControl<TextBlock>("BigPicturePosition")!;
         var menu=window.FindControl<Border>("BigPictureMenuOverlay")!;
+        var shelf=window.FindControl<GameShelfControl>("BigPictureShelf")!;
+        Check(shelf.UseGpuTextures && shelf.UseCompositorScaling,"Big Picture did not enable the optimised renderer.");
+        var selectedCase=shelf.Children.OfType<GameCaseControl>().Single(c=>c.IsInteractive);
+        Check(selectedCase.UseGpuTextures,"Shelf cases did not inherit the renderer selection.");
+        shelf.FlipSelected();
+        var flipped=typeof(GameCaseControl).GetField("_flipped",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
+        Check((bool)flipped.GetValue(selectedCase)!,"Selected case did not flip.");
+        var chosenIndex=int.Parse(position.Text!.Split('/')[0].Trim())-1;
+        var beforeDecode=CoverBitmapCache.DecodeCount;
+        shelf.SetSelection(chosenIndex,true);
+        Check((bool)flipped.GetValue(selectedCase)! && CoverBitmapCache.DecodeCount==beforeDecode,
+            "Refreshing the same selection reset inspection or decoded textures again.");
+        var hiddenCard=window.FindControl<ItemsControl>("LibraryCards")!.Items.Cast<MainWindow.DesktopGameCard>().First(c=>c.Game.RuntimeOwnsSetup);
+        var executable=hiddenCard.Game.Executable;var label=hiddenCard.PlayLabel;
+        var placeholder=Path.Combine(new PlatformPaths().DataDirectory,"not-an-executable.txt");File.WriteAllText(placeholder,"test fixture, never executed");
+        var refresh=typeof(MainWindow).GetMethod("RefreshQuickPlayUi",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
+        hiddenCard.Game.Executable=placeholder;refresh.Invoke(window,null);
+        Check(hiddenCard.PlayLabel==label,"Background status refreshed the hidden desktop cards.");
+        window.FindControl<Button>("BigPictureExitButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Check(hiddenCard.PlayLabel!=label,"Desktop status did not catch up when leaving Big Picture.");
+        hiddenCard.Game.Executable=executable;refresh.Invoke(window,null);
+        window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         void Input(int value)=>window.HandleBigPictureControllerInput(value);
         var console=consoles.SelectedIndex;Input(13);
         Check(consoles.SelectedIndex==(console+1)%3,"Stick up did not change platform.");
@@ -58,7 +81,24 @@ static class BigPictureControlsChecks
             var pending=launch.WaitForOpeningAsync(CancellationToken.None);
             Check(!pending.IsCompleted,"The game would launch before the case opens.");
             launch.Advance(.85);Save($"opening-{index}-mid.png");
-            launch.Advance(.8);Check(pending.IsCompletedSuccessfully && pending.Result,"Opening animation never completed.");
+            launch.Advance(.5);Save($"opening-{index}-spinning.png");
+            Check(!pending.IsCompleted,"The game would launch before the disc spins.");
+            var animated=launch.GetLogicalDescendants().OfType<GameCaseControl>().Single();
+            if(index!=2)
+            {
+                Check(animated.MediaVerticalOffset<0,"The disc moved up instead of down.");
+                var first=animated.MediaRotationDegrees;launch.Advance(.05);
+                var second=animated.MediaRotationDegrees;launch.Advance(.05);
+                Check(second>first && animated.MediaRotationDegrees-second>second-first,"Disc rotation did not accelerate.");
+            }
+            launch.Advance(GameLaunchTransition.OpeningDuration);Check(pending.IsCompletedSuccessfully && pending.Result,"Opening animation never completed.");
+            if(index!=2)
+            {
+                var rotation=animated.MediaRotationDegrees;
+                Check(launch.Advance(.05),"Disc animation stopped while the launch screen remained visible.");
+                Check(animated.MediaRotationDegrees!=rotation,"The disc stopped spinning while the game was still starting.");
+            }
+            else Check(!launch.Advance(.05),"The static cartridge kept scheduling unnecessary animation frames.");
             Save($"opening-{index}-open.png");launch.Stop();
         }
         launch.Start("Cancel test","","","","",openCase:true);
@@ -76,6 +116,7 @@ static class BigPictureControlsChecks
         Check(!menu.IsVisible && consoles.SelectedIndex==console,"Big Picture controls changed the classic interface.");
         Console.WriteLine("OK  stick / D-pad separation, dead zone, platform and game navigation, menu and persisted inversion.");
         Console.WriteLine("OK  three opening animations complete before launch; B and cancellation prevent launch.");
+        Console.WriteLine("OK  discs descend and accelerate; repeated selection preserves inspection; hidden card updates resume on desktop.");
         void Save(string file)
         {
             if(snapshots is null)return;

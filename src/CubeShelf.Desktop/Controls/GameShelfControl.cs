@@ -20,6 +20,7 @@ public sealed class GameShelfControl : Panel, IDisposable
     /// <summary>Keep case geometry at a stable size while the compositor moves and scales it.</summary>
     public bool UseCompositorScaling { get; init; }
     public bool UseCompactTextureMesh { get; init; }
+    public bool UseGpuTextures { get; init; }
     private readonly DemandAnimation _animation;
     private double _layoutResponse = 1;
     private bool _moving;
@@ -58,6 +59,7 @@ public sealed class GameShelfControl : Panel, IDisposable
     public void SetSelection(int selected, bool ribbon, bool animate = true)
     {
         if (_items.Count == 0) return;
+        if (animate && _cases.Count>0 && _selected==Math.Clamp(selected,0,_items.Count-1) && _ribbon==ribbon) return;
         _selected = Math.Clamp(selected, 0, _items.Count - 1);
         _ribbon = ribbon;
         _animate = animate;
@@ -88,7 +90,8 @@ public sealed class GameShelfControl : Panel, IDisposable
                     MinWidth = 0, MinHeight = 0, ShadowOpacity = .8,
                     RealisticShell = true, UseImportedModel = true,
                     CaseFormat = GameCaseControl.FormatForConsole(item.Console),
-                    UseCompactTextureMesh = UseCompactTextureMesh
+                    UseCompactTextureMesh = UseCompactTextureMesh,
+                    UseGpuTextures = UseGpuTextures
                 };
                 cover.SetCover(item.Front, item.Back, item.Spine);
                 AutomationProperties.SetName(cover, item.Title);

@@ -13,6 +13,7 @@ new CubeShelf.Core.Platform.UserPreferencesStore(new CubeShelf.Core.Platform.Pla
 var snapshotDirectory = Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR");
 var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).UseSkia();
 builder.SetupWithoutStarting();
+if(args.Contains("--render-benchmark")) { RenderBenchmark.Run();return; }
 var window = new MainWindow();
 try
 {

@@ -11,6 +11,8 @@ namespace CubeShelf.Desktop.Controls;
 public sealed partial class GameCaseControl
 {
     public static bool PreferGpuTextures { get; set; }
+    public bool UseGpuTextures { get; init; }
+    private bool UsesGpuTextures => PreferGpuTextures || UseGpuTextures;
     internal static bool BatchGpuDraws { get; set; } = true;
     internal static Action<double, long>? FrontendTiming { get; set; }
     internal static Action<double>? BackendTiming { get; set; }
@@ -48,7 +50,7 @@ public sealed partial class GameCaseControl
 
     private bool DrawGpuTexture(DrawingContext context, Bitmap image, Point[] quad, int columns, int rows)
     {
-        var paint = CoverBitmapCache.CreateTexturePaint(image);
+        var paint = CoverBitmapCache.CreateTexturePaint(image,UseGpuTextures);
         if (paint is null) return false;
         if (!_textureBuffers.TryGetValue((columns, rows), out var buffers))
         {

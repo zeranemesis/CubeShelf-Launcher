@@ -145,7 +145,12 @@ public sealed partial class GameCaseControl : Control, IDisposable
         _front = Load(front);
         _back = Load(back);
         _spine = Load(spine);
-        if (PreferGpuTextures) CoverBitmapCache.PrepareTexture(_back);
+        if (UsesGpuTextures)
+        {
+            CoverBitmapCache.PrepareTexture(_front);
+            CoverBitmapCache.PrepareTexture(_back);
+            CoverBitmapCache.PrepareTexture(_spine);
+        }
         _flipped = false;
         _pointerInside = false;
         _baseYaw = 0;
@@ -390,7 +395,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
             fallback);
     }
 
-    private static void DrawFace(DrawingContext context, Face face, Point pointer, double glare)
+    private void DrawFace(DrawingContext context, Face face, Point pointer, double glare)
     {
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
         var outline = BuildGeometry(quad);
@@ -469,13 +474,19 @@ public sealed partial class GameCaseControl : Control, IDisposable
         context.DrawGeometry(highlight, null, outline);
     }
 
-    private static void DrawTexturedQuadMesh(
+    private void DrawTexturedQuadMesh(
         DrawingContext context,
         Bitmap image,
         IReadOnlyList<Point> quad,
         int columns,
         int rows)
     {
+        if (UsesGpuTextures && DrawGpuTexture(context,image,quad as Point[] ?? quad.ToArray(),columns,rows))
+        {
+            // Submit inside the caller's clip, before its sleeve/ring geometry is popped.
+            FlushGpuDraws(context);
+            return;
+        }
         if(Math.Abs(quad[0].Y-quad[1].Y)<.001 && Math.Abs(quad[1].X-quad[2].X)<.001
             && Math.Abs(quad[2].Y-quad[3].Y)<.001 && Math.Abs(quad[3].X-quad[0].X)<.001
             && quad[2].X>quad[0].X && quad[2].Y>quad[0].Y)

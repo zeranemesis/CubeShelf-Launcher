@@ -130,7 +130,7 @@ public sealed partial class GameCaseControl
             if (comparison == 0) comparison = a.Depth.CompareTo(b.Depth);
             return comparison == 0 ? a.Order.CompareTo(b.Order) : comparison;
         });
-        if (PreferGpuTextures)
+        if (UsesGpuTextures)
         {
             if (_modelCommands is null || _modelCommands.Length < commands.Count)
                 _modelCommands = new ModelDraw[Math.Max(commands.Count, _nextDrawOrder)];
@@ -180,7 +180,7 @@ public sealed partial class GameCaseControl
         for (var index = 0; index < _modelCommandCount; index++)
         {
             var command = _modelCommands![index];
-            if (PreferGpuTextures && command.TextureSlot is null)
+            if (UsesGpuTextures && command.TextureSlot is null)
             {
                 var end = index + 1;
                 while (end < _modelCommandCount && _modelCommands[end].TextureSlot is null
@@ -198,7 +198,7 @@ public sealed partial class GameCaseControl
                     context.DrawGeometry(command.Brush, null, command.Outline);
                     continue;
                 }
-                if (PreferGpuTextures && DrawGpuTexture(context, texture, command.Points,
+                if (UsesGpuTextures && DrawGpuTexture(context, texture, command.Points,
                     slot == "spine" ? 2 : 8, slot == "spine" ? 6 : 12))
                 {
                     if (_glare * .45 > .01)

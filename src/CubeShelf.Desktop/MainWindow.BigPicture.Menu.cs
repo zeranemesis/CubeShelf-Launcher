@@ -12,6 +12,7 @@ public sealed partial class MainWindow
     private string _bigPictureMenuPage = "main";
     private int _bigPictureMenuIndex;
     private readonly List<Button> _bigPictureMenuButtons = new();
+    private static readonly IBrush BigPictureMenuTextBrush = new SolidColorBrush(Color.Parse("#303A44"));
 
     private void ShowBigPictureMenu(string page = "main")
     {
@@ -91,11 +92,13 @@ public sealed partial class MainWindow
     private void FocusBigPictureMenu(int index)
     {
         if(_bigPictureMenuButtons.Count==0)return;
+        if(_bigPictureMenuIndex==(index+_bigPictureMenuButtons.Count)%_bigPictureMenuButtons.Count
+            && _bigPictureMenuButtons[_bigPictureMenuIndex].IsFocused)return;
         _bigPictureMenuIndex=(index+_bigPictureMenuButtons.Count)%_bigPictureMenuButtons.Count;
         for(var i=0;i<_bigPictureMenuButtons.Count;i++)
         {
             _bigPictureMenuButtons[i].Background=i==_bigPictureMenuIndex?Brushes.Crimson:Brushes.Transparent;
-            _bigPictureMenuButtons[i].Foreground=i==_bigPictureMenuIndex?Brushes.White:new SolidColorBrush(Color.Parse("#303A44"));
+            _bigPictureMenuButtons[i].Foreground=i==_bigPictureMenuIndex?Brushes.White:BigPictureMenuTextBrush;
         }
         var selected=_bigPictureMenuButtons[_bigPictureMenuIndex];
         if(!selected.IsFocused)selected.Focus();
