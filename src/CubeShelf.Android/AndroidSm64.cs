@@ -35,7 +35,7 @@ internal static class AndroidSm64
             var picked = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Ta copie de Super Mario 64 · ROM US ou japonaise .z64", AllowMultiple = false,
-                FileTypeFilter = [new FilePickerFileType("ROM Nintendo 64 (.z64)") { Patterns = ["*.z64"], MimeTypes = ["application/octet-stream"] }]
+                FileTypeFilter = [new FilePickerFileType("ROM Nintendo 64 (.z64)") { Patterns = ["*.z64"], MimeTypes = ["*/*"] }]
             });
             cancellation.ThrowIfCancellationRequested();
             if (picked.Count == 0) throw new OperationCanceledException("Choix de la ROM annulé.");
