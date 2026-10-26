@@ -3,12 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Interactivity;
 using CubeShelf.Desktop;
+using CubeShelf.Desktop.Controls;
 
 var profile = Path.Combine(Path.GetTempPath(), "cubeshelf-selector-" + Guid.NewGuid().ToString("N"));
 Environment.SetEnvironmentVariable("CUBESHELF_DATA_DIR",profile);
 var snapshotDirectory = Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR");
-var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = snapshotDirectory is null });
-if(snapshotDirectory is not null) builder.UseSkia();
+var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).UseSkia();
 builder.SetupWithoutStarting();
 var window = new MainWindow();
 try
@@ -49,14 +49,63 @@ try
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
+    typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
+    window.Width=1440;window.Height=1000;window.Show();
+    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+    var transition=window.FindControl<ShelfTransitionControl>("ShelfTransition")!;
+    var host=window.FindControl<Grid>("LibraryView")!;
+    selector.SelectedIndex=1;
+    if(!transition.IsRunning || cards.Items.Count!=13)throw new Exception("Console transition did not start with the new catalogue ready.");
+    transition.Advance(ShelfTransitionControl.Duration/2);
+    if(host.Opacity<=0 || host.Opacity>=1)throw new Exception("Transition did not reveal the incoming library progressively.");
     if(snapshotDirectory is not null)
     {
         Directory.CreateDirectory(snapshotDirectory);
-        typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
-        window.Width=1440;window.Height=1000;window.Show();
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        using var midpoint=window.CaptureRenderedFrame();
+        midpoint!.Save(Path.Combine(snapshotDirectory,"transition-midpoint.png"));
+    }
+    selector.SelectedIndex=0;selector.SelectedIndex=2;
+    transition.Advance(1);
+    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=16)
+        throw new Exception("Rapid switching left stale content, opacity or transforms.");
+    var decodes=CoverBitmapCache.DecodeCount;
+    var search=window.FindControl<TextBox>("LibrarySearchBox")!;
+    search.Text="Mario";search.Text="";
+    if(CoverBitmapCache.DecodeCount!=decodes)throw new Exception("A warm search decoded cover images again.");
+    var reduce=window.FindControl<CheckBox>("ReduceShelfMotionBox")!;
+    reduce.IsChecked=true;selector.SelectedIndex=1;
+    if(transition.IsRunning || host.Opacity!=1 || cards.Items.Count!=13)throw new Exception("Reduced motion did not switch immediately.");
+    reduce.IsChecked=false;
+    selector.SelectedIndex=2;
+    window.Hide();
+    if(transition.IsRunning || host.Opacity!=1)throw new Exception("Hiding the window did not release the transition.");
+    window.Show();
+    window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    var stateChanges=0;
+    void CountStateChanges(object? sender,AvaloniaPropertyChangedEventArgs args) { if(args.Property==Window.WindowStateProperty)stateChanges++; }
+    window.PropertyChanged+=CountStateChanges;
+    fullscreen.SelectedIndex=1;
+    transition.Advance(1);
+    window.PropertyChanged-=CountStateChanges;
+    if(stateChanges!=0 || !window.FindControl<Control>("BigPictureView")!.IsVisible)
+        throw new Exception("Changing console unnecessarily left fullscreen.");
+    typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
+    selector.SelectedIndex=2;transition.Advance(1);
+    if(cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card=>card.Cover!.PixelSize.Height>512))
+        throw new Exception("Library cards retained oversized images.");
+    Console.WriteLine("OK  transition midpoint, rapid switching, reduced motion and hiding restore a clean view.");
+    Console.WriteLine("OK  changing console keeps fullscreen; card thumbnails are bounded to 512 pixels.");
+    Console.WriteLine($"OK  warm search: 0 additional cover decodes; estimated cover cache {CoverBitmapCache.EstimatedBytes/1048576d:0.0} MiB.");
+    if(snapshotDirectory is not null)
+    {
+        Directory.CreateDirectory(snapshotDirectory);
         foreach(var console in new[]{0,1,2})
         {
             selector.SelectedIndex=console;
+            transition.Advance(1);
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
             AvaloniaHeadlessPlatform.ForceRenderTimerTick(3);
             using var frame=window.CaptureRenderedFrame();
@@ -65,6 +114,7 @@ try
         foreach(var console in new[]{0,1,2})
         {
             selector.SelectedIndex=console;
+            transition.Advance(1);
             var game=cards.Items.Cast<MainWindow.DesktopGameCard>().First().Game;
             typeof(MainWindow).GetMethod("SelectCatalogGame", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window,[game,true]);
             var renderedCase=window.FindControl<CubeShelf.Desktop.Controls.GameCaseControl>("GameCase")!;

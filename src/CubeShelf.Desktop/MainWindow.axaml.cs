@@ -890,6 +890,7 @@ public sealed partial class MainWindow : Window
         UpdatePopupBox.IsChecked = _preferences.ShowGameUpdatePopup;
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
         StartInBigPictureBox.IsChecked = _preferences.StartInBigPicture;
+        ReduceShelfMotionBox.IsChecked = _preferences.ReduceShelfMotion;
         ApplyPresencePreferences();
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
@@ -910,10 +911,12 @@ public sealed partial class MainWindow : Window
             CheckGamesOnStartup = CheckUpdatesBox.IsChecked == true,
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
             RefreshModsOnOpen = RefreshModsBox.IsChecked == true,
-            StartInBigPicture = StartInBigPictureBox.IsChecked == true
+            StartInBigPicture = StartInBigPictureBox.IsChecked == true,
+            ReduceShelfMotion = ReduceShelfMotionBox.IsChecked == true
         };
         SavePresencePreferences();
         _preferencesStore.Save(_preferences);
+        if (_preferences.ReduceShelfMotion) ShelfTransition.Stop();
         if (Avalonia.Application.Current is { } application)
             application.RequestedThemeVariant = theme == "light" ? ThemeVariant.Light : ThemeVariant.Dark;
         SettingsStatus.Text = UiLocalization.IsEnglish(language) ? "Settings saved." : "Paramètres enregistrés.";

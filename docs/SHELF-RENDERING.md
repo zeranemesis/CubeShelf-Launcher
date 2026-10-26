@@ -1,0 +1,11 @@
+# Boîtiers et changement de console
+
+La [présentation de Socket](https://depmots.com/socket) sert de référence pour la lecture des objets physiques : silhouettes propres à chaque plateforme, matière discrète et mouvements courts. CubeShelf utilise ses propres contrôles Avalonia, son modèle GameCube existant et les scans de jaquettes référencés dans `COVER-SOURCES.md`.
+
+Les cartes de bibliothèque utilisent un dessin statique du boîtier et une miniature de 512 pixels de haut au maximum, sans agrandir les petites sources. Les fiches et Big Picture gardent des textures plus grandes. La face, la tranche de charnière et le dos restent distincts ; le bord d'ouverture n'affiche plus une deuxième tranche imprimée. Un dos manquant reste sans illustration. Les matériaux et les traits de lumière sont partagés, et le maillage des boîtiers voisins est plus léger que celui du jeu sélectionné.
+
+La transition change immédiatement les données sélectionnées, puis anime la page visible pendant 380 ms : sortie rapide de l'ancienne image, fondu et déplacement léger de la nouvelle bibliothèque. Une seule capture de l'ancienne page est conservée, avec une définition maximale de 1600 × 1200 pixels. Le sélecteur reste utilisable. Un nouveau choix annule la transition précédente ; masquer, désactiver ou fermer la fenêtre restaure les transformations et libère la capture. Big Picture reconstruit son contenu sans quitter le plein écran.
+
+Le cache partage les bitmaps par fichier, date, taille et résolution. Les images utilisées restent référencées ; les images inactives sont limitées à 24 Mio. Cette limite concerne la partie inactive du cache, pas toute la mémoire du programme. Le décodage se fait hors du verrou commun. Les nouvelles cartes acquièrent leurs images avant que les anciennes ne les libèrent.
+
+Validation : `dotnet run --project tests/CubeShelf.ShelfUi.Tests -c Release` utilise Skia hors écran. Il contrôle les bibliothèques, la sélection des ports, les jaquettes, l'état intermédiaire de transition, les changements rapides, la réduction des animations, le masquage, le maintien du plein écran et l'absence de nouveau décodage lors d'une recherche après chargement des jaquettes. `CUBESHELF_UI_SNAPSHOT_DIR` permet de sauvegarder les captures du rendu. Les captures et les compteurs de décodage ne constituent pas une mesure de FPS sur chaque matériel.

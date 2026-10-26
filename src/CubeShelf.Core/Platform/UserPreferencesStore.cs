@@ -128,7 +128,8 @@ public sealed record UserPreferences(
     long DownloadBandwidthLimit = 0,
 
     /// <summary>Open the desktop launcher directly in Big Picture on normal startup.</summary>
-    bool StartInBigPicture = false);
+    bool StartInBigPicture = false,
+    bool ReduceShelfMotion = false);
 
 public sealed class UserPreferencesStore
 {

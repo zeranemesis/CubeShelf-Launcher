@@ -73,6 +73,20 @@ public sealed partial class MainWindow
         _bigPicturePreviousWidth = Width;
         _bigPicturePreviousHeight = Height;
         _bigPicturePreviousView = ContentViews.FirstOrDefault(view => view.IsVisible);
+        _bigPictureActive = true;
+        RebuildBigPictureShelf();
+        DesktopSidebar.IsVisible = false;
+        Grid.SetColumn(ViewHost, 0);
+        Grid.SetColumnSpan(ViewHost, 2);
+        ShowParityView(BigPictureView);
+        QueueBigPictureFullscreen();
+        _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
+        UpdateBigPictureGamepadPolling();
+        FocusBigPictureAction(0);
+    }
+
+    private void RebuildBigPictureShelf()
+    {
         _bigPictureGames = ShelfGames.OrderBy(game => game.Title).ToArray();
         BigPictureShelf.SetGames(_bigPictureGames.Select(game =>
         {
@@ -82,18 +96,9 @@ public sealed partial class MainWindow
         }).ToArray());
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
-        _bigPictureActive = true;
         // Realize the cases before exposing them to synchronous fullscreen layout.
         RefreshBigPictureGame();
         BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
-        DesktopSidebar.IsVisible = false;
-        Grid.SetColumn(ViewHost, 0);
-        Grid.SetColumnSpan(ViewHost, 2);
-        ShowParityView(BigPictureView);
-        QueueBigPictureFullscreen();
-        _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
-        UpdateBigPictureGamepadPolling();
-        FocusBigPictureAction(0);
     }
 
     private void QueueBigPictureFullscreen()

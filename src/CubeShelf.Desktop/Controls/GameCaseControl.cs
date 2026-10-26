@@ -10,7 +10,7 @@ namespace CubeShelf.Desktop.Controls;
 public enum GameCaseFormat { GameCube, Wii, Switch }
 
 /// <summary>
-/// Portable GameCube case renderer with a real projected cuboid, textured
+/// Portable console case renderer with a real projected cuboid, textured
 /// front/back/spine faces and time-based, compositor-paced interaction. The renderer stays
 /// framework-native (no WPF Viewport3D and no Windows-only graphics API).
 /// </summary>
@@ -18,7 +18,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
 {
     private double CaseWidth => CaseFormat == GameCaseFormat.Switch ? 1.79 : 2.08;
     private const double CaseHeight = 2.92;
-    private double CaseDepth => CaseFormat == GameCaseFormat.Switch ? .16 : .20;
+    private double CaseDepth => CaseFormat == GameCaseFormat.Switch ? .174 : .215;
     private const double CameraDistance = 5.75;
     private const double FieldOfViewDegrees = 32;
     private const double MaxHoverYaw = 19;
@@ -39,6 +39,30 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private static readonly IBrush ShellEdgeBrush = new SolidColorBrush(Color.Parse("#26334A"));
     private static readonly IPen EdgePen = new Pen(new SolidColorBrush(Color.FromArgb(145, 120, 150, 200)), 1);
     private static readonly IBrush ShadowBrush = new SolidColorBrush(Color.FromArgb(54, 0, 0, 0));
+    private static readonly IBrush[] CaseMaterials =
+    [
+        Material("#45454B", "#111114", "#252529", "#08080A"),
+        Material("#FFFFFF", "#E5E5E2", "#FAFAF7", "#C7CBCB"),
+        Material("#E8EBEE", "#ADB6BF", "#D4DADE", "#8B969F")
+    ];
+    private static readonly IPen CaseOutline = new Pen(new SolidColorBrush(Color.FromArgb(110,65,65,72)), .7);
+    private static readonly IPen CaseHighlight = new Pen(new SolidColorBrush(Color.FromArgb(105,245,247,250)), .7);
+    private static readonly IPen CaseSeam = new Pen(new SolidColorBrush(Color.FromArgb(85,0,0,0)), .8);
+    private static readonly IPen SleeveEdge = new Pen(new SolidColorBrush(Color.FromArgb(65,235,236,242)), .65);
+    private static readonly IBrush SleeveReflection = new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0,0,RelativeUnit.Relative), EndPoint = new RelativePoint(1,.3,RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new(Color.FromArgb(12,255,255,255),0), new(Colors.Transparent,.24),
+            new(Color.FromArgb(14,255,255,255),.38),new(Colors.Transparent,.52), new(Color.FromArgb(5,0,0,0),1)
+        }
+    };
+    private static IBrush Material(string a,string b,string c,string d) => new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0,0,RelativeUnit.Relative), EndPoint = new RelativePoint(1,1,RelativeUnit.Relative),
+        GradientStops = new GradientStops {new(Color.Parse(a),0),new(Color.Parse(b),.09),new(Color.Parse(c),.5),new(Color.Parse(d),1)}
+    };
 
     private readonly DemandAnimation _animation;
     private Bitmap? _front;
@@ -99,9 +123,25 @@ public sealed partial class GameCaseControl : Control, IDisposable
         DetachedFromVisualTree += (_, _) => _animation.Stop();
     }
 
-    public void SetCover(string? front, string? back, string? spine)
+    private (string Front,string Back,string Spine,GameCaseFormat Format)? _coverIdentity;
+
+    private static string CoverIdentity(string? path)
     {
+        if (string.IsNullOrWhiteSpace(path)) return "";
+        try
+        {
+            var file = new FileInfo(path);
+            return file.Exists ? file.FullName + "|" + file.Length + "|" + file.LastWriteTimeUtc.Ticks : path;
+        }
+        catch (Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException) { return path; }
+    }
+
+    public bool SetCover(string? front, string? back, string? spine)
+    {
+        var identity = (CoverIdentity(front),CoverIdentity(back),CoverIdentity(spine),CaseFormat);
+        if (_coverIdentity == identity) return false;
         DisposeBitmaps();
+        _coverIdentity = identity;
         _front = Load(front);
         _back = Load(back);
         _spine = Load(spine);
@@ -123,6 +163,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         _targetLift = 0;
         _animation.Stop();
         InvalidateVisual();
+        return true;
     }
 
     public void Flip()
@@ -220,62 +261,35 @@ public sealed partial class GameCaseControl : Control, IDisposable
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
         var broad = face.Name is "front" or "back";
         var outline = RoundedQuad(quad, broad ? .009 : .02);
-        var colors = CaseFormat switch
-        {
-            GameCaseFormat.Wii => new[] { "#FFFFFF", "#D6D8DA", "#FBFBFA", "#BDC1C5" },
-            GameCaseFormat.Switch => new[] { "#E4E7EC", "#A1A8B2", "#CED3DB", "#858E9B" },
-            _ => new[] { "#45454B", "#111114", "#252529", "#08080A" }
-        };
-        var shell = new LinearGradientBrush
-        {
-            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
-            GradientStops = new GradientStops
-            {
-                new GradientStop(Color.Parse(colors[0]), 0),
-                new GradientStop(Color.Parse(colors[1]), .09),
-                new GradientStop(Color.Parse(colors[2]), .5),
-                new GradientStop(Color.Parse(colors[3]), 1)
-            }
-        };
-        context.DrawGeometry(shell, new Pen(new SolidColorBrush(Color.Parse("#414148")), .9), outline);
+        var shell = CaseMaterials[(int)CaseFormat];
+        context.DrawGeometry(shell, CaseOutline, outline);
 
         // The printed insert sits inside a molded frame under a clear sleeve.
         // The asymmetrical gutter leaves room for the hinge beside the front/back.
-        var left = face.Name == "front" ? .045 : broad ? .018 : .10;
-        var right = face.Name == "back" ? .955 : broad ? .982 : .90;
-        var top = broad ? .014 : .018;
+        var gutter = CaseFormat == GameCaseFormat.Switch ? .018 : .028;
+        var left = face.Name == "front" ? gutter : broad ? .012 : .06;
+        var right = face.Name == "back" ? 1-gutter : broad ? .988 : .94;
+        var top = broad ? .012 : .018;
         var artwork = new[] { Bilinear(quad, left, top), Bilinear(quad, right, top),
             Bilinear(quad, right, 1 - top), Bilinear(quad, left, 1 - top) };
         var sleeve = RoundedQuad(artwork, broad ? .005 : .01);
         using (context.PushGeometryClip(sleeve))
         {
             if (face.Texture is not null)
-                DrawTexturedQuadMesh(context, face.Texture, artwork, broad ? 8 : 2, broad ? 12 : 10);
+                DrawTexturedQuadMesh(context, face.Texture, artwork,
+                    broad ? IsInteractive ? (UseCompactTextureMesh ? 4 : 8) : 3 : 2,
+                    broad ? IsInteractive ? (UseCompactTextureMesh ? 6 : 12) : 4 : 6);
             if (broad)
             {
-                var reflection = new LinearGradientBrush
-                {
-                    StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-                    EndPoint = new RelativePoint(1, .3, RelativeUnit.Relative),
-                    GradientStops = new GradientStops
-                    {
-                        new GradientStop(Color.FromArgb(22, 255, 255, 255), 0),
-                        new GradientStop(Color.FromArgb(0, 255, 255, 255), .24),
-                        new GradientStop(Color.FromArgb(25, 255, 255, 255), .38),
-                        new GradientStop(Color.FromArgb(0, 255, 255, 255), .52),
-                        new GradientStop(Color.FromArgb(12, 0, 0, 0), 1)
-                    }
-                };
-                context.DrawGeometry(reflection, null, sleeve);
+                context.DrawGeometry(SleeveReflection, null, sleeve);
                 DrawPointerGlare(context, sleeve, artwork, _pointerPosition, _glare * .55);
             }
         }
-        var highlight = new Pen(new SolidColorBrush(Color.FromArgb(95, 213, 216, 225)), .7);
-        var seam = new Pen(new SolidColorBrush(Color.FromArgb(205, 0, 0, 0)), 1.1);
+        var highlight = CaseHighlight;
+        var seam = CaseSeam;
         if (broad)
         {
-            context.DrawGeometry(null, new Pen(new SolidColorBrush(Color.FromArgb(85, 235, 236, 242)), .65), sleeve);
+            context.DrawGeometry(null, SleeveEdge, sleeve);
             var hinge = face.Name == "front" ? .026 : .973;
             context.DrawLine(seam, Bilinear(quad, hinge, .012), Bilinear(quad, hinge, .988));
             context.DrawLine(highlight, Bilinear(quad, hinge + .004, .014), Bilinear(quad, hinge + .004, .986));
@@ -286,6 +300,12 @@ public sealed partial class GameCaseControl : Control, IDisposable
             // Two halves of the case meet along the exposed top/bottom edge.
             if (face.Name is "top" or "bottom")
                 context.DrawLine(seam, Bilinear(quad, 0, .5), Bilinear(quad, 1, .5));
+            if (face.Name == "right")
+            {
+                // The opening edge is bare molded plastic, with a latch recess, not a second spine.
+                context.DrawLine(seam,Bilinear(quad,.5,.02),Bilinear(quad,.5,.98));
+                context.DrawLine(highlight,Bilinear(quad,.22,.44),Bilinear(quad,.22,.56));
+            }
             context.DrawLine(highlight, quad[0], quad[1]);
         }
     }
@@ -338,13 +358,13 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private Face[] BuildFaces(ProjectedVertex[] v)
     {
         var frontTexture = _front ?? _back;
-        var backTexture = _back ?? _front;
+        var backTexture = RealisticShell ? _back : _back ?? _front;
         return new[]
         {
             MakeFace("front", v, new[] { 0, 1, 2, 3 }, new Vec3(0, 0, 1), frontTexture, ShellFrontBrush),
             MakeFace("back", v, new[] { 5, 4, 7, 6 }, new Vec3(0, 0, -1), backTexture, ShellFrontBrush),
             MakeFace("left", v, new[] { 4, 0, 3, 7 }, new Vec3(-1, 0, 0), _spine, ShellSideBrush),
-            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), _spine, ShellSideBrush),
+            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), RealisticShell ? null : _spine, ShellSideBrush),
             MakeFace("top", v, new[] { 4, 5, 1, 0 }, new Vec3(0, 1, 0), null, ShellEdgeBrush),
             MakeFace("bottom", v, new[] { 3, 2, 6, 7 }, new Vec3(0, -1, 0), null, ShellEdgeBrush)
         };
@@ -454,7 +474,16 @@ public sealed partial class GameCaseControl : Control, IDisposable
         IReadOnlyList<Point> quad,
         int columns,
         int rows)
-        => DrawPreparedTextureMesh(context, image, PrepareTexturedQuadMesh(image, quad, columns, rows));
+    {
+        if(Math.Abs(quad[0].Y-quad[1].Y)<.001 && Math.Abs(quad[1].X-quad[2].X)<.001
+            && Math.Abs(quad[2].Y-quad[3].Y)<.001 && Math.Abs(quad[3].X-quad[0].X)<.001
+            && quad[2].X>quad[0].X && quad[2].Y>quad[0].Y)
+        {
+            context.DrawImage(image,new Rect(image.Size),new Rect(quad[0],quad[2]));
+            return;
+        }
+        DrawPreparedTextureMesh(context, image, PrepareTexturedQuadMesh(image, quad, columns, rows));
+    }
 
     private static TexturedTriangle[] PrepareTexturedQuadMesh(
         Bitmap image, IReadOnlyList<Point> quad, int columns, int rows)

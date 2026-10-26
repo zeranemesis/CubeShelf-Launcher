@@ -80,7 +80,7 @@
       </DockPanel>
     </Border>
 
-    <Grid x:Name="ViewHost" Grid.Column="1">
+    <Grid x:Name="ViewHost" Grid.Column="1" ClipToBounds="True">
       <Grid x:Name="BigPictureHomeView" Classes="view" IsVisible="False" RowDefinitions="Auto,*" Background="{DynamicResource Bg}">
         <StackPanel Margin="36,24" Spacing="18">
           <TextBlock x:Name="BigPictureHomeTitle" FontSize="34" FontWeight="Bold" />
@@ -214,10 +214,8 @@
                       <StackPanel>
                         <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                         <Grid>
-                          <Border Height="330" Width="{Binding CoverWidth}" HorizontalAlignment="Center" Background="{Binding CaseBackground}" CornerRadius="4" ClipToBounds="True">
-                            <Image Source="{Binding Cover}" Stretch="Uniform" />
-                          </Border>
-                          <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC101524" CornerRadius="9" Padding="8,5" Margin="8">
+                          <controls:GameCoverControl Height="330" Width="{Binding CoverWidth}" HorizontalAlignment="Center" Cover="{Binding Cover}" Format="{Binding CaseFormat}" />
+                          <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC101524" CornerRadius="9" Padding="8,5" Margin="8" IsVisible="{Binding HasFavorite}">
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
                           </Border>
                         </Grid>
@@ -467,6 +465,7 @@
             <StackPanel Spacing="8">
               <TextBlock Text="{DynamicResource StartupModeTitle}" FontSize="18" FontWeight="Bold" />
               <CheckBox x:Name="StartInBigPictureBox" Content="{DynamicResource StartInBigPicture}" Checked="SaveSettings" Unchecked="SaveSettings" />
+              <CheckBox x:Name="ReduceShelfMotionBox" Content="{DynamicResource ReduceShelfMotion}" Checked="SaveSettings" Unchecked="SaveSettings" />
               <TextBlock Text="{DynamicResource StartupModeHelp}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
@@ -1089,5 +1088,6 @@
         <Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="4"><TextBlock x:Name="ToastTitle" FontWeight="Bold" FontSize="15" /><TextBlock x:Name="ToastMessage" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" /></StackPanel><Button Grid.Column="1" Content="×" Click="HideToastParity" /></Grid>
       </Border>
     </Grid>
+    <controls:ShelfTransitionControl x:Name="ShelfTransition" Grid.Column="1" ZIndex="100" />
   </Grid>
 </Window>

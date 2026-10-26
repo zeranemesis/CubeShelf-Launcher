@@ -28,24 +28,42 @@ internal static class CoverBitmapCache
     private static readonly Dictionary<string, Entry> Entries = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     private static readonly Dictionary<Bitmap, Entry> Bitmaps = new(ReferenceEqualityComparer.Instance);
     private static long _clock;
+    internal static long DecodeCount { get; private set; }
     private static readonly SemaphoreSlim PreparationSlot = new(1, 1);
     private static readonly List<Entry> RemovalBuffer = new();
 
     public static long EstimatedBytes { get { lock (Gate) return Entries.Values.Sum(entry => entry.Bytes); } }
 
-    public static Bitmap Acquire(string path)
+    public static Bitmap Acquire(string path, int maximumHeight = 1024)
     {
+        if (maximumHeight is < 64 or > 2048) throw new ArgumentOutOfRangeException(nameof(maximumHeight));
         var file = new FileInfo(Path.GetFullPath(path));
-        var key = file.FullName + "\0" + file.LastWriteTimeUtc.Ticks + "\0" + file.Length;
+        var key = file.FullName + "\0" + file.LastWriteTimeUtc.Ticks + "\0" + file.Length + "\0" + maximumHeight;
         lock (Gate)
         {
+            if (Entries.TryGetValue(key, out var cached))
+            {
+                cached.References++;
+                cached.LastUse = ++_clock;
+                return cached.Bitmap;
+            }
+        }
+        // Decode outside the shared lock so texture preparation and release stay responsive.
+        using var stream = File.OpenRead(file.FullName);
+        using var codec = SKCodec.Create(stream);
+        var height = Math.Min(maximumHeight, codec?.Info.Height ?? maximumHeight);
+        using var imageStream = File.OpenRead(file.FullName);
+        var decoded = Bitmap.DecodeToHeight(imageStream, height, BitmapInterpolationMode.HighQuality);
+        lock (Gate)
+        {
+            DecodeCount++;
             if (!Entries.TryGetValue(key, out var entry))
             {
-                using var stream = File.OpenRead(file.FullName);
-                entry = new Entry(key, Bitmap.DecodeToHeight(stream, 1024, BitmapInterpolationMode.HighQuality), file.FullName);
+                entry = new Entry(key, decoded, file.FullName);
                 Entries.Add(key, entry);
                 Bitmaps.Add(entry.Bitmap, entry);
             }
+            else decoded.Dispose();
             entry.References++;
             entry.LastUse = ++_clock;
             Trim();

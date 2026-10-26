@@ -188,13 +188,16 @@ public sealed partial class MainWindow
                     $"{child.Name} est une vue de contenu mais n’a pas Classes=\"view\".");
     }
 
-    private void LibrarySearchChanged(object? sender, TextChangedEventArgs args) => RefreshLibraryParity();
+    private void LibrarySearchChanged(object? sender, TextChangedEventArgs args)
+    {
+        if (!_changingShelf) RefreshLibraryParity();
+    }
     private void LibrarySortChanged(object? sender, SelectionChangedEventArgs args) => RefreshLibraryParity();
 
     private void RefreshLibraryParity()
     {
         if (LibraryCards is null) return;
-        foreach (var card in _parityCards) card.Dispose();
+        var previousCards = _parityCards.ToArray();
         _parityCards.Clear();
 
         // Keep the original game on the shelf; active mods only select its launch configuration.
@@ -227,6 +230,8 @@ public sealed partial class MainWindow
         }
 
         LibraryCards.ItemsSource = _parityCards.ToArray();
+        // Acquire the next cards before releasing the old ones, keeping reused art pinned in cache.
+        foreach (var card in previousCards) card.Dispose();
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
         Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;
@@ -260,7 +265,7 @@ public sealed partial class MainWindow
             : "";
         var card = new DesktopGameCard(
             game,
-            LoadBitmap(coverPath),
+            LoadCardCover(coverPath),
             game.IsFavorite ? "★" : "",
             game.RuntimeOwnsSetup ? "◆ Port natif" : File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
             runtime.IsInstalled || File.Exists(executable)
@@ -367,10 +372,11 @@ public sealed partial class MainWindow
         GameCase.CaseFormat = Controls.GameCaseControl.FormatForConsole(baseGame.ShelfConsole);
         GameCase.RealisticShell = true;
         GameCase.UseImportedModel = baseGame.ShelfConsole == "gamecube";
-        GameCase.SetCover(
+        if(GameCase.SetCover(
             ResolveCoverPath(cover?.Front),
             ResolveCoverPath(cover?.Back),
-            ResolveCoverPath(cover?.Spine));
+            ResolveCoverPath(cover?.Spine)))
+            GameCase.SetShelfPose(baseGame.ShelfConsole == "gamecube" ? 24 : 14,true,animate:false);
 
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var updateSnapshot))
             ApplyGameUpdateSnapshotPhase3(updateSnapshot);
@@ -411,6 +417,12 @@ public sealed partial class MainWindow
         return Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
+    }
+
+    private static Bitmap? LoadCardCover(string path)
+    {
+        try { return File.Exists(path) ? Controls.CoverBitmapCache.Acquire(path, 512) : null; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or InvalidOperationException) { return null; }
     }
 
     private static Bitmap? LoadBitmap(string path)
@@ -579,8 +591,9 @@ public sealed partial class MainWindow
         public PortVersionChoice[] Versions { get; set; } = [];
         public PortVersionChoice? SelectedVersion { get; set; }
         public bool HasVersionChoice => Versions.Length > 1;
+        public Controls.GameCaseFormat CaseFormat => Controls.GameCaseControl.FormatForConsole(Game.ShelfConsole);
+        public bool HasFavorite => Favorite.Length > 0;
         public double CoverWidth => Game.ShelfConsole == "switch" ? 202 : 234;
-        public IBrush CaseBackground => new SolidColorBrush(Color.Parse(Game.ShelfConsole == "wii" ? "#F3F3F1" : Game.ShelfConsole == "switch" ? "#B9C0C8" : "#090C13"));
         public Bitmap? Cover { get; }
         public string Title => Game.Title;
         public string Subtitle => string.Join(" • ", new[] { Game.Year > 0 ? Game.Year.ToString() : "", Game.Genre }.Where(value => value.Length > 0));
@@ -602,6 +615,6 @@ public sealed partial class MainWindow
             foreach (var property in new[] { nameof(PlayLabel), nameof(PlayHint), nameof(CanQuickPlay), nameof(IsPreparing) })
                 PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(property));
         }
-        public void Dispose() => Cover?.Dispose();
+        public void Dispose() => Controls.CoverBitmapCache.Release(Cover);
     }
 }

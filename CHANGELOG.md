@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.0-preview.3 — fidélité des boîtiers et transitions, non publiée
+
+- Changement de console avec glissement directionnel et fondu de 380 ms, capture temporaire bornée à 1600 × 1200 pixels, annulation lors des changements rapides ou de la fermeture/masquage. Option de réduction des animations dans les paramètres.
+- Big Picture change de bibliothèque sans quitter puis rétablir le plein écran. Suppression des reconstructions redondantes lors du changement de console.
+- Miniatures partagées et limitées à 512 pixels, cache inactif borné à 24 Mio, décodage hors du verrou partagé et sans agrandir les petites sources. Les images déjà utilisées sont conservées pendant le remplacement des cartes.
+- Boîtiers de cartes avec charnière, rebords et reflet discret ; matériaux Wii blancs et Switch translucides stylisés. Rendu 3D avec épaisseur adaptée, tranche imprimée uniquement sur la charnière et bord d'ouverture avec joint. Aucun faux dos remplacé par la face avant. La pose d'inspection est conservée lors des rafraîchissements sans changement de jaquette.
+- Matériaux partagés, rendu direct pour les faces sans perspective et maillage simplifié pour les voisins du jeu sélectionné. Tests Skia hors écran du rendu, transitions interrompues, réduction des animations, plein écran et absence de nouveaux décodages lors d'une recherche avec images en cache.
+
 ## 0.18.0-preview.2 — versions regroupées et jaquettes, non publiée
 
 - Une carte par jeu et par console. Les ports alternatifs se choisissent dans un menu déroulant sur la carte, la fiche ou en Big Picture ; choix mémorisé et favoris communs aux versions.

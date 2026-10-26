@@ -65,8 +65,7 @@ public sealed partial class MainWindow
         PersistCatalog();
         if (_bigPictureActive)
         {
-            ExitBigPicture(this, new RoutedEventArgs());
-            EnterBigPicture(this, new RoutedEventArgs());
+            RebuildBigPictureShelf();
         }
     }
 
@@ -146,12 +145,23 @@ public sealed partial class MainWindow
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
         Title = "CubeShelf · " + ShelfProduct.Resolve(_activeShelfConsole).Console;
         _consoleShelfReady = true;
+        Closed += (_, _) => ShelfTransition.Dispose();
+        Deactivated += (_, _) => ShelfTransition.Stop();
+        PropertyChanged += (_, change) =>
+        {
+            if ((change.Property == WindowStateProperty && WindowState == WindowState.Minimized)
+                || (change.Property == IsVisibleProperty && !IsVisible)) ShelfTransition.Stop();
+        };
     }
 
     private void ConsoleShelfChanged(object? sender, SelectionChangedEventArgs args)
     {
         if (!_consoleShelfReady || sender is not ComboBox { SelectedItem: ComboBoxItem { Tag: string console } }
             || console == _activeShelfConsole) return;
+        var direction = ConsoleIndex(console) > ConsoleIndex(_activeShelfConsole) ? 1 : -1;
+        Grid.SetColumn(ShelfTransition, _bigPictureActive ? 0 : 1);
+        Grid.SetColumnSpan(ShelfTransition, _bigPictureActive ? 2 : 1);
+        ShelfTransition.Capture(ViewHost,ShelfProduct.Resolve(console).Console,direction,_preferences.ReduceShelfMotion);
         _activeShelfConsole = console;
         _consoleShelfReady = false;
         ConsoleShelfPicker.SelectedIndex = console switch { "wii" => 1, "switch" => 2, _ => 0 };
@@ -162,17 +172,24 @@ public sealed partial class MainWindow
         Title = "CubeShelf · " + ShelfProduct.Resolve(console).Console;
         _favoritesOnly = false;
         _selectedGame = ShelfGames.FirstOrDefault();
-        LibrarySearchBox.Text = "";
-        RefreshLibraryParity();
+        // Clearing search already refreshes the library; suppress that redundant rebuild.
+        _changingShelf = true;
+        try { LibrarySearchBox.Text = ""; }
+        finally { _changingShelf = false; }
         if (_selectedGame is not null) RefreshGameState();
+        else RefreshLibraryParity();
         if (_bigPictureActive)
         {
-            ExitBigPicture(this, new RoutedEventArgs());
-            EnterBigPicture(this, new RoutedEventArgs());
+            RebuildBigPictureShelf();
+            ShelfTransition.Play();
             return;
         }
         ShowParityView(LibraryView);
+        ShelfTransition.Play();
     }
+
+    private bool _changingShelf;
+    private static int ConsoleIndex(string console) => console switch { "wii"=>1,"switch"=>2,_=>0 };
 
     private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false)
     {
