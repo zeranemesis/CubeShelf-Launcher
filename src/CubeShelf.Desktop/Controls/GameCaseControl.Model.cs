@@ -268,9 +268,9 @@ public sealed partial class GameCaseControl
                     // Export is Z-up with the front at negative Y. Reorient to the
                     // existing renderer's Y-up, front-positive-Z camera; preserve scale.
                     var positions = Enumerable.Range(0, coordinates.Length / 3).Select(index => new Vec3(
-                        coordinates[index * 3] * (CaseHeight / .195),
-                        (coordinates[index * 3 + 2] - .0975) * (CaseHeight / .195),
-                        -coordinates[index * 3 + 1] * (CaseHeight / .195))).ToArray();
+                        coordinates[index * 3] * (StandardCaseHeight / .195),
+                        (coordinates[index * 3 + 2] - .0975) * (StandardCaseHeight / .195),
+                        -coordinates[index * 3 + 1] * (StandardCaseHeight / .195))).ToArray();
                     var indices = ReadIndices(primitive.GetProperty("indices").GetInt32());
                     if (indices.Length % 3 != 0 || indices.Any(index => index < 0 || index >= positions.Length))
                         throw new InvalidDataException("Invalid case triangle indices.");

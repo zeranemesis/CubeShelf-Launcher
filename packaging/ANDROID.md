@@ -75,9 +75,7 @@ capacités réseau déterminent les fonctions disponibles.
   un Galaxy S20. La nouvelle installation d'une mise à jour doit encore être
   validée de bout en bout sur téléphone ; aucune partie Android vers Android
   n'est annoncée comme validée ici.
-- Seul Mario Party 4 dispose du parcours de jeu Android prévu dans cet aperçu.
-  Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule
-  installation du launcher Android.
+- Mario Party 4 conserve son moteur intégré. Les cinq ports Nintendo 64 listés ci-dessous s’installent comme applications Android distinctes. Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule installation du launcher.
 - Les projets Android expérimentaux de Melee et Mario Party 5 ne sont pas
   présentés comme des jeux complets jouables. Les décompilations de Mario
   Party 6, Mario Kart Double Dash, TTYD, F-Zero GX, Super Paper Mario et Sunshine
@@ -113,3 +111,25 @@ La configuration APK et signature suit les propriétés officielles de
 [.NET pour Android](https://learn.microsoft.com/dotnet/android/building-apps/build-properties)
 et les indications de déploiement
 [Avalonia Android](https://docs.avaloniaui.net/docs/deployment/android).
+
+## Nintendo 64 — cinq ports natifs
+
+Choisir **Nintendo 64** dans le menu en haut de DecompShelf. Les cinq jeux apparaissent une seule fois :
+
+| Jeu | Projet / version épinglée | État |
+| --- | --- | --- |
+| Super Mario 64 | HarbourMasters/Ghostship 3.0.0 | Android disponible |
+| Ocarina of Time | Waterdish/Shipwright-Android v9.0.2P2 | Android disponible |
+| Majora’s Mask | Waterdish/2ship2harkinian-Android v1.1.2P1 | Android disponible |
+| Pilotwings 64 | NoahVl/Birdman64 v1.5.1 | Expérimental |
+| Pokémon Snap | JackandBeans/Snap64Recomp v1.1.6 | Bêta, ARM64 et Vulkan 1.2 |
+
+1. **Télécharger le port** l’ajoute à la file de téléchargement commune. La source, la taille, les empreintes SHA-256, l’identité Android et les architectures contrôlées se trouvent dans `src/CubeShelf.Mobile/Catalogs/android-ports.json`.
+2. Quand le paquet est prêt, **Installer l’APK** ouvre l’autorisation d’installation depuis DecompShelf si nécessaire. Revenir ensuite dans DecompShelf et retoucher Installer l’APK. Android demande confirmation.
+3. Après installation, revenir dans DecompShelf : **Jouer** ouvre l’application du port. Fournir les fichiers de sa propre copie dans cette application. Les données, réglages et sauvegardes appartiennent au port ; ils ne sont pas importés de la bibliothèque PC.
+
+Aucun APK téléchargé n’est installé silencieusement. Le ZIP Ghostship est contrôlé avant extraction d’un unique APK vers une destination fixe ; l’APK extrait est aussi contrôlé. Les APK sont revérifiés au moment de l’installation. Une signature différente d’une installation existante entraîne un refus, sans désinstallation ni remplacement forcé.
+
+Les paquets sont épinglés : lorsqu’un catalogue plus récent est livré avec DecompShelf, une version installée plus ancienne peut être mise à jour par le même parcours. Les versions plus récentes déjà installées restent conservées. Aucun contrôle automatique des nouvelles releases des cinq ports n’est annoncé.
+
+Validation de cet ajout : métadonnées extraites des vrais APK, compilation Android, tests hors ligne de téléchargement/intégrité/reprise/annulation, parcours d’installation et de lancement simulés, contrôles visuels aux formats portrait/paysage. Aucun téléphone connecté et aucune partie réelle exécutée.

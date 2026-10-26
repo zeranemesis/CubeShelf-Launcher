@@ -26,4 +26,4 @@ foreach ($product in @(@{Name='DecompShelf';Console='gamecube'})) {
     Copy-Item -LiteralPath (Join-Path $repository 'docs/NATIVE-PORT-INVENTORY.md') -Destination $directory
     Write-Output "Prêt : $directory"
 }
-Write-Output 'Une seule application : choisir GameCube, Wii ou Switch en haut à gauche. Conserver le dossier complet.'
+Write-Output 'Une seule application : choisir GameCube, Wii, Switch ou Nintendo 64 en haut à gauche. Conserver le dossier complet.'

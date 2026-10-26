@@ -79,9 +79,9 @@ public sealed partial class MobileLibraryView
         var inspection = new GameCaseControl
         {
             MinWidth = 0, MinHeight = 0, RealisticShell = true, UseImportedModel = true,
-            UseCompactTextureMesh = true, ShadowOpacity = .8
+            UseCompactTextureMesh = true, ShadowOpacity = .8,CaseFormat=GameCaseControl.FormatForConsole(game.ShelfConsole)
         };
-        inspection.SetCover(Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine));
+        inspection.SetCover(Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine),Cover(cover?.Right),Cover(cover?.Top),Cover(cover?.Bottom));
         inspection.SetShelfPose(28, true, false);
         _inspectionCase = inspection;
         _inspectionStage.Child = inspection;

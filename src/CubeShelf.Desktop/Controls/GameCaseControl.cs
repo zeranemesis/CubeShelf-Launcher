@@ -7,7 +7,7 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
-public enum GameCaseFormat { GameCube, Wii, Switch }
+public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64 }
 
 /// <summary>
 /// Portable console case renderer with a real projected cuboid, textured
@@ -16,9 +16,11 @@ public enum GameCaseFormat { GameCube, Wii, Switch }
 /// </summary>
 public sealed partial class GameCaseControl : Control, IDisposable
 {
-    private double CaseWidth => CaseFormat == GameCaseFormat.Switch ? 1.79 : 2.08;
-    private const double CaseHeight = 2.92;
-    private double CaseDepth => CaseFormat == GameCaseFormat.Switch ? .174 : .215;
+    private bool PortraitNintendo64 => CaseFormat == GameCaseFormat.Nintendo64 && _front is { } front && front.PixelSize.Height > front.PixelSize.Width;
+    private double CaseWidth => CaseFormat switch { GameCaseFormat.Nintendo64 => PortraitNintendo64 ? 2.08 : 2.92, GameCaseFormat.Switch => 1.79, _ => 2.08 };
+    private const double StandardCaseHeight = 2.92;
+    private double CaseHeight => CaseFormat == GameCaseFormat.Nintendo64 && !PortraitNintendo64 ? 2.08 : StandardCaseHeight;
+    private double CaseDepth => CaseFormat switch { GameCaseFormat.Nintendo64 => .48, GameCaseFormat.Switch => .174, _ => .215 };
     private const double CameraDistance = 5.75;
     private const double FieldOfViewDegrees = 32;
     private const double MaxHoverYaw = 19;
@@ -43,7 +45,8 @@ public sealed partial class GameCaseControl : Control, IDisposable
     [
         Material("#45454B", "#111114", "#252529", "#08080A"),
         Material("#FFFFFF", "#E5E5E2", "#FAFAF7", "#C7CBCB"),
-        Material("#E8EBEE", "#ADB6BF", "#D4DADE", "#8B969F")
+        Material("#E8EBEE", "#ADB6BF", "#D4DADE", "#8B969F"),
+        Material("#353637", "#242526", "#38393A", "#202122")
     ];
     private static readonly IPen CaseOutline = new Pen(new SolidColorBrush(Color.FromArgb(110,65,65,72)), .7);
     private static readonly IPen CaseHighlight = new Pen(new SolidColorBrush(Color.FromArgb(105,245,247,250)), .7);
@@ -68,8 +71,12 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private Bitmap? _front;
     private Bitmap? _back;
     private Bitmap? _spine;
+    private Bitmap? _right, _top, _bottom;
     private bool _flipped;
     private bool _pointerInside;
+    private bool _rotatingBox, _boxDragged;
+    private Point _rotationOrigin;
+    private double _rotationYaw, _rotationPitch;
     private double _baseYaw;
     private double _restYaw;
     public bool IsInteractive { get; set; } = true;
@@ -79,7 +86,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     public GameCaseFormat CaseFormat { get; set; } = GameCaseFormat.GameCube;
     public double CaseAspectRatio => CaseWidth / CaseHeight;
     public static GameCaseFormat FormatForConsole(string console) => console switch
-    { "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, _ => GameCaseFormat.GameCube };
+    { "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, "n64" => GameCaseFormat.Nintendo64, _ => GameCaseFormat.GameCube };
     private bool UsesGameCubeModel => UseImportedModel && CaseFormat == GameCaseFormat.GameCube;
     public bool UseCompactTextureMesh { get; init; }
     private double _restPitch;
@@ -119,11 +126,29 @@ public sealed partial class GameCaseControl : Control, IDisposable
             _hoverPitch = 0;
             UpdateAnimationTarget();
         };
-        PointerPressed += (_, _) => { if (IsInteractive) Flip(); };
+        PointerPressed += (_, args) =>
+        {
+            if(!IsInteractive)return;
+            if(CaseFormat!=GameCaseFormat.Nintendo64) { Flip();return; }
+            if(!args.GetCurrentPoint(this).Properties.IsLeftButtonPressed && args.Pointer.Type!=PointerType.Touch)return;
+            _rotatingBox=true;_boxDragged=false;_rotationOrigin=args.GetPosition(this);
+            _rotationYaw=_yaw;_rotationPitch=_pitch;
+            args.Pointer.Capture(this);args.Handled=true;
+        };
+        PointerReleased += (_, args) =>
+        {
+            if(!_rotatingBox)return;
+            RotateBox(args.GetPosition(this));
+            _rotatingBox=false;args.Pointer.Capture(null);
+            if(!_boxDragged)Flip();
+            else { _restYaw=_baseYaw=_yaw;_restPitch=_pitch;_hoverYaw=_hoverPitch=0;_pointerInside=false;UpdateAnimationTarget(); }
+            args.Handled=true;
+        };
+        PointerCaptureLost += (_, _) => _rotatingBox=false;
         DetachedFromVisualTree += (_, _) => _animation.Stop();
     }
 
-    private (string Front,string Back,string Spine,GameCaseFormat Format)? _coverIdentity;
+    private (string Front,string Back,string Spine,string Right,string Top,string Bottom,GameCaseFormat Format)? _coverIdentity;
 
     private static string CoverIdentity(string? path)
     {
@@ -136,20 +161,24 @@ public sealed partial class GameCaseControl : Control, IDisposable
         catch (Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException) { return path; }
     }
 
-    public bool SetCover(string? front, string? back, string? spine)
+    public bool SetCover(string? front, string? back, string? spine, string? right = null, string? top = null, string? bottom = null)
     {
-        var identity = (CoverIdentity(front),CoverIdentity(back),CoverIdentity(spine),CaseFormat);
+        var identity = (CoverIdentity(front),CoverIdentity(back),CoverIdentity(spine),CoverIdentity(right),CoverIdentity(top),CoverIdentity(bottom),CaseFormat);
         if (_coverIdentity == identity) return false;
         DisposeBitmaps();
         _coverIdentity = identity;
         _front = Load(front);
         _back = Load(back);
         _spine = Load(spine);
+        _right = Load(right); _top = Load(top); _bottom = Load(bottom);
         if (UsesGpuTextures)
         {
             CoverBitmapCache.PrepareTexture(_front);
             CoverBitmapCache.PrepareTexture(_back);
             CoverBitmapCache.PrepareTexture(_spine);
+            CoverBitmapCache.PrepareTexture(_right);
+            CoverBitmapCache.PrepareTexture(_top);
+            CoverBitmapCache.PrepareTexture(_bottom);
         }
         _flipped = false;
         _pointerInside = false;
@@ -265,6 +294,17 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private void DrawRealisticFace(DrawingContext context, Face face)
     {
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
+        if(CaseFormat==GameCaseFormat.Nintendo64)
+        {
+            // Printed cardboard wraps to each crease; there is no frame around the artwork.
+            var panel=BuildGeometry(quad);
+            context.DrawGeometry(CaseMaterials[(int)CaseFormat],null,panel);
+            if(face.Texture is not null)
+                using(context.PushGeometryClip(panel))DrawTexturedQuadMesh(context,face.Texture,quad,
+                    face.Name is "front" or "back"?8:2,face.Name is "front" or "back"?12:4);
+            context.DrawGeometry(null,CaseSeam,panel);
+            return;
+        }
         var broad = face.Name is "front" or "back";
         var outline = RoundedQuad(quad, broad ? .009 : .02);
         var shell = CaseMaterials[(int)CaseFormat];
@@ -285,7 +325,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
                 DrawTexturedQuadMesh(context, face.Texture, artwork,
                     broad ? IsInteractive ? (UseCompactTextureMesh ? 4 : 8) : 3 : 2,
                     broad ? IsInteractive ? (UseCompactTextureMesh ? 6 : 12) : 4 : 6);
-            if (broad)
+            if (broad && CaseFormat != GameCaseFormat.Nintendo64)
             {
                 context.DrawGeometry(SleeveReflection, null, sleeve);
                 DrawPointerGlare(context, sleeve, artwork, _pointerPosition, _glare * .55);
@@ -293,7 +333,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         }
         var highlight = CaseHighlight;
         var seam = CaseSeam;
-        if (broad)
+        if (broad && CaseFormat != GameCaseFormat.Nintendo64)
         {
             context.DrawGeometry(null, SleeveEdge, sleeve);
             var hinge = face.Name == "front" ? .026 : .973;
@@ -352,7 +392,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         var rotated = Rotate(point, _yaw, _pitch);
         var fovRadians = FieldOfViewDegrees * Math.PI / 180.0;
         var focal = 1.0 / Math.Tan(fovRadians / 2.0);
-        var fitScale = Math.Min(Bounds.Width / 2.67, Bounds.Height / 3.48);
+        var fitScale = Math.Min(Bounds.Width / (CaseFormat == GameCaseFormat.Nintendo64 ? 3.6 : 2.67), Bounds.Height / 3.48);
         var perspective = focal / Math.Max(0.28, CameraDistance - rotated.Z);
         var scale = fitScale * perspective * 1.72 * (1 + HoverLift * _lift);
         var center = new Point(Bounds.Width / 2, Bounds.Height / 2);
@@ -370,9 +410,9 @@ public sealed partial class GameCaseControl : Control, IDisposable
             MakeFace("front", v, new[] { 0, 1, 2, 3 }, new Vec3(0, 0, 1), frontTexture, ShellFrontBrush),
             MakeFace("back", v, new[] { 5, 4, 7, 6 }, new Vec3(0, 0, -1), backTexture, ShellFrontBrush),
             MakeFace("left", v, new[] { 4, 0, 3, 7 }, new Vec3(-1, 0, 0), _spine, ShellSideBrush),
-            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), RealisticShell ? null : _spine, ShellSideBrush),
-            MakeFace("top", v, new[] { 4, 5, 1, 0 }, new Vec3(0, 1, 0), null, ShellEdgeBrush),
-            MakeFace("bottom", v, new[] { 3, 2, 6, 7 }, new Vec3(0, -1, 0), null, ShellEdgeBrush)
+            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), _right ?? (RealisticShell ? null : _spine), ShellSideBrush),
+            MakeFace("top", v, new[] { 4, 5, 1, 0 }, new Vec3(0, 1, 0), _top, ShellEdgeBrush),
+            MakeFace("bottom", v, new[] { 3, 2, 6, 7 }, new Vec3(0, -1, 0), _bottom, ShellEdgeBrush)
         };
     }
 
@@ -639,8 +679,22 @@ public sealed partial class GameCaseControl : Control, IDisposable
         return new Rect(minX, minY, Math.Max(0, maxX - minX), Math.Max(0, maxY - minY));
     }
 
+    private void RotateBox(Point position)
+    {
+        var delta=position-_rotationOrigin;
+        if(!_boxDragged && Math.Abs(delta.X)+Math.Abs(delta.Y)<5)return;
+        _boxDragged=true;_animation.Stop();_pointerInside=false;
+        _yaw=_targetYaw=_rotationYaw+delta.X*.6;
+        _pitch=_targetPitch=Math.Clamp(_rotationPitch+delta.Y*.5,-80,80);
+        InvalidateVisual();
+    }
+
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
+        if(_rotatingBox)
+        {
+            RotateBox(e.GetPosition(this));e.Handled=true;return;
+        }
         if (!IsInteractive || e.Pointer.Type == PointerType.Touch) return;
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
         _pointerInside = true;
@@ -733,7 +787,8 @@ public sealed partial class GameCaseControl : Control, IDisposable
         CoverBitmapCache.Release(_front);
         CoverBitmapCache.Release(_back);
         CoverBitmapCache.Release(_spine);
-        _front = _back = _spine = null;
+        CoverBitmapCache.Release(_right); CoverBitmapCache.Release(_top); CoverBitmapCache.Release(_bottom);
+        _front = _back = _spine = _right = _top = _bottom = null;
     }
 
     public void Dispose()

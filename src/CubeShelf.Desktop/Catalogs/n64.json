@@ -1,0 +1,1390 @@
+[
+  {
+    "Id": "banjorecomp-banjorecomp",
+    "Title": "Banjo-Kazooie",
+    "Project": "Banjo: Recompiled",
+    "Repository": "BanjoRecomp/BanjoRecomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "04fa546a91d3000b5e0b0e247480ceefedbeb12f",
+    "ReadmeUrl": "https://github.com/BanjoRecomp/BanjoRecomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/BanjoRecomp/BanjoRecomp/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BanjoRecompiled-v1.0.2-Linux-ARM64.tar.gz",
+        "Url": "https://github.com/BanjoRecomp/BanjoRecomp/releases/download/v1.0.2/BanjoRecompiled-v1.0.2-Linux-ARM64.tar.gz",
+        "Sha256": "53515be8bc453bc32ed8cbc72e3cd06350ab4a28bd94b0aa6499d4b963a83757",
+        "Size": 8414426,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "BanjoRecompiled-v1.0.2-Linux-X64.tar.gz",
+        "Url": "https://github.com/BanjoRecomp/BanjoRecomp/releases/download/v1.0.2/BanjoRecompiled-v1.0.2-Linux-X64.tar.gz",
+        "Sha256": "a34a4d361221171ea638e0165301fff817c53b9cd46167c5affd37867cfc7ad0",
+        "Size": 8380240,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "BanjoRecompiled-v1.0.2-Windows.zip",
+        "Url": "https://github.com/BanjoRecomp/BanjoRecomp/releases/download/v1.0.2/BanjoRecompiled-v1.0.2-Windows.zip",
+        "Sha256": "fc34aad48e06681878bedd13b88d5332a2f21f6a98cafc931c94d54892a4dd92",
+        "Size": 18669475,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "some-scurvy-dog-banjo-tooie-scurvy-dog-port",
+    "Title": "Banjo-Tooie",
+    "Project": "Banjo-Tooie: Scurvy Dog Port",
+    "Repository": "some-scurvy-dog/banjo-tooie-scurvy-dog-port",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "08df58df9eedc189897d013c65c3b09c3c113a61",
+    "ReadmeUrl": "https://github.com/some-scurvy-dog/banjo-tooie-scurvy-dog-port/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/some-scurvy-dog/banjo-tooie-scurvy-dog-port/releases/tag/v0.1.0-alpha.4.4",
+    "ReleaseTag": "v0.1.0-alpha.4.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BanjoTooieScurvyDogPort-Alpha4.4-Windows-x64.zip",
+        "Url": "https://github.com/some-scurvy-dog/banjo-tooie-scurvy-dog-port/releases/download/v0.1.0-alpha.4.4/BanjoTooieScurvyDogPort-Alpha4.4-Windows-x64.zip",
+        "Sha256": "5c634dc119e4fa9f3eccd27fa0017bd0d5548650c5fbc8d2e527ba4be1147129",
+        "Size": 16979282,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "fliperama86-cvlod-recomp",
+    "Title": "Castlevania: Legacy of Darkness",
+    "Project": "LodRecomp",
+    "Repository": "fliperama86/cvlod_recomp",
+    "Method": "Recompilation statique",
+    "Status": "Développement précoce",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "494016067f1f893e845ba6db41601c15811b2d10",
+    "ReadmeUrl": "https://github.com/fliperama86/cvlod_recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/fliperama86/cvlod_recomp/releases/tag/v0.2.29",
+    "ReleaseTag": "v0.2.29",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "LodRecomp-v0.2.29-linux-x64.tar.gz",
+        "Url": "https://github.com/fliperama86/cvlod_recomp/releases/download/v0.2.29/LodRecomp-v0.2.29-linux-x64.tar.gz",
+        "Sha256": "0d9e54387efa82fa74ceaa588314596ac7ba77681e30b905dd89feb5f8943aad",
+        "Size": 55162656,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "LodRecomp-v0.2.29-macos-arm64.zip",
+        "Url": "https://github.com/fliperama86/cvlod_recomp/releases/download/v0.2.29/LodRecomp-v0.2.29-macos-arm64.zip",
+        "Sha256": "fdedea70286fff585ec671600ec3e863b8297b27281df44a1ff4b07c8798e1f8",
+        "Size": 21232725,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "LodRecomp-v0.2.29-windows-x64.zip",
+        "Url": "https://github.com/fliperama86/cvlod_recomp/releases/download/v0.2.29/LodRecomp-v0.2.29-windows-x64.zip",
+        "Sha256": "68a2ae45bff297583a2e12d0beb41bf1212c98ff57105d6b4d1a31954d142b23",
+        "Size": 29763505,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "sciaschi-cbfd-recompiled",
+    "Title": "Conker's Bad Fur Day",
+    "Project": "Conker's Bad Fur Day: Recompiled",
+    "Repository": "sciaschi/CBFD-Recompiled",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "c1d0c4a4bd97c71f02e1fdadd8718842727e308b",
+    "ReadmeUrl": "https://github.com/sciaschi/CBFD-Recompiled/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/sciaschi/CBFD-Recompiled/releases/tag/V0.1.6",
+    "ReleaseTag": "V0.1.6",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ConkerRecompiled-V0.1.6-Linux.tar.gz",
+        "Url": "https://github.com/sciaschi/CBFD-Recompiled/releases/download/V0.1.6/ConkerRecompiled-V0.1.6-Linux.tar.gz",
+        "Sha256": "4fc3b53bf422385c11eadea14415445ca5c72dd32795a22ce200c5713368a422",
+        "Size": 9658408,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ConkerRecompiled-V0.1.6-Windows.zip",
+        "Url": "https://github.com/sciaschi/CBFD-Recompiled/releases/download/V0.1.6/ConkerRecompiled-V0.1.6-Windows.zip",
+        "Sha256": "0fcef307aff8f3632cddfecb4a1a6233af0afb0b77d5deaab6538be5c563115e",
+        "Size": 22781093,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "dahsidiabdallah-conkerbfdreloaded",
+    "Title": "Conker's Bad Fur Day",
+    "Project": "Conker's Bad Fur Day: Reloaded",
+    "Repository": "DahSidiAbdallah/ConkerBFDReloaded",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "9c978445dfb56db752a6e5c2c606543ba9853761",
+    "ReadmeUrl": "https://github.com/DahSidiAbdallah/ConkerBFDReloaded/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/DahSidiAbdallah/ConkerBFDReloaded/releases/tag/v1.4.6",
+    "ReleaseTag": "v1.4.6",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ConkerBFDReloaded-v1.4.6-Linux.tar.gz",
+        "Url": "https://github.com/DahSidiAbdallah/ConkerBFDReloaded/releases/download/v1.4.6/ConkerBFDReloaded-v1.4.6-Linux.tar.gz",
+        "Sha256": "8c84c574740ed98cc873f4e627fd237d42d548a94b49cbfc2bdcc8a07f8ab357",
+        "Size": 43979053,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ConkerBFDReloaded-v1.4.6-Windows.zip",
+        "Url": "https://github.com/DahSidiAbdallah/ConkerBFDReloaded/releases/download/v1.4.6/ConkerBFDReloaded-v1.4.6-Windows.zip",
+        "Sha256": "321490fe8f71072cf7277b9b7b816ff5c6213f7ccccea2cde6fdd623d9a95675",
+        "Size": 41546560,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "thatguymcd-dkr-r",
+    "Title": "Diddy Kong Racing",
+    "Project": "DKR-R (Diddy Kong Racing Recompiled)",
+    "Repository": "ThatGuyMcd/DKR-R",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "1f08997fe478d1db5ffec8b70ec64381a66676a1",
+    "ReadmeUrl": "https://github.com/ThatGuyMcd/DKR-R/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/ThatGuyMcd/DKR-R/releases/tag/Version1.0.11",
+    "ReleaseTag": "Version1.0.11",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DKR-R-1.0.11-Linux-aarch64.AppImage",
+        "Url": "https://github.com/ThatGuyMcd/DKR-R/releases/download/Version1.0.11/DKR-R-1.0.11-Linux-aarch64.AppImage",
+        "Sha256": "664971b3780edc8b0326a0821d2e60f4716fef548e79f86fe4bf46d5c6f3e4ca",
+        "Size": 59001352,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "DKR-R-1.0.11-Linux-x86_64.AppImage",
+        "Url": "https://github.com/ThatGuyMcd/DKR-R/releases/download/Version1.0.11/DKR-R-1.0.11-Linux-x86_64.AppImage",
+        "Sha256": "ebcf122d7cff7c19773d808726037c4d840367f1236483086acb9ddc5e37e955",
+        "Size": 68348408,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "DKR-R-1.0.11-SteamDeck-x86_64.AppImage",
+        "Url": "https://github.com/ThatGuyMcd/DKR-R/releases/download/Version1.0.11/DKR-R-1.0.11-SteamDeck-x86_64.AppImage",
+        "Sha256": "ebcf122d7cff7c19773d808726037c4d840367f1236483086acb9ddc5e37e955",
+        "Size": 68348408,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "DKR-R-1.0.11-Windows-x64.zip",
+        "Url": "https://github.com/ThatGuyMcd/DKR-R/releases/download/Version1.0.11/DKR-R-1.0.11-Windows-x64.zip",
+        "Sha256": "75beadc7bdd5c5eeaba7143351cc1d5fd0fd617cf91adc4f6e904370dfafab98",
+        "Size": 59495435,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "rainchus-donkey-kong-64-recompiled",
+    "Title": "Donkey Kong 64",
+    "Project": "Donkey Kong 64: Recompiled",
+    "Repository": "Rainchus/Donkey-Kong-64-Recompiled",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "fa544542b220012b7d2f04fff90323f7b1ac3648",
+    "ReadmeUrl": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/releases/tag/v1.0.3",
+    "ReleaseTag": "v1.0.3",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DK64Recompiled-Linux-ARM64-Release-1-0-3.zip",
+        "Url": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/releases/download/v1.0.3/DK64Recompiled-Linux-ARM64-Release-1-0-3.zip",
+        "Sha256": "bb887245c61ee08f98c2e724ec2b3877000a02554bd501a122bd91409c888ba4",
+        "Size": 9489336,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "DK64Recompiled-Linux-X64-Release-1-0-3.zip",
+        "Url": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/releases/download/v1.0.3/DK64Recompiled-Linux-X64-Release-1-0-3.zip",
+        "Sha256": "352380418f2376640825fe65b0ba085e12e7b792205cfa435a6caa0202e54b5c",
+        "Size": 9321970,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "DK64Recompiled-macOS-ARM64-Release-1-0-3.zip",
+        "Url": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/releases/download/v1.0.3/DK64Recompiled-macOS-ARM64-Release-1-0-3.zip",
+        "Sha256": "c3c80f5d0b7bf4c2a21386ae573d70f57d84046aee00906814a88081923b8046",
+        "Size": 11352069,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "DK64Recompiled-Windows-Release-1-0-3.zip",
+        "Url": "https://github.com/Rainchus/Donkey-Kong-64-Recompiled/releases/download/v1.0.3/DK64Recompiled-Windows-Release-1-0-3.zip",
+        "Sha256": "bfde3985365247f083ee47568b496eaf8a4a0845155a95802bc8f4a4871c60d5",
+        "Size": 19986113,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jkdansereau-goldeneye-pc-port",
+    "Title": "GoldenEye 007",
+    "Project": "GoldenEye 007 PC Port",
+    "Repository": "jkdansereau/goldeneye-pc-port",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "4f8d2d849c565994d425a09a780f3a7387444827",
+    "ReadmeUrl": "https://github.com/jkdansereau/goldeneye-pc-port/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jkdansereau/goldeneye-pc-port/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "goldeneye-pc-port-0.5.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/jkdansereau/goldeneye-pc-port/releases/download/v0.5.0/goldeneye-pc-port-0.5.0-linux-x86_64.tar.gz",
+        "Sha256": "011ee5acdd75028fa3af8cbad2aaade1f362aee89f17b43a15d1d1836e98ab92",
+        "Size": 11527864,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "goldeneye-pc-port-0.5.0-win64.zip",
+        "Url": "https://github.com/jkdansereau/goldeneye-pc-port/releases/download/v0.5.0/goldeneye-pc-port-0.5.0-win64.zip",
+        "Sha256": "b49bfb826566367a4d1af16466530f0fadd85e522b33859521d849c143a005ef",
+        "Size": 17178242,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "harvestmoon64recomp-harvestmoon64recomp",
+    "Title": "Harvest Moon 64",
+    "Project": "Harvest Moon 64: Recompiled",
+    "Repository": "HarvestMoon64Recomp/HarvestMoon64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "0862e9a62021ebe03b07ee1f63891f9302aea775",
+    "ReadmeUrl": "https://github.com/HarvestMoon64Recomp/HarvestMoon64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarvestMoon64Recomp/HarvestMoon64Recomp/releases/tag/v1.2.2",
+    "ReleaseTag": "v1.2.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "HarvestMoon64Recompiled-v1.2.2-Linux-ARM64.zip",
+        "Url": "https://github.com/HarvestMoon64Recomp/HarvestMoon64Recomp/releases/download/v1.2.2/HarvestMoon64Recompiled-v1.2.2-Linux-ARM64.zip",
+        "Sha256": "cd9c19f86bbb3df153de3f49d377d7120cc44f999499731843f281d455882f26",
+        "Size": 7135180,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "HarvestMoon64Recompiled-v1.2.2-Linux-X64.zip",
+        "Url": "https://github.com/HarvestMoon64Recomp/HarvestMoon64Recomp/releases/download/v1.2.2/HarvestMoon64Recompiled-v1.2.2-Linux-X64.zip",
+        "Sha256": "ae0865eaa1092a88a9321e776ca71dcab86c69c4f74d1004dc4f2d6f2224685c",
+        "Size": 7242561,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "HarvestMoon64Recompiled-v1.2.2-Windows.zip",
+        "Url": "https://github.com/HarvestMoon64Recomp/HarvestMoon64Recomp/releases/download/v1.2.2/HarvestMoon64Recompiled-v1.2.2-Windows.zip",
+        "Sha256": "bbea76c78256eb40da61ed951dbd2efdee9dfdcaffc501c24bab1ad39ac2c896",
+        "Size": 17740648,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "sonicdcer-mariokart64recomp",
+    "Title": "Mario Kart 64",
+    "Project": "MarioKart 64: Recompiled",
+    "Repository": "sonicdcer/MarioKart64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "7db65e56bd771b8158f999f179ff7ea72709237f",
+    "ReadmeUrl": "https://github.com/sonicdcer/MarioKart64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/sonicdcer/MarioKart64Recomp/releases/tag/v0.9.2",
+    "ReleaseTag": "v0.9.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MarioKart64Recompiled-v0.9.2-Linux-ARM64-Release.zip",
+        "Url": "https://github.com/sonicdcer/MarioKart64Recomp/releases/download/v0.9.2/MarioKart64Recompiled-v0.9.2-Linux-ARM64-Release.zip",
+        "Sha256": "c0ba8b08f7c31510871433ffd3e23ce8f07de77a31b15a66a0ccfb5a26386afa",
+        "Size": 13173429,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "MarioKart64Recompiled-v0.9.2-Linux-X64-Release.zip",
+        "Url": "https://github.com/sonicdcer/MarioKart64Recomp/releases/download/v0.9.2/MarioKart64Recompiled-v0.9.2-Linux-X64-Release.zip",
+        "Sha256": "46d4c34f755111daa460c64d34c1e97a932a3406995936ae1f059453a4fba819",
+        "Size": 13126507,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "MarioKart64Recompiled-v0.9.2-Windows-RelWithDebInfo.zip",
+        "Url": "https://github.com/sonicdcer/MarioKart64Recomp/releases/download/v0.9.2/MarioKart64Recompiled-v0.9.2-Windows-RelWithDebInfo.zip",
+        "Sha256": "4b41226ad7d4c6012878194fa88fe1a83c1fa8f425dfbaa2a7ea87eb01c1c2b4",
+        "Size": 23847630,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "harbourmasters-spaghettikart",
+    "Title": "Mario Kart 64",
+    "Project": "SpaghettiKart",
+    "Repository": "HarbourMasters/SpaghettiKart",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "577ecd9a3d21f968595b48c508409993ef911c38",
+    "ReadmeUrl": "https://github.com/HarbourMasters/SpaghettiKart/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarbourMasters/SpaghettiKart/releases/tag/1.0.0",
+    "ReleaseTag": "1.0.0",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "spaghetti-linux.zip",
+        "Url": "https://github.com/HarbourMasters/SpaghettiKart/releases/download/1.0.0/spaghetti-linux.zip",
+        "Sha256": "54e249bd4aa71e55c63239c9c1c0eb522b07497d85f2ede193907059e4de250c",
+        "Size": 12395451,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "spaghetti-mac-arm64.zip",
+        "Url": "https://github.com/HarbourMasters/SpaghettiKart/releases/download/1.0.0/spaghetti-mac-arm64.zip",
+        "Sha256": "d40314ed0cd8932c359239fb6dcd8554d4dd48e85be3c460c044004a88a03e80",
+        "Size": 7542558,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "spaghetti-mac-intel-x64.zip",
+        "Url": "https://github.com/HarbourMasters/SpaghettiKart/releases/download/1.0.0/spaghetti-mac-intel-x64.zip",
+        "Sha256": "6ca0cf6747cf3081a65a7324a6c0c891be75465966fa4872fb57f9e58966cd90",
+        "Size": 7858520,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "spaghetti-windows.zip",
+        "Url": "https://github.com/HarbourMasters/SpaghettiKart/releases/download/1.0.0/spaghetti-windows.zip",
+        "Sha256": "bf7bd7cdb5f412c7b370af92949b9431ce7503968631f8cacd607933fb32aff3",
+        "Size": 7806456,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "klorfmorf-goemon64recomp",
+    "Title": "Mystical Ninja Starring Goemon",
+    "Project": "Goemon 64: Recompiled",
+    "Repository": "klorfmorf/Goemon64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "2a66da6643e926581ac89c425a57ee2297dd5564",
+    "ReadmeUrl": "https://github.com/klorfmorf/Goemon64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/klorfmorf/Goemon64Recomp/releases/tag/v0.2.0-dev",
+    "ReleaseTag": "v0.2.0-dev",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Goemon64Recompiled-Linux-ARM64-Release.zip",
+        "Url": "https://github.com/klorfmorf/Goemon64Recomp/releases/download/v0.2.0-dev/Goemon64Recompiled-Linux-ARM64-Release.zip",
+        "Sha256": "134fc51de50d8aba05fe9b13c069598030e9588d2b83304e1ace925c135f321b",
+        "Size": 14575973,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Goemon64Recompiled-Linux-X64-Release.zip",
+        "Url": "https://github.com/klorfmorf/Goemon64Recomp/releases/download/v0.2.0-dev/Goemon64Recompiled-Linux-X64-Release.zip",
+        "Sha256": "73e0deb9fab6deb40365708ca4c8ef5ef2d06e54160a9eb089655b063b361f0d",
+        "Size": 14374720,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Goemon64Recompiled-Windows-RelWithDebInfo.zip",
+        "Url": "https://github.com/klorfmorf/Goemon64Recomp/releases/download/v0.2.0-dev/Goemon64Recompiled-Windows-RelWithDebInfo.zip",
+        "Sha256": "f74041842f059e65be3cc2ba3d51a82c543a3b16406189afe45951cb40ac5896",
+        "Size": 25007915,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "lfarroco-ogre-battle-64-recomp",
+    "Title": "Ogre Battle 64: Person of Lordly Caliber",
+    "Project": "Ogre Battle 64 PC port",
+    "Repository": "lfarroco/ogre-battle-64-recomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "241fc37b928bb04d708c0972d19cbe51129159fe",
+    "ReadmeUrl": "https://github.com/lfarroco/ogre-battle-64-recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/lfarroco/ogre-battle-64-recomp/releases/tag/v0.8.3",
+    "ReleaseTag": "v0.8.3",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "ogre-battle-64-recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/lfarroco/ogre-battle-64-recomp/releases/download/v0.8.3/ogre-battle-64-recomp-linux-x86_64.tar.gz",
+        "Sha256": "48d158ca2f32c411d8897f2dce72002523420e5acfc4220240ce3dc7725e8d6f",
+        "Size": 9848588,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ogre-battle-64-recomp-macos-arm64.tar.gz",
+        "Url": "https://github.com/lfarroco/ogre-battle-64-recomp/releases/download/v0.8.3/ogre-battle-64-recomp-macos-arm64.tar.gz",
+        "Sha256": "1b4398ec85d31255aa964fd8221c665ffc054d6eaa1a02bf3257942c7a28981a",
+        "Size": 8342195,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "ogre-battle-64-recomp-windows-x86_64.zip",
+        "Url": "https://github.com/lfarroco/ogre-battle-64-recomp/releases/download/v0.8.3/ogre-battle-64-recomp-windows-x86_64.zip",
+        "Sha256": "d9c269587b2f2b224bc6203c7ac9c4f42022f6990643cd38a870cb56df243169",
+        "Size": 17230380,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "harbourmasters-paperboat",
+    "Title": "Paper Mario",
+    "Project": "PaperBoat",
+    "Repository": "HarbourMasters/PaperBoat",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "e226104b1e9d35bd52cc6ebfab64fe2f49d87531",
+    "ReadmeUrl": "https://github.com/HarbourMasters/PaperBoat/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarbourMasters/PaperBoat/releases/tag/1.0.3",
+    "ReleaseTag": "1.0.3",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Paperboat-Mulberry-Delta-Linux.zip",
+        "Url": "https://github.com/HarbourMasters/PaperBoat/releases/download/1.0.3/Paperboat-Mulberry-Delta-Linux.zip",
+        "Sha256": "f6c72564e8c1485df6022aed24e33c5122815c9c6c90589411f3fbd23e56ffa2",
+        "Size": 21437464,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Paperboat-Mulberry-Delta-Win64.zip",
+        "Url": "https://github.com/HarbourMasters/PaperBoat/releases/download/1.0.3/Paperboat-Mulberry-Delta-Win64.zip",
+        "Sha256": "ad7a825befbbad2d925f511fc97cfa26027f825935b413040b9d294d953983f3",
+        "Size": 27512774,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "perfect-dark-pc-port-perfect-dark",
+    "Title": "Perfect Dark",
+    "Project": "Perfect Dark port",
+    "Repository": "perfect-dark-pc-port/perfect_dark",
+    "Method": "Décompilation / port natif",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "84edda74cc5cb1c06799d00408a5863b78a8143f",
+    "ReadmeUrl": "https://github.com/perfect-dark-pc-port/perfect_dark/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/perfect-dark-pc-port/perfect_dark/releases/tag/ci-dev-build",
+    "ReleaseTag": "ci-dev-build",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "pd-i686-linux.tar.gz",
+        "Url": "https://github.com/perfect-dark-pc-port/perfect_dark/releases/download/ci-dev-build/pd-i686-linux.tar.gz",
+        "Sha256": "46bf3ecd5f8394094aacb04d9e5182c3871ed01de19df28f6ff5c2afd3c66618",
+        "Size": 21419437,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "pd-i686-windows.zip",
+        "Url": "https://github.com/perfect-dark-pc-port/perfect_dark/releases/download/ci-dev-build/pd-i686-windows.zip",
+        "Sha256": "685eb52755e4f71269a1af7ccc76f5f5921c211a4624572e3e0b91bd0afe4ab7",
+        "Size": 25147137,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "pd-x86_64-linux.tar.gz",
+        "Url": "https://github.com/perfect-dark-pc-port/perfect_dark/releases/download/ci-dev-build/pd-x86_64-linux.tar.gz",
+        "Sha256": "0f28fd59b488e0a919aae4350083059faebd462fce52df7bfdc9a4aec26f92ae",
+        "Size": 22213594,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "pd-x86_64-windows.zip",
+        "Url": "https://github.com/perfect-dark-pc-port/perfect_dark/releases/download/ci-dev-build/pd-x86_64-windows.zip",
+        "Sha256": "56e6a2f8bad36bd90f0d396c1d525b953adcc1a20157f594b90a7530d58258d3",
+        "Size": 25739820,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "noahvl-birdman64",
+    "Title": "Pilotwings 64",
+    "Project": "Birdman64",
+    "Repository": "NoahVl/Birdman64",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "1ef4e8932fc9fb9c25597b82c7e2f20c4f5d17c4",
+    "ReadmeUrl": "https://github.com/NoahVl/Birdman64/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/NoahVl/Birdman64/releases/tag/v1.5.1",
+    "ReleaseTag": "v1.5.1",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "birdman64-linux-x64.tar.gz",
+        "Url": "https://github.com/NoahVl/Birdman64/releases/download/v1.5.1/birdman64-linux-x64.tar.gz",
+        "Sha256": "50626333b0622ab95f558f0ad84b6f52fbca84e423364cfbd566e40f8abe8443",
+        "Size": 91388113,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Birdman64-windows-x64.zip",
+        "Url": "https://github.com/NoahVl/Birdman64/releases/download/v1.5.1/Birdman64-windows-x64.zip",
+        "Sha256": "b03ca52fccb59d108854f2b955d0e3b0206a6bce9dbcf82edc2a5f2562232d5c",
+        "Size": 66899026,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Birdman64-x86_64.AppImage",
+        "Url": "https://github.com/NoahVl/Birdman64/releases/download/v1.5.1/Birdman64-x86_64.AppImage",
+        "Sha256": "33e12591a616478fdf991fbbe94fadbbd3e9b653b016631ee3a504d135ecb18d",
+        "Size": 82553336,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jackandbeans-snap64recomp",
+    "Title": "Pokémon Snap",
+    "Project": "Snap64 Recomp",
+    "Repository": "JackandBeans/Snap64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "b83ce9dbf16c1afd12a5b935d3c0efdcc7ffa46a",
+    "ReadmeUrl": "https://github.com/JackandBeans/Snap64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/JackandBeans/Snap64Recomp/releases/tag/v1.1.6",
+    "ReleaseTag": "v1.1.6",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Snap64Recomp-1.1.6-linux-arm64.tar.gz",
+        "Url": "https://github.com/JackandBeans/Snap64Recomp/releases/download/v1.1.6/Snap64Recomp-1.1.6-linux-arm64.tar.gz",
+        "Sha256": "7d1926fdc1204834a7478ec5fd67f5dda729ef2e8799ee70b3c78fb7f0f98dee",
+        "Size": 7617486,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Snap64Recomp-1.1.6-linux-x86_64.tar.gz",
+        "Url": "https://github.com/JackandBeans/Snap64Recomp/releases/download/v1.1.6/Snap64Recomp-1.1.6-linux-x86_64.tar.gz",
+        "Sha256": "97bf3c48610f65f5dc7287b63d2418a1713ec992777b54e41eb660f500772ead",
+        "Size": 7556961,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Snap64Recomp-1.1.6-win64.zip",
+        "Url": "https://github.com/JackandBeans/Snap64Recomp/releases/download/v1.1.6/Snap64Recomp-1.1.6-win64.zip",
+        "Sha256": "73bd4f7fae0f41670d9222af1f7287dfe60978997128a5926179e48d28ac351d",
+        "Size": 16580695,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "linkssy2-roadrash64recompiled",
+    "Title": "Road Rash 64",
+    "Project": "Road Rash 64 Recompiled",
+    "Repository": "linkssy2/RoadRash64Recompiled",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "24aec5c14e49fee42244cc1cfe912b5a5e0805f7",
+    "ReadmeUrl": "https://github.com/linkssy2/RoadRash64Recompiled/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/linkssy2/RoadRash64Recompiled/releases/tag/v1.4.8",
+    "ReleaseTag": "v1.4.8",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "RoadRash64Recompiled-v1.4.8-Linux-Experimental.zip",
+        "Url": "https://github.com/linkssy2/RoadRash64Recompiled/releases/download/v1.4.8/RoadRash64Recompiled-v1.4.8-Linux-Experimental.zip",
+        "Sha256": "4ca6e103fc6dead44b325df5143e6af704a6516dd711edb63b9d9dcd19715c16",
+        "Size": 589060551,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "RoadRash64Recompiled-v1.4.8-Win64.zip",
+        "Url": "https://github.com/linkssy2/RoadRash64Recompiled/releases/download/v1.4.8/RoadRash64Recompiled-v1.4.8-Win64.zip",
+        "Sha256": "70114da39d0311ca0698d6a7e6fd554507ac1add29173ab7b344408118697275",
+        "Size": 47342190,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bryantmh-rush2recompiled",
+    "Title": "Rush 2: Extreme Racing USA",
+    "Project": "Rush 2 Recompiled",
+    "Repository": "bryantmh/rush2recompiled",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "0d2545aa01e69da319512a9614b38ebdd564e603",
+    "ReadmeUrl": "https://github.com/bryantmh/rush2recompiled/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/bryantmh/rush2recompiled/releases/tag/v1.0.34",
+    "ReleaseTag": "v1.0.34",
+    "Platforms": [
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "Rush2Recompiled-1.0.34-x86_64.AppImage",
+        "Url": "https://github.com/bryantmh/rush2recompiled/releases/download/v1.0.34/Rush2Recompiled-1.0.34-x86_64.AppImage",
+        "Sha256": "9a0381cf54ad84b17ac700d73789a2bee4461d611f130795f62e723174beff2f",
+        "Size": 24529400,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "cdlewis-snowboardkids2-recomp",
+    "Title": "Snowboard Kids 2",
+    "Project": "Snowboard Kids 2: Recompiled",
+    "Repository": "cdlewis/snowboardkids2-recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "eb8242cf7337866073e378b04875f6093a36d410",
+    "ReadmeUrl": "https://github.com/cdlewis/snowboardkids2-recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/cdlewis/snowboardkids2-recomp/releases/tag/v2.0.2",
+    "ReleaseTag": "v2.0.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SnowboardKids2Recompiled-Linux-ARM64.tar.gz",
+        "Url": "https://github.com/cdlewis/snowboardkids2-recomp/releases/download/v2.0.2/SnowboardKids2Recompiled-Linux-ARM64.tar.gz",
+        "Sha256": "735c5fa8fe2f7555d5553d94509eb6838a3cc4fe030df7c224bbda7e181aa487",
+        "Size": 10381651,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SnowboardKids2Recompiled-Linux-X64.tar.gz",
+        "Url": "https://github.com/cdlewis/snowboardkids2-recomp/releases/download/v2.0.2/SnowboardKids2Recompiled-Linux-X64.tar.gz",
+        "Sha256": "be89a751c26e33f1d467d014bb784848402596ef4d219f262f7b9518f5b3690e",
+        "Size": 10628935,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SnowboardKids2Recompiled-Windows.zip",
+        "Url": "https://github.com/cdlewis/snowboardkids2-recomp/releases/download/v2.0.2/SnowboardKids2Recompiled-Windows.zip",
+        "Sha256": "51b0c78e758d334eeab2f6aab0eec94daf75d30f7a430375d8bea5f5c26e2414",
+        "Size": 20071009,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "sonicdcer-starfox64recomp",
+    "Title": "Star Fox 64",
+    "Project": "Starfox 64: Recompiled",
+    "Repository": "sonicdcer/Starfox64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "742778046ff5462cf40abfc9a4b03ade23f64750",
+    "ReadmeUrl": "https://github.com/sonicdcer/Starfox64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/sonicdcer/Starfox64Recomp/releases/tag/1.0.3",
+    "ReleaseTag": "1.0.3",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Starfox64Recompiled-v1.0.3-Linux-ARM64-Release.zip",
+        "Url": "https://github.com/sonicdcer/Starfox64Recomp/releases/download/1.0.3/Starfox64Recompiled-v1.0.3-Linux-ARM64-Release.zip",
+        "Sha256": "85408daa5ceac1fc208a744b0a35fb316c417d62c709761aceb242353fb2a1c0",
+        "Size": 14074262,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Starfox64Recompiled-v1.0.3-Linux-X64-Release.zip",
+        "Url": "https://github.com/sonicdcer/Starfox64Recomp/releases/download/1.0.3/Starfox64Recompiled-v1.0.3-Linux-X64-Release.zip",
+        "Sha256": "e74932bd0edb6186a015dabaa87b6b24af3d3b5511ff3b0293a2c3331840cdf0",
+        "Size": 13806756,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Starfox64Recompiled-v1.0.3-macOS-Release.zip",
+        "Url": "https://github.com/sonicdcer/Starfox64Recomp/releases/download/1.0.3/Starfox64Recompiled-v1.0.3-macOS-Release.zip",
+        "Sha256": "36d9da91eb4a895440f96092ef66729bdc69b814a8d6b076810f2ad3cf198b18",
+        "Size": 22848885,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "Starfox64Recompiled-v1.0.3-Windows-RelWithDebInfo.zip",
+        "Url": "https://github.com/sonicdcer/Starfox64Recomp/releases/download/1.0.3/Starfox64Recompiled-v1.0.3-Windows-RelWithDebInfo.zip",
+        "Sha256": "768c18b0aeb325a0102f722338f09a270a76eeebea29154764147a93d0bde530",
+        "Size": 24382268,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "harbourmasters-starship",
+    "Title": "Star Fox 64",
+    "Project": "Starship",
+    "Repository": "HarbourMasters/Starship",
+    "Method": "Décompilation / port natif",
+    "Status": "Installation manuelle",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Installer ou compiler le projet selon son README, puis associer le programme. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "83fd5e4d9eebd45f3065dd5f838bbf9df0dd9760",
+    "ReadmeUrl": "https://github.com/HarbourMasters/Starship/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarbourMasters/Starship/releases/tag/v2.0.0",
+    "ReleaseTag": "v2.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "harbourmasters-ghostship",
+    "Title": "Super Mario 64",
+    "Project": "Ghostship",
+    "Repository": "HarbourMasters/Ghostship",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "08defc1a36391bec3218f5dbefb68472920022e7",
+    "ReadmeUrl": "https://github.com/HarbourMasters/Ghostship/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarbourMasters/Ghostship/releases/tag/3.0.0",
+    "ReleaseTag": "3.0.0",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Nautilus-Alfa-Linux.zip",
+        "Url": "https://github.com/HarbourMasters/Ghostship/releases/download/3.0.0/Nautilus-Alfa-Linux.zip",
+        "Sha256": "f295cb24bfd78660a9caa834e267cc009b4ccdb4ebe68005ab677dc5e4417e83",
+        "Size": 18060413,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Nautilus-Alfa-Win64.zip",
+        "Url": "https://github.com/HarbourMasters/Ghostship/releases/download/3.0.0/Nautilus-Alfa-Win64.zip",
+        "Sha256": "49a0ab6c6624ccb20d29bb433f391d017f638f2b7db0601eae7808574a62aa18",
+        "Size": 20379303,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "coop-deluxe-sm64coopdx",
+    "Title": "Super Mario 64",
+    "Project": "sm64coopdx",
+    "Repository": "coop-deluxe/sm64coopdx",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "16ae934acf3c2b5628b4339d9adb16d3e589dacf",
+    "ReadmeUrl": "https://github.com/coop-deluxe/sm64coopdx/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/coop-deluxe/sm64coopdx/releases/tag/v1.5.1",
+    "ReleaseTag": "v1.5.1",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "sm64coopdx_Linux.zip",
+        "Url": "https://github.com/coop-deluxe/sm64coopdx/releases/download/v1.5.1/sm64coopdx_Linux.zip",
+        "Sha256": "4229f82fc4395e78faf192c910ffcfcc1d70f59a558cadf0f63ae548901fa5f5",
+        "Size": 55414437,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "sm64coopdx_macOS_Intel.zip",
+        "Url": "https://github.com/coop-deluxe/sm64coopdx/releases/download/v1.5.1/sm64coopdx_macOS_Intel.zip",
+        "Sha256": "665e82a486b1477b22cb9d0320120a961d0cbf3904f188a0ab7bb8ab137343c7",
+        "Size": 44493092,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "sm64coopdx_Windows.zip",
+        "Url": "https://github.com/coop-deluxe/sm64coopdx/releases/download/v1.5.1/sm64coopdx_Windows.zip",
+        "Sha256": "2a98c40acb2a46d30cde89f3072c039b641dbdf977985f9e82a040615f1b2381",
+        "Size": 41801915,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "2ship2harkinian-2ship2harkinian",
+    "Title": "The Legend of Zelda: Majora's Mask",
+    "Project": "2 Ship 2 Harkinian",
+    "Repository": "2ship2harkinian/2ship2harkinian",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "c6edcc629aeb3112edd9a9332f5ed538b5de4dc4",
+    "ReadmeUrl": "https://github.com/2ship2harkinian/2ship2harkinian/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/2ship2harkinian/2ship2harkinian/releases/tag/5.0.1",
+    "ReleaseTag": "5.0.1",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "2Ship-Battler-Bravo-Linux.zip",
+        "Url": "https://github.com/2ship2harkinian/2ship2harkinian/releases/download/5.0.1/2Ship-Battler-Bravo-Linux.zip",
+        "Sha256": "6cdd4fe06f3f9b095e99c86fef70b9265cc921fb6faa7ba1e18e94e90ed0b345",
+        "Size": 16262941,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "2Ship-Battler-Bravo-Win64.zip",
+        "Url": "https://github.com/2ship2harkinian/2ship2harkinian/releases/download/5.0.1/2Ship-Battler-Bravo-Win64.zip",
+        "Sha256": "a46664a01623ad5d7cc82d29a9889699f6a98c9501c7a959a089f34380c1f078",
+        "Size": 44976935,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "zelda64recomp-zelda64recomp",
+    "Title": "The Legend of Zelda: Majora's Mask",
+    "Project": "Zelda 64: Recompiled",
+    "Repository": "Zelda64Recomp/Zelda64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "e31603ebdd4d10e7e1c7cdb5b0e9ef235f03288f",
+    "ReadmeUrl": "https://github.com/Zelda64Recomp/Zelda64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/Zelda64Recomp/Zelda64Recomp/releases/tag/v1.2.2",
+    "ReleaseTag": "v1.2.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Zelda64Recompiled-v1.2.2-Linux-ARM64.zip",
+        "Url": "https://github.com/Zelda64Recomp/Zelda64Recomp/releases/download/v1.2.2/Zelda64Recompiled-v1.2.2-Linux-ARM64.zip",
+        "Sha256": "2e49b96aced578363065e1764ca96eaa5590cb6f7e80efd10e8ce1a08462b933",
+        "Size": 19228944,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Zelda64Recompiled-v1.2.2-Linux-X64.zip",
+        "Url": "https://github.com/Zelda64Recomp/Zelda64Recomp/releases/download/v1.2.2/Zelda64Recompiled-v1.2.2-Linux-X64.zip",
+        "Sha256": "de8b19cdb4e3ad0c10fd6d8127f7a6cc2a9eba106d89c753439178b718887c42",
+        "Size": 18638525,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Zelda64Recompiled-v1.2.2-Windows.zip",
+        "Url": "https://github.com/Zelda64Recomp/Zelda64Recomp/releases/download/v1.2.2/Zelda64Recompiled-v1.2.2-Windows.zip",
+        "Sha256": "d02b95f1cf5e4d44d6587fa6136c6db521f61aa41ba8700c05f91bea8b0a26d0",
+        "Size": 28940501,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "harbourmasters-shipwright",
+    "Title": "The Legend of Zelda: Ocarina of Time",
+    "Project": "Ship of Harkinian",
+    "Repository": "HarbourMasters/Shipwright",
+    "Method": "Décompilation / port natif",
+    "Status": "Release disponible",
+    "Notes": "Port natif : port issu de décompilation. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "ba3b6dd857dff56a5a89d10acd2528a95ad6fd58",
+    "ReadmeUrl": "https://github.com/HarbourMasters/Shipwright/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/HarbourMasters/Shipwright/releases/tag/9.3.1",
+    "ReleaseTag": "9.3.1",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SoH-Dewey-Bravo-Win64.zip",
+        "Url": "https://github.com/HarbourMasters/Shipwright/releases/download/9.3.1/SoH-Dewey-Bravo-Win64.zip",
+        "Sha256": "429292a0bfbdfcda283b33c1538ecdc49163b9ed53e8702cac80b2489d9fe26c",
+        "Size": 72980600,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SoH-Dewey-Bravo.appimage",
+        "Url": "https://github.com/HarbourMasters/Shipwright/releases/download/9.3.1/SoH-Dewey-Bravo.appimage",
+        "Sha256": "e4bb775c9a0c3629ebac57e4b6ccba6d0b621d71ab201e9105aceef9141ad1f4",
+        "Size": 32113856,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-vpw2recomp",
+    "Title": "Virtual Pro Wrestling 2",
+    "Project": "VPW2 Recompiled",
+    "Repository": "jessetbh/VPW2Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "696ddbc1cdca19fb1184abe364651327dc26a1c1",
+    "ReadmeUrl": "https://github.com/jessetbh/VPW2Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/VPW2Recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Vpw2Recompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/VPW2Recomp/releases/download/v0.2.0/Vpw2Recompiled-v0.2.0-Windows.zip",
+        "Sha256": "c8ce3fc60286dd19808e685c3fffe44f6abb684f6feddbb414cb194c046025f0",
+        "Size": 23020224,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-vpw64recomp",
+    "Title": "Virtual Pro Wrestling 64",
+    "Project": "Virtual Pro Wrestling 64: Recompiled",
+    "Repository": "jessetbh/VPW64Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "78dd6fc58810bdfb4f36cfad780855d85312271f",
+    "ReadmeUrl": "https://github.com/jessetbh/VPW64Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/VPW64Recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Vpw64Recompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/VPW64Recomp/releases/download/v0.2.0/Vpw64Recompiled-v0.2.0-Windows.zip",
+        "Sha256": "ee1d367cb9f0c0a43b8289a7422d9420cc7604d5a6be17324d7fcae4b8bd2936",
+        "Size": 22480983,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-wcwvsnwoworldtourrecomp",
+    "Title": "WCW vs. nWo World Tour",
+    "Project": "WCW vs. nWo World Tour: Recompiled",
+    "Repository": "jessetbh/WCWvsNWOWorldTourRecomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "45b8b8e5953992d3781e3d15cb58dece8f731470",
+    "ReadmeUrl": "https://github.com/jessetbh/WCWvsNWOWorldTourRecomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/WCWvsNWOWorldTourRecomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "WCWRecompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/WCWvsNWOWorldTourRecomp/releases/download/v0.2.0/WCWRecompiled-v0.2.0-Windows.zip",
+        "Sha256": "313e5d11f518806a92de3a2d7cb7a1263b1a7e2efb7abafbffba5fda7b1842ea",
+        "Size": 22238444,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-wcwnworevengerecomp",
+    "Title": "WCW/nWo Revenge",
+    "Project": "WCW/nWo Revenge: Recompiled",
+    "Repository": "jessetbh/WCWnWoRevengeRecomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "78e5efb922170b1d179b0775282c063cfd86ceea",
+    "ReadmeUrl": "https://github.com/jessetbh/WCWnWoRevengeRecomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/WCWnWoRevengeRecomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "RevengeRecompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/WCWnWoRevengeRecomp/releases/download/v0.2.0/RevengeRecompiled-v0.2.0-Windows.zip",
+        "Sha256": "509425d4b2bbe6c01d46e97078946d77c1cbed562aa6f0787633d58a69185620",
+        "Size": 22418056,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-wwfnomercyrecomp",
+    "Title": "WWF No Mercy",
+    "Project": "WWF No Mercy: Recompiled",
+    "Repository": "jessetbh/WWFNoMercyRecomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "a702635d4bec4d78bbd7bc36b0c679f746002847",
+    "ReadmeUrl": "https://github.com/jessetbh/WWFNoMercyRecomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/WWFNoMercyRecomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NoMercyRecompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/WWFNoMercyRecomp/releases/download/v0.2.0/NoMercyRecompiled-v0.2.0-Windows.zip",
+        "Sha256": "d35dc104bb2ad77797b12272f13d9404453b30c22526e4ec2e8cffff21866149",
+        "Size": 23049485,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jessetbh-wwfwrestlemania2000recomp",
+    "Title": "WWF WrestleMania 2000",
+    "Project": "WWF WrestleMania 2000: Recompiled",
+    "Repository": "jessetbh/WWFWrestleMania2000Recomp",
+    "Method": "Recompilation statique",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Projet en développement ; consulter les limites indiquées par les auteurs. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "cddd59152bf454b08919cf859881f2855db124f7",
+    "ReadmeUrl": "https://github.com/jessetbh/WWFWrestleMania2000Recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/jessetbh/WWFWrestleMania2000Recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Wm2kRecompiled-v0.2.0-Windows.zip",
+        "Url": "https://github.com/jessetbh/WWFWrestleMania2000Recomp/releases/download/v0.2.0/Wm2kRecompiled-v0.2.0-Windows.zip",
+        "Sha256": "9be37a71781937ec4a1119e93f63b5471c1c5fb0adb4d33a13c361f28a32ae15",
+        "Size": 22942365,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "danielgomesvieira2000-wave-race-64-recomp",
+    "Title": "Wave Race 64",
+    "Project": "Wave Race 64: Recompiled",
+    "Repository": "danielgomesvieira2000/wave-race-64-recomp",
+    "Method": "Recompilation statique",
+    "Status": "Release disponible",
+    "Notes": "Port natif : recompilation statique. Fournis ta propre copie compatible du jeu ; aucun fichier de jeu fourni. Paquets épinglés avec taille et SHA-256 GitHub. Disponibilité déclarée par le projet ; aucune partie exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "019a569db1df6db62c852390397d608cbd1488d1",
+    "ReadmeUrl": "https://github.com/danielgomesvieira2000/wave-race-64-recomp/blob/HEAD/README.md",
+    "ReleaseUrl": "https://github.com/danielgomesvieira2000/wave-race-64-recomp/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "WaveRace64Recomp-1.0.2-linux-x86_64.tar.gz",
+        "Url": "https://github.com/danielgomesvieira2000/wave-race-64-recomp/releases/download/v1.0.2/WaveRace64Recomp-1.0.2-linux-x86_64.tar.gz",
+        "Sha256": "5ea07206731b1afde10f52909443a50b64b6ebd113634d383a5538f86437e60f",
+        "Size": 6296691,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "WaveRace64Recomp-1.0.2-windows-x64.zip",
+        "Url": "https://github.com/danielgomesvieira2000/wave-race-64-recomp/releases/download/v1.0.2/WaveRace64Recomp-1.0.2-windows-x64.zip",
+        "Sha256": "8603e582e7a549f1f3a02c108d1453ad61e7f5df03b2f3232f9939323b044583",
+        "Size": 17397538,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

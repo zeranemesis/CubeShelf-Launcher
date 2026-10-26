@@ -235,7 +235,7 @@ public sealed partial class MainWindow
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
         Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;
-        Resources["SelectedGame"] = "NINTENDO " + console.ToUpperInvariant() + (english ? " • SELECTED GAME" : " • JEU SÉLECTIONNÉ");
+        Resources["SelectedGame"] = (console.StartsWith("Nintendo ", StringComparison.Ordinal) ? "" : "NINTENDO ") + console.ToUpperInvariant() + (english ? " • SELECTED GAME" : " • JEU SÉLECTIONNÉ");
         LibrarySectionTitle.Text = _favoritesOnly ? UiLocalization.Get(_preferences.Language, "FavoritesTitle")
             : english ? "Your " + console + " games" : "Tes jeux " + console;
         LibraryUpdatesText.Text = _favoritesOnly
@@ -375,7 +375,8 @@ public sealed partial class MainWindow
         if(GameCase.SetCover(
             ResolveCoverPath(cover?.Front),
             ResolveCoverPath(cover?.Back),
-            ResolveCoverPath(cover?.Spine)))
+            ResolveCoverPath(cover?.Spine), ResolveCoverPath(cover?.Right),
+            ResolveCoverPath(cover?.Top), ResolveCoverPath(cover?.Bottom)))
             GameCase.SetShelfPose(baseGame.ShelfConsole == "gamecube" ? 24 : 14,true,animate:false);
 
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var updateSnapshot))

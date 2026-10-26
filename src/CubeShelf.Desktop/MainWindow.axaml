@@ -26,6 +26,7 @@
             <ComboBoxItem Content="GameCube" Tag="gamecube" />
             <ComboBoxItem Content="Wii" Tag="wii" />
             <ComboBoxItem Content="Switch" Tag="switch" />
+            <ComboBoxItem Content="Nintendo 64" Tag="n64" />
           </ComboBox>
           <Button x:Name="NavLibraryButton" Classes="nav selected" TabIndex="1" Click="ParityShowLibrary">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▦" Width="18" /><TextBlock Text="{DynamicResource AppLibrary}" /></StackPanel>
@@ -112,6 +113,7 @@
               <ComboBoxItem Content="GameCube" Tag="gamecube" />
               <ComboBoxItem Content="Wii" Tag="wii" />
               <ComboBoxItem Content="Switch" Tag="switch" />
+              <ComboBoxItem Content="Nintendo 64" Tag="n64" />
             </ComboBox>
           </StackPanel>
           <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -214,7 +216,7 @@
                       <StackPanel>
                         <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                         <Grid>
-                          <controls:GameCoverControl Height="330" Width="{Binding CoverWidth}" HorizontalAlignment="Center" Cover="{Binding Cover}" Format="{Binding CaseFormat}" />
+                          <controls:GameCoverControl Width="{Binding CoverWidth}" HorizontalAlignment="Center" Cover="{Binding Cover}" Format="{Binding CaseFormat}" />
                           <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC101524" CornerRadius="9" Padding="8,5" Margin="8" IsVisible="{Binding HasFavorite}">
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
                           </Border>

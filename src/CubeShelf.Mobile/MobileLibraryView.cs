@@ -45,7 +45,8 @@ public sealed partial class MobileLibraryView : UserControl
     private readonly TextBlock _hint = new() { FontSize = 11, Foreground = Brushes.LightGray, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(24, 6) };
     private bool _controllerInput;
     private Button? _focusedButton;
-    private MobileGame[] _catalog = [];
+    private MobileGame[] _catalog = [], _allCatalog = [];
+    private string _activeConsole = "gamecube";
     private int _selected;
     private bool _realized;
     private bool _ribbon = true;
@@ -70,7 +71,7 @@ public sealed partial class MobileLibraryView : UserControl
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
         ConfigureButtonStyles();
         var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
-        heading.Children.Add(new TextBlock { Text = "CubeShelf", FontSize = 21, FontWeight = FontWeight.Bold });
+        heading.Children.Add(BuildPlatformHeading());
         Grid.SetColumn(_position, 1); heading.Children.Add(_position);
         Grid.SetColumn(_downloadsButton, 2); heading.Children.Add(_downloadsButton);
         Grid.SetColumn(_appUpdatesButton, 3); heading.Children.Add(_appUpdatesButton);
@@ -81,7 +82,7 @@ public sealed partial class MobileLibraryView : UserControl
         _online.Content = ActionLabel("◎", "Salons en ligne");
         _play.Click += async (_, _) => await LaunchSelectedGameAsync();
         _online.Click += (_, _) => Run(() => _games.OpenOnline());
-        _download.Click += (_, _) => PreparePartyBoard();
+        _download.Click += async (_, _) => await PrepareSelectedPortAsync();
         _join.Click += (_, _) => Run(() => _games.OpenOnline(_invite.Text?.Trim()));
         _onlinePanel.Children.Add(_online);
         var invitation = new StackPanel { Spacing = 10 };
@@ -89,6 +90,7 @@ public sealed partial class MobileLibraryView : UserControl
         invitation.Children.Add(_invite); invitation.Children.Add(_join);
         _invitationPanel.Content = invitation;
         _onlinePanel.Children.Add(_invitationPanel);
+        _details.Children.Add(_nativeNotes);
         _details.Children.Add(_onlinePanel);
         _body.Children.Add(_shelf);
         _detailsScroll = new ScrollViewer { Content = _details, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, Margin = new Thickness(0, 12, 0, 8) };
@@ -172,7 +174,8 @@ public sealed partial class MobileLibraryView : UserControl
             else FocusDownloadAction();
             return;
         }
-        if (ReferenceEquals(focused, _invitationPanel)) _invitationPanel.IsExpanded = !_invitationPanel.IsExpanded;
+        if(ReferenceEquals(focused,_consolePicker))_consolePicker.SelectedIndex=(_consolePicker.SelectedIndex+1)%_consolePicker.ItemCount;
+        else if (ReferenceEquals(focused, _invitationPanel)) _invitationPanel.IsExpanded = !_invitationPanel.IsExpanded;
         else if (focused is Button button
             && button.IsEffectivelyVisible && button.IsEnabled)
             button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -183,7 +186,7 @@ public sealed partial class MobileLibraryView : UserControl
     {
         if (_launching || _inspectionCase is not null || _downloadsOverlay.IsVisible) return;
         if (_play.IsVisible && _play.IsEnabled) _ = LaunchSelectedGameAsync();
-        else if (_download.IsVisible && _download.IsEnabled) PreparePartyBoard();
+        else if (_download.IsVisible && _download.IsEnabled) _ = PrepareSelectedPortAsync();
     }
 
     public void FlipFromController() { SetControllerInput(true); if (!_launching && !_downloadsOverlay.IsVisible) { if (_inspectionCase is { } cover) cover.Flip(); else _shelf.FlipSelected(); } }
@@ -216,7 +219,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
-        Control[] candidates = [_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download];
+        Control[] candidates = [_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download];
         var actions = candidates.Where(control => control.IsEffectivelyVisible && control.IsEnabled
             && (control != _invite && control != _join || _invitationPanel.IsExpanded)).ToArray();
         if (actions.Length == 0) return;
@@ -259,6 +262,8 @@ public sealed partial class MobileLibraryView : UserControl
     public void RefreshAvailability()
     {
         if (_catalog.Length == 0) return;
+        if(SelectedNativePort is { } native) { RefreshNativeAvailability(native);return; }
+        _nativeNotes.IsVisible=false;
         var supported = _catalog[_selected].Id == PartyBoardId;
         var installed = supported && _games.IsInstalled();
         var compatible = supported && _games.DeviceSupportsPublishedGame();
@@ -376,7 +381,7 @@ public sealed partial class MobileLibraryView : UserControl
             _cache = Path.Combine(_games.DataDirectory, "covers-v1");
             Directory.CreateDirectory(_cache);
             using var source = AssetLoader.Open(Resource("games.json"));
-            _catalog = (JsonSerializer.Deserialize<MobileGame[]>(source) ?? []).Where(game => string.IsNullOrWhiteSpace(game.VariantOf)).ToArray();
+            _allCatalog = (JsonSerializer.Deserialize<MobileGame[]>(source) ?? []).Where(game => string.IsNullOrWhiteSpace(game.VariantOf)).Concat(NativeCatalogGames()).ToArray();
             if (!_stateLoaded)
             {
                 _stateLoaded = true;
@@ -393,13 +398,12 @@ public sealed partial class MobileLibraryView : UserControl
                 }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
             }
+            _activeConsole=_savedState?.Console=="n64" && _allCatalog.Any(g=>g.ShelfConsole=="n64")?"n64":"gamecube";
+            _consolePicker.SelectedIndex=_activeConsole=="n64"?1:0;
+            _catalog=_allCatalog.Where(g=>g.ShelfConsole==_activeConsole).ToArray();
             var remembered = Array.FindIndex(_catalog, game => game.Id == _rememberedGame);
             if (remembered >= 0) _selected = remembered;
-            _shelf.SetGames(_catalog.Select(game =>
-            {
-                var cover = game.Covers.FirstOrDefault();
-                return new GameShelfItem(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine));
-            }).ToArray());
+            RebuildMobileShelf();
             _realized = true;
             Select(_selected, false);
         }
@@ -430,7 +434,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_catalog.Length == 0) return;
         _rememberedGame = _catalog[_selected].Id;
         _stateSaveTimer.Stop();
-        _stateDirty = _savedState != new LibraryState(_rememberedGame, _ribbon);
+        _stateDirty = _savedState != new LibraryState(_rememberedGame, _ribbon, _activeConsole);
         if (_stateDirty) _stateSaveTimer.Start();
     }
 
@@ -438,7 +442,7 @@ public sealed partial class MobileLibraryView : UserControl
     {
         _stateSaveTimer.Stop();
         if (!_stateDirty) return;
-        var state = new LibraryState(_rememberedGame, _ribbon);
+        var state = new LibraryState(_rememberedGame, _ribbon, _activeConsole);
         try
         {
             Directory.CreateDirectory(_games.DataDirectory);
@@ -452,7 +456,7 @@ public sealed partial class MobileLibraryView : UserControl
         { SetStatus("Impossible de mémoriser la bibliothèque : " + error.Message); }
     }
 
-    private sealed record LibraryState(string SelectedGame, bool Ribbon);
+    private sealed record LibraryState(string SelectedGame, bool Ribbon, string Console="gamecube");
 
     private string Cover(string? relative)
     {
@@ -481,22 +485,28 @@ public sealed partial class MobileLibraryView : UserControl
     private async Task LaunchSelectedGameAsync()
     {
         if (_launching || !_play.IsVisible || _catalog.Length == 0) return;
-        _launching = true;
+        _launching = true;_consolePicker.IsEnabled=false;
         using var cancellation = new CancellationTokenSource();
         _launchCancellation = cancellation;
         try
         {
             var game = _catalog[_selected];
             var cover = game.Covers.FirstOrDefault();
-            _launchTransition.Start(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine), "Lancement…", game.Id);
-            await Task.Delay(500, cancellation.Token);
-            Run(_games.OpenGame);
+            _launchTransition.Start(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine), "Lancement…", game.Id,
+                game.ShelfConsole,openCase:game.ShelfConsole=="n64",media:Cover(cover?.Media),right:Cover(cover?.Right),top:Cover(cover?.Top),bottom:Cover(cover?.Bottom));
+            if(game.ShelfConsole=="n64")
+            {
+                if(!await _launchTransition.WaitForOpeningAsync(cancellation.Token))return;
+                cancellation.Token.ThrowIfCancellationRequested();
+                _games.NativePorts!.Launch(game.Id);
+            }
+            else { await Task.Delay(500,cancellation.Token);Run(_games.OpenGame); }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) { SetStatus(error.Message); }
         finally
         {
-            _launchTransition.Stop(); _launchCancellation = null; _launching = false;
+            _launchTransition.Stop(); _launchCancellation = null; _launching = false;_consolePicker.IsEnabled=true;
         }
     }
 
@@ -520,6 +530,8 @@ public sealed partial class MobileLibraryView : UserControl
         if (_layoutKey == key) return;
         _layoutKey = key;
         var wide = root.Bounds.Width >= 600 && root.Bounds.Width > root.Bounds.Height;
+        _downloadsButton.Content=wide?"Téléchargements":"↓";
+        AutomationProperties.SetName(_downloadsButton,"Téléchargements");
         var available = Math.Max(80, root.Bounds.Height - header - footer);
         var compact = available < 500;
         var shelfHeight = wide ? available : Math.Min(available * (compact ? .36 : .52), root.Bounds.Width * 1.08);
@@ -547,6 +559,7 @@ public sealed partial class MobileLibraryView : UserControl
         public string Id { get; set; } = "";
         public string Title { get; set; } = "";
         public string VariantOf { get; set; } = "";
+        public string ShelfConsole { get; set; } = "gamecube";
         public int Year { get; set; }
         public string Genre { get; set; } = "";
         public string Players { get; set; } = "";
@@ -557,5 +570,9 @@ public sealed partial class MobileLibraryView : UserControl
         public string Front { get; set; } = "";
         public string Back { get; set; } = "";
         public string Spine { get; set; } = "";
+        public string Right { get; set; } = "";
+        public string Top { get; set; } = "";
+        public string Bottom { get; set; } = "";
+        public string Media { get; set; } = "";
     }
 }

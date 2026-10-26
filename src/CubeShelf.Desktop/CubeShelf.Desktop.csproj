@@ -4,7 +4,7 @@
     <AssemblyName>CubeShelf</AssemblyName>
     <Product>DecompShelf</Product>
     <AssemblyTitle>DecompShelf</AssemblyTitle>
-    <Description>Bibliothèque de ports natifs GameCube, Wii et Switch</Description>
+    <Description>Bibliothèque de ports natifs GameCube, Wii, Switch et Nintendo 64</Description>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

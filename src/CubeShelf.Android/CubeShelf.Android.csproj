@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>io.github.zeranemesis.cubeshelf</ApplicationId>
-    <ApplicationVersion>42</ApplicationVersion>
+    <ApplicationVersion>43</ApplicationVersion>
     <ApplicationDisplayVersion>$(CubeShelfVersion)</ApplicationDisplayVersion>
-    <ApplicationTitle>CubeShelf</ApplicationTitle>
+    <ApplicationTitle>DecompShelf</ApplicationTitle>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
     <RuntimeIdentifiers Condition="'$(RuntimeIdentifier)' == ''">android-arm64;android-x64</RuntimeIdentifiers>
     <RunAOTCompilation Condition="'$(Configuration)' == 'Release'">true</RunAOTCompilation>

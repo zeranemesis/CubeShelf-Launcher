@@ -40,6 +40,8 @@ jobs:
         run: dotnet new globaljson --sdk-version "$PREVIEW_DOTNET_VERSION" --roll-forward latestPatch
       - name: Test Android application updates
         run: dotnet run --project tests/CubeShelf.AppUpdates.Tests/CubeShelf.AppUpdates.Tests.csproj -c Release
+      - name: Test Android native ports and mobile UI
+        run: dotnet run --project tests/CubeShelf.Mobile.Tests/CubeShelf.Mobile.Tests.csproj -c Release
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

@@ -75,7 +75,7 @@ public sealed partial class MainWindow
         var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         var games = JsonSerializer.Deserialize<List<GameCatalogEntry>>(
             File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "games.json")), options) ?? [];
-        foreach (var console in new[] { "gamecube", "wii", "switch" })
+        foreach (var console in new[] { "gamecube", "wii", "switch", "n64" })
         {
             foreach (var port in NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", console + ".json")))
             {
@@ -102,9 +102,9 @@ public sealed partial class MainWindow
             foreach (var game in group.Where(game => game.Covers.Count == 0))
             {
                 if (existing is not null) game.Covers = existing.Select(cover => new GameCover
-                    { Label = cover.Label, Front = cover.Front, Back = cover.Back, Spine = cover.Spine }).ToList();
+                    { Label = cover.Label, Front = cover.Front, Back = cover.Back, Spine = cover.Spine, Right = cover.Right, Top = cover.Top, Bottom = cover.Bottom }).ToList();
                 else if (artwork is not null && artwork.Front.Length > 0) game.Covers = [new GameCover
-                    { Label = "GameTDB · " + artwork.GameTdbId, Front = artwork.Front, Back = artwork.Back, Spine = artwork.Spine }];
+                    { Label = (artwork.Console == "n64" ? "Nintendo 64 · " : "GameTDB · ") + artwork.GameTdbId, Front = artwork.Front, Back = artwork.Back, Spine = artwork.Spine, Right = artwork.Right, Top = artwork.Top, Bottom = artwork.Bottom }];
             }
         }
         Directory.CreateDirectory(paths.CacheDirectory);
@@ -122,6 +122,9 @@ public sealed partial class MainWindow
         public string Back { get; set; } = "";
         public string Spine { get; set; } = "";
         public string Media { get; set; } = "";
+        public string Right { get; set; } = "";
+        public string Top { get; set; } = "";
+        public string Bottom { get; set; } = "";
     }
 
     private void InitializeConsoleShelfPicker()
@@ -142,9 +145,9 @@ public sealed partial class MainWindow
         if (Program.Product.Id == "gamecube" && File.Exists(file))
         {
             var saved = File.ReadAllText(file).Trim();
-            if (saved is "gamecube" or "wii" or "switch") _activeShelfConsole = saved;
+            if (saved is "gamecube" or "wii" or "switch" or "n64") _activeShelfConsole = saved;
         }
-        ConsoleShelfPicker.SelectedIndex = _activeShelfConsole switch { "wii" => 1, "switch" => 2, _ => 0 };
+        ConsoleShelfPicker.SelectedIndex = _activeShelfConsole switch { "wii" => 1, "switch" => 2, "n64" => 3, _ => 0 };
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
         RefreshShelfBranding();
         _consoleShelfReady = true;
@@ -167,7 +170,7 @@ public sealed partial class MainWindow
         ShelfTransition.Capture(ViewHost,ShelfProduct.Resolve(console).Console,direction,_preferences.ReduceShelfMotion);
         _activeShelfConsole = console;
         _consoleShelfReady = false;
-        ConsoleShelfPicker.SelectedIndex = console switch { "wii" => 1, "switch" => 2, _ => 0 };
+        ConsoleShelfPicker.SelectedIndex = console switch { "wii" => 1, "switch" => 2, "n64" => 3, _ => 0 };
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
         _consoleShelfReady = true;
         Directory.CreateDirectory(_paths.ConfigurationDirectory);
@@ -198,7 +201,7 @@ public sealed partial class MainWindow
     }
 
     private bool _changingShelf;
-    private static int ConsoleIndex(string console) => console switch { "wii"=>1,"switch"=>2,_=>0 };
+    private static int ConsoleIndex(string console) => console switch { "wii"=>1,"switch"=>2,"n64"=>3,_=>0 };
 
     private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false)
     {

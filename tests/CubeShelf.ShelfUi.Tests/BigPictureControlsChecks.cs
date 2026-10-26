@@ -50,7 +50,7 @@ static class BigPictureControlsChecks
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         void Input(int value)=>window.HandleBigPictureControllerInput(value);
         var console=consoles.SelectedIndex;Input(13);
-        Check(consoles.SelectedIndex==(console+1)%3,"Stick up did not change platform.");
+        Check(consoles.SelectedIndex==(console+1)%consoles.ItemCount,"Stick up did not change platform.");
         var game=position.Text;Input(12);Check(game!=position.Text,"Stick right did not change game.");
         game=position.Text;Input(4);Check(menu.IsVisible && game==position.Text,"D-pad changed game instead of opening menus.");
         Input(15);Check(!menu.IsVisible,"Start did not close the menu.");
@@ -69,7 +69,7 @@ static class BigPictureControlsChecks
         var currentGame=typeof(MainWindow).GetProperty("BigPictureGame",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
         using var sources=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs/covers.json")));
         string PathFor(string? file)=>string.IsNullOrEmpty(file)?"":Path.Combine(AppContext.BaseDirectory,file.Replace('\\',Path.DirectorySeparatorChar));
-        foreach(var index in new[]{0,1,2})
+        foreach(var index in new[]{0,1,2,3})
         {
             consoles.SelectedIndex=index;
             window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Advance(1);
@@ -79,14 +79,18 @@ static class BigPictureControlsChecks
             var art=sources.RootElement.EnumerateArray().FirstOrDefault(e=>e.GetProperty("Console").GetString()==selected.ShelfConsole && e.GetProperty("Title").GetString()==selected.Title);
             var media=art.ValueKind==JsonValueKind.Object && art.TryGetProperty("Media",out var source)?PathFor(source.GetString()):"";
             launch.Start(selected.Title,PathFor(cover.Front),PathFor(cover.Back),PathFor(cover.Spine),"Lancement…",selected.Id,
-                selected.ShelfConsole,openCase:true,media:media);
+                selected.ShelfConsole,openCase:true,media:media,right:PathFor(cover.Right),top:PathFor(cover.Top),bottom:PathFor(cover.Bottom));
+            // Advance manually: screenshots must not also advance the compositor clock.
+            ((DemandAnimation)typeof(GameLaunchTransition).GetField("_animation",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.GetValue(launch)!).Stop();
             var pending=launch.WaitForOpeningAsync(CancellationToken.None);
             Check(!pending.IsCompleted,"The game would launch before the case opens.");
             launch.Advance(.85);Save($"opening-{index}-mid.png");
             launch.Advance(.5);Save($"opening-{index}-spinning.png");
             Check(!pending.IsCompleted,"The game would launch before the disc spins.");
             var animated=launch.GetLogicalDescendants().OfType<GameCaseControl>().Single();
-            if(index!=2)
+            if(index==3)Check(animated.CaseFormat==GameCaseFormat.Nintendo64 && animated.CaseAspectRatio>1 && File.Exists(media),
+                "Nintendo 64 did not use its landscape cardboard box and cartridge scan.");
+            if(index is 0 or 1)
             {
                 Check(animated.MediaVerticalOffset<0,"The disc moved up instead of down.");
                 var first=animated.MediaRotationDegrees;launch.Advance(.05);
@@ -94,7 +98,7 @@ static class BigPictureControlsChecks
                 Check(second>first && animated.MediaRotationDegrees-second>second-first,"Disc rotation did not accelerate.");
             }
             launch.Advance(GameLaunchTransition.OpeningDuration);Check(pending.IsCompletedSuccessfully && pending.Result,"Opening animation never completed.");
-            if(index!=2)
+            if(index is 0 or 1)
             {
                 var rotation=animated.MediaRotationDegrees;
                 Check(launch.Advance(.05),"Disc animation stopped while the launch screen remained visible.");
@@ -117,7 +121,7 @@ static class BigPictureControlsChecks
         console=consoles.SelectedIndex;Input(13);Input(15);
         Check(!menu.IsVisible && consoles.SelectedIndex==console,"Big Picture controls changed the classic interface.");
         Console.WriteLine("OK  stick / D-pad separation, dead zone, platform and game navigation, menu and persisted inversion.");
-        Console.WriteLine("OK  three opening animations complete before launch; B and cancellation prevent launch.");
+        Console.WriteLine("OK  four opening animations complete before launch; B and cancellation prevent launch.");
         Console.WriteLine("OK  discs descend and accelerate; repeated selection preserves inspection; hidden card updates resume on desktop.");
         void Save(string file)
         {

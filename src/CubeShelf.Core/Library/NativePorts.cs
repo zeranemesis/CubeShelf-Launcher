@@ -19,6 +19,7 @@ public sealed record ShelfProduct(string Id, string Name, string Console, string
     });
     public static ShelfProduct Resolve(string? id) => id?.ToLowerInvariant() switch
     {
+        "n64" or "nintendo64" => new("n64", "N64Shelf", "Nintendo 64", "#31B767"),
         "wii" or "wiishelf" => new("wii", "WiiShelf", "Wii", "#45C5E8"),
         "switch" or "switchshelf" => new("switch", "SwitchShelf", "Switch", "#FA5365"),
         null or "gamecube" or "cubeshelf" => new("gamecube", "CubeShelf", "GameCube", "#A88BFA"),

@@ -43,7 +43,7 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
     }
 
     public void Start(string title, string front, string back, string spine, string status, string? gameId = null,
-        string console = "gamecube", bool openCase = false, string? media = null)
+        string console = "gamecube", bool openCase = false, string? media = null, string? right = null, string? top = null, string? bottom = null)
     {
         Stop();
         _openCase=openCase;
@@ -54,7 +54,7 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
             UseGpuTextures = openCase };
         _content.Children[0] = _case;
         _title.SetGame(gameId, title); _status.Text = status;
-        _case.SetCover(front, back, spine);
+        _case.SetCover(front, back, spine, right, top, bottom);
         _case.SetShelfPose(28, false, false);
         if(openCase) { _case.SetOpeningMedia(media);_case.SetOpeningProgress(0,0); }
         _elapsed = 0;
@@ -80,7 +80,7 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
         if(_elapsed>=OpeningDuration)
         {
             _openingFinished?.TrySetResult(true);
-            if(_case.CaseFormat==GameCaseFormat.Switch)return false;
+            if(_case.CaseFormat is GameCaseFormat.Switch or GameCaseFormat.Nintendo64)return false;
         }
         return IsVisible;
     }

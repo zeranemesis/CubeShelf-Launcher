@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using CubeShelf.Desktop;
 using CubeShelf.Desktop.Controls;
 
@@ -42,6 +43,41 @@ try
     if(!File.ReadAllText(Path.Combine(profile,"selected-port-versions.json")).Contains(alternative.GameId))
         throw new Exception("Selected port version was not persisted.");
     AssertCovers();
+    selector.SelectedIndex=3;
+    AssertBrand("n64");
+    if(cards.Items.Count!=29 || fullscreen.SelectedIndex!=3)throw new Exception("Nintendo 64 catalogue or selectors incorrect.");
+    AssertCovers();
+    var japanese=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Virtual Pro Wrestling 2").Game.Covers.First();
+    var landscapeCard=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Banjo-Kazooie");
+    var portraitCard=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Virtual Pro Wrestling 2");
+    var thumbnail=new GameCoverControl { Width=234,Format=GameCaseFormat.Nintendo64,Cover=landscapeCard.Cover };
+    thumbnail.Measure(new Size(234,double.PositiveInfinity));
+    if(thumbnail.DesiredSize.Height>=234)throw new Exception("Landscape Nintendo 64 cover retained a portrait frame.");
+    var aspect=(thumbnail.DesiredSize.Height-8)/(thumbnail.DesiredSize.Width-6);
+    if(Math.Abs(aspect-(double)landscapeCard.Cover!.PixelSize.Height/landscapeCard.Cover.PixelSize.Width)>.01)
+        throw new Exception("Nintendo 64 thumbnail added letterboxing or changed the printed artwork's proportions.");
+    thumbnail.Cover=portraitCard.Cover;
+    thumbnail.Measure(new Size(234,double.PositiveInfinity));
+    if(thumbnail.DesiredSize.Height<=234)throw new Exception("Japanese portrait cover did not resize its card.");
+    var complete=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Paper Mario").Game.Covers.First();
+    using(var box=new GameCaseControl { CaseFormat=GameCaseFormat.Nintendo64 })
+    {
+        string Art(string path)=>Path.Combine(AppContext.BaseDirectory,path);
+        box.SetCover(Art(complete.Front),Art(complete.Back),Art(complete.Spine),Art(complete.Right),Art(complete.Top),Art(complete.Bottom));
+        if(box.Nintendo64OpensAtTop)throw new Exception("Landscape Nintendo 64 cartons must open at the short side.");
+        foreach(var face in new[]{"_front","_back","_spine","_right","_top","_bottom"})
+            if(typeof(GameCaseControl).GetField(face,System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.GetValue(box) is null)
+                throw new Exception("Nintendo 64 face not decoded: "+face);
+        if(box.SetCover(Art(complete.Front),Art(complete.Back),Art(complete.Spine),Art(complete.Right),Art(complete.Top),Art(complete.Bottom)))
+            throw new Exception("Unchanged six-face artwork was decoded again.");
+    }
+    using(var box=new GameCaseControl { CaseFormat=GameCaseFormat.Nintendo64 })
+    {
+        box.SetCover(Path.Combine(AppContext.BaseDirectory,japanese.Front),"","");
+        if(box.CaseAspectRatio>=1)throw new Exception("Japanese Nintendo 64 packaging was stretched into a landscape box.");
+        if(!box.Nintendo64OpensAtTop)throw new Exception("Portrait Nintendo 64 cartons must open at the top.");
+    }
+    if(File.ReadAllText(Path.Combine(profile,"selected-console.txt"))!="n64")throw new Exception("Nintendo 64 selection was not persisted.");
     fullscreen.SelectedIndex=0;
     if(cards.Items.Count!=cubeCount || selector.SelectedIndex!=0)throw new Exception("Big Picture selector did not restore the GameCube library.");
     if(File.ReadAllText(Path.Combine(profile,"selected-console.txt"))!="gamecube")throw new Exception("Last console was not persisted.");
@@ -54,7 +90,7 @@ try
     AssertBrand("switch");
     if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=16)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
-    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (13) → Switch (16) → GameCube ({cubeCount})");
+    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (13) → Switch (16) → Nintendo 64 (29) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
@@ -111,7 +147,7 @@ try
     if(snapshotDirectory is not null)
     {
         Directory.CreateDirectory(snapshotDirectory);
-        foreach(var console in new[]{0,1,2})
+        foreach(var console in new[]{0,1,2,3})
         {
             selector.SelectedIndex=console;
             transition.Advance(1);
@@ -120,7 +156,7 @@ try
             using var frame=window.CaptureRenderedFrame();
             frame!.Save(Path.Combine(snapshotDirectory,$"library-{console}.png"));
         }
-        foreach(var console in new[]{0,1,2})
+        foreach(var console in new[]{0,1,2,3})
         {
             selector.SelectedIndex=console;
             transition.Advance(1);
@@ -128,6 +164,18 @@ try
             typeof(MainWindow).GetMethod("SelectCatalogGame", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window,[game,true]);
             var renderedCase=window.FindControl<CubeShelf.Desktop.Controls.GameCaseControl>("GameCase")!;
             if(renderedCase.CaseFormat!=CubeShelf.Desktop.Controls.GameCaseControl.FormatForConsole(game.ShelfConsole))throw new Exception("Wrong case format.");
+            if(console==3)
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+                var origin=renderedCase.TranslatePoint(new Point(renderedCase.Bounds.Width/2,renderedCase.Bounds.Height/2),window)!.Value;
+                window.MouseMove(origin);window.MouseDown(origin,MouseButton.Left,Avalonia.Input.RawInputModifiers.LeftMouseButton);
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                var destination=origin+new Vector(-110,100);
+                window.MouseMove(destination,Avalonia.Input.RawInputModifiers.LeftMouseButton);window.MouseUp(destination,MouseButton.Left);
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                var pitch=(double)typeof(GameCaseControl).GetField("_pitch",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.GetValue(renderedCase)!;
+                if(pitch<40)throw new Exception($"Dragging did not expose Nintendo 64 box edges: pitch {pitch}, origin {origin}, target {window.InputHitTest(origin)?.GetType().Name}, visible {renderedCase.IsEffectivelyVisible}.");
+            }
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
             AvaloniaHeadlessPlatform.ForceRenderTimerTick(3);
             using var frame=window.CaptureRenderedFrame();

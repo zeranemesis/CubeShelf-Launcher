@@ -12,4 +12,5 @@ public interface IMobileGameService
     string? LastError { get; }
     IRuntimeDownloads? Downloads => null;
     LauncherAppUpdates? AppUpdates => null;
+    IMobileNativePorts? NativePorts => null;
 }

@@ -12,9 +12,14 @@
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
   <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
   <queries>
+    <package android:name="dev.net64.ghostship" />
+    <package android:name="com.dishii.soh" />
+    <package android:name="com.dishii.mm" />
+    <package android:name="app.birdman64" />
+    <package android:name="io.github.jackandbeans.snap64recomp" />
     <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
   </queries>
-  <application android:label="CubeShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true">
+  <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true">
     <provider android:name="androidx.core.content.FileProvider"
               android:authorities="io.github.zeranemesis.cubeshelf.updates"
               android:exported="false" android:grantUriPermissions="true">

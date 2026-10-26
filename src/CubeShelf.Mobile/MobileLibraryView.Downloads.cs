@@ -95,8 +95,18 @@ public sealed partial class MobileLibraryView
             if (state == RuntimeDownloadState.Ready)
             {
                 CloseDownloads(false);
-                var index = Array.FindIndex(_catalog, game => game.Id == (entry?.GameId ?? PartyBoardId));
-                if (index >= 0) { Select(index, false); await LaunchSelectedGameAsync(); }
+                var target=_allCatalog.FirstOrDefault(game=>game.Id==(entry?.GameId??PartyBoardId));
+                if(target is not null)
+                {
+                    _consolePicker.SelectedIndex=target.ShelfConsole=="n64"?1:0;
+                    var index=Array.FindIndex(_catalog,game=>game.Id==target.Id);
+                    if(index>=0)
+                    {
+                        Select(index,false);
+                        if(SelectedNativePort is { } port && (!_games.NativePorts!.IsInstalled(port.Id)||_games.NativePorts.IsUpdateAvailable(port.Id)))await PrepareSelectedPortAsync();
+                        else await LaunchSelectedGameAsync();
+                    }
+                }
             }
             else if (DownloadManager is { } manager)
             {
@@ -187,21 +197,26 @@ public sealed partial class MobileLibraryView
     private void ApplyDownloadSnapshot(RuntimeDownloadSnapshot snapshot)
     {
         var entries = DownloadManager?.Entries ?? Array.Empty<RuntimeQueueEntry>();
-        var primaryState = entries.FirstOrDefault(item => item.GameId == PartyBoardId)?.Transfer.State ?? snapshot.State;
+        var primaryState = entries.FirstOrDefault(item => item.GameId == (_catalog.Length>0?_catalog[_selected].Id:PartyBoardId))?.Transfer.State ?? snapshot.State;
         var changed = _lastDownloadState != primaryState; _lastDownloadState = primaryState;
         if (changed) RefreshAvailability();
         if (!_downloadsOverlay.IsVisible) return;
         var manager = DownloadManager;
         var entry = entries.FirstOrDefault(item => item.Transfer.IsBusy)
-            ?? entries.FirstOrDefault(item => item.Position >= 0) ?? entries.FirstOrDefault();
+            ?? entries.FirstOrDefault(item => item.Position >= 0)
+            ?? entries.FirstOrDefault(item=>item.GameId==(_catalog.Length>0?_catalog[_selected].Id:PartyBoardId)) ?? entries.FirstOrDefault();
         if (entry is not null) snapshot = entry.Transfer;
         _displayedDownloadId = entry?.Id ?? "partyboard";
         var previousFocus = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
         _transferName.Text = entry?.Title ?? "Mario Party 4";
         _transferVersion.Text = entry is null ? "PartyBoard · v0.20.0" : $"Moteur · {entry.Version}";
         _transferCover.Source = DownloadCover(entry?.GameId ?? PartyBoardId);
-        _transferState.Text = TransferLabel(snapshot.State);
-        _transferHeading.Text = snapshot.IsBusy ? "EN COURS" : snapshot.State == RuntimeDownloadState.Ready ? "INSTALLÉ" : "À TÉLÉCHARGER";
+        _transferCover.Stretch=Stretch.Uniform;
+        _transferCover.Height=_transferCover.Source is Bitmap artwork?82d*artwork.PixelSize.Height/artwork.PixelSize.Width:116;
+        var needsInstall=entry is not null && _games.NativePorts?.Catalog.Any(p=>p.Id==entry.GameId)==true
+            && (!_games.NativePorts.IsInstalled(entry.GameId)||_games.NativePorts.IsUpdateAvailable(entry.GameId));
+        _transferState.Text = snapshot.State==RuntimeDownloadState.Ready&&needsInstall?"APK prêt à installer":TransferLabel(snapshot.State);
+        _transferHeading.Text = snapshot.IsBusy ? "EN COURS" : snapshot.State == RuntimeDownloadState.Ready ? needsInstall?"APK VÉRIFIÉ":"INSTALLÉ" : "À TÉLÉCHARGER";
         var percent = Math.Clamp(100d * snapshot.ReceivedBytes / Math.Max(1, snapshot.TotalBytes), 0, 100);
         _transferProgress.Value = percent;
         _transferProgress.IsIndeterminate = snapshot.State is RuntimeDownloadState.Verifying or RuntimeDownloadState.Installing;
@@ -212,7 +227,7 @@ public sealed partial class MobileLibraryView
             or RuntimeDownloadState.Failed or RuntimeDownloadState.Ready || snapshot.State == RuntimeDownloadState.Queued && manager?.IsPaused == true;
         var action = snapshot.State switch
         {
-            RuntimeDownloadState.Ready => "Jouer", RuntimeDownloadState.Paused => "Reprendre",
+            RuntimeDownloadState.Ready => needsInstall?"Installer l’APK":"Jouer", RuntimeDownloadState.Paused => "Reprendre",
             RuntimeDownloadState.Queued => "Reprendre la file", RuntimeDownloadState.Failed => "Réessayer", _ => "Télécharger"
         };
         if ((_transferStart.Tag as string) != action)
@@ -221,7 +236,7 @@ public sealed partial class MobileLibraryView
         _transferPause.IsEnabled = snapshot.State == RuntimeDownloadState.Downloading;
         _transferCancel.IsVisible = snapshot.State is RuntimeDownloadState.Downloading or RuntimeDownloadState.Paused or RuntimeDownloadState.Failed or RuntimeDownloadState.Queued;
         _transferExplanation.Text = snapshot.Error ?? (snapshot.State == RuntimeDownloadState.Ready
-            ? "Ton image disque personnelle se sélectionne au premier lancement."
+            ? needsInstall?"Installation à confirmer dans Android. Le port demandera ensuite les fichiers de ta propre copie du jeu.":"Les fichiers de ta propre copie se sélectionnent dans le port au premier lancement."
             : snapshot.State == RuntimeDownloadState.Queued && manager?.IsPaused == true ? "La file est en pause. Reprends-la quand tu es prêt."
             : "Les fichiers sont préparés dans CubeShelf. Tu peux continuer à parcourir ta bibliothèque.");
         var rate = snapshot.State == RuntimeDownloadState.Downloading ? snapshot.BytesPerSecond : 0;
@@ -299,7 +314,8 @@ public sealed partial class MobileLibraryView
     private Grid DownloadIdentity(string gameId, string title, string detail)
     {
         var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*"), ColumnSpacing = 12 };
-        grid.Children.Add(new Image { Source = DownloadCover(gameId), Width = 48, Height = 68, Stretch = Stretch.UniformToFill });
+        var cover=DownloadCover(gameId);
+        grid.Children.Add(new Image { Source = cover, Width = 48, Height = cover is null?68:48d*cover.PixelSize.Height/cover.PixelSize.Width, Stretch = Stretch.Uniform });
         var text = new StackPanel { Spacing = 5, VerticalAlignment = VerticalAlignment.Center };
         var name = DownloadText(15); name.Text = title; name.Foreground = Brushes.White;
         var details = DownloadText(12); details.Text = detail;

@@ -207,6 +207,9 @@ public sealed class GameCover
     public string Front { get; set; } = "";
     public string Back { get; set; } = "";
     public string Spine { get; set; } = "";
+    public string Right { get; set; } = "";
+    public string Top { get; set; } = "";
+    public string Bottom { get; set; } = "";
 }
 
 /// <summary>
@@ -397,6 +400,9 @@ public sealed class GameCatalogService
         Label = source.Label,
         Front = source.Front,
         Back = source.Back,
-        Spine = source.Spine
+        Spine = source.Spine,
+        Right = source.Right,
+        Top = source.Top,
+        Bottom = source.Bottom
     };
 }

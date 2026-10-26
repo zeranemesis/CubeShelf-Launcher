@@ -1,11 +1,11 @@
-# DecompShelf — bibliothèques GameCube, Wii et Switch
+# DecompShelf — bibliothèques GameCube, Wii, Switch et Nintendo 64
 
-DecompShelf réunit les trois bibliothèques de ports natifs et recompilations dans l'application issue de CubeShelf. Elle ne fournit ni émulateur généraliste, ni disque, jeu, firmware ou clé.
+DecompShelf réunit les quatre bibliothèques de ports natifs et recompilations dans l'application issue de CubeShelf. Elle ne fournit ni émulateur généraliste, ni disque, jeu, firmware ou clé.
 
 ## Utiliser l'application
 
-- Choisir **GameCube**, **Wii** ou **Switch** dans le sélecteur **en haut à gauche**. Les cartes et favoris changent dans la même fenêtre. Le mode Big Picture propose aussi ce sélecteur.
-- Le logo à côté de DecompShelf suit automatiquement le catalogue : GameCube, Wii ou Switch. Les marques sont incluses dans l'application et ne nécessitent aucun accès réseau.
+- Choisir **GameCube**, **Wii**, **Switch** ou **Nintendo 64** dans le sélecteur **en haut à gauche**. Les cartes et favoris changent dans la même fenêtre. Le mode Big Picture propose aussi ce sélecteur.
+- Le logo à côté de DecompShelf suit automatiquement le catalogue : GameCube, Wii, Switch ou Nintendo 64. Les marques sont incluses dans l'application et ne nécessitent aucun accès réseau.
 - Une transition courte accompagne le changement de console. **Paramètres → Réduire les animations de changement de console** permet un passage immédiat. Big Picture conserve le plein écran lors du changement.
 - Un jeu n'apparaît qu'une fois par console. Lorsqu'il possède plusieurs ports, choisir le projet et sa version dans le **menu déroulant de sa carte ou de sa fiche**. Le choix est mémorisé ; les favoris sont communs aux versions du même jeu. Les programmes associés et les statistiques restent propres à chaque port.
 - Les jaquettes réelles sont incluses pour chaque jeu : format GameCube, boîtier Wii blanc et boîtier Switch plus étroit. Les scans de face, dos et tranche disponibles viennent de [GameTDB](https://www.gametdb.com/). Les identifiants, URLs et empreintes sont consignés dans `Catalogs/covers.json`. Les jeux dématérialisés utilisent les jaquettes correspondantes de la base ; aucun dos fictif n'est ajouté quand le scan manque.
@@ -44,3 +44,27 @@ dotnet run --project src/CubeShelf.Desktop -- --shelf switch
 ```
 
 Les tests vérifient les catalogues, les origines des paquets, leurs empreintes, l'extraction, l'association des programmes et la séparation des profils. Aucun test ne remplace une partie réelle avec les fichiers du joueur.
+
+## Nintendo 64
+
+29 jeux, 34 projets natifs, regroupés sans doublons. Les autres versions du même jeu restent accessibles dans le sélecteur de port. Boîtes en carton horizontales, ou verticales pour les éditions japonaises, 29 scans de cartouches. Au lancement en Big Picture, le rabat s’ouvre et la cartouche sort puis descend devant la boîte ; elle ne tourne pas comme un disque. L’animation s’arrête une fois terminée et reste annulable avec B/Échap.
+
+Le catalogue PC contient 29 jeux Nintendo 64. Depuis preview.11, Android propose les cinq ports compatibles décrits dans `packaging/ANDROID.md` ; les autres ne sont pas annoncés compatibles.
+
+### Boîtes Nintendo 64 complètes
+
+Les six faces sont prises en charge dans la bibliothèque, la fiche du jeu et le lancement Big Picture : face, dos, tranche gauche, tranche droite, dessus, dessous. Les scans de chaque boîte complète viennent de la même édition Nintendo64EVER ; des éditions régionales différentes peuvent être illustrées selon les scans disponibles. Les données de jeu demandées restent celles du port natif.
+
+22 jeux disposent des six scans. Les côtés manquants restent en carton uni : Harvest Moon 64, Ogre Battle 64, Snowboard Kids 2 et WWF WrestleMania 2000 (tranches et dessous) ; Star Fox 64 et les deux Virtual Pro Wrestling (dessous). Les 29 boîtes ont leur face, leur dos, leur dessus et leur cartouche.
+
+Sur une boîte Nintendo 64 sélectionnée, maintenir le clic et glisser pour la faire tourner horizontalement et verticalement. Un clic simple conserve le retournement face/dos. La navigation manette entre les jeux et consoles reste identique.
+
+### Construction du carton
+
+Le visuel est imprimé jusqu’aux plis, sans cadre beige ni joint de boîtier plastique. L’animation ouvre le petit côté des éditions horizontales et le haut des éditions japonaises verticales, déplie le rabat et les pattes, puis fait sortir un support intérieur en carton avec la cartouche. Le support est une représentation simplifiée ; sa forme exacte varie selon les éditions.
+
+Références visuelles : [boîte PAL originale Ocarina of Time et son support](https://own4less.co.uk/product/386486/zelda-ocarina-of-time-nintendo-n64-game-boxed-instructions-a), [inventaire de contenus originaux Micro-64](https://www.micro-64.com/database/n64gamecontents.shtml).
+
+### Cartes de bibliothèque
+
+La hauteur des miniatures suit le rapport largeur/hauteur réel des jaquettes. Une boîte Nintendo 64 horizontale occupe un espace horizontal, une boîte japonaise reste verticale ; aucune bande noire ni découpe n’est ajoutée. Les boîtiers GameCube, Wii et Switch conservent leurs bordures propres à la console.

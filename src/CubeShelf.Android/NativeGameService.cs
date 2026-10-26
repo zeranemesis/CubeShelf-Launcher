@@ -18,8 +18,8 @@ public static class NativeGameService
     private static RuntimeDownloadQueue CreateDownloads()
     {
         var context = global::Android.App.Application.Context;
-        var downloads = new RuntimeDownloadQueue(context.FilesDir!.AbsolutePath,
-            new RuntimeDownloadSource("partyboard", "GMPE01_00", "Mario Party 4", PartyBoardDownloads.Version, Engine, Engine.InstalledAt));
+        var sources=new[] {new RuntimeDownloadSource("partyboard", "GMPE01_00", "Mario Party 4", PartyBoardDownloads.Version, Engine, Engine.InstalledAt)};
+        var downloads = new RuntimeDownloadQueue(context.FilesDir!.AbsolutePath,sources.Concat(AndroidNativePorts.Instance.Sources).ToArray());
         downloads.Changed += snapshot => RuntimeDownloadService.Observe(snapshot);
         return downloads;
     }

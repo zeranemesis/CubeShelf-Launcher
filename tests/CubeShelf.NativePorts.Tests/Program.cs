@@ -9,17 +9,20 @@ var root = Path.Combine(Path.GetTempPath(), "native-shelves-tests-" + Guid.NewGu
 Directory.CreateDirectory(root);
 try
 {
-    var catalogs = new[] { "gamecube", "wii", "switch" }.ToDictionary(id => id, id => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory,"Catalogs",id+".json")));
-    Check(catalogs["gamecube"].Count >= 19 && catalogs["wii"].Count >= 13 && catalogs["switch"].Count >= 20, "all three catalogues load with verified source references");
+    var catalogs = new[] { "gamecube", "wii", "switch", "n64" }.ToDictionary(id => id, id => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory,"Catalogs",id+".json")));
+    Check(catalogs["gamecube"].Count >= 19 && catalogs["wii"].Count >= 13 && catalogs["switch"].Count >= 20, "all four catalogues load with verified source references");
     Check(catalogs.Values.SelectMany(p=>p).All(p => p.ReadmeUrl.StartsWith(p.Homepage+"/") && p.SourceCommit.Length==40 && p.VerifiedAt=="2026-10-26"), "primary README provenance is retained");
     Check(catalogs.Values.SelectMany(p=>p).All(p => !p.Repository.Contains("nxnative")), "mobile-only project is not labelled as a desktop port");
     Check(ShelfProduct.Resolve("wii").CreatePaths().DataDirectory != ShelfProduct.Resolve("switch").CreatePaths().DataDirectory, "WiiShelf and SwitchShelf profiles are isolated");
+    Check(catalogs["n64"].Count == 34 && catalogs["n64"].Select(p=>p.Title).Distinct().Count()==29, "Nintendo 64 native ports group into 29 unique games");
+    Check(ShelfProduct.Resolve("n64").Console=="Nintendo 64", "Nintendo 64 identity resolves");
     var suiteGames = new[] {
         new GameCatalogEntry {Id="legacy",Title="Legacy"},
         new GameCatalogEntry {Id="native-wii-test",Title="Wii game",ShelfConsole="wii",NativePortId="wii-test",RuntimeOwnsSetup=true,DataPreparation=GameDataPreparation.Runtime},
         new GameCatalogEntry {Id="native-switch-test",Title="Switch game",ShelfConsole="switch",NativePortId="switch-test",RuntimeOwnsSetup=true,DataPreparation=GameDataPreparation.Runtime}
     };
     suiteGames[1].IsFavorite=true;suiteGames[2].PlayCount=7;
+    suiteGames[2].Covers=[new GameCover { Front="front",Back="back",Spine="left",Right="right",Top="top",Bottom="bottom" }];
     Check(NativePortCatalog.ForConsole(suiteGames,"wii").Single().Id=="native-wii-test"
         && NativePortCatalog.ForConsole(suiteGames,"switch").Single().Id=="native-switch-test"
         && NativePortCatalog.ForConsole(suiteGames,"gamecube").Single().Id=="legacy", "console selector scopes the existing library without mixing games");
@@ -44,6 +47,8 @@ try
     var loaded=store.Load();
     Check(loaded.Single(g=>g.Id=="native-switch-test") is {ShelfConsole:"switch",RuntimeOwnsSetup:true,NativePortId:"switch-test",PlayCount:7},
         "console and native launch contracts persist through catalogue migration");
+    Check(loaded.Single(g=>g.Id=="native-switch-test").Covers.Single() is {Right:"right",Top:"top",Bottom:"bottom"},
+        "all six box faces survive catalogue cloning and persistence");
     var payload = Zip("native.exe", "placeholder, never executed");
     var port = new NativePort { Id="fixture",Title="Fixture",Repository="owner/port" };
     var asset = new NativePortAsset { Name="port.zip",Url="https://github.com/owner/port/releases/download/v1/port.zip",Size=payload.Length,Sha256=Convert.ToHexString(SHA256.HashData(payload)),RuntimeIdentifiers=[NativePortAsset.CurrentRuntimeIdentifier] };
@@ -64,7 +69,7 @@ try
     Throws(()=>NativePortCatalog.Load(file),"duplicate catalogue IDs rejected");
     using var cancelled=new CancellationTokenSource();cancelled.Cancel();
     await ThrowsAsync(()=>library.InstallAsync(port,asset,null,cancelled.Token,http),"cancellation cannot activate a package");
-    Console.WriteLine("18 native shelf checks passed.");
+    Console.WriteLine("21 native shelf checks passed.");
 }
 finally { Directory.Delete(root,true); }
 static void Check(bool condition,string text){if(!condition)throw new Exception(text);Console.WriteLine("OK  "+text);}

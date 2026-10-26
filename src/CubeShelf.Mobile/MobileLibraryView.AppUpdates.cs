@@ -23,14 +23,14 @@ public sealed partial class MobileLibraryView
         _appUpdatesButton.MinWidth = 48; _appUpdatesButton.MinHeight = 48;
         _appUpdatesButton.Padding = new Thickness(10, 6); _appUpdatesButton.Margin = new Thickness(6, 0, 0, 0);
         _appUpdatesButton.IsVisible = _games.AppUpdates is not null;
-        AutomationProperties.SetName(_appUpdatesButton, "Mises à jour de l'application CubeShelf");
+        AutomationProperties.SetName(_appUpdatesButton, "Mises à jour de l'application DecompShelf");
         _appUpdatesButton.Click += async (_, _) =>
         {
             ShowDownloads(); _checkAppUpdate.Focus(); _checkAppUpdate.BringIntoView();
             if (_games.AppUpdates is { } updates) await updates.CheckAsync();
         };
         var card = new StackPanel { Spacing = 12 };
-        card.Children.Add(new TextBlock { Text = "Application CubeShelf", FontSize = 19, FontWeight = FontWeight.SemiBold });
+        card.Children.Add(new TextBlock { Text = "Application DecompShelf", FontSize = 19, FontWeight = FontWeight.SemiBold });
         card.Children.Add(_appUpdateText); card.Children.Add(_appUpdateProgress);
         card.Children.Add(new TextBlock { Text = "L'installation sera confirmée dans l'écran Android. Tes données sont conservées lors d'une mise à jour avec la même signature.", FontSize = 12, TextWrapping = TextWrapping.Wrap, Foreground = Brushes.LightGray });
         var actions = new WrapPanel { Orientation = Orientation.Horizontal };
@@ -91,13 +91,13 @@ public sealed partial class MobileLibraryView
         _appUpdateText.Text = snapshot.State switch
         {
             AppUpdateState.Checking => "Recherche de la dernière version sur GitHub…",
-            AppUpdateState.Current => $"CubeShelf {snapshot.CurrentVersion} est à jour.",
-            AppUpdateState.Available => $"CubeShelf {snapshot.Package?.Version} est disponible (version installée : {snapshot.CurrentVersion}).",
-            AppUpdateState.Downloading => $"CubeShelf {snapshot.Package?.Version} · {DataSize(snapshot.Received)} / {DataSize(snapshot.Package?.Size ?? 0)}",
-            AppUpdateState.Ready => $"CubeShelf {snapshot.Package?.Version} est téléchargé et vérifié. Tu peux l'installer.",
+            AppUpdateState.Current => $"DecompShelf {snapshot.CurrentVersion} est à jour.",
+            AppUpdateState.Available => $"DecompShelf {snapshot.Package?.Version} est disponible (version installée : {snapshot.CurrentVersion}).",
+            AppUpdateState.Downloading => $"DecompShelf {snapshot.Package?.Version} · {DataSize(snapshot.Received)} / {DataSize(snapshot.Package?.Size ?? 0)}",
+            AppUpdateState.Ready => $"DecompShelf {snapshot.Package?.Version} est téléchargé et vérifié. Tu peux l'installer.",
             AppUpdateState.Failed => "Mise à jour indisponible : " + snapshot.Error + " Tu peux réessayer.",
             _ => $"Version installée : {snapshot.CurrentVersion}. Vérification automatique au démarrage et toutes les cinq minutes."
         };
-        AutomationProperties.SetName(_appUpdatesButton, available ? $"CubeShelf {snapshot.Package?.Version} disponible" : "Mises à jour de l'application CubeShelf");
+        AutomationProperties.SetName(_appUpdatesButton, available ? $"DecompShelf {snapshot.Package?.Version} disponible" : "Mises à jour de l'application DecompShelf");
     }
 }

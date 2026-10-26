@@ -17,9 +17,13 @@
     <Compile Include="../CubeShelf.Desktop/Controls/DemandAnimation.cs" Link="Controls/DemandAnimation.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameLaunchTransition.cs" Link="Controls/GameLaunchTransition.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameTitleControl.cs" Link="Controls/GameTitleControl.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/ConsoleBrandMark.cs" Link="Controls/ConsoleBrandMark.cs" />
+    <AvaloniaResource Include="Assets/Covers/**/*" />
+    <AvaloniaResource Include="Catalogs/*.json" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Assets/Brand/gamecube_logo.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/*.png" Link="Assets/Logos/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />
-    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/**/*" Exclude="../CubeShelf.Desktop/Assets/Covers/Media/**/*" Link="Assets/Covers/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/**/*" Exclude="../CubeShelf.Desktop/Assets/Covers/Media/**/*;../CubeShelf.Desktop/Assets/Covers/N64/**/*" Link="Assets/Covers/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/games.json" Link="games.json" />
   </ItemGroup>
 </Project>

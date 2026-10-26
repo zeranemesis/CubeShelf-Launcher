@@ -92,7 +92,8 @@ public sealed partial class MainWindow
         {
             var cover = game.Covers.FirstOrDefault();
             return new Controls.GameShelfItem(game.Title, ResolveCoverPath(cover?.Front),
-                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), game.ShelfConsole);
+                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), game.ShelfConsole,
+                ResolveCoverPath(cover?.Right), ResolveCoverPath(cover?.Top), ResolveCoverPath(cover?.Bottom));
         }).ToArray());
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
@@ -131,7 +132,7 @@ public sealed partial class MainWindow
         {
             var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
             var missing = _bigPictureGames.SelectMany(game => game.Covers.Take(1))
-                .SelectMany(cover => new[] { cover.Front, cover.Back, cover.Spine })
+                .SelectMany(cover => new[] { cover.Front, cover.Back, cover.Spine, cover.Right, cover.Top, cover.Bottom })
                 .Count(path => string.IsNullOrWhiteSpace(path) || !File.Exists(ResolveCoverPath(path)));
             var folder = Path.Combine(_paths.DataDirectory, "Logs");
             Directory.CreateDirectory(folder);
@@ -302,8 +303,8 @@ public sealed partial class MainWindow
         {
             case Key.Left: MoveBigPictureGame(-1); break;
             case Key.Right: MoveBigPictureGame(1); break;
-            case Key.Up: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%3; break;
-            case Key.Down: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+2)%3; break;
+            case Key.Up: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%BigPictureConsoleShelfPicker.ItemCount; break;
+            case Key.Down: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+BigPictureConsoleShelfPicker.ItemCount-1)%BigPictureConsoleShelfPicker.ItemCount; break;
             case Key.Escape: case Key.F10: ShowBigPictureMenu(); break;
             case Key.Enter: ActivateBigPictureAction(); break;
             case Key.F: FlipBigPictureCase(this, new RoutedEventArgs()); break;

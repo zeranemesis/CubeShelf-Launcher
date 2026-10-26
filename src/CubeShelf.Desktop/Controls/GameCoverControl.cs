@@ -23,13 +23,33 @@ public sealed class GameCoverControl : Control
         StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative), EndPoint = new RelativePoint(1, .4, RelativeUnit.Relative),
         GradientStops = new GradientStops { new(Color.FromArgb(14,255,255,255),0),new(Colors.Transparent,.28),new(Color.FromArgb(9,255,255,255),.5),new(Colors.Transparent,.7) }
     };
-    static GameCoverControl() => AffectsRender<GameCoverControl>(CoverProperty, FormatProperty);
+    static GameCoverControl()
+    {
+        AffectsRender<GameCoverControl>(CoverProperty, FormatProperty);
+        AffectsMeasure<GameCoverControl>(CoverProperty, FormatProperty);
+    }
     public GameCoverControl() => RenderOptions.SetBitmapInterpolationMode(this,BitmapInterpolationMode.HighQuality);
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var width=double.IsFinite(availableSize.Width)?availableSize.Width:234;
+        var cardboard=Format==GameCaseFormat.Nintendo64;
+        var inset=cardboard?6:Format==GameCaseFormat.Switch?14:16;
+        var ratio=Cover is { PixelSize.Width: >0 } cover?(double)cover.PixelSize.Height/cover.PixelSize.Width
+            :Format switch {GameCaseFormat.Nintendo64=>2.08/2.92,GameCaseFormat.Switch=>2.92/1.79,_=>2.92/2.08};
+        return new Size(width,Math.Max(0,width-inset)*ratio+(cardboard?8:14));
+    }
     public override void Render(DrawingContext context)
     {
         var box = new Rect(3, 2, Math.Max(0, Bounds.Width - 6), Math.Max(0, Bounds.Height - 8));
         if (box.Width < 2 || box.Height < 2) return;
         context.DrawRectangle(Shadow, null, box.Translate(new Vector(0, 4)).Inflate(1), 3, 3);
+        if(Format==GameCaseFormat.Nintendo64)
+        {
+            if(Cover is { } print)context.DrawImage(print,new Rect(print.Size),box);
+            else context.DrawRectangle(DarkShell,null,box);
+            context.DrawRectangle(null,Seam,box);
+            return;
+        }
         var shell = Format switch { GameCaseFormat.Wii => WhiteShell, GameCaseFormat.Switch => ClearShell, _ => DarkShell };
         context.DrawRectangle(shell, Edge, box, 2.5, 2.5);
         var hinge = Format == GameCaseFormat.Switch ? 3 : 5;

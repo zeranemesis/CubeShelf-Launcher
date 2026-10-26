@@ -19,7 +19,7 @@ internal static class Program
             var option = Array.IndexOf(args, "--shelf");
             if (option >= 0)
             {
-                if (option + 1 >= args.Length) throw new ArgumentException("--shelf attend gamecube, wii ou switch.");
+                if (option + 1 >= args.Length) throw new ArgumentException("--shelf attend gamecube, wii, switch ou n64.");
                 id = args[option + 1];
             }
             Product = ShelfProduct.Resolve(id);

@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.18.0-preview.11 — Ports natifs Android, non publiée
+
+- Android : catalogue Nintendo 64 de cinq ports natifs (Super Mario 64, Ocarina of Time, Majora’s Mask, Pilotwings 64, Pokémon Snap), boîtes et cartouches, sélection de plateforme dans DecompShelf.
+- Téléchargements officiels épinglés, reprise HTTP, SHA-256 du paquet et de l’APK, contrôle de l’identité et de la signature avant mise à jour du port, confirmation dans Android et lancement de son application installée.
+- PartyBoard et les mises à jour du launcher restent disponibles. Android versionCode 43, identifiant de paquet conservé pour les mises à jour.
+- Vérification des architectures, version Android, OpenGL ES et Vulkan selon les ports ; versions expérimentales signalées. Aucun jeu ni ROM fourni.
+- Tests de téléchargement et d’interface avec ports simulés ; aucun téléphone connecté pour valider les jeux.
+
+## 0.18.0-preview.10 — Cartes adaptées aux boîtes, non publiée
+
+- La hauteur des jaquettes de la bibliothèque suit les proportions de chaque image, au lieu d’un cadre vertical de hauteur fixe.
+- Boîtes Nintendo 64 horizontales ou japonaises verticales sans bandes noires, charnière ni effet de pochette plastique.
+- Les boîtiers GameCube, Wii et Switch conservent leur habillage et affichent l’intégralité de leur jaquette.
+
+## 0.18.0-preview.9 — Forme des cartons Nintendo 64, non publiée
+
+- Impression jusqu’aux arêtes, suppression du cadre beige et des détails de boîtier plastique sur les boîtes Nintendo 64.
+- Ouverture par le petit côté pour les boîtes horizontales, par le haut pour les éditions japonaises verticales ; rabat rentrant, petites pattes et support intérieur en carton.
+- La cartouche sort avec le support puis descend devant la boîte au lancement Big Picture.
+
+## 0.18.0-preview.8 — Boîtes Nintendo 64, non publiée
+
+- Inspection Nintendo 64 par clic-glisser pour tourner la boîte et voir ses bords.
+- Rendu des six faces : face, dos, deux tranches, dessus et dessous. Textures transmises à la bibliothèque, à la fiche et au lancement Big Picture.
+- Scans complets pour 22 jeux ; les sept autres conservent les scans disponibles et des faces unies quand une source manque. Éditions de boîte conservées ensemble.
+- Textures des côtés et du rabat dans l’animation de sortie de cartouche ; conservation des six faces dans le profil.
+
+## 0.18.0-preview.7 — Nintendo 64, non publiée
+
+- Catalogue Nintendo 64 dans la même application : 34 ports natifs, 29 jeux uniques, choix des versions sans doublon.
+- Jaquettes et cartouches scannées ; formats carton horizontal et japonais vertical.
+- Big Picture : rabat de boîte animé, cartouche sortante, logo Nintendo 64 et navigation entre quatre consoles.
+- Version Windows locale ; aucun nouvel APK Android publié.
+
 ## 0.18.0-preview.6 — DecompShelf et logos par catalogue, non publiée
 
 - L'application s'appelle désormais DecompShelf dans la fenêtre, les en-têtes, les réglages, les menus Big Picture et la zone de notification. Le paquet de travail fournit le lanceur DecompShelf.

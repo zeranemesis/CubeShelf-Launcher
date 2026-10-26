@@ -6,7 +6,8 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
-public sealed record GameShelfItem(string Title, string Front, string Back, string Spine, string Console = "gamecube");
+public sealed record GameShelfItem(string Title, string Front, string Back, string Spine, string Console = "gamecube",
+    string Right = "", string Top = "", string Bottom = "");
 
 /// <summary>A bounded shelf of actual projected, textured cases, with no external renderer.</summary>
 public sealed class GameShelfControl : Panel, IDisposable
@@ -93,7 +94,7 @@ public sealed class GameShelfControl : Panel, IDisposable
                     UseCompactTextureMesh = UseCompactTextureMesh,
                     UseGpuTextures = UseGpuTextures
                 };
-                cover.SetCover(item.Front, item.Back, item.Spine);
+                cover.SetCover(item.Front, item.Back, item.Spine, item.Right, item.Top, item.Bottom);
                 AutomationProperties.SetName(cover, item.Title);
                 cover.PointerPressed += (_, args) =>
                 {

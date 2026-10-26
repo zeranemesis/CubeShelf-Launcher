@@ -9,7 +9,7 @@ public sealed partial class GameCaseControl
     private bool _openingEnabled;
     private double _opening, _mediaLift;
     private double _mediaSpinDegrees;
-    internal double MediaVerticalOffset => (CaseFormat==GameCaseFormat.Switch?.82:-1.05)*_mediaLift;
+    internal double MediaVerticalOffset => (CaseFormat switch { GameCaseFormat.Switch => .82, GameCaseFormat.Nintendo64 => -2.2, _ => -1.05 })*_mediaLift;
     internal double MediaRotationDegrees => _mediaSpinDegrees;
     private Bitmap? _mediaArtwork;
     private static readonly IBrush DiscSilver = Material("#E8EDF3","#879CB3","#FCFCFF","#9DA5B6");
@@ -35,6 +35,7 @@ public sealed partial class GameCaseControl
 
     private void RenderOpening(DrawingContext context)
     {
+        if(CaseFormat==GameCaseFormat.Nintendo64) { RenderNintendo64Opening(context);return; }
         var half=CaseWidth/2;var tall=CaseHeight/2;
         var (sinYaw,cosYaw)=Math.SinCos(12*Math.PI/180);
         var (sinPitch,cosPitch)=Math.SinCos(-4*Math.PI/180);
@@ -147,5 +148,81 @@ public sealed partial class GameCaseControl
         }
         context.DrawLine(CaseHighlight,lid[0],lid[3]);
         if(_mediaLift>0)Media();
+    }
+
+    private static readonly IBrush CartridgeTrayPaper = new SolidColorBrush(Color.Parse("#EEEDE5"));
+    private static readonly IBrush CartridgeTrayWell = new SolidColorBrush(Color.Parse("#B8B6AE"));
+    internal bool Nintendo64OpensAtTop => PortraitNintendo64;
+
+    private void RenderNintendo64Opening(DrawingContext context)
+    {
+        var half=CaseWidth/2;var tall=CaseHeight/2;var depth=CaseDepth/2;
+        var portrait=Nintendo64OpensAtTop;
+        var end=portrait?tall:half;var side=portrait?half:tall;
+        var fit=Math.Min(Bounds.Width/6.2,Bounds.Height/(portrait?7.8:5.7));
+        Point Project(double x,double y,double z) => new(Bounds.Width*(portrait?.5:.34)+(x*.951-z*.309)*fit,
+            Bounds.Height*(portrait?.53:.33)-(y*.990-(x*.309+z*.951)*.139)*fit);
+        Point Local(double u,double v,double z) => portrait?Project(-v,u,z):Project(u,v,z);
+        Point[] Panel(double left,double top,double right,double bottom,double z) =>
+            [Project(left,top,z),Project(right,top,z),Project(right,bottom,z),Project(left,bottom,z)];
+        void DrawPanel(Point[] points,IBrush paper,Bitmap? print=null)
+        {
+            var outline=BuildGeometry(points);
+            context.DrawGeometry(paper,null,outline);
+            if(print is not null)using(context.PushGeometryClip(outline))DrawTexturedQuadMesh(context,print,points,4,4);
+            context.DrawGeometry(null,CaseSeam,outline);
+        }
+        var front=Panel(-half,tall,half,-tall,depth);
+        DrawContactShadow(context,ComputeBounds(front));
+        DrawPanel(Panel(-half,tall,half,-tall,-depth),CartridgeTrayWell);
+        if(!portrait)
+            DrawPanel([Project(-half,tall,-depth),Project(half,tall,-depth),Project(half,tall,depth),Project(-half,tall,depth)],CartridgeTrayPaper,_top);
+        else
+            DrawPanel([Project(half,tall,depth),Project(half,tall,-depth),Project(half,-tall,-depth),Project(half,-tall,depth)],CartridgeTrayPaper,_right);
+
+        // Western cartons open at the short end; Japanese portrait cartons open at the top.
+        // Two dust flaps sit under the printed tuck flap, with a folded paper cartridge tray inside.
+        foreach(var sign in new[]{-1,1})
+        {
+            var rim=side*sign;
+            DrawPanel([Local(end,rim,-depth),Local(end,rim,depth),
+                Local(end+.32*_opening,rim-sign*.28*(1-_opening),depth),
+                Local(end+.32*_opening,rim-sign*.28*(1-_opening),-depth)],CartridgeTrayPaper);
+        }
+        var slide=Math.Clamp(_mediaLift/.6,0,1);
+        var trayCenter=slide*2.65;
+        var trayHalf=1.23;var traySide=side-.12;
+        if(_mediaLift>0)
+        {
+            DrawPanel([Local(trayCenter-trayHalf,traySide,.025),Local(trayCenter+trayHalf,traySide,.025),
+                Local(trayCenter+trayHalf,-traySide,.025),Local(trayCenter-trayHalf,-traySide,.025)],CartridgeTrayPaper);
+            DrawPanel([Local(trayCenter-.9,traySide-.18,.03),Local(trayCenter+.9,traySide-.18,.03),
+                Local(trayCenter+.9,-traySide+.18,.03),Local(trayCenter-.9,-traySide+.18,.03)],CartridgeTrayWell);
+        }
+        void Cartridge()
+        {
+            if(_mediaLift<=0)return;
+            var release=Math.Clamp((_mediaLift-.55)/.45,0,1);release=release*release*(3-2*release);
+            var x=portrait?0:trayCenter*(1-release);
+            var y=(portrait?trayCenter:0)*(1-release)+MediaVerticalOffset*release;
+            var width=portrait?1.75:1.9;
+            var height=_mediaArtwork is null?width*.67:width*_mediaArtwork.PixelSize.Height/_mediaArtwork.PixelSize.Width;
+            var card=Panel(x-width/2,y+height/2,x+width/2,y-height/2,.06+release*.8);
+            if(_mediaArtwork is not null)DrawTexturedQuadMesh(context,_mediaArtwork,card,4,4);
+            else context.DrawGeometry(InteriorLight,CaseOutline,RoundedQuad(card,.14));
+        }
+        if(_mediaLift<.6)Cartridge();
+        DrawPanel(front,CaseMaterials[(int)CaseFormat],_front);
+        var angle=_opening*Math.PI*.66;
+        var freeU=end+CaseDepth*Math.Sin(angle);var freeZ=-depth+CaseDepth*Math.Cos(angle);
+        Point[] flap=portrait
+            ?[Local(end,side,-depth),Local(end,-side,-depth),Local(freeU,-side,freeZ),Local(freeU,side,freeZ)]
+            :[Local(freeU,side,freeZ),Local(end,side,-depth),Local(end,-side,-depth),Local(freeU,-side,freeZ)];
+        DrawPanel(flap,CartridgeTrayPaper,_opening<.55?(portrait?_top:_right):null);
+        if(_opening>.1)
+            DrawPanel([Local(freeU,side-.09,freeZ),Local(freeU,-side+.09,freeZ),
+                Local(freeU+.16*Math.Sin(angle),-side+.09,freeZ+.16*Math.Cos(angle)),
+                Local(freeU+.16*Math.Sin(angle),side-.09,freeZ+.16*Math.Cos(angle))],CartridgeTrayPaper);
+        if(_mediaLift>=.6)Cartridge();
     }
 }

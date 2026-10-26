@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/CubeShelf.Mobile/CubeShelf.Mobile.csproj" />
+    <PackageReference Include="Avalonia.Headless" Version="11.3.21" />
+    <Content Include="../../src/CubeShelf.Mobile/Catalogs/android-ports.json" Link="android-ports.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

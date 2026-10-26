@@ -9,7 +9,7 @@ using AndroidX.Core.View;
 
 namespace CubeShelf.Android;
 
-[Activity(Label = "CubeShelf", Theme = "@style/CubeShelfTheme", Icon = "@drawable/icon",
+[Activity(Label = "DecompShelf", Theme = "@style/CubeShelfTheme", Icon = "@drawable/icon",
     MainLauncher = true, Exported = true,
     // Let Android recreate the native view/window on rotation. Avalonia's single-view
     // lifetime retains the library controls, while the replacement view gets a fresh
@@ -213,6 +213,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
         public string? LastError => NativeGameService.LastError;
         public IRuntimeDownloads Downloads => NativeGameService.Downloads;
         public LauncherAppUpdates AppUpdates => AndroidAppUpdates.Instance;
+        public IMobileNativePorts NativePorts => AndroidNativePorts.Instance;
         public bool IsInstalled() => NativeGameService.IsInstalled();
         public bool DeviceSupportsPublishedGame() => NativeGameService.DeviceSupportsPublishedGame();
         public bool OpenGame() => NativeGameService.OpenGame();

@@ -13,7 +13,8 @@ public sealed partial class MainWindow
         {
             LaunchTransition.Start(game.Title, ResolveCoverPath(cover?.Front),
                 ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), P7("Lancement… · B pour annuler", "Launching… · B to cancel"), game.Id,
-                game.ShelfConsole,openCase:true,media:ResolveCoverPath(_shelfMediaArtwork.GetValueOrDefault(NativePortCatalog.GameKey(GameVariants.BaseOf(_catalogGames,game)))));
+                game.ShelfConsole,openCase:true,media:ResolveCoverPath(_shelfMediaArtwork.GetValueOrDefault(NativePortCatalog.GameKey(GameVariants.BaseOf(_catalogGames,game)))),
+                right:ResolveCoverPath(cover?.Right),top:ResolveCoverPath(cover?.Top),bottom:ResolveCoverPath(cover?.Bottom));
             if(!await LaunchTransition.WaitForOpeningAsync(cancellationToken))throw new OperationCanceledException(cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if(_bigPictureClosed || !_bigPictureActive || !LaunchTransition.IsVisible)throw new OperationCanceledException(cancellationToken);

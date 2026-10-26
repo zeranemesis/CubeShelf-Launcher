@@ -57,7 +57,7 @@ public sealed partial class MainWindow
         }
         else if(page=="platform")
         {
-            foreach(var (name,index) in new[]{("GameCube",0),("Wii",1),("Switch",2)})
+            foreach(var (name,index) in new[]{("GameCube",0),("Wii",1),("Switch",2),("Nintendo 64",3)})
                 Row(name,()=>Go(()=>BigPictureConsoleShelfPicker.SelectedIndex=index),BigPictureConsoleShelfPicker.SelectedIndex==index?"✓":"");
         }
         else if(page=="game")
@@ -135,8 +135,8 @@ public sealed partial class MainWindow
         {
             case 11:MoveBigPictureGame(-1);break;
             case 12:MoveBigPictureGame(1);break;
-            case 13:BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%3;break;
-            case 14:BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+2)%3;break;
+            case 13:BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%BigPictureConsoleShelfPicker.ItemCount;break;
+            case 14:BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+BigPictureConsoleShelfPicker.ItemCount-1)%BigPictureConsoleShelfPicker.ItemCount;break;
             case >=1 and <=4:ShowBigPictureMenu();break;
             case 5:PlayBigPicture(this,new RoutedEventArgs());break;
             case 6:ShowBigPictureMenu();break;
