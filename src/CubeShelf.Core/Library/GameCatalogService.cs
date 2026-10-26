@@ -77,6 +77,10 @@ public sealed class GameCatalogEntry
 {
     public string Id { get; set; } = "";
     public string Title { get; set; } = "";
+    /// <summary>Stable visual platform ID. Defaults to GameCube for existing catalogs.</summary>
+    public string PlatformId { get; set; } = "gamecube";
+    [JsonIgnore]
+    public ConsoleMediaProfile MediaProfile => ConsoleMediaProfiles.Resolve(PlatformId);
     public int Year { get; set; }
     public string Genre { get; set; } = "";
     public string Players { get; set; } = "";
@@ -297,6 +301,7 @@ public sealed class GameCatalogService
 
             // Presentation metadata belongs to CubeShelf.
             target.Title = source.Title;
+            target.PlatformId = source.PlatformId;
             target.Year = source.Year;
             target.Genre = source.Genre;
             target.Players = source.Players;
@@ -343,6 +348,7 @@ public sealed class GameCatalogService
     {
         Id = source.Id,
         Title = source.Title,
+        PlatformId = source.PlatformId,
         Year = source.Year,
         Genre = source.Genre,
         Players = source.Players,
