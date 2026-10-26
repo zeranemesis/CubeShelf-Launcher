@@ -7,6 +7,8 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
+public enum GameCaseFormat { GameCube, Wii, Switch }
+
 /// <summary>
 /// Portable GameCube case renderer with a real projected cuboid, textured
 /// front/back/spine faces and time-based, compositor-paced interaction. The renderer stays
@@ -14,9 +16,9 @@ namespace CubeShelf.Desktop.Controls;
 /// </summary>
 public sealed partial class GameCaseControl : Control, IDisposable
 {
-    private const double CaseWidth = 2.08;
+    private double CaseWidth => CaseFormat == GameCaseFormat.Switch ? 1.79 : 2.08;
     private const double CaseHeight = 2.92;
-    private const double CaseDepth = 0.20;
+    private double CaseDepth => CaseFormat == GameCaseFormat.Switch ? .16 : .20;
     private const double CameraDistance = 5.75;
     private const double FieldOfViewDegrees = 32;
     private const double MaxHoverYaw = 19;
@@ -50,6 +52,11 @@ public sealed partial class GameCaseControl : Control, IDisposable
     public double ShadowOpacity { get; set; } = 1;
     public bool RealisticShell { get; set; }
     public bool UseImportedModel { get; set; }
+    public GameCaseFormat CaseFormat { get; set; } = GameCaseFormat.GameCube;
+    public double CaseAspectRatio => CaseWidth / CaseHeight;
+    public static GameCaseFormat FormatForConsole(string console) => console switch
+    { "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, _ => GameCaseFormat.GameCube };
+    private bool UsesGameCubeModel => UseImportedModel && CaseFormat == GameCaseFormat.GameCube;
     public bool UseCompactTextureMesh { get; init; }
     private double _restPitch;
     private double _hoverYaw;
@@ -121,7 +128,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     public void Flip()
     {
         _flipped = !_flipped;
-        _baseYaw = UseImportedModel ? (_flipped ? 180 - _restYaw : _restYaw) : _restYaw + (_flipped ? 180 : 0);
+        _baseYaw = UsesGameCubeModel ? (_flipped ? 180 - _restYaw : _restYaw) : _restYaw + (_flipped ? 180 : 0);
         UpdateAnimationTarget();
     }
 
@@ -166,7 +173,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private void RenderCase(DrawingContext context)
     {
-        if (UseImportedModel && RenderImportedModel(context)) return;
+        if (UsesGameCubeModel && RenderImportedModel(context)) return;
 
         var vertices = BuildProjectedVertices();
         var faces = BuildFaces(vertices)
@@ -213,16 +220,22 @@ public sealed partial class GameCaseControl : Control, IDisposable
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
         var broad = face.Name is "front" or "back";
         var outline = RoundedQuad(quad, broad ? .009 : .02);
+        var colors = CaseFormat switch
+        {
+            GameCaseFormat.Wii => new[] { "#FFFFFF", "#D6D8DA", "#FBFBFA", "#BDC1C5" },
+            GameCaseFormat.Switch => new[] { "#E4E7EC", "#A1A8B2", "#CED3DB", "#858E9B" },
+            _ => new[] { "#45454B", "#111114", "#252529", "#08080A" }
+        };
         var shell = new LinearGradientBrush
         {
             StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
             EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
             GradientStops = new GradientStops
             {
-                new GradientStop(Color.Parse("#45454B"), 0),
-                new GradientStop(Color.Parse("#111114"), .09),
-                new GradientStop(Color.Parse("#252529"), .5),
-                new GradientStop(Color.Parse("#08080A"), 1)
+                new GradientStop(Color.Parse(colors[0]), 0),
+                new GradientStop(Color.Parse(colors[1]), .09),
+                new GradientStop(Color.Parse(colors[2]), .5),
+                new GradientStop(Color.Parse(colors[3]), 1)
             }
         };
         context.DrawGeometry(shell, new Pen(new SolidColorBrush(Color.Parse("#414148")), .9), outline);
@@ -601,7 +614,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     private void UpdateAnimationTarget()
     {
         _targetYaw = _baseYaw + (_pointerInside ? _hoverYaw : 0);
-        if (UseImportedModel) _targetYaw = Math.Clamp(_targetYaw, 12, 168);
+        if (UsesGameCubeModel) _targetYaw = Math.Clamp(_targetYaw, 12, 168);
         _targetPitch = _restPitch + (_pointerInside ? _hoverPitch : 0);
         _targetGlare = _pointerInside ? 1 : 0;
         _targetLift = _pointerInside ? 1 : 0;

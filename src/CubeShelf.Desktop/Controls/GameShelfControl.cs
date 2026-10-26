@@ -6,7 +6,7 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
-public sealed record GameShelfItem(string Title, string Front, string Back, string Spine);
+public sealed record GameShelfItem(string Title, string Front, string Back, string Spine, string Console = "gamecube");
 
 /// <summary>A bounded shelf of actual projected, textured cases, with no external renderer.</summary>
 public sealed class GameShelfControl : Panel, IDisposable
@@ -87,6 +87,7 @@ public sealed class GameShelfControl : Panel, IDisposable
                 {
                     MinWidth = 0, MinHeight = 0, ShadowOpacity = .8,
                     RealisticShell = true, UseImportedModel = true,
+                    CaseFormat = GameCaseControl.FormatForConsole(item.Console),
                     UseCompactTextureMesh = UseCompactTextureMesh
                 };
                 cover.SetCover(item.Front, item.Back, item.Spine);

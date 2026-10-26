@@ -228,6 +228,11 @@ public sealed partial class MainWindow
 
         LibraryCards.ItemsSource = _parityCards.ToArray();
         var english = UiLocalization.IsEnglish(_preferences.Language);
+        var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
+        Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;
+        Resources["SelectedGame"] = "NINTENDO " + console.ToUpperInvariant() + (english ? " • SELECTED GAME" : " • JEU SÉLECTIONNÉ");
+        LibrarySectionTitle.Text = _favoritesOnly ? UiLocalization.Get(_preferences.Language, "FavoritesTitle")
+            : english ? "Your " + console + " games" : "Tes jeux " + console;
         LibraryUpdatesText.Text = _favoritesOnly
             ? english ? $"{_parityCards.Count} favorite(s)" : $"{_parityCards.Count} favori(s)"
             : english ? $"{_parityCards.Count} game(s)" : $"{_parityCards.Count} jeu(x)";
@@ -253,7 +258,7 @@ public sealed partial class MainWindow
                         ? (english ? "↻ Newer source" : "↻ Source plus récente")
                         : (english ? "✓ Up to date" : "✓ À jour")
             : "";
-        return new DesktopGameCard(
+        var card = new DesktopGameCard(
             game,
             LoadBitmap(coverPath),
             game.IsFavorite ? "★" : "",
@@ -271,6 +276,9 @@ public sealed partial class MainWindow
                 ? $"{game.PlayCount} launches • {FormatPlayTime(game.TotalPlaySeconds)} • {last}"
                 : $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • {last}",
             update);
+        card.Versions = PortVersionsFor(game);
+        card.SelectedVersion = card.Versions.FirstOrDefault(choice => choice.GameId == game.Id);
+        return card;
     }
 
     private void SelectLibraryGame(object? sender, RoutedEventArgs args)
@@ -313,6 +321,7 @@ public sealed partial class MainWindow
         if (_selectedGame is null || SelectedTitleText is null) return;
         var game = _selectedGame;
         var baseGame = GameVariants.BaseOf(_catalogGames, game);
+        RefreshPortVersionPickers(baseGame);
         SelectedTitleText.Text = baseGame.Title;
         SelectedMetaText.Text = string.Join("  •  ", new[]
         {
@@ -355,6 +364,9 @@ public sealed partial class MainWindow
             ? (english ? "★ Favorite" : "★ Favori")
             : (english ? "☆ Add to favorites" : "☆ Ajouter aux favoris");
         var cover = baseGame.Covers.FirstOrDefault();
+        GameCase.CaseFormat = Controls.GameCaseControl.FormatForConsole(baseGame.ShelfConsole);
+        GameCase.RealisticShell = true;
+        GameCase.UseImportedModel = baseGame.ShelfConsole == "gamecube";
         GameCase.SetCover(
             ResolveCoverPath(cover?.Front),
             ResolveCoverPath(cover?.Back),
@@ -564,6 +576,11 @@ public sealed partial class MainWindow
         }
 
         public GameCatalogEntry Game { get; }
+        public PortVersionChoice[] Versions { get; set; } = [];
+        public PortVersionChoice? SelectedVersion { get; set; }
+        public bool HasVersionChoice => Versions.Length > 1;
+        public double CoverWidth => Game.ShelfConsole == "switch" ? 202 : 234;
+        public IBrush CaseBackground => new SolidColorBrush(Color.Parse(Game.ShelfConsole == "wii" ? "#F3F3F1" : Game.ShelfConsole == "switch" ? "#B9C0C8" : "#090C13"));
         public Bitmap? Cover { get; }
         public string Title => Game.Title;
         public string Subtitle => string.Join(" • ", new[] { Game.Year > 0 ? Game.Year.ToString() : "", Game.Genre }.Where(value => value.Length > 0));

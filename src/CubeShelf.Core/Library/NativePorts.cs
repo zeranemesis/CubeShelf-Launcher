@@ -61,8 +61,20 @@ public sealed class NativePortAsset
 
 public static class NativePortCatalog
 {
-    public static IEnumerable<GameCatalogEntry> ForConsole(IEnumerable<GameCatalogEntry> games, string console) =>
-        games.Where(game => game.ShelfConsole == ShelfProduct.Resolve(console).Id && !GameVariants.IsVariant(game));
+    public static string GameKey(GameCatalogEntry game) => game.ShelfConsole + ":" +
+        string.Concat(game.Title.Normalize(System.Text.NormalizationForm.FormD).Where(char.IsLetterOrDigit)).ToUpperInvariant();
+
+    public static IEnumerable<GameCatalogEntry> VersionsOf(IEnumerable<GameCatalogEntry> games, GameCatalogEntry game) =>
+        games.Where(candidate => !GameVariants.IsVariant(candidate) && GameKey(candidate) == GameKey(game));
+
+    public static IEnumerable<GameCatalogEntry> ForConsole(IEnumerable<GameCatalogEntry> games, string console,
+        IReadOnlyDictionary<string, string>? selectedVersions = null)
+    {
+        var id = ShelfProduct.Resolve(console).Id;
+        return games.Where(game => game.ShelfConsole == id && !GameVariants.IsVariant(game))
+            .GroupBy(GameKey).Select(group => selectedVersions is not null && selectedVersions.TryGetValue(group.Key, out var selected)
+                ? group.FirstOrDefault(game => game.Id == selected) ?? group.First() : group.First());
+    }
     public static IReadOnlyList<NativePort> Load(string file)
     {
         var ports = JsonSerializer.Deserialize<List<NativePort>>(File.ReadAllText(file)) ?? [];

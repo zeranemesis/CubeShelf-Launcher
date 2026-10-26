@@ -78,7 +78,7 @@ public sealed partial class MainWindow
         {
             var cover = game.Covers.FirstOrDefault();
             return new Controls.GameShelfItem(game.Title, ResolveCoverPath(cover?.Front),
-                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine));
+                ResolveCoverPath(cover?.Back), ResolveCoverPath(cover?.Spine), game.ShelfConsole);
         }).ToArray());
         _bigPictureIndex = Math.Max(0, Array.FindIndex(_bigPictureGames,
             game => _selectedGame is not null && PlayKey(game) == PlayKey(_selectedGame)));
@@ -201,6 +201,7 @@ public sealed partial class MainWindow
     private void RefreshBigPictureGame()
     {
         var game = BigPictureGame;
+        RefreshPortVersionPickers(game is null ? null : GameVariants.BaseOf(_catalogGames, game));
         BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon);
         BigPictureTitle.SetGame(game?.Id, game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty"));
         BigPictureMetadata.Text = game is null ? "" : string.Join("  •  ", new[] { game.Genre, game.Players, game.Year > 0 ? game.Year.ToString() : "" }.Where(value => value.Length > 0));

@@ -24,6 +24,18 @@ try
         && NativePortCatalog.ForConsole(suiteGames,"switch").Single().Id=="native-switch-test"
         && NativePortCatalog.ForConsole(suiteGames,"gamecube").Single().Id=="legacy", "console selector scopes the existing library without mixing games");
     Check(suiteGames[1].IsFavorite && suiteGames[2].PlayCount==7, "switching console keeps favourites and statistics");
+    var sameGame = new[] {
+        new GameCatalogEntry { Id="first", Title="Same Game!", ShelfConsole="wii" },
+        new GameCatalogEntry { Id="second", Title="Same Game", ShelfConsole="wii" },
+        new GameCatalogEntry { Id="switch", Title="Same Game", ShelfConsole="switch" }
+    };
+    var selectedVersion = new Dictionary<string,string> { [NativePortCatalog.GameKey(sameGame[0])]="second" };
+    Check(NativePortCatalog.ForConsole(sameGame,"wii",selectedVersion).Single().Id=="second"
+        && NativePortCatalog.ForConsole(sameGame,"switch",selectedVersion).Single().Id=="switch",
+        "alternate ports share one game card while the same title on another console stays separate");
+    selectedVersion[NativePortCatalog.GameKey(sameGame[0])]="removed-port";
+    Check(NativePortCatalog.ForConsole(sameGame,"wii",selectedVersion).Single().Id=="first",
+        "removed selected port falls back to an available version");
     Check(DiscImageService.Inspect("",suiteGames[1]).Supported && !DiscImageService.Inspect("",suiteGames[0]).Supported,
         "native Wii setup bypasses GameCube disc validation; legacy validation remains required");
     var shipped=Path.Combine(root,"suite.json");File.WriteAllText(shipped,JsonSerializer.Serialize(suiteGames));
@@ -52,7 +64,7 @@ try
     Throws(()=>NativePortCatalog.Load(file),"duplicate catalogue IDs rejected");
     using var cancelled=new CancellationTokenSource();cancelled.Cancel();
     await ThrowsAsync(()=>library.InstallAsync(port,asset,null,cancelled.Token,http),"cancellation cannot activate a package");
-    Console.WriteLine("16 native shelf checks passed.");
+    Console.WriteLine("18 native shelf checks passed.");
 }
 finally { Directory.Delete(root,true); }
 static void Check(bool condition,string text){if(!condition)throw new Exception(text);Console.WriteLine("OK  "+text);}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0-preview.2 — versions regroupées et jaquettes, non publiée
+
+- Une carte par jeu et par console. Les ports alternatifs se choisissent dans un menu déroulant sur la carte, la fiche ou en Big Picture ; choix mémorisé et favoris communs aux versions.
+- 47 nouvelles faces GameTDB, 41 dos et tranches, avec registre de provenance. Les jeux intégrés conservent leurs jaquettes. Boîtiers Wii blancs et Switch plus étroits ; proportions conservées dans la bibliothèque et le rendu 3D.
+- Tests d'interface : 21 jeux GameCube, 13 Wii, 16 Switch sans doublons de ports, sélection persistante et synchronisation Big Picture. Construction du renderer partagé mobile vérifiée.
+
 ## 0.18.0-preview.1 — suite de ports natifs, non publiée
 
 - Une seule application conserve l'interface CubeShelf : sélecteur GameCube / Wii / Switch en haut à gauche, synchronisé en Big Picture. Même bibliothèque, cartes et favoris ; dernier choix de console conservé au redémarrage.

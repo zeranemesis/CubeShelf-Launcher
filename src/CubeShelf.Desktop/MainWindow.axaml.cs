@@ -323,7 +323,7 @@ public sealed partial class MainWindow : Window
     private void PersistCatalog() => _catalogService.Save(_catalogGames);
 
     /// <summary>The library's games: variants (Super Mario Eclipse) are reached through their base game.</summary>
-    private IEnumerable<GameCatalogEntry> ShelfGames => NativePortCatalog.ForConsole(_catalogGames, _activeShelfConsole);
+    private IEnumerable<GameCatalogEntry> ShelfGames => NativePortCatalog.ForConsole(_catalogGames, _activeShelfConsole, _selectedPortVersions);
 
     /// <summary>
     /// After the selected game's mods change: Super Mario Sunshine becomes Super Mario Eclipse
@@ -339,7 +339,9 @@ public sealed partial class MainWindow : Window
     private void ToggleFavorite(object? sender, RoutedEventArgs args)
     {
         if (_selectedGame is null) return;
-        _selectedGame.IsFavorite = !_selectedGame.IsFavorite;
+        var baseGame = GameVariants.BaseOf(_catalogGames, _selectedGame);
+        var favorite = !baseGame.IsFavorite;
+        foreach (var game in NativePortCatalog.VersionsOf(_catalogGames, baseGame)) game.IsFavorite = favorite;
         PersistCatalog();
         RefreshGameState();
     }

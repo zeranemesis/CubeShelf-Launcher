@@ -20,6 +20,8 @@ public sealed class NativePortsWindow : Window
     private readonly TextBlock _count = Text(13), _title = Text(29), _project = Text(15), _notes = Text(15),
         _sources = Text(12), _status = Text(13), _configured = Text(12);
     private readonly ComboBox _packages = new() { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 44 };
+    private readonly ComboBox _portVersions = new() { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 44 };
+    private bool _refreshingPortVersions;
     private readonly Button _install = Button("Installer ce paquet"), _launch = Button("Jouer"),
         _configure = Button("Associer le programme"), _cancel = Button("Annuler"), _folder = Button("Ouvrir les fichiers"),
         _releases = Button("Versions officielles"), _source = Button("Projet et instructions"), _macApp = Button("Associer une application .app");
@@ -55,7 +57,7 @@ public sealed class NativePortsWindow : Window
         Grid.SetRow(_list, 3); _list.Margin = new Thickness(0, 12, 0, 0); left.Children.Add(_list);
         body.Children.Add(left);
         _title.FontWeight = FontWeight.Bold; _project.Foreground = accent;
-        _details.Children.Add(_title); _details.Children.Add(_project); _details.Children.Add(_notes);
+        _details.Children.Add(_title); _details.Children.Add(_portVersions); _details.Children.Add(_project); _details.Children.Add(_notes);
         _details.Children.Add(_sources); _details.Children.Add(_packages);
         _install.Background = accent; _install.Foreground = Brush("#121521");
         _launch.Background = accent; _launch.Foreground = Brush("#121521");
@@ -73,6 +75,7 @@ public sealed class NativePortsWindow : Window
         _compatible.IsCheckedChanged += (_, _) => Filter();
         _list.SelectionChanged += (_, _) => Select((_list.SelectedItem as ListBoxItem)?.Tag as NativePort);
         _packages.SelectionChanged += (_, _) => RefreshActions();
+        _portVersions.SelectionChanged += (_, _) => { if (!_refreshingPortVersions && _portVersions.SelectedItem is NativePort port) Select(port); };
         _source.Click += (_, _) => OpenUrl(_selected?.Homepage);
         _releases.Click += (_, _) => OpenUrl(_selected?.ReleaseUrl.Length > 0 ? _selected.ReleaseUrl : _selected?.Homepage + "/releases");
         _configure.Click += async (_, _) => await ConfigureAsync(false);
@@ -87,6 +90,7 @@ public sealed class NativePortsWindow : Window
             _installation.Cancel(); args.Cancel = true;
             _status.Text = "Annulation en cours… Ferme la fenêtre une fois le transfert arrêté.";
         };
+        _selected = _ports.FirstOrDefault(port => port.Id == selectedPortId);
         Filter();
         if (selectedPortId is not null)
             _list.SelectedItem = _list.ItemsSource!.Cast<ListBoxItem>().FirstOrDefault(i => (i.Tag as NativePort)?.Id == selectedPortId);
@@ -95,17 +99,20 @@ public sealed class NativePortsWindow : Window
     private void Filter()
     {
         var term = _search.Text?.Trim() ?? "";
-        var ports = _ports.Where(p => (p.Title + " " + p.Project).Contains(term, StringComparison.OrdinalIgnoreCase)
-            && (_compatible.IsChecked != true || p.Assets.Any(a => a.MatchesCurrentPlatform))).OrderBy(p => p.Title).ThenBy(p => p.Project).ToList();
         var selectedId = _selected?.Id;
+        var ports = _ports.Where(p => (p.Title + " " + p.Project).Contains(term, StringComparison.OrdinalIgnoreCase)
+            && (_compatible.IsChecked != true || p.Assets.Any(a => a.MatchesCurrentPlatform)))
+            .GroupBy(p => p.Title, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.FirstOrDefault(p => p.Id == selectedId) ?? group.First())
+            .OrderBy(p => p.Title).ToList();
         _list.ItemsSource = ports.Select(port =>
         {
             var title = Text(15); title.Text = port.Title; title.Foreground = Brushes.White; title.FontWeight = FontWeight.SemiBold;
-            var detail = Text(12); detail.Text = port.Project + " · " + port.Status;
+            var detail = Text(12); detail.Text = _ports.Count(p => p.Title.Equals(port.Title, StringComparison.OrdinalIgnoreCase)) + " version(s) / port(s)";
             return new ListBoxItem { Tag = port, Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 5),
                 Content = new StackPanel { Spacing = 6, Children = { title, detail } } };
         }).ToList();
-        _count.Text = $"{ports.Count} projets · {_ports.Select(p => p.Title).Distinct().Count()} jeux recensés · 26/10/2026";
+        _count.Text = $"{ports.Count} jeux · {_ports.Count} versions / ports · 26/10/2026";
         var items = _list.ItemsSource.Cast<ListBoxItem>().ToList();
         _list.SelectedItem = items.FirstOrDefault(i => (i.Tag as NativePort)?.Id == selectedId) ?? items.FirstOrDefault();
         if (items.Count == 0) Select(null);
@@ -116,6 +123,11 @@ public sealed class NativePortsWindow : Window
         _selected = port; _downloadDirectory = null;
         _details.IsVisible = port is not null;
         if (port is null) return;
+        _refreshingPortVersions = true;
+        _portVersions.ItemsSource = _ports.Where(p => p.Title.Equals(port.Title, StringComparison.OrdinalIgnoreCase)).ToArray();
+        _portVersions.SelectedItem = port;
+        _portVersions.IsVisible = _portVersions.ItemCount > 1;
+        _refreshingPortVersions = false;
         _title.Text = port.Title;
         _project.Text = port.Project + " · " + port.Method + " · " + port.Status;
         _notes.Text = port.Notes;
@@ -134,7 +146,7 @@ public sealed class NativePortsWindow : Window
         _install.IsVisible = _packages.SelectedItem is NativePortAsset;
         _install.IsEnabled = !busy; _cancel.IsVisible = busy;
         _launch.IsEnabled = !busy && _selected is { } port && _library.IsConfigured(port);
-        _configure.IsEnabled = _macApp.IsEnabled = !busy;
+        _configure.IsEnabled = _macApp.IsEnabled = _portVersions.IsEnabled = !busy;
         _macApp.IsVisible = OperatingSystem.IsMacOS();
         _folder.IsVisible = _downloadDirectory is not null;
         _list.IsEnabled = _search.IsEnabled = _compatible.IsEnabled = !busy;

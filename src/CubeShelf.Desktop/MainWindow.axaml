@@ -135,6 +135,8 @@
                 </StackPanel>
               </Border>
               <Button x:Name="BigPicturePlayButton" Classes="primary" Click="PlayBigPicture" FontSize="20" Padding="24,16" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+              <ComboBox x:Name="BigPicturePortVersionPicker" SelectionChanged="PortVersionChanged" HorizontalAlignment="Stretch"
+                        MinHeight="44" AutomationProperties.Name="Version du port" />
               <Button x:Name="BigPictureOnlineButton" Click="OpenBigPictureOnline" FontSize="18" Padding="20,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
               <Button x:Name="BigPictureModsButton" Click="OpenBigPictureMods" FontSize="17" Padding="18,12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
               <TextBlock x:Name="BigPictureStatus" Foreground="#706671" FontSize="14" TextWrapping="Wrap" />
@@ -212,8 +214,8 @@
                       <StackPanel>
                         <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                         <Grid>
-                          <Border Height="330" Background="#090C13" CornerRadius="11" ClipToBounds="True">
-                            <Image Source="{Binding Cover}" Stretch="UniformToFill" />
+                          <Border Height="330" Width="{Binding CoverWidth}" HorizontalAlignment="Center" Background="{Binding CaseBackground}" CornerRadius="4" ClipToBounds="True">
+                            <Image Source="{Binding Cover}" Stretch="Uniform" />
                           </Border>
                           <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC101524" CornerRadius="9" Padding="8,5" Margin="8">
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
@@ -222,6 +224,9 @@
                         </Button>
                         <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" Margin="3,13,3,0" />
                         <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="3,4,3,0" />
+                        <ComboBox ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=OneWay}"
+                                  IsVisible="{Binding HasVersionChoice}" Tag="{Binding}" SelectionChanged="CardPortVersionChanged"
+                                  HorizontalAlignment="Stretch" Margin="0,10,0,0" MinHeight="38" AutomationProperties.Name="Version du port" />
                         <TextBlock Text="{Binding PlayHint}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" MinHeight="36" Margin="3,10,3,4" />
                         <TextBlock Text="{Binding Stats}" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" Margin="3,6,3,1" />
                         <TextBlock Text="{Binding Update}" Foreground="{DynamicResource Accent2}" FontSize="10" FontWeight="SemiBold" TextWrapping="Wrap" Margin="3,4,3,1" />
@@ -260,6 +265,8 @@
                   <TextBlock x:Name="SelectedMetaText" Foreground="{DynamicResource Muted}" FontSize="13" TextWrapping="Wrap" />
                   <TextBlock x:Name="SelectedDescriptionText" Foreground="{DynamicResource Text}" Opacity="0.82" FontSize="15" LineHeight="23" TextWrapping="Wrap" />
                   <TextBlock x:Name="GameStatsText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" />
+                  <ComboBox x:Name="GamePortVersionPicker" SelectionChanged="PortVersionChanged" HorizontalAlignment="Stretch"
+                            MinHeight="44" AutomationProperties.Name="Version du port" />
                   <TextBlock x:Name="SetupProgressText" Foreground="{DynamicResource Accent2}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
 
                   <WrapPanel>
