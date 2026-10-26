@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>io.github.zeranemesis.cubeshelf</ApplicationId>
-    <ApplicationVersion>43</ApplicationVersion>
+    <ApplicationVersion>44</ApplicationVersion>
     <ApplicationDisplayVersion>$(CubeShelfVersion)</ApplicationDisplayVersion>
     <ApplicationTitle>DecompShelf</ApplicationTitle>
     <AndroidPackageFormats>apk</AndroidPackageFormats>

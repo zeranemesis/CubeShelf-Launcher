@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.18.0 — DecompShelf, 26 octobre 2026
+
+- Application renommée DecompShelf ; catalogues GameCube, Wii, Switch et Nintendo 64 dans un menu déroulant, logos adaptés et choix des ports sans doublon.
+- Jaquettes aux proportions d’origine, boîtes Nintendo 64 et cartouches scannées, inspection des faces et animations de lancement propres à chaque console.
+- Big Picture : navigation stick/croix configurable, menus inspirés de Recalbox, transitions de plateforme et rendu optimisé ; disque descendant et tournant au lancement.
+- Android : cinq ports natifs Nintendo 64, téléchargement officiel vérifié, installation avec confirmation Android et lancement des applications installées. Pilotwings 64 reste expérimental et Pokémon Snap en bêta.
+- Android versionCode 44, signature persistante compatible avec la version 0.17.0. Aucun jeu ni ROM fourni ; les jeux n’ont pas été validés sur un téléphone physique.
+- Cette release réunit les modifications des aperçus 0.18.0 ci-dessous.
+
 ## 0.18.0-preview.11 — Ports natifs Android, non publiée
 
 - Android : catalogue Nintendo 64 de cinq ports natifs (Super Mario 64, Ocarina of Time, Majora’s Mask, Pilotwings 64, Pokémon Snap), boîtes et cartouches, sélection de plateforme dans DecompShelf.

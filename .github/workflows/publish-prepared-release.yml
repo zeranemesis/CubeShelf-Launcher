@@ -135,7 +135,7 @@ jobs:
             "$signer" verify --print-certs "$apk" > certificate.txt
             grep -q 'certificate SHA-256 digest: 3c5e62f4713b437cee47fca52246e1edff3b52252cf2472d8ad7695f184b8344' certificate.txt
             "$aapt" dump badging "$apk" > badging.txt
-            grep -q "package: name='io.github.zeranemesis.cubeshelf' versionCode='42' versionName='$(cat VERSION)'" badging.txt
+            grep -q "package: name='io.github.zeranemesis.cubeshelf' versionCode='44' versionName='$(cat VERSION)'" badging.txt
             grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' badging.txt
           done
       - name: Upload packages to the existing draft and verify GitHub digests

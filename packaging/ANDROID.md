@@ -1,9 +1,9 @@
 # Aperçu Android
 
-CubeShelf Android est un projet Avalonia distinct du launcher PC :
+DecompShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-La version 0.17.0 porte le code Android `42` et comprend la mise à jour
+La version 0.18.0 porte le code Android `44` et comprend la mise à jour
 de l'application depuis les releases GitHub.
 
 ## Produire les APK
@@ -19,7 +19,7 @@ artefacts conservés 14 jours :
 | x86-64 `x86_64` | `CubeShelf-android-x86_64-preview.apk` | Appareils ou émulateurs Android x86-64 |
 
 Chaque artefact comprend son SHA-256. Ce workflow compile et signe le launcher ;
-il ne lance aucun test, ne démarre aucun appareil et ne publie aucune release.
+il teste les mises à jour, les téléchargements et l’interface mobile, mais ne démarre aucun appareil et ne publie aucune release.
 Un APK compilé ne constitue pas une validation sur téléphone.
 
 La signature utilise la clé de développement persistante conservée dans le
