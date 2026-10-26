@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.0-preview.4 — navigation et lancement Big Picture, non publiée
+
+- Uniquement en Big Picture : stick gauche horizontal pour les jeux, vertical pour changer de console ; une impulsion verticale change d'une plateforme. Croix directionnelle pour les menus. START ouvre et ferme le menu principal, A valide, B revient en arrière.
+- Menu central à grandes lignes inspiré de Recalbox : jeu sélectionné, plateformes, manette, disposition, amis et accès aux paramètres avancés. L'inversion des rôles stick/croix est mémorisée dans les paramètres manette. XInput et SDL conservent la distinction des deux sources et leur zone morte.
+- Ouverture du boîtier, puis extraction du mini-disque GameCube, disque Wii ou de la cartouche Switch, avant de démarrer le jeu. 47 scans de supports réels GameTDB ajoutés avec provenance et SHA-256 ; les trois jeux dématérialisés sans scan utilisent un support neutre. La préparation habituelle des ports reste nécessaire.
+- Le lancement attend la fin de l'animation (environ 1,6 seconde). B, le bouton de retour, la perte de focus et l'annulation de la préparation empêchent le lancement pendant l'ouverture. Le mode classique et le lancement mobile gardent leur comportement existant.
+- Tests hors écran : axes et zone morte, séparation stick/croix, navigation des consoles et jeux, inversion persistante, menus, rendu des trois supports et fin/annulation de l'ouverture. Une manette physique et des parties réelles restent à vérifier.
+
 ## 0.18.0-preview.3 — fidélité des boîtiers et transitions, non publiée
 
 - Changement de console avec glissement directionnel et fondu de 380 ms, capture temporaire bornée à 1600 × 1200 pixels, annulation lors des changements rapides ou de la fermeture/masquage. Option de réduction des animations dans les paramètres.

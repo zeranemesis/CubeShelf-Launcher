@@ -51,7 +51,7 @@ public sealed partial class MainWindow
         if (game.RuntimeOwnsSetup)
         {
             if (!await EnsureNativeShelfPortAsync(game)) return;
-            if (OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))
+            if (!_bigPictureActive && OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))
             {
                 new NativePortLibrary(_paths).Launch(_nativeShelfPorts[game.Id]);
                 return;
@@ -69,11 +69,11 @@ public sealed partial class MainWindow
                 ct =>
                 {
                     ct.ThrowIfCancellationRequested();
-                    if (!CanPlay(game)) throw new InvalidOperationException(P7(
+                    if (!CanPlay(game) && !(game.RuntimeOwnsSetup && OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))) throw new InvalidOperationException(P7(
                         "Le jeu n’est plus prêt. Vérifie son image dans les options avancées.",
                         "The game is no longer ready. Check its disc image in advanced options."));
                     if (readyAction is not null) return readyAction();
-                    return LaunchWithBigPictureTransitionAsync(game);
+                    return LaunchWithBigPictureTransitionAsync(game,ct);
                 }), intent.Cancellation.Token);
         }
         catch (OperationCanceledException)
@@ -143,7 +143,7 @@ public sealed partial class MainWindow
     {
         var game = intent.Game;
         HydrateGamePathsPhase3(game);
-        if (File.Exists(game.Executable)) return;
+        if (File.Exists(game.Executable) || game.RuntimeOwnsSetup && OperatingSystem.IsMacOS() && Directory.Exists(game.Executable)) return;
         SetPlayStatus(intent, P7("Installation avant lancement…", "Installing before launch…"));
         if (string.IsNullOrWhiteSpace(game.GitHubOwner) || string.IsNullOrWhiteSpace(game.GitHubRepo))
         {

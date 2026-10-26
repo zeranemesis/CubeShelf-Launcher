@@ -1076,6 +1076,18 @@
           </StackPanel>
         </Grid>
       </Border>
+      <Border x:Name="BigPictureMenuOverlay" IsVisible="False" Background="#B8000000" ZIndex="80">
+        <Border Width="650" MaxWidth="900" MaxHeight="820" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#EDEDEB" CornerRadius="6" BoxShadow="0 12 40 0 #80000000">
+          <Grid RowDefinitions="Auto,*,Auto">
+            <Border Background="#303A44" Padding="30,22" CornerRadius="6,6,0,0">
+              <TextBlock x:Name="BigPictureMenuTitle" Foreground="White" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
+            </Border>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="BigPictureMenuRows" Margin="14,12" Spacing="3" /></ScrollViewer>
+            <TextBlock x:Name="BigPictureMenuHelp" Grid.Row="2" Margin="26,12,26,22" Foreground="#59616A" FontSize="15" TextAlignment="Center" TextWrapping="Wrap" />
+          </Grid>
+        </Border>
+      </Border>
       <!-- THEME TRANSITION -->
       <Border x:Name="ThemeTransitionOverlay" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource OverlayBrush}">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.14" /></Transitions></Border.Transitions>

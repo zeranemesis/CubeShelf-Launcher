@@ -160,6 +160,7 @@ public sealed partial class MainWindow
     private void ExitBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        CloseBigPictureMenu();
         _bigPictureActive = false;
         SystemDecorations = _bigPicturePreviousDecorations;
         CanResize = _bigPicturePreviousCanResize;
@@ -259,6 +260,16 @@ public sealed partial class MainWindow
             args.Handled = true; return;
         }
         if (OwnedWindows.Any(window => window.IsVisible)) return;
+        if (_bigPictureActive && BigPictureMenuOverlay.IsVisible)
+        {
+            var input=args.Key switch { Key.Up=>3,Key.Down=>4,Key.Left=>1,Key.Right=>2,Key.Enter=>5,Key.Escape=>6,Key.F10=>15,_=>0 };
+            if(input!=0)
+            {
+                HandleBigPictureControllerInput(Controls.BigPictureGamepad.MapNavigation(input,_preferences.SwapBigPictureNavigation));
+                args.Handled=true;
+            }
+            return;
+        }
         if (args.Key == Key.F11)
         {
             if (_bigPictureActive) ExitBigPicture(this, new RoutedEventArgs());
@@ -290,9 +301,9 @@ public sealed partial class MainWindow
         {
             case Key.Left: MoveBigPictureGame(-1); break;
             case Key.Right: MoveBigPictureGame(1); break;
-            case Key.Up: FocusBigPictureAction(-1); break;
-            case Key.Down: FocusBigPictureAction(1); break;
-            case Key.Escape: ExitBigPicture(this, new RoutedEventArgs()); break;
+            case Key.Up: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%3; break;
+            case Key.Down: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+2)%3; break;
+            case Key.Escape: case Key.F10: ShowBigPictureMenu(); break;
             case Key.Enter: ActivateBigPictureAction(); break;
             case Key.F: FlipBigPictureCase(this, new RoutedEventArgs()); break;
             case Key.V: ToggleBigPictureLayout(this, new RoutedEventArgs()); break;
@@ -324,7 +335,6 @@ public sealed partial class MainWindow
 
     private void PollBigPictureGamepad()
     {
-        if (LaunchTransition.IsVisible) return;
         if (!_bigPictureActive || !IsVisible || WindowState == WindowState.Minimized || _bigPictureGameRunning)
         {
             UpdateBigPictureGamepadPolling();
@@ -345,27 +355,18 @@ public sealed partial class MainWindow
             _bigPictureLastInput = -1;
         }
         var help = connected
-            ? P7("← → Choisir   •   A Valider   •   X Retourner   •   Y Vue   •   B Retour", "← → Browse   •   A Select   •   X Flip   •   Y View   •   B Back")
-            : P7("← → Choisir   •   ↑ ↓ Actions   •   Entrée Valider   •   F Retourner   •   V Vue   •   F11 Bureau", "← → Browse   •   ↑ ↓ Actions   •   Enter Select   •   F Flip   •   V View   •   F11 Desktop");
+            ? (_preferences.SwapBigPictureNavigation
+                ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
+                : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
+            : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
         if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;
         var now = Environment.TickCount64;
-        var direction = input is >= 1 and <= 4;
+        var direction = Controls.BigPictureGamepad.MapNavigation(input,_preferences.SwapBigPictureNavigation) is >= 1 and <= 4 or 11 or 12;
         if (input == _bigPictureLastInput && (!direction || now < _bigPictureNextRepeat)) return;
         _bigPictureNextRepeat = now + (input == _bigPictureLastInput ? 180 : 450);
         _bigPictureLastInput = input;
-        if (!BigPictureView.IsVisible || inputWindow != this) { HandleBigPicturePageInput(input); return; }
-        switch (input)
-        {
-            case 1: MoveBigPictureGame(-1); break;
-            case 2: MoveBigPictureGame(1); break;
-            case 3: FocusBigPictureAction(-1); break;
-            case 4: FocusBigPictureAction(1); break;
-            case 5: ActivateBigPictureAction(); break;
-            case 6: ExitBigPicture(this, new RoutedEventArgs()); break;
-            case 7: FlipBigPictureCase(this, new RoutedEventArgs()); break;
-            case 8: ToggleBigPictureLayout(this, new RoutedEventArgs()); break;
-        }
+        HandleBigPictureControllerInput(input);
     }
 }

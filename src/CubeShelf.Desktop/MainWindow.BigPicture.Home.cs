@@ -34,7 +34,7 @@ public sealed partial class MainWindow
     }
 
     private void OpenBigPictureFriends(object? sender, RoutedEventArgs args) => ParityShowFriends(sender, args);
-    private void OpenBigPictureSettings(object? sender, RoutedEventArgs args) => ParityShowSettings(sender, args);
+    private void OpenBigPictureSettings(object? sender, RoutedEventArgs args) => ShowBigPictureMenu();
 
     private void BigPictureHomeSearchChanged(object? sender, TextChangedEventArgs args)
     {

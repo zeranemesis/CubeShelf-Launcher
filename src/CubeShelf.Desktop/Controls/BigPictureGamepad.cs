@@ -73,12 +73,21 @@ internal sealed class BigPictureGamepad : IDisposable
         if ((state.Buttons & 0x8000) != 0) return 8;
         if ((state.Buttons & 0x0100) != 0) return 9;
         if ((state.Buttons & 0x0200) != 0) return 10;
-        if ((state.Buttons & 0x0004) != 0 || state.LeftX < -16000) return 1;
-        if ((state.Buttons & 0x0008) != 0 || state.LeftX > 16000) return 2;
-        if ((state.Buttons & 0x0001) != 0 || state.LeftY > 16000) return 3;
-        if ((state.Buttons & 0x0002) != 0 || state.LeftY < -16000) return 4;
-        return 0;
+        if ((state.Buttons & 0x0030) != 0) return 15; // Start / Back opens the menu.
+        var dpad = (state.Buttons & 4) != 0 ? 1 : (state.Buttons & 8) != 0 ? 2
+            : (state.Buttons & 1) != 0 ? 3 : (state.Buttons & 2) != 0 ? 4 : 0;
+        return DirectionInput(dpad,state.LeftX,state.LeftY);
     }
+
+    internal static int DirectionInput(int dpad,int x,int y)
+    {
+        if(dpad!=0) return dpad;
+        if(Math.Max(Math.Abs(x),Math.Abs(y))<16000) return 0;
+        return Math.Abs(x)>Math.Abs(y) ? x<0 ? 11 : 12 : y>0 ? 13 : 14;
+    }
+
+    internal static int MapNavigation(int input,bool swap) => !swap ? input : input switch
+    { >=1 and <=4 => input+10, >=11 and <=14 => input-10, _=>input };
 
     public void Dispose()
     {

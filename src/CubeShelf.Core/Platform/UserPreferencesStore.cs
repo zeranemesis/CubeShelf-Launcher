@@ -129,7 +129,8 @@ public sealed record UserPreferences(
 
     /// <summary>Open the desktop launcher directly in Big Picture on normal startup.</summary>
     bool StartInBigPicture = false,
-    bool ReduceShelfMotion = false);
+    bool ReduceShelfMotion = false,
+    bool SwapBigPictureNavigation = false);
 
 public sealed class UserPreferencesStore
 {

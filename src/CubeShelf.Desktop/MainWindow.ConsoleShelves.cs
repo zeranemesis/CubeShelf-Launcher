@@ -12,6 +12,7 @@ public sealed partial class MainWindow
     private string _activeShelfConsole = "gamecube";
     private bool _consoleShelfReady;
     private readonly Dictionary<string, NativePort> _nativeShelfPorts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string,string> _shelfMediaArtwork = new();
     private Dictionary<string, string> _selectedPortVersions = new();
     private bool _updatingPortVersions;
 
@@ -97,6 +98,7 @@ public sealed partial class MainWindow
         {
             var existing = group.FirstOrDefault(game => game.Covers.Count > 0)?.Covers;
             var artwork = covers.FirstOrDefault(cover => cover.Console == group.First().ShelfConsole && cover.Title == group.First().Title);
+            if(artwork is { Media.Length: >0 })_shelfMediaArtwork[group.Key]=artwork.Media;
             foreach (var game in group.Where(game => game.Covers.Count == 0))
             {
                 if (existing is not null) game.Covers = existing.Select(cover => new GameCover
@@ -119,6 +121,7 @@ public sealed partial class MainWindow
         public string Front { get; set; } = "";
         public string Back { get; set; } = "";
         public string Spine { get; set; } = "";
+        public string Media { get; set; } = "";
     }
 
     private void InitializeConsoleShelfPicker()

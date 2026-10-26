@@ -7,6 +7,9 @@ using CubeShelf.Desktop.Controls;
 
 var profile = Path.Combine(Path.GetTempPath(), "cubeshelf-selector-" + Guid.NewGuid().ToString("N"));
 Environment.SetEnvironmentVariable("CUBESHELF_DATA_DIR",profile);
+new CubeShelf.Core.Platform.UserPreferencesStore(new CubeShelf.Core.Platform.PlatformPaths()).Save(
+    new CubeShelf.Core.Platform.UserPreferences(FirstRunCompleted:true,MeshDiscoveryNoticeSeen:true,
+        MeshEnabled:false,MeshPublicDiscovery:false,CheckGamesOnStartup:false));
 var snapshotDirectory = Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR");
 var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).UseSkia();
 builder.SetupWithoutStarting();
@@ -125,6 +128,7 @@ try
             frame!.Save(Path.Combine(snapshotDirectory,$"case-{console}.png"));
         }
     }
+    BigPictureControlsChecks.Run(window,snapshotDirectory);
     void AssertCovers()
     {
         foreach(var card in cards.Items.Cast<MainWindow.DesktopGameCard>())

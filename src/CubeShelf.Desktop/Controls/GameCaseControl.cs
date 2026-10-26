@@ -214,6 +214,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private void RenderCase(DrawingContext context)
     {
+        if(_openingEnabled) { RenderOpening(context);return; }
         if (UsesGameCubeModel && RenderImportedModel(context)) return;
 
         var vertices = BuildProjectedVertices();
@@ -715,6 +716,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private void DisposeBitmaps()
     {
+        CoverBitmapCache.Release(_mediaArtwork);_mediaArtwork=null;
         _modelCommands = null;
         _modelDrawingKey = default;
         CoverBitmapCache.Release(_front);

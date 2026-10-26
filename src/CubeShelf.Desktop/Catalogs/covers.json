@@ -13,7 +13,10 @@
     "FrontFileSha256": "35036fc58298f976d02778f28a6f6dab7b6f37a8fd182b83f3703778f824a7ad",
     "BackFileSha256": "64a9570220d04c149868967937150a7e5ca5c72a64d7150aa914f629e4956ed3",
     "SpineFileSha256": "963780de325bfc5a3088ab25324d50bc683bde3067dabfb5bb39074058850701",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GAFE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GAFE01.png",
+    "MediaFileSha256": "5f73daad54522ea15e8c80c3e0a55b2dd821a13daa1f10e413df62610957b3bb"
   },
   {
     "Console": "gamecube",
@@ -29,7 +32,10 @@
     "FrontFileSha256": "82374714e62a0999b063b46682c53fb70ac8b3641b5847124577df1ed30982d6",
     "BackFileSha256": "b2815901a8b99f2f607a5badbd5b33dc90fb89b2036475530c21ecb30e2f9cb3",
     "SpineFileSha256": "78c5078d07aa4d9bc0c25c057175f58951440d9aa814b485e72a969b7f33aca9",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GGTE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GGTE01.png",
+    "MediaFileSha256": "cbb9bf144c3f085e581ea626b9d92d6a97597eac32e97c8178692ddaa0929d7f"
   },
   {
     "Console": "gamecube",
@@ -45,7 +51,10 @@
     "FrontFileSha256": "43ea1e2753184297c13a031f069ca01573a1b7d4ee50323efa33f0eb04ec34a1",
     "BackFileSha256": "08af8b97ef162ae121a6f905005e2641b1b6438bee1c1cc457b7b209db96cb00",
     "SpineFileSha256": "59bddd00c236a69080bc80cf3b141ec994fedc476ce4a2773455d6b1c1f06ee9",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GEDE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GEDE01.png",
+    "MediaFileSha256": "6d096792cf85c0cc9242448735f97eb348e264244c0f3229808919836b1a1a2e"
   },
   {
     "Console": "gamecube",
@@ -61,7 +70,10 @@
     "FrontFileSha256": "50326d072ea17774702b2a59d76f52841bd0bbc5ec6d89eb142a0b9dbda88f41",
     "BackFileSha256": "4d76840b4c7b37a8269925c959c555a5887fbbcfb244cd7832c9493e5c7e854f",
     "SpineFileSha256": "7f014d97c728cc49eed667ea919af58c012a111fc1beaf6149064927e9767d14",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GLME01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GLME01.png",
+    "MediaFileSha256": "5fa597ca94d1dd0162168d672d6c4d5e3368ea1fb1d9ffdfb95e8f31eca937ed"
   },
   {
     "Console": "gamecube",
@@ -77,7 +89,10 @@
     "FrontFileSha256": "3fe351ddcb4c2d7bc4fd445670a5ddad5c6c28325ed520c2e26fcb10d04af7e1",
     "BackFileSha256": "872f3e4b8cfec23caa051615a7253a9df31d088028aa6a173a97639747e55bf4",
     "SpineFileSha256": "4a5105d12c772b4587f484a295f9f84a863145dcd332f99437aeef64ad39306b",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GV4E69.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GV4E69.png",
+    "MediaFileSha256": "1b7cdf6430aebb5c75d87c30a3a1e8808c83b60c8ec8f01efc0880674be02e3f"
   },
   {
     "Console": "gamecube",
@@ -93,7 +108,10 @@
     "FrontFileSha256": "3f62c3ce7e1994acfb719fb422ab169cc2250676c03b0024f9aebac296999504",
     "BackFileSha256": "6590834e75317694b157953750081b025d13827dd8dd6b4cdd8f3949085357ae",
     "SpineFileSha256": "190fa8f111ca049de3f050cb020ff59efe6b4617a150379b9b0e4fc50924d287",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GP6E01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GP6E01.png",
+    "MediaFileSha256": "9eb63b3a8fbedb5774a2800a17506a069c718c886cd37b747a36eeecb546757b"
   },
   {
     "Console": "gamecube",
@@ -109,7 +127,10 @@
     "FrontFileSha256": "4688f96b6e6e8c0c8294e734f9bfbcf80e46de703d9c11d046b6602249206af7",
     "BackFileSha256": "0ec408837842e46e02eda2969b52e657c97504c7e954f888b12f85561fcf4e10",
     "SpineFileSha256": "d67d0e7fee9efa77b9351b2a03ace774d38a77dd11f7e161bc5d39f4af18a1e0",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GXRE08.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GXRE08.png",
+    "MediaFileSha256": "80222d7a8d72d87987f5b97045f8e72863a1e1dedeb9d5339d11879d5f4ae2bf"
   },
   {
     "Console": "gamecube",
@@ -125,7 +146,10 @@
     "FrontFileSha256": "9dfbe63bbe83498fe05d169ac877abca78456886de957f5011d1fbda1b9a8bda",
     "BackFileSha256": "e04009dad908d9e47bbf0923a0549ecaeafacedbf4a84759494de398ed0f02d3",
     "SpineFileSha256": "9352459523bc804fd66ef33de54e50c3dcff621a8e2269cab7bd5dfd5c116192",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GM8E01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GM8E01.png",
+    "MediaFileSha256": "8c833b7cf14b2feb727e6894515d42d14c0445b8a2668565e942681abf9f7d4f"
   },
   {
     "Console": "gamecube",
@@ -141,7 +165,10 @@
     "FrontFileSha256": "f85add75cf48cbe9358a84715a16ad9162d2d1b63d47bee5d76501cecd8eb33d",
     "BackFileSha256": "c8114f519164c95d07e36a9c2904f04f71a7af7b114bff92b3d504ab9df31394",
     "SpineFileSha256": "ce8c3910d850cf2bf312d7caf75c510380dc27282c41f4abf8968daf8607486b",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-G3VE69.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/G3VE69.png",
+    "MediaFileSha256": "f3542b979201cce0978be9500e40de3a77111e2b66329484ec30c1380e355942"
   },
   {
     "Console": "gamecube",
@@ -157,7 +184,10 @@
     "FrontFileSha256": "966413e285fb61449c4dd28f5e2e8f405b207cf0d9cb70b25bca76eb30943d36",
     "BackFileSha256": "1f288d9f5706f4c5e63f117c2e23977d10f7078d3df3def0c57ae4d4d2c87110",
     "SpineFileSha256": "5906b936f99ca622d2a5e3fdf8e4d22c5dd694c021c136a24765f93249f9d190",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GIHE78.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GIHE78.png",
+    "MediaFileSha256": "f431533dbf5cecab399016058076da06f747a3352374ee42cc4e7fdd29c407ff"
   },
   {
     "Console": "gamecube",
@@ -173,7 +203,10 @@
     "FrontFileSha256": "32de55b76b9619e80ef0ea8214ea76c8df8db9dd1a71bd7c167d4e7c445e7c42",
     "BackFileSha256": "98ef21a90f7b930d5823767c49cee4875fd25361cbb68883389ee03143041777",
     "SpineFileSha256": "3d8135fcaf2f7104543508c7512892ab8d7bbd0fc9db6332f2b5b909b109e882",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-G5DE78.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/G5DE78.png",
+    "MediaFileSha256": "5df0f79481d37081cc57f353d06eaf244f0e48421bb025309e7f4387541d7344"
   },
   {
     "Console": "gamecube",
@@ -189,7 +222,10 @@
     "FrontFileSha256": "3e40be6ca8e75dbfdeffa9c0e0346a121689f2a6222b4fd4d0a406ef3b883a1b",
     "BackFileSha256": "0bbcff80e25e3a467ba80825801154295bc8e18c608e234f5358faf57c882a10",
     "SpineFileSha256": "e040d2b0fa3d923fea9dcc51378a2923c1b516291e4c2d4ffc8075864b302880",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GEAE8P.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GEAE8P.png",
+    "MediaFileSha256": "090dc91f7dfdbe2ab587bd533cb24f9e9346a31f3bbb1f68629c8094ea188c78"
   },
   {
     "Console": "gamecube",
@@ -205,7 +241,10 @@
     "FrontFileSha256": "3a0db89945981946bd7ac78763a229a84d53980707b5f84b4292a6026c0f42d6",
     "BackFileSha256": "759d4a79e3556d7e1e58346ddb68ce93a1fe00e5d84e5698c3df205588972097",
     "SpineFileSha256": "a3269d3d0c77ee97cb5c4b0bb5324fd40e28f3a017891b341bf3e50bc962b3be",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GSNE8P.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GSNE8P.png",
+    "MediaFileSha256": "b7c347628b4e00aaf05278ec3d9a7df0505a7bc4291978675b89e785d7ca1342"
   },
   {
     "Console": "gamecube",
@@ -221,7 +260,10 @@
     "FrontFileSha256": "69f64aaf6756cce55f8dff5f7083f8b1ee7d0f5ab2947a4e0545cdde4d97e52b",
     "BackFileSha256": "9f166d80a2eb12d9e884997be703166ef5c720194a8a2b20a038b0b263b26849",
     "SpineFileSha256": "9dce641fe0faf88c7cae9f03ad4113617044221af2027c2059846676bf79f0ac",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GSAE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GSAE01.png",
+    "MediaFileSha256": "ca8e5ffffd76934ab8ef72389b8994534bf1e6fbf4ca7c27187c88e481d357f1"
   },
   {
     "Console": "gamecube",
@@ -237,7 +279,10 @@
     "FrontFileSha256": "ef3c62429f10f6d8bd109cda9b1e809fcb82a238d4a235962023c682a5b027ce",
     "BackFileSha256": "7f046fba66dab9c9383b64052b4e6b744a948dce6581317446383713449cd75d",
     "SpineFileSha256": "2b94891b20e2a56d5d999df08c25de340619a0c7c5e6b0a87af57387f8dd9ebd",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GMSE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GMSE01.png",
+    "MediaFileSha256": "2fbc424df3108d835b9ee668b952f17a63dae6e5e62eb8e8e0e3258e1ae1af39"
   },
   {
     "Console": "gamecube",
@@ -253,7 +298,10 @@
     "FrontFileSha256": "2e063fb7b36a3af27ac03850311cdd41064b2101f8d22fefea26274f964ad260",
     "BackFileSha256": "2b9cf2b43f44e902a7f2da8e45b9dc6f195f8787f328c622fbe2a0b1de546f3d",
     "SpineFileSha256": "bd93460d0ff4882a1cfc0bda60aa0cc5d075c369fd7aa93a8f339c706b9f4a3e",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GALE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GALE01.png",
+    "MediaFileSha256": "fc1aaa0a9dc428d4739bf341e6c0e8c57e5569cf4af141e75435bc0832e87f4b"
   },
   {
     "Console": "gamecube",
@@ -269,7 +317,10 @@
     "FrontFileSha256": "cda1055bc7f77989d63a073d84b2985b679181761793ab8bb2f59adf18acd648",
     "BackFileSha256": "e95deb4de39ecda5afae9d6497d15c9142bb9c4cbaf28346eea53c598dfd05cc",
     "SpineFileSha256": "2a866463126d915dc192837198c34dd5f730516c61cd82cad1804186fbdae4dc",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GZLE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GZLE01.png",
+    "MediaFileSha256": "dbceae34908f2890e75057fca47f17a144316978f048e661e4ab6389b683630f"
   },
   {
     "Console": "gamecube",
@@ -285,7 +336,10 @@
     "FrontFileSha256": "d2d131b64bc0e5f7744735981337a7682950b60c7b0a9378b7db31f4d7915c98",
     "BackFileSha256": "e445479bfe588ec3e87c8594dba3db959f7bbcfa9f5716bdcf42dff3434b2826",
     "SpineFileSha256": "f99193da28c5ba74062538c5cef0041c288e933680a48dcbaa301a1ca5bc1c3e",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/gamecube-GZ2E01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GZ2E01.png",
+    "MediaFileSha256": "a0c204546892c4f1cf3925414b0ea748d7a1ea7161a855c110bb02b904d3fe31"
   },
   {
     "Console": "wii",
@@ -301,7 +355,10 @@
     "FrontFileSha256": "4da079dbf4685d01dea56c5bd168f8fd04116d4a71e4ab90505ba5720a14cb37",
     "BackFileSha256": "b40ec5e746c35a482ecf6c401db5aa6e7aeccc41d0271a1d7c4c4dc744a10c3c",
     "SpineFileSha256": "0a6c67d3415f35cbdac04a6bcbc002b1f59fc73a057e85de293b989b0ef3c080",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-SUKE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/SUKE01.png",
+    "MediaFileSha256": "889d04c6a1dca53a6c408ddc4b1e29b8809ee5c0792632f6f8c31858fe7b6993"
   },
   {
     "Console": "wii",
@@ -317,7 +374,10 @@
     "FrontFileSha256": "af4e6e6be89ebf68bc138019126a9177dde9d5a56bed97855a6e6d76a7f8e633",
     "BackFileSha256": "fcfebf15d78cff80220c310411d19aee3bb4d59420833619a49c170d150d9e50",
     "SpineFileSha256": "2cd5cc61c51bdcf402bc33ea1040fe6413df0dc95eed702cb68ef2b676d6106b",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RL8E54.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RL8E54.png",
+    "MediaFileSha256": "c48a5ebabccafe8e3846f3d06667aa0fb1287f27e79fd3891ed9854259ef1a3a"
   },
   {
     "Console": "wii",
@@ -333,7 +393,10 @@
     "FrontFileSha256": "78d84e726d0e0c8d27b7cb58f5483ce47a7e814d3fea5ce4f1f96ce8e5cc641c",
     "BackFileSha256": "ac629a107ab4518e42ae45d0af46e737ce8afff7be366fb19b010d8bd0719202",
     "SpineFileSha256": "4cbfaaa5dff5f5b11abb4cfb4dfed535270fef4cf50d97915ab1b7fce80c5d62",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RMCE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RMCE01.png",
+    "MediaFileSha256": "636dbfa64b1d890c8042ed3db0be8dff164e4ace5e37c336be00ef73b2b5e45b"
   },
   {
     "Console": "wii",
@@ -349,7 +412,10 @@
     "FrontFileSha256": "16f7ab5e6463193e2c736f379a7f061fcd17eddfede3c8905c4c7774913e274f",
     "BackFileSha256": "16c39e820f4ecdda603416d5fc463e89ebaeccfa4d3d3648a68ac4a51bfcc8cc",
     "SpineFileSha256": "2fe56afa992eb734344c5e3cb920b8fc408ffdd0871a3f4cd975e19ffc693fa3",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-R4QE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/R4QE01.png",
+    "MediaFileSha256": "cfd60fc740e2d67c803699173613cbfc75e22f5c888397d95e2c702a4a1d2748"
   },
   {
     "Console": "wii",
@@ -381,7 +447,10 @@
     "FrontFileSha256": "5d3b46d183f2803cb69b9980446c226cfd18ccdf2b93a136e7cc90c275d29c16",
     "BackFileSha256": "51086ea4516a06757a94a27ecdfdd497a262e3ba6532f1c47ae17cfa207b644b",
     "SpineFileSha256": "a66af2fada6346ae5438268c99d58ec1370fe62b827ac070ae9061b159169922",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-SMNE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/SMNE01.png",
+    "MediaFileSha256": "311731c8768c9f0e7159b5b5fa4252d25dd98b71ba41a93d4a49825c9a7cff0e"
   },
   {
     "Console": "wii",
@@ -397,7 +466,10 @@
     "FrontFileSha256": "4bac779b84bbe278558aca41f86bdbfee557fe06da79a45559a33f9c99b9852b",
     "BackFileSha256": "5dc7ac5e1f2b51600dec5523fbb20910d0352541995410da2985ee49d02a0186",
     "SpineFileSha256": "5ccfc079754fced5d9e6a97d57a96ad919f25158e1ef8a81f53be358f6854355",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RENE8P.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RENE8P.png",
+    "MediaFileSha256": "3aa212bbbe9e1149354c388483dcc80fee0e36746cd874729723dd4b12612113"
   },
   {
     "Console": "wii",
@@ -413,7 +485,10 @@
     "FrontFileSha256": "5f5b2abeb92d6d10b31c970a8ff3c69a465f4fe01c76991dbf57338950756c73",
     "BackFileSha256": "87425d6f96136d2d0cf31c3b5fcead4e7308b381ac9b58e73fc5cda3d9253f32",
     "SpineFileSha256": "377cd4421c24207368824ca4bec42972b28283cc561404af35a16716a144504e",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RSRE8P.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RSRE8P.png",
+    "MediaFileSha256": "4799efd2ac1dde47092e36942ecf4240d9ca2f36d0a50bb1653d0466189da103"
   },
   {
     "Console": "wii",
@@ -429,7 +504,10 @@
     "FrontFileSha256": "5d33c744fa999e5c895aee8b4f7827762356745486a8711e56fa248242c4b21d",
     "BackFileSha256": "c10d52f138802a5484c51f3239676c5f62da4056d4f14a83fde7392d1d94d53c",
     "SpineFileSha256": "a44a8a8291f63899edc6bd980b52697f4a6e338366b2ade98d3fa4ec225e01a9",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RMGE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RMGE01.png",
+    "MediaFileSha256": "a9168dfa80fffb69641e1c1fdfc5b7439c8170a72eb9af7500db8119df7b1267"
   },
   {
     "Console": "wii",
@@ -445,7 +523,10 @@
     "FrontFileSha256": "0c206895c8c2c938beea6e02f9a5584ce707b728c228d766e32a632730eebbe8",
     "BackFileSha256": "fb65298e669171ec65214a5459fc3431b5ce5735bc3350b7e52effc35560df32",
     "SpineFileSha256": "049fc33ede228f3793e0d093f50099ab3c6a82ca954bd623b723eb4669096782",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-R8PE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/R8PE01.png",
+    "MediaFileSha256": "2d9c6d2cf887e849e58d98e374a293219df9279934e2a3622b6a520f1b36d88b"
   },
   {
     "Console": "wii",
@@ -461,7 +542,10 @@
     "FrontFileSha256": "5a81defe6fb91cf7ee30df06de6752ebce5c72d19b6a06c3dfe58d2c253a0a8d",
     "BackFileSha256": "6c2a5d282d1a3c84b2f637a9c4fee282eadbbccec4829a79d6913c1944768058",
     "SpineFileSha256": "5f2fc01111b4c2da70a6539bf37ac0493e28e827b5e146eddeca0801fb7cff59",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-SOUE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/SOUE01.png",
+    "MediaFileSha256": "b81702f59a90eadd987132749cabe296c3c5cebe2d31d6cac613b3644468a1f2"
   },
   {
     "Console": "wii",
@@ -477,7 +561,10 @@
     "FrontFileSha256": "54e52d816d44c4da785bfb1edb612b60f4d681913d4cd0c637a3c906300fff3d",
     "BackFileSha256": "dbf8ea20bf913f94c94e95fed67dbf3a97ad643903e94bd260283a6d5e552164",
     "SpineFileSha256": "943348b9a8f98de3d75620ce35564787bdf0444cb1c6b19673fca263e6b71888",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-RZDE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/RZDE01.png",
+    "MediaFileSha256": "b6c3e342ca7f617bb2b0ef997d01a2b8804468050a538cb1385a22b3963cd9b3"
   },
   {
     "Console": "wii",
@@ -493,7 +580,10 @@
     "FrontFileSha256": "fc227a44b84abfb87e1704e826be7cbdca9636e107dee9ed5a75b9a48c5852d9",
     "BackFileSha256": "b537b34d677bda1d3d1386ee1f682cbf34a6198001f4a6737558a867a787a2f9",
     "SpineFileSha256": "ce2f8e6c1faac02a72ca56b19747d2de68a9ea0586477cf46a7a13cb2bf886ba",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/wii-SUPE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/SUPE01.png",
+    "MediaFileSha256": "0746d9c0d657e01f00bdf5e0788475fcb630ac8caecb2c0b4ad716f1cb3b72f3"
   },
   {
     "Console": "switch",
@@ -502,7 +592,10 @@
     "Front": "Assets/Covers/Shelf/switch-AB48A.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AB48A.jpg",
     "Sha256": "66117e2ed43e5ff39bc73fdd2aa323844f4adcf3f3178c195a73b6f3526abcad",
-    "FrontFileSha256": "66117e2ed43e5ff39bc73fdd2aa323844f4adcf3f3178c195a73b6f3526abcad"
+    "FrontFileSha256": "66117e2ed43e5ff39bc73fdd2aa323844f4adcf3f3178c195a73b6f3526abcad",
+    "Media": "Assets/Covers/Media/switch-AB48A.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AB48A.png",
+    "MediaFileSha256": "114cee3618b8c869a95b5875afe3f1bb5d14a2d31b7568d2e2e2bbc83685ea92"
   },
   {
     "Console": "switch",
@@ -518,7 +611,10 @@
     "FrontFileSha256": "b6f5698cbadb2485b0775604b125e3ceb7662272002370997cc88dc41b292513",
     "BackFileSha256": "a769f8d33840de996c627b3a4c341e559a18c08ccad63d54913d0f7732c302ba",
     "SpineFileSha256": "b2c029d4866f2353c111c3007a120c57f269e407bc95a40d8f2392e13fe3b39f",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AE98A.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/US/AE98A.png",
+    "MediaFileSha256": "3b0603fac686c69e74318036aabc3f02a200693ad470dfb58a6d7c6f66758d21"
   },
   {
     "Console": "switch",
@@ -527,7 +623,10 @@
     "Front": "Assets/Covers/Shelf/switch-AST4A.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AST4A.jpg",
     "Sha256": "1663639761980ae6dfc3a10d96858eb10b55b027197bf05931c6e5f0a274c989",
-    "FrontFileSha256": "1663639761980ae6dfc3a10d96858eb10b55b027197bf05931c6e5f0a274c989"
+    "FrontFileSha256": "1663639761980ae6dfc3a10d96858eb10b55b027197bf05931c6e5f0a274c989",
+    "Media": "Assets/Covers/Media/switch-AST4A.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AST4A.png",
+    "MediaFileSha256": "c4583ac97fffc7e0f32b6cf704c54cfe49b836f34b5904b779b84f9e40f839f8"
   },
   {
     "Console": "switch",
@@ -545,7 +644,10 @@
     "Front": "Assets/Covers/Shelf/switch-AKUTB.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AKUTB.jpg",
     "Sha256": "3747c93cdf3e5f91f6b21109a1e15a81e99210758b325fe72be33480da676909",
-    "FrontFileSha256": "3747c93cdf3e5f91f6b21109a1e15a81e99210758b325fe72be33480da676909"
+    "FrontFileSha256": "3747c93cdf3e5f91f6b21109a1e15a81e99210758b325fe72be33480da676909",
+    "Media": "Assets/Covers/Media/switch-AKUTB.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AKUTB.png",
+    "MediaFileSha256": "c7471e1fea3c3a96ef3eb3db782c15714a1c1ffe001797f41cbd7cd708f20d2e"
   },
   {
     "Console": "switch",
@@ -561,7 +663,10 @@
     "FrontFileSha256": "550b34127ff55cd793d73da5896efabb073e0de126cb3f5fcb1ab161d21be107",
     "BackFileSha256": "e15dcc5454153be336973d90a39ee0748ef8b4f974792dc2e589f24050f4c390",
     "SpineFileSha256": "6034a97d6f72d7a2be68d3853d87a12daee94fdf0229be724631a352632ecc41",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AABPA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AABPA.png",
+    "MediaFileSha256": "846ee62493c2596f78043e5ed447ea26e088831494f9f8ac20c76338df16c206"
   },
   {
     "Console": "switch",
@@ -586,7 +691,10 @@
     "FrontFileSha256": "69122bc95a34bf1b6b272258a2f3fb8d9d9e1f7a64f838d1bb2f779e2de8189c",
     "BackFileSha256": "d522c3472114bf831ce4deaeeeb403c45d16ad6f5bef504e668a2efb8cfbf51c",
     "SpineFileSha256": "cdeacdb10c1460fc2175fa97690ed2c493c7581cd9156c2c8ad16d80871eb14e",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-BAAQA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/BAAQA.png",
+    "MediaFileSha256": "b8a973877690df7ceffd4cd38bb48db2dbd2c5c61cdc98f07ff69f2139d968b8"
   },
   {
     "Console": "switch",
@@ -602,7 +710,10 @@
     "FrontFileSha256": "c04e821b12beb43e6e0b320cc21012ee241e393e6631e80e730c23c96870d342",
     "BackFileSha256": "a1cd2419cb64785f988b9f29579e7f9e9b0b83c29481a0c0f7c8026aea7db566",
     "SpineFileSha256": "b5bb0896494ce72dec0f6096342bd3ffa6e76cc72a6d2b2537032eec71ce4681",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AAACA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AAACA.png",
+    "MediaFileSha256": "e2af03fb751b4c23521b00f4b0eecff30feec3ddfc9469e57c86443e47edda3a"
   },
   {
     "Console": "switch",
@@ -618,7 +729,10 @@
     "FrontFileSha256": "df520e787f8c9899240444ca57721bb03bd635197e4db0481141e9d7a30cd75f",
     "BackFileSha256": "e06faf259a58f350ccf9d4f5a60881ca8208008dfeeb0ae05380b5e847334b29",
     "SpineFileSha256": "2bd9a40972366bda9205fe8064daa4ea44593fa1417096c242ed7edae4f60a75",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AAABA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AAABA.png",
+    "MediaFileSha256": "1d72047171b887a96c5e93898a5e36db70ca7cc98b4333881c55f550a102c28a"
   },
   {
     "Console": "switch",
@@ -634,7 +748,10 @@
     "FrontFileSha256": "eb6e7f9503440accd0a2241b349f59936c082ebdaec3ddcc33d73513316956da",
     "BackFileSha256": "13bc9df4e1b206f54e53932dbcec186e21c37a4618a4b9f8d11b3baea403889a",
     "SpineFileSha256": "a71fc55f0faf545759c26a43ff3dcdc82289d8648cae39b38a166cab76998c38",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AAAAA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AAAAA.png",
+    "MediaFileSha256": "8f42a3c6ed3b37ae72ad987b71901613c172b5e71680169c7daa7b318e9e3eb4"
   },
   {
     "Console": "switch",
@@ -650,7 +767,10 @@
     "FrontFileSha256": "3b76b247b9460202be26abf375177fc09e310625ad1d6ea566b85ae786215833",
     "BackFileSha256": "1bce86f3717088053afe3ad5151672f1f6d9c1408f9d2f45b940f8b73137724a",
     "SpineFileSha256": "db1ff24e13e7a4d929c3b51d1969aa72ab1d93384e82a8b970c8eea6bd8aaf6c",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-BDGEA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/BDGEA.png",
+    "MediaFileSha256": "8fd97c1f5c5780f13aa829ee7252b0b4753b0fa6f6e0c03e355ea57f479a0ab2"
   },
   {
     "Console": "switch",
@@ -666,7 +786,10 @@
     "FrontFileSha256": "b9aa37c1b8447b0845878c5155747e2ec5efa3528ec096bf605279cb4e0a38b5",
     "BackFileSha256": "e39d0b03e5286a9b896a8a874f20967d81cb93b5606c19eac6dd6168467b36b4",
     "SpineFileSha256": "8bc8b5b9ec555e3d35f177e8b6f75e8bc11b680efa8243b9678f369b15f4f2bf",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AR3NA.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AR3NA.png",
+    "MediaFileSha256": "6f5eb52726bb460ee9593a3ba5000654042e705228769f440a6e950883de27c4"
   },
   {
     "Console": "switch",
@@ -682,7 +805,10 @@
     "FrontFileSha256": "1f99539aab3bc7cbc5b14521c955cb6ae55761f8633f45413c4492b798aaf899",
     "BackFileSha256": "f2daae47bb5ffed2b2bd5d07a7657eb39fbf5b8aa67c9c8d13e2ae3cb7477f00",
     "SpineFileSha256": "010cb4a062bb8e3362235fae6b8812093564369bbfaa2c15e6bd181172564a3f",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AZ89A.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AZ89A.png",
+    "MediaFileSha256": "2e1f217346502e657f2cdb9b35f066b675187690958b49ca895914907b12696f"
   },
   {
     "Console": "switch",
@@ -698,7 +824,10 @@
     "FrontFileSha256": "a5cdc8906d62921494a19fbb660af6b714ec9066768866ae745cb7f664620952",
     "BackFileSha256": "3863878baa3c9125061b620aad52a13f6f63c00081f17f9a8c8aa63668b55f61",
     "SpineFileSha256": "c088a59515fe17f0f1aaaf8054547b8149c1b9232631fb1d3e357a0b18b5869c",
-    "FrontDerivedFromFull": true
+    "FrontDerivedFromFull": true,
+    "Media": "Assets/Covers/Media/switch-AXN7A.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/EN/AXN7A.png",
+    "MediaFileSha256": "a5c35ded366f3e1e947662faf2fbec1f610ac90f85933515c22f5c9e3a671a65"
   },
   {
     "Console": "switch",
@@ -707,6 +836,33 @@
     "Front": "Assets/Covers/Shelf/switch-BACCC.jpg",
     "Source": "https://art.gametdb.com/switch/cover/EN/BACCC.jpg",
     "Sha256": "f735a42f6bf42e06dab8889083753417dc577cd49361329b59564575825fef0a",
-    "FrontFileSha256": "f735a42f6bf42e06dab8889083753417dc577cd49361329b59564575825fef0a"
+    "FrontFileSha256": "f735a42f6bf42e06dab8889083753417dc577cd49361329b59564575825fef0a",
+    "Media": "Assets/Covers/Media/switch-BACCC.png",
+    "MediaSource": "https://art.gametdb.com/switch/cart/US/BACCC.png",
+    "MediaFileSha256": "e1e0bb052c35e2efb37df0fa5ef951f6078f36a3715b644ac0aacd04d81fe528"
+  },
+  {
+    "Console": "gamecube",
+    "Title": "Mario Party 4",
+    "GameTdbId": "GMPE01",
+    "Media": "Assets/Covers/Media/gamecube-GMPE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GMPE01.png",
+    "MediaFileSha256": "d68a7b0bf2f8b3950d9cc73531e89259d0affa890271c94ba72a5f70578bb511"
+  },
+  {
+    "Console": "gamecube",
+    "Title": "Soulcalibur II",
+    "GameTdbId": "GRSEAF",
+    "Media": "Assets/Covers/Media/gamecube-GRSEAF.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/GRSEAF.png",
+    "MediaFileSha256": "6ce442c0494d158fadfdb4504957db69dbc228875f9d4a40141d7f1e7e37445d"
+  },
+  {
+    "Console": "gamecube",
+    "Title": "Super Mario Strikers",
+    "GameTdbId": "G4QE01",
+    "Media": "Assets/Covers/Media/gamecube-G4QE01.png",
+    "MediaSource": "https://art.gametdb.com/wii/disc/US/G4QE01.png",
+    "MediaFileSha256": "8d4a64bead4848859140f92ed8cff383887905ae55a6d3ebd1a54d50644d9df5"
   }
 ]

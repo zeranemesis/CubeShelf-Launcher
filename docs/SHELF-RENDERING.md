@@ -1,5 +1,11 @@
 # Boîtiers et changement de console
 
+En Big Picture uniquement, le stick gauche horizontal choisit les jeux et le stick vertical change de plateforme. La croix ouvre et parcourt les menus. START ouvre/ferme le menu principal, A valide et B revient. **Paramètres manette → Inverser stick et croix** échange les rôles sans modifier A/B/X/Y ; le choix est conservé au redémarrage. Les impulsions verticales changent une seule plateforme, tandis que le défilement horizontal et les menus se répètent après maintien. Le clavier garde les flèches pour les jeux/plateformes, F10 pour le menu et Entrée/Échap pour valider/revenir.
+
+Le [menu Recalbox](https://wiki.recalbox.com/en/basic-usage/getting-started/frontend) inspire le panneau central et sa navigation en liste. Les options proposées sont celles de CubeShelf et de ses ports natifs. L'interface classique reste indépendante de ce menu.
+
+Au lancement en Big Picture, le boîtier s'ouvre et son support sort du logement : mini-disque GameCube, disque Wii ou cartouche Switch. L'animation dure environ 1,6 seconde avant le démarrage effectif du programme. B, Échap ou le bouton de retour annulent pendant l'ouverture. Le lancement classique et l'animation mobile restent inchangés. Les tests vérifient la séparation des commandes, la persistance de l'inversion et que la fin ou l'annulation de l'animation autorise ou empêche le lancement ; aucun programme de jeu n'est exécuté par les tests visuels.
+
 La [présentation de Socket](https://depmots.com/socket) sert de référence pour la lecture des objets physiques : silhouettes propres à chaque plateforme, matière discrète et mouvements courts. CubeShelf utilise ses propres contrôles Avalonia, son modèle GameCube existant et les scans de jaquettes référencés dans `COVER-SOURCES.md`.
 
 Les cartes de bibliothèque utilisent un dessin statique du boîtier et une miniature de 512 pixels de haut au maximum, sans agrandir les petites sources. Les fiches et Big Picture gardent des textures plus grandes. La face, la tranche de charnière et le dos restent distincts ; le bord d'ouverture n'affiche plus une deuxième tranche imprimée. Un dos manquant reste sans illustration. Les matériaux et les traits de lumière sont partagés, et le maillage des boîtiers voisins est plus léger que celui du jeu sélectionné.
