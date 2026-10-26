@@ -10,6 +10,8 @@ using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
+Run("library: console media profiles and fallback", ConsoleMediaProfilesTests.RegistryAndFallback);
+Run("library: platform catalog migration preserves user state", ConsoleMediaProfilesTests.CatalogMigration);
 Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
 Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
 Run("runtime: a console game's output goes to its log, not a window", RuntimeIntegrationTests.OutputLog);
