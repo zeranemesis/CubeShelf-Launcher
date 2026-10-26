@@ -48,6 +48,15 @@ public sealed partial class MainWindow
             return;
         }
 
+        if (game.RuntimeOwnsSetup)
+        {
+            if (!await EnsureNativeShelfPortAsync(game)) return;
+            if (OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))
+            {
+                new NativePortLibrary(_paths).Launch(_nativeShelfPorts[game.Id]);
+                return;
+            }
+        }
         var intent = new PlayIntent(game, P7("Préparation…", "Getting ready…"), readyAction is not null);
         _playIntents.Add(key, intent);
         RefreshQuickPlayUi();
@@ -216,6 +225,8 @@ public sealed partial class MainWindow
     {
         if (RunningGameFor(game) is not null) return P7("■ Arrêter", "■ Stop");
         if (PlayIntentFor(game) is { } intent) return intent.Status;
+        if (game.RuntimeOwnsSetup) return File.Exists(game.Executable) || OperatingSystem.IsMacOS() && Directory.Exists(game.Executable)
+            ? P7("▶ Jouer", "▶ Play") : P7("↓ Installer le port", "↓ Install native port");
         if (!DiscImageService.Inspect(game.DiscImage, game).Supported) return P7("▶ Configurer et jouer", "▶ Set up and play");
         var runtime = _installer.GetStatus(game.Id);
         if (!runtime.IsInstalled && !File.Exists(ResolveApplicationPath(game.Executable)))
@@ -228,6 +239,7 @@ public sealed partial class MainWindow
     private string QuickPlayHint(GameCatalogEntry game)
     {
         if (RunningGameFor(game) is not null) return P7("En cours de jeu", "Playing now");
+        if (game.RuntimeOwnsSetup) return P7("Port natif : installation et fichiers selon les instructions du projet.", "Native port: setup and game files follow the project's instructions.");
         if (PlayIntentFor(game) is { } intent) return intent.Status + (intent.OpensOnline
             ? P7(" Les salons s’ouvriront automatiquement.", " The room list will open automatically.")
             : P7(" Le jeu se lancera automatiquement.", " The game will start automatically."));

@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Catalogs/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
     <AvaloniaResource Include="Assets/Logos/*.png" />

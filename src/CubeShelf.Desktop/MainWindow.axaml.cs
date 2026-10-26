@@ -16,6 +16,20 @@ namespace CubeShelf.Desktop;
 
 public sealed partial class MainWindow : Window
 {
+    private NativePortsWindow? _nativePortsWindow;
+    private async void OpenNativePortsCatalog(object? sender, RoutedEventArgs args)
+    {
+        if (_nativePortsWindow is not null) { _nativePortsWindow.Activate(); return; }
+        _nativePortsWindow = new NativePortsWindow(ShelfProduct.Resolve(_activeShelfConsole), paths: _paths);
+        _nativePortsWindow.Closed += (_, _) => _nativePortsWindow = null;
+        await _nativePortsWindow.ShowDialog(this);
+        var library = new NativePortLibrary(_paths);
+        foreach (var game in _catalogGames.Where(game => game.RuntimeOwnsSetup))
+            if (_nativeShelfPorts.TryGetValue(game.Id, out var port) && library.IsConfigured(port))
+                game.Executable = library.Executable(port)!;
+        PersistCatalog();
+        if (_selectedGame is not null) RefreshGameState();
+    }
     private readonly IProcessLauncher _processLauncher = new ProcessLauncher();
     private readonly GameProfileStore _profileStore;
     private readonly PartyBoardInstaller _installer;
@@ -89,9 +103,10 @@ public sealed partial class MainWindow : Window
             SettingsStatus.Text = $"Migration terminée : {migration.RuntimesCopied} runtime(s), {migration.ModLibrariesCopied} bibliothèque(s) de mods copiés. Sources conservées.";
 
         _catalogService = new GameCatalogService(
-            Path.Combine(AppContext.BaseDirectory, "games.json"),
+            PrepareUnifiedShelfCatalog(paths),
             paths.DataDirectory);
         _catalogGames.AddRange(_catalogService.Load());
+        InitializeConsoleShelfPicker();
         _selectedGame = ShelfGames.FirstOrDefault() is { } firstGame
             ? GameVariants.Resolve(_catalogGames, firstGame, paths)
             : null;
@@ -270,10 +285,15 @@ public sealed partial class MainWindow : Window
     private async void RepairPartyBoard(object? sender, RoutedEventArgs args)
         => await RunInstallationAsync(repair: true);
 
-    private Task RunInstallationAsync(bool repair)
+    private async Task RunInstallationAsync(bool repair)
     {
+        if (_selectedGame is { RuntimeOwnsSetup: true } native)
+        {
+            await EnsureNativeShelfPortAsync(native, alwaysShow: true);
+            RefreshGameState();
+            return;
+        }
         EnqueueRuntimeInstallationPhase3(repair);
-        return Task.CompletedTask;
     }
     private void CancelInstall(object? sender, RoutedEventArgs args)
     {
@@ -303,7 +323,7 @@ public sealed partial class MainWindow : Window
     private void PersistCatalog() => _catalogService.Save(_catalogGames);
 
     /// <summary>The library's games: variants (Super Mario Eclipse) are reached through their base game.</summary>
-    private IEnumerable<GameCatalogEntry> ShelfGames => _catalogGames.Where(game => !GameVariants.IsVariant(game));
+    private IEnumerable<GameCatalogEntry> ShelfGames => NativePortCatalog.ForConsole(_catalogGames, _activeShelfConsole);
 
     /// <summary>
     /// After the selected game's mods change: Super Mario Sunshine becomes Super Mario Eclipse
@@ -372,6 +392,7 @@ public sealed partial class MainWindow : Window
         DiscPathText.Text = File.Exists(game.DiscImage)
             ? game.DiscImage
             : "Aucune image sélectionnée";
+        if (game.RuntimeOwnsSetup) DiscPathText.Text = "Configuration dans le port natif";
         ExecutablePathText.Text = File.Exists(game.Executable)
             ? game.Executable
             : $"{game.RuntimeName} non configuré";
@@ -379,6 +400,7 @@ public sealed partial class MainWindow : Window
         var runtime = _installer.GetStatus(game.Id);
         RuntimeSectionLabel.Text = game.RuntimeName.ToUpperInvariant();
         InstallButton.Content = runtime.IsInstalled ? "Mettre à jour" : $"Installer {game.RuntimeName}";
+        if (game.RuntimeOwnsSetup) InstallButton.Content = "Installer / configurer le port";
         RepairButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         UninstallButton.IsVisible = runtime.IsInstalled || runtime.NeedsRepair;
         if (runtime.IsInstalled)
@@ -393,8 +415,9 @@ public sealed partial class MainWindow : Window
         }
 
         var compatibility = DiscImageService.Inspect(game.DiscImage, game, UiLocalization.IsEnglish(_preferences.Language));
-        DiscCompatibilityText.Text = compatibility.Message + Environment.NewLine +
-            DiscImageService.DescribeSupported(game.SupportedDiscIds);
+        DiscCompatibilityText.Text = compatibility.Message + (game.RuntimeOwnsSetup ? "" : Environment.NewLine +
+            DiscImageService.DescribeSupported(game.SupportedDiscIds));
+        DiscSelectionActions.IsVisible = !game.RuntimeOwnsSetup;
 
         var prepared = !runtimeManagesDisc && _gameData.IsPrepared(game, game.Executable);
         PrepareDataButton.IsVisible = !runtimeManagesDisc;

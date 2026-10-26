@@ -257,7 +257,7 @@ public sealed partial class MainWindow
             game,
             LoadBitmap(coverPath),
             game.IsFavorite ? "★" : "",
-            File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
+            game.RuntimeOwnsSetup ? "◆ Port natif" : File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
             runtime.IsInstalled || File.Exists(executable)
                 ? $"✓ {game.RuntimeName}"
                 : $"○ {game.RuntimeName}",

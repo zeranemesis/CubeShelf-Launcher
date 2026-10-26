@@ -15,7 +15,9 @@ public sealed record DiscCompatibility(string VersionId, bool Recognized, bool S
 public static class DiscImageService
 {
     public static DiscCompatibility Inspect(string path, GameCatalogEntry game, bool english = false) =>
-        Inspect(path, game.SupportedDiscIds, english,
+        game.RuntimeOwnsSetup
+        ? new("", false, true, english ? "Game files are prepared by the native port." : "Les fichiers du jeu se préparent dans le port natif.")
+        : Inspect(path, game.SupportedDiscIds, english,
             game.DataPreparation == GameDataPreparation.Runtime ? game.DiscFormats : new[] { ".iso", ".gcm", ".rvz" });
 
     /// <summary>Accepted by PartyBoard. Used by the legacy WPF launcher, which is single-game.</summary>

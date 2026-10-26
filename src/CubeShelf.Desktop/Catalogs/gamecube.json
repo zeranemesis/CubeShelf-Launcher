@@ -1,0 +1,704 @@
+[
+  {
+    "Id": "flyngmt-acgc-pc-port-animal-crossing",
+    "Title": "Animal Crossing",
+    "Project": "ACGC-PC-Port",
+    "Repository": "flyngmt/ACGC-PC-Port",
+    "Method": "Decompilation",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "48c3bf5b4fbc1615d5c58d25a32b4b41f4ce6401",
+    "ReadmeUrl": "https://github.com/flyngmt/ACGC-PC-Port/blob/master/README.md",
+    "ReleaseUrl": "https://github.com/flyngmt/ACGC-PC-Port/releases/tag/v0.9.3-playtest",
+    "ReleaseTag": "v0.9.3-playtest",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ACGC-PC-Port0.9.3.zip",
+        "Url": "https://github.com/flyngmt/ACGC-PC-Port/releases/download/v0.9.3-playtest/ACGC-PC-Port0.9.3.zip",
+        "Sha256": "4fe10763238596d8f1f278461cf3f3e49c7e99903b9fb4e1271e84e72e47976a",
+        "Size": 5117308,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "armandpro12-chibi-robo-pc-chibi-robo",
+    "Title": "Chibi-Robo!",
+    "Project": "chibi-robo-pc",
+    "Repository": "Armandpro12/chibi-robo-pc",
+    "Method": "Port natif (projet amont)",
+    "Status": "Développement précoce",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.Projet précoce : démarrage ou premières scènes seulement ; jeu complet non validé.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "af369bdd5b5c101168b3915203ec004f0f4e636f",
+    "ReadmeUrl": "https://github.com/Armandpro12/chibi-robo-pc/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/Armandpro12/chibi-robo-pc/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "chibi-robo-pc-setup-0.1.1.exe",
+        "Url": "https://github.com/Armandpro12/chibi-robo-pc/releases/download/v0.1.1/chibi-robo-pc-setup-0.1.1.exe",
+        "Sha256": "05fddc0d0ad8b36da4807d1cf3eb1d3952e807c51097543ad94cbcd341701a90",
+        "Size": 31628452,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "griches-eternaldarknessrecomp-eternal-darkness-sanity-s-requiem",
+    "Title": "Eternal Darkness: Sanity's Requiem",
+    "Project": "Eternal Darkness Recomp",
+    "Repository": "griches/EternalDarknessRecomp",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "6850cc95c581fc7d38b0475e3957a9059ff97673",
+    "ReadmeUrl": "https://github.com/griches/EternalDarknessRecomp/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/griches/EternalDarknessRecomp/releases/tag/v0.9.6",
+    "ReleaseTag": "v0.9.6",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "EternalDarkness-linux-x86_64-202610242126-e9ff8d6.tar.gz",
+        "Url": "https://github.com/griches/EternalDarknessRecomp/releases/download/v0.9.6/EternalDarkness-linux-x86_64-202610242126-e9ff8d6.tar.gz",
+        "Sha256": "553b9ab78a65d56f00b702438fc7f1c925d5e9c0dbe9baf86dbc91c4ee482b48",
+        "Size": 110838232,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "EternalDarkness-mac-202610200024-1cb3fe6.zip",
+        "Url": "https://github.com/griches/EternalDarknessRecomp/releases/download/v0.9.6/EternalDarkness-mac-202610200024-1cb3fe6.zip",
+        "Sha256": "09b96848c33f7475b8055562d5f77454bdff7ad87ee5b130aaf8fdf7f8ae632c",
+        "Size": 80444470,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "EternalDarkness-windows-x64-202610200024-1cb3fe6.zip",
+        "Url": "https://github.com/griches/EternalDarknessRecomp/releases/download/v0.9.6/EternalDarkness-windows-x64-202610200024-1cb3fe6.zip",
+        "Sha256": "010020309969752c50da8affb323d0e5e55fd1ba85bc738074423de092d7e331",
+        "Size": 46900147,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "rob646464-luigis-mansion-recompiled-luigi-s-mansion",
+    "Title": "Luigi's Mansion",
+    "Project": "Luigi's Mansion Recompiled",
+    "Repository": "rob646464/luigis-mansion-recompiled",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "cdcc6708d233b4ca626c79b4747fc4e919f13022",
+    "ReadmeUrl": "https://github.com/rob646464/luigis-mansion-recompiled/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/rob646464/luigis-mansion-recompiled/releases/tag/v1.1.4",
+    "ReleaseTag": "v1.1.4",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LuigisMansionRecompiled-1.1.4-linux-x86_64.tar.gz",
+        "Url": "https://github.com/rob646464/luigis-mansion-recompiled/releases/download/v1.1.4/LuigisMansionRecompiled-1.1.4-linux-x86_64.tar.gz",
+        "Sha256": "f178b9cff3e36062ecf584bde9c958fdb2bf2dbd98bd4e08308c891be872c947",
+        "Size": 150718657,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "LuigisMansionRecompiled-1.1.4-windows-x64.zip",
+        "Url": "https://github.com/rob646464/luigis-mansion-recompiled/releases/download/v1.1.4/LuigisMansionRecompiled-1.1.4-windows-x64.zip",
+        "Sha256": "f060fc82603616fd5f746e16c5b715762cd6855f410fe785504ee7997a4e7da5",
+        "Size": 88093838,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "ptitty12-mvp2005-decomp-mvp-baseball-2005",
+    "Title": "MVP Baseball 2005",
+    "Project": "mvp2005-decomp",
+    "Repository": "ptitty12/mvp2005-decomp",
+    "Method": "Static recompilation",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "d720706f9cc5a42ece96992d4c4880fb6c0468b0",
+    "ReadmeUrl": "https://github.com/ptitty12/mvp2005-decomp/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Compilation selon les instructions du projet"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "iirg4x-mp6-native-port-mario-party-6",
+    "Title": "Mario Party 6",
+    "Project": "mp6-native-port",
+    "Repository": "iirg4x/mp6-native-port",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "1fb4e70821aaad72feb7c9422627949914920fa4",
+    "ReadmeUrl": "https://github.com/iirg4x/mp6-native-port/blob/master/README.md",
+    "ReleaseUrl": "https://github.com/iirg4x/mp6-native-port/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "starlit-party-v0.5.0-61a99d3-win-x64.zip",
+        "Url": "https://github.com/iirg4x/mp6-native-port/releases/download/v0.5.0/starlit-party-v0.5.0-61a99d3-win-x64.zip",
+        "Sha256": "c7c8117300fd47f7048a0a282019b2c51fda5ae332d11c791ddb8fdbac7aed16",
+        "Size": 44270946,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "vs-sr-dev-pc-megamanxcm-mega-man-x-command-mission",
+    "Title": "Mega Man X: Command Mission",
+    "Project": "pc-megamanxcm",
+    "Repository": "vs-sr-dev/pc-megamanxcm",
+    "Method": "Port natif (projet amont)",
+    "Status": "Développement précoce",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.Projet précoce : démarrage ou premières scènes seulement ; jeu complet non validé.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "a387090b800a672115d309141cc01d21fa6a431b",
+    "ReadmeUrl": "https://github.com/vs-sr-dev/pc-megamanxcm/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Compilation selon les instructions du projet"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "odrannnn-metroidprimeport-metroid-prime",
+    "Title": "Metroid Prime",
+    "Project": "MetroidPrimePort",
+    "Repository": "Odrannnn/MetroidPrimePort",
+    "Method": "Decompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "47b9ac7f5507071c98a3bea7e20088fc2acd6ff7",
+    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/port/README.md",
+    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrimePort/releases/tag/v0.33.1",
+    "ReleaseTag": "v0.33.1",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "metroid-prime-port-0.33.1-linux-aarch64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/metroid-prime-port-0.33.1-linux-aarch64.tar.gz",
+        "Sha256": "50be737ecc18e64ca4bada8c89f66f9932d0c2784a8a60a75039f95a1d335fcf",
+        "Size": 150878388,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "metroid-prime-port-0.33.1-linux-x86_64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/metroid-prime-port-0.33.1-linux-x86_64.tar.gz",
+        "Sha256": "0515c300ff9351ce97e10669d704ed56e4e93a06707b9f2667916d7d21235947",
+        "Size": 154469965,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "metroid-prime-port-0.33.1-macos-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/metroid-prime-port-0.33.1-macos-arm64.zip",
+        "Sha256": "08224279dc30c49179b4010f77abb679b9d3e7e9e232be4543bbe200d662c7e8",
+        "Size": 17985123,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "metroid-prime-port-0.33.1-windows-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/metroid-prime-port-0.33.1-windows-arm64.zip",
+        "Sha256": "d484bc4d8abe981f74620ffc156e0b46c74831481f35bd241b8de2922ba754ee",
+        "Size": 68793381,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "metroid-prime-port-0.33.1-windows-x86_64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/metroid-prime-port-0.33.1-windows-x86_64.zip",
+        "Sha256": "aad1f58b5066e521204ab04a07f3147b36054f32200702e66f4efb95160bc68e",
+        "Size": 70951262,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "MetroidPrime-aarch64.AppImage",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/MetroidPrime-aarch64.AppImage",
+        "Sha256": "8923cb05b045c9f7b06b9a2fb40768866d6911e2873ed3c35bf81112f68b5e19",
+        "Size": 135801352,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "MetroidPrime-x86_64.AppImage",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.33.1/MetroidPrime-x86_64.AppImage",
+        "Sha256": "8163088ce8ca1b133e0d192acf45749f99e1b49e2777bc8675d179ca45cbc4de",
+        "Size": 139364856,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "recomp-code-street-recomp-v3-nba-street-v3",
+    "Title": "NBA Street V3",
+    "Project": "street-recomp-v3",
+    "Repository": "recomp-code/street-recomp-v3",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "f2d0f5837bdc4ff9b717fb1a33f48f0c0edf0740",
+    "ReadmeUrl": "https://github.com/recomp-code/street-recomp-v3/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/recomp-code/street-recomp-v3/releases/tag/v2.0",
+    "ReleaseTag": "v2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NBAStreetV3_Windows_Recomp.zip",
+        "Url": "https://github.com/recomp-code/street-recomp-v3/releases/download/v2.0/NBAStreetV3_Windows_Recomp.zip",
+        "Sha256": "a0944c28ffbe8718a89ced3b9b39e6ecd0fad7137b4ccec7075e7d7451dba67c",
+        "Size": 139512535,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "josiahg2502-glitch-scooby-doo-refrightened-scooby-doo-night-of-100-frights",
+    "Title": "Scooby-Doo! Night of 100 Frights",
+    "Project": "Scooby-Doo-Refrightened",
+    "Repository": "josiahg2502-glitch/Scooby-Doo-Refrightened",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "e8b49c59c19896831257ab655a802c03b41b5205",
+    "ReadmeUrl": "https://github.com/josiahg2502-glitch/Scooby-Doo-Refrightened/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/josiahg2502-glitch/Scooby-Doo-Refrightened/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ScoobyDooRefrightened.zip",
+        "Url": "https://github.com/josiahg2502-glitch/Scooby-Doo-Refrightened/releases/download/v1.0.2/ScoobyDooRefrightened.zip",
+        "Sha256": "57d887112a8637c7371bcae0a6f0f9c0ac1371c21b0c49a9b77e4a1d46a73287",
+        "Size": 693354313,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "josiahg2502-glitch-scooby-doo-remasked-scooby-doo-unmasked",
+    "Title": "Scooby-Doo! Unmasked",
+    "Project": "Scooby-Doo-ReMasked",
+    "Repository": "josiahg2502-glitch/Scooby-Doo-ReMasked",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "4f00c4f3fece0a64c173802bd8f61e5be292fc2e",
+    "ReadmeUrl": "https://github.com/josiahg2502-glitch/Scooby-Doo-ReMasked/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/josiahg2502-glitch/Scooby-Doo-ReMasked/releases/tag/v1.0.1",
+    "ReleaseTag": "v1.0.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ScoobyDooReMasked.zip",
+        "Url": "https://github.com/josiahg2502-glitch/Scooby-Doo-ReMasked/releases/download/v1.0.1/ScoobyDooReMasked.zip",
+        "Sha256": "7cacbc92ef91eb4f44d4ee0de39be4953abb4e65a44148f45e37e21860a7fb08",
+        "Size": 144775706,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "ogdanimal-skiesofarcadialegends-recomp-skies-of-arcadia-legends",
+    "Title": "Skies of Arcadia Legends",
+    "Project": "SkiesOfArcadiaLegends-Recomp",
+    "Repository": "ogdanimal/SkiesOfArcadiaLegends-Recomp",
+    "Method": "Port natif (projet amont)",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "9f61819e41c3926901a9d8f6cf39af16a9707809",
+    "ReadmeUrl": "https://github.com/ogdanimal/SkiesOfArcadiaLegends-Recomp/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/ogdanimal/SkiesOfArcadiaLegends-Recomp/releases/tag/perftest1",
+    "ReleaseTag": "perftest1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SkiesOfArcadiaLegends-v0.83.0-perftest1-windows.zip",
+        "Url": "https://github.com/ogdanimal/SkiesOfArcadiaLegends-Recomp/releases/download/perftest1/SkiesOfArcadiaLegends-v0.83.0-perftest1-windows.zip",
+        "Sha256": "1863cf52a364eb3f7487130c91b352a3661f94017cab35095b5bfcd7459c8b9c",
+        "Size": 56909365,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "kittycache9-opensa2-sonic-adventure-2-battle",
+    "Title": "Sonic Adventure 2: Battle",
+    "Project": "OpenSA2",
+    "Repository": "kittycache9/OpenSA2",
+    "Method": "Port natif (projet amont)",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "28f234d9ba1d361864a1043ee9404973df2ccc23",
+    "ReadmeUrl": "https://github.com/kittycache9/OpenSA2/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/kittycache9/OpenSA2/releases/tag/v0.1.0-alpha.6",
+    "ReleaseTag": "v0.1.0-alpha.6",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "OpenSA2-v0.1.0-alpha.6-linux-x86_64.deb",
+        "Url": "https://github.com/kittycache9/OpenSA2/releases/download/v0.1.0-alpha.6/OpenSA2-v0.1.0-alpha.6-linux-x86_64.deb",
+        "Sha256": "e0b981a33cbfc9cabfd22883f945135de319214e4d998f3a4d7ff6de1e852bad",
+        "Size": 37876020,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "OpenSA2-v0.1.0-alpha.6-windows-x86_64.zip",
+        "Url": "https://github.com/kittycache9/OpenSA2/releases/download/v0.1.0-alpha.6/OpenSA2-v0.1.0-alpha.6-windows-x86_64.zip",
+        "Sha256": "c834a53b9e1bc5c813f13dccf5fc9f30a605118efb14d43647ad30af1d910cec",
+        "Size": 53874681,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jackpriceburns-foxhollow-star-fox-adventures",
+    "Title": "Star Fox Adventures",
+    "Project": "foxhollow",
+    "Repository": "JackPriceBurns/foxhollow",
+    "Method": "Port natif (projet amont)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "c947dfb6adffdc225083f0a3793a3723f120d4e7",
+    "ReadmeUrl": "https://github.com/JackPriceBurns/foxhollow/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Compilation selon les instructions du projet"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "chasem-dev-sms-pc-port-super-mario-sunshine",
+    "Title": "Super Mario Sunshine",
+    "Project": "sms-port (SMS PC Port)",
+    "Repository": "chasem-dev/sms-pc-port",
+    "Method": "Decompilation",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "ae333134a2f43a337c575e020b4acfdcd12a7fb1",
+    "ReadmeUrl": "https://github.com/chasem-dev/sms-pc-port/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "999sian-melee-pc-super-smash-bros-melee",
+    "Title": "Super Smash Bros. Melee",
+    "Project": "melee-pc",
+    "Repository": "999sian/melee-pc",
+    "Method": "Decompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "a25befb26042da29b01a760bfbae64e1ba7288b5",
+    "ReadmeUrl": "https://github.com/999sian/melee-pc/blob/master/README.md",
+    "ReleaseUrl": "https://github.com/999sian/melee-pc/releases/tag/v0.4.2",
+    "ReleaseTag": "v0.4.2",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Melee-aarch64.AppImage",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-aarch64.AppImage",
+        "Sha256": "8327c6e63832f790d9839f0c85b1a83731a58163c8f3927b8a215f0e8f1c538c",
+        "Size": 19974664,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "melee-linux-aarch64.tar.gz",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/melee-linux-aarch64.tar.gz",
+        "Sha256": "bcc873abf932b32ee6c177903bb24ffb65194dff514c2d03e05643602bca266c",
+        "Size": 21254730,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "melee-linux-x86_64.tar.gz",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/melee-linux-x86_64.tar.gz",
+        "Sha256": "3da3adb012bb3e15a871ecb49cc4bf1bd181c848239b0609636391d1edab7d76",
+        "Size": 21894608,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Melee-macOS-arm64.zip",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-macOS-arm64.zip",
+        "Sha256": "168bd5113f4296e871a198e9c3f1f877e54f0833c2fe5dd8ba8b6a4136a5ffe1",
+        "Size": 12706671,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "Melee-macOS-x86_64.zip",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-macOS-x86_64.zip",
+        "Sha256": "d00234cf047103b743994a3d8406aa5a0cc35961ed699ec19f0d57944d5276f9",
+        "Size": 13845341,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "Melee-Windows-arm64.zip",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-Windows-arm64.zip",
+        "Sha256": "df1d25f566ce677e920157f4efb3a09ec98eef3887888e2dd1579c634af791ed",
+        "Size": 26010379,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "Melee-Windows-x86_64.zip",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-Windows-x86_64.zip",
+        "Sha256": "87f1cb3053ea536744920ecd47057ceb9d3b21018f3f90bcbc0a9d37d8b16044",
+        "Size": 26605743,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Melee-x86_64.AppImage",
+        "Url": "https://github.com/999sian/melee-pc/releases/download/v0.4.2/Melee-x86_64.AppImage",
+        "Sha256": "5287c20c1198e6c42974cdc25765e17674c26526f1820ecaa736e6ab26e1fe5d",
+        "Size": 20797944,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "chrissotraidis-bluewake-the-legend-of-zelda-the-wind-waker",
+    "Title": "The Legend of Zelda: The Wind Waker",
+    "Project": "BlueWake (The Wind Waker Recompiled; absorbed Wind Waker Recomp)",
+    "Repository": "chrissotraidis/bluewake",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "5fc3dd8cd120c22c0721008bdd130f75623d29ce",
+    "ReadmeUrl": "https://github.com/chrissotraidis/bluewake/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/chrissotraidis/bluewake/releases/tag/v0.9.0",
+    "ReleaseTag": "v0.9.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BlueWake-v0.9.0-windows-x64.zip",
+        "Url": "https://github.com/chrissotraidis/bluewake/releases/download/v0.9.0/BlueWake-v0.9.0-windows-x64.zip",
+        "Sha256": "3c0edc36241fc1783693e1a9fa942995f4f32efec14fb3a9afc889a595da61ce",
+        "Size": 226932899,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "maskezeny-windowwaker-the-legend-of-zelda-the-wind-waker",
+    "Title": "The Legend of Zelda: The Wind Waker",
+    "Project": "WindowWaker",
+    "Repository": "MaskeZenY/WindowWaker",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "6ce134d94d17f58833689590240f3e2f643e9508",
+    "ReadmeUrl": "https://github.com/MaskeZenY/WindowWaker/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/MaskeZenY/WindowWaker/releases/tag/v1.0.0-win",
+    "ReleaseTag": "v1.0.0-win",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SwitchWaker-Windows-x64.zip",
+        "Url": "https://github.com/MaskeZenY/WindowWaker/releases/download/v1.0.0-win/SwitchWaker-Windows-x64.zip",
+        "Sha256": "19bcac76994fa73c01b43d7110cb7299675a2a90e469545ac1edf4764e24c2f9",
+        "Size": 22996149,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "twilitrealm-dusklight-the-legend-of-zelda-twilight-princess",
+    "Title": "The Legend of Zelda: Twilight Princess",
+    "Project": "Dusklight (formerly Dusk)",
+    "Repository": "TwilitRealm/dusklight",
+    "Method": "Decompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "7445e43ea9fbdbf35d5a905c5ecf48998cdf7147",
+    "ReadmeUrl": "https://github.com/TwilitRealm/dusklight/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/TwilitRealm/dusklight/releases/tag/v2.0.3",
+    "ReleaseTag": "v2.0.3",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Dusklight-v2.0.3-linux-arm64.AppImage",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-linux-arm64.AppImage",
+        "Sha256": "7f7d72054847277afccdddb93f7cca4e3b730768da64e30a4cdd6774c23bdbf9",
+        "Size": 42076680,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Dusklight-v2.0.3-linux-x86_64.AppImage",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-linux-x86_64.AppImage",
+        "Sha256": "87ec251963c984ad2b3ac075281431d2221db2297dc19f2ab5daad92e969fc06",
+        "Size": 43837944,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Dusklight-v2.0.3-macos-arm64.zip",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-macos-arm64.zip",
+        "Sha256": "b3e6aae6c7fc6a4f863b45b64e3bdcf12e5d88213f82bc5a08e215c39e4682f2",
+        "Size": 38440850,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "Dusklight-v2.0.3-macos-x86_64.zip",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-macos-x86_64.zip",
+        "Sha256": "ab54f38637e3a0a4b50192b5ba26d9052a66426e38ebaaf583d3eff4ac12aa01",
+        "Size": 40164595,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "Dusklight-v2.0.3-win32-arm64.zip",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-win32-arm64.zip",
+        "Sha256": "1740d250e9891b7a8852e9f5bb9c84b6ac5698abb52836a169e933b3d59d5f42",
+        "Size": 53433665,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "Dusklight-v2.0.3-win32-x86_64.zip",
+        "Url": "https://github.com/TwilitRealm/dusklight/releases/download/v2.0.3/Dusklight-v2.0.3-win32-x86_64.zip",
+        "Sha256": "ac63514eeb13cd4e9bd22be02dabee4952d1331a78f0496326bba2b577b12caf",
+        "Size": 56037777,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

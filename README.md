@@ -4,6 +4,8 @@ CubeShelf est un launcher et un gestionnaire de bibliothèque GameCube. L’inte
 
 CubeShelf ne contient aucun fichier de jeu Nintendo.
 
+La version 0.18 en préparation conserve **une seule application CubeShelf** : un sélecteur **GameCube / Wii / Switch en haut à gauche** change de bibliothèque dans la même interface, y compris en Big Picture. Les ports supplémentaires utilisent les mêmes cartes, favoris et réglages. [Utilisation et compilation](docs/NATIVE-SHELVES.md) · [Inventaire sourcé au 26 octobre 2026](docs/NATIVE-PORT-INVENTORY.md).
+
 ## Améliorations du launcher en préparation
 
 La version source `0.17.0-preview.3` améliore Big Picture, les profils de mods,

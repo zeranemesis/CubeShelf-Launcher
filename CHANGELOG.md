@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.0-preview.1 — suite de ports natifs, non publiée
+
+- Une seule application conserve l'interface CubeShelf : sélecteur GameCube / Wii / Switch en haut à gauche, synchronisé en Big Picture. Même bibliothèque, cartes et favoris ; dernier choix de console conservé au redémarrage.
+- GameCube : 19 projets supplémentaires ; Wii : 13 projets ; Switch : 20 projets pour 16 titres. Identifiants des jeux distincts par console, sources primaires, état du projet, architecture et empreintes des paquets. Les ports Apple Silicon ne sont pas présentés comme des paquets Windows et les projets uniquement mobiles sont écartés.
+- Recherche, filtre des paquets compatibles, téléchargement annulable, contrôle taille/SHA-256, extraction bornée dans un nouveau dossier, association explicite du programme et lancement natif sans arguments inventés.
+- Les ports préparent eux-mêmes les fichiers du joueur selon leurs instructions. Aucune installation n'écrase le runtime précédent ni ses sauvegardes, aucun programme téléchargé n'est exécuté automatiquement.
+- Script de construction d'une application Windows/Linux/macOS, inventaire daté et tests de catalogue, sélection des consoles, provenance, intégrité, traversée de chemins, annulation et persistance. Les parties réelles restent à valider et l'exhaustivité de tous les projets existants n'est pas garantie.
+
 ## 0.17.0 — 2026-10-25
 
 - Regroupe les évolutions depuis la version 0.16.0 : récupération du launcher, sauvegardes de profils et de sauvegardes de jeux, reprise après mise à jour et contrôles d'espace disque.

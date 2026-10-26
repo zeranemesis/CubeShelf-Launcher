@@ -396,6 +396,7 @@ public sealed partial class MainWindow
 
         foreach (var game in _catalogGames.ToArray())
         {
+            if (game.RuntimeOwnsSetup) continue;
             cancellationToken.ThrowIfCancellationRequested();
             try
             {

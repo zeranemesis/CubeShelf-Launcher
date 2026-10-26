@@ -21,12 +21,19 @@
               <TextBlock Text="{DynamicResource BrandSubtitle}" Foreground="{DynamicResource Muted}" FontSize="10" />
             </StackPanel>
           </StackPanel>
+          <ComboBox x:Name="ConsoleShelfPicker" HorizontalAlignment="Stretch" Margin="0,-12,0,18"
+                    MinHeight="44" SelectionChanged="ConsoleShelfChanged">
+            <ComboBoxItem Content="GameCube" Tag="gamecube" />
+            <ComboBoxItem Content="Wii" Tag="wii" />
+            <ComboBoxItem Content="Switch" Tag="switch" />
+          </ComboBox>
           <Button x:Name="NavLibraryButton" Classes="nav selected" TabIndex="1" Click="ParityShowLibrary">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▦" Width="18" /><TextBlock Text="{DynamicResource AppLibrary}" /></StackPanel>
           </Button>
           <Button x:Name="NavFavoritesButton" Classes="nav" TabIndex="2" Click="ParityShowFavorites">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="★" Width="18" /><TextBlock Text="{DynamicResource AppFavorites}" /></StackPanel>
           </Button>
+          <Button Classes="nav" Click="OpenNativePortsCatalog" Content="Gérer les ports natifs" />
           <Button x:Name="NavModsButton" Classes="nav" TabIndex="3" Click="ParityOpenMods">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="◈" Width="18" /><TextBlock Text="{DynamicResource AppMods}" /></StackPanel>
           </Button>
@@ -101,9 +108,11 @@
           <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
             <Image Source="avares://CubeShelf/Assets/Brand/gamecube_logo.png" Width="32" Height="32" />
             <TextBlock Text="CubeShelf" Foreground="#302C35" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
-            <Border Background="#EFDDD8" CornerRadius="9" Padding="14,8" Margin="10,0,0,0">
-              <TextBlock Text="GAMECUBE" Foreground="#80594E" FontSize="11" FontWeight="Bold" LetterSpacing="2" />
-            </Border>
+            <ComboBox x:Name="BigPictureConsoleShelfPicker" Margin="10,0,0,0" MinWidth="130" MinHeight="44" SelectionChanged="ConsoleShelfChanged">
+              <ComboBoxItem Content="GameCube" Tag="gamecube" />
+              <ComboBoxItem Content="Wii" Tag="wii" />
+              <ComboBoxItem Content="Switch" Tag="switch" />
+            </ComboBox>
           </StackPanel>
           <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
@@ -278,7 +287,7 @@
                   <TextBlock Text="{DynamicResource GameDiscLabel}" Foreground="{DynamicResource Muted}" FontSize="10" FontWeight="Bold" />
                   <TextBlock x:Name="DiscPathText" Text="{DynamicResource NoDisc}" Foreground="{DynamicResource Text}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
                   <TextBlock x:Name="DiscCompatibilityText" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
-                  <StackPanel Orientation="Horizontal" Spacing="8">
+                  <StackPanel x:Name="DiscSelectionActions" Orientation="Horizontal" Spacing="8">
                     <Button Content="{DynamicResource ChooseDisc}" Click="ChooseDisc" />
                     <Button Content="{DynamicResource Clear}" Click="ClearDisc" />
                   </StackPanel>

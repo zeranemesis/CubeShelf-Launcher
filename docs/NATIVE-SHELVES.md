@@ -1,0 +1,42 @@
+# CubeShelf — bibliothèques GameCube, Wii et Switch
+
+Une seule application conserve l'interface CubeShelf et ses trois bibliothèques de ports natifs et recompilations. Elle ne fournit ni émulateur généraliste, ni disque, jeu, firmware ou clé.
+
+## Utiliser les applications
+
+- Choisir **GameCube**, **Wii** ou **Switch** dans le sélecteur **en haut à gauche**. Les cartes et favoris changent dans la même fenêtre. Le mode Big Picture propose aussi ce sélecteur.
+- GameCube conserve ses intégrations existantes et affiche les ports supplémentaires dans la même bibliothèque.
+- Wii et Switch utilisent les mêmes pages, cartes et réglages. Les projets Apple Silicon restent signalés comme tels et ne deviennent pas compatibles Windows.
+- **Installer le port**, depuis une carte, ouvre sa fiche de gestion pour télécharger le paquet vérifié et associer son programme. Le bouton **Gérer les ports natifs** donne accès à tout le catalogue de la console courante.
+
+La recherche porte sur les titres et les noms de projets. Le filtre **Paquets pour ce PC uniquement** montre uniquement les entrées avec un paquet dont l'architecture est déclarée compatible. Une entrée sans paquet vérifié peut nécessiter une compilation depuis les sources. Une release disponible ne signifie pas que le jeu est entièrement jouable : lire l'état et les instructions du projet.
+
+Choisir un paquet et toucher **Installer ce paquet** le télécharge dans un nouveau dossier, vérifie sa taille et son SHA-256 puis extrait les ZIP et archives tar.gz. Les fichiers existants et sauvegardes ne sont pas remplacés. Les EXE d'installation, AppImage, DMG, PKG et DEB restent des fichiers à ouvrir ou installer selon les instructions de leur auteur. Aucun programme téléchargé n'est exécuté automatiquement.
+
+Utiliser **Associer le programme** pour choisir l'exécutable natif, ou **Associer une application .app** sur macOS, puis **Jouer**. Le port lui-même demande et prépare les fichiers de votre copie du jeu. Le launcher n'invente pas d'arguments de démarrage et ne soumet pas les disques Wii ou Switch à une validation GameCube.
+
+Les versions officielles et le README sont accessibles depuis chaque fiche. Le catalogue est une photographie vérifiée le 26 octobre 2026 ; il ne se met pas silencieusement à jour. L'inventaire cite les sources primaires et les exclusions. L'exhaustivité de tous les projets existants n'est pas garantie.
+
+## Données et mises à jour
+
+Les réglages et données restent dans le profil **CubeShelf**. Chaque entrée de port possède un identifiant incluant sa console : favoris, statistiques et programmes associés ne sont pas confondus entre bibliothèques. Le dernier choix de console est conservé au redémarrage. La variable de test `CUBESHELF_DATA_DIR` peut isoler le profil complet.
+
+Il n'y a plus d'applications WiiShelf ou SwitchShelf à lancer séparément. Cette version de travail remplace la proposition initiale de trois exécutables et n'est pas une nouvelle release stable publiée.
+
+## Compiler
+
+```powershell
+dotnet run --project tests/CubeShelf.NativePorts.Tests -c Release
+pwsh packaging/Build-Native-Shelves.ps1 -RuntimeIdentifier win-x64 -OutputDirectory dist/native-shelves
+```
+
+Le script produit un seul dossier **CubeShelf**, avec le sélecteur des trois consoles. Ne pas déplacer l'EXE seul : conserver les DLL, catalogues et autres fichiers à côté. Le paquet n'est pas signé avec un certificat de distribution.
+
+Pour le développement :
+
+```powershell
+dotnet run --project src/CubeShelf.Desktop -- --shelf wii
+dotnet run --project src/CubeShelf.Desktop -- --shelf switch
+```
+
+Les tests vérifient les catalogues, les origines des paquets, leurs empreintes, l'extraction, l'association des programmes et la séparation des profils. Aucun test ne remplace une partie réelle avec les fichiers du joueur.

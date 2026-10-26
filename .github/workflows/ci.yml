@@ -32,6 +32,10 @@ jobs:
         run: dotnet run --project tests/CubeShelf.Core.Tests/CubeShelf.Core.Tests.csproj -c Release
       - name: Test archive and disc handling
         run: dotnet run --project tests/CubeShelf.Tests/CubeShelf.Tests.csproj -c Release
+      - name: Test native port catalogues and installations
+        run: dotnet run --project tests/CubeShelf.NativePorts.Tests/CubeShelf.NativePorts.Tests.csproj -c Release
+      - name: Test console selectors in the existing UI
+        run: dotnet run --project tests/CubeShelf.ShelfUi.Tests/CubeShelf.ShelfUi.Tests.csproj -c Release
 
   windows:
     runs-on: windows-latest

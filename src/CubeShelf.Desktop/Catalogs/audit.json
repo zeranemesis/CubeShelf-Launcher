@@ -1,0 +1,40 @@
+{
+  "CheckedAt": "2026-10-26",
+  "DiscoverySources": [
+    "https://github.com/wangxiaoxiang5599/recompiled-games-list",
+    "https://recomp.gg/c/gamecube",
+    "https://recomp.gg/c/wii",
+    "https://recomp.gg/c/switch"
+  ],
+  "Method": "Discovery indexes are leads only. Repository README identity and release asset metadata were fetched directly from GitHub. Availability is not a gameplay validation. The inventory is a dated snapshot, not a guarantee that every existing project has been found.",
+  "Excluded": [
+    {
+      "Repository": "new-coke/strikers",
+      "Reason": "Déjà intégré au catalogue CubeShelf existant."
+    },
+    {
+      "Repository": "jackpoison-prog/RingOut",
+      "Reason": "Déjà intégré au catalogue CubeShelf existant."
+    },
+    {
+      "Repository": "chrissotraidis/sunpad",
+      "Reason": "Paquets mobiles ou console ; aucun port de bureau natif vérifié dans la source consultée."
+    },
+    {
+      "Repository": "chrissotraidis/kartpad",
+      "Reason": "Paquets mobiles ou console ; aucun port de bureau natif vérifié dans la source consultée."
+    },
+    {
+      "Repository": "seedds/nxnative",
+      "Reason": "Paquets mobiles ou console ; aucun port de bureau natif vérifié dans la source consultée."
+    },
+    {
+      "Repository": "BelmanteGu/SuperMarioWonderRecomp",
+      "Reason": "README primaire inaccessible : intégration suspendue."
+    },
+    {
+      "Repository": "AxioDL/metaforce",
+      "Reason": "README primaire inaccessible : intégration suspendue."
+    }
+  ]
+}
