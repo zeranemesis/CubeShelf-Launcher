@@ -50,7 +50,8 @@ internal static class AndroidSm64
                 await using var output = File.Create(Path.Combine(files.Staging, "gamecontrollerdb.txt"));
                 await controller.CopyToAsync(output, cancellation);
             }, cancellation);
-            using var receiver = new ExtractionResult();
+            // Binder can deliver the final callback after cancellation; retain its Java-managed lifetime.
+            var receiver = new ExtractionResult();
             using var intent = new Intent().SetClassName(Context.PackageName!, ExtractionService);
             intent.PutExtra("receiver", receiver);
             intent.PutExtra("attempt", Path.GetFileName(files.Staging));

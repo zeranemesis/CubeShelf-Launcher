@@ -11,11 +11,12 @@ import android.os.IBinder;
 import android.os.Process;
 import android.os.ResultReceiver;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** A separate process reclaims Torch's retained extraction data after each attempt. */
 public final class ExtractionService extends Service {
     private boolean running;
-    private volatile boolean delivered;
+    private final AtomicBoolean delivered = new AtomicBoolean();
     private ResultReceiver receiver;
 
     @Override public IBinder onBind(Intent intent) { return null; }
@@ -56,8 +57,7 @@ public final class ExtractionService extends Service {
             }
             Bundle result = new Bundle();
             result.putString("error", error);
-            delivered = true;
-            if (receiver != null) receiver.send(error == null ? 0 : 1, result);
+            if (delivered.compareAndSet(false, true) && receiver != null) receiver.send(error == null ? 0 : 1, result);
             stopForeground(STOP_FOREGROUND_REMOVE);
             stopSelf();
         }, "sm64-extraction").start();
@@ -65,7 +65,7 @@ public final class ExtractionService extends Service {
     }
 
     @Override public void onDestroy() {
-        if (!delivered && receiver != null) {
+        if (delivered.compareAndSet(false, true) && receiver != null) {
             Bundle result = new Bundle();
             result.putString("error", "Préparation annulée. Tes sauvegardes sont conservées.");
             receiver.send(1, result);
