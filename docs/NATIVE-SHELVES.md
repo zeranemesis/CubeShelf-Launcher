@@ -1,10 +1,11 @@
-# CubeShelf — bibliothèques GameCube, Wii et Switch
+# DecompShelf — bibliothèques GameCube, Wii et Switch
 
-Une seule application conserve l'interface CubeShelf et ses trois bibliothèques de ports natifs et recompilations. Elle ne fournit ni émulateur généraliste, ni disque, jeu, firmware ou clé.
+DecompShelf réunit les trois bibliothèques de ports natifs et recompilations dans l'application issue de CubeShelf. Elle ne fournit ni émulateur généraliste, ni disque, jeu, firmware ou clé.
 
 ## Utiliser l'application
 
 - Choisir **GameCube**, **Wii** ou **Switch** dans le sélecteur **en haut à gauche**. Les cartes et favoris changent dans la même fenêtre. Le mode Big Picture propose aussi ce sélecteur.
+- Le logo à côté de DecompShelf suit automatiquement le catalogue : GameCube, Wii ou Switch. Les marques sont incluses dans l'application et ne nécessitent aucun accès réseau.
 - Une transition courte accompagne le changement de console. **Paramètres → Réduire les animations de changement de console** permet un passage immédiat. Big Picture conserve le plein écran lors du changement.
 - Un jeu n'apparaît qu'une fois par console. Lorsqu'il possède plusieurs ports, choisir le projet et sa version dans le **menu déroulant de sa carte ou de sa fiche**. Le choix est mémorisé ; les favoris sont communs aux versions du même jeu. Les programmes associés et les statistiques restent propres à chaque port.
 - Les jaquettes réelles sont incluses pour chaque jeu : format GameCube, boîtier Wii blanc et boîtier Switch plus étroit. Les scans de face, dos et tranche disponibles viennent de [GameTDB](https://www.gametdb.com/). Les identifiants, URLs et empreintes sont consignés dans `Catalogs/covers.json`. Les jeux dématérialisés utilisent les jaquettes correspondantes de la base ; aucun dos fictif n'est ajouté quand le scan manque.
@@ -22,7 +23,7 @@ Les versions officielles et le README sont accessibles depuis chaque fiche. Le c
 
 ## Données et mises à jour
 
-Les réglages et données restent dans le profil **CubeShelf**. Chaque entrée de port possède un identifiant incluant sa console : favoris, statistiques et programmes associés ne sont pas confondus entre bibliothèques. Le dernier choix de console est conservé au redémarrage. La variable de test `CUBESHELF_DATA_DIR` peut isoler le profil complet.
+Les réglages et données restent dans le profil **CubeShelf** après le changement de nom : aucune migration ni réinstallation des jeux n'est nécessaire. Chaque entrée de port possède un identifiant incluant sa console : favoris, statistiques et programmes associés ne sont pas confondus entre bibliothèques. Le dernier choix de console est conservé au redémarrage. La variable de test `CUBESHELF_DATA_DIR` peut isoler le profil complet.
 
 Il n'y a plus d'applications WiiShelf ou SwitchShelf à lancer séparément. Cette version de travail remplace la proposition initiale de trois exécutables et n'est pas une nouvelle release stable publiée.
 
@@ -33,7 +34,7 @@ dotnet run --project tests/CubeShelf.NativePorts.Tests -c Release
 pwsh packaging/Build-Native-Shelves.ps1 -RuntimeIdentifier win-x64 -OutputDirectory dist/native-shelves
 ```
 
-Le script produit un seul dossier **CubeShelf**, avec le sélecteur des trois consoles. Ne pas déplacer l'EXE seul : conserver les DLL, catalogues et autres fichiers à côté. Le paquet n'est pas signé avec un certificat de distribution.
+Le script produit un seul dossier **DecompShelf**, avec le sélecteur des trois consoles. Sous Windows, ouvrir **DecompShelf.exe**. Ne pas déplacer l'EXE seul : conserver les DLL, catalogues et autres fichiers à côté. Le fichier CubeShelf.exe reste un lanceur de compatibilité pour les anciens contrats de mise à jour et de restauration ; il ouvre la même application et le même profil. Le paquet n'est pas signé avec un certificat de distribution.
 
 Pour le développement :
 

@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.LogicalTree;
 using CubeShelf.Core.Platform;
+using CubeShelf.Core.Library;
 using CubeShelf.Desktop;
 using CubeShelf.Desktop.Controls;
 
@@ -65,14 +66,15 @@ static class BigPictureControlsChecks
         Check(!new UserPreferencesStore(new PlatformPaths()).Load().SwapBigPictureNavigation,"Could not restore original navigation.");
         Input(6);Input(6);
         var launch=window.FindControl<GameLaunchTransition>("LaunchTransition")!;
-        var cards=window.FindControl<ItemsControl>("LibraryCards")!;
+        var currentGame=typeof(MainWindow).GetProperty("BigPictureGame",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
         using var sources=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs/covers.json")));
         string PathFor(string? file)=>string.IsNullOrEmpty(file)?"":Path.Combine(AppContext.BaseDirectory,file.Replace('\\',Path.DirectorySeparatorChar));
         foreach(var index in new[]{0,1,2})
         {
             consoles.SelectedIndex=index;
             window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Advance(1);
-            var selected=cards.Items.Cast<MainWindow.DesktopGameCard>().First().Game;
+            Save($"catalogue-{index}.png");
+            var selected=(GameCatalogEntry)currentGame.GetValue(window)!;
             var cover=selected.Covers.First();
             var art=sources.RootElement.EnumerateArray().FirstOrDefault(e=>e.GetProperty("Console").GetString()==selected.ShelfConsole && e.GetProperty("Title").GetString()==selected.Title);
             var media=art.ValueKind==JsonValueKind.Object && art.TryGetProperty("Media",out var source)?PathFor(source.GetString()):"";

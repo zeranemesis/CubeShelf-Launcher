@@ -146,7 +146,7 @@ public sealed partial class MainWindow
         }
         ConsoleShelfPicker.SelectedIndex = _activeShelfConsole switch { "wii" => 1, "switch" => 2, _ => 0 };
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
-        Title = "CubeShelf · " + ShelfProduct.Resolve(_activeShelfConsole).Console;
+        RefreshShelfBranding();
         _consoleShelfReady = true;
         Closed += (_, _) => ShelfTransition.Dispose();
         Deactivated += (_, _) => ShelfTransition.Stop();
@@ -172,7 +172,7 @@ public sealed partial class MainWindow
         _consoleShelfReady = true;
         Directory.CreateDirectory(_paths.ConfigurationDirectory);
         File.WriteAllText(Path.Combine(_paths.ConfigurationDirectory, "selected-console.txt"), console);
-        Title = "CubeShelf · " + ShelfProduct.Resolve(console).Console;
+        RefreshShelfBranding();
         _favoritesOnly = false;
         _selectedGame = ShelfGames.FirstOrDefault();
         // Clearing search already refreshes the library; suppress that redundant rebuild.
@@ -189,6 +189,12 @@ public sealed partial class MainWindow
         }
         ShowParityView(LibraryView);
         ShelfTransition.Play();
+    }
+
+    private void RefreshShelfBranding()
+    {
+        Title=Program.DisplayName+" · "+ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarConsoleLogo.Platform=BigPictureConsoleLogo.Platform=_activeShelfConsole;
     }
 
     private bool _changingShelf;

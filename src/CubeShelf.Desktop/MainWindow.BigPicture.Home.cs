@@ -16,7 +16,7 @@ public sealed partial class MainWindow
     private void OpenBigPictureHome(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
-        BigPictureHomeTitle.Text = P7("CubeShelf · À toi de jouer", "CubeShelf · Time to play");
+        BigPictureHomeTitle.Text = P7("DecompShelf · À toi de jouer", "DecompShelf · Time to play");
         BigPictureCollectionButton.Content = P7("▦ Bibliothèque", "▦ Library");
         BigPictureHomeFriendsButton.Content = P7("Amis et invitations", "Friends and invites");
         BigPictureHomeSettingsButton.Content = P7("Paramètres", "Settings");

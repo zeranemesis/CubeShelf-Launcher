@@ -21,12 +21,15 @@ try
     var fullscreen=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
     var cards=window.FindControl<ItemsControl>("LibraryCards")!;
     var cubeCount=cards.Items.Count;
+    AssertBrand("gamecube");
     if(cubeCount!=21)throw new Exception($"GameCube catalogue should contain 21 unique games, got {cubeCount}.");
     AssertCovers();
     selector.SelectedIndex=1;
+    AssertBrand("wii");
     if(cards.Items.Count!=13 || fullscreen.SelectedIndex!=1 || !window.Title!.Contains("Wii"))throw new Exception("Wii selector did not update the existing library.");
     AssertCovers();
     selector.SelectedIndex=2;
+    AssertBrand("switch");
     if(cards.Items.Count!=16 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
     if(!window.FindControl<TextBlock>("LibrarySectionTitle")!.Text!.Contains("Switch"))throw new Exception("Library heading does not match selected console.");
     var multi = cards.Items.Cast<MainWindow.DesktopGameCard>().First(card => card.HasVersionChoice);
@@ -44,9 +47,11 @@ try
     if(File.ReadAllText(Path.Combine(profile,"selected-console.txt"))!="gamecube")throw new Exception("Last console was not persisted.");
     window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     fullscreen.SelectedIndex=1;
+    AssertBrand("wii");
     if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=13 || selector.SelectedIndex!=1)
         throw new Exception("Changing console left Big Picture or used the wrong catalogue.");
     fullscreen.SelectedIndex=2;
+    AssertBrand("switch");
     if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=16)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
     Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (13) → Switch (16) → GameCube ({cubeCount})");
@@ -130,6 +135,17 @@ try
         }
     }
     BigPictureControlsChecks.Run(window,snapshotDirectory);
+    void AssertBrand(string console)
+    {
+        if(window.FindControl<ConsoleBrandMark>("SidebarConsoleLogo")!.Platform!=console
+            || window.FindControl<ConsoleBrandMark>("BigPictureConsoleLogo")!.Platform!=console
+            || !window.Title!.StartsWith("DecompShelf · ")
+            || window.FindControl<TextBlock>("SidebarAppName")!.Text!="DecompShelf"
+            || window.FindControl<TextBlock>("BigPictureAppName")!.Text!="DecompShelf")
+            throw new Exception("Application branding or catalogue logo did not follow the selected console.");
+        if(new CubeShelf.Core.Platform.PlatformPaths().DataDirectory!=profile)
+            throw new Exception("Renaming the application changed its existing profile location.");
+    }
     void AssertCovers()
     {
         foreach(var card in cards.Items.Cast<MainWindow.DesktopGameCard>())

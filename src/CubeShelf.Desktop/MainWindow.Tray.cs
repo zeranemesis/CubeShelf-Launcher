@@ -26,7 +26,7 @@ public sealed partial class MainWindow
         try
         {
             var icon = new WindowIcon(AssetLoader.Open(new Uri("avares://CubeShelf/Assets/Brand/gamecube_logo.png")));
-            var open = new NativeMenuItem(P7("Ouvrir CubeShelf", "Open CubeShelf"));
+            var open = new NativeMenuItem(P7("Ouvrir DecompShelf", "Open DecompShelf"));
             open.Click += (_, _) => RestoreFromTray(showFriends: false);
             var friends = new NativeMenuItem(P7("Amis", "Friends"));
             friends.Click += (_, _) => RestoreFromTray(showFriends: true);
@@ -36,7 +36,7 @@ public sealed partial class MainWindow
             _tray = new TrayIcon
             {
                 Icon = icon,
-                ToolTipText = "CubeShelf",
+                ToolTipText = "DecompShelf",
                 Menu = new NativeMenu { open, friends, new NativeMenuItemSeparator(), quit },
                 IsVisible = true
             };
@@ -80,7 +80,7 @@ public sealed partial class MainWindow
 
         _preferences = _preferences with { TrayHintShown = true };
         _preferencesStore.Save(_preferences);
-        Notify(P7("CubeShelf reste ouvert", "CubeShelf stays open"),
+        Notify(P7("DecompShelf reste ouvert", "DecompShelf stays open"),
             P7("Tes amis te voient toujours et tes invitations arrivent. Pour quitter vraiment : clic droit sur l’icône près de l’horloge, puis Quitter.",
                "Your friends still see you and invitations still arrive. To really quit: right-click the icon near the clock, then Quit."),
             showFriends: false);

@@ -121,7 +121,7 @@ public sealed partial class MainWindow
                 Margin = new Avalonia.Thickness(24), Spacing = 14,
                 Children =
                 {
-                    new TextBlock { Text = P7("CubeShelf doit convertir le RVZ avant de préparer le jeu.", "CubeShelf must convert the RVZ before preparing the game."), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new TextBlock { Text = P7("DecompShelf doit convertir le RVZ avant de préparer le jeu.", "DecompShelf must convert the RVZ before preparing the game."), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     new TextBlock { Text = P7("Télécharger automatiquement Dolphin 2606a depuis le site officiel, vérifier son SHA-256 puis utiliser DolphinTool ? L’image RVZ originale ne sera jamais supprimée.", "Automatically download Dolphin 2606a from the official site, verify its SHA-256, then use DolphinTool? The original RVZ image will never be deleted."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     CreateDialogButton(P7("Télécharger et continuer", "Download and continue"), (_, _) => dialog.Close(true)),
                     CreateDialogButton(P7("Annuler", "Cancel"), (_, _) => dialog.Close(false))
@@ -180,12 +180,12 @@ public sealed partial class MainWindow
             if (!update.Available)
             {
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    LauncherUpdateStatusText.Text = P7($"CubeShelf {update.CurrentVersion} est à jour.", $"CubeShelf {update.CurrentVersion} is up to date."));
+                    LauncherUpdateStatusText.Text = P7($"DecompShelf {update.CurrentVersion} est à jour.", $"DecompShelf {update.CurrentVersion} is up to date."));
                 return;
             }
 
             await Dispatcher.UIThread.InvokeAsync(() =>
-                LauncherUpdateStatusText.Text = P7($"CubeShelf {update.LatestVersion} est disponible.", $"CubeShelf {update.LatestVersion} is available."));
+                LauncherUpdateStatusText.Text = P7($"DecompShelf {update.LatestVersion} est disponible.", $"DecompShelf {update.LatestVersion} is available."));
 
             if (!interactive)
             {
@@ -193,18 +193,18 @@ public sealed partial class MainWindow
                 {
                     _lastLauncherUpdateNotice = update.LatestVersion;
                     await Dispatcher.UIThread.InvokeAsync(() =>
-                        ShowToastParity(P7("Mise à jour CubeShelf", "CubeShelf update"), P7($"Version {update.LatestVersion} disponible.", $"Version {update.LatestVersion} is available.")));
+                        ShowToastParity(P7("Mise à jour DecompShelf", "DecompShelf update"), P7($"Version {update.LatestVersion} disponible.", $"Version {update.LatestVersion} is available.")));
                 }
                 return;
             }
 
-            var dialog = CreatePhase7Dialog(P7("Mise à jour CubeShelf", "CubeShelf update"), 540, 355);
+            var dialog = CreatePhase7Dialog(P7("Mise à jour DecompShelf", "DecompShelf update"), 540, 355);
             dialog.Content = new StackPanel
             {
                 Margin = new Avalonia.Thickness(24), Spacing = 14,
                 Children =
                 {
-                    new TextBlock { Text = P7($"Installer CubeShelf {update.LatestVersion} ?", $"Install CubeShelf {update.LatestVersion}?"), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold },
+                    new TextBlock { Text = P7($"Installer DecompShelf {update.LatestVersion} ?", $"Install DecompShelf {update.LatestVersion}?"), FontSize = 21, FontWeight = Avalonia.Media.FontWeight.Bold },
                     new TextBlock { Text = P7("Le paquet sera téléchargé en HTTPS et vérifié avec le SHA-256 du manifeste avant toute installation.", "The package will be downloaded over HTTPS and verified against the manifest SHA-256 before installation."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     new TextBlock { Text = P7("Un point de restauration de ton profil sera créé avant la mise à jour.", "A restore point for your profile will be created before the update."), TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     CreateDialogButton(P7("Voir les nouveautés", "View release notes"), (_, _) =>
@@ -225,9 +225,9 @@ public sealed partial class MainWindow
 
             if (_portableQueue is null) return;
             string? archive = null;
-            var queued = _portableQueue.Enqueue("launcher-update", $"CubeShelf {update.LatestVersion}", "LAUNCHER",
-                P7("Mise à jour du logiciel · CubeShelf redémarrera pour terminer l’installation.",
-                   "Launcher update · CubeShelf will restart to finish installation."),
+            var queued = _portableQueue.Enqueue("launcher-update", $"DecompShelf {update.LatestVersion}", "LAUNCHER",
+                P7("Mise à jour du logiciel · DecompShelf redémarrera pour terminer l’installation.",
+                   "Launcher update · DecompShelf will restart to finish installation."),
                 async (progress, token) => archive = await _launcherUpdates.DownloadAsync(update, progress, token),
                 after: async () => await Dispatcher.UIThread.InvokeAsync(() =>
                 {

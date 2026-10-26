@@ -28,7 +28,7 @@ public sealed partial class MainWindow
         if (!show) return;
         _bigPicturePageMargins[view] = view.Margin;
         view.Margin = new Thickness(view.Margin.Left, view.Margin.Top + 64, view.Margin.Right, view.Margin.Bottom);
-        BigPictureSubnavTitle.Text = "CubeShelf · " + P7("Big Picture", "Big Picture");
+        BigPictureSubnavTitle.Text = "DecompShelf · " + P7("Big Picture", "Big Picture");
         BigPictureReturnButton.Content = view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
             : _bigPictureBackStack.TryPeek(out var previous) && previous.View != BigPictureView && previous.View != BigPictureHomeView
                 ? P7("← Retour · Échap / B", "← Back · Esc / B")

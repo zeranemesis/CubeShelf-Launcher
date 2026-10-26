@@ -2,6 +2,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <AssemblyName>CubeShelf</AssemblyName>
+    <Product>DecompShelf</Product>
+    <Title>DecompShelf</Title>
+    <Description>Bibliothèque de ports natifs GameCube, Wii et Switch</Description>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

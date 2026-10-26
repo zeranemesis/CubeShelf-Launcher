@@ -7,6 +7,7 @@ namespace CubeShelf.Desktop;
 
 internal static class Program
 {
+    public const string DisplayName = "DecompShelf";
     public static ShelfProduct Product { get; private set; } = ShelfProduct.Resolve(null);
     [STAThread]
     public static void Main(string[] args)

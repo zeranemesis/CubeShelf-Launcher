@@ -979,8 +979,8 @@ public sealed partial class MainWindow : Window
         try
         {
             var update = await _launcherUpdates.CheckAsync();
-            if (!update.Available) { SettingsStatus.Text = $"CubeShelf {update.CurrentVersion} est à jour."; return; }
-            SettingsStatus.Text = $"CubeShelf {update.LatestVersion} est disponible.";
+            if (!update.Available) { SettingsStatus.Text = $"DecompShelf {update.CurrentVersion} est à jour."; return; }
+            SettingsStatus.Text = $"DecompShelf {update.LatestVersion} est disponible.";
             if (!OperatingSystem.IsWindows())
             {
                 Process.Start(new ProcessStartInfo("https://github.com/zeranemesis/CubeShelf-Launcher/releases/latest") { UseShellExecute = true });
@@ -992,7 +992,7 @@ public sealed partial class MainWindow : Window
                 Margin = new Avalonia.Thickness(24), Spacing = 16,
                 Children =
                 {
-                    new TextBlock { Text = $"Installer CubeShelf {update.LatestVersion} ?", FontSize = 21, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new TextBlock { Text = $"Installer DecompShelf {update.LatestVersion} ?", FontSize = 21, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                     CreateDialogButton("Télécharger et redémarrer", (_, _) => dialog.Close(true)),
                     CreateDialogButton("Plus tard", (_, _) => dialog.Close(false))
                 }

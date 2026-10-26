@@ -40,7 +40,7 @@ public sealed class FirstRunWizardWindow : Window
         _retroAchievementsLogin = retroAchievementsLogin;
         _retroAchievementsUser = retroAchievementsUser;
         Preferences = preferences;
-        this.Title = English ? "CubeShelf • First setup" : "CubeShelf • Premier démarrage";
+        this.Title = English ? "DecompShelf • First setup" : "DecompShelf • Premier démarrage";
         Width = 760;
         Height = 590;
         MinWidth = 720;
@@ -49,7 +49,7 @@ public sealed class FirstRunWizardWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         BuildUi();
         KeyDown += OnWizardKeyDown;
-        AutomationProperties.SetName(this, Title ?? "CubeShelf");
+        AutomationProperties.SetName(this, Title ?? "DecompShelf");
         ShowPage(0);
     }
 
@@ -123,10 +123,10 @@ public sealed class FirstRunWizardWindow : Window
     private Control WelcomePage()
     {
         var stack = PageStack();
-        stack.Children.Add(Heading(English ? "Welcome to CubeShelf" : "Bienvenue dans CubeShelf"));
+        stack.Children.Add(Heading(English ? "Welcome to DecompShelf" : "Bienvenue dans DecompShelf"));
         stack.Children.Add(Body(English
-            ? "CubeShelf manages PartyBoard, updates, mods and your local GameCube setup. Nintendo game data is never bundled: you select your own legally obtained ISO/RVZ."
-            : "CubeShelf gère PartyBoard, les mises à jour, les mods et ton installation GameCube locale. Les données Nintendo ne sont jamais fournies : tu sélectionnes ton propre ISO/RVZ obtenu légalement."));
+            ? "DecompShelf manages PartyBoard, updates, mods and your local GameCube setup. Nintendo game data is never bundled: you select your own legally obtained ISO/RVZ."
+            : "DecompShelf gère PartyBoard, les mises à jour, les mods et ton installation GameCube locale. Les données Nintendo ne sont jamais fournies : tu sélectionnes ton propre ISO/RVZ obtenu légalement."));
         return stack;
     }
 
@@ -182,7 +182,7 @@ public sealed class FirstRunWizardWindow : Window
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(path);
         panel.Children.Add(open);
-        stack.Children.Add(Card(English ? "CubeShelf data" : "Données CubeShelf", panel));
+        stack.Children.Add(Card(English ? "DecompShelf data" : "Données DecompShelf", panel));
         return stack;
     }
 
@@ -221,8 +221,8 @@ public sealed class FirstRunWizardWindow : Window
         var stack = PageStack();
         stack.Children.Add(Heading("RetroAchievements"));
         stack.Children.Add(Body(English
-            ? "Log in once here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: CubeShelf keeps only the token the site returns, encrypted for your Windows account. No account? Continue: you can log in later in Settings."
-            : "Connecte-toi une fois ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarrera connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : CubeShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows. Pas de compte ? Continue : tu pourras te connecter plus tard dans Paramètres."));
+            ? "Log in once here, and every game that supports RetroAchievements (Mario Party 4 with PartyBoard) starts logged in. Your password goes to retroachievements.org once and is never kept: DecompShelf keeps only the token the site returns, encrypted for your Windows account. No account? Continue: you can log in later in Settings."
+            : "Connecte-toi une fois ici, et chaque jeu qui gère RetroAchievements (Mario Party 4 avec PartyBoard) démarrera connecté. Ton mot de passe part une fois vers retroachievements.org et n’est jamais gardé : DecompShelf garde seulement le jeton que le site renvoie, chiffré pour ton compte Windows. Pas de compte ? Continue : tu pourras te connecter plus tard dans Paramètres."));
 
         var status = new TextBlock { TextWrapping = TextWrapping.Wrap };
         var user = new TextBox { MaxLength = 64, Watermark = English ? "RetroAchievements user name" : "Nom d’utilisateur RetroAchievements" };
@@ -277,8 +277,8 @@ public sealed class FirstRunWizardWindow : Window
         var stack = PageStack();
         stack.Children.Add(Heading("Mario Party 4"));
         stack.Children.Add(Body(English
-            ? "CubeShelf will guide you from the game page: install PartyBoard, select ISO/RVZ, prepare data, then play."
-            : "CubeShelf va te guider depuis la page du jeu : installer PartyBoard, sélectionner ISO/RVZ, préparer les données puis jouer."));
+            ? "DecompShelf will guide you from the game page: install PartyBoard, select ISO/RVZ, prepare data, then play."
+            : "DecompShelf va te guider depuis la page du jeu : installer PartyBoard, sélectionner ISO/RVZ, préparer les données puis jouer."));
         stack.Children.Add(Body(English
             ? "1  PartyBoard\n2  ISO / RVZ\n3  Local preparation\n4  Play"
             : "1  PartyBoard\n2  ISO / RVZ\n3  Préparation locale\n4  Jouer"));

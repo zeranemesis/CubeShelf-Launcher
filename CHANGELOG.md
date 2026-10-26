@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0-preview.6 — DecompShelf et logos par catalogue, non publiée
+
+- L'application s'appelle désormais DecompShelf dans la fenêtre, les en-têtes, les réglages, les menus Big Picture et la zone de notification. Le paquet de travail fournit le lanceur DecompShelf.
+- Le logo en haut à gauche suit GameCube, Wii ou Switch, dans la bibliothèque et en Big Picture. Le logo GameCube existant est partagé en mémoire ; les marques de catalogue Wii et Switch sont dessinées en vectoriel, sans téléchargement ni décodage au changement de console.
+- Les dossiers, identifiants de profil, noms d'assembly et contrats de mise à jour CubeShelf restent stables pour conserver les réglages, sauvegardes et installations. Le lanceur historique reste disponible pour les outils de mise à jour et de restauration.
+
 ## 0.18.0-preview.5 — fluidité Big Picture et disque en rotation, non publiée
 
 - Ruban Big Picture déplacé et redimensionné par le compositeur sans recalculer la géométrie des boîtiers à chaque changement de taille. Dessins regroupés via Skia pour les modèles GameCube et les textures Wii/Switch, avec filtrage de qualité et préparation des textures en arrière-plan.

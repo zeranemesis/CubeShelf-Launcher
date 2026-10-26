@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:CubeShelf.Desktop.Controls"
         x:Class="CubeShelf.Desktop.MainWindow"
-        Title="CubeShelf"
+        Title="DecompShelf"
         Width="1530" Height="930" MinWidth="960" MinHeight="560"
         Background="{DynamicResource Bg}"
         Opened="OnParityWindowOpened"
@@ -14,10 +14,10 @@
         <StackPanel DockPanel.Dock="Top">
           <StackPanel Orientation="Horizontal" Margin="0,4,0,28" Spacing="12">
             <Border Width="46" Height="46" CornerRadius="12" Background="#101524" BorderBrush="{DynamicResource Border}" BorderThickness="1" Padding="4">
-              <Image Source="avares://CubeShelf/Assets/Brand/gamecube_logo.png" Stretch="Uniform" />
+              <controls:ConsoleBrandMark x:Name="SidebarConsoleLogo" />
             </Border>
             <StackPanel VerticalAlignment="Center" Spacing="2">
-              <TextBlock Text="CubeShelf" Foreground="{DynamicResource Text}" FontSize="23" FontWeight="Bold" />
+              <TextBlock x:Name="SidebarAppName" Text="DecompShelf" Foreground="{DynamicResource Text}" FontSize="20" FontWeight="Bold" />
               <TextBlock Text="{DynamicResource BrandSubtitle}" Foreground="{DynamicResource Muted}" FontSize="10" />
             </StackPanel>
           </StackPanel>
@@ -106,8 +106,8 @@
         <controls:ShelfContourBackground Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0.55" />
         <Grid Margin="32,24" ColumnDefinitions="Auto,*,Auto">
           <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-            <Image Source="avares://CubeShelf/Assets/Brand/gamecube_logo.png" Width="32" Height="32" />
-            <TextBlock Text="CubeShelf" Foreground="#302C35" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+            <controls:ConsoleBrandMark x:Name="BigPictureConsoleLogo" Width="36" Height="36" />
+            <TextBlock x:Name="BigPictureAppName" Text="DecompShelf" Foreground="#302C35" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
             <ComboBox x:Name="BigPictureConsoleShelfPicker" Margin="10,0,0,0" MinWidth="130" MinHeight="44" SelectionChanged="ConsoleShelfChanged">
               <ComboBoxItem Content="GameCube" Tag="gamecube" />
               <ComboBoxItem Content="Wii" Tag="wii" />
