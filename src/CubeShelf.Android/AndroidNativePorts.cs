@@ -16,21 +16,23 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
     {
         using var stream=AssetLoader.Open(new Uri("avares://CubeShelf.Mobile/Catalogs/android-ports.json"));
         Catalog=MobileNativePort.Load(stream);
-        _engines=Catalog.ToDictionary(p=>p.Id,p=>new NativeApkDownload(p,Context.FilesDir!.AbsolutePath,CompatibilityError(p.Id) is null));
+        _engines=Catalog.Where(p=>!IsEmbedded(p.Id)).ToDictionary(p=>p.Id,p=>new NativeApkDownload(p,Context.FilesDir!.AbsolutePath,CompatibilityError(p.Id) is null));
     }
-    internal IEnumerable<RuntimeDownloadSource> Sources => Catalog.Select(p=>new RuntimeDownloadSource(p.Id,p.Id,p.Title,p.Version,_engines[p.Id]));
+    internal IEnumerable<RuntimeDownloadSource> Sources => Catalog.Where(p=>!IsEmbedded(p.Id)).Select(p=>new RuntimeDownloadSource(p.Id,p.Id,p.Title,p.Version,_engines[p.Id]));
     private MobileNativePort Port(string id)=>Catalog.Single(p=>p.Id==id);
     private static PackageInfo? Installed(string package)
     {
         try {return Context.PackageManager!.GetPackageInfo(package,PackageInfoFlags.MetaData);}
         catch(PackageManager.NameNotFoundException) {return null;}
     }
-    public bool IsInstalled(string id)=>Installed(Port(id).PackageName) is not null;
-    public bool IsUpdateAvailable(string id)=>Installed(Port(id).PackageName) is { } info && VersionCode(info)<Port(id).VersionCode;
-    public bool IsPackageReady(string id)=>_engines[id].IsReady;
+    public bool IsEmbedded(string id)=>id==AndroidSm64.Id;
+    public bool IsInstalled(string id)=>IsEmbedded(id)?AndroidSm64.IsPrepared:Installed(Port(id).PackageName) is not null;
+    public bool IsUpdateAvailable(string id)=>!IsEmbedded(id)&&Installed(Port(id).PackageName) is { } info && VersionCode(info)<Port(id).VersionCode;
+    public bool IsPackageReady(string id)=>IsEmbedded(id)?AndroidSm64.EngineAvailable:_engines[id].IsReady;
     public string? CompatibilityError(string id)
     {
         var port=Port(id);
+        if(IsEmbedded(id)&&!AndroidSm64.EngineAvailable)return "Super Mario 64 intégré nécessite l’APK ARM64 de DecompShelf.";
         if((int)global::Android.OS.Build.VERSION.SdkInt<port.MinimumSdk)return "Version Android trop ancienne pour ce port.";
         if(!port.Abis.Intersect(global::Android.OS.Build.SupportedAbis??[]).Any())return "Architecture incompatible avec ce port Android.";
         if(port.RequiresVulkan12&&!Context.PackageManager!.HasSystemFeature("android.hardware.vulkan.version",0x00402000))
@@ -39,8 +41,10 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
             return "Ce port nécessite OpenGL ES 3.0.";
         return null;
     }
-    public async Task<string> PrepareAsync(string id)
+    public async Task<string> PrepareAsync(string id, CancellationToken cancellation = default)
     {
+        if(IsEmbedded(id))return await AndroidSm64.PrepareAsync(cancellation);
+        cancellation.ThrowIfCancellationRequested();
         var port=Port(id);
         if(CompatibilityError(id) is { } issue)throw new InvalidOperationException(issue);
         if(!_engines[id].IsReady)
@@ -79,6 +83,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
     }
     public void Launch(string id)
     {
+        if(IsEmbedded(id)) {AndroidSm64.Launch();return;}
         var activity=NativeGameService.CurrentActivity??throw new InvalidOperationException("Rouvre DecompShelf puis réessaie.");
         using var intent=activity.PackageManager!.GetLaunchIntentForPackage(Port(id).PackageName)
             ??throw new InvalidOperationException("Installe d’abord le port Android.");

@@ -13,7 +13,7 @@
       "armeabi-v7a"
     ],
     "RequiresVulkan12": false,
-    "RequiresGles3": false,
+    "RequiresGles3": true,
     "Status": "Disponible",
     "Notes": "Fournis ta propre ROM US ou japonaise ; extraction dans le port. Le port demande les fichiers de ta propre copie ; aucun jeu fourni.",
     "Name": "Nautilus-Alfa-Android.zip",

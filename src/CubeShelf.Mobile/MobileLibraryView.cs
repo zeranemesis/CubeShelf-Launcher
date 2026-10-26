@@ -99,7 +99,11 @@ public sealed partial class MobileLibraryView : UserControl
         var primaryActions = new StackPanel { Spacing = 6, Margin = new Thickness(0, 8, 0, 4) };
         _status.IsVisible = false;
         primaryActions.Children.Add(_status);
+        primaryActions.Children.Add(_nativePreparationProgress);
         primaryActions.Children.Add(_play); primaryActions.Children.Add(_download); primaryActions.Children.Add(_unavailableAction);
+        _cancelNativePreparation.IsVisible=false;
+        _cancelNativePreparation.Click+=(_,_)=>_nativePreparation?.Cancel();
+        primaryActions.Children.Add(_cancelNativePreparation);
         Grid.SetRow(primaryActions, 2); _gamePanel.Children.Add(primaryActions);
         Grid.SetRow(_gamePanel, 1); _body.Children.Add(_gamePanel);
         var content = new Grid { RowDefinitions = new RowDefinitions("Auto,*,Auto"), Margin = new Thickness(8) };
@@ -195,6 +199,7 @@ public sealed partial class MobileLibraryView : UserControl
     public void BackFromController()
     {
         SetControllerInput(true);
+        if(_nativePreparation is not null) {_nativePreparation.Cancel();return;}
         if (_launching) { CancelLaunchTransition(); return; }
         if (_downloadsOverlay.IsVisible) { CloseDownloads(); return; }
         if (_inspectionCase is not null) { CloseInspection(); return; }
@@ -219,7 +224,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
-        Control[] candidates = [_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download];
+        Control[] candidates = [_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download,_cancelNativePreparation];
         var actions = candidates.Where(control => control.IsEffectivelyVisible && control.IsEnabled
             && (control != _invite && control != _join || _invitationPanel.IsExpanded)).ToArray();
         if (actions.Length == 0) return;
@@ -413,7 +418,7 @@ public sealed partial class MobileLibraryView : UserControl
     private void Select(int index) => Select(index, true);
     private void Select(int index, bool animate)
     {
-        if (_launching) return;
+        if (_launching || _nativePreparation is not null) return;
         if (_catalog.Length == 0) return;
         _selected = (index % _catalog.Length + _catalog.Length) % _catalog.Length;
         var game = _catalog[_selected];

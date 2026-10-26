@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.1-preview.1 — Super Mario 64 intégré, non publiée
+
+- Android ARM64 : moteur Ghostship 3.0.0 embarqué dans DecompShelf ; plus d’APK Super Mario 64 séparé à télécharger ou installer.
+- Import de sa propre ROM US/japonaise .z64, contrôle SHA-1, extraction en arrière-plan avec annulation, puis bouton Jouer et retour à DecompShelf. Données préparées et sauvegardes séparées.
+- SDL2 isolée de la SDL3 de PartyBoard, processus séparés pour le jeu et l’extraction, contrôles de paquet ARM64 et alignement mémoire 16 Ko.
+- Android versionCode 45. Les quatre autres ports Nintendo 64 conservent leur installation séparée. Aucune ROM fournie ; fonctionnement en jeu non validé sur téléphone.
+
 ## 0.18.0 — DecompShelf, 26 octobre 2026
 
 - Application renommée DecompShelf ; catalogues GameCube, Wii, Switch et Nintendo 64 dans un menu déroulant, logos adaptés et choix des ports sans doublon.

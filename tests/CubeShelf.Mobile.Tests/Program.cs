@@ -70,6 +70,7 @@ using(var http=new HttpClient(new SlowHttp()))
     engine.Cancel();Check(engine.Snapshot.State==RuntimeDownloadState.NotInstalled&&!File.Exists(engine.ApkFile),"cancel removes the pending APK without invoking an installer");
 }
 
+await Sm64Tests.Run(root);
 RunUi();
 Console.WriteLine("Mobile Android catalogue, download integrity, install handoff, cancellation and layout checks passed.");
 void RunUi()
@@ -107,6 +108,36 @@ void RunUi()
     }
     view.SetActive(false);view.SetActive(true);Jobs();Check(picker.SelectedIndex==1,"selected Nintendo 64 catalogue survives pause/resume");
     picker.SelectedIndex=0;Jobs();Check(Field<Button>("_play").IsVisible&&Field<StackPanel>("_onlinePanel").IsVisible,"PartyBoard launch and online actions remain available");
+    window.Close();
+    var embeddedHost=new FakeGames(root,ports);
+    embeddedHost.Native.Embedded.Add(ports[0].Id);
+    embeddedHost.Native.EmbeddedPreparation=new(TaskCreationOptions.RunContinuationsAsynchronously);
+    view=new MobileLibraryView(embeddedHost);window=new Window {Width=390,Height=844,Content=view};window.Show();Jobs();
+    picker=Field<ComboBox>("_consolePicker");picker.SelectedIndex=1;Jobs();
+    Check(Field<TextBlock>("_availability").Text!.Contains("Moteur intégré"),"embedded game requests a ROM without Android installation text");
+    Field<Button>("_download").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(!picker.IsEnabled&&Field<Button>("_cancelNativePreparation").IsVisible&&!Field<Grid>("_downloadsOverlay").IsVisible,
+        "embedded preparation stays in the library and exposes cancellation");
+    foreach(var size in new[]{new Size(390,844),new Size(844,390)})
+    {
+        window.Width=size.Width;window.Height=size.Height;Jobs();
+        var cancel=Field<Button>("_cancelNativePreparation");var origin=cancel.TranslatePoint(default,view)!.Value;
+        Check(origin.Y>=0&&origin.Y+cancel.Bounds.Height<=view.Bounds.Height+1,"preparation cancellation fits in portrait and landscape");
+        if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } folder)
+        {Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"mobile-sm64-prepare-{size.Width}.png"));}
+    }
+    view.BrowseFromController(1);Jobs();Check(Field<TextBlock>("_position").Text=="1 / 5","game selection cannot change under an active ROM preparation");
+    view.SetActive(false);view.SetActive(true);Jobs();
+    Field<Button>("_cancelNativePreparation").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+    for(var i=0;i<100&&!picker.IsEnabled;i++){Jobs();Thread.Sleep(5);}
+    Check(picker.IsEnabled&&!Field<Button>("_play").IsVisible&&embeddedHost.Native.Launched.Count==0,"cancelling preparation cannot mark or launch the game");
+    embeddedHost.Native.EmbeddedPreparation=new(TaskCreationOptions.RunContinuationsAsynchronously);
+    Field<Button>("_download").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    embeddedHost.Native.EmbeddedPreparation.SetResult("Préparation terminée");
+    for(var i=0;i<100&&!Field<Button>("_play").IsVisible;i++){Jobs();Thread.Sleep(5);}
+    Check(Field<Button>("_play").IsVisible&&!Field<Button>("_cancelNativePreparation").IsVisible
+        &&embeddedHost.Engines[ports[0].Id].Snapshot.State==RuntimeDownloadState.NotInstalled,
+        "embedded ROM preparation enables Play without enqueuing or installing an APK");
     window.Close();
     T Field<T>(string name)=>(T)typeof(MobileLibraryView).GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(view)!;
     void Jobs(){Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);Dispatcher.UIThread.RunJobs();}
@@ -167,15 +198,23 @@ sealed class FakeNative(MobileNativePort[] ports):IMobileNativePorts
 {
     public IReadOnlyList<MobileNativePort> Catalog=>ports;
     public HashSet<string> Installed {get;}=[];
+    public HashSet<string> Embedded {get;}=[];
+    public TaskCompletionSource<string>? EmbeddedPreparation {get;set;}
     public HashSet<string> Blocked {get;}=[];
     public List<string> Launched {get;}=[];
     public List<string> Prepared {get;}=[];
     public RuntimeDownloadQueue Queue {get;set;}=null!;
     public Dictionary<string,FakeTransfer> Engines {get;set;}=null!;
     public bool IsInstalled(string id)=>Installed.Contains(id);
+    public bool IsEmbedded(string id)=>Embedded.Contains(id);
     public bool IsUpdateAvailable(string id)=>false;
     public bool IsPackageReady(string id)=>Engines[id].Snapshot.State==RuntimeDownloadState.Ready;
     public string? CompatibilityError(string id)=>Blocked.Contains(id)?"Incompatible":null;
-    public Task<string> PrepareAsync(string id){Prepared.Add(id);if(!IsPackageReady(id))Queue.Enqueue(id);return Task.FromResult("Confirmation Android requise");}
+    public async Task<string> PrepareAsync(string id,CancellationToken cancellation=default)
+    {
+        Prepared.Add(id);
+        if(IsEmbedded(id)) {var message=await EmbeddedPreparation!.Task.WaitAsync(cancellation);Installed.Add(id);return message;}
+        if(!IsPackageReady(id))Queue.Enqueue(id);return "Confirmation Android requise";
+    }
     public void Launch(string id)=>Launched.Add(id);
 }

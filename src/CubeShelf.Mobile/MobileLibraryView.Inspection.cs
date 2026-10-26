@@ -62,6 +62,7 @@ public sealed partial class MobileLibraryView
 
     public bool DismissOverlay()
     {
+        if(_nativePreparation is not null) {_nativePreparation.Cancel();return true;}
         if (_downloadsOverlay.IsVisible) { CloseDownloads(); return true; }
         if (_inspectionCase is not null) { CloseInspection(); return true; }
         if (!_invitationPanel.IsExpanded) return false;

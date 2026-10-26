@@ -253,7 +253,7 @@ public sealed partial class MobileLibraryView
         _pauseQueue.Content = manager?.IsPaused == true ? "Reprendre la file" : "Tout mettre en pause";
         _queueHeading.Text = "File d’attente" + (manager?.IsPaused == true ? " · en pause" : "");
         ReconcileDownloadRows(entries, manager?.History ?? Array.Empty<RuntimeDownloadHistory>());
-        _managerNote.Text = manager?.PersistenceError ?? "Un transfert à la fois · PartyBoard est actuellement le seul moteur Android proposé. Aucun disque de jeu fourni.";
+        _managerNote.Text = manager?.PersistenceError ?? "Un transfert à la fois · Les moteurs intégrés se préparent depuis leur fiche. Aucun jeu ni ROM fourni.";
         if (_controllerInput && (previousFocus is null || !previousFocus.IsEffectivelyVisible || !previousFocus.IsEnabled
             || !previousFocus.GetVisualAncestors().Contains(_downloadsOverlay))) FocusDownloadAction();
     }

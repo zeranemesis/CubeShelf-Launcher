@@ -3,7 +3,7 @@
 DecompShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-La version 0.18.0 porte le code Android `44` et comprend la mise à jour
+La version 0.18.1-preview.1 porte le code Android `45` et comprend la mise à jour
 de l'application depuis les releases GitHub.
 
 ## Produire les APK
@@ -75,7 +75,7 @@ capacités réseau déterminent les fonctions disponibles.
   un Galaxy S20. La nouvelle installation d'une mise à jour doit encore être
   validée de bout en bout sur téléphone ; aucune partie Android vers Android
   n'est annoncée comme validée ici.
-- Mario Party 4 conserve son moteur intégré. Les cinq ports Nintendo 64 listés ci-dessous s’installent comme applications Android distinctes. Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule installation du launcher.
+- Mario Party 4 conserve son moteur intégré. Super Mario 64 est désormais intégré ; les quatre autres ports Nintendo 64 listés ci-dessous s’installent comme applications Android distinctes. Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule installation du launcher.
 - Les projets Android expérimentaux de Melee et Mario Party 5 ne sont pas
   présentés comme des jeux complets jouables. Les décompilations de Mario
   Party 6, Mario Kart Double Dash, TTYD, F-Zero GX, Super Paper Mario et Sunshine
@@ -118,17 +118,21 @@ Choisir **Nintendo 64** dans le menu en haut de DecompShelf. Les cinq jeux appar
 
 | Jeu | Projet / version épinglée | État |
 | --- | --- | --- |
-| Super Mario 64 | HarbourMasters/Ghostship 3.0.0 | Android disponible |
+| Super Mario 64 | HarbourMasters/Ghostship 3.0.0 | Moteur intégré, ARM64 et OpenGL ES 3.0 |
 | Ocarina of Time | Waterdish/Shipwright-Android v9.0.2P2 | Android disponible |
 | Majora’s Mask | Waterdish/2ship2harkinian-Android v1.1.2P1 | Android disponible |
 | Pilotwings 64 | NoahVl/Birdman64 v1.5.1 | Expérimental |
 | Pokémon Snap | JackandBeans/Snap64Recomp v1.1.6 | Bêta, ARM64 et Vulkan 1.2 |
 
+Pour **Super Mario 64**, toucher **Choisir ma ROM Super Mario 64** : sélectionner sa propre ROM US ou japonaise au format .z64, attendre la préparation dans DecompShelf, puis toucher **Jouer**. La sélection initiale utilise le sélecteur de fichiers Android. Aucun APK de jeu ni accès à tous les fichiers n’est demandé. Le jeu conserve ses réglages et contrôles tactiles internes ; un bouton permet de revenir à DecompShelf. Une installation Ghostship séparée et ses sauvegardes restent intactes, sans migration automatique. Détails : [moteur intégré](../vendor/ghostship-android/README.md).
+
+Pour les quatre autres ports :
+
 1. **Télécharger le port** l’ajoute à la file de téléchargement commune. La source, la taille, les empreintes SHA-256, l’identité Android et les architectures contrôlées se trouvent dans `src/CubeShelf.Mobile/Catalogs/android-ports.json`.
 2. Quand le paquet est prêt, **Installer l’APK** ouvre l’autorisation d’installation depuis DecompShelf si nécessaire. Revenir ensuite dans DecompShelf et retoucher Installer l’APK. Android demande confirmation.
 3. Après installation, revenir dans DecompShelf : **Jouer** ouvre l’application du port. Fournir les fichiers de sa propre copie dans cette application. Les données, réglages et sauvegardes appartiennent au port ; ils ne sont pas importés de la bibliothèque PC.
 
-Aucun APK téléchargé n’est installé silencieusement. Le ZIP Ghostship est contrôlé avant extraction d’un unique APK vers une destination fixe ; l’APK extrait est aussi contrôlé. Les APK sont revérifiés au moment de l’installation. Une signature différente d’une installation existante entraîne un refus, sans désinstallation ni remplacement forcé.
+Aucun APK téléchargé n’est installé silencieusement. À la compilation, le paquet Ghostship et son APK sont vérifiés avant d’en embarquer le moteur ; cet APK n’est jamais installé sur le téléphone. Les APK des quatre autres ports sont revérifiés au moment de l’installation. Une signature différente d’une installation existante entraîne un refus, sans désinstallation ni remplacement forcé.
 
 Les paquets sont épinglés : lorsqu’un catalogue plus récent est livré avec DecompShelf, une version installée plus ancienne peut être mise à jour par le même parcours. Les versions plus récentes déjà installées restent conservées. Aucun contrôle automatique des nouvelles releases des cinq ports n’est annoncé.
 

@@ -51,7 +51,7 @@ jobs:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
       - name: Install Android platform and build tools
-        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmake;3.22.1" "ndk;29.0.14206865"
       - name: Install the .NET Android workload
         run: dotnet workload install android --skip-manifest-update
       - name: Restore the persistent Android signing key
@@ -83,6 +83,8 @@ jobs:
           mkdir -p dist
           cp "${packages[0]}" "dist/CubeShelf-android-${{ matrix.abi }}-preview.apk"
           (cd dist && sha256sum "CubeShelf-android-${{ matrix.abi }}-preview.apk" > "CubeShelf-android-${{ matrix.abi }}-preview.apk.sha256")
+      - name: Verify embedded Super Mario 64 and PartyBoard packaging
+        run: python3 eng/test-ghostship-package.py "dist/CubeShelf-android-${{ matrix.abi }}-preview.apk" --abi "${{ matrix.abi }}"
       - uses: actions/upload-artifact@v4
         with:
           name: CubeShelf-android-${{ matrix.abi }}-preview

@@ -66,7 +66,8 @@ public interface IMobileNativePorts
     bool IsInstalled(string id);
     bool IsUpdateAvailable(string id);
     bool IsPackageReady(string id);
+    bool IsEmbedded(string id) => false;
     string? CompatibilityError(string id);
-    Task<string> PrepareAsync(string id);
+    Task<string> PrepareAsync(string id, CancellationToken cancellation = default);
     void Launch(string id);
 }
