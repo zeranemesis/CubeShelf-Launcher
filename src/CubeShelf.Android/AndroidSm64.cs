@@ -84,6 +84,7 @@ internal static class AndroidSm64
         var activity = NativeGameService.CurrentActivity ?? throw new InvalidOperationException("Rouvre DecompShelf puis réessaie.");
         using var intent = new Intent().SetClassName(activity.PackageName!, GameActivity);
         activity.StartActivity(intent);
+        GameHelpOverlay.StartForGame(activity, "Super Mario 64", activity.PackageName, GameActivity);
     }
 
     private sealed class ExtractionResult() : ResultReceiver(new Handler(Looper.MainLooper!))

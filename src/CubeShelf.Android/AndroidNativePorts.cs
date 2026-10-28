@@ -88,6 +88,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         using var intent=activity.PackageManager!.GetLaunchIntentForPackage(Port(id).PackageName)
             ??throw new InvalidOperationException("Installe d’abord le port Android.");
         activity.StartActivity(intent);
+        GameHelpOverlay.StartForGame(activity, Port(id).Title, intent.Component?.PackageName, intent.Component?.ClassName);
     }
     private static long VersionCode(PackageInfo info)
     {

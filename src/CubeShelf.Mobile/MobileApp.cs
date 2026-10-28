@@ -19,6 +19,7 @@ public sealed class MobileApp : Application
         set => Desktop.Controls.DemandAnimation.FrameScheduler = value;
     }
     public static IMobileGameService? Games { get; set; }
+    public static Action<string>? HelpRequested { get; set; }
     public override void Initialize()
     {
         Desktop.Controls.GameCaseControl.PreferGpuTextures = true;

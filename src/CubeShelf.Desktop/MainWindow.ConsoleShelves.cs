@@ -9,6 +9,23 @@ namespace CubeShelf.Desktop;
 
 public sealed partial class MainWindow
 {
+    private NativePortsWindow CreateNativePortsWindow(ShelfProduct product, string? selectedPort = null, Action? onLaunching = null)
+    {
+        var window = new NativePortsWindow(product, selectedPort, _paths);
+        window.LaunchRequested += port =>
+        {
+            var game = _catalogGames.FirstOrDefault(candidate =>
+                _nativeShelfPorts.TryGetValue(candidate.Id, out var entry) && entry.Id == port.Id)
+                ?? throw new InvalidOperationException("Ce port n’est pas associé à un jeu de la bibliothèque.");
+            onLaunching?.Invoke();
+            window.Close();
+            if (RunningGameFor(game) is not null) return;
+            // Use the common launch path so process tracking, statistics and the help button agree.
+            _ = RequestPlayAsync(game);
+        };
+        return window;
+    }
+
     private string _activeShelfConsole = "gamecube";
     private bool _consoleShelfReady;
     private readonly Dictionary<string, NativePort> _nativeShelfPorts = new(StringComparer.OrdinalIgnoreCase);
@@ -209,7 +226,9 @@ public sealed partial class MainWindow
         var library = new NativePortLibrary(_paths);
         if (alwaysShow || !library.IsConfigured(port))
         {
-            await new NativePortsWindow(ShelfProduct.Resolve(game.ShelfConsole), port.Id, _paths).ShowDialog(this);
+            var launched = false;
+            await CreateNativePortsWindow(ShelfProduct.Resolve(game.ShelfConsole), port.Id, () => launched = true).ShowDialog(this);
+            if (launched) return false; // The dialog's Play action already owns the new launch request.
             library = new NativePortLibrary(_paths);
         }
         if (!library.IsConfigured(port)) return false;

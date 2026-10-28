@@ -10,6 +10,7 @@ using CubeShelf.Core.Social;
 
 var failures = new List<string>();
 var executed = 0;
+Run("capture: only tracked game processes are eligible", GameCaptureSessionTests.OnlyTrackedProcesses);
 Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
 Run("quick play: install and prepare finish before launch", GamePlayFlowTests.PreparationIsOrderedAndAwaited);
 Run("quick play: double clicks keep one request", GamePlayFlowTests.DoubleClickDoesNotQueueTwoGames);

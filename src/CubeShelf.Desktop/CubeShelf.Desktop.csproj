@@ -13,6 +13,9 @@
     <ApplicationIcon>Assets\Brand\gamecube_logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../CubeShelf.Assistance/CubeShelf.Assistance.csproj" />
+    <PackageReference Include="System.Speech" Version="8.0.0" />
+    <Content Include="../../vendor/assistance/*.txt" Link="licenses/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
     <PackageReference Include="Avalonia.BuildServices" Version="11.3.2" ExcludeAssets="all" PrivateAssets="all" />
@@ -32,5 +35,15 @@
     </ItemGroup>
     <Error Condition="!Exists('$(PublishDir)Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)')"
            Text="Missing published cover: Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)" />
+  </Target>
+  <Target Name="PrepareLocalAssistant" BeforeTargets="PrepareForBuild" Condition="'$(OS)' == 'Windows_NT' and ('$(RuntimeIdentifier)' == '' or '$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == 'win-arm64')">
+    <PropertyGroup>
+      <AssistantArch Condition="'$(RuntimeIdentifier)' == 'win-arm64'">ARM64</AssistantArch>
+      <AssistantArch Condition="'$(AssistantArch)' == ''">x64</AssistantArch>
+    </PropertyGroup>
+    <Exec Command="python &quot;$(MSBuildProjectDirectory)/../../eng/prepare-assistance.py&quot; --arch $(AssistantArch)" />
+    <ItemGroup>
+      <Content Include="Generated/Assistance/$(AssistantArch)/decompshelf_ai.dll" Link="decompshelf_ai.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    </ItemGroup>
   </Target>
 </Project>

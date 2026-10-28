@@ -48,6 +48,11 @@ public sealed class GameSessionTracker : IDisposable
         }
     }
 
+    public string? GameIdForProcess(int processId)
+    {
+        lock (_gate) return _running.FirstOrDefault(pair => IsAlive(pair.Value.Process) && pair.Value.Process.Id == processId).Key;
+    }
+
     public Process Start(
         string gameId,
         string executable,

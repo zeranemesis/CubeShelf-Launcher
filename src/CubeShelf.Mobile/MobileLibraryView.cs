@@ -70,11 +70,15 @@ public sealed partial class MobileLibraryView : UserControl
         _launchTransition.DismissRequested += CancelLaunchTransition;
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
         ConfigureButtonStyles();
-        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
+        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
         heading.Children.Add(BuildPlatformHeading());
         Grid.SetColumn(_position, 1); heading.Children.Add(_position);
-        Grid.SetColumn(_downloadsButton, 2); heading.Children.Add(_downloadsButton);
-        Grid.SetColumn(_appUpdatesButton, 3); heading.Children.Add(_appUpdatesButton);
+        var help = MakeButton("?");
+        AutomationProperties.SetName(help, "Aide locale LFM3");
+        help.Click += (_, _) => MobileApp.HelpRequested?.Invoke(_catalog.ElementAtOrDefault(_selected)?.Title ?? "Jeu sélectionné");
+        Grid.SetColumn(help, 2); heading.Children.Add(help);
+        Grid.SetColumn(_downloadsButton, 3); heading.Children.Add(_downloadsButton);
+        Grid.SetColumn(_appUpdatesButton, 4); heading.Children.Add(_appUpdatesButton);
         _summary.Children.Add(_title); _summary.Children.Add(_info); _summary.Children.Add(_availability);
         _play.Classes.Add("primary"); _download.Classes.Add("primary");
         _play.Content = ActionLabel("▶", "Jouer");

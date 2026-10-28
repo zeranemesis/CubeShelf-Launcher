@@ -76,6 +76,7 @@ public static class NativeGameService
             if (!string.IsNullOrEmpty(invitation)) intent.PutExtra("invitation", invitation);
             intent.PutExtra("language", "fr");
             activity.StartActivity(intent);
+            GameHelpOverlay.StartForGame(activity, "Mario Party 4", activity.PackageName, className);
             return true;
         }
         catch (Exception error)

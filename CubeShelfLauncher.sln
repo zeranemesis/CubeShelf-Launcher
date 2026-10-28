@@ -14,6 +14,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeShelf.Core.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeShelf.Tests", "tests\CubeShelf.Tests\CubeShelf.Tests.csproj", "{B16AC7E0-E61E-47E4-BAE8-0D30FC7ADECD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2142EBD6-EDAE-4D88-AE7A-3644E94589EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeShelf.Assistance", "src\CubeShelf.Assistance\CubeShelf.Assistance.csproj", "{7807312B-DF0C-4564-9839-47740FDBD6A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeShelf.Assistance.Tests", "tests\CubeShelf.Assistance.Tests\CubeShelf.Assistance.Tests.csproj", "{E8167E9B-52F8-47F8-B92D-01892BC65578}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,9 +46,19 @@ Global
 		{B16AC7E0-E61E-47E4-BAE8-0D30FC7ADECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B16AC7E0-E61E-47E4-BAE8-0D30FC7ADECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B16AC7E0-E61E-47E4-BAE8-0D30FC7ADECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7807312B-DF0C-4564-9839-47740FDBD6A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7807312B-DF0C-4564-9839-47740FDBD6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7807312B-DF0C-4564-9839-47740FDBD6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7807312B-DF0C-4564-9839-47740FDBD6A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8167E9B-52F8-47F8-B92D-01892BC65578}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8167E9B-52F8-47F8-B92D-01892BC65578}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8167E9B-52F8-47F8-B92D-01892BC65578}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8167E9B-52F8-47F8-B92D-01892BC65578}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BBF4BCCD-6830-4443-8E86-72F3A255BA47} = {FF9A0674-80F8-43BF-A68D-F5C963ED7EEC}
 		{B16AC7E0-E61E-47E4-BAE8-0D30FC7ADECD} = {FF9A0674-80F8-43BF-A68D-F5C963ED7EEC}
+		{7807312B-DF0C-4564-9839-47740FDBD6A0} = {2142EBD6-EDAE-4D88-AE7A-3644E94589EF}
+		{E8167E9B-52F8-47F8-B92D-01892BC65578} = {FF9A0674-80F8-43BF-A68D-F5C963ED7EEC}
 	EndGlobalSection
 EndGlobal

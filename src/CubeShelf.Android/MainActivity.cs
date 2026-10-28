@@ -155,6 +155,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         MobileApp.Games = new AndroidGames();
+        MobileApp.HelpRequested = title => { if (NativeGameService.CurrentActivity is { } activity) GameHelpActivity.Open(activity, title); };
         return base.CustomizeAppBuilder(builder).With(new AndroidPlatformOptions
         {
             RenderingMode = Intent?.GetBooleanExtra("cubeshelf_egl", false) == true
@@ -165,6 +166,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
 
     protected override void OnResume()
     {
+        GameHelpOverlay.Stop(this);
         NativeGameService.CurrentActivity = this;
         base.OnResume();
         ApplyImmersiveMode();

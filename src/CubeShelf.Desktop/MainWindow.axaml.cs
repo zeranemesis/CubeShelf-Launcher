@@ -20,7 +20,7 @@ public sealed partial class MainWindow : Window
     private async void OpenNativePortsCatalog(object? sender, RoutedEventArgs args)
     {
         if (_nativePortsWindow is not null) { _nativePortsWindow.Activate(); return; }
-        _nativePortsWindow = new NativePortsWindow(ShelfProduct.Resolve(_activeShelfConsole), paths: _paths);
+        _nativePortsWindow = CreateNativePortsWindow(ShelfProduct.Resolve(_activeShelfConsole));
         _nativePortsWindow.Closed += (_, _) => _nativePortsWindow = null;
         await _nativePortsWindow.ShowDialog(this);
         var library = new NativePortLibrary(_paths);
@@ -107,6 +107,7 @@ public sealed partial class MainWindow : Window
             paths.DataDirectory);
         _catalogGames.AddRange(_catalogService.Load());
         InitializeConsoleShelfPicker();
+        InitializeGameHelp();
         _selectedGame = ShelfGames.FirstOrDefault() is { } firstGame
             ? GameVariants.Resolve(_catalogGames, firstGame, paths)
             : null;

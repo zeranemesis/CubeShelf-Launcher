@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>io.github.zeranemesis.cubeshelf</ApplicationId>
-    <ApplicationVersion>45</ApplicationVersion>
+    <ApplicationVersion>49</ApplicationVersion>
     <ApplicationDisplayVersion>$(CubeShelfVersion)</ApplicationDisplayVersion>
     <ApplicationTitle>DecompShelf</ApplicationTitle>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
@@ -18,11 +18,14 @@
     <CheckEolWorkloads>false</CheckEolWorkloads>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../tests/CubeShelf.Assistance.Tests/AndroidOverlayProbe.cs" Link="Tests/AndroidOverlayProbe.cs" Condition="'$(Configuration)' == 'Debug'" />
+    <AndroidNativeLibrary Remove="Generated/Assistance/**/*.so" />
     <AndroidJavaSource Remove="Generated/Ghostship/**/*.java" />
     <AndroidLibrary Remove="**/*.jar" />
     <AndroidLibrary Include="Generated/PartyBoard/partyboard-host.jar" Bind="false" />
     <AndroidLibrary Include="Generated/Ghostship/ghostship-host.jar" Bind="false" />
     <AndroidAsset Include="../../vendor/ghostship-android/licenses/*" Link="ghostship/licenses/%(Filename)%(Extension)" />
+    <AndroidAsset Include="../../vendor/assistance/*.txt" Link="assistance/licenses/%(Filename)%(Extension)" />
     <PackageReference Include="Avalonia.Android" Version="11.3.21" />
     <ProjectReference Include="../CubeShelf.Mobile/CubeShelf.Mobile.csproj" />
     <AndroidResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Resources/drawable/icon.png" />
@@ -53,6 +56,19 @@
       <AndroidAsset Include="Generated/Ghostship/assets/ghostship/gamedata.version" Link="ghostship/gamedata.version" />
       <AndroidAsset Include="Generated/Ghostship/assets/ghostship/gamecontrollerdb.txt" Link="ghostship/gamecontrollerdb.txt" />
       <AndroidAsset Include="Generated/Ghostship/assets/ghostship/LLVM-NOTICE.txt" Link="ghostship/LLVM-NOTICE.txt" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PrepareLocalAssistant" BeforeTargets="PrepareForBuild" DependsOnTargets="_ResolveMonoAndroidSdks">
+    <PropertyGroup>
+      <AssistantPython Condition="'$(OS)' == 'Windows_NT'">python</AssistantPython>
+      <AssistantPython Condition="'$(AssistantPython)' == ''">python3</AssistantPython>
+      <AssistantAbi Condition="'$(RuntimeIdentifier)' == 'android-x64'">x86_64</AssistantAbi>
+      <AssistantAbi Condition="'$(AssistantAbi)' == ''">arm64-v8a</AssistantAbi>
+    </PropertyGroup>
+    <Exec Command="&quot;$(AssistantPython)&quot; &quot;$(MSBuildProjectDirectory)/../../eng/prepare-assistance.py&quot; --android-sdk &quot;$(_AndroidSdkDirectory).&quot; --abi $(AssistantAbi)" />
+    <ItemGroup>
+      <AndroidNativeLibrary Remove="Generated/Assistance/**/*.so" />
+      <AndroidNativeLibrary Include="Generated/Assistance/$(AssistantAbi)/libdecompshelf_ai.so" Abi="$(AssistantAbi)" />
     </ItemGroup>
   </Target>
 </Project>

@@ -42,6 +42,8 @@ jobs:
         run: dotnet run --project tests/CubeShelf.AppUpdates.Tests/CubeShelf.AppUpdates.Tests.csproj -c Release
       - name: Test Android native ports and mobile UI
         run: dotnet run --project tests/CubeShelf.Mobile.Tests/CubeShelf.Mobile.Tests.csproj -c Release
+      - name: Test offline assistance model verification and gesture
+        run: dotnet run --project tests/CubeShelf.Assistance.Tests/CubeShelf.Assistance.Tests.csproj -c Release
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

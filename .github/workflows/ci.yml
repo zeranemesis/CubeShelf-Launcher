@@ -36,6 +36,8 @@ jobs:
         run: dotnet run --project tests/CubeShelf.NativePorts.Tests/CubeShelf.NativePorts.Tests.csproj -c Release
       - name: Test console selectors in the existing UI
         run: dotnet run --project tests/CubeShelf.ShelfUi.Tests/CubeShelf.ShelfUi.Tests.csproj -c Release
+      - name: Test offline game assistance and model verification
+        run: dotnet run --project tests/CubeShelf.Assistance.Tests/CubeShelf.Assistance.Tests.csproj -c Release
 
   windows:
     runs-on: windows-latest

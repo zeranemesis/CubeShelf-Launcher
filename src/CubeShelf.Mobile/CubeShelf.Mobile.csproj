@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../CubeShelf.Assistance/CubeShelf.Assistance.csproj" />
     <PackageReference Include="Avalonia" Version="11.3.21" />
     <PackageReference Include="Avalonia.Skia" Version="11.3.21" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />

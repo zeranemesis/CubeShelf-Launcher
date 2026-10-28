@@ -14,3 +14,4 @@ package-lock.json
 package.json
 /artifacts/
 /src/CubeShelf.Android/Generated/
+/src/CubeShelf.Desktop/Generated/

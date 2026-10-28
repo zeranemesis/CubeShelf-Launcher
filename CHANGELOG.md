@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.18.1-preview.5 — Bip visuel sur PC, non publiée
+
+- Bulle PC minimale après le choix : « Je réfléchis… », puis texte seul à hauteur ajustée. Clic sur la réponse pour ajouter une précision et relancer le même type d’aide ; options et sources accessibles au clic droit sur la bulle.
+- Recherche affinée par les précisions du joueur, jusqu’à quatre pages candidates par site et ajout de Wikibooks aux sources publiques.
+
+- Un clic sur Bip propose Indice / Solution ; le choix capture le jeu et lance LFM3-VL-2B localement, sans saisie obligatoire. Modèle facultatif de 1,3 Go, vérifié et libéré après utilisation.
+- PC : recherche de guides sur StrategyWiki et MarioWiki, filtrage par jeu et scène, sources consultables dans la bulle. Seuls le nom du jeu et les mots-clés textuels sont transmis ; les images restent locales.
+- Superposition PC limitée aux jeux suivis au premier plan, positionnée dans leur fenêtre ; masquage lorsqu’on passe à une autre application, puis réouverture de la réponse conservée au clic sur Bip.
+- Correction du clic sur Bip : l’activation du compagnon conserve la fenêtre du jeu comme cible et ouvre les deux choix ; le bouton peut prendre le focus au clic sans le voler à son apparition.
+- PC : déplacement de Bip en maintenant puis glissant, distinction du clic et du glissement, position relative conservée pendant la session de l’application et placement de l’aide selon l’espace disponible.
+- Bulle PC unifiée, choix Indice / Solution centrés et alignés, réduction discrète et contrôle du rendu aux largeurs normale et étroite.
+- Correction de la réouverture après changement de fenêtre : une bulle cachée est de nouveau affichée, sans perdre la réponse ni laisser un ancien événement de fermeture effacer la nouvelle fenêtre.
+- Réponse directe sans introduction ni commentaire technique ; sources, voix et précisions repliées derrière Options. Clic droit sur Bip → Masquer Bip, restauration par Ctrl+Maj+H ou nouvelle session.
+- Android : infrastructure de capture ajoutée, versionCode 49. Réponse visuelle complète sur téléphone, recherche web et masquage hors jeu restent à valider ou terminer ; priorité actuelle à Windows.
+
+## 0.18.1-preview.4 — Bulle simplifiée, non publiée
+
+- Bulle arrondie avec une pointe vers Bip, deux choix directs Indice / Solution, boutons toujours accessibles sous la réponse et réduction immédiate.
+- Précisions vocales ou écrites et préparation du modèle regroupées dans un volet secondaire ; suppression du sélecteur à trois niveaux et du bouton d’envoi distinct.
+- L’interface indique explicitement l’absence d’analyse visuelle dans cette version. Les deux choix utilisent encore la situation fournie par le joueur ; aucun accès à l’écran n’est prétendu.
+- Android versionCode 48 ; identité, signature et données conservées.
+
+## 0.18.1-preview.3 — Compagnon en surimpression, non publiée
+
+- Bip, petit compagnon illustré avec expressions d’écoute, de réflexion et de parole ; mouvements doux à la demande, arrêt au repos et respect de la réduction des animations.
+- Bulle compacte au-dessus du jeu, sans page séparée : trois appuis ou appui long sur Android, clic ou Ctrl+Maj+H sur Windows. Réduire laisse le compagnon visible.
+- Dictée et lecture françaises locales facultatives, uniquement sur demande. Android nécessite une reconnaissance embarquée Android 12+ et une voix hors ligne ; Windows utilise les composants vocaux installés. Le mode écrit reste accessible.
+- Android versionCode 47. Tests de cycle de vie, d’annulation et de présentation ; reconnaissance et lecture audio réelles encore à vérifier sur les appareils cibles.
+
+## 0.18.1-preview.2 — Aide locale LFM3, non publiée
+
+- Assistant LFM3-1.7B Q4_K_M intégré à Windows et Android, modèle facultatif téléchargé et vérifié séparément (1,1 Go), traitement local des questions, indices progressifs et annulation.
+- Android : bouton d’aide commun aux jeux lancés par DecompShelf, trois appuis ou un appui long, autorisation de superposition explicite et processus privé pour l’assistant. Le retour à la bibliothèque et la notification permettent de masquer le bouton.
+- Windows : bouton au premier plan pendant les sessions, raccourci Ctrl+Maj+H, accès par F1 et menu du jeu Big Picture. Le plein écran exclusif peut masquer la fenêtre.
+- Quelques repères du manuel Nintendo pour Super Mario 64 ; aucune soluce exhaustive. L’assistant ne voit pas le jeu et ne le met pas automatiquement en pause. Poids et contexte sont libérés après chaque réponse.
+- Android versionCode 46 ; identifiant et clé de signature conservés. Tests de contrôle du modèle et des gestes, génération réelle sur Windows et dans le panneau superposé Android 11 virtuel x86-64. Validation sur téléphone physique encore nécessaire.
+
 ## 0.18.1-preview.1 — Super Mario 64 intégré, non publiée
 
 - Android ARM64 : moteur Ghostship 3.0.0 embarqué dans DecompShelf ; plus d’APK Super Mario 64 séparé à télécharger ou installer.

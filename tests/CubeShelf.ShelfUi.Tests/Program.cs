@@ -96,6 +96,7 @@ try
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
     typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
     window.Width=1440;window.Height=1000;window.Show();
+    GameHelpChecks.Run(window);
     Avalonia.Threading.Dispatcher.UIThread.RunJobs();
     AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
     var transition=window.FindControl<ShelfTransitionControl>("ShelfTransition")!;

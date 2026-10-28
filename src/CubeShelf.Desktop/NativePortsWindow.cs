@@ -11,6 +11,7 @@ namespace CubeShelf.Desktop;
 
 public sealed class NativePortsWindow : Window
 {
+    public event Action<NativePort>? LaunchRequested;
     private readonly ShelfProduct _product;
     private readonly NativePortLibrary _library;
     private readonly IReadOnlyList<NativePort> _ports;
@@ -80,7 +81,7 @@ public sealed class NativePortsWindow : Window
         _releases.Click += (_, _) => OpenUrl(_selected?.ReleaseUrl.Length > 0 ? _selected.ReleaseUrl : _selected?.Homepage + "/releases");
         _configure.Click += async (_, _) => await ConfigureAsync(false);
         _macApp.Click += async (_, _) => await ConfigureAsync(true);
-        _launch.Click += (_, _) => Run(() => { if (_selected is { } port) { _library.Launch(port); _status.Text = "Programme démarré. La préparation des fichiers se fait dans le port."; } });
+        _launch.Click += (_, _) => Run(() => { if (_selected is { } port) { if (LaunchRequested is { } launch) launch(port); else _library.Launch(port); _status.Text = "Programme démarré. La préparation des fichiers se fait dans le port."; } });
         _install.Click += async (_, _) => await InstallAsync();
         _cancel.Click += (_, _) => _installation?.Cancel();
         _folder.Click += (_, _) => Run(() => { if (_downloadDirectory is { } directory) new ProcessLauncher().OpenDirectory(directory); });

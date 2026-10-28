@@ -10,9 +10,22 @@ def verify(path, abi):
         names = set(apk.namelist())
         assert apk.testzip() is None
         assert not any(n.lower().endswith((".z64", ".n64", ".v64", ".apk")) for n in names)
+        assert not any(n.lower().endswith(".gguf") for n in names), "Optional LFM3 weights must not be in the APK"
+        helper = apk.read(f"lib/{abi}/libdecompshelf_ai.so")
+        assert b"ds_ai_generate" in helper, "Local inference bridge missing"
+        assert "assets/assistance/licenses/LFM-Open-License-1.0.txt" in names
+        assert "assets/assistance/licenses/llama.cpp-LICENSE.txt" in names
+        assert helper[:6] == b"\x7fELF\x02\x01"
+        assert struct.unpack_from("<H", helper, 18)[0] == (183 if abi == "arm64-v8a" else 62)
+        start = struct.unpack_from("<Q", helper, 32)[0]
+        size, count = struct.unpack_from("<HH", helper, 54)
+        for i in range(count):
+            if struct.unpack_from("<I", helper, start + size * i)[0] == 1:
+                assert struct.unpack_from("<Q", helper, start + size * i + 48)[0] >= 16384, "Assistant: 16 KB pages"
         dex = b"".join(apk.read(n) for n in names if n.endswith(".dex"))
         for name in (b"Ldev/net64/ghostship/ExtractionService;", b"Ldev/net64/ghostship/MainActivity;",
-                     b"Lio/decompshelf/sdl2/SDLActivity;", b"Lorg/libsdl/app/SDLActivity;"):
+                     b"Lio/decompshelf/sdl2/SDLActivity;", b"Lorg/libsdl/app/SDLActivity;",
+                     b"Lio/decompshelf/GameHelpOverlay;", b"Lio/decompshelf/GameHelpActivity;"):
             assert name in dex, name
         if abi != "arm64-v8a":
             assert not any(n.endswith("/libghostship.so") for n in names)
