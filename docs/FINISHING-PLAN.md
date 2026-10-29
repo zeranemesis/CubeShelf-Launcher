@@ -1,90 +1,54 @@
-# DecompShelf — plan de finition
+# DecompShelf — état de la finition
 
-État examiné le 29 octobre 2026. Passe de finition en cours sur **0.19.0-rc.1**, Android code **50**. Bip est exclu de cette passe. Les cases non cochées ne sont pas des validations déjà réalisées.
+Candidate : **0.19.0-rc.1**, Android code **50**. Périmètre confirmé : bureau Windows, Big Picture, catalogue Android et distribution ; **Bip reste inchangé et hors de cette passe**.
 
-Les six suites locales cœur, archives, ports natifs, interface, mobile et mises à jour passent. Interface/mobile repassées après les dernières corrections. Publication Windows x64 réussie ; campagne GitHub et validation des paquets encore à consigner. La version reste candidate : téléphone, manette physique et parcours de jeu réels non qualifiés.
+Les résultats détaillés et les liens de contrôle sont dans [le rapport de validation](VALIDATION-0.19.0-rc.1.md). Les cases non cochées restent des limites, pas des essais réussis.
 
-## Ce que « fini » doit signifier
+## Consolidation et navigation
 
-Un nouvel utilisateur installe une version clairement identifiée, choisit sa console, installe un port compatible, fournit ses propres fichiers, joue, retrouve sa sauvegarde et met le launcher à jour sans perdre son profil. Il peut effectuer ce parcours au clavier/souris, à la manette en Big Picture, ou au tactile sur Android, selon les fonctions annoncées pour chaque appareil.
+- [x] Sources et ressources utiles regroupées dans des commits poussés ; outils personnels et fichiers temporaires exclus du dépôt.
+- [x] Numéro de version central et code Android incrémenté ; identités techniques et profil existant conservés.
+- [x] Accueil par console à chaque ouverture, photos au bureau et carrousel 3D stylisé en Big Picture.
+- [x] Menu gauche conservé, défilant en petite hauteur ; Bibliothèque, Consoles, Téléchargements et Paramètres couverts par les tests.
+- [x] Retour des jeux aux consoles par bouton, B et Échap, avec sélection conservée ; F11 fonctionne depuis le carrousel.
+- [x] Tri, proportions des jaquettes, logos dans les sélecteurs et l’en-tête ; accueil français/anglais et thèmes clair/sombre vérifiés automatiquement.
+- [ ] Dernier parcours manuel complet à la souris et au clavier, à toutes les résolutions de référence. La session Windows s’est verrouillée pendant la passe complémentaire : paramètres et F11 vérifiés, test de jeu supplémentaire non exécuté.
+- [ ] Essai de la navigation et de l’inversion stick/croix sur une manette physique.
 
-Le launcher peut être stable avec des ports tiers expérimentaux, à condition que leur état et leur compatibilité soient explicites. La présence dans un catalogue ne doit jamais être présentée comme une preuve de jouabilité.
+## Catalogues et fiabilité
 
-## 1. Figer et consolider la version à terminer — priorité bloquante
+- [x] 30 catalogues PC, regroupement des variantes sur une carte, sources épinglées et état expérimental conservés ; Melee-3D exclu conformément à la décision de l’utilisateur.
+- [x] Catalogue Android distinct limité aux six plateformes ayant un moteur ou un APK Android identifié.
+- [x] Installation automatique uniquement avec paquet vérifiable compatible ; sinon association d’un programme avec instructions explicites.
+- [x] Contrôles automatisés : téléchargements, pause/reprise, annulation, archives invalides, empreintes, compatibilité et préservation des installations.
+- [x] 259 jaquettes exactes de l’extension, 30 photos de consoles et logos locaux avec provenance ; 19 correspondances de titres supplémentaires contrôlées manuellement.
+- [ ] 54 jaquettes exactes encore absentes, notamment Arcade, prototypes et éditions sans image trouvée. Aucun autre titre substitué.
+- [ ] Affinage artistique des silhouettes 3D simplifiées ; les modèles sont annoncés comme stylisés.
+- [ ] Parcours réels d’installation, préparation, jeu, sauvegarde et second lancement sur un ensemble représentatif de ports. La présence dans le catalogue n’est pas une preuve de jouabilité.
 
-- [x] Conserver les choix acceptés : accueil par console à chaque lancement ; photos dans les cases du bureau ; menu gauche accessible ; carrousel 3D en Big Picture ; retour aux consoles par bouton, B et Échap ; ports natifs uniquement ; catalogue Android distinct.
-- [ ] Relire et organiser les modifications encore locales, séparer les sources et ressources utiles des fichiers temporaires et outils personnels avant les commits.
-- [ ] Établir une version de référence unique à tester. Éviter que plusieurs dossiers de builds portant le même numéro soient confondus avec la dernière application.
-- [x] Conserver les identités techniques et emplacements du profil existant pendant le renommage visuel en DecompShelf.
+## Fluidité
 
-Terminé quand les sources de la version candidate sont identifiables et que son contenu est fixé.
+- [x] Rendu à la demande, images bornées, absence de décodage supplémentaire à la recherche à chaud et libération des ressources contrôlés.
+- [x] Benchmark reproductible hors écran et résultats bruts enregistrés dans le dépôt : médianes optimisées de 11,6 à 14,6 ms pour les trois formats historiques mesurés.
+- [ ] Mesures complètes de démarrage à froid, de consommation au repos et de présentation GPU sur les machines de référence ; aucune promesse universelle de 60/120 FPS.
 
-## 2. Valider le parcours de jeu et la fiabilité du catalogue — priorité bloquante
+## Android : essais physiques en attente
 
-- [ ] Pour les jeux présentés comme prêts : vérifier paquet disponible, système, architecture, prérequis graphiques, révision des données attendues et méthode de préparation.
-- [ ] Afficher des états compréhensibles : prêt, à installer, fichiers du jeu manquants, incompatible, expérimental, compilation nécessaire.
-- [x] Sur Windows, ne pas proposer l'installation d'un paquet réservé à Linux ou macOS ; conserver l'information sur les autres versions sans confusion.
-- [ ] Valider sur un ensemble représentatif de ports les parcours : installation neuve, choix des fichiers personnels, lancement, manette, sauvegarde, fermeture et second lancement.
-- [ ] Vérifier pause/reprise des téléchargements, annulation, coupure réseau, espace disque insuffisant, archive invalide, mise à jour du port et préservation des données.
-- [ ] Consigner pour chaque port réellement essayé la version, l'appareil et le résultat. Les autres restent signalés comme non testés.
-- [x] Conserver l'absence de doublons et la distinction entre variantes d'un jeu. Melee-3D reste exclu conformément à la décision de l'utilisateur.
+- [x] Tests du catalogue, de l’intégrité des APK, de l’installation externe, des annulations et des mises à jour ; builds signés ARM64 et x86-64 réussis.
+- [x] Confirmations système nécessaires conservées et différences entre moteurs intégrés et applications séparées documentées.
+- [ ] Reprendre les essais sur le téléphone seulement lorsque l’utilisateur le déclare disponible.
+- [ ] Installation neuve et mise à niveau conservant profil et sauvegardes ; autorisations, portrait/paysage, tactile, manette, arrière-plan et retour du jeu.
+- [ ] Jouabilité des nouveaux ports et refus Android/ARM64/Vulkan sur les appareils concernés. Un APK vérifié ne suffit pas.
 
-Terminé quand les états affichés correspondent aux capacités vérifiées et que les jeux de référence passent le parcours complet. L'exhaustivité mondiale de tous les ports n'est pas un critère de sortie.
+## Distribution
 
-## 3. Terminer l'interface et mesurer sa fluidité — priorité haute
+- [x] README, démarrage, commandes Big Picture, catalogues, crédits, mises à jour et documentation Android actualisés.
+- [x] Six suites locales et validation GitHub Windows/Linux réussies sur la révision applicative `0602e32`.
+- [x] Configuration de signature vérifiée : Android avec clé de développement persistante ; aucun certificat Authenticode de distribution annoncé pour Windows.
+- [x] Premier installateur candidat : mise à niveau depuis 0.18.0, contrôle des fichiers installés, désinstallation et conservation du profil réussis sur runner jetable.
+- [ ] Répétition du contrôle sur les paquets finaux Windows, six builds PC complets et vérification finale des signatures/manifestes/empreintes avant publication.
+- [ ] Publication de la candidate avec notes de version et contrôles des fichiers mis à disposition.
 
-- [ ] Faire une passe manuelle sur bureau et Big Picture : démarrage, consoles, jeux, retours, menus latéraux, paramètres et téléchargements.
-- [ ] Vérifier chaque commande à la manette physique, y compris l'inversion stick/croix, les menus et l'annulation d'un lancement.
-- [ ] Vérifier français/anglais sans mélange, libellés exacts des raccourcis, contraste, focus visible et textes longs.
-- [ ] Contrôler petites fenêtres, 1080p, écran haute définition et mise à l'échelle Windows ; garantir l'accès aux menus et actions même lorsque la hauteur manque.
-- [ ] Compléter les jaquettes manquantes à partir d'une source exacte ; uniformiser le cadrage des photos et logos tout en conservant leurs proportions et crédits.
-- [ ] Affiner les modèles 3D simplifiés de Big Picture après validation du parcours principal.
-- [ ] Mesurer le chargement à froid, les changements rapides de console, le défilement, la mémoire et l'activité au repos. Vérifier la présentation réelle à l'écran, pas seulement le rendu hors écran.
+## Condition de sortie
 
-Terminé quand les parcours ne se bloquent pas et que les mesures sont reproductibles sur les appareils de référence. Aucun engagement universel de 60/120 FPS sans mesure correspondante.
-
-## 4. Valider Android sur un téléphone réel — priorité bloquante pour une version Android annoncée stable
-
-- [ ] Reprendre les essais physiques seulement lorsque l'utilisateur annonce son téléphone disponible.
-- [ ] Tester installation neuve et mise à jour conservant profil, préférences, données et sauvegardes.
-- [ ] Tester portrait/paysage, zones système, tactile, manette, passage en arrière-plan et retour du jeu.
-- [ ] Valider les ports intégrés et les nouveaux APK externes : téléchargement, vérification, autorisations, installation, lancement et retour à DecompShelf.
-- [ ] Vérifier les refus de compatibilité Android/ARM64/Vulkan sur les appareils concernés. Un APK vérifié ne suffit pas à qualifier une partie comme fonctionnelle.
-- [ ] Garder les confirmations système nécessaires et expliquer clairement quand un port s'installe comme application séparée.
-
-Terminé quand la version ARM64 signée destinée à la distribution passe ces essais, avec une liste claire des appareils et limites validés.
-
-## 5. Bip — hors périmètre à la demande de l’utilisateur
-
-- [ ] Sur PC, essayer l'analyse au-dessus de vrais jeux : menu, exploration, énigme et combat ; comparer plusieurs demandes Indice/Solution avec des guides pertinents.
-- [ ] Vérifier la concision, le niveau de spoiler, les précisions ajoutées et l'absence d'affirmations inventées lorsque l'image ou les guides ne suffisent pas.
-- [ ] Vérifier le téléchargement du modèle, le temps de réponse, la mémoire, l'annulation et la libération effective des ressources.
-- [ ] Tester déplacement, clic, clic droit, masquage, changement de fenêtre et retour répété à la réponse. Documenter le cas du plein écran exclusif.
-- [ ] Sur Android, terminer le raccordement de la recherche web et du masquage hors jeu ; valider une réponse visuelle complète sur le téléphone.
-- [ ] Vérifier que les captures restent locales, que les requêtes textuelles web sont expliquées et que les autorisations nécessaires sont gérées correctement.
-- [ ] Tester voix et audio réels si ces fonctions sont proposées dans la version candidate.
-
-Terminé quand les fonctions annoncées sont démontrées sur leur appareil cible. Sinon Bip doit rester explicitement en préversion ; il ne doit pas être annoncé comme finalisé sur Android.
-
-## 6. Préparer une distribution maintenable — priorité bloquante avant publication
-
-- [ ] Mettre README, aide de démarrage, captures, inventaire et documentation Android à jour : certains passages décrivent encore CubeShelf limité à GameCube ou d'anciennes versions.
-- [ ] Exécuter les suites pertinentes sur la même révision : cœur, installation/archives, ports natifs, interface, assistance, mobile et mises à jour.
-- [ ] Vérifier les builds GitHub Actions depuis un checkout propre et la présence des photos, logos, jaquettes, licences et composants natifs dans les paquets.
-- [ ] Tester l'installateur Windows et sa mise à jour, ainsi que l'APK Android avec une signature persistante compatible. Ne pas assimiler un APK local de débogage à une distribution stable.
-- [ ] Vérifier la configuration de signature réellement disponible avant d'annoncer une signature Windows ou Android de distribution.
-- [x] Choisir les nouveaux numéros de version et incrémenter le code Android : VERSION 0.19.0-rc.1 et ApplicationVersion 50.
-- [ ] Vérifier manifestes et empreintes publiés, détection de la nouvelle version, remplacement de l'ancienne installation et conservation du profil.
-- [ ] Tester une dernière version candidate sans nouvelle fonction ajoutée, corriger les problèmes bloquants, puis préparer commit, notes de version et release.
-
-Terminé quand une installation et une mise à jour à partir des vrais paquets distribuables passent les essais de bout en bout.
-
-## Ordre de travail conseillé
-
-1. Consolider la version candidate et fiabiliser un petit ensemble de jeux de référence.
-2. Terminer les parcours et contrôles manuels Windows/Big Picture.
-3. Effectuer la validation Android lorsque le téléphone est disponible, et terminer Bip selon les capacités annoncées.
-4. Achever les ressources visuelles, la documentation et les paquets.
-5. Faire une dernière campagne sur la version candidate, puis publier.
-
-L'ajout de nouvelles plateformes et de nouveaux jeux peut attendre cette première version stabilisée. Ce plan repose sur l'examen des sources et les validations déjà consignées ; aucune nouvelle campagne de jeu réelle n'a été effectuée pour le rédiger.
+La candidate peut servir aux essais après contrôle de ses paquets. Elle ne remplace pas automatiquement la stable 0.18.0. Une qualification stable nécessite les essais physiques et les parcours de jeu ci-dessus ; les ports tiers expérimentaux et les jaquettes manquantes doivent rester signalés. Aucun travail supplémentaire sur Bip n’est inclus dans cette liste.

@@ -2,10 +2,10 @@
 
 Le bouton principal de chaque jaquette donne accès directement au jeu :
 
-- **Configurer et jouer** : choisir son image de disque. CubeShelf mémorise ce choix,
+- **Configurer et jouer** : choisir son image de disque. DecompShelf mémorise ce choix,
   installe les composants manquants et lance le jeu lorsqu’il est prêt.
 - **Installer et jouer** : le disque est déjà connu ; seule l’installation manque.
-- **Préparer et jouer** : le moteur est installé ; CubeShelf prépare les données
+- **Préparer et jouer** : le moteur est installé ; DecompShelf prépare les données
   nécessaires, puis démarre le jeu sans autre clic.
 - **Jouer** : tout est prêt, le jeu démarre directement sans attendre une recherche
   de mise à jour. **Arrêter** remplace ce bouton pendant une partie.
@@ -22,7 +22,7 @@ restent gérables dans leur onglet. Une annulation ou un échec dans la file emp
 également le démarrage automatique.
 
 Les moteurs qui lisent ou préparent eux-mêmes leur disque gardent ce fonctionnement :
-CubeShelf ne leur ajoute pas d’extraction. Pour un RVZ nécessitant une conversion,
+DecompShelf ne leur ajoute pas d’extraction. Pour un RVZ nécessitant une conversion,
 DolphinTool est récupéré automatiquement sur les plateformes où cette acquisition
 est disponible. Ailleurs, un message indique ce qu’il faut installer. Une variante
 qui nécessite le patch d’un mod doit toujours disposer de ce mod dans l’onglet Mods.
@@ -31,20 +31,24 @@ Un jeu personnalisé sans source d’installation demande une fois son programme
 Seuls les fichiers de jeu fournis par l’utilisateur sont utilisés ; le launcher
 ne récupère pas de disque de jeu.
 
+## Ports natifs des autres catalogues
+
+Le bouton **Installer le port** apparaît lorsqu’un paquet vérifiable correspond à ce PC. Sans paquet compatible, **Configurer le port** ouvre le parcours d’association d’un programme installé en suivant les instructions du projet. La disponibilité d’une release et son état expérimental sont séparés de sa compatibilité et de sa jouabilité. Plusieurs versions d’un titre restent sur la même carte.
+
 ## Big Picture
 
 Le bouton **Big Picture** de la barre latérale ou **F11** ouvre une bibliothèque
-plein écran avec une étagère de boîtiers GameCube en 3D. La présentation s’inspire
+plein écran. À chaque ouverture, le carrousel des consoles permet de choisir sa plateforme avant les jeux. Le bureau conserve une grille de photos avec son menu gauche ; Big Picture utilise des consoles 3D stylisées, triables par nom, marque, année ou nombre de jeux. Les formats GameCube, Wii, Switch et Nintendo 64 suivent leurs supports d’origine ; les autres jaquettes conservent leurs proportions. La présentation s’inspire
 de [Sly Launcher](https://github.com/ioncodes/sly) : fond clair à courbes discrètes,
 jeu sélectionné au premier plan, voisins inclinés et fiche compacte à droite.
-Le rendu utilise le composant natif de CubeShelf, avec ses jaquettes avant,
+Le rendu utilise le composant natif de DecompShelf, avec ses jaquettes avant,
 arrière et tranche ; aucun code ni visuel de Sly n’est embarqué.
-Les boîtiers de l’étagère utilisent le modèle fourni
+Les boîtiers GameCube de l’étagère utilisent le modèle fourni
 `Assets/Models/Jaquette_GameCube_3D_vierge.glb`, embarqué dans l’application.
 Sa coque, ses cadres, ses charnières, ses butées et ses bandes de film sont
 conservés. Les trois inserts reçoivent les jaquettes avant, arrière et tranche
 du jeu ; les textures vierges du fichier sont remplacées au rendu. L’orientation
-et les proportions du modèle sont adaptées à la caméra de CubeShelf.
+et les proportions du modèle sont adaptées à la caméra de DecompShelf.
 Le modèle est chargé une fois et partagé entre les boîtiers. Son rendu reste
 natif, avec éclairage simplifié et ombres de contact ; il ne nécessite pas de
 navigateur. Le lecteur prend en charge cet export précis, pas l’import de GLB
@@ -56,19 +60,18 @@ Le jeu choisi utilise le même lancement
 automatique que la bibliothèque classique. Les options avancées restent dépliées
 par défaut sur sa fiche.
 
-- **Gauche / droite** : changer de jeu ; **haut / bas** : choisir une action.
-- **Entrée** : activer l’action sélectionnée ; **Échap / F11** : revenir au bureau.
+- **Gauche / droite** : changer de jeu ; **haut / bas** : changer de plateforme.
+- **Entrée** : activer l’action sélectionnée ; **Échap** : revenir aux consoles depuis les jeux ; **F11** : revenir au bureau, y compris depuis le carrousel des consoles.
+- **F10** : ouvrir le menu depuis les jeux ; **Tab** : parcourir les actions.
 - **F** : retourner le boîtier ; **V** : alterner les vues **Ruban / Rangée**.
 - Souris : sélectionner un voisin, retourner le boîtier sélectionné, parcourir
   l’étagère à la molette, ou utiliser les boutons de navigation.
-- Sous Windows, une manette compatible **XInput** peut utiliser la croix ou le
-  stick gauche, **A** pour valider, **X** pour retourner le boîtier, **Y** pour
-  changer de vue et **B** pour revenir au bureau.
+- Sous Windows, une manette compatible **XInput** utilise le stick pour les jeux et plateformes, la croix pour les menus, **A** pour valider, **X** pour retourner le boîtier, **Y** pour changer de vue et **B** pour revenir aux consoles depuis les jeux. **START** ouvre le menu. Stick et croix peuvent être inversés dans les paramètres manette.
 
 L’étagère garde au plus sept boîtiers chargés et libère leurs images en quittant
 Big Picture. La vue vide conserve le bouton de retour au bureau.
 
-La manette est lue uniquement lorsque CubeShelf ou un de ses dialogues Big Picture
+La manette est lue uniquement lorsque DecompShelf ou un de ses dialogues Big Picture
 a le focus, hors des parties. Une pression maintenue ne déclenche pas plusieurs lancements.
 La fenêtre retrouve son état et ses dimensions précédents en quittant le mode ;
 le retour après une partie conserve le plein écran. La configuration initiale
@@ -116,7 +119,7 @@ avec leur jeu de base pour le classement par dernière partie. Les invitations
 réellement reçues d’amis apparaissent sur l’accueil et utilisent le même parcours
 de connexion que la page Amis. Aucun ami ou salon fictif n’est ajouté.
 
-Dans les pages et les dialogues de CubeShelf : haut/bas parcourt les commandes,
+Dans les pages et les dialogues de DecompShelf : haut/bas parcourt les commandes,
 gauche/droite modifie listes, choix et curseurs, A valide et B revient ou ferme
 le dialogue. A sur un champ texte ouvre le clavier à l’écran ; le bouton
 **Clavier** permet aussi de l’ouvrir. AZERTY, majuscules/minuscules, chiffres,
@@ -152,7 +155,7 @@ ont également un récapitulatif ; PartyBoard compare leurs disques et versions
 lors de la connexion, avant d’autoriser le lancement.
 
 L’état « joueurs prêts » vient de PartyBoard, après ses contrôles de compatibilité.
-CubeShelf n’invente aucun état de disponibilité et ne démarre pas automatiquement
+DecompShelf n’invente aucun état de disponibilité et ne démarre pas automatiquement
 une partie. Les aperçus du dialogue de vérification utilisent un salon d’exemple ;
 aucun salon n’a été créé pour les captures et aucune partie à deux PC n’a été validée.
 
