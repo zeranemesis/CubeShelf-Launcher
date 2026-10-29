@@ -8,7 +8,7 @@ Le workflow **Build portable desktop previews (manual)** se lance manuellement d
 | Linux avec glibc | x64, arm64 | TAR.GZ, exécutable `CubeShelf` |
 | macOS | Intel x64, Apple Silicon arm64 | TAR.GZ contenant `CubeShelf.app` |
 
-Les archives et leur SHA-256 se trouvent dans les artefacts du workflow pendant 14 jours. Ce workflow ne lance aucun test, n'exécute pas le launcher, ne publie aucune release et ne remplace pas le circuit de publication stable. Les cibles ARM peuvent être compilées depuis un runner d'une autre architecture : un build réussi ne constitue pas une validation sur appareil.
+Les archives et leur SHA-256 se trouvent dans les artefacts du workflow pendant 14 jours. Le job Windows x64 teste l’installation, la mise à niveau depuis 0.18.0 et la préservation du profil sur son runner jetable. Les suites fonctionnelles tournent dans le workflow de validation séparé ; les essais de jeu et de manette réels restent nécessaires. Ce workflow ne publie aucune release à lui seul. Les cibles ARM peuvent être compilées depuis un runner d'une autre architecture : un build réussi ne constitue pas une validation sur appareil.
 
 ## Utilisation
 

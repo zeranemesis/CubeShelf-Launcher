@@ -34,6 +34,11 @@ static class BigPictureControlsChecks
         Check(!window.FindControl<PlatformHomeControl>("PlatformHome")!.IsGrid &&
             window.FindControl<PlatformHomeControl>("PlatformHome")!.Background is Avalonia.Media.ISolidColorBrush { Color: var homeColor } && homeColor==Avalonia.Media.Color.Parse("#F5F0EE"),
             "Big Picture console carousel must use the game selection background.");
+        window.RaiseEvent(new KeyEventArgs { RoutedEvent=InputElement.KeyDownEvent,Key=Key.F11 });
+        Check(window.FindControl<Border>("DesktopSidebar")!.IsVisible,"F11 must leave the console carousel and return to desktop.");
+        window.RaiseEvent(new KeyEventArgs { RoutedEvent=InputElement.KeyDownEvent,Key=Key.F11 });
+        Check(window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible && !window.FindControl<Border>("DesktopSidebar")!.IsVisible,
+            "F11 must reopen Big Picture from desktop console home.");
         Save("startup-platforms.png");
         window.HandleBigPictureControllerInput(5);
         Check(!menu.IsVisible,"Confirming the current platform must open its catalogue.");

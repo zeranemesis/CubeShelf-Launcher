@@ -187,4 +187,3 @@ public sealed class PlatformHomeControl : UserControl
         "xbox"=>("Microsoft",2001),"xbox360"=>("Microsoft",2005),"neogeo"=>("SNK",1990),"cdi"=>("Philips",1991),
         _=>("Arcade",0) };
 }
-

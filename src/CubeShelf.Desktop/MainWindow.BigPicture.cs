@@ -260,6 +260,12 @@ public sealed partial class MainWindow
     {
         if(PlatformHome.IsVisible)
         {
+            if(args.Key==Key.F11)
+            {
+                if(_bigPictureActive)ExitBigPicture(this,new RoutedEventArgs());
+                else EnterBigPicture(this,new RoutedEventArgs());
+                args.Handled=true;return;
+            }
             if(PlatformHome.IsGrid)return;
             if(PlatformHome.SortHasFocus)return;
             if(args.Key is Key.Left or Key.Right)PlatformHome.Move(args.Key==Key.Left?-1:1);

@@ -49,6 +49,9 @@ def main():
         build = cache / ("windows-" + args.arch)
         output = ROOT / "src/CubeShelf.Desktop/Generated/Assistance" / args.arch
         options = ["-A", args.arch]
+        if args.arch == "ARM64":
+            # MSVC requires host probing; clang-cl supports a portable ARM64 cross-build.
+            options += ["-T", "ClangCL", "-DGGML_CPU_ARM_ARCH=armv8-a"]
     subprocess.run([cmake, "-S", str(ROOT / "native/assistance"), "-B", str(build),
                     "-DLLAMA_SOURCE=" + str(source), "-DCMAKE_BUILD_TYPE=Release", *options], check=True)
     subprocess.run([cmake, "--build", str(build), "--config", "Release", "--target", "decompshelf_ai", "-j", "4"], check=True)
