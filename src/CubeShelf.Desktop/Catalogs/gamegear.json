@@ -1,0 +1,20 @@
+[
+  {
+    "Id": "mstan-sonicblastggrecomp-sonic-blast",
+    "Title": "Sonic Blast",
+    "Project": "SonicBlastGGRecomp",
+    "Repository": "mstan/SonicBlastGGRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "87ff0697ef218bf68eced25b05c02c674cb3253f",
+    "ReadmeUrl": "https://github.com/mstan/SonicBlastGGRecomp/blob/87ff0697ef218bf68eced25b05c02c674cb3253f/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SonicBlastGGRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  }
+]

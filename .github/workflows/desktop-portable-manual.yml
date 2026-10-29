@@ -74,10 +74,11 @@ jobs:
         if: matrix.rid == 'win-x64'
         run: |
           $version = (Get-Content -LiteralPath VERSION -Raw).Trim()
-          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Installer VERSION must use MAJOR.MINOR.PATCH.' }
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$') { throw 'Invalid VERSION.' }
+          $numericVersion = $version.Split('-')[0]
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
             "/DMyAppVersion=$version" `
-            "/DMyAppNumericVersion=$version" `
+            "/DMyAppNumericVersion=$numericVersion" `
             "/DPublishDirectory=$((Resolve-Path -LiteralPath 'publish/${{ matrix.rid }}').Path)" `
             "/DInstallerOutputDirectory=$((Resolve-Path -LiteralPath 'dist/${{ matrix.rid }}').Path)" `
             installer/CubeShelf.iss
@@ -91,7 +92,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(cat VERSION)"
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid VERSION"; exit 1; }
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]] || { echo "Invalid VERSION"; exit 1; }
           mkdir -p AppDir/usr/bin
           cp -a publish/linux-x64/. AppDir/usr/bin/
           cp packaging/linux/AppRun AppDir/AppRun
@@ -104,6 +105,13 @@ jobs:
           chmod +x appimagetool
           APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 VERSION="$version" ./appimagetool AppDir dist/linux-x64/CubeShelf-linux-x64.AppImage
           (cd dist/linux-x64 && sha256sum CubeShelf-linux-x64.AppImage > CubeShelf-linux-x64.AppImage.sha256)
+      - name: Test installer upgrade and profile preservation
+        if: matrix.rid == 'win-x64'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          ./eng/Test-InstallerUpdate.ps1 -Installer dist/win-x64/CubeShelf-Setup-x64.exe -PublishDirectory publish/win-x64 -Version $version
       - uses: actions/upload-artifact@v4
         with:
           name: CubeShelf-${{ matrix.rid }}-portable-preview

@@ -35,6 +35,8 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         if(IsEmbedded(id)&&!AndroidSm64.EngineAvailable)return "Super Mario 64 intégré nécessite l’APK ARM64 de DecompShelf.";
         if((int)global::Android.OS.Build.VERSION.SdkInt<port.MinimumSdk)return "Version Android trop ancienne pour ce port.";
         if(!port.Abis.Intersect(global::Android.OS.Build.SupportedAbis??[]).Any())return "Architecture incompatible avec ce port Android.";
+        if(port.RequiresVulkan13&&!Context.PackageManager!.HasSystemFeature("android.hardware.vulkan.version",0x00403000))
+            return "Ce port nécessite un pilote Vulkan 1.3.";
         if(port.RequiresVulkan12&&!Context.PackageManager!.HasSystemFeature("android.hardware.vulkan.version",0x00402000))
             return "Ce port nécessite un pilote Vulkan 1.2.";
         if(port.RequiresGles3 && (Context.GetSystemService(Context.ActivityService) as ActivityManager)?.DeviceConfigurationInfo?.ReqGlEsVersion<0x30000)

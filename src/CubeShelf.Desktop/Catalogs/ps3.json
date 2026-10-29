@@ -1,0 +1,74 @@
+[
+  {
+    "Id": "gnome41-dbz-budokai-hd-dragon-ball-z-budokai-hd",
+    "Title": "Dragon Ball Z: Budokai HD",
+    "Project": "dbz-budokai-hd",
+    "Repository": "gnome41/dbz-budokai-hd",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "1b13a28a76c26797d6f860dd29d05215f3508cbe",
+    "ReadmeUrl": "https://github.com/gnome41/dbz-budokai-hd/blob/1b13a28a76c26797d6f860dd29d05215f3508cbe/README.md",
+    "ReleaseUrl": "https://github.com/gnome41/dbz-budokai-hd/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sp00nznet-gt5p-gran-turismo-5-prologue",
+    "Title": "Gran Turismo 5 Prologue",
+    "Project": "GT5P",
+    "Repository": "sp00nznet/GT5P",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "65c75d61ade58efb4f6af5f099c3b78b64c0a8e6",
+    "ReadmeUrl": "https://github.com/sp00nznet/GT5P/blob/65c75d61ade58efb4f6af5f099c3b78b64c0a8e6/README.md",
+    "ReleaseUrl": "https://github.com/sp00nznet/GT5P/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "yasindevs-imabikisou-pc-imabikisou",
+    "Title": "Imabikisou",
+    "Project": "imabikisou-pc",
+    "Repository": "yasindevs/imabikisou-pc",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "9cb011b0459c26c2921f43d6374d3e6069611756",
+    "ReadmeUrl": "https://github.com/yasindevs/imabikisou-pc/blob/9cb011b0459c26c2921f43d6374d3e6069611756/README.md",
+    "ReleaseUrl": "https://github.com/yasindevs/imabikisou-pc/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sp00nznet-twistedmetal-twisted-metal",
+    "Title": "Twisted Metal",
+    "Project": "twistedmetal",
+    "Repository": "sp00nznet/twistedmetal",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "23afb436f3a955cdab5fe342d36076b4be0ab2bf",
+    "ReadmeUrl": "https://github.com/sp00nznet/twistedmetal/blob/23afb436f3a955cdab5fe342d36076b4be0ab2bf/README.md",
+    "ReleaseUrl": "https://github.com/sp00nznet/twistedmetal/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  }
+]

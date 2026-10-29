@@ -27,6 +27,8 @@ public sealed partial class MainWindow
     }
 
     private string _activeShelfConsole = "gamecube";
+    private static readonly ShelfProduct[] ShelfProducts = ShelfProduct.All.Where(product =>
+        File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json"))).ToArray();
     private bool _consoleShelfReady;
     private readonly Dictionary<string, NativePort> _nativeShelfPorts = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string,string> _shelfMediaArtwork = new();
@@ -92,7 +94,7 @@ public sealed partial class MainWindow
         var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         var games = JsonSerializer.Deserialize<List<GameCatalogEntry>>(
             File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "games.json")), options) ?? [];
-        foreach (var console in new[] { "gamecube", "wii", "switch", "n64" })
+        foreach (var console in ShelfProducts.Select(product => product.Id))
         {
             foreach (var port in NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", console + ".json")))
             {
@@ -101,7 +103,7 @@ public sealed partial class MainWindow
                 games.Add(new GameCatalogEntry
                 {
                     Id = id, Title = port.Title, ShelfConsole = console, NativePortId = port.Id,
-                    RuntimeOwnsSetup = true, RuntimeName = port.Project, Genre = "Port natif",
+                    RuntimeOwnsSetup = true, RuntimeName = port.Project, Genre = port.Status.StartsWith("Expérimental", StringComparison.Ordinal) ? "Port natif · expérimental" : "Port natif",
                     Region = string.Join(", ", port.Platforms), Players = port.Status,
                     Description = port.Notes + "\nProjet : " + port.Repository,
                     DataPreparation = GameDataPreparation.Runtime, HomepageUrl = port.Homepage,
@@ -121,7 +123,7 @@ public sealed partial class MainWindow
                 if (existing is not null) game.Covers = existing.Select(cover => new GameCover
                     { Label = cover.Label, Front = cover.Front, Back = cover.Back, Spine = cover.Spine, Right = cover.Right, Top = cover.Top, Bottom = cover.Bottom }).ToList();
                 else if (artwork is not null && artwork.Front.Length > 0) game.Covers = [new GameCover
-                    { Label = (artwork.Console == "n64" ? "Nintendo 64 · " : "GameTDB · ") + artwork.GameTdbId, Front = artwork.Front, Back = artwork.Back, Spine = artwork.Spine, Right = artwork.Right, Top = artwork.Top, Bottom = artwork.Bottom }];
+                    { Label = (artwork.Source.Length > 0 ? artwork.Source + " · " : artwork.Console == "n64" ? "Nintendo 64 · " : "GameTDB · ") + artwork.GameTdbId, Front = artwork.Front, Back = artwork.Back, Spine = artwork.Spine, Right = artwork.Right, Top = artwork.Top, Bottom = artwork.Bottom }];
             }
         }
         Directory.CreateDirectory(paths.CacheDirectory);
@@ -134,6 +136,7 @@ public sealed partial class MainWindow
     {
         public string Console { get; set; } = "";
         public string Title { get; set; } = "";
+        public string Source { get; set; } = "";
         public string GameTdbId { get; set; } = "";
         public string Front { get; set; } = "";
         public string Back { get; set; } = "";
@@ -162,9 +165,29 @@ public sealed partial class MainWindow
         if (Program.Product.Id == "gamecube" && File.Exists(file))
         {
             var saved = File.ReadAllText(file).Trim();
-            if (saved is "gamecube" or "wii" or "switch" or "n64") _activeShelfConsole = saved;
+            if (ShelfProducts.Any(product => product.Id == saved)) _activeShelfConsole = saved;
         }
-        ConsoleShelfPicker.SelectedIndex = _activeShelfConsole switch { "wii" => 1, "switch" => 2, "n64" => 3, _ => 0 };
+        foreach (var picker in new[] { ConsoleShelfPicker, BigPictureConsoleShelfPicker })
+        {
+            StackPanel Row(ShelfProduct product)
+            {
+                var row=new Avalonia.Controls.StackPanel { Orientation=Avalonia.Layout.Orientation.Horizontal,Spacing=8 };
+                row.Children.Add(new Controls.ConsoleBrandMark { Platform=product.Id,Width=34,Height=26,VerticalAlignment=Avalonia.Layout.VerticalAlignment.Center });
+                var label=new TextBlock { Text=product.Console,FontSize=14,VerticalAlignment=Avalonia.Layout.VerticalAlignment.Center };
+                label.Bind(TextBlock.ForegroundProperty,new Avalonia.Data.Binding("Foreground") { Source=picker });
+                row.Children.Add(label);
+                return row;
+            }
+            picker.ItemsSource = ShelfProducts.Select(product =>
+            {
+                var item=new ComboBoxItem { Content=Row(product),Tag=product.Id,MinHeight=38 };
+                Avalonia.Automation.AutomationProperties.SetName(item,product.Console);
+                return item;
+            }).ToArray();
+            picker.SelectionBoxItemTemplate=new Avalonia.Controls.Templates.FuncDataTemplate<object>((_,_)=>
+                Row(ShelfProducts[Math.Clamp(picker.SelectedIndex,0,ShelfProducts.Length-1)]));
+        }
+        ConsoleShelfPicker.SelectedIndex = ConsoleIndex(_activeShelfConsole);
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
         RefreshShelfBranding();
         _consoleShelfReady = true;
@@ -187,7 +210,7 @@ public sealed partial class MainWindow
         ShelfTransition.Capture(ViewHost,ShelfProduct.Resolve(console).Console,direction,_preferences.ReduceShelfMotion);
         _activeShelfConsole = console;
         _consoleShelfReady = false;
-        ConsoleShelfPicker.SelectedIndex = console switch { "wii" => 1, "switch" => 2, "n64" => 3, _ => 0 };
+        ConsoleShelfPicker.SelectedIndex = ConsoleIndex(console);
         BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
         _consoleShelfReady = true;
         Directory.CreateDirectory(_paths.ConfigurationDirectory);
@@ -214,11 +237,12 @@ public sealed partial class MainWindow
     private void RefreshShelfBranding()
     {
         Title=Program.DisplayName+" · "+ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarShelfSubtitle.Text = ShelfProduct.Resolve(_activeShelfConsole).Console;
         SidebarConsoleLogo.Platform=BigPictureConsoleLogo.Platform=_activeShelfConsole;
     }
 
     private bool _changingShelf;
-    private static int ConsoleIndex(string console) => console switch { "wii"=>1,"switch"=>2,"n64"=>3,_=>0 };
+    private static int ConsoleIndex(string console) => Array.FindIndex(ShelfProducts, product => product.Id == console);
 
     private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false)
     {

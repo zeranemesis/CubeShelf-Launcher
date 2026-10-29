@@ -7,7 +7,7 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
-public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64 }
+public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64, OriginalBox }
 
 /// <summary>
 /// Portable console case renderer with a real projected cuboid, textured
@@ -17,7 +17,7 @@ public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64 }
 public sealed partial class GameCaseControl : Control, IDisposable
 {
     private bool PortraitNintendo64 => CaseFormat == GameCaseFormat.Nintendo64 && _front is { } front && front.PixelSize.Height > front.PixelSize.Width;
-    private double CaseWidth => CaseFormat switch { GameCaseFormat.Nintendo64 => PortraitNintendo64 ? 2.08 : 2.92, GameCaseFormat.Switch => 1.79, _ => 2.08 };
+    private double CaseWidth => CaseFormat switch { GameCaseFormat.OriginalBox => 2.92 * Math.Clamp(_front is { } art ? art.Size.Width / art.Size.Height : .72, .55, 1.6), GameCaseFormat.Nintendo64 => PortraitNintendo64 ? 2.08 : 2.92, GameCaseFormat.Switch => 1.79, _ => 2.08 };
     private const double StandardCaseHeight = 2.92;
     private double CaseHeight => CaseFormat == GameCaseFormat.Nintendo64 && !PortraitNintendo64 ? 2.08 : StandardCaseHeight;
     private double CaseDepth => CaseFormat switch { GameCaseFormat.Nintendo64 => .48, GameCaseFormat.Switch => .174, _ => .215 };
@@ -46,6 +46,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
         Material("#45454B", "#111114", "#252529", "#08080A"),
         Material("#FFFFFF", "#E5E5E2", "#FAFAF7", "#C7CBCB"),
         Material("#E8EBEE", "#ADB6BF", "#D4DADE", "#8B969F"),
+        Material("#353637", "#242526", "#38393A", "#202122"),
         Material("#353637", "#242526", "#38393A", "#202122")
     ];
     private static readonly IPen CaseOutline = new Pen(new SolidColorBrush(Color.FromArgb(110,65,65,72)), .7);
@@ -86,7 +87,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
     public GameCaseFormat CaseFormat { get; set; } = GameCaseFormat.GameCube;
     public double CaseAspectRatio => CaseWidth / CaseHeight;
     public static GameCaseFormat FormatForConsole(string console) => console switch
-    { "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, "n64" => GameCaseFormat.Nintendo64, _ => GameCaseFormat.GameCube };
+    { "gamecube" => GameCaseFormat.GameCube, "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, "n64" => GameCaseFormat.Nintendo64, _ => GameCaseFormat.OriginalBox };
     private bool UsesGameCubeModel => UseImportedModel && CaseFormat == GameCaseFormat.GameCube;
     public bool UseCompactTextureMesh { get; init; }
     private double _restPitch;
@@ -248,6 +249,7 @@ public sealed partial class GameCaseControl : Control, IDisposable
 
     private void RenderCase(DrawingContext context)
     {
+        if (HardwareConsole is not null) { RenderHardware(context); return; }
         if(_openingEnabled) { RenderOpening(context);return; }
         if (UsesGameCubeModel && RenderImportedModel(context)) return;
 

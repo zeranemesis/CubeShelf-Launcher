@@ -103,6 +103,7 @@ static class GameHelpChecks
             "Déplace-toi vers une ouverture de la page, puis ajuste ta position avant qu’elle ne tombe. Reste attentif à la page suivante pour anticiper ton prochain déplacement.";
         ((TextBlock)typeof(GameHelpPanel).GetField("_status", flags)!.GetValue(voicePanel)!).IsVisible = false;
         panelWindow.Width = 320; panelWindow.Height = 320; Save("companion-answer.png");
+        panelWindow.UpdateLayout();
         var helpHeader = voicePanel.GetLogicalDescendants().OfType<DockPanel>().Single(control => control.Name == "HelpHeader");
         var helpBody = voicePanel.GetLogicalDescendants().OfType<ScrollViewer>().Single(control => control.Name == "HelpBody");
         if (helpHeader.IsVisible || helpBody.Bounds.Height < 50)

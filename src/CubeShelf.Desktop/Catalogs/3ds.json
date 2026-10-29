@@ -1,0 +1,21 @@
+[
+  {
+    "Id": "coccofresco-triaevum-ocarina-of-time-3d",
+    "Title": "Ocarina of Time 3D",
+    "Project": "TriAevum",
+    "Repository": "coccofresco/TriAevum",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "8f69a26f390bf3a500bf3149b6596c19724a5b5d",
+    "ReadmeUrl": "https://github.com/coccofresco/TriAevum/blob/8f69a26f390bf3a500bf3149b6596c19724a5b5d/README.md",
+    "ReleaseUrl": "https://github.com/coccofresco/TriAevum/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  }
+]

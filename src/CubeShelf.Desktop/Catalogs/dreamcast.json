@@ -1,0 +1,107 @@
+[
+  {
+    "Id": "sonicfreak1337-sarecomp-sonic-adventure",
+    "Title": "Sonic Adventure",
+    "Project": "SARecomp",
+    "Repository": "sonicfreak1337/SARecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "73e9e854cde6fe8b158779c0c0a70c6cec4828ff",
+    "ReadmeUrl": "https://github.com/sonicfreak1337/SARecomp/blob/73e9e854cde6fe8b158779c0c0a70c6cec4828ff/README.md",
+    "ReleaseUrl": "https://github.com/sonicfreak1337/SARecomp/releases/tag/v0.52.1",
+    "ReleaseTag": "v0.52.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "enrique363-voldorium-soulcalibur",
+    "Title": "SoulCalibur",
+    "Project": "voldorium",
+    "Repository": "enrique363/voldorium",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b7e4cb6e213bf7fe31c35b0eee168f357e8a530e",
+    "ReadmeUrl": "https://github.com/enrique363/voldorium/blob/b7e4cb6e213bf7fe31c35b0eee168f357e8a530e/README.md",
+    "ReleaseUrl": "https://github.com/enrique363/voldorium/releases/tag/v1.1.0",
+    "ReleaseTag": "v1.1.0",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "zoomieszaggy-space-channel-5-space-channel-5",
+    "Title": "Space Channel 5",
+    "Project": "Space-Channel-5",
+    "Repository": "ZoomiesZaggy/Space-Channel-5",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "ff246d27baabeee6c7a342fd7ce69f6755e2d5cd",
+    "ReadmeUrl": "https://github.com/ZoomiesZaggy/Space-Channel-5/blob/ff246d27baabeee6c7a342fd7ce69f6755e2d5cd/README.md",
+    "ReleaseUrl": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/tag/v0.1.0-preview.2",
+    "ReleaseTag": "v0.1.0-preview.2",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SpaceChannel5-v0.1.0-preview.2-Linux-ARM64.tar.gz",
+        "Url": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/download/v0.1.0-preview.2/SpaceChannel5-v0.1.0-preview.2-Linux-ARM64.tar.gz",
+        "Sha256": "463b2641c8c478ea2a5ce446ce284c6f1810aac25055819eeb103b597e597985",
+        "Size": 193163212,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SpaceChannel5-v0.1.0-preview.2-Linux-X64.tar.gz",
+        "Url": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/download/v0.1.0-preview.2/SpaceChannel5-v0.1.0-preview.2-Linux-X64.tar.gz",
+        "Sha256": "d7dd0875533fe3188c0f59c65d338d3c6ef7a8699b19df7ef6a527164956e95d",
+        "Size": 240471810,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SpaceChannel5-v0.1.0-preview.2-macOS-ARM64.zip",
+        "Url": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/download/v0.1.0-preview.2/SpaceChannel5-v0.1.0-preview.2-macOS-ARM64.zip",
+        "Sha256": "0735ef6c761c7cc0fafef2980d3513462fea20ed173ff1cf732653d247037e4f",
+        "Size": 177095798,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SpaceChannel5-v0.1.0-preview.2-macOS-X64.zip",
+        "Url": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/download/v0.1.0-preview.2/SpaceChannel5-v0.1.0-preview.2-macOS-X64.zip",
+        "Sha256": "e0bf3551ec14c1c12dc3c483319bbe40486313f97f331172bc619ab1c72233c4",
+        "Size": 230344370,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "SpaceChannel5-v0.1.0-preview.2-Windows-X64.zip",
+        "Url": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/download/v0.1.0-preview.2/SpaceChannel5-v0.1.0-preview.2-Windows-X64.zip",
+        "Sha256": "7b46563608ac66b0c89af6a0c22d7f0f85328b1b2984aca8022000d8385f9468",
+        "Size": 244067522,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

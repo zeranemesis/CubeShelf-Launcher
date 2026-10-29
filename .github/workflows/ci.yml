@@ -1,6 +1,7 @@
 name: Validate Windows build
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -36,6 +37,10 @@ jobs:
         run: dotnet run --project tests/CubeShelf.NativePorts.Tests/CubeShelf.NativePorts.Tests.csproj -c Release
       - name: Test console selectors in the existing UI
         run: dotnet run --project tests/CubeShelf.ShelfUi.Tests/CubeShelf.ShelfUi.Tests.csproj -c Release
+      - name: Test mobile catalogue and installation handoff
+        run: dotnet run --project tests/CubeShelf.Mobile.Tests -c Release
+      - name: Test application updates and rollback
+        run: dotnet run --project tests/CubeShelf.AppUpdates.Tests -c Release
       - name: Test offline game assistance and model verification
         run: dotnet run --project tests/CubeShelf.Assistance.Tests/CubeShelf.Assistance.Tests.csproj -c Release
 

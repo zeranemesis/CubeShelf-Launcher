@@ -1,0 +1,60 @@
+[
+  {
+    "Id": "mstan-supermarioland2recomp-super-mario-land-2-6-golden-coins",
+    "Title": "Super Mario Land 2: 6 Golden Coins",
+    "Project": "SuperMarioLand2Recomp",
+    "Repository": "mstan/SuperMarioLand2Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "be57e210f1c1a11d777b5482076dbbc371468ea1",
+    "ReadmeUrl": "https://github.com/mstan/SuperMarioLand2Recomp/blob/be57e210f1c1a11d777b5482076dbbc371468ea1/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioLand2Recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SuperMarioLand2Recomp-linux-0.2.0-x86_64.AppImage",
+        "Url": "https://github.com/mstan/SuperMarioLand2Recomp/releases/download/v0.2.0/SuperMarioLand2Recomp-linux-0.2.0-x86_64.AppImage",
+        "Sha256": "e5a9203fe49bf969e1d0daa8f9e6ffd145cd8f147ec9a518c2d9259cf1ed0e0f",
+        "Size": 23222776,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SuperMarioLand2Recomp-windows-x64-v0.2.0.zip",
+        "Url": "https://github.com/mstan/SuperMarioLand2Recomp/releases/download/v0.2.0/SuperMarioLand2Recomp-windows-x64-v0.2.0.zip",
+        "Sha256": "e1cdf3b1cd643b310e0fc1f144b57485830b8c066524b7c0e2caf8bd5ad80a6d",
+        "Size": 30247001,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "gabrielnnk-bigodao-wario-land-super-mario-land-3",
+    "Title": "Wario Land: Super Mario Land 3",
+    "Project": "Bigodao",
+    "Repository": "GABRIELNNK/Bigodao",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "491b62989922582ff97fb3ce6c7dec6be3835cce",
+    "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/491b62989922582ff97fb3ce6c7dec6be3835cce/README.md",
+    "ReleaseUrl": "https://github.com/GABRIELNNK/Bigodao/releases/tag/1.6.0",
+    "ReleaseTag": "1.6.0",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  }
+]

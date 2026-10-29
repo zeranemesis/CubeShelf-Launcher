@@ -36,9 +36,10 @@ public sealed partial class MobileLibraryView : UserControl
     private readonly Button _join = MakeButton("Rejoindre l’invitation");
     private readonly StackPanel _onlinePanel = new() { Spacing = 12 };
     private readonly Grid _body = new() { RowDefinitions = new RowDefinitions("Auto,Auto") };
-    private readonly TextBlock _position = new() { FontSize = 14, Foreground = Brushes.LightGray, VerticalAlignment = VerticalAlignment.Center };
+    private readonly TextBlock _position = new() { FontSize = 13, Foreground = Brushes.LightGray, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 8, 0) };
     private readonly StackPanel _details = new() { Spacing = 12 };
     private readonly StackPanel _summary = new() { Spacing = 6 };
+    private readonly Grid _heading = new() { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
     private readonly Grid _gamePanel = new() { RowDefinitions = new RowDefinitions("Auto,*,Auto"), Margin = new Thickness(16, 0) };
     private readonly Expander _invitationPanel = new() { Header = "Invitation privée", Focusable = true, HorizontalAlignment = HorizontalAlignment.Stretch };
     private readonly TextBlock _unavailableAction = new() { Text = "Port Android indisponible", FontSize = 15, TextWrapping = TextWrapping.Wrap, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(8, 16), Foreground = Brushes.LightGray };
@@ -56,6 +57,8 @@ public sealed partial class MobileLibraryView : UserControl
     private int _touchSelection;
     private bool _horizontalDrag;
     private bool _stateLoaded;
+    private bool _startupPlatformChoiceShown;
+    private readonly PlatformHomeControl _platformHome = new() { IsVisible=false,ZIndex=100 };
     private string _rememberedGame = "";
     private readonly DispatcherTimer _stateSaveTimer = new() { Interval = TimeSpan.FromMilliseconds(900) };
     private LibraryState? _savedState;
@@ -70,10 +73,15 @@ public sealed partial class MobileLibraryView : UserControl
         _launchTransition.DismissRequested += CancelLaunchTransition;
         Background = new SolidColorBrush(Color.Parse("#0B101B"));
         ConfigureButtonStyles();
-        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"), Margin = new Thickness(16, 10) };
+        var heading = _heading;
         heading.Children.Add(BuildPlatformHeading());
         Grid.SetColumn(_position, 1); heading.Children.Add(_position);
         var help = MakeButton("?");
+        help.Width = 48; help.MinHeight = 48; help.Padding = new Thickness(0); help.Margin = new Thickness(0, 0, 6, 0);
+        _downloadsButton.MinHeight = _appUpdatesButton.MinHeight = 48;
+        _downloadsButton.Padding = _appUpdatesButton.Padding = new Thickness(0);
+        _downloadsButton.Margin = new Thickness(0, 0, 6, 0);
+        _appUpdatesButton.Width = 48;
         AutomationProperties.SetName(help, "Aide locale LFM3");
         help.Click += (_, _) => MobileApp.HelpRequested?.Invoke(_catalog.ElementAtOrDefault(_selected)?.Title ?? "Jeu sélectionné");
         Grid.SetColumn(help, 2); heading.Children.Add(help);
@@ -119,6 +127,8 @@ public sealed partial class MobileLibraryView : UserControl
         Grid.SetRowSpan(inspection, 3); content.Children.Add(inspection);
         Grid.SetRowSpan(_launchTransition, 3); content.Children.Add(_launchTransition);
         Content = content;
+        Grid.SetRowSpan(_platformHome,3);content.Children.Add(_platformHome);
+        _platformHome.ConsoleChosen+=id=> { _consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);_platformHome.IsVisible=false;FocusPrimaryAction(); };
         UpdateInputHint();
         AddHandler(PointerPressedEvent, (_, args) =>
         {
@@ -159,6 +169,15 @@ public sealed partial class MobileLibraryView : UserControl
         LayoutUpdated += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
+            if(_platformHome.IsVisible)
+            {
+                if(_platformHome.SortHasFocus)return;
+                if(args.Key is Key.Left or Key.Right) _platformHome.Move(args.Key==Key.Left?-1:1);
+                else if(args.Key==Key.Enter)_platformHome.Choose();
+                else return;
+                args.Handled=true;return;
+            }
+            if (_consolePicker.IsDropDownOpen) return;
             if (args.Key == Key.Escape) { BackFromController(); args.Handled = true; return; }
             if (_invite.IsKeyboardFocusWithin) return;
             if (args.Key == Key.Left) { BrowseFromController(-1); args.Handled = true; }
@@ -171,7 +190,9 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void ActivateFromController()
     {
+        if(_platformHome.IsVisible){_platformHome.Choose();return;}
         SetControllerInput(true);
+        if (_consolePicker.IsDropDownOpen) { _consolePicker.IsDropDownOpen = false; FocusPrimaryAction(); return; }
         if (_launching) return;
         if (_inspectionCase is not null) { CloseInspection(); return; }
         var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
@@ -192,17 +213,19 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void ActivatePrimaryAction()
     {
-        if (_launching || _inspectionCase is not null || _downloadsOverlay.IsVisible) return;
+        if (_platformHome.IsVisible || _launching || _inspectionCase is not null || _downloadsOverlay.IsVisible) return;
         if (_play.IsVisible && _play.IsEnabled) _ = LaunchSelectedGameAsync();
         else if (_download.IsVisible && _download.IsEnabled) _ = PrepareSelectedPortAsync();
     }
 
-    public void FlipFromController() { SetControllerInput(true); if (!_launching && !_downloadsOverlay.IsVisible) { if (_inspectionCase is { } cover) cover.Flip(); else _shelf.FlipSelected(); } }
-    public void OpenOnlineFromController() { SetControllerInput(true); if (!_launching && !_downloadsOverlay.IsVisible && _inspectionCase is null && _onlinePanel.IsVisible) Run(() => _games.OpenOnline()); }
+    public void FlipFromController() { SetControllerInput(true); if (!_platformHome.IsVisible && !_launching && !_downloadsOverlay.IsVisible) { if (_inspectionCase is { } cover) cover.Flip(); else _shelf.FlipSelected(); } }
+    public void OpenOnlineFromController() { SetControllerInput(true); if (!_platformHome.IsVisible && !_launching && !_downloadsOverlay.IsVisible && _inspectionCase is null && _onlinePanel.IsVisible) Run(() => _games.OpenOnline()); }
 
     public void BackFromController()
     {
+        if(_platformHome.IsVisible)return;
         SetControllerInput(true);
+        if (_consolePicker.IsDropDownOpen) { _consolePicker.IsDropDownOpen = false; FocusPrimaryAction(); return; }
         if(_nativePreparation is not null) {_nativePreparation.Cancel();return;}
         if (_launching) { CancelLaunchTransition(); return; }
         if (_downloadsOverlay.IsVisible) { CloseDownloads(); return; }
@@ -224,7 +247,13 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void MoveActionFocus(int step)
     {
+        if(_platformHome.IsVisible){_platformHome.CycleSort();return;}
         SetControllerInput(true);
+        if (_consolePicker.IsDropDownOpen)
+        {
+            _consolePicker.SelectedIndex = (_consolePicker.SelectedIndex + step + _consolePicker.ItemCount) % _consolePicker.ItemCount;
+            return;
+        }
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
@@ -374,6 +403,7 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void BrowseFromController(int step)
     {
+        if(_platformHome.IsVisible){_platformHome.Move(step);return;}
         SetControllerInput(true);
         if (_launching) return;
         if (_inspectionCase is not null || _downloadsOverlay.IsVisible) return;
@@ -390,7 +420,7 @@ public sealed partial class MobileLibraryView : UserControl
             _cache = Path.Combine(_games.DataDirectory, "covers-v1");
             Directory.CreateDirectory(_cache);
             using var source = AssetLoader.Open(Resource("games.json"));
-            _allCatalog = (JsonSerializer.Deserialize<MobileGame[]>(source) ?? []).Where(game => string.IsNullOrWhiteSpace(game.VariantOf)).Concat(NativeCatalogGames()).ToArray();
+            _allCatalog = (JsonSerializer.Deserialize<MobileGame[]>(source) ?? []).Where(game => game.Id == PartyBoardId).Concat(NativeCatalogGames()).ToArray();
             if (!_stateLoaded)
             {
                 _stateLoaded = true;
@@ -407,14 +437,23 @@ public sealed partial class MobileLibraryView : UserControl
                 }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
             }
-            _activeConsole=_savedState?.Console=="n64" && _allCatalog.Any(g=>g.ShelfConsole=="n64")?"n64":"gamecube";
-            _consolePicker.SelectedIndex=_activeConsole=="n64"?1:0;
+            _mobilePlatforms = CubeShelf.Core.Library.ShelfProduct.All.Where(product => _allCatalog.Any(game => game.ShelfConsole == product.Id)).ToArray();
+            _consolePicker.ItemsSource = _mobilePlatforms.Select(product => product.Console).ToArray();
+            _consolePicker.IsVisible = _mobilePlatforms.Length > 1;
+            _activeConsole = _mobilePlatforms.Any(product => product.Id == _savedState?.Console) ? _savedState!.Console : _mobilePlatforms.FirstOrDefault()?.Id ?? "gamecube";
+            _consolePicker.SelectedIndex = Array.FindIndex(_mobilePlatforms, product => product.Id == _activeConsole);
             _catalog=_allCatalog.Where(g=>g.ShelfConsole==_activeConsole).ToArray();
+            UpdatePlatformCaption();
             var remembered = Array.FindIndex(_catalog, game => game.Id == _rememberedGame);
             if (remembered >= 0) _selected = remembered;
             RebuildMobileShelf();
             _realized = true;
             Select(_selected, false);
+            if (!_startupPlatformChoiceShown && _mobilePlatforms.Length > 1)
+            {
+                _startupPlatformChoiceShown = true;
+                Dispatcher.UIThread.Post(() => { if (_realized) OpenPlatformHome(); });
+            }
         }
         catch (Exception error) { SetStatus("Impossible de charger la bibliothèque : " + error.Message); }
     }
@@ -539,7 +578,14 @@ public sealed partial class MobileLibraryView : UserControl
         if (_layoutKey == key) return;
         _layoutKey = key;
         var wide = root.Bounds.Width >= 600 && root.Bounds.Width > root.Bounds.Height;
+        var narrow = root.Bounds.Width < 360;
+        _heading.RowDefinitions = new RowDefinitions(narrow ? "Auto,Auto" : "Auto");
+        Grid.SetColumnSpan(_heading.Children[0], narrow ? 5 : 1);
+        foreach (var control in _heading.Children.Skip(1)) Grid.SetRow(control, narrow ? 1 : 0);
         _downloadsButton.Content=wide?"Téléchargements":"↓";
+        _downloadsButton.FontSize=wide?12:20;
+        _downloadsButton.Width=wide?double.NaN:48;
+        _downloadsButton.Padding=wide?new Thickness(14, 0):new Thickness(0);
         AutomationProperties.SetName(_downloadsButton,"Téléchargements");
         var available = Math.Max(80, root.Bounds.Height - header - footer);
         var compact = available < 500;
@@ -562,7 +608,7 @@ public sealed partial class MobileLibraryView : UserControl
     private static Button MakeButton(string text) => new() { Content = text, FontSize = 17, MinHeight = 56,
         FontWeight = FontWeight.SemiBold, CornerRadius = new CornerRadius(18), Padding = new Thickness(18, 12),
         BorderThickness = new Thickness(2),
-        HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Center };
+        HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Center, VerticalContentAlignment = VerticalAlignment.Center };
     private sealed class MobileGame
     {
         public string Id { get; set; } = "";

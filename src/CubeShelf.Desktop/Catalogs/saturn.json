@@ -1,0 +1,62 @@
+[
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-1",
+    "Title": "Shining Force III Scenario 1",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-2",
+    "Title": "Shining Force III Scenario 2",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-3",
+    "Title": "Shining Force III Scenario 3",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  }
+]

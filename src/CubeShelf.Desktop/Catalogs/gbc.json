@@ -1,0 +1,80 @@
+[
+  {
+    "Id": "kirby-letsgo-oracles-decomp-the-legend-of-zelda-oracle-of-ages",
+    "Title": "The Legend of Zelda: Oracle of Ages",
+    "Project": "oracles-decomp",
+    "Repository": "kirby-letsgo/oracles-decomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
+    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/cebff309ec646e6f54f175866b209233cd8eb4b7/README.md",
+    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Oracles-linux-x86_64.AppImage",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-linux-x86_64.AppImage",
+        "Sha256": "5ea9f20bbf518086713c00f5057f9484facc857273f1f7167eaec3b93eb81dc5",
+        "Size": 10275320,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Oracles-windows-x64.zip",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-windows-x64.zip",
+        "Sha256": "6e3a63c18b0a40672f824dbb8ce6629e62242ae73f15a4fbc5b45f149da1ab67",
+        "Size": 10979036,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "kirby-letsgo-oracles-decomp-the-legend-of-zelda-oracle-of-seasons",
+    "Title": "The Legend of Zelda: Oracle of Seasons",
+    "Project": "oracles-decomp",
+    "Repository": "kirby-letsgo/oracles-decomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
+    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/cebff309ec646e6f54f175866b209233cd8eb4b7/README.md",
+    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Oracles-linux-x86_64.AppImage",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-linux-x86_64.AppImage",
+        "Sha256": "5ea9f20bbf518086713c00f5057f9484facc857273f1f7167eaec3b93eb81dc5",
+        "Size": 10275320,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Oracles-windows-x64.zip",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-windows-x64.zip",
+        "Sha256": "6e3a63c18b0a40672f824dbb8ce6629e62242ae73f15a4fbc5b45f149da1ab67",
+        "Size": 10979036,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

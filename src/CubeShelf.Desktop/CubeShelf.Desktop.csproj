@@ -4,7 +4,7 @@
     <AssemblyName>CubeShelf</AssemblyName>
     <Product>DecompShelf</Product>
     <AssemblyTitle>DecompShelf</AssemblyTitle>
-    <Description>Bibliothèque de ports natifs GameCube, Wii, Switch et Nintendo 64</Description>
+    <Description>Bibliothèque de ports natifs de consoles pour PC</Description>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -24,8 +24,13 @@
   <ItemGroup>
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Catalogs/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Consoles/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
+    <AvaloniaResource Include="Assets/Brand/Consoles/*.png" />
+    <AvaloniaResource Include="Assets/Brand/Consoles/*.gif" />
+    <Content Include="Assets/Brand/Consoles/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Brand/Consoles/*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <AvaloniaResource Include="Assets/Logos/*.png" />
     <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>

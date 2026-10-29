@@ -42,6 +42,7 @@ public sealed partial class MainWindow
         if (!startupArgs.Contains("--desktop", StringComparer.OrdinalIgnoreCase) &&
             (_preferences.StartInBigPicture || startupArgs.Contains("--big-picture", StringComparer.OrdinalIgnoreCase)))
             EnterBigPicture(this, new RoutedEventArgs());
+        else ShowPlatformHome();
     }
 
     private async Task ShowMeshDiscoveryNoticeAsync()
@@ -169,9 +170,11 @@ public sealed partial class MainWindow
 
     private void ShowParityView(Control view)
     {
+        PlatformHome.IsVisible=false;
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
         UpdateBigPictureSubnav(view);
+        UpdateNavigationStatePhase5();
     }
 
     /// <summary>

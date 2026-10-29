@@ -1,0 +1,20 @@
+[
+  {
+    "Id": "mstan-sonicthehedgehogsmsrecomp-sonic-the-hedgehog",
+    "Title": "Sonic the Hedgehog",
+    "Project": "SonicTheHedgehogSMSRecomp",
+    "Repository": "mstan/SonicTheHedgehogSMSRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b643f5422c2023532dda5f0c97fd64c901db27e8",
+    "ReadmeUrl": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/blob/b643f5422c2023532dda5f0c97fd64c901db27e8/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  }
+]

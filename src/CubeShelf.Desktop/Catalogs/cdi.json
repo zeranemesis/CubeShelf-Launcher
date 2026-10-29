@@ -1,0 +1,48 @@
+[
+  {
+    "Id": "tools81-link-faces-of-evil-static-recomp-link-the-faces-of-evil",
+    "Title": "Link: The Faces of Evil",
+    "Project": "link-faces-of-evil-static-recomp",
+    "Repository": "tools81/link-faces-of-evil-static-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "67c1d8c3df091b5ea97461cc7a1151371d3e72f3",
+    "ReadmeUrl": "https://github.com/tools81/link-faces-of-evil-static-recomp/blob/67c1d8c3df091b5ea97461cc7a1151371d3e72f3/README.md",
+    "ReleaseUrl": "https://github.com/tools81/link-faces-of-evil-static-recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "tools81-mutant-rampage-bodyslam-static-recomp-mutant-rampage-bodyslam",
+    "Title": "Mutant Rampage: Bodyslam",
+    "Project": "mutant-rampage-bodyslam-static-recomp",
+    "Repository": "tools81/mutant-rampage-bodyslam-static-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "fff3b3a3c3f6fe47def39e0fe15abe1580cd1f9a",
+    "ReadmeUrl": "https://github.com/tools81/mutant-rampage-bodyslam-static-recomp/blob/fff3b3a3c3f6fe47def39e0fe15abe1580cd1f9a/README.md",
+    "ReleaseUrl": "https://github.com/tools81/mutant-rampage-bodyslam-static-recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MutantRampageBodyslam-1.0.0-win64-portable.zip",
+        "Url": "https://github.com/tools81/mutant-rampage-bodyslam-static-recomp/releases/download/v1.0.0/MutantRampageBodyslam-1.0.0-win64-portable.zip",
+        "Sha256": "39ce14a43b231565d6578389e4438f6641bef5fdada5eaa1c139638327967651",
+        "Size": 2163868,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

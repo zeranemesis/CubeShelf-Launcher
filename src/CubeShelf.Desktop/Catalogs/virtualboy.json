@@ -1,0 +1,32 @@
+[
+  {
+    "Id": "mstan-mariotennisvirtualboyrecomp-mario-s-tennis",
+    "Title": "Mario's Tennis",
+    "Project": "MarioTennisVirtualBoyRecomp",
+    "Repository": "mstan/MarioTennisVirtualBoyRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "28995d368538559005aaaf9a78ab8e35eacecd71",
+    "ReadmeUrl": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/blob/28995d368538559005aaaf9a78ab8e35eacecd71/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/releases/tag/v0.2.3",
+    "ReleaseTag": "v0.2.3",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "MarioTennisVirtualBoyRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/releases/download/v0.2.3/MarioTennisVirtualBoyRecomp-windows-x64.zip",
+        "Sha256": "4f951d8c313e3cb7c3822cafb1eedad4b04362385a8e1568720b8d7e1c3789de",
+        "Size": 8198020,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

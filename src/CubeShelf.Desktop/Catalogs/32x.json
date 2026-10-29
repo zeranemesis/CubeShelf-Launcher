@@ -1,0 +1,50 @@
+[
+  {
+    "Id": "yuutatsubasa-chaotixrecompiled-knuckles-chaotix",
+    "Title": "Knuckles' Chaotix",
+    "Project": "ChaotixRecompiled",
+    "Repository": "YuutaTsubasa/ChaotixRecompiled",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "f2d1f94d1ca16ddf216aed89962f4d2144d3b6d5",
+    "ReadmeUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/blob/f2d1f94d1ca16ddf216aed89962f4d2144d3b6d5/README.md",
+    "ReleaseUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/tag/v0.15.10",
+    "ReleaseTag": "v0.15.10",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "ChaotixRecompiled-0.15.10-linux-x64.tar.gz",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-linux-x64.tar.gz",
+        "Sha256": "dca2eb9584a2adb2e6cbcf6e7d5138a32e9ea111ff3cdf02dc47475159bf123b",
+        "Size": 5276764,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ChaotixRecompiled-0.15.10-macos-arm64.zip",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-macos-arm64.zip",
+        "Sha256": "4eecf58249feacfb46632151cd75e1e2540c84a0b46372153171f8489d397bff",
+        "Size": 5157804,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "ChaotixRecompiled-0.15.10-windows-x64.zip",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-windows-x64.zip",
+        "Sha256": "1a07ced555ebe69ddf0cfba0a1d0205fe232e5b642020aaa274f8bd7182b8369",
+        "Size": 9728716,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

@@ -6,10 +6,13 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../CubeShelf.Assistance/CubeShelf.Assistance.csproj" />
+    <ProjectReference Include="../CubeShelf.Core/CubeShelf.Core.csproj" />
     <PackageReference Include="Avalonia" Version="11.3.21" />
     <PackageReference Include="Avalonia.Skia" Version="11.3.21" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.cs" Link="Controls/GameCaseControl.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Hardware.cs" Link="Controls/GameCaseControl.Hardware.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/PlatformHomeControl.cs" Link="Controls/PlatformHomeControl.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Opening.cs" Link="Controls/GameCaseControl.Opening.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Model.cs" Link="Controls/GameCaseControl.Model.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Gpu.cs" Link="Controls/GameCaseControl.Gpu.cs" />
@@ -22,9 +25,17 @@
     <AvaloniaResource Include="Assets/Covers/**/*" />
     <AvaloniaResource Include="Catalogs/*.json" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Assets/Brand/gamecube_logo.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/Consoles/*.png" Link="Assets/Brand/Consoles/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/Consoles/*.gif" Link="Assets/Brand/Consoles/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/*.png" Link="Assets/Logos/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />
-    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/**/*" Exclude="../CubeShelf.Desktop/Assets/Covers/Media/**/*;../CubeShelf.Desktop/Assets/Covers/N64/**/*" Link="Assets/Covers/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Common/**/*" Link="Assets/Covers/Common/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/MarioParty4/**/*" Link="Assets/Covers/MarioParty4/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Shelf/**/*" Link="Assets/Covers/Shelf/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SoulcaliburII/**/*" Link="Assets/Covers/SoulcaliburII/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SuperMarioEclipse/**/*" Link="Assets/Covers/SuperMarioEclipse/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SuperMarioStrikers/**/*" Link="Assets/Covers/SuperMarioStrikers/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SuperMarioSunshine/**/*" Link="Assets/Covers/SuperMarioSunshine/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/games.json" Link="games.json" />
   </ItemGroup>
 </Project>

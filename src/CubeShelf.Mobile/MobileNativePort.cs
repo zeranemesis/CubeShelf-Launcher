@@ -5,6 +5,8 @@ namespace CubeShelf.Mobile;
 public sealed class MobileNativePort
 {
     public string Id { get; set; } = "";
+    public string ShelfConsole { get; set; } = "n64";
+    public int Year { get; set; }
     public string Title { get; set; } = "";
     public string Project { get; set; } = "";
     public string Repository { get; set; } = "";
@@ -14,6 +16,7 @@ public sealed class MobileNativePort
     public int MinimumSdk { get; set; }
     public string[] Abis { get; set; } = [];
     public bool RequiresVulkan12 { get; set; }
+    public bool RequiresVulkan13 { get; set; }
     public bool RequiresGles3 { get; set; }
     public string Status { get; set; } = "";
     public string Notes { get; set; } = "";
@@ -34,7 +37,8 @@ public sealed class MobileNativePort
     public void Validate()
     {
         static bool Hash(string hash) => hash.Length==64 && hash.All(Uri.IsHexDigit);
-        if(Id.Length is <1 or >80 || Id.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='-')
+        if(!CubeShelf.Core.Library.ShelfProduct.All.Any(product => product.Id == ShelfConsole)
+            || Id.Length is <1 or >80 || Id.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='-')
             || Repository.Split('/') is not [var owner,var repo] || string.IsNullOrWhiteSpace(owner) || string.IsNullOrWhiteSpace(repo)
             || Name.Length==0 || Name!=Path.GetFileName(Name) || Name.Contains('\\')
             || !(Name.EndsWith(".apk",StringComparison.OrdinalIgnoreCase)||Name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase))

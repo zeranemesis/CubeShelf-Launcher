@@ -25,6 +25,15 @@ public sealed class ConsoleBrandMark : Control
     private static readonly Geometry LeftJoyCon = Geometry.Parse("M44,19 L32,19 C22,19 17,26 17,36 L17,64 C17,75 23,81 33,81 L44,81 Z");
     private static readonly Geometry RightJoyCon = Geometry.Parse("M56,19 L68,19 C78,19 83,26 83,36 L83,64 C83,75 77,81 67,81 L56,81 Z");
     private static readonly IPen WhiteOutline = new Pen(Brushes.White,4.5);
+    private static readonly Dictionary<string,Bitmap?> Logos = new();
+    private static Bitmap? Logo(string platform)
+    {
+        if(Logos.TryGetValue(platform,out var logo))return logo;
+        var uri=new Uri($"avares://{typeof(ConsoleBrandMark).Assembly.GetName().Name}/Assets/Brand/Consoles/{platform}.png");
+        if(!AssetLoader.Exists(uri))uri=new Uri($"avares://{typeof(ConsoleBrandMark).Assembly.GetName().Name}/Assets/Brand/Consoles/{platform}.gif");
+        if(AssetLoader.Exists(uri)) {using var stream=AssetLoader.Open(uri);logo=new Bitmap(stream);}
+        Logos[platform]=logo;return logo;
+    }
     private static readonly IBrush N64GreenBrush = new SolidColorBrush(Color.Parse("#00A650"));
     private static readonly IBrush N64BlueBrush = new SolidColorBrush(Color.Parse("#244CA1"));
     private static readonly IBrush N64YellowBrush = new SolidColorBrush(Color.Parse("#FFC526"));
@@ -38,11 +47,19 @@ public sealed class ConsoleBrandMark : Control
         PlatformProperty.Changed.AddClassHandler<ConsoleBrandMark>((mark,_)=>mark.UpdateAccessibleName());
     }
     public ConsoleBrandMark() { IsHitTestVisible=false;UpdateAccessibleName(); }
-    private void UpdateAccessibleName()=>AutomationProperties.SetName(this,"Nintendo "+(Platform switch {"wii"=>"Wii","switch"=>"Switch","n64"=>"64",_=>"GameCube"}));
+    private void UpdateAccessibleName()=>AutomationProperties.SetName(this,CubeShelf.Core.Library.ShelfProduct.Resolve(Platform).Console);
     public override void Render(DrawingContext context)
     {
         var size=Math.Min(Bounds.Width,Bounds.Height);
         if(size<=0)return;
+        if(Logo(Platform) is {} logo)
+        {
+            context.DrawRectangle(Brushes.White,null,new Rect(Bounds.Size),5,5);
+            var fit=Math.Min(Math.Max(1,Bounds.Width-6)/logo.Size.Width,Math.Max(1,Bounds.Height-6)/logo.Size.Height);
+            var width=logo.Size.Width*fit;var height=logo.Size.Height*fit;
+            context.DrawImage(logo,new Rect(logo.Size),new Rect((Bounds.Width-width)/2,(Bounds.Height-height)/2,width,height));
+            return;
+        }
         using(context.PushTransform(Matrix.CreateScale(size/100,size/100)*Matrix.CreateTranslation((Bounds.Width-size)/2,(Bounds.Height-size)/2)))
         {
             if(Platform=="n64")
@@ -65,10 +82,18 @@ public sealed class ConsoleBrandMark : Control
                 context.DrawEllipse(Brushes.White,null,new Point(31,39),5,5);
                 context.DrawEllipse(Red,null,new Point(69,61),5,5);
             }
-            else
+            else if (Platform == "gamecube")
             {
                 var cube=Cube.Value;
                 context.DrawImage(cube,new Rect(cube.Size),new Rect(0,0,100,100));
+            }
+            else
+            {
+                var product = CubeShelf.Core.Library.ShelfProduct.Resolve(Platform);
+                var label = Platform switch { "megadrive"=>"MD", "mastersystem"=>"SMS", "dreamcast"=>"DC", "virtualboy"=>"VB", "gamegear"=>"GG", "xbox360"=>"360", "segacd"=>"CD", _=>Platform.ToUpperInvariant() };
+                context.DrawRectangle(new SolidColorBrush(Color.Parse(product.Accent)),null,new Rect(0,0,100,100),12,12);
+                var text = new FormattedText(label,CultureInfo.InvariantCulture,FlowDirection.LeftToRight,new Typeface("Arial",FontStyle.Normal,FontWeight.Bold),label.Length > 4 ? 20 : 30,Brushes.White);
+                context.DrawText(text,new Point((100-text.Width)/2,(100-text.Height)/2));
             }
         }
     }

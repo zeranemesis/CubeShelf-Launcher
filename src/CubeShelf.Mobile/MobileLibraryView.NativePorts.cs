@@ -3,13 +3,16 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using CubeShelf.Desktop.Controls;
+using CubeShelf.Core.Library;
 
 namespace CubeShelf.Mobile;
 
 public sealed partial class MobileLibraryView
 {
-    private readonly ComboBox _consolePicker=new() {ItemsSource=new[]{"GameCube","Nintendo 64"},SelectedIndex=0,MinHeight=40,FontSize=14,HorizontalAlignment=HorizontalAlignment.Stretch};
-    private readonly ConsoleBrandMark _consoleLogo=new() {Width=26,Height=26};
+    private readonly ComboBox _consolePicker=new() {MinHeight=44,FontSize=14,HorizontalAlignment=HorizontalAlignment.Stretch};
+    private readonly ConsoleBrandMark _consoleLogo=new() {Width=30,Height=30};
+    private readonly TextBlock _platformCaption = new() { FontSize = 12, Foreground = Brushes.LightGray };
+    private ShelfProduct[] _mobilePlatforms = [];
     private readonly TextBlock _nativeNotes=new() {FontSize=13,TextWrapping=TextWrapping.Wrap,IsVisible=false};
     private readonly Button _cancelNativePreparation=MakeButton("Annuler la préparation");
     private readonly ProgressBar _nativePreparationProgress=new() {IsVisible=false,IsIndeterminate=true,Height=4};
@@ -20,25 +23,29 @@ public sealed partial class MobileLibraryView
         var heading=new StackPanel {Spacing=6,Margin=new Thickness(0,0,8,0)};
         var name=new StackPanel {Orientation=Orientation.Horizontal,Spacing=7};
         name.Children.Add(_consoleLogo);name.Children.Add(new TextBlock {Text="DecompShelf",FontSize=18,FontWeight=FontWeight.Bold,VerticalAlignment=VerticalAlignment.Center});
-        heading.Children.Add(name);heading.Children.Add(_consolePicker);
-        _consolePicker.IsVisible=_games.NativePorts?.Catalog.Count>0;
+        var home=new Button {Content=name,Padding=new Thickness(0),Background=Brushes.Transparent,BorderThickness=new Thickness(0)};
+        home.Click+=(_,_)=>OpenPlatformHome();
+        heading.Children.Add(home);heading.Children.Add(_consolePicker); heading.Children.Add(_platformCaption);
         _consolePicker.SelectionChanged+=(_,_)=>
         {
             if(!_realized||_launching||_nativePreparation is not null)return;
-            var console=_consolePicker.SelectedIndex==1?"n64":"gamecube";
+            if (_consolePicker.SelectedIndex < 0 || _consolePicker.SelectedIndex >= _mobilePlatforms.Length) return;
+            var console=_mobilePlatforms[_consolePicker.SelectedIndex].Id;
             if(console==_activeConsole)return;
             CloseInspection(false);ResetTouch();_activeConsole=console;_consoleLogo.Platform=console;
             _catalog=_allCatalog.Where(game=>game.ShelfConsole==console).ToArray();_selected=0;
-            RebuildMobileShelf();Select(0,false);
+            RebuildMobileShelf();Select(0,false); UpdatePlatformCaption();
         };
         return heading;
     }
+    private void OpenPlatformHome() => _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
     private IEnumerable<MobileGame> NativeCatalogGames() => (_games.NativePorts?.Catalog??[]).Select(p=>new MobileGame
     {
-        Id=p.Id,Title=p.Title,ShelfConsole="n64",Genre=p.Project,Players=p.Status,
-        Year=p.Id switch {"n64-sm64" or "n64-pilotwings"=>1996,"n64-oot"=>1998,"n64-mm"=>2000,_=>1999},
+        Id=p.Id,Title=p.Title,ShelfConsole=p.ShelfConsole,Genre=p.Project,Players=p.Status,
+        Year=p.Year > 0 ? p.Year : p.Id switch {"n64-sm64" or "n64-pilotwings"=>1996,"n64-oot"=>1998,"n64-mm"=>2000,_=>1999},
         Covers=[new MobileCover {Front=p.Front,Back=p.Back,Spine=p.Spine,Right=p.Right,Top=p.Top,Bottom=p.Bottom,Media=p.Media}]
     });
+    private void UpdatePlatformCaption() => _platformCaption.Text = $"{_catalog.Length} jeu(x) · Android";
     private void RebuildMobileShelf()
     {
         _consoleLogo.Platform=_activeConsole;

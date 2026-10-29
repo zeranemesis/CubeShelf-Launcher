@@ -82,7 +82,7 @@ public sealed partial class MainWindow
         QueueBigPictureFullscreen();
         _bigPictureLastInput = -1; // Require a release after entering / returning from a dialog.
         UpdateBigPictureGamepadPolling();
-        FocusBigPictureAction(0);
+        ShowPlatformHome();
     }
 
     private void RebuildBigPictureShelf()
@@ -161,6 +161,7 @@ public sealed partial class MainWindow
     private void ExitBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        PlatformHome.IsVisible=false;
         CloseBigPictureMenu();
         _bigPictureActive = false;
         SystemDecorations = _bigPicturePreviousDecorations;
@@ -216,7 +217,8 @@ public sealed partial class MainWindow
         BigPictureDescription.Text = game?.Description ?? P7("Ajoute un jeu depuis la bibliothèque pour commencer.", "Add a game from the library to get started.");
         BigPictureCount.Text = P7("Bibliothèque", "Library") + $" · {_bigPictureGames.Length}";
         BigPicturePosition.Text = _bigPictureGames.Length == 0 ? "0 / 0" : $"{_bigPictureIndex + 1} / {_bigPictureGames.Length}";
-        BigPictureExitButton.Content = P7("Bureau · Échap", "Desktop · Esc");
+        BigPictureExitButton.Content = P7("Bureau · F11", "Desktop · F11");
+        BigPictureConsolesButton.Content = P7("Retour aux consoles", "Back to consoles");
         BigPictureLayoutButton.Content = _bigPictureRibbon ? P7("Vue : Ruban · V", "View: Ribbon · V") : P7("Vue : Rangée · V", "View: Row · V");
         BigPictureFlipButton.Content = P7("↻ Retourner le boîtier · F", "↻ Flip case · F");
         BigPictureFlipButton.IsEnabled = game is not null;
@@ -256,6 +258,16 @@ public sealed partial class MainWindow
 
     private void BigPictureKeyDown(object? sender, KeyEventArgs args)
     {
+        if(PlatformHome.IsVisible)
+        {
+            if(PlatformHome.IsGrid)return;
+            if(PlatformHome.SortHasFocus)return;
+            if(args.Key is Key.Left or Key.Right)PlatformHome.Move(args.Key==Key.Left?-1:1);
+            else if(args.Key==Key.Enter)PlatformHome.Choose();
+            else if(args.Key==Key.F3)PlatformHome.CycleSort();
+            else return;
+            args.Handled=true;return;
+        }
         if (LaunchTransition.IsVisible)
         {
             if (args.Key == Key.Escape) LaunchTransition.Stop();
@@ -305,7 +317,8 @@ public sealed partial class MainWindow
             case Key.Right: MoveBigPictureGame(1); break;
             case Key.Up: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+1)%BigPictureConsoleShelfPicker.ItemCount; break;
             case Key.Down: BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+BigPictureConsoleShelfPicker.ItemCount-1)%BigPictureConsoleShelfPicker.ItemCount; break;
-            case Key.Escape: case Key.F10: ShowBigPictureMenu(); break;
+            case Key.Escape: ShowPlatformHome(); break;
+            case Key.F10: ShowBigPictureMenu(); break;
             case Key.Enter: ActivateBigPictureAction(); break;
             case Key.F: FlipBigPictureCase(this, new RoutedEventArgs()); break;
             case Key.V: ToggleBigPictureLayout(this, new RoutedEventArgs()); break;
@@ -315,7 +328,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureConsolesButton, BigPictureExitButton }
         .Where(button => button.IsEffectivelyVisible && button.IsEffectivelyEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -361,6 +374,7 @@ public sealed partial class MainWindow
                 ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
                 : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
             : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
+        help += connected ? "   •   B Consoles" : P7("   •   Échap Consoles", "   •   Esc Consoles");
         if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;

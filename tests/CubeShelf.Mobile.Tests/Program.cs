@@ -13,7 +13,8 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==5&&ports.Select(p=>p.PackageName).Distinct().Count()==5,"five distinct Android ports and package identities");
+Check(ports.Length==9&&ports.Select(p=>p.PackageName).Distinct().Count()==9,"nine distinct Android ports and package identities");
+Check(ports.Single(p=>p.Id=="wiiu-windwakerhd").RequiresVulkan13,"Wind Waker HD requires Vulkan 1.3");
 var payload="APK fixture, never executed"u8.ToArray();
 MobileNativePort Fixture(byte[] bytes,string name="test.apk")=>new()
 {
@@ -78,7 +79,33 @@ void RunUi()
     AppBuilder.Configure<MobileApp>().UseHeadless(new AvaloniaHeadlessPlatformOptions {UseHeadlessDrawing=false}).UseSkia().SetupWithoutStarting();
     var host=new FakeGames(root,ports);var view=new MobileLibraryView(host);var window=new Window {Width=390,Height=844,Content=view};window.Show();Jobs();
     Field<Button>("_appUpdatesButton").IsVisible=true;
-    var picker=Field<ComboBox>("_consolePicker");picker.SelectedIndex=1;Jobs();
+    var picker=Field<ComboBox>("_consolePicker");
+    var home=Field<CubeShelf.Desktop.Controls.PlatformHomeControl>("_platformHome");
+    Check(home.IsVisible,"Android starts with the 3D console carousel");
+    var selectedConsole=home.SelectedConsole;
+    for(var sort=0;sort<5;sort++){home.CycleSort();Check(home.SelectedConsole==selectedConsole,"sorting preserves the selected console");}
+    home.CycleSort();home.CycleSort();home.Move(1);
+    Check(home.SelectedConsole=="wiiu","chronological sorting puts Wii U after GameCube among Android platforms");
+    home.Move(1);Check(home.SelectedConsole=="gb","chronological sorting wraps from the latest to the oldest platform");
+    for(var sort=0;sort<3;sort++)home.CycleSort();
+    if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } startupFolder)
+    {
+        Directory.CreateDirectory(startupFolder);
+        foreach(var size in new[]{new Size(390,844),new Size(320,700),new Size(844,390)})
+        {window.Width=size.Width;window.Height=size.Height;Jobs();using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(startupFolder,$"mobile-platforms-{size.Width}.png"));}
+        window.Width=390;window.Height=844;Jobs();
+    }
+    for(var step=0;step<6&&home.SelectedConsole!="n64";step++)view.BrowseFromController(1);
+    view.ActivateFromController();Check(!home.IsVisible&&picker.SelectedIndex==1,"controller confirms the 3D console and opens its games");Jobs();
+    Check(picker.ItemCount == 6 && picker.Items.Cast<string>().SequenceEqual(new[]{"GameCube","Nintendo 64","Game Boy","Game Boy Color","Game Boy Advance","Wii U"}), "Android only shows platforms backed by Android games");
+    Check(Field<TextBlock>("_platformCaption").Text == "5 jeu(x) · Android", "platform caption reflects the Android catalogue");
+    foreach (var (index, platform) in new[]{(2,"gb"),(3,"gbc"),(4,"gba"),(5,"wiiu")})
+    {
+        picker.SelectedIndex=index;Jobs();
+        Check(Field<CubeShelf.Desktop.Controls.ConsoleBrandMark>("_consoleLogo").Platform==platform &&
+            Field<TextBlock>("_platformCaption").Text=="1 jeu(x) · Android", "verified Android platform selects its own catalogue: "+platform);
+    }
+    picker.SelectedIndex=1;Jobs();
     Check(Field<TextBlock>("_position").Text=="1 / 5","Nintendo 64 selector exposes five games in the same mobile shell");
     Check(!Field<Button>("_play").IsVisible&&Field<Button>("_download").IsVisible,"uninstalled native game offers download, not Play");
     Field<Button>("_download").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
@@ -98,7 +125,7 @@ void RunUi()
     Check(!Field<StackPanel>("_onlinePanel").IsVisible,"PartyBoard online controls are hidden for native Nintendo 64 apps");
     host.Native.Blocked.Add(ports[0].Id);host.Native.Installed.Clear();view.RefreshAvailability();
     Check(!Field<Button>("_download").IsVisible,"incompatible port download is hidden");host.Native.Blocked.Clear();view.RefreshAvailability();
-    foreach(var size in new[]{new Size(390,844),new Size(844,390)})
+    foreach(var size in new[]{new Size(320,700),new Size(390,844),new Size(844,390)})
     {
         window.Width=size.Width;window.Height=size.Height;Jobs();
         var play=Field<Button>("_download");var origin=play.TranslatePoint(default,view)!.Value;
@@ -106,14 +133,14 @@ void RunUi()
         if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } folder)
         {Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"mobile-n64-{size.Width}.png"));}
     }
-    view.SetActive(false);view.SetActive(true);Jobs();Check(picker.SelectedIndex==1,"selected Nintendo 64 catalogue survives pause/resume");
-    picker.SelectedIndex=0;Jobs();Check(Field<Button>("_play").IsVisible&&Field<StackPanel>("_onlinePanel").IsVisible,"PartyBoard launch and online actions remain available");
+    view.SetActive(false);view.SetActive(true);Jobs();Check(picker.SelectedIndex==1&&!picker.IsDropDownOpen,"selected catalogue survives pause/resume without reopening the startup list");
+    picker.SelectedIndex=0;Jobs();Check(Field<TextBlock>("_platformCaption").Text=="1 jeu(x) · Android" && Field<Button>("_play").IsVisible&&Field<StackPanel>("_onlinePanel").IsVisible,"only Android-compatible PartyBoard appears in GameCube and its actions remain available");
     window.Close();
     var embeddedHost=new FakeGames(root,ports);
     embeddedHost.Native.Embedded.Add(ports[0].Id);
     embeddedHost.Native.EmbeddedPreparation=new(TaskCreationOptions.RunContinuationsAsynchronously);
     view=new MobileLibraryView(embeddedHost);window=new Window {Width=390,Height=844,Content=view};window.Show();Jobs();
-    picker=Field<ComboBox>("_consolePicker");picker.SelectedIndex=1;Jobs();
+    picker=Field<ComboBox>("_consolePicker");Field<CubeShelf.Desktop.Controls.PlatformHomeControl>("_platformHome").IsVisible=false;picker.SelectedIndex=1;Jobs();
     Check(Field<TextBlock>("_availability").Text!.Contains("Moteur intégré"),"embedded game requests a ROM without Android installation text");
     Field<Button>("_download").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
     Check(!picker.IsEnabled&&Field<Button>("_cancelNativePreparation").IsVisible&&!Field<Grid>("_downloadsOverlay").IsVisible,

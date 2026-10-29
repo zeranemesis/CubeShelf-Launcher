@@ -1,0 +1,487 @@
+[
+  {
+    "Id": "danielgomesvieira2000-burnout3-pc-burnout-3-takedown",
+    "Title": "Burnout 3: Takedown",
+    "Project": "burnout3-pc",
+    "Repository": "danielgomesvieira2000/burnout3-pc",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "772d150481325078b8f14d43d80b8e2ce4546c93",
+    "ReadmeUrl": "https://github.com/danielgomesvieira2000/burnout3-pc/blob/772d150481325078b8f14d43d80b8e2ce4546c93/README.md",
+    "ReleaseUrl": "https://github.com/danielgomesvieira2000/burnout3-pc/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "literalynn-burnoutdominatorreversed-burnout-dominator",
+    "Title": "Burnout Dominator",
+    "Project": "BurnoutDominatorReversed",
+    "Repository": "literalynn/BurnoutDominatorReversed",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "49f5ff6b137aebecab842d1b07294c49dcb232dc",
+    "ReadmeUrl": "https://github.com/literalynn/BurnoutDominatorReversed/blob/49f5ff6b137aebecab842d1b07294c49dcb232dc/README.md",
+    "ReleaseUrl": "https://github.com/literalynn/BurnoutDominatorReversed/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "jcsix694-def-jam-vendetta-recomp-def-jam-vendetta",
+    "Title": "Def Jam Vendetta",
+    "Project": "def-jam-vendetta-recomp",
+    "Repository": "jcsix694/def-jam-vendetta-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "d3d857b436beceebf1c77b0141c46bb7f13ee1fe",
+    "ReadmeUrl": "https://github.com/jcsix694/def-jam-vendetta-recomp/blob/d3d857b436beceebf1c77b0141c46bb7f13ee1fe/README.md",
+    "ReleaseUrl": "https://github.com/jcsix694/def-jam-vendetta-recomp/releases/tag/v0.4.4",
+    "ReleaseTag": "v0.4.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sweeax-exe-ffny-online-def-jam-fight-for-ny-ffny-online-",
+    "Title": "Def Jam: Fight for NY",
+    "Project": "ffny-online",
+    "Repository": "sweeax-exe/ffny-online",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Def Jam: Fight for NY (FFNY Online).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "e1866fe2c0912b23433e5df1a4a249552653c01a",
+    "ReadmeUrl": "https://github.com/sweeax-exe/ffny-online/blob/e1866fe2c0912b23433e5df1a4a249552653c01a/README.md",
+    "ReleaseUrl": "https://github.com/sweeax-exe/ffny-online/releases/tag/v0.12.2-remaster.36",
+    "ReleaseTag": "v0.12.2-remaster.36",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "skuza-oss-downhill-revived-downhill-domination-downhill-revived-",
+    "Title": "Downhill Domination",
+    "Project": "downhill-revived",
+    "Repository": "skuza-oss/downhill-revived",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Downhill Domination (downhill-revived).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "4aafa3920892180fef5c862367f283fef8b85537",
+    "ReadmeUrl": "https://github.com/skuza-oss/downhill-revived/blob/4aafa3920892180fef5c862367f283fef8b85537/README.md",
+    "ReleaseUrl": "https://github.com/skuza-oss/downhill-revived/releases/tag/v0.7.1",
+    "ReleaseTag": "v0.7.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "z3xox-bt3-recomp-dragon-ball-z-budokai-tenkaichi-3",
+    "Title": "Dragon Ball Z: Budokai Tenkaichi 3",
+    "Project": "BT3-Recomp",
+    "Repository": "z3xox/BT3-Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "e22a34beb564e2d0f32bd60b02f0a95d9645ddcc",
+    "ReadmeUrl": "https://github.com/z3xox/BT3-Recomp/blob/e22a34beb564e2d0f32bd60b02f0a95d9645ddcc/README.md",
+    "ReleaseUrl": "https://github.com/z3xox/BT3-Recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "lasvola-godhand-recomp-god-hand",
+    "Title": "God Hand",
+    "Project": "godhand-recomp",
+    "Repository": "LasVola/godhand-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "14e956a1274332440273845fbab2c1f1e30c4a5a",
+    "ReadmeUrl": "https://github.com/LasVola/godhand-recomp/blob/14e956a1274332440273845fbab2c1f1e30c4a5a/README.md",
+    "ReleaseUrl": "https://github.com/LasVola/godhand-recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "yyozcan-tobiichi-port-god-of-war",
+    "Title": "God of War",
+    "Project": "Tobiichi-Port",
+    "Repository": "YYOzcan/Tobiichi-Port",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "471c83180a8df575cff4abd3fae6c043b5096925",
+    "ReadmeUrl": "https://github.com/YYOzcan/Tobiichi-Port/blob/471c83180a8df575cff4abd3fae6c043b5096925/README.md",
+    "ReleaseUrl": "https://github.com/YYOzcan/Tobiichi-Port/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "waffle565-god-of-war-native-port-god-of-war",
+    "Title": "God of War",
+    "Project": "God-Of-War-Native-Port",
+    "Repository": "Waffle565/God-Of-War-Native-Port",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "514f89186f1926edaf4807696a59557679c7d517",
+    "ReadmeUrl": "https://github.com/Waffle565/God-Of-War-Native-Port/blob/514f89186f1926edaf4807696a59557679c7d517/README.md",
+    "ReleaseUrl": "https://github.com/Waffle565/God-Of-War-Native-Port/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "cxldsakeb-gow2-nativo-ps2-god-of-war-ii",
+    "Title": "God of War II",
+    "Project": "GoW2-nativo-PS2",
+    "Repository": "cxldsakeb/GoW2-nativo-PS2",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "5145dad446d2deb9276238e8d646c915bce988fb",
+    "ReadmeUrl": "https://github.com/cxldsakeb/GoW2-nativo-PS2/blob/5145dad446d2deb9276238e8d646c915bce988fb/README.md",
+    "ReleaseUrl": "https://github.com/cxldsakeb/GoW2-nativo-PS2/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "open-goal-jak-project-jak-and-daxter-the-precursor-legacy",
+    "Title": "Jak and Daxter: The Precursor Legacy",
+    "Project": "jak-project",
+    "Repository": "open-goal/jak-project",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "94684e32f60008d3d9617621e7c3a478c9e2af56",
+    "ReadmeUrl": "https://github.com/open-goal/jak-project/blob/94684e32f60008d3d9617621e7c3a478c9e2af56/README.md",
+    "ReleaseUrl": "https://github.com/open-goal/jak-project/releases/tag/v0.3.9",
+    "ReleaseTag": "v0.3.9",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "open-goal-jak-project-jak-ii",
+    "Title": "Jak II",
+    "Project": "jak-project",
+    "Repository": "open-goal/jak-project",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "94684e32f60008d3d9617621e7c3a478c9e2af56",
+    "ReadmeUrl": "https://github.com/open-goal/jak-project/blob/94684e32f60008d3d9617621e7c3a478c9e2af56/README.md",
+    "ReleaseUrl": "https://github.com/open-goal/jak-project/releases/tag/v0.3.9",
+    "ReleaseTag": "v0.3.9",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "drakolordx7-killzonerecomp-killzone",
+    "Title": "Killzone",
+    "Project": "KillzoneRecomp",
+    "Repository": "drakolordx7/KillzoneRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "63917763d68532048edbabc9e7d6d01c9738e55a",
+    "ReadmeUrl": "https://github.com/drakolordx7/KillzoneRecomp/blob/63917763d68532048edbabc9e7d6d01c9738e55a/README.md",
+    "ReleaseUrl": "https://github.com/drakolordx7/KillzoneRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "asobicodes-rac-rs-ratchet-clank-rac-rs-",
+    "Title": "Ratchet & Clank",
+    "Project": "rac-rs",
+    "Repository": "AsobiCodes/rac-rs",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Ratchet & Clank (rac-rs).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "5a93984555dd83c0004a9dedf82328e0e7d8a5c5",
+    "ReadmeUrl": "https://github.com/AsobiCodes/rac-rs/blob/5a93984555dd83c0004a9dedf82328e0e7d8a5c5/README.md",
+    "ReleaseUrl": "https://github.com/AsobiCodes/rac-rs/releases/tag/v0.4.1",
+    "ReleaseTag": "v0.4.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "rac-native-rac1-native-game-ratchet-clank-rac1-native-",
+    "Title": "Ratchet & Clank",
+    "Project": "rac1-native-game",
+    "Repository": "RAC-Native/rac1-native-game",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Ratchet & Clank (rac1-native).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b4c85ffa51d154c774c9173944dfeaa01078cb54",
+    "ReadmeUrl": "https://github.com/RAC-Native/rac1-native-game/blob/b4c85ffa51d154c774c9173944dfeaa01078cb54/README.md",
+    "ReleaseUrl": "https://github.com/RAC-Native/rac1-native-game/releases/tag/v0.6.0",
+    "ReleaseTag": "v0.6.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "aikatore-recvx-enhanced-port-resident-evil---code-veronica-x",
+    "Title": "Resident Evil - Code: Veronica X",
+    "Project": "recvx-enhanced-port",
+    "Repository": "aikatore/recvx-enhanced-port",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "0e27d9fb7fda56cf42402eec9ccaaaa2724b3f8d",
+    "ReadmeUrl": "https://github.com/aikatore/recvx-enhanced-port/blob/0e27d9fb7fda56cf42402eec9ccaaaa2724b3f8d/README.md",
+    "ReleaseUrl": "https://github.com/aikatore/recvx-enhanced-port/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "raccoonrecomp-residenteviloutbreakrecompiled-resident-evil-outbreak",
+    "Title": "Resident Evil Outbreak",
+    "Project": "ResidentEvilOutbreakRecompiled",
+    "Repository": "RaccoonRecomp/ResidentEvilOutbreakRecompiled",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "e0fcc5fb6e7e1011a6876824fa772ec5354a4534",
+    "ReadmeUrl": "https://github.com/RaccoonRecomp/ResidentEvilOutbreakRecompiled/blob/e0fcc5fb6e7e1011a6876824fa772ec5354a4534/README.md",
+    "ReleaseUrl": "https://github.com/RaccoonRecomp/ResidentEvilOutbreakRecompiled/releases/tag/v1.5.1",
+    "ReleaseTag": "v1.5.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "silentsudin-roadtripadventure-recomp-road-trip",
+    "Title": "Road Trip",
+    "Project": "RoadTripAdventure-recomp",
+    "Repository": "silentsudin/RoadTripAdventure-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "0f6d3613e8e32ccda5305227a578b1fb659983a8",
+    "ReadmeUrl": "https://github.com/silentsudin/RoadTripAdventure-recomp/blob/0f6d3613e8e32ccda5305227a578b1fb659983a8/README.md",
+    "ReleaseUrl": "https://github.com/silentsudin/RoadTripAdventure-recomp/releases/tag/v0.2.3",
+    "ReleaseTag": "v0.2.3",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "RoadTripRecomp-0.2.3-Windows-x64-DLSS-XeSS-addon.zip",
+        "Url": "https://github.com/silentsudin/RoadTripAdventure-recomp/releases/download/v0.2.3/RoadTripRecomp-0.2.3-Windows-x64-DLSS-XeSS-addon.zip",
+        "Sha256": "c6720233ab44c1f4f2bbdcd02fbbf057bfa536587a247d20a59f0c9d3276535e",
+        "Size": 90093178,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "RoadTripRecomp-0.2.3-Windows-x64-portable.zip",
+        "Url": "https://github.com/silentsudin/RoadTripAdventure-recomp/releases/download/v0.2.3/RoadTripRecomp-0.2.3-Windows-x64-portable.zip",
+        "Sha256": "32c5771065cd293e52e77a5cc88204f73f2775c75e576d4ae2d370fbb084ffb1",
+        "Size": 91927272,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "RoadTripRecomp-0.2.3-Windows-x64.zip",
+        "Url": "https://github.com/silentsudin/RoadTripAdventure-recomp/releases/download/v0.2.3/RoadTripRecomp-0.2.3-Windows-x64.zip",
+        "Sha256": "2dd1bcffda446170d4568416a3d355e9e540c24d26bc101455305ecc6b4a3885",
+        "Size": 91839502,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "nicolasserpa-shadow-the-hedgehog-recomp-shadow-the-hedgehog",
+    "Title": "Shadow the Hedgehog",
+    "Project": "shadow-the-hedgehog-recomp",
+    "Repository": "nicolasserpa/shadow-the-hedgehog-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "0642b8146c8519d0b9081ad38eaeff78ad228512",
+    "ReadmeUrl": "https://github.com/nicolasserpa/shadow-the-hedgehog-recomp/blob/0642b8146c8519d0b9081ad38eaeff78ad228512/README.md",
+    "ReleaseUrl": "https://github.com/nicolasserpa/shadow-the-hedgehog-recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "gtteancum-timesplitters-timesplitters",
+    "Title": "TimeSplitters",
+    "Project": "Timesplitters",
+    "Repository": "GTTeancum/Timesplitters",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "37658ff87311692c36ddee8704870f10c02f325d",
+    "ReadmeUrl": "https://github.com/GTTeancum/Timesplitters/blob/37658ff87311692c36ddee8704870f10c02f325d/README.md",
+    "ReleaseUrl": "https://github.com/GTTeancum/Timesplitters/releases/tag/v1.0",
+    "ReleaseTag": "v1.0",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "TimeSplitters-Recomp-v1.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/GTTeancum/Timesplitters/releases/download/v1.0/TimeSplitters-Recomp-v1.0-linux-x86_64.tar.gz",
+        "Sha256": "794b89a4d0a9c8fc202525f6ce6d1061e8ddbb9749b089ce2c5d69e6145402cb",
+        "Size": 15157741,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "thiagordsfx-urban-reign-recomp-urban-reign",
+    "Title": "Urban Reign",
+    "Project": "urban-reign-recomp",
+    "Repository": "thiagordsfx/urban-reign-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "20b30fd731b153110bd1b60db61bc421d42586c4",
+    "ReadmeUrl": "https://github.com/thiagordsfx/urban-reign-recomp/blob/20b30fd731b153110bd1b60db61bc421d42586c4/README.md",
+    "ReleaseUrl": "https://github.com/thiagordsfx/urban-reign-recomp/releases/tag/v1.4.0",
+    "ReleaseTag": "v1.4.0",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "UrbanReignPC-1.4.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/thiagordsfx/urban-reign-recomp/releases/download/v1.4.0/UrbanReignPC-1.4.0-linux-x86_64.tar.gz",
+        "Sha256": "f2beb82389205a9efc1f81889d8f4b4cba09bf4734a39de4d10399d00a6a986e",
+        "Size": 33059637,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "yanm1103-war_of_the_monsters_recomp-war-of-the-monsters",
+    "Title": "War of the Monsters",
+    "Project": "War_of_the_Monsters_recomp",
+    "Repository": "yanm1103/War_of_the_Monsters_recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "9b47b11119b9c87eab517f29d6beb8c33a17d435",
+    "ReadmeUrl": "https://github.com/yanm1103/War_of_the_Monsters_recomp/blob/9b47b11119b9c87eab517f29d6beb8c33a17d435/README.md",
+    "ReleaseUrl": "https://github.com/yanm1103/War_of_the_Monsters_recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "bigdaddyjrich-hctp-recomp-wwe-smackdown-here-comes-the-pain",
+    "Title": "WWE SmackDown! Here Comes the Pain",
+    "Project": "hctp-recomp",
+    "Repository": "BigDaddyJRich/hctp-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "dccdd015515a6d890646e20e8315a5bb5a67222f",
+    "ReadmeUrl": "https://github.com/BigDaddyJRich/hctp-recomp/blob/dccdd015515a6d890646e20e8315a5bb5a67222f/README.md",
+    "ReleaseUrl": "https://github.com/BigDaddyJRich/hctp-recomp/releases/tag/v0.3.4",
+    "ReleaseTag": "v0.3.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  }
+]

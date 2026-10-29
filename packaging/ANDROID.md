@@ -3,8 +3,14 @@
 DecompShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-La version 0.18.1-preview.1 porte le code Android `45` et comprend la mise à jour
+La version candidate 0.19.0-rc.1 porte le code Android `50` et comprend la mise à jour
 de l'application depuis les releases GitHub.
+
+## Catalogue et état de la candidate
+
+Les plateformes mobiles sont GameCube, Nintendo 64, Game Boy, Game Boy Color, Game Boy Advance et Wii U. Elles sont calculées à partir des jeux Android présents, sans importer automatiquement les catalogues PC. L’accueil des consoles s’ouvre au lancement ; revenir d’un jeu ne rouvre pas systématiquement cet accueil.
+
+Une candidate est une préversion GitHub. La recherche automatique ne propose que les versions stables : son APK s’installe manuellement pour les essais. Le contrôle de la même signature, du même identifiant et d’un code de version supérieur est conservé pour les mises à jour. Les essais physiques restent à effectuer quand le téléphone sera disponible.
 
 ## Produire les APK
 
@@ -26,7 +32,7 @@ La signature utilise la clé de développement persistante conservée dans le
 secret GitHub `CUBESHELF_ANDROID_KEYSTORE_BASE64`, commune aux architectures
 et aux exécutions. Le build échoue si cette clé manque, au lieu de produire
 un APK incompatible avec les mises à jour. Aucun keystore n'est publié.
-Cette clé reste une clé de développement, pas une signature de distribution.
+Cette clé reste une clé de développement persistante, pas une certification de distribution en boutique.
 Un ancien aperçu signé avec une autre clé ne peut pas être remplacé directement.
 Ne pas le désinstaller pour contourner ce refus sans sauvegarder ses données.
 
@@ -75,7 +81,7 @@ capacités réseau déterminent les fonctions disponibles.
   un Galaxy S20. La nouvelle installation d'une mise à jour doit encore être
   validée de bout en bout sur téléphone ; aucune partie Android vers Android
   n'est annoncée comme validée ici.
-- Mario Party 4 conserve son moteur intégré. Super Mario 64 est désormais intégré ; les quatre autres ports Nintendo 64 listés ci-dessous s’installent comme applications Android distinctes. Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule installation du launcher.
+- Mario Party 4 conserve son moteur intégré. Super Mario 64 est désormais intégré ; les quatre autres ports Nintendo 64 listés ci-dessous s’installent comme applications Android distinctes. Le catalogue mobile comprend aussi les ports Android de Wario Land, Oracle of Ages / Seasons (une application commune), Final Fantasy Tactics Advance et The Wind Waker HD. Leurs APK ARM64 ont été vérifiés, pas leurs parties sur téléphone. Les autres jeux du catalogue PC ne deviennent pas compatibles par la seule installation du launcher.
 - Les projets Android expérimentaux de Melee et Mario Party 5 ne sont pas
   présentés comme des jeux complets jouables. Les décompilations de Mario
   Party 6, Mario Kart Double Dash, TTYD, F-Zero GX, Super Paper Mario et Sunshine

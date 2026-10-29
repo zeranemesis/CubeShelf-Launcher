@@ -19,7 +19,7 @@ internal static class Program
             var option = Array.IndexOf(args, "--shelf");
             if (option >= 0)
             {
-                if (option + 1 >= args.Length) throw new ArgumentException("--shelf attend gamecube, wii, switch ou n64.");
+                if (option + 1 >= args.Length) throw new ArgumentException("--shelf attend un identifiant de console : " + string.Join(", ", ShelfProduct.All.Select(product => product.Id)));
                 id = args[option + 1];
             }
             Product = ShelfProduct.Resolve(id);

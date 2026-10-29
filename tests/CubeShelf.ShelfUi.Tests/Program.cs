@@ -3,6 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Interactivity;
 using Avalonia.Input;
+using Avalonia.Threading;
+using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
 using CubeShelf.Desktop;
 using CubeShelf.Desktop.Controls;
 
@@ -19,10 +22,27 @@ var window = new MainWindow();
 try
 {
     var selector=window.FindControl<ComboBox>("ConsoleShelfPicker")!;
+    var englishHome=new PlatformHomeControl { IsVisible=false };
+    englishHome.Open(new[]{(CubeShelf.Core.Library.ShelfProduct.Resolve("gamecube"),2)},"gamecube",desktop:true,grid:true,english:true);
+    if(!englishHome.GetLogicalDescendants().OfType<TextBlock>().Any(t=>t.Text=="2 games") || !englishHome.GetLogicalDescendants().OfType<TextBlock>().Any(t=>t.Text=="Sort by"))
+        throw new Exception("English console home must not retain French action labels.");
+    englishHome.IsVisible=false;
     var fullscreen=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
     var cards=window.FindControl<ItemsControl>("LibraryCards")!;
     var cubeCount=cards.Items.Count;
     AssertBrand("gamecube");
+    if(selector.ItemCount < 25) throw new Exception("Expanded platforms are missing from the unified selector.");
+    foreach(var picker in new[]{selector,fullscreen})
+    foreach(var item in picker.Items.Cast<ComboBoxItem>())
+    {
+        var id=(string)item.Tag!;
+        if(item.Content is not StackPanel row || row.Children[0] is not ConsoleBrandMark mark || mark.Platform!=id
+            || row.Children[1] is not TextBlock { Text: var consoleName } || consoleName!=CubeShelf.Core.Library.ShelfProduct.Resolve(id).Console)
+            throw new Exception("Each console selector entry must show its own logo before its name.");
+        if(id is not "arcade" and not "n64" && !Avalonia.Platform.AssetLoader.Exists(new Uri($"avares://CubeShelf/Assets/Brand/Consoles/{id}.png"))
+            && !Avalonia.Platform.AssetLoader.Exists(new Uri($"avares://CubeShelf/Assets/Brand/Consoles/{id}.gif")))
+            throw new Exception("Missing console logo artwork: "+id);
+    }
     if(cubeCount!=21)throw new Exception($"GameCube catalogue should contain 21 unique games, got {cubeCount}.");
     AssertCovers();
     selector.SelectedIndex=1;
@@ -94,10 +114,88 @@ try
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
+    foreach (var index in Enumerable.Range(4, selector.ItemCount - 4))
+    {
+        selector.SelectedIndex = index;
+        var id = ((ComboBoxItem)selector.SelectedItem!).Tag!.ToString()!;
+        AssertBrand(id);
+        if(id=="3ds" && cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card=>!card.PlayLabel.Contains("config",StringComparison.OrdinalIgnoreCase)))
+            throw new Exception("Ports without a verified compatible package must offer configuration rather than automatic installation.");
+        if (cards.Items.Count == 0 || fullscreen.SelectedIndex != index ||
+            cards.Items.Cast<MainWindow.DesktopGameCard>().Select(card => card.Title).Distinct().Count() != cards.Items.Count)
+            throw new Exception("Platform selection is empty, duplicated or out of sync: " + id);
+        if (cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.CaseFormat != GameCaseFormat.OriginalBox))
+            throw new Exception("New console inherited a GameCube case: " + id);
+    }
+    fullscreen.SelectedIndex = 2;
+    Console.WriteLine("OK  all expanded catalogues switch in one window, with matching branding and no duplicate cards.");
     typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
     window.Width=1440;window.Height=1000;window.Show();
     GameHelpChecks.Run(window);
     Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    var consoleHome=window.FindControl<PlatformHomeControl>("PlatformHome")!;
+    if (!consoleHome.IsVisible || !consoleHome.IsGrid) throw new Exception("Desktop must start with console image tiles.");
+    var sidebar=window.FindControl<Border>("DesktopSidebar")!;
+    if(!sidebar.IsEffectivelyVisible || Grid.GetColumn(consoleHome)!=1 || Grid.GetColumnSpan(consoleHome)!=1 ||
+        consoleHome.TranslatePoint(default,window)!.Value.X < sidebar.TranslatePoint(default,window)!.Value.X+sidebar.Bounds.Width)
+        throw new Exception("Desktop console home must leave the sidebar visible and unobstructed.");
+    var libraryNav=window.FindControl<Button>("NavLibraryButton")!;
+    var libraryNavPoint=libraryNav.TranslatePoint(new Point(libraryNav.Bounds.Width/2,libraryNav.Bounds.Height/2),window)!.Value;
+    if(window.InputHitTest(libraryNavPoint) is not Visual navHit || (navHit!=libraryNav&&!libraryNav.IsVisualAncestorOf(navHit)))
+        throw new Exception("The console home blocks pointer access to sidebar navigation.");
+    var consoleTiles=consoleHome.GetLogicalDescendants().OfType<Button>().Where(b=>b.Tag is string).ToArray();
+    if(consoleTiles.Length!=selector.ItemCount || consoleHome.GetLogicalDescendants().OfType<Image>().Count(image=>image.Source is not null)!=consoleTiles.Length)
+        throw new Exception("Each desktop console must have one illustrated tile.");
+    if(snapshotDirectory is not null)
+    {
+        Directory.CreateDirectory(snapshotDirectory);AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+        using var desktopConsoles=window.CaptureRenderedFrame();desktopConsoles!.Save(Path.Combine(snapshotDirectory,"desktop-consoles.png"));
+    }
+    var previousTheme=window.RequestedThemeVariant;
+    foreach(var theme in new[]{Avalonia.Styling.ThemeVariant.Light,Avalonia.Styling.ThemeVariant.Dark})
+    {
+        window.RequestedThemeVariant=theme;window.Width=960;window.Height=700;
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+        var sidebarScroll=window.FindControl<ScrollViewer>("SidebarScroll")!;
+        if(sidebarScroll.Extent.Height>sidebarScroll.Viewport.Height)
+        {
+            sidebarScroll.Offset=new Vector(0,sidebarScroll.Extent.Height);
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            if(sidebarScroll.Offset.Y<=0)throw new Exception("Small windows must allow reaching the bottom of the sidebar.");
+            sidebarScroll.Offset=default;
+        }
+        var selectorLabel=(TextBlock)((StackPanel)((ComboBoxItem)selector.SelectedItem!).Content!).Children[1];
+        var expected=theme==Avalonia.Styling.ThemeVariant.Light?"#151927":"#F8FAFF";
+        if(selectorLabel.Foreground is not Avalonia.Media.ISolidColorBrush brush || brush.Color!=Avalonia.Media.Color.Parse(expected))throw new Exception("Console selector text must follow the theme for readable contrast.");
+        foreach(var card in consoleHome.GetLogicalDescendants().OfType<Button>().Where(b=>b.Tag is string))
+        {
+            var lastLine=((StackPanel)card.Content!).Children.Last();
+            if(lastLine.TranslatePoint(default,card)!.Value.Y+lastLine.Bounds.Height>card.Bounds.Height)throw new Exception("Console card information is cut off for a long name.");
+        }
+        if(snapshotDirectory is not null)
+        {
+            Thread.Sleep(180);Avalonia.Threading.Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(2);
+            using var compactConsoles=window.CaptureRenderedFrame();compactConsoles!.Save(Path.Combine(snapshotDirectory,$"desktop-consoles-960-{theme}.png"));
+        }
+    }
+    window.RequestedThemeVariant=previousTheme;window.Width=1440;window.Height=1000;
+    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    foreach(var (button,page) in new[]{("NavLibraryButton","LibraryView"),("NavDownloadsButton","DownloadsView"),("NavSettingsButton","SettingsView")})
+    {
+        window.FindControl<Button>(button)!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        if(consoleHome.IsVisible||!window.FindControl<Control>(page)!.IsVisible)throw new Exception("Sidebar navigation did not leave console home: "+button);
+        window.FindControl<Button>("NavConsolesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        if(!consoleHome.IsVisible||!window.FindControl<Button>("NavConsolesButton")!.Classes.Contains("selected"))throw new Exception("Sidebar must reopen and highlight console home.");
+    }
+    var targetTile=consoleHome.GetLogicalDescendants().OfType<Button>().First(b=>b.Tag is "wiiu");
+    targetTile.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+    if(consoleHome.IsVisible || !window.FindControl<Control>("LibraryView")!.IsVisible || ((ComboBoxItem)selector.SelectedItem!).Tag!.ToString()!="wiiu")throw new Exception("Clicking a console tile must open its catalogue.");
+    if(snapshotDirectory is not null)
+    {
+        selector.IsDropDownOpen=true;Avalonia.Threading.Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+        using var logoSelector=window.CaptureRenderedFrame();logoSelector!.Save(Path.Combine(snapshotDirectory,"console-logo-selector.png"));
+        selector.IsDropDownOpen=false;
+    }
     AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
     var transition=window.FindControl<ShelfTransitionControl>("ShelfTransition")!;
     var host=window.FindControl<Grid>("LibraryView")!;
@@ -184,6 +282,16 @@ try
         }
     }
     BigPictureControlsChecks.Run(window,snapshotDirectory);
+    if (snapshotDirectory is not null)
+    {
+        foreach (var console in new[] { "nes", "gba", "ps1", "xbox360" })
+        {
+            selector.SelectedIndex = selector.Items.OfType<ComboBoxItem>().Select((item,index)=>(item,index)).Single(pair => pair.item.Tag?.ToString() == console).index;
+            window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Stop();
+            Dispatcher.UIThread.RunJobs(); window.UpdateLayout(); AvaloniaHeadlessPlatform.ForceRenderTimerTick(2);
+            using var capture = window.CaptureRenderedFrame(); capture!.Save(Path.Combine(snapshotDirectory, "platform-" + console + ".png"));
+        }
+    }
     void AssertBrand(string console)
     {
         if(window.FindControl<ConsoleBrandMark>("SidebarConsoleLogo")!.Platform!=console

@@ -27,7 +27,7 @@ public sealed partial class GameCaseControl
     }
     public void SetOpeningProgress(double opening,double mediaLift,double spinDegrees = 0)
     {
-        _openingEnabled=true;
+        _openingEnabled=CaseFormat!=GameCaseFormat.OriginalBox;
         _opening=Math.Clamp(opening,0,1);_mediaLift=Math.Clamp(mediaLift,0,1);
         _mediaSpinDegrees=spinDegrees%360;
         InvalidateVisual();

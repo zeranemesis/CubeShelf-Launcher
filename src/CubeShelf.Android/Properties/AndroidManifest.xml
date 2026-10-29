@@ -22,6 +22,10 @@
     <package android:name="com.dishii.mm" />
     <package android:name="app.birdman64" />
     <package android:name="io.github.jackandbeans.snap64recomp" />
+    <package android:name="org.oracles" />
+    <package android:name="com.fftarecomp.port" />
+    <package android:name="com.bigodao.warioland" />
+    <package android:name="org.wwhdrecomp.wwhd" />
     <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true" android:allowNativeHeapPointerTagging="false">

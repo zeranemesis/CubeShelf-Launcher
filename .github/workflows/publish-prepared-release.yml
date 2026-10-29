@@ -1,19 +1,20 @@
 name: Publish verified release artifacts
 
 on:
-  push:
-    branches: [release/0.17.0]
-    paths: [.github/workflows/publish-prepared-release.yml]
   workflow_dispatch:
     inputs:
       desktop_run:
         description: Successful portable desktop workflow run
         required: true
-        default: '40219163710'
       android_run:
         description: Successful Android workflow run
         required: true
-        default: '40219163889'
+
+      prerelease:
+        description: Publish a release candidate instead of a stable release
+        type: boolean
+        required: true
+        default: true
 
 permissions:
   contents: write
@@ -29,8 +30,9 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
-      DESKTOP_RUN: ${{ inputs.desktop_run || '40219163710' }}
-      ANDROID_RUN: ${{ inputs.android_run || '40219163889' }}
+      DESKTOP_RUN: ${{ inputs.desktop_run }}
+      ANDROID_RUN: ${{ inputs.android_run }}
+      PRERELEASE: ${{ inputs.prerelease && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,7 +50,7 @@ jobs:
           set -euo pipefail
           [[ "$DESKTOP_RUN" =~ ^[0-9]+$ && "$ANDROID_RUN" =~ ^[0-9]+$ ]]
           version="$(cat VERSION)"
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]]
           echo "RELEASE_TAG=v$version" >> "$GITHUB_ENV"
           gh run view "$DESKTOP_RUN" --json conclusion,headSha,workflowName > desktop-run.json
           gh run view "$ANDROID_RUN" --json conclusion,headSha,workflowName > android-run.json
@@ -129,13 +131,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          version_code="$(python3 -c 'import xml.etree.ElementTree as E; print(E.parse("src/CubeShelf.Android/CubeShelf.Android.csproj").findtext("PropertyGroup/ApplicationVersion"))')"
           signer="$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)"
           aapt="$(dirname "$signer")/aapt2"
           for apk in assets/*.apk; do
             "$signer" verify --print-certs "$apk" > certificate.txt
             grep -q 'certificate SHA-256 digest: 3c5e62f4713b437cee47fca52246e1edff3b52252cf2472d8ad7695f184b8344' certificate.txt
             "$aapt" dump badging "$apk" > badging.txt
-            grep -q "package: name='io.github.zeranemesis.cubeshelf' versionCode='44' versionName='$(cat VERSION)'" badging.txt
+            grep -q "package: name='io.github.zeranemesis.cubeshelf' versionCode='$version_code' versionName='$(cat VERSION)'" badging.txt
             grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' badging.txt
           done
       - name: Upload packages to the existing draft and verify GitHub digests
@@ -148,10 +151,10 @@ jobs:
           release_id="$(python -c 'import json, os; print(next(r["id"] for r in json.load(open("releases.json")) if r["tag_name"] == os.environ["RELEASE_TAG"]))')"
           gh api "repos/$GH_REPO/releases/$release_id" > uploaded-release.json
           python - <<'PY'
-          import hashlib, json
+          import hashlib, json, os
           from pathlib import Path
           release = json.load(open('uploaded-release.json'))
-          assert release['draft'] and not release['prerelease']
+          assert release['draft'] and release['prerelease'] == (os.environ['PRERELEASE'] == 'true')
           assets = {asset['name']: asset for asset in release['assets']}
           files = list(Path('assets').iterdir())
           assert len(files) == len(assets) == 14
@@ -166,7 +169,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release edit "$RELEASE_TAG" --draft=false --latest --target "$GITHUB_SHA"
+          latest=true
+          if [[ "$PRERELEASE" == true ]]; then latest=false; fi
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease="$PRERELEASE" --latest="$latest" --target "$GITHUB_SHA"
           gh release view "$RELEASE_TAG" --json url,isDraft,tagName --jq '{url,isDraft,tagName}'
           echo "Published $RELEASE_TAG with 12 verified packages, SHA-256 checksums and a six-platform update manifest." >> "$GITHUB_STEP_SUMMARY"
 

@@ -225,8 +225,12 @@ public sealed partial class MainWindow
     {
         if (RunningGameFor(game) is not null) return P7("■ Arrêter", "■ Stop");
         if (PlayIntentFor(game) is { } intent) return intent.Status;
-        if (game.RuntimeOwnsSetup) return File.Exists(game.Executable) || OperatingSystem.IsMacOS() && Directory.Exists(game.Executable)
-            ? P7("▶ Jouer", "▶ Play") : P7("↓ Installer le port", "↓ Install native port");
+        if (game.RuntimeOwnsSetup)
+        {
+            if(File.Exists(game.Executable) || OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))return P7("▶ Jouer", "▶ Play");
+            return _nativeShelfPorts.TryGetValue(game.Id,out var port) && port.Assets.Any(asset=>asset.MatchesCurrentPlatform)
+                ? P7("↓ Installer le port", "↓ Install native port") : P7("Configurer le port", "Configure port");
+        }
         if (!DiscImageService.Inspect(game.DiscImage, game).Supported) return P7("▶ Configurer et jouer", "▶ Set up and play");
         var runtime = _installer.GetStatus(game.Id);
         if (!runtime.IsInstalled && !File.Exists(ResolveApplicationPath(game.Executable)))
@@ -239,7 +243,9 @@ public sealed partial class MainWindow
     private string QuickPlayHint(GameCatalogEntry game)
     {
         if (RunningGameFor(game) is not null) return P7("En cours de jeu", "Playing now");
-        if (game.RuntimeOwnsSetup) return P7("Port natif : installation et fichiers selon les instructions du projet.", "Native port: setup and game files follow the project's instructions.");
+        if (game.RuntimeOwnsSetup) return _nativeShelfPorts.TryGetValue(game.Id,out var port) && port.Assets.Any(asset=>asset.MatchesCurrentPlatform)
+            ? P7("Port natif : installation et fichiers selon les instructions du projet.", "Native port: setup and game files follow the project's instructions.")
+            : P7("Aucun paquet vérifié pour ce PC. Consulte les instructions du projet et associe un programme compatible.", "No verified package for this PC. Follow the project instructions and link a compatible program.");
         if (PlayIntentFor(game) is { } intent) return intent.Status + (intent.OpensOnline
             ? P7(" Les salons s’ouvriront automatiquement.", " The room list will open automatically.")
             : P7(" Le jeu se lancera automatiquement.", " The game will start automatically."));

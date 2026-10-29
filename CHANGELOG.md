@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.19.0-rc.1 — consolidation multi-consoles
+
+- Candidate de validation : 30 catalogues PC, six plateformes Android avec ports identifiés ; Bip conservé sans changement.
+- Accueil et tri français/anglais ; menu latéral défilant en petite fenêtre ; configuration manuelle explicite sans paquet compatible.
+- 19 jaquettes supplémentaires sur correspondances exactes ; 54 images restent indisponibles.
+- Windows : test de mise à jour depuis 0.18.0 sur runner isolé, contrôle des fichiers installés et du profil conservé. Android versionCode 50 ; signature persistante vérifiée avant publication.
+- Essais téléphone, manette physique et jouabilité complète des ports encore nécessaires avant qualification stable.
+
+
+## En cours — retour aux consoles en Big Picture
+
+- Bouton « Retour aux consoles » dans le catalogue des jeux ; B à la manette et Échap au clavier ouvrent directement le carrousel des consoles, sans quitter Big Picture.
+- La console actuelle reste sélectionnée au retour. Le raccourci affiché pour revenir au bureau est corrigé en F11.
+
+## En cours — navigation et finition de l’accueil
+
+- Menu de gauche conservé sur l’accueil des consoles en mode bureau ; Bibliothèque, Téléchargements et Paramètres quittent correctement l’accueil et le bouton Consoles permet d’y revenir.
+- Page courante indiquée dans le menu, cases adaptées à la largeur disponible, informations lisibles avec les noms longs et libellé du tri.
+- Contraste du nom sélectionné corrigé en thèmes clair et sombre. Big Picture conserve son accueil sur toute la fenêtre.
+
+## En cours — logos des consoles
+
+- Logos devant les noms dans les sélecteurs bureau et Big Picture ; le logo en haut à gauche suit la console sélectionnée.
+- Visuels Wikimedia intégrés et disponibles hors connexion, avec leurs sources et licences. Le symbole Nintendo 64 existant est conservé.
+
+## En cours — accueil des consoles 3D
+
+- Mode bureau : grille de cases avec 30 photos de consoles provenant de Wikimedia Commons, chargées localement ; sources, auteurs et licences fournis avec les images.
+- Big Picture : carrousel 3D conservé, sur le fond clair à courbes du choix des jeux. Le mode bureau suit le thème de la bibliothèque.
+- Accueil commun PC, Big Picture et Android : consoles en volume dans le carrousel des jaquettes, sélection avant d’ouvrir les jeux à chaque lancement.
+- Tris par nom, marque, année de première sortie et nombre de jeux. Android conserve ses seules plateformes mobiles.
+- Modèles géométriques originaux et stylisés, éclairés et projetés en perspective ; plusieurs silhouettes restent simplifiées. Aucun modèle tiers ajouté.
+
+## En cours — catalogues PC multi-consoles
+
+- 26 plateformes supplémentaires, dont Sega, PlayStation et Xbox : 346 références documentées regroupées en 313 jeux, variantes sur une seule carte et état expérimental visible.
+- Sélecteurs bureau et Big Picture, menu manette et mémorisation de la console utilisent une liste commune des catalogues disponibles.
+- 259 nouvelles jaquettes avec provenance, proportions adaptées, repères par console et signalement explicite des 54 jaquettes encore manquantes.
+- Sources épinglées, paquets avec taille et SHA-256 lorsqu’ils sont publiés par le projet ; association manuelle pour les autres. Aucun jeu fourni.
+- Android : sélecteur limité aux six plateformes avec ports Android, quatre ports ARM64 supplémentaires avec APK vérifiés et installation Android à confirmer. Les parties n’ont pas été testées sur téléphone.
+- Big Picture : menu des plateformes avec repères visuels, nombre de jeux et sélection courante.
+
 ## 0.18.1-preview.5 — Bip visuel sur PC, non publiée
 
 - Bulle PC minimale après le choix : « Je réfléchis… », puis texte seul à hauteur ajustée. Clic sur la réponse pour ajouter une précision et relancer le même type d’aide ; options et sources accessibles au clic droit sur la bulle.

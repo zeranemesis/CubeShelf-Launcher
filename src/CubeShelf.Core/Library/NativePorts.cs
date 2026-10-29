@@ -10,6 +10,26 @@ namespace CubeShelf.Core.Library;
 
 public sealed record ShelfProduct(string Id, string Name, string Console, string Accent)
 {
+    public static readonly ShelfProduct[] All =
+    [
+        new("gamecube", "CubeShelf", "GameCube", "#A88BFA"), new("wii", "WiiShelf", "Wii", "#45C5E8"),
+        new("switch", "SwitchShelf", "Switch", "#FA5365"), new("n64", "N64Shelf", "Nintendo 64", "#31B767"),
+        new("nes", "NESShelf", "NES", "#D64D4D"), new("snes", "SNESShelf", "Super Nintendo", "#9C87BC"),
+        new("gb", "GBShelf", "Game Boy", "#91A65A"), new("gbc", "GBCShelf", "Game Boy Color", "#8555B2"),
+        new("gba", "GBAShelf", "Game Boy Advance", "#7561C8"), new("nds", "DSShelf", "Nintendo DS", "#9CA6B5"),
+        new("3ds", "3DSShelf", "Nintendo 3DS", "#CE4448"), new("wiiu", "WiiUShelf", "Wii U", "#25B3D3"),
+        new("virtualboy", "VBShelf", "Virtual Boy", "#D93440"),
+        new("mastersystem", "SMSShelf", "Master System", "#D84248"), new("megadrive", "MegaDriveShelf", "Mega Drive", "#4477CD"),
+        new("gamegear", "GameGearShelf", "Game Gear", "#5777B5"), new("32x", "32XShelf", "Sega 32X", "#CDAD39"),
+        new("segacd", "SegaCDShelf", "Sega CD", "#4287BC"), new("saturn", "SaturnShelf", "Sega Saturn", "#6D73BC"),
+        new("dreamcast", "DreamcastShelf", "Dreamcast", "#E78B43"),
+        new("ps1", "PS1Shelf", "PlayStation", "#7280A8"), new("ps2", "PS2Shelf", "PlayStation 2", "#4777CE"),
+        new("ps3", "PS3Shelf", "PlayStation 3", "#647A9F"), new("ps4", "PS4Shelf", "PlayStation 4", "#446DB0"),
+        new("psp", "PSPShelf", "PlayStation Portable", "#8393AA"),
+        new("xbox", "XboxShelf", "Xbox", "#72AE42"), new("xbox360", "Xbox360Shelf", "Xbox 360", "#8ABF57"),
+        new("arcade", "ArcadeShelf", "Arcade", "#D49A46"), new("neogeo", "NeoGeoShelf", "Neo Geo", "#C9A847"),
+        new("cdi", "CDIShelf", "Philips CD-i", "#69A1A7")
+    ];
     public PlatformPaths CreatePaths() => new(Name, new Dictionary<string, string?>
     {
         ["XDG_DATA_HOME"] = Environment.GetEnvironmentVariable("XDG_DATA_HOME"),
@@ -23,7 +43,8 @@ public sealed record ShelfProduct(string Id, string Name, string Console, string
         "wii" or "wiishelf" => new("wii", "WiiShelf", "Wii", "#45C5E8"),
         "switch" or "switchshelf" => new("switch", "SwitchShelf", "Switch", "#FA5365"),
         null or "gamecube" or "cubeshelf" => new("gamecube", "CubeShelf", "GameCube", "#A88BFA"),
-        _ => throw new ArgumentException("Console inconnue.", nameof(id))
+        _ => All.FirstOrDefault(product => product.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException("Console inconnue.", nameof(id))
     };
 }
 

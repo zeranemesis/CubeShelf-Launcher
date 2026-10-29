@@ -98,7 +98,7 @@ public sealed partial class MobileLibraryView
                 var target=_allCatalog.FirstOrDefault(game=>game.Id==(entry?.GameId??PartyBoardId));
                 if(target is not null)
                 {
-                    _consolePicker.SelectedIndex=target.ShelfConsole=="n64"?1:0;
+                    _consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms, product => product.Id == target.ShelfConsole);
                     var index=Array.FindIndex(_catalog,game=>game.Id==target.Id);
                     if(index>=0)
                     {

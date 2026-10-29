@@ -10,6 +10,7 @@
   <Grid ColumnDefinitions="225,*">
     <!-- SIDEBAR -->
     <Border x:Name="DesktopSidebar" Grid.Column="0" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
+      <ScrollViewer x:Name="SidebarScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
       <DockPanel Margin="16">
         <StackPanel DockPanel.Dock="Top">
           <StackPanel Orientation="Horizontal" Margin="0,4,0,28" Spacing="12">
@@ -18,16 +19,13 @@
             </Border>
             <StackPanel VerticalAlignment="Center" Spacing="2">
               <TextBlock x:Name="SidebarAppName" Text="DecompShelf" Foreground="{DynamicResource Text}" FontSize="20" FontWeight="Bold" />
-              <TextBlock Text="{DynamicResource BrandSubtitle}" Foreground="{DynamicResource Muted}" FontSize="10" />
+              <TextBlock x:Name="SidebarShelfSubtitle" Text="{DynamicResource BrandSubtitle}" Foreground="{DynamicResource Muted}" FontSize="10" />
             </StackPanel>
           </StackPanel>
           <ComboBox x:Name="ConsoleShelfPicker" HorizontalAlignment="Stretch" Margin="0,-12,0,18"
                     MinHeight="44" SelectionChanged="ConsoleShelfChanged">
-            <ComboBoxItem Content="GameCube" Tag="gamecube" />
-            <ComboBoxItem Content="Wii" Tag="wii" />
-            <ComboBoxItem Content="Switch" Tag="switch" />
-            <ComboBoxItem Content="Nintendo 64" Tag="n64" />
           </ComboBox>
+          <Button x:Name="NavConsolesButton" Classes="nav" Content="Consoles" Click="OpenPlatformHome" HorizontalAlignment="Stretch" Margin="0,0,0,12" />
           <Button x:Name="NavLibraryButton" Classes="nav selected" TabIndex="1" Click="ParityShowLibrary">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▦" Width="18" /><TextBlock Text="{DynamicResource AppLibrary}" /></StackPanel>
           </Button>
@@ -79,6 +77,7 @@
           <TextBlock x:Name="VersionText" Foreground="{DynamicResource Muted}" FontSize="10" />
         </StackPanel>
       </DockPanel>
+      </ScrollViewer>
     </Border>
 
     <Grid x:Name="ViewHost" Grid.Column="1" ClipToBounds="True">
@@ -110,10 +109,6 @@
             <controls:ConsoleBrandMark x:Name="BigPictureConsoleLogo" Width="36" Height="36" />
             <TextBlock x:Name="BigPictureAppName" Text="DecompShelf" Foreground="#302C35" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
             <ComboBox x:Name="BigPictureConsoleShelfPicker" Margin="10,0,0,0" MinWidth="130" MinHeight="44" SelectionChanged="ConsoleShelfChanged">
-              <ComboBoxItem Content="GameCube" Tag="gamecube" />
-              <ComboBoxItem Content="Wii" Tag="wii" />
-              <ComboBoxItem Content="Switch" Tag="switch" />
-              <ComboBoxItem Content="Nintendo 64" Tag="n64" />
             </ComboBox>
           </StackPanel>
           <TextBlock x:Name="BigPictureCount" Grid.Column="1" Foreground="#706671" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -147,13 +142,14 @@
             </StackPanel>
           </ScrollViewer>
         </Grid>
-        <Grid Grid.Row="2" Margin="32,16,32,24" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="12">
-          <Button x:Name="BigPicturePreviousButton" Content="❮" Click="PreviousBigPictureGame" Padding="16,8" />
-          <Border Grid.Column="1" CornerRadius="8" Background="#EFDDD8" Padding="16,10">
+        <Grid Grid.Row="2" Margin="32,16,32,24" ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="12">
+          <Button x:Name="BigPictureConsolesButton" Click="OpenPlatformHome" Padding="16,10" />
+          <Button x:Name="BigPicturePreviousButton" Grid.Column="1" Content="❮" Click="PreviousBigPictureGame" Padding="16,8" />
+          <Border Grid.Column="2" CornerRadius="8" Background="#EFDDD8" Padding="16,10">
             <TextBlock x:Name="BigPicturePosition" Foreground="#80594E" FontSize="13" VerticalAlignment="Center" />
           </Border>
-          <Button x:Name="BigPictureNextButton" Grid.Column="2" Content="❯" Click="NextBigPictureGame" Padding="16,8" />
-          <TextBlock x:Name="BigPictureHelp" Grid.Column="3" Foreground="#706671" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" />
+          <Button x:Name="BigPictureNextButton" Grid.Column="3" Content="❯" Click="NextBigPictureGame" Padding="16,8" />
+          <TextBlock x:Name="BigPictureHelp" Grid.Column="4" Foreground="#706671" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" />
         </Grid>
       </Grid>
       </ThemeVariantScope>
@@ -1080,9 +1076,9 @@
       </Border>
       <Border x:Name="BigPictureMenuOverlay" IsVisible="False" Background="#B8000000" ZIndex="80">
         <Border Width="650" MaxWidth="900" MaxHeight="820" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#EDEDEB" CornerRadius="6" BoxShadow="0 12 40 0 #80000000">
+                Background="#EDEDEB" CornerRadius="12" BoxShadow="0 12 40 0 #80000000">
           <Grid RowDefinitions="Auto,*,Auto">
-            <Border Background="#303A44" Padding="30,22" CornerRadius="6,6,0,0">
+            <Border Background="#303A44" Padding="30,22" CornerRadius="12,12,0,0">
               <TextBlock x:Name="BigPictureMenuTitle" Foreground="White" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
             </Border>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="BigPictureMenuRows" Margin="14,12" Spacing="3" /></ScrollViewer>
@@ -1103,5 +1099,6 @@
       </Border>
     </Grid>
     <controls:ShelfTransitionControl x:Name="ShelfTransition" Grid.Column="1" ZIndex="100" />
+    <controls:PlatformHomeControl x:Name="PlatformHome" IsVisible="False" Grid.Column="1" ZIndex="110" />
   </Grid>
 </Window>

@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "overkilllabs3-driveclub-recomp-driveclub",
+    "Title": "DriveClub",
+    "Project": "driveclub-recomp",
+    "Repository": "OverkillLabs3/driveclub-recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "ba850846bf711d655e2cc810647317c6547aa6ac",
+    "ReadmeUrl": "https://github.com/OverkillLabs3/driveclub-recomp/blob/ba850846bf711d655e2cc810647317c6547aa6ac/README.md",
+    "ReleaseUrl": "https://github.com/OverkillLabs3/driveclub-recomp/releases/tag/v0.3.2",
+    "ReleaseTag": "v0.3.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "driveclub-recomp-0.3.2-win64.zip",
+        "Url": "https://github.com/OverkillLabs3/driveclub-recomp/releases/download/v0.3.2/driveclub-recomp-0.3.2-win64.zip",
+        "Sha256": "a4bdf0041e9bdf02457cd1cd028fe759eed8047a2a750c5a3cfca5375e6495e1",
+        "Size": 96801711,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

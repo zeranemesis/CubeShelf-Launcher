@@ -1,0 +1,51 @@
+[
+  {
+    "Id": "bgyss-snatcher-port-snatcher",
+    "Title": "Snatcher",
+    "Project": "snatcher-port",
+    "Repository": "bgyss/snatcher-port",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "2a2b20dbc1cd985af50310f349a0491acfe6ea88",
+    "ReadmeUrl": "https://github.com/bgyss/snatcher-port/blob/2a2b20dbc1cd985af50310f349a0491acfe6ea88/README.md",
+    "ReleaseUrl": "https://github.com/bgyss/snatcher-port/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "carl0srmz-littleplanet-sonic-cd",
+    "Title": "Sonic CD",
+    "Project": "littleplanet",
+    "Repository": "carl0srmz/littleplanet",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "093f58a0428bd5f15d9faa5e20af0894f1bf8686",
+    "ReadmeUrl": "https://github.com/carl0srmz/littleplanet/blob/093f58a0428bd5f15d9faa5e20af0894f1bf8686/README.md",
+    "ReleaseUrl": "https://github.com/carl0srmz/littleplanet/releases/tag/1.0",
+    "ReleaseTag": "1.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "littleplanet-linux-aarch64.AppImage",
+        "Url": "https://github.com/carl0srmz/littleplanet/releases/download/1.0/littleplanet-linux-aarch64.AppImage",
+        "Sha256": "d05e4f466c99be613ddf0dd9c36a3c4c6d23453051d5f0293712bbd65a0d937a",
+        "Size": 160995848,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      }
+    ]
+  }
+]

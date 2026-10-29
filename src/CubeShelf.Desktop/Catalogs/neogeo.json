@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "almazproud-metal-slug-x-recomp-metal-slug-x",
+    "Title": "Metal Slug X",
+    "Project": "metal-slug-x-recomp",
+    "Repository": "AlmazProud/metal-slug-x-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "bd946a70dd56c15ec101b4fa7a8b71ff3ade9b95",
+    "ReadmeUrl": "https://github.com/AlmazProud/metal-slug-x-recomp/blob/bd946a70dd56c15ec101b4fa7a8b71ff3ade9b95/README.md",
+    "ReleaseUrl": "https://github.com/AlmazProud/metal-slug-x-recomp/releases/tag/v2.0.0",
+    "ReleaseTag": "v2.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "metal-slug-x-recomp-v2.0.0-win64.zip",
+        "Url": "https://github.com/AlmazProud/metal-slug-x-recomp/releases/download/v2.0.0/metal-slug-x-recomp-v2.0.0-win64.zip",
+        "Sha256": "b0eb2bdf3d13ed5f38380512223cb64a39478b9b70a8be1efaabd507f2af4619",
+        "Size": 2789993,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

@@ -13,6 +13,8 @@ public sealed class GameCoverControl : Control
     public Bitmap? Cover { get => GetValue(CoverProperty); set => SetValue(CoverProperty, value); }
     public GameCaseFormat Format { get => GetValue(FormatProperty); set => SetValue(FormatProperty, value); }
     private static readonly IBrush Shadow = new SolidColorBrush(Color.FromArgb(35, 0, 0, 0));
+    private static readonly FormattedText MissingCover = new("Jaquette\nindisponible", System.Globalization.CultureInfo.InvariantCulture,
+        FlowDirection.LeftToRight, new Typeface("Arial"), 14, new SolidColorBrush(Color.Parse("#B5C8D6")));
     private static readonly IBrush DarkShell = new SolidColorBrush(Color.Parse("#151518"));
     private static readonly IBrush WhiteShell = new SolidColorBrush(Color.Parse("#F5F5F2"));
     private static readonly IBrush ClearShell = new SolidColorBrush(Color.Parse("#C1C6CD"));
@@ -43,6 +45,12 @@ public sealed class GameCoverControl : Control
         var box = new Rect(3, 2, Math.Max(0, Bounds.Width - 6), Math.Max(0, Bounds.Height - 8));
         if (box.Width < 2 || box.Height < 2) return;
         context.DrawRectangle(Shadow, null, box.Translate(new Vector(0, 4)).Inflate(1), 3, 3);
+        if (Cover is null)
+        {
+            context.DrawRectangle(DarkShell, Edge, box, 2.5, 2.5);
+            context.DrawText(MissingCover, new Point(box.X + (box.Width - MissingCover.Width) / 2, box.Y + (box.Height - MissingCover.Height) / 2));
+            return;
+        }
         if(Format==GameCaseFormat.Nintendo64)
         {
             if(Cover is { } print)context.DrawImage(print,new Rect(print.Size),box);

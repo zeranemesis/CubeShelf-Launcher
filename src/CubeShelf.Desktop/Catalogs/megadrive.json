@@ -1,0 +1,70 @@
+[
+  {
+    "Id": "kruzeman-rrop-rings-of-power",
+    "Title": "Rings of Power",
+    "Project": "RROP",
+    "Repository": "kruzeman/RROP",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "d3a00f15a220dec107790e2282c974425bfaed34",
+    "ReadmeUrl": "https://github.com/kruzeman/RROP/blob/d3a00f15a220dec107790e2282c974425bfaed34/README.md",
+    "ReleaseUrl": "https://github.com/kruzeman/RROP/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "heyjoeway-sonic3air-sonic-3-knuckles",
+    "Title": "Sonic 3 & Knuckles",
+    "Project": "sonic3air",
+    "Repository": "heyjoeway/sonic3air",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "1f346407d342beeba97d7d042653f13b49b02792",
+    "ReadmeUrl": "https://github.com/heyjoeway/sonic3air/blob/1f346407d342beeba97d7d042653f13b49b02792/README.md",
+    "ReleaseUrl": "https://github.com/heyjoeway/sonic3air/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "mstan-sonicthehedgehogrecomp-sonic-the-hedgehog",
+    "Title": "Sonic the Hedgehog",
+    "Project": "SonicTheHedgehogRecomp",
+    "Repository": "mstan/SonicTheHedgehogRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "510679e66abc435f12a29d66c2d6788f4e1008f9",
+    "ReadmeUrl": "https://github.com/mstan/SonicTheHedgehogRecomp/blob/510679e66abc435f12a29d66c2d6788f4e1008f9/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehogRecomp/releases/tag/v0.7.3",
+    "ReleaseTag": "v0.7.3",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SonicTheHedgehogRecomp-windows-x64-v0.7.3.zip",
+        "Url": "https://github.com/mstan/SonicTheHedgehogRecomp/releases/download/v0.7.3/SonicTheHedgehogRecomp-windows-x64-v0.7.3.zip",
+        "Sha256": "082cfb48e1d35a5ae05f054ad663e4eee46b21e5d920ec7e7d6628bce32a3fc8",
+        "Size": 4750567,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

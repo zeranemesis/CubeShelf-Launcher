@@ -1,0 +1,2775 @@
+{
+  "VerifiedAt": "2026-10-29",
+  "Method": "Primary READMEs reviewed, pinned commit provenance; no full-game validation",
+  "DiscoverySource": "https://github.com/Carter54git/Greates-Games-Decompilations-List",
+  "Entries": [
+    {
+      "Console": "32x",
+      "Title": "Knuckles' Chaotix",
+      "Repository": "YuutaTsubasa/ChaotixRecompiled",
+      "SourceCommit": "f2d1f94d1ca16ddf216aed89962f4d2144d3b6d5",
+      "Evidence": "A static recompilation of the Sega 32X game *Knuckles' Chaotix* into native native program on each platform.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "3ds",
+      "Title": "Ocarina of Time 3D",
+      "Repository": "coccofresco/TriAevum",
+      "SourceCommit": "8f69a26f390bf3a500bf3149b6596c19724a5b5d",
+      "Evidence": "A native PC AOT recompilation of *The Legend of Zelda: Ocarina of Time 3D*, `logs/oot3d_native_game.log`. **Normal in-game save files are particularly",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Dead or Alive ++",
+      "Repository": "3dge7161/Jiggle-or-Physics",
+      "SourceCommit": "9e42e3ba122249d14ec2acbcc22f9fca34330f68",
+      "Evidence": "**An unofficial Windows x64 static recompilation of the US PlayStation 1 release of _Dead or Alive_, created by 3DGE.** Version **0.1.0** · Experimental. > Jiggle or Physics translates the game's MIPS executable into generated C, then compiles it into a native Windows program linked to the PSXRecomp runtime. This is a recompilation project: it is not a conventional emulator front-end or a traditional hand-written decompilation.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Dig Dug",
+      "Repository": "TekRantGaming/digdug-native",
+      "SourceCommit": "f39916ef85cb8080baa32a7a2e030abd19f1b8fb",
+      "Evidence": "Grab the latest build from the **[Releases](https://github.com/TekRantGaming/digdug-native/releases/latest)** page. 4. the per-user config folder: `%APPDATA%\\DigDugNative\\roms` (Windows) or `~/.config/DigDugNative/roms` (Linux)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Killer Instinct",
+      "Repository": "thefixinhixon/UltraCombo",
+      "SourceCommit": "b7ae26e7605efbe53cb60433ade26d5579900d8e",
+      "Evidence": "Native PC ports of the Killer Instinct arcade games, for Windows and Linux: ROMs, and compiles it into a native module. That takes about a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "OutRun",
+      "Repository": "djyt/cannonball",
+      "SourceCommit": "27493ebf62be3498dff93ed6a45e8e2db819bae1",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Pac-Man",
+      "Repository": "Wilson-Flores/PacmanRecomp",
+      "SourceCommit": "910c9ae6e588983c1266df8f2d578c55ac4cb2c4",
+      "Evidence": "Static recompilation of Midway's original Pac-Man arcade game for PC (Windows/Linux/Mac)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Thrill Drive 2",
+      "Repository": "spita90/konami-viper-recomp",
+      "SourceCommit": "f65fa785c032faf9ef4bb6423e1cceb307805477",
+      "Evidence": "Native PC ports of Konami's **Viper** arcade games: **Thrill Drive 2** and **GTI Club 2** The original PowerPC code is **statically recompiled** into C, so the game runs as native code",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Super Street Fighter II Turbo",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Street Fighter Alpha",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Street Fighter Alpha 2",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Street Fighter Zero 2 Alpha",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Street Fighter Alpha 3",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Super Gem Fighter Mini Mix",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Marvel Super Heroes",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "X-Men vs. Street Fighter",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Marvel Super Heroes vs. Street Fighter",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Marvel vs. Capcom",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Super Puzzle Fighter II Turbo",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior 2",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Hunter 2",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior Definitive",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Alien vs. Predator",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Cadillacs and Dinosaurs",
+      "Repository": "tmcleroy/cps2recomp",
+      "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+      "Evidence": "**Unofficial native PC ports of Capcom's CPS-2 arcade games (and a CPS-1 one), for macOS, Linux (Steam Deck and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "cdi",
+      "Title": "Link: The Faces of Evil",
+      "Repository": "tools81/link-faces-of-evil-static-recomp",
+      "SourceCommit": "67c1d8c3df091b5ea97461cc7a1151371d3e72f3",
+      "Evidence": "native Windows program. The game's 68000 machine code is translated ahead of desktop's native resolution. The game itself draws a fixed 384×240 picture (a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "cdi",
+      "Title": "Mutant Rampage: Bodyslam",
+      "Repository": "tools81/mutant-rampage-bodyslam-static-recomp",
+      "SourceCommit": "fff3b3a3c3f6fe47def39e0fe15abe1580cd1f9a",
+      "Evidence": "A native Windows port of *Mutant Rampage: Bodyslam* (Philips CD-i, 1995). The It is built from the CD-i static recompilation template (extracted from the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "dreamcast",
+      "Title": "Sonic Adventure",
+      "Repository": "sonicfreak1337/SARecomp",
+      "SourceCommit": "73e9e854cde6fe8b158779c0c0a70c6cec4828ff",
+      "Evidence": "Sonic Adventure Recompiled is an unofficial native PC port of the Dreamcast original adventure while adding widescreen support, modern camera controls, native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "dreamcast",
+      "Title": "SoulCalibur",
+      "Repository": "enrique363/voldorium",
+      "SourceCommit": "b7e4cb6e213bf7fe31c35b0eee168f357e8a530e",
+      "Evidence": "A native Windows port of the Dreamcast fighting game **SoulCalibur** (USA, T-1401N, V1.000), made by static recompilation: the game's SH-4 machine code is translated into C and compiled",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "dreamcast",
+      "Title": "Space Channel 5",
+      "Repository": "ZoomiesZaggy/Space-Channel-5",
+      "SourceCommit": "ff246d27baabeee6c7a342fd7ce69f6755e2d5cd",
+      "Evidence": "An unofficial native port of the USA Dreamcast release, with configurable controls, display options and compiler-free downloads. > **Bring your own disc.** You need the supported USA Dreamcast GDI and all its track files. Downloads include precompiled native modules, but no original disc assets. No Python, Git or compiler is needed to play.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gamegear",
+      "Title": "Sonic Blast",
+      "Repository": "mstan/SonicBlastGGRecomp",
+      "SourceCommit": "87ff0697ef218bf68eced25b05c02c674cb3253f",
+      "Evidence": "Static recompilation of *Sonic Blast* (Sega Game Gear, 1996) into native C, to a native binary — it is not interpreted at runtime. The rest of the Game Gear",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gb",
+      "Title": "Super Mario Land 2: 6 Golden Coins",
+      "Repository": "mstan/SuperMarioLand2Recomp",
+      "SourceCommit": "be57e210f1c1a11d777b5482076dbbc371468ea1",
+      "Evidence": "Static recompilation of the Game Boy title *Super Mario Land 2 - 6 Golden Coins (UE) (V1.0)* (CRC32 `D5EC24E4`) to native code via",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gb",
+      "Title": "Wario Land: Super Mario Land 3",
+      "Repository": "GABRIELNNK/Bigodao",
+      "SourceCommit": "491b62989922582ff97fb3ce6c7dec6be3835cce",
+      "Evidence": "> **A static recompilation study and native port of *Wario Land: Super Mario Land 3* with native widescreen, a GPU renderer with an optional 3D mode, and mods support for HD tiles and remastered music.** By extracting and recompiling game code into modern C/C++, this project enables *Wario Land: Super Mario Land 3* to run natively on Linux, Windows and Android with enhanced performance and **native widescreen rendering** without standard emulator stretched distortion.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Dragon Ball Z: Buu's Fury",
+      "Repository": "mstan/DragonBallZBuusFuryRecomp",
+      "SourceCommit": "ccc81d732eb6937421cf9ae0b6347308d06cd09c",
+      "Evidence": "Static recompilation of **Dragon Ball Z: Buu's Fury** for Windows, with an",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Dragon Ball Z: The Legacy of Goku",
+      "Repository": "mstan/DragonBallZLegacyOfGokuRecomp",
+      "SourceCommit": "de4026b22bfc824822fe9f01353937cc129afa5d",
+      "Evidence": "Static recompilation of **Dragon Ball Z: The Legacy of Goku** for Windows, view has been validated at native 240-pixel width and representative 320-,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Dragon Ball Z: The Legacy of Goku II",
+      "Repository": "mstan/DragonBallZLegacyofGokuIIRecomp",
+      "SourceCommit": "1ebd9c9283a7af1e54af551df44194ce07e9381c",
+      "Evidence": "Static recompilation of **Dragon Ball Z: The Legacy of Goku II** for Windows,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Final Fantasy Tactics Advance",
+      "Repository": "Jorge262007/FFTARecomp",
+      "SourceCommit": "fcc38cc46084793f29136419a8a15e6914a570ce",
+      "Evidence": "**FFTARecomp** turns *Final Fantasy Tactics Advance* (USA version) into a native program for Windows, Linux and Steam Deck. Instead of running in an emulator, the game is recompiled from your own ROM, so it runs smoothly, needs no BIOS, and gets modern options. It is based on [gba-recomp](https://github.com/JRickey/gba-recomp) by JRickey.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Fire Emblem: The Sacred Stones",
+      "Repository": "Lordingard/SacredStonesRecomp",
+      "SourceCommit": "214b273aeabb3e46a85d24cadc62f5b30b40a8df",
+      "Evidence": "> This is a playable, actively maintained static recompilation for Windows and Android. Static recompilation of *Fire Emblem: The Sacred Stones* (Game Boy Advance) to a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Golden Sun",
+      "Repository": "Shmargus/GSRecomp",
+      "SourceCommit": "c22c8aeead65fae05b765a494bf360e070cabb46",
+      "Evidence": "Native PC ports of **Golden Sun** (The Broken Seal) and **Golden Sun: The Lost Age** for the Game Boy Advance, made by static recompilation, for Windows and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Golden Sun: The Lost Age",
+      "Repository": "Shmargus/GSRecomp",
+      "SourceCommit": "c22c8aeead65fae05b765a494bf360e070cabb46",
+      "Evidence": "Native PC ports of **Golden Sun** (The Broken Seal) and **Golden Sun: The Lost Age** for the Game Boy Advance, made by static recompilation, for Windows and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Mario Kart: Super Circuit",
+      "Repository": "mstan/MarioKartSuperCircuitRecomp",
+      "SourceCommit": "37fd0805386bb771f7c6746402b6bb173f41b2a7",
+      "Evidence": "Static recompilation of **Mario Kart: Super Circuit** for Windows and Linux, with to fit the window or fullscreen display. **Native (3:2)** deliberately keeps",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Mega Man Zero",
+      "Repository": "mstan/MegaManZeroRecomp",
+      "SourceCommit": "3418f7e02624ff027ff52cc3189d6007e3769b29",
+      "Evidence": "Static recompilation of **Mega Man Zero** (Game Boy Advance) to native PC, Both images were captured from strict native/LLE verification runs.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Pokémon Emerald",
+      "Repository": "NTx86/pokeemerald-sdl2pc",
+      "SourceCommit": "58b0783eb7b5335dc20e4d3b47226819da5cc32a",
+      "Evidence": "This is a PC port of Pokémon Emerald based off [pret decompilation](https://github.com/pret/pokeemerald).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Pokémon Mystery Dungeon: Red Rescue Team",
+      "Repository": "Asphaltian/pmd-green",
+      "SourceCommit": "e65f7e79a44edfe5b2abe1efee2184247f1eb112",
+      "Evidence": "Green Rescue Team is Pokémon Mystery Dungeon: Red Rescue Team, recompiled to run natively on PC. It's the same game you know, with a few enhancements as well as mod support.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Sonic Advance",
+      "Repository": "smiluredev/SonicAdvanceRecomp",
+      "SourceCommit": "e637fc89861b66b291ce3a1b02cdb151ca53bc22",
+      "Evidence": "A native, high-performance C/C++ port of **Sonic Advance** (Game Boy Advance) for modern platforms, created via static recompilation using `GBARecomp`. This project translates the original GBA machine code into clean, platform-agnostic C/C++, running natively without CPU emulation overhead, input lag, or reliance on legacy J2ME adaptations.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Super Mario Advance 2: Super Mario World",
+      "Repository": "mstan/SuperMarioAdvance2Recomp",
+      "SourceCommit": "71f360f52190a466109de75c60585bc49b7599f9",
+      "Evidence": "Static recompilation of **Super Mario Advance 2: Super Mario World** for Windows. It runs the original Game Boy Advance game as a native desktop",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "Super Mario Advance 4: Super Mario Bros. 3",
+      "Repository": "mstan/SuperMarioAdvance4Recomp",
+      "SourceCommit": "f9344ab09c4e2e14fa7fbeba378d97b3d0477f12",
+      "Evidence": "Static recompilation of **Super Mario Advance 4: Super Mario Bros. 3** for Windows. The original Game Boy Advance code runs as a native desktop",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gba",
+      "Title": "WarioWare: Twisted!",
+      "Repository": "mstan/WarioWareTwistedRecomp",
+      "SourceCommit": "e959da47db510917971e19adf0e6e9d20adbbcf0",
+      "Evidence": "Static recompilation of **WarioWare: Twisted!** for Windows and Android, with native motion controls for the cartridge's built-in gyroscope.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gbc",
+      "Title": "The Legend of Zelda: Oracle of Ages",
+      "Repository": "kirby-letsgo/oracles-decomp",
+      "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
+      "Evidence": "Native macOS, Windows, Linux and Android versions of **Oracle of Ages** and **Oracle of Seasons** run as native programs, which is what makes widescreen, save states and save sync across your",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "gbc",
+      "Title": "The Legend of Zelda: Oracle of Seasons",
+      "Repository": "kirby-letsgo/oracles-decomp",
+      "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
+      "Evidence": "Native macOS, Windows, Linux and Android versions of **Oracle of Ages** and **Oracle of Seasons** run as native programs, which is what makes widescreen, save states and save sync across your",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "mastersystem",
+      "Title": "Sonic the Hedgehog",
+      "Repository": "mstan/SonicTheHedgehogSMSRecomp",
+      "SourceCommit": "b643f5422c2023532dda5f0c97fd64c901db27e8",
+      "Evidence": "Static recompilation of *Sonic the Hedgehog* (Sega Master System, 1991) into native C, using the [smsggrecomp](https://github.com/mstan/smsggrecomp)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "megadrive",
+      "Title": "Rings of Power",
+      "Repository": "kruzeman/RROP",
+      "SourceCommit": "d3a00f15a220dec107790e2282c974425bfaed34",
+      "Evidence": "into a native Linux or Windows executable. It statically recompiles Motorola translations can still stop execution. Native long-session errors are monitored,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "megadrive",
+      "Title": "Sonic 3 & Knuckles",
+      "Repository": "heyjoeway/sonic3air",
+      "SourceCommit": "1f346407d342beeba97d7d042653f13b49b02792",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "megadrive",
+      "Title": "Sonic the Hedgehog",
+      "Repository": "mstan/SonicTheHedgehogRecomp",
+      "SourceCommit": "510679e66abc435f12a29d66c2d6788f4e1008f9",
+      "Evidence": "> A native x64 static recompilation of Sonic the Hedgehog (Sega Genesis/Mega Drive). Green Hill Zone is fully playable — all 3 acts including the Robotnik boss fight. The game runner for the [Genesis 68K Static Recompiler](https://github.com/mstan/segagenesisrecomp). Takes 530+ statically recompiled C functions generated from a Sonic 1 ROM and runs them natively on the engine's clean-room backend (own VDP / bus / Z80 scheduling, ymfm FM synthesis). The AGPL [clownmdemu](https://github.com/Clownacy/clownmdemu) core is used only by unshipped development builds as a conformance oracle.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nds",
+      "Title": "Final Fantasy Crystal Chronicles: Echoes of Time",
+      "Repository": "JonathanDC64/FFCCEOT-Recomp",
+      "SourceCommit": "934c7434c9a6c2866fea17fa36098ef9c0652fc4",
+      "Evidence": "A native PC port of **Final Fantasy Crystal Chronicles: Echoes of Time** (Nintendo DS, 2009), made by statically **The user interface** is a port of [Dusklight](https://github.com/TwilitRealm/dusklight)'s (the PC port of Twilight",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nds",
+      "Title": "Jump Ultimate Stars",
+      "Repository": "piuzera/JUSDecomp",
+      "SourceCommit": "6a061e3897f10a8800bf7ec9afde82fa8c9dbe1b",
+      "Evidence": "Reverse engineering and **static recompilation** of **Jump Ultimate Stars** (Nintendo DS, game code `AJUJ`) into a native Windows or Linux executable — with a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nds",
+      "Title": "Kingdom Hearts 358/2 Days",
+      "Repository": "Yokimitsuro/khdays-port",
+      "SourceCommit": "b3965470b2426fc2edfdce2ab7334a5f459607be",
+      "Evidence": "A native PC port of **Kingdom Hearts 358/2 Days**, built on The whole game runs natively from the decompilation: the title and its menus,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nds",
+      "Title": "Pokémon Black 2",
+      "Repository": "CallanCampos/Frigate",
+      "SourceCommit": "56a9ef2a1db0fde6ddb542f15013155a6e473478",
+      "Evidence": "A work-in-progress decompilation of Pokémon Black 2 and White 2, with a long-term goal of a native PC port. | [Native port notes](docs/porting-notes.md) | Recovered platform assumptions and open porting questions |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nds",
+      "Title": "Pokémon White 2",
+      "Repository": "CallanCampos/Frigate",
+      "SourceCommit": "56a9ef2a1db0fde6ddb542f15013155a6e473478",
+      "Evidence": "A work-in-progress decompilation of Pokémon Black 2 and White 2, with a long-term goal of a native PC port. | [Native port notes](docs/porting-notes.md) | Recovered platform assumptions and open porting questions |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "neogeo",
+      "Title": "Metal Slug X",
+      "Repository": "AlmazProud/metal-slug-x-recomp",
+      "SourceCommit": "bd946a70dd56c15ec101b4fa7a8b71ff3ade9b95",
+      "Evidence": "A native Windows port of **Metal Slug X** (Neo Geo MVS, 1999), built by statically recompiling 3. **Runtime.** The Neo Geo hardware is a native runtime written for this project:",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Dr. Mario",
+      "Repository": "mstan/DrMarioNesRecomp",
+      "SourceCommit": "8742c953985b2f7fe6e9267068b748640304d66b",
+      "Evidence": "Static recompilation of Dr. Mario (NES) for native PC. Cycle-native comparisons use `nesrecomp/tools/cyc/cyc_verify.py`; `--interp-only`",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Duck Hunt",
+      "Repository": "mstan/DuckHuntNESRecomp",
+      "SourceCommit": "906d1496b3162d838274cc9307f9459895f419b3",
+      "Evidence": "Static recompilation of Duck Hunt (NES) for native PC. This is a **static recompiler**, not an emulator. The original 6502 machine code is translated to C at build time, then compiled to native x64. The NES PPU, APU, and mapper are simulated by the runner library.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Faxanadu",
+      "Repository": "mstan/FaxanaduRecomp",
+      "SourceCommit": "f743ae4c87406947de7a6a61cacd2cc036ca631c",
+      "Evidence": "Static recompilation of Faxanadu (NES) for native PC. This is a **static recompiler**, not an emulator. The 6502 machine code in the ROM",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Mega Man 3",
+      "Repository": "mstan/Megaman3NESRecomp",
+      "SourceCommit": "b3d6d270018b9311cb39638fa39bf3ec2e7fd69a",
+      "Evidence": "Static recompilation of Mega Man 3 (NES) for native PC. at stock timing, versus 600 with this enhancement. Native/interpreted enhanced",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Metroid",
+      "Repository": "mstan/MetroidNESRecomp",
+      "SourceCommit": "caccee62a67daea083fac8af36b1d0065b902071",
+      "Evidence": "A static recompilation of Metroid (NES) using [nesrecomp](https://github.com/mstan/nesrecomp). The original 6502 machine code is translated to C at build time, then compiled to native x64 for direct execution on modern PCs. **This is NOT an emulator.** The game logic runs as native compiled code. NES hardware (PPU, APU, mapper) is simulated by the runner library.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Pac-Man",
+      "Repository": "Mr-Shizzy/PacManRecomp",
+      "SourceCommit": "877c0ebce229e6308a4a7e8d28f5fde4714f7592",
+      "Evidence": "A native Windows version of **Pac-Man for the NES** (Namco, 1993), made by static recompilation: the game's original 6502 code is translated into C and",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Super Mario Bros.",
+      "Repository": "mstan/SuperMarioBrosNESRecomp",
+      "SourceCommit": "45f95754f8ad6e04fc39966505c94af9783bd787",
+      "Evidence": "Static recompilation of Super Mario Bros. (NES) for native PC. defeats enemies while its native temporary invincibility is active. Metroid's",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Yoshi",
+      "Repository": "mstan/YoshiNESRecomp",
+      "SourceCommit": "f219991df2e70d6bf41f4ba9a46c8ddf990b572e",
+      "Evidence": "Static recompilation of Yoshi (NES) for native PC. Cycle-native comparisons use `nesrecomp/tools/cyc/cyc_verify.py`; `--interp-only`",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "nes",
+      "Title": "Yoshi's Cookie",
+      "Repository": "mstan/YoshisCookieRecomp",
+      "SourceCommit": "1abdd99dc21953f4188e2052675a7d21ee367420",
+      "Evidence": "Static recompilation of Yoshi's Cookie (NES) for native PC. Cycle-native comparisons use `nesrecomp/tools/cyc/cyc_verify.py`; `--interp-only`",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Ace Combat 3: Electrosphere",
+      "Repository": "i5han/ac3-remix",
+      "SourceCommit": "c2e4a0b8e54336ad8d41278e6cc31a2077181923",
+      "Evidence": "This is a development build of the PC port of **Ace Combat 3: Electrosphere**.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Ace Combat 3: Electrosphere",
+      "Repository": "alexbeavs-ps1-ports/ace-combat-3-electrosphere-recomp",
+      "SourceCommit": "9ef9c15ea10339c15c5ac0ad2250969ff9235afb",
+      "Evidence": "Static recompilation of **Ace Combat 3: Electrosphere (Japan)** built on A native recompilation setup host for Ace Combat 3: Electrosphere (Japan).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Alien Resurrection",
+      "Repository": "alexbeavs-ps1-ports/alien-resurrection-recomp",
+      "SourceCommit": "38ac885663ca130ae39e05eb5fe2d6ad3ba4e68c",
+      "Evidence": "Static recompilation of **Alien Resurrection** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Ape Escape",
+      "Repository": "NVDEMU/ApeEscapeRecomp-MacWindowsLinux",
+      "SourceCommit": "95398d212b0b263a3132cecc8ad253533e61496d",
+      "Evidence": "A fan-made, native Windows/macOS/Linux project for revisiting Spike's first monkey-catching adventure. This repository packages the North American **Ape Escape** game (SCUS-94423) as a native application through static recompilation. The goal is a convenient desktop experience with a dedicated launcher, flexible controller and video settings, saves, and an optional mod collection.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Ape Escape",
+      "Repository": "mstan/ApeEscapeRecomp",
+      "SourceCommit": "345ea8daf5ed92f05183c52f07ec8c22d4ec30b3",
+      "Evidence": "Ape Escape (USA, SCUS-94423) statically recompiled to a native PC executable code is machine-translated (\"recompiled\") ahead of time into native C, then",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Apocalypse",
+      "Repository": "MustafaSamer93/Apocalypse-PC-Native-Port",
+      "SourceCommit": "f63dbd5ee8ef0dca6caf7ba1891fb4b7519a2838",
+      "Evidence": "**Apocalypse** (PlayStation, 1998), rebuilt as a native PC game for Windows and Linux. The game's original code was translated into native code ahead of time, so it",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Armored Core",
+      "Repository": "alexbeavs-ps1-ports/armored-core-recomp",
+      "SourceCommit": "5cd98795627f6225adac9376d6fb94009d8f6c91",
+      "Evidence": "Static recompilation of **Armored Core** built on A native recompilation setup host for Armored Core.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Battle Arena Toshinden",
+      "Repository": "mstan/BattleArenaToshindenRecomp",
+      "SourceCommit": "cadc96f1b681c8cde5e3b144aa7a67f109ae05d5",
+      "Evidence": "Static recompilation of **Battle Arena Toshinden (USA)**, PlayStation serial **SCUS-94200**, to native code using [psxrecomp](https://github.com/mstan/psxrecomp)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Bloody Roar 2",
+      "Repository": "novapowers0/BloodyRoar2Recomp",
+      "SourceCommit": "eed1e8d123d903d24ec0adf49ebee71a16c5892c",
+      "Evidence": "**Native PC port of *Bloody Roar II* for the Sony PlayStation (Windows + Linux).** into a standalone executable — this is a real PC port, not an emulator.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Bushido Blade 2",
+      "Repository": "alexbeavs-ps1-ports/bushido-blade-2-recomp",
+      "SourceCommit": "4aac7520365174d06f013032984de0d794a78277",
+      "Evidence": "Static recompilation of **Bushido Blade 2** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Castlevania: Symphony of the Night",
+      "Repository": "birabittoh/NocturneRecomp",
+      "SourceCommit": "01a1a71d8347a5d7f4377215ef8c62f85f4caf32",
+      "Evidence": "Static recompilation of **Castlevania: Symphony of the Night** (Xbox Live Arcade) for Windows This project converts the Xbox 360 PowerPC `default.xex` into native x86_64",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Castlevania: Symphony of the Night",
+      "Repository": "BlackLabelHQ/SymphonyRecomp",
+      "SourceCommit": "081396cf38ed31193422e3553082f4974231a4de",
+      "Evidence": "The goal of this project is to help bring the game to modern computers without some of the limitations of older consoles. This was accomplished through both recompilation means and decompilation efforts. Stay tuned for the full SOTN Decomp release by the SOTN Decomp community, which will be the de facto means of the modern \"PC port\" efforts once it's fully released.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Colin McRae Rally 2.0",
+      "Repository": "alexbeavs-ps1-ports/colin-mcrae-rally-2-0-recomp",
+      "SourceCommit": "9cae7344ed27b64d5677a84e67139e416871c4cf",
+      "Evidence": "Static recompilation of **Colin McRae Rally 2.0** built on A native recompilation setup host for Colin McRae Rally 2.0.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Colony Wars: Red Sun",
+      "Repository": "alexbeavs-ps1-ports/colony-wars-red-sun-recomp",
+      "SourceCommit": "8e48605680d41f0e6de5721421c5d8caf65bd329",
+      "Evidence": "Static recompilation of **Colony Wars: Red Sun** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Crash Team Racing",
+      "Repository": "NyperYuhgard/CTR-PC-Port",
+      "SourceCommit": "09949b6548aac237b1266db744e66fd0f45776f5",
+      "Evidence": "A native PC port of Crash Team Racing (PS1, 1999), built on top of the [CTR-ModSDK](https://github.com/CTR-tools/CTR-ModSDK) decompilation project BUT with mod support and more extras ctr_native/",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Crash Team Racing",
+      "Repository": "CameronRedmore/Crash-Team-Racing-Turbocharged",
+      "SourceCommit": "07d0c49f01d62dcb9887b455be27ce65728ee893",
+      "Evidence": "Crash Team Racing: Turbocharged is a fork of [Crash Team Racing: High Octane](https://github.com/Rinnegatamante/Crash-Team-Racing-High-Octane), a sourceport for PSVita, PC (Windows) and Web Browser based on the [ctr-native](https://github.com/CTR-tools/ctr-native) project. Turbocharged extends High Octane with additional rendering, precision, and quality-of-life options. ctr_native                            (Linux)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Destruction Derby 2",
+      "Repository": "alexbeavs-ps1-ports/destruction-derby-2-recomp",
+      "SourceCommit": "72ae26264416290c2ad0c1a8656b2ccaf5bb6604",
+      "Evidence": "Static recompilation of **Destruction Derby 2** built on A native recompilation setup host for Destruction Derby 2.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Destruction Derby Raw",
+      "Repository": "alexbeavs-ps1-ports/destruction-derby-raw-recomp",
+      "SourceCommit": "bf868ca2d910411d7eb306bcc1440eca944f5c15",
+      "Evidence": "Static recompilation of **Destruction Derby Raw** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Digimon World 2003",
+      "Repository": "gascarcella/dw2003recomp",
+      "SourceCommit": "a836a9e8489ee127024b1847f32a01678c4af94f",
+      "Evidence": "a native **PC port** built from it. your PC, runs the game natively, with a launcher and a few optional mods.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Disney's Hercules",
+      "Repository": "obaidr1/hercules-recompiled",
+      "SourceCommit": "9df37864f6e5d50e30ff7381117e34a06a1a04c0",
+      "Evidence": "A native PC (Windows and Linux) port of the 1997 PlayStation action game *Disney's | [`port/`](port) | The PC port, built on [psxrecomp](https://github.com/RetroPortingToolKit/psxrecomp): game configuration, game-specific mods (HD sprites, widescreen, level select, skip intro / direct start, NTSC speed) and the launcher |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Disruptor",
+      "Repository": "RecompTeam/DisruptorRecomp",
+      "SourceCommit": "7e91c85569f2e9eec47ffa73424dd90fb631c603",
+      "Evidence": "A native PC recompilation of <b>Disruptor</b> (PlayStation, 1996)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Dragon Ball GT: Final Bout",
+      "Repository": "novapowers0/DB-Final-Bout-Recomp",
+      "SourceCommit": "5646617ee9339836f12a947cceb849ee07c1bad9",
+      "Evidence": "Static recompilation for PC of *Dragon Ball GT: Final Bout* for PlayStation, The original MIPS code is recompiled as native Windows code and integrated into",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Driver",
+      "Repository": "alexbeavs-ps1-ports/driver-recomp",
+      "SourceCommit": "11e9a4a8c8fcf931e4ef70121d231a5a3cb5c42b",
+      "Evidence": "Static recompilation of **Driver** built on A native recompilation setup host for Driver.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Driver 2",
+      "Repository": "OpenDriver2/REDRIVER2",
+      "SourceCommit": "b2d8857426f815007486def9bd23f9a6007a2c64",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Earthworm Jim 2",
+      "Repository": "elprogramadorloco-arch/jim2-recomp",
+      "SourceCommit": "a7a68daab33c4ff3b6fba1250b9babf04f25e61f",
+      "Evidence": "A native Windows version of the PlayStation release of *Earthworm Jim 2*, produced by **static recompilation** with",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Einhänder",
+      "Repository": "strider973/Einhander-Recompiled",
+      "SourceCommit": "607c5c827caf3bc2a2fd7cd2ec00ba8e825eb9f8",
+      "Evidence": "Static recompilation of **Einhander** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Future Cop: L.A.P.D.",
+      "Repository": "alexbeavs-ps1-ports/future-cop-lapd-recomp",
+      "SourceCommit": "fe6e0cd39d55dc413ae77444fc65512c1ce22ffe",
+      "Evidence": "Static recompilation of **Future Cop: L.A.P.D.** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Gran Turismo 2",
+      "Repository": "dubrovskiy-yevhen-stakelogic/gt-2-pc",
+      "SourceCommit": "b64ea27b884cb2a4b92428697395d5e744c2344a",
+      "Evidence": "A native C++ port with Arcade and Simulation, cockpit driving, desktop and VR Windows and Quest installers use the compiled files under `native/` and prepare",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Hell Night",
+      "Repository": "goodshepherd23/Hellnight-Recompiled",
+      "SourceCommit": "910251a71b14bd0df3b3474f22eecfe820641954",
+      "Evidence": "A native PC build of **Hellnight** (PlayStation, 1999; *Dark Messiah* in Japan), made with the [PSXRecomp](https://github.com/mstan/psxrecomp) static recompiler",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Hogs of War / Frontschweine",
+      "Repository": "Nero2611/FrontschweineRecomp",
+      "SourceCommit": "b8041f3be0db2bd4799b30ae83f27b1f1c1a6a9e",
+      "Evidence": "A native PC version of **Hogs of War** (German release *Frontschweine*, Infogrames, 2000) for the PlayStation, built by static recompilation: the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "In Cold Blood",
+      "Repository": "alexbeavs-ps1-ports/in-cold-blood-recomp",
+      "SourceCommit": "98c6abf6574ae5957291d71ecaa5b7ea0b03b708",
+      "Evidence": "Static recompilation of **In Cold Blood** built on A native recompilation setup host for In Cold Blood.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Jet Moto 2",
+      "Repository": "goodshepherd23/JetMoto2-Recomp",
+      "SourceCommit": "cd14d8727d16c1da12cf1da547de3f5b8d6b473b",
+      "Evidence": "A native PC build of **Jet Moto 2: Championship Edition** (PlayStation, 1998, SCUS-94167), made by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "JoJo's Bizarre Adventure: Heritage for the Future",
+      "Repository": "MenuuTUX/jojo-hftf-native",
+      "SourceCommit": "dc1b886e29fcc7940e330cb19762ae85f8d138e1",
+      "Evidence": "A native macOS build of the PlayStation version of *JoJo's Bizarre Adventure* (Capcom, 1999, US release SLUS-01060). The game is a static recompilation on [psxrecomp](https://github.com/RetroPortingToolKit/psxrecomp). On top of it, the game's own code is being replaced with native C, one function at a time. Each replacement has been compared against the original on thousands of captured game states before it is allowed to run.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "King's Field",
+      "Repository": "Acranon/kf1-enhanced",
+      "SourceCommit": "ac147450249c95b8d7683300292a2761796cb611",
+      "Evidence": "of the game, which runs the original game logic natively. The settings menus, the PC port of the US King's Field. Its in-game menus, live-reloading Lua mod",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Klonoa: Door to Phantomile",
+      "Repository": "TechnicallyComputers/Klonoa-Door-to-Phantomile",
+      "SourceCommit": "99a7ccc15375f0a7773f8ab5a607caeb9c85e02d",
+      "Evidence": "Static recompilation of **Klonoa - Door to Phantomile** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Koudelka",
+      "Repository": "alexbeavs-ps1-ports/koudelka-recomp",
+      "SourceCommit": "3576d3395f67a89aa4f8645709a291de15d3d930",
+      "Evidence": "Static recompilation of **Koudelka** built on A native recompilation setup host for Koudelka.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Legend of Legaia",
+      "Repository": "SamSteProjects/legend-of-legaia-recomp",
+      "SourceCommit": "261a40d12a800a73426367f643d2267e8393db3f",
+      "Evidence": "The package is a Windows x64 build, not a native Linux build. It can be used This is Proton guidance, not a claim of native-Linux support. Please report",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Medal of Honor",
+      "Repository": "FractalEngineer/Medal-Of-Honor-PSX-Recomp",
+      "SourceCommit": "d82a5d0024570d7477db38d3cea5dfc59dd22035",
+      "Evidence": "Static recompilation of **Medal of Honor** built on Play the original game on a flat display, or opt into the experimental native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "MediEvil",
+      "Repository": "alexbeavs-ps1-ports/medievil-recomp",
+      "SourceCommit": "918e3c2db5e0f2fca97cfd2998f607a1822573f2",
+      "Evidence": "Static recompilation of **MediEvil** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "MediEvil II",
+      "Repository": "alexbeavs-ps1-ports/medievil-ii-recomp",
+      "SourceCommit": "432c69c9ca8e9942ec23b4a984dd98ef8518fcda",
+      "Evidence": "A native recompilation of **MediEvil II** for Windows and Linux, built on adds corrected mouse direction, smoother mouse input, capture through native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Mega Man Legends",
+      "Repository": "alexbeavs-ps1-ports/mega-man-legends-recomp",
+      "SourceCommit": "4379d066854973e6482f13ee3a96e74b9c1b53b4",
+      "Evidence": "Static recompilation of **Mega Man Legends** built on pass the required native setup, startup, responsiveness, and clean-exit gates.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Mega Man Legends 2",
+      "Repository": "alexbeavs-ps1-ports/mega-man-legends-2-recomp",
+      "SourceCommit": "1b38948eb0c6a938528a47cad75721f35714d8b7",
+      "Evidence": "Static recompilation of **Mega Man Legends 2** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Mega Man X5",
+      "Repository": "mstan/MegaManX5Recomp",
+      "SourceCommit": "c8fde08b77b8c8daae8d0955b6529de79c82d85b",
+      "Evidence": "Mega Man X5 (USA, SLUS-01334) statically recompiled to a native PC executable code is machine-translated (\"recompiled\") ahead of time into native C, then",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Mega Man X6",
+      "Repository": "mstan/MegaManX6Recomp",
+      "SourceCommit": "288918a735f3b68da25cc967955a3d917ac3cb89",
+      "Evidence": "native PC executable with [PSXRecomp](https://github.com/mstan/psxrecomp) — the code is machine-translated (\"recompiled\") ahead of time into native C, then",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "PaRappaTheRapper",
+      "Repository": "kirby1237/PaRappaTheRapperRecomp",
+      "SourceCommit": "cff6e6908e7f44032b6fa0edf6136cf360bfea8b",
+      "Evidence": "Static recompilation of **PaRappaTheRapper** built on view using the native wide renderer. In **Mods > Widescreen**, choose",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Parasite Eve",
+      "Repository": "alexbeavs-ps1-ports/parasite-eve-recomp",
+      "SourceCommit": "abfc05bc23a9a264cf9a105b2662226e17ece299",
+      "Evidence": "Static recompilation of **Parasite Eve** built on A native recompilation setup host for the two-disc USA release of Parasite Eve.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Parasite Eve II",
+      "Repository": "faligame/Parasite-Eve-2-HD-Remaster",
+      "SourceCommit": "6244648ae8e18d370c5eec0e74fcfd76b3fdcc80",
+      "Evidence": "This is **not an emulator**. The original PlayStation game code has been statically recompiled into a native Windows size), fullscreen, antialiasing (FXAA), reconstruction (Native AA, Quality, Balanced, Performance, Ultra) and upscaler",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Point Blank",
+      "Repository": "TekRantGaming/point-blank-recompiled",
+      "SourceCommit": "15c48788c5d02b0075343f007e282193426cd27b",
+      "Evidence": "**Native, not emulated**<br>",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Puyo Puyo BOX",
+      "Repository": "kirby1237/PuyoPuyoBoxRecomp",
+      "SourceCommit": "ea96779399aafe4c76ab240550737efe421177e1",
+      "Evidence": "Static recompilation of **PuyoPuyoBox** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Rockman Dash",
+      "Repository": "Rainchus/RockmanDash-Recompiled",
+      "SourceCommit": "f56d6dccea24d47583253a7f8e92ab3a5cb145ac",
+      "Evidence": "Chameleon Twist: Recompiled is a project that uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Chameleon Twist into a native port with many new features and enhancements. This project uses [RT64](https://github.com/rt64/rt64) as the rendering engine to provide some of these enhancements. Saving and loading files, going from place to place, and pausing all happen in the blink of an eye thanks to the game running natively on modern hardware.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Simpsons Wrestling Recompiled",
+      "Repository": "TekRantGaming/simpsons-wrestling-recompiled",
+      "SourceCommit": "1aaee1a999f4dcc60dbf965a9ed9944373528469",
+      "Evidence": "**Native, not emulated**<br> | | PlayStation | PC port |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Spider-Man 2: Enter Electro",
+      "Repository": "alexbeavs-ps1-ports/spider-man-2-enter-electro-recomp",
+      "SourceCommit": "06484f6d823c93aec06dea84cdd12f8344abfdfe",
+      "Evidence": "Static recompilation of **Spider-Man 2: Enter Electro** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Street Fighter EX 2 Plus",
+      "Repository": "strider973/Street-Fighter-EX2-Plus-Recompiled",
+      "SourceCommit": "f4151f535b258f59db62932931f940c87758c345",
+      "Evidence": "Static recompilation of **Street Fighter EX2 Plus** (PS1, `SLUS-01105`), the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Strider 2",
+      "Repository": "strider973/STRIDER-2-Recompiled",
+      "SourceCommit": "de06b17aec80f76d611bf99f62185901df79deb6",
+      "Evidence": "Static recompilation of **Strider 2** (SLUS-01163) built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Syphon Filter",
+      "Repository": "Madxbio97/SF-pc-port",
+      "SourceCommit": "a11020bbf8ea136e1685edfe29217e7c965b49c9",
+      "Evidence": "a native Windows host for rendering, input, menus, audio and FMV playback. native. Bug reports should include the mission number, reproduction steps, GPU,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tekken 3",
+      "Repository": "FishB0nes98/Tekken3Recompiled",
+      "SourceCommit": "3d3acc81ba84752c711f3b047d1779a816046d11",
+      "Evidence": "later starts open the native launcher with Mods, controls, disc library, and Native-port and static-recompilation research for **Tekken 3 (USA, SLUS-00402)** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tekken 3",
+      "Repository": "Muqaddas12/Tekken3-PC",
+      "SourceCommit": "b6e941378ad03dbd834fef340bd8d90bae6e430b",
+      "Evidence": "A native x86_64 PC port of **Tekken 3 (USA)** for Windows. Runs as a standalone native Windows executable without any emulator or launcher wrapper, featuring direct loose PC asset loading, true 16:9 fullscreen presentation, 1080p supersampling, and locked 60 FPS.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tomb Raider",
+      "Repository": "XProger/OpenLara",
+      "SourceCommit": "3b268ca4bf986c380f44a26ffd9218bf6d376249",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tomba!",
+      "Repository": "mstan/TombaRecomp",
+      "SourceCommit": "cf6171b93d75b902b1f940daad4f0f5677d0951f",
+      "Evidence": "SCES-01331 Rev 1) statically recompiled to three separate native PC executables with Seamless Loading and audited native opening overlays. Widescreen starts off;",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tomba! 2: The Evil Swine Return",
+      "Repository": "mstan/Tomba2Recomp",
+      "SourceCommit": "54c6dc3addc200f36b433b54b2068735d306d91e",
+      "Evidence": "Static recompilation of **Tomba! 2 - The Evil Swine Return (USA)** (serial **SCUS-94454**) to native code, built on the shared **psxrecomp** framework —",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Tony Hawk's Pro Skater",
+      "Repository": "alexbeavs-ps1-ports/tony-hawk-s-pro-skater-recomp",
+      "SourceCommit": "77657d41b28abf14f1d05b394bacdad1afa93704",
+      "Evidence": "Static recompilation of **Tony Hawks Pro Skater** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "ToyStory2",
+      "Repository": "PeriBluGaming/ToyStory2Recomp",
+      "SourceCommit": "97738d2e45cc2ac35c0e0ecfd2da89916d736476",
+      "Evidence": "Static recompilation of **ToyStory2** built on Toy Story 2: Buzz Lightyear to the Rescue (USA, SLUS-00893) statically recompiled to a native PC executable with PSXRecomp.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Vagrant Story",
+      "Repository": "riotashley81-jpg/vagrantstory_recomp",
+      "SourceCommit": "898a34db9913d0b9835ed26af6e769ea3389cc80",
+      "Evidence": "An unofficial native PC build of **Vagrant Story** (PlayStation, USA, from an *x64 Native Tools* prompt with Git's `bin` folder ahead of WSL on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Valkyrie Profile",
+      "Repository": "Ed1z19/ValkyrieRecomp",
+      "SourceCommit": "3894f4acbe0c92e4148b1c736fc3773a149f9a86",
+      "Evidence": "A native PC recompilation project for **Valkyrie Profile (PlayStation, USA)**,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Vandal Hearts",
+      "Repository": "HalmyLyseas/VandalHearts-PcPort",
+      "SourceCommit": "14552fffa0e0b47e02b57592e274fc6e7a649923",
+      "Evidence": "A native PC port of the PlayStation 1 game **Vandal Hearts**, built on byte-exact matching 2. **De-consolization → native PC port.** Each PlayStation hardware interface — GPU packet",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Wipeout 3 Special Edition",
+      "Repository": "mstan/Wipeout-3-Special-Edition-Recomp",
+      "SourceCommit": "f1ab735d3bd71f1527a2580d1a210a809d116248",
+      "Evidence": "Static recompilation of **Wipeout 3 Special Edition** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "WWF SmackDown! 2: Know Your Role",
+      "Repository": "Comfubar/KnowYourRoleRecomp",
+      "SourceCommit": "32cf0309e85b2a4f504622b507e9d523c3a138bd",
+      "Evidence": "**Native Windows port of the 2000 PlayStation wrestling game, built from your own disc** static recompiler and compiled on your PC. It runs natively on RecompOne's runtime (graphics, sound, CD-ROM,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Xena: Warrior Princess",
+      "Repository": "alexbeavs-ps1-ports/xena-warrior-princess-recomp",
+      "SourceCommit": "38ec7b4fc740e9251fdcc0d19740528b34fb35f7",
+      "Evidence": "Static recompilation of **Xena: Warrior Princess** built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Xenogears",
+      "Repository": "Blizz127/xenogears-decomp-port",
+      "SourceCommit": "33a7260a242b23079836a178943ce8b8e25325b6",
+      "Evidence": "Xenogears Decomp and Port: the source of a native PC port layer for A native Linux build of Xenogears, not an emulator. You need your own copy of the game; no game assets (graphics, music, movies, text) are included. No BIOS is needed. (The r5 build does contain about 6.6 KB of transcribed retail data tables; v0.6.0 loads them from your disc instead.)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Yu-Gi-Oh! Forbidden Memories",
+      "Repository": "Unchiga/Yu-Gi-Oh-Forbidden-Memories-Recompiled",
+      "SourceCommit": "dc31c8d36ccab1d785c953cc46830d6e93eb0991",
+      "Evidence": "native PC game for Windows and Linux, with a macOS ARM64 source build. Bring your own disc image; no game data is This is not a static recompilation: the game code was decompiled",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Burnout 3: Takedown",
+      "Repository": "danielgomesvieira2000/burnout3-pc",
+      "SourceCommit": "772d150481325078b8f14d43d80b8e2ce4546c93",
+      "Evidence": "**Burnout 3: Takedown, native on Windows.** The PS2 game's program translated",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Burnout Dominator",
+      "Repository": "literalynn/BurnoutDominatorReversed",
+      "SourceCommit": "49f5ff6b137aebecab842d1b07294c49dcb232dc",
+      "Evidence": "**Burnout Dominator (PS2) recompiled into a native PC game.** The whole game runs natively on PC, from the intro videos to the last World Tour event: races, crashes, Burning Laps, the memory card, sound, gamepads, at full speed and up to four times the PS2's resolution.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Def Jam Vendetta",
+      "Repository": "jcsix694/def-jam-vendetta-recomp",
+      "SourceCommit": "d3d857b436beceebf1c77b0141c46bb7f13ee1fe",
+      "Evidence": "**Def Jam Vendetta, the PlayStation 2 fighter, as a native Windows program, built on your PC from your own disc.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Def Jam: Fight for NY",
+      "Repository": "sweeax-exe/ffny-online",
+      "SourceCommit": "e1866fe2c0912b23433e5df1a4a249552653c01a",
+      "Evidence": "the native PC port this project is a fork of; all credit for the port itself goes there. | Linux (x86-64) | Builds and runs natively through Vulkan, with the launcher and overlay of v0.6.2; see [Build on macOS and Linux](docs/build-macos-linux.md) |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Downhill Domination",
+      "Repository": "skuza-oss/downhill-revived",
+      "SourceCommit": "4aafa3920892180fef5c862367f283fef8b85537",
+      "Evidence": "A PC port of Downhill Domination. Downhill Revived is a native 64-bit Windows port of *Downhill Domination* (PlayStation 2, Incognito",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Dragon Ball Z: Budokai Tenkaichi 3",
+      "Repository": "z3xox/BT3-Recomp",
+      "SourceCommit": "e22a34beb564e2d0f32bd60b02f0a95d9645ddcc",
+      "Evidence": "A statically recompiled, native PC port of *Dragon Ball Z: Budokai Tenkaichi 3* > recompiled into a native, portable game tree with an OpenGL renderer. Ships",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "God Hand",
+      "Repository": "LasVola/godhand-recomp",
+      "SourceCommit": "14e956a1274332440273845fbab2c1f1e30c4a5a",
+      "Evidence": "**God Hand (PS2, 2006) running natively on PC. Not an emulator: the game's own code, rebuilt as a Windows program.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "God of War",
+      "Repository": "YYOzcan/Tobiichi-Port",
+      "SourceCommit": "471c83180a8df575cff4abd3fae6c043b5096925",
+      "Evidence": "**A native PC port of *God of War* (PlayStation 2, NTSC-U `SCUS-97399`) for Linux and Windows. The game's code is statically recompiled from MIPS to C++; the PS2 hardware is replaced by native code, not emulated.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "God of War",
+      "Repository": "Waffle565/God-Of-War-Native-Port",
+      "SourceCommit": "514f89186f1926edaf4807696a59557679c7d517",
+      "Evidence": "**A native PC port of *God of War* (PS2, NTSC-U `SCUS-97399`): the game's code is statically recompiled to C++, and the PS2 hardware it talked to is replaced by native code, not emulated.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "God of War II",
+      "Repository": "cxldsakeb/GoW2-nativo-PS2",
+      "SourceCommit": "5145dad446d2deb9276238e8d646c915bce988fb",
+      "Evidence": "Static recompilation of **God of War II** (PS2, 2007) into a native Windows executable with [PS2Recomp](https://github.com/ran-j/PS2Recomp). It is not an emulator: the game's code is translated to C++ and compiled as a PC program, together with a runtime that plays the part of the PS2 (GS, VU1, IOP, sound, controller, videos and memory card). You need Windows, Visual Studio 2022 and your copy of the game. Follow [docs/SETUP.md](docs/SETUP.md). In short: extract your ISO with `scripts/extract-iso.ps1` (the ELF's SHA1 must match the one in NOTES.md), build the tools, `scripts/recompile.ps1` and `scripts/run.ps1 -Config RelWithDebInfo` (the first build takes ~20–50 min depending on the PC). To ",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Jak and Daxter: The Precursor Legacy",
+      "Repository": "open-goal/jak-project",
+      "SourceCommit": "94684e32f60008d3d9617621e7c3a478c9e2af56",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Jak II",
+      "Repository": "open-goal/jak-project",
+      "SourceCommit": "94684e32f60008d3d9617621e7c3a478c9e2af56",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Killzone",
+      "Repository": "drakolordx7/KillzoneRecomp",
+      "SourceCommit": "63917763d68532048edbabc9e7d6d01c9738e55a",
+      "Evidence": "A native Windows port of Killzone (PlayStation 2, 2004) by [drakolordx7](https://github.com/drakolordx7). The game's code is recompiled to C++ with [PS2Recomp](https://github.com/ran-j/PS2Recomp), so it runs as a PC program with mouse and keyboard aim, high frame rates, higher resolutions and ultrawide support.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Ratchet & Clank",
+      "Repository": "AsobiCodes/rac-rs",
+      "SourceCommit": "5a93984555dd83c0004a9dedf82328e0e7d8a5c5",
+      "Evidence": "An unofficial PC port of **Ratchet & Clank** (PlayStation 2, 2002), written in Rust. It runs the full game, start to credits, from **your own disc**. The game runs on its own original code. When you run setup, it translates the PS2 code from your disc into native Rust (\"static recompilation\"), and that code runs on a PS2 CPU core written in Rust. Because the game logic is the original code, gameplay behaves exactly like the PS2 version.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Ratchet & Clank",
+      "Repository": "RAC-Native/rac1-native-game",
+      "SourceCommit": "b4c85ffa51d154c774c9173944dfeaa01078cb54",
+      "Evidence": "> port. **The whole game has been played through to the end** on 0.4.0. 0.6.0 brings the native A native PC port of **Ratchet & Clank** (PlayStation 2, 2002), for Linux and Windows.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Resident Evil - Code: Veronica X",
+      "Repository": "aikatore/recvx-enhanced-port",
+      "SourceCommit": "0e27d9fb7fda56cf42402eec9ccaaaa2724b3f8d",
+      "Evidence": "A native PC port of *Resident Evil Code: Veronica X* (PS2) for Linux and Windows, built from the native paths replace the expensive parts. The game reads your own disc image in place.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Resident Evil Outbreak",
+      "Repository": "RaccoonRecomp/ResidentEvilOutbreakRecompiled",
+      "SourceCommit": "e0fcc5fb6e7e1011a6876824fa772ec5354a4534",
+      "Evidence": "**An unofficial PC port of Resident Evil Outbreak (File #1, USA) for Windows.** Resident Evil Outbreak Recompiled runs the original PlayStation 2 game as a native Windows program. The game's own",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Road Trip",
+      "Repository": "silentsudin/RoadTripAdventure-recomp",
+      "SourceCommit": "0f6d3613e8e32ccda5305227a578b1fb659983a8",
+      "Evidence": "**Road Trip** (*Choro Q HG 2*, PS2, 2002), running natively on **Windows**, **macOS** and **Android**, with This isn't an emulator. The game's program is *statically recompiled* into native code, built on",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Shadow the Hedgehog",
+      "Repository": "nicolasserpa/shadow-the-hedgehog-recomp",
+      "SourceCommit": "0642b8146c8519d0b9081ad38eaeff78ad228512",
+      "Evidence": "Static recompilation of the PlayStation 2 release of *Shadow the Hedgehog* (SLUS-212.61) into native x86_64 C++ linked against `ps2xRuntime`, which",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "TimeSplitters",
+      "Repository": "GTTeancum/Timesplitters",
+      "SourceCommit": "37658ff87311692c36ddee8704870f10c02f325d",
+      "Evidence": "A static recompilation of TimeSplitters (PlayStation 2, Free Radical Design, 2000; the USA release, SLUS-200.90) to native code for Windows, Linux and the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "Urban Reign",
+      "Repository": "thiagordsfx/urban-reign-recomp",
+      "SourceCommit": "20b30fd731b153110bd1b60db61bc421d42586c4",
+      "Evidence": "**Urban Reign (PS2) running natively on Windows and Linux: 60 FPS, high resolution, HD textures, up to 8 players.** A PC port of *Urban Reign* made by **static recompilation**: the game's PS2 code was translated into C++ and compiled",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "War of the Monsters",
+      "Repository": "yanm1103/War_of_the_Monsters_recomp",
+      "SourceCommit": "9b47b11119b9c87eab517f29d6beb8c33a17d435",
+      "Evidence": "A decompilation and recompilation project for **War of the Monsters** (PS2, NTSC-U, SCUS-97197), aiming at an **easy-to-mod native PC port**. The game runs on Windows at 60 fps with native rendering: stages, monsters, particles, shadows, fog, menu text, HUD, screen fades and Hor+ widescreen. Fights are playable with the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps2",
+      "Title": "WWE SmackDown! Here Comes the Pain",
+      "Repository": "BigDaddyJRich/hctp-recomp",
+      "SourceCommit": "dccdd015515a6d890646e20e8315a5bb5a67222f",
+      "Evidence": "A static recompilation of **WWE SmackDown! Here Comes the Pain** (PlayStation 2, NTSC-U, **SLUS-20787**) into a native compiled on your PC. The PS2 graphics chip is drawn on the GPU by a native Direct3D 11 renderer, and the IOP",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Dragon Ball Z: Budokai HD",
+      "Repository": "gnome41/dbz-budokai-hd",
+      "SourceCommit": "1b13a28a76c26797d6f860dd29d05215f3508cbe",
+      "Evidence": "A work-in-progress static recompilation of **Dragon Ball Z: Budokai HD Collection** (`EBOOT.elf`, PS3 / BLES01658) to a native Windows x64 executable. Built on top of the **[ps3recomp](https://github.com/sp00nznet/ps3recomp) SDK** — a PS3 PowerPC → C++ static recompilation framework.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Gran Turismo 5 Prologue",
+      "Repository": "sp00nznet/GT5P",
+      "SourceCommit": "65c75d61ade58efb4f6af5f099c3b78b64c0a8e6",
+      "Evidence": "**Gran Turismo 5 Prologue Recompiled** is a native PC port built with Native x86-64 executable",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Imabikisou",
+      "Repository": "yasindevs/imabikisou-pc",
+      "SourceCommit": "9cb011b0459c26c2921f43d6374d3e6069611756",
+      "Evidence": "Imabikisō is a Japanese horror visual novel from Chunsoft. This project explores running the PS3 release **BLJM60042 / 01.00** as a native PC program through static recompilation, alongside tools for extracting, understanding and patching its scripts. No game executable, generated game code, disc image, fonts, sound or video is included. You need your own game dump and locally generated files to build and run the native port.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Twisted Metal",
+      "Repository": "sp00nznet/twistedmetal",
+      "SourceCommit": "23afb436f3a955cdab5fe342d36076b4be0ab2bf",
+      "Evidence": "> disc binary into a native Windows executable — no emulator underneath.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "ps4",
+      "Title": "DriveClub",
+      "Repository": "OverkillLabs3/driveclub-recomp",
+      "SourceCommit": "ba850846bf711d655e2cc810647317c6547aa6ac",
+      "Evidence": "**DriveClub for PS4 (version 1.28), running natively on Windows.** **Upscaling:** with FSR 3.1 or DLSS: **DLAA** (**Native** with FSR) draws every pixel; **Quality**, **Balanced**, **Performance** and **Ultra Perf.** draw the game at 1/1.5, 1/1.7, 1/2 and 1/3 of the output size and rebuild the full picture, for more FPS each. The Render resolution choice does not apply then. With upscaling, F9 leaves FSR or DLSS on: the game draws at the smaller size, so there is no full-resolution picture to switch to. **Sharpness:** 0 to 100 (80 by default).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "psp",
+      "Title": "Grand Theft Auto: Liberty City Stories",
+      "Repository": "elmasas/lcs-recomp",
+      "SourceCommit": "1132a76e59a29d7395635a5239a0d4aadd948385",
+      "Evidence": "GTA: Liberty City Stories PC port, built on [PSPRecomp](https://github.com/jessicanataliagta/PSPRecomp). Game files not included. Settings are in `lcs/config/LCSNative.ini`.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "psp",
+      "Title": "Phantasy Star Portable 2 Infinity",
+      "Repository": "zmbkilla/PSP2I_Recomp",
+      "SourceCommit": "c3ed2f4b6ecf81037a52fe699af7c1dcfab8f9a9",
+      "Evidence": "A recompilation project for **Phantasy Star Portable 2 Infinity (PSP2i)**, bringing the game to a native PC environment while preserving the original game's functionality and feel. The current goal is to produce a native PC build of the game while maintaining compatibility with the original game logic and improving the experience with modern PC features.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "psp",
+      "Title": "Star Wars Battlefront: Renegade Squadron",
+      "Repository": "GTTeancum/StarWars-RenegadeSquadron-PC",
+      "SourceCommit": "7c0e0db52d5076f5794284f000277525d11fe563",
+      "Evidence": "A native Windows port of the PSP game *Star Wars Battlefront: Renegade Squadron* (ULUS10292), made by **static recompilation**: the game's PSP program is translated into C++ and compiled into a regular",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "saturn",
+      "Title": "Shining Force III Scenario 1",
+      "Repository": "mattkuhnQAAI/sfiii-native",
+      "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+      "Evidence": "**Shining Force III Recomp (Shining Force 3 Recomp)** is an experimental native PC static recompilation of Sega Saturn's **Shining Force III**, with profiles for **Scenario 1 USA MK-81383 V1.001**, **Scenario 2 Translation Project v24** and **Scenario 3 Translation Project v25.1**. Game SH-2 code is generated locally as C++ and compiled for the PC. Windows is the established development platform; experimental Linux x64, Apple Silicon and Intel Mac candidates are built separately. The runtime supplies Saturn graphics, sound, storage and other hardware services; static recompilation does not remove the need to model those systems. **The project is playable in tested Windows routes and remains ",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "saturn",
+      "Title": "Shining Force III Scenario 2",
+      "Repository": "mattkuhnQAAI/sfiii-native",
+      "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+      "Evidence": "**Shining Force III Recomp (Shining Force 3 Recomp)** is an experimental native PC static recompilation of Sega Saturn's **Shining Force III**, with profiles for **Scenario 1 USA MK-81383 V1.001**, **Scenario 2 Translation Project v24** and **Scenario 3 Translation Project v25.1**. Game SH-2 code is generated locally as C++ and compiled for the PC. Windows is the established development platform; experimental Linux x64, Apple Silicon and Intel Mac candidates are built separately. The runtime supplies Saturn graphics, sound, storage and other hardware services; static recompilation does not remove the need to model those systems. **The project is playable in tested Windows routes and remains ",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "saturn",
+      "Title": "Shining Force III Scenario 3",
+      "Repository": "mattkuhnQAAI/sfiii-native",
+      "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+      "Evidence": "**Shining Force III Recomp (Shining Force 3 Recomp)** is an experimental native PC static recompilation of Sega Saturn's **Shining Force III**, with profiles for **Scenario 1 USA MK-81383 V1.001**, **Scenario 2 Translation Project v24** and **Scenario 3 Translation Project v25.1**. Game SH-2 code is generated locally as C++ and compiled for the PC. Windows is the established development platform; experimental Linux x64, Apple Silicon and Intel Mac candidates are built separately. The runtime supplies Saturn graphics, sound, storage and other hardware services; static recompilation does not remove the need to model those systems. **The project is playable in tested Windows routes and remains ",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "segacd",
+      "Title": "Snatcher",
+      "Repository": "bgyss/snatcher-port",
+      "SourceCommit": "2a2b20dbc1cd985af50310f349a0491acfe6ea88",
+      "Evidence": "1. a clean-room **PC port**: a new engine that runs the original game data from mise run build         # translated native build -> engine/build/snatcher",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "segacd",
+      "Title": "Sonic CD",
+      "Repository": "carl0srmz/littleplanet",
+      "SourceCommit": "093f58a0428bd5f15d9faa5e20af0894f1bf8686",
+      "Evidence": "FM, PSG and PCM are each resampled the same way from their native rates (53.3 kHz, 223.7 kHz, 32.6 kHz). | Static recompiler | yes: all game code runs as recompiled C, frame-identical to the interpreter |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Donkey Kong Country",
+      "Repository": "elliotttate/DKC1Recomp",
+      "SourceCommit": "3eb9a10c49cb210df2bd63addafe2a78cf9f4e22",
+      "Evidence": "Static recompilation of *Donkey Kong Country* (SNES, USA v1.0) into a native code, a headless validation host, playable Windows and native macOS hosts,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Doom",
+      "Repository": "Cacodemontube/DoomSNESRecomp",
+      "SourceCommit": "23b7a495055516ab0b938de51ee51ac46634c96f",
+      "Evidence": "A still in development, native PC port of SNES Doom! the unresolved E1M1 music crackle. The native release workflow runs the regression",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "EarthBound",
+      "Repository": "rages4calm/earthbound-companion",
+      "SourceCommit": "993438440cd2e397e9ee70882c7a0d79c84f0a80",
+      "Evidence": "**Native EarthBound for Windows, with Linux, macOS and Android community previews. Includes a MaternalBound Redux adaptation, widescreen and ultrawide scenery, 1080p–4K output, MSU music, keyboard and controller support, save recovery, Story Shuffle v4 and 46 offline achievements.** > **Community platform previews:** Linux x64/SteamOS, macOS Apple Silicon/Intel and Android ARM64/x64 share the native game core, settings, Story Shuffle and achievements. [Linux/macOS preview.24](https://github.com/rages4calm/earthbound-companion/releases/tag/v0.5.0-ports-preview.24) · [Android preview.24](https://github.com/rages4calm/earthbound-companion/releases/tag/v0.5.0-ports-preview.24) · [setup and cover",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "F-Zero",
+      "Repository": "craigshaw/FZeroRecomp",
+      "SourceCommit": "5f37c22c7a2acef8b341545e9f2a4c5a4463990b",
+      "Evidence": "A native, widescreen, static recompilation of F-Zero (USA). controller software. **View+Menu** (Select+Start) remains an alternative.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Final Fight 3",
+      "Repository": "omegakatana92/Final-Fight-3-Recomp",
+      "SourceCommit": "7041b443b70633f28bd9ea36ffaa0500e00530d0",
+      "Evidence": "A native recompilation of **Final Fight 3** (USA), built on Native Windows recompilation project for Final Fight 3",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Mega Man X2",
+      "Repository": "mstan/MegaManX2Recomp",
+      "SourceCommit": "9c3b374c4a0cf0a93748a52a74375d2b4af731a3",
+      "Evidence": "Static recompilation of **Mega Man X2 (USA)** built on * **The interrupt handlers live in WRAM.** The ROM's native NMI/IRQ vectors",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Mega Man X3",
+      "Repository": "mstan/MegamanX3SNESRecomp",
+      "SourceCommit": "e88e5aabc940e0d64b0b8ea9474d528ee8fe8aed",
+      "Evidence": "Static recompilation of **Mega Man X3 (USA)** built on gameplay have been verified through the debug surface. The native coverage",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Super Mario World",
+      "Repository": "mstan/SuperMarioWorldRecomp",
+      "SourceCommit": "324dfc8fb8359c7eb514259a16867e05e06129bb",
+      "Evidence": "Static recompilation of *Super Mario World* (SNES) into native C, too, they aren't — and a static recompiler can't recompile them",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Super Mario World",
+      "Repository": "snesrev/smw",
+      "SourceCommit": "eae20c65c58930c8b62c76188d259579ad4130f1",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Super Metroid",
+      "Repository": "snesrev/sm",
+      "SourceCommit": "578f90b3cc49557bb70060ad033bb90b8cf8ac50",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "The Legend of Zelda: A Link to the Past",
+      "Repository": "YeOldPress/alttp-dx",
+      "SourceCommit": "13d4cfeb71b2c67af592b26407e62bb66e8a6254",
+      "Evidence": "*The Legend of Zelda: A Link to the Past*, rebuilt to run natively on PC,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "The Legend of Zelda: A Link to the Past",
+      "Repository": "mstan/ZeldaAlttPSNESRecomp",
+      "SourceCommit": "8eee8b655c9d00c1fcd3bc825b5a53543417154d",
+      "Evidence": "Static recompilation of *The Legend of Zelda: A Link to the Past* (SNES) into native C, using the [snesrecomp](https://github.com/mstan/snesrecomp)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "The Legend of Zelda: A Link to the Past",
+      "Repository": "snesrev/zelda3",
+      "SourceCommit": "45a149d8b4bb8098f53d1009f76e76e7d8b79bbf",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Tiny Toon Adventures: Buster Busts Loose!",
+      "Repository": "Darhkfox/BusterBustsLoose",
+      "SourceCommit": "10aa80dea7fbdae31f0c38f51199c136ed0172d2",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "snes",
+      "Title": "Zombies Ate My Neighbors",
+      "Repository": "moshferatu/zombies-ate-my-neighbors-pc-port",
+      "SourceCommit": "08fb9f3cca20139a48dc13d90348ed59325be345",
+      "Evidence": "An unofficial PC port of the 1993 SNES game *[Zombies Ate My Neighbors](https://en.wikipedia.org/wiki/Zombies_Ate_My_Neighbors)*. Some of the game is still being emulated, and only a very small portion of what is running natively has been translated into what could be called \"readable\" C.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "virtualboy",
+      "Title": "Mario's Tennis",
+      "Repository": "mstan/MarioTennisVirtualBoyRecomp",
+      "SourceCommit": "28995d368538559005aaaf9a78ab8e35eacecd71",
+      "Evidence": "Static V810→C recompilation of **Mario's Tennis** (Virtual Boy, 1995) running as a native Windows binary. Native red gameplay captured from the recomp with color mods disabled.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "wiiu",
+      "Title": "The Legend of Zelda: Breath of the Wild",
+      "Repository": "IshaanKalra2103/BotWRecomp",
+      "SourceCommit": "2b84b82dbe7efe41707d236fdbac9ec5e98c8d3d",
+      "Evidence": "A native port of **The Legend of Zelda: Breath of the Wild (Wii U)** to iPhone and Apple Silicon Cemu's layer ([`docs/native-renderer.md`](docs/native-renderer.md)). It is off by default.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "wiiu",
+      "Title": "The Legend of Zelda: The Wind Waker HD",
+      "Repository": "ZeldaWWHDRecomp/ZeldaWWHDRecomp",
+      "SourceCommit": "0a53327a6876d2c404406ac74fe11ac6a3333a99",
+      "Evidence": "A static recompilation of the Wii U version (USA or European) that runs natively on **macOS** (Apple Silicon), reimplemented natively, and GX2 graphics are implemented directly on Metal (macOS) or Vulkan (all",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "wiiu",
+      "Title": "The Legend of Zelda: Twilight Princess HD",
+      "Repository": "AsadSi/twilight-princess-hd-recomp",
+      "SourceCommit": "1f208ec1bf7ea0519bbd0a1712fea8568cd1637d",
+      "Evidence": "A static recompilation of The Legend of Zelda: Twilight Princess HD (Wii U, USA disc, Rev 2) into a native macOS app for Apple Silicon. The game's PowerPC code (`code/Zelda.rpx`) is translated to C ahead",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Black",
+      "Repository": "portingpete/Black-2006-Recomp",
+      "SourceCommit": "2041e5a97f1300dca128d51fc06e1ae32cea9f21",
+      "Evidence": "launcher, and native audio output. Movies are enabled by default. The Windows continue through the native rules. These options are independent of difficulty and optional secondary objectives.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Black",
+      "Repository": "TGP482/BLACK-XBERecomp",
+      "SourceCommit": "6df259fddeb4417ab9a9f41c360ffaf898a45fb8",
+      "Evidence": "An unofficial native PC port of the original Xbox version of Black, with extended graphics options, keyboard and mouse support, and other enhancements.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "BLACK",
+      "Repository": "Spark198rus/black-pc",
+      "SourceCommit": "b826153997907272dd555b8ec63b6a54fcde0600",
+      "Evidence": "An unofficial native Windows port (and playable on Linux) of **BLACK** (Criterion Games, 2006), made from the original Xbox releases (NTSC-U and PAL Europe). 3. Run the game, forcing Wine to use the native DXVK libraries we just copied:",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Blinx 2: Masters of Time and Space",
+      "Repository": "apexJCL/blinx2-recomp",
+      "SourceCommit": "3d05113763352513e023c06568ba4084cfd593a1",
+      "Evidence": "turns your own copy of it into a native program for your PC or Mac: the game's | Steam Deck (stock SteamOS), or a Linux gaming PC | `steamos` (the Windows build, run under Proton through `umu-run`) | Direct3D 11 (DXVK) | XAudio2 (FAudio) | Controller (XInput) and keyboard | Plays with sound and saves. The Deck is the regular manual test machine. Set the Steam entry's Game Resolution to Native (1280x800) so Steam does not rescale the game, then set `scale = 2`, or leave it at 1 and rely on FSR; `aspect = \"16:10\"` fills the Deck's screen. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Bloody Roar Extreme",
+      "Repository": "bromurok/BloodyRoarExtremeRecomp",
+      "SourceCommit": "86cb42be2ac4b811d282d7c570107fc4bfb85343",
+      "Evidence": "An unofficial native PC port of the original Xbox version of **Bloody Roar Extreme** (*Bloody Roar: Primal Fury*), with enhanced graphics options, Vulkan backend, high-resolution rendering, and controller support. > **Why Native PC Recompilation?**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Breakdown",
+      "Repository": "Heromachine/Breakdown-Recompilation",
+      "SourceCommit": "473b7d22c6c24b74f4bf424ecfff3cc1355c6a5a",
+      "Evidence": "native Windows build, using a fork of [xboxrecomp](https://github.com/Heromachine/xboxrecomp) to",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Burnout",
+      "Repository": "Heromachine/Burnout-Recompilation",
+      "SourceCommit": "1068afc478b28d6cc15f8d0ed325e156cf7c7848",
+      "Evidence": "Acclaim, 2002) into a native Windows build. It uses a fork of",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Burnout 2: Point of Impact",
+      "Repository": "timftw21/burnout2-recompilation",
+      "SourceCommit": "aa0ba5510726ec5a9b71147d9fe1e51cf3a23405",
+      "Evidence": "performance checks on native desktop hardware. macOS needs those checks on both Linux uses Vulkan through DXVK Native and runs without Wine. Desktop gameplay,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Burnout 3: Takedown",
+      "Repository": "griches/PS5_Burnout3",
+      "SourceCommit": "36a3d7cfda74c27343310668890cc8fe7d23a93d",
+      "Evidence": "static recompilation of the original Xbox *Burnout 3: Takedown* by xenophobentx. The 2004 game runs natively on the console at 60 fps: 4x resolution, widescreen",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Darkwatch",
+      "Repository": "linkssy2/DarkwatchDarkerEdition",
+      "SourceCommit": "361879da87a3e12bc75b880f0286ebd36099eae3",
+      "Evidence": "**PC port · Windows 0.6.1 · Experimental Linux/Proton 0.6.1** An unofficial PC port of the original Xbox Darkwatch, powered by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Dead or Alive 2 Ultimate",
+      "Repository": "parkerallan/doa2u-recomp",
+      "SourceCommit": "7134564015edd6de117961283be7b80289dac614",
+      "Evidence": "Translation of the original Xbox binary of Dead or Alive 2 Ultimate into native C that compiles and runs on Windows as a native x86-64 executable.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Dead or Alive 2 Ultimate",
+      "Repository": "NoRain211/doa2u-re",
+      "SourceCommit": "d75f7bfedd906faf41cba1eef170903826a6011d",
+      "Evidence": "**A native Windows, macOS and Linux port of _Dead or Alive 2 Ultimate_ (Xbox), built by static recompilation, with the goal of rewriting it into readable source.** static recompiler, then linked against a hand-written runtime that replaces",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Dead or Alive 3",
+      "Repository": "parkerallan/doa3-recomp",
+      "SourceCommit": "919c49f7f364fce67e85f13e75d4921e148422d9",
+      "Evidence": "Translation of the original Xbox binary of Dead or Alive 3 into native C that compiles and runs on Windows as a native x86-64 executable.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Dead or Alive 3",
+      "Repository": "NoRain211/doa3-re",
+      "SourceCommit": "ff290455dfa5f2d142cd66a197d98fd4e1a15366",
+      "Evidence": "**A native PC port of _Dead or Alive 3_ (Windows, macOS & Linux), built by static recompilation, with the goal of rewriting it into readable source.** The original Xbox executable is lifted to C with a static recompiler, then",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Def Jam: Fight for NY",
+      "Repository": "comoria08/defjam_recomp",
+      "SourceCommit": "acfb3142d14f72214c93fed3b357d5624876df8d",
+      "Evidence": "A static recompilation of Def Jam: Fight for NY (Xbox, USA) into a native Windows program, built on your PC from your own disc image. **No game content is included.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Far Cry Instincts",
+      "Repository": "VinceIP/fci-recomp",
+      "SourceCommit": "4ed3f6881a05d7a0699bcfd1f79b6115b1bc849b",
+      "Evidence": "A native Windows port of **Far Cry Instincts** (2005, original Xbox) and **Far Cry Instincts: Evolution**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Genma Onimusha",
+      "Repository": "rafaelkenedy/genma-recomp",
+      "SourceCommit": "bd30555cb8c161da2c7068c9137b669dfff64f95",
+      "Evidence": "An unofficial native Windows port, with experimental native Linux support, of the original Xbox version of **Genma Onimusha**, made by statically recompiling the game's executable to C++ with [Xbox XBE Recomp](https://github.com/TGP482/XboxXBERecomp). The left stick uses modern movement relative to the camera. Holding the same stick direction through a camera cut preserves the character's actual heading; release the stick or change its direction to adopt the new view. The D-pad keeps the original tank controls and takes priority. Hold guard and use the stick for native directional steps and dodges. Attacks and target selection retain the game's native behavior.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Halo: Combat Evolved",
+      "Repository": "kirklandsig/halo-ce-anbernic-rg35xx",
+      "SourceCommit": "fa34f9f0d563a6b98540a7d92596e1c70432eb53",
+      "Evidence": "Yes — Halo CE runs natively on the Anbernic RG35XX H (RG35XXH) under Knulli: handhelds) and offline against bots. This repository is a native ARM64 (AArch64) port of the Halo:",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Halo: Combat Evolved",
+      "Repository": "ChupathingyCE/chupathingyce",
+      "SourceCommit": "bca23c1828d62c9f1da802692cf2da4ea23a955b",
+      "Evidence": "decompilation. It runs natively on Windows, Mac (Apple silicon and Intel),",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Halo: Combat Evolved",
+      "Repository": "JackTulli/halo-64",
+      "SourceCommit": "70d7067cc6495529d800345139824368f68baed1",
+      "Evidence": "project's PC ports (the Xbox SDK's headers, the MSVC string functions,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Halo: Combat Evolved",
+      "Repository": "BirchWoodGod/halo-ce-vita",
+      "SourceCommit": "cbdfb64645141e0175415906fb810de89ed7e2ad",
+      "Evidence": "**A native PlayStation Vita port of Halo: Combat Evolved, built from the decompilation of the Xbox game.** decompilation the native port starts from.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Lord of the Rings; The Third Age",
+      "Repository": "Revan67/ThirdAge-Recomp",
+      "SourceCommit": "39757977fda4d4707286a2bb4219c7264c628702",
+      "Evidence": "An early-stage static recompilation of the North American original-Xbox release version 8) into a native Windows executable.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Mercenaries: Playground of Destruction",
+      "Repository": "KraftMacAndChee/Mercenaries-Recompiled",
+      "SourceCommit": "f513ae4e041401b7b032410016940971488d523b",
+      "Evidence": "A native Windows port of **Mercenaries: Playground of Destruction**, built with played. A player release is a separate package containing the launcher, native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Midtown Madness 3",
+      "Repository": "MattSG/mm3-recomp",
+      "SourceCommit": "992d55d6360a0f1dddcba4795dadf91a2d27adf6",
+      "Evidence": "A static recompilation of the Xbox game to native Windows x64, using captured during setup and compiled to native code.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Mortal Kombat: Shaolin Monks",
+      "Repository": "OAleex/OpenShao",
+      "SourceCommit": "1952f4f373c736874fe8701830343f562f66f06a",
+      "Evidence": "OpenShao is a native PC port of **Mortal Kombat: Shaolin Monks**, made by statically recompiling the original Xbox game.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Ninja Gaiden Black",
+      "Repository": "gamboozino/ngbrecomp",
+      "SourceCommit": "83d54163f5886299f001e394a17a87583d61a610",
+      "Evidence": "**A PC port of Ninja Gaiden Black by static recompilation.** A native Linux and Windows version of *Ninja Gaiden Black* (Xbox, 2005), made by statically",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Prince of Persia: The Sands of Time",
+      "Repository": "FulGerNet/rePOP",
+      "SourceCommit": "43a7440a8f2e5069b23c7849c7dccceb1400e595",
+      "Evidence": "**Prince of Persia: The Sands of Time, recompiled from Xbox to native Windows and Android.** Windows has separate native executables for demo and retail. Android has one",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Project Gotham Racing",
+      "Repository": "hk21x/pgr1-recomp",
+      "SourceCommit": "b51d9aeb59d344604ee301f997500c45da7f5a26",
+      "Evidence": "An unofficial native PC port of the original Xbox version of Project Gotham Racing, with extended graphics options",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Project Gotham Racing 2",
+      "Repository": "hk21x/pgr2-recomp",
+      "SourceCommit": "3419efddf538ae4dd228ea09187d362cc5a2b25c",
+      "Evidence": "An unofficial native PC port of the original Xbox version of Project Gotham Racing 2, with extended graphics options",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "RalliSport Challenge 2",
+      "Repository": "Mortify7612/RallisportChallenge2-decomp",
+      "SourceCommit": "ef8c383ddaae44fb858efd6a1fbf02b811046a88",
+      "Evidence": "A native PC build of *RalliSport Challenge 2* (Xbox, NTSC, title `0x4D530039`),",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Shin Megami Tensei: NINE",
+      "Repository": "gymzatan/smt-nine-recomp",
+      "SourceCommit": "456a834313023f31860bfa341eb42a6548154e52",
+      "Evidence": "A native Windows port of **Shin Megami Tensei NINE** for the original Xbox, built with [xboxrecomp](https://github.com/sp00nznet/xboxrecomp). Game code is statically translated from your Japanese retail disc and compiled locally. The default build provides Japanese; the project's Chinese translation is optional. Config can import an ISO that you have separately patched with an English translation, with or without Chinese support. Config offers Auto, Vulkan, OpenGL, D3D12 and D3D11. Auto tries **Vulkan → OpenGL → D3D12 → D3D11** on initialization errors. D3D12 reuses the existing D3D11 rendering code through [Microsoft D3D11On12](https://learn.microsoft.com/en-us/windows/win32/direct3d12/dire",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Spider-Man 2",
+      "Repository": "SirSymo/SM2-Recomp",
+      "SourceCommit": "a11fb1d0a550ded60077b78da04c698052a0ec7e",
+      "Evidence": "SM2-Recomp is an unofficial project that recompiles the original Xbox release of Spider-Man 2 for native execution on modern Windows systems. **SM2-Recomp** is an experimental native recompilation project for the original Xbox version of Spider-Man 2.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "SSX 3",
+      "Repository": "koenhendriks/SSX3-recomp",
+      "SourceCommit": "cdb3e5bcaf8e06c4000e489385e9f6c692577b49",
+      "Evidence": "Static recompilation of **SSX 3** (original Xbox, PAL) into a native program runs as native code, and the Xbox GPU is emulated on Vulkan. It plays at",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "SSX 3",
+      "Repository": "bertibertig/SSX3-Recomp",
+      "SourceCommit": "a4fb6ebd80776f18c86d4b221b419bedb4f8d2c1",
+      "Evidence": "A native PC port of **SSX 3 (original Xbox, 2003)**, made by **static recompilation**: the game's own x86 **Goal:** SSX 3 running natively and well on today's PCs – first on **Linux and the Steam Deck**, then Windows,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "SSX Tricky",
+      "Repository": "GiZcesi/OpenTricky",
+      "SourceCommit": "ff9eb4e09a430f07f2aaf189950e20daa4c56b0f",
+      "Evidence": "OpenTricky runs *SSX Tricky* (2001) natively on Windows. It is not an emulator: the game's own Xbox code is translated to C with | **Only Xbox-style (XInput) controllers are supported natively.** | Use Steam Input or DS4Windows, and choose *PlayStation modern* or *PS2 original* in *Button style*. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "SSX Tricky",
+      "Repository": "MatiasRiveraC/SSX-Tricky-PC",
+      "SourceCommit": "569353b50db976fcd4b7c5046978a6cac46da257",
+      "Evidence": "This is a native Windows port of the 2001 Xbox game *SSX Tricky*. It isn't an emulator. The game's own code is translated to C with [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) and built into an ordinary Windows program. It uses Direct3D 11 for graphics, XAudio2 for sound and XInput for controllers. | `xboxrecomp/` | The static recompiler and Xbox runtime, vendored from [sp00nznet/xboxrecomp](https://github.com/sp00nznet/xboxrecomp) with its history, plus this port's changes: the NV2A → Direct3D 11 renderer, register combiners and vertex programs as shaders, the kernel, timers, audio. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Star Wars: Episode III – Revenge of the Sith",
+      "Repository": "jedijosh920/SWROTS-PC",
+      "SourceCommit": "5be69c5624a5cce0a0fc95ba65408cafc59f0c20",
+      "Evidence": "An unofficial, native Windows port of **Star Wars: Episode III - Revenge of the Sith** for the Xbox it relied on (its kernel, Direct3D, audio and controllers) are replaced by native Windows code.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Star Wars: The Clone Wars",
+      "Repository": "GTTeancum/StarWars-CloneWars-PC",
+      "SourceCommit": "843f4d47cb20db25000e6fd4287ec893f6fee325",
+      "Evidence": "A native Windows port of the 2002 Xbox game *Star Wars: The Clone Wars* (LucasArts / Pandemic Studios), built by **static recompilation**: the game's",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "StarCraft: Ghost",
+      "Repository": "aknavj/scghost-recomp",
+      "SourceCommit": "f67e6eb6440af617daea95fa340be8601720080f",
+      "Evidence": "Native Windows port of the Xbox StarCraft: Ghost executable using | Rendering | Working | Native GPU rendering works; fence corruption and cache churn are fixed. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Lord of the Rings: The Two Towers",
+      "Repository": "Gumpolas/TooTawersRecomp",
+      "SourceCommit": "82ff73754aa484438806a6ff5348184269274e22",
+      "Evidence": "A native PC port of *The Lord of the Rings: The Two Towers* (Xbox, USA, 2002), made by static recompilation. It needs your own copy of the game, either the disc image (ISO) or an extracted folder. No game data is included. https://www.moddb.com/mods/the-two-towers-textures-4k-ai-remaster/addons/the-two-towers-textures-4k-ai-remaster-575gb-version-native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Nightmare Before Christmas: Oogie's Revenge",
+      "Repository": "josiahg2502-glitch/OogiesRevengeRecompiled",
+      "SourceCommit": "3e74015d75dafe7d0dbb7f0a99b8e0ea08674745",
+      "Evidence": "A native PC port of **Tim Burton's The Nightmare Before Christmas: Oogie's Revenge** (Xbox, USA, title ID 42560004),",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Sims 2",
+      "Repository": "abilliontokens/sims2-recomp",
+      "SourceCommit": "8ce155df78ba5f5a2078acfeb2a5bbc8c2fc3689",
+      "Evidence": "An unofficial native PC port of the original Xbox release of *The Sims 2* (USA), > release run stayed healthy with no `exception` in its log. The native Linux build (Vulkan)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Sims: Bustin' Out",
+      "Repository": "abilliontokens/bustinout-recomp",
+      "SourceCommit": "e37436806c5107ee0ed4cb4d5c7a62b4c72eb613",
+      "Evidence": "An unofficial native PC port of the original Xbox release of *The Sims: Bustin' Out* (USA), Windows uses Direct3D 12 and XAudio2; Linux is a native Vulkan and SDL3 build — no Wine.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Urbz: Sims in the City",
+      "Repository": "abilliontokens/urbz-recomp",
+      "SourceCommit": "aac2198e767fece3d690863fab6ff3d42776fb3f",
+      "Evidence": "An unofficial native PC port of the original Xbox release of *The Urbz: Sims in the City* (USA), | Recompilation and native build | done - 15,942 functions, `Urbz.exe` boots and opens its window, see `docs/status.md` |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "The Warriors",
+      "Repository": "Antriksh1984/TheWarriors-XBERecomp",
+      "SourceCommit": "1d0c8c70951e102181a13a818702759ab3941843",
+      "Evidence": "An unofficial native PC port of the original Xbox version of The Warriors via static recompilation, built into a 64 bit Windows executable. The game's x86 code is translated to C++ ahead of time, the Xbox kernel, Direct3D and DirectSound calls are implemented on Windows, and everything is drawn with Direct3D 12 and played through XAudio2. Made with the [Xbox XBE Recomp](https://github.com/TGP482/XboxXBERecomp) tool.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Tom Clancy's Splinter Cell: Double Agent",
+      "Repository": "TGP482/SCDA-XBERecomp",
+      "SourceCommit": "ee5b44027bb99cdc11692b466f01d7930912240d",
+      "Evidence": "An unofficial native PC port of the original Xbox version of Splinter Cell: Double Agent via static recompilation, built into a 64 bit Windows executable. The game's x86 code is translated to C++ ahead of time, the Xbox kernel, Direct3D and DirectSound calls are implemented on Windows, and everything is drawn with Direct3D 12 and played through XAudio2. Made with the [Xbox XBE Recomp](https://github.com/TGP482/XboxXBE-Recomp) tool, created for this game originally.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Urban Chaos: Riot Response",
+      "Repository": "linkssy2/UrbanChaosRiotResponseBurnerEdition",
+      "SourceCommit": "935131bc2c01b3f4a78686541890f5f1f07d51fc",
+      "Evidence": "**PC port - 0.08** An unofficial PC port powered by [XboxXBERecomp by TGP482](https://github.com/TGP482/XboxXBERecomp), with Direct3D 12 rendering and statically recompiled original Xbox gameplay. Earlier Burner Edition work and retained helpers use [xboxrecomp by sp00nz](https://github.com/sp00nznet/xboxrecomp).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Wreckless: The Yakuza Missions",
+      "Repository": "sp00nznet/wreckless",
+      "SourceCommit": "9e35c2c328de1532983c6f537bf827286f900aa6",
+      "Evidence": "A static recompilation of the original Xbox game **Wreckless: The Yakuza *Double Steal*) into a native Windows executable.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox",
+      "Title": "X-Men Legends",
+      "Repository": "GTTeancum/XML1-recomp",
+      "SourceCommit": "0392feb139c0634bee67d3181d41d6543ffb1260",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "11eyes CrossOver",
+      "Repository": "ThePlayer14/project-eleven-recomp",
+      "SourceCommit": "0e3ed718e33e5e2df570fc10bbab246cd28b28ba",
+      "Evidence": "A native PC recompilation of the Xbox 360 version of 11eyes CrossOver using ReXGlue.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "2014 FIFA World Cup Brazil",
+      "Repository": "HossEz/fifa-world-cup-2014-recompiled",
+      "SourceCommit": "1cd53ed476ccd849effb8527f713c22f82c0b761",
+      "Evidence": "An *unofficial* PC port of the Xbox 360 game **2014 FIFA World Cup Brazil**, by ***hosse***. The game's code was statically recompiled into C++ using [ReXGlue](https://github.com/rexglue/rexglue-sdk) and compiled for Windows, allowing it to run natively. | [`launcher/`](launcher/) | The launcher, which finds and checks the game and has the menu, settings and updates (native, Direct3D 11 + Dear ImGui). |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "3 on 3 NHL Arcade",
+      "Repository": "Wndwsqrrl/3on3NHL-recomp",
+      "SourceCommit": "0abd1d0d4322b4cc282697380e2cbcf517f27001",
+      "Evidence": "A native PC port of **3 on 3 NHL Arcade** (Xbox 360, Xbox Live Arcade, 2009), made by statically",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Army of Two",
+      "Repository": "nikolaygorb/ArmyOfTwoRecomp",
+      "SourceCommit": "d6dc5c48087c5f18c9395cc9bc4e5f1ec0c514b7",
+      "Evidence": "A static recompilation of [**Army of Two**](https://en.wikipedia.org/wiki/Army_of_Two) (2008, EA Montreal / Electronic Arts, Xbox 360; Title ID `4541084C`, retail hash `AA1EA03FEC9A549C`) to native x86-64 (Windows / Linux),",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Army of Two",
+      "Repository": "OpenPortroid/ArmyOfTwoRecompilation",
+      "SourceCommit": "37924cdc34199af3ab3d74773022b4ab7e294859",
+      "Evidence": "Unofficial PC port of the Xbox 360 version of Army of Two (2008). The campaign can be played in online co-op, without EA servers. `hardware.toml`|Window, fullscreen, render scale (`ao2_native_gpu_resolution_scale`), FPS cap (`ao2_fps_target`), anisotropic filtering, language (`ao2_game_language`)",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Army of Two",
+      "Repository": "Genesis5500/ArmyOfTwo-Recomp",
+      "SourceCommit": "bd7e07472acfe9d8563a318502f4d399b6d4d791",
+      "Evidence": "An experimental native PC port of **Army of Two** for Xbox 360. **Windows x64 · Direct3D 12 · PowerPC static recompilation (ReXGlue)**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Army of Two: The 40th Day",
+      "Repository": "automoto/Libre40",
+      "SourceCommit": "497fac9c84dbe46ad907af44415bbca3a1ddc21c",
+      "Evidence": "A [ReXGlue](https://github.com/rexglue)-based native PC static recompilation of Run the CMake commands from an **\"x64 Native Tools Command Prompt for VS 2022\"** with",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Bully: Scholarship Edition",
+      "Repository": "coole42-pixel/BullyRecomp",
+      "SourceCommit": "856b4cd98fb591a67b7a312c6c6b6b90da12a66e",
+      "Evidence": "A static recompilation of **Bully: Scholarship Edition** (Xbox 360) to native Windows x64,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Burnout CRASH!",
+      "Repository": "kiesxoxo/burnout-crash-recomp",
+      "SourceCommit": "ac11bd1043e13db61bd0a8171043ac053a1ac88f",
+      "Evidence": "An unofficial native Windows port of the Xbox 360 (XBLA) game **Burnout CRASH!** (2011), built by > **This project is vibe-coded.** Everything in it (the reverse engineering, codegen configs, native hooks,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Call of Duty 3",
+      "Repository": "FrankHUN88453/CoD3Recomp",
+      "SourceCommit": "3c3178a85075cfa6e0703de5e553ff472acc7916",
+      "Evidence": "Static recompilation of Call of Duty 3 (Xbox 360) to native x86-64, using `cg_subtitles`) and the console, and on its Experimental page the native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Call of Duty 3",
+      "Repository": "zenit2893-cmyk/project-1944",
+      "SourceCommit": "62ab3b08e4db1a5f21fb0c13b49d4a3ebd004812",
+      "Evidence": "**An unofficial native Windows PC port of Call of Duty 3 (Xbox 360).** Project 1944 statically recompiles the supported Xbox 360 game's PowerPC code to C++ using [ReXGlue](https://github.com/rexglue/rexglue-sdk), then builds a Windows x64 host and 15 campaign level DLLs. The runtime uses Xenia-derived kernel and graphics layers. This is a native PC build rather than an emulator frontend.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Call of Duty 3",
+      "Repository": "jxnplays/cod3-recomp",
+      "SourceCommit": "ef7048c568fd0756ffa4856ff6d3d9e0bc90ac2e",
+      "Evidence": "**Call of Duty 3** (Xbox 360, 2007) running as a **native Windows PC binary**. compiled, the game code is ordinary x86-64 that the OS runs natively.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Civilization Revolution",
+      "Repository": "ReRevvedRecomp/rerevved",
+      "SourceCommit": "7b1e7a0a81de6dfc344fdce1b9a7c2166727a33a",
+      "Evidence": "Static recompilation of Civilization Revolution for Xbox 360.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Comix Zone",
+      "Repository": "sp00nznet/comixzone",
+      "SourceCommit": "c59735a4a2c18a98ea9c32075742a0f43a1a271f",
+      "Evidence": "This project is a **static recompilation** of the Xbox 360 XBLA binary — translating the PowerPC machine code directly into native x86-64 C code that runs on modern PCs. No emulation. No interpretation. Direct, compiled, full-speed native code. │   (static recompilation)      │",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Condemned 2: Bloodshot",
+      "Repository": "psxrestore/Condemned2Recomp",
+      "SourceCommit": "30634b2eccf48a099c147f3e365afa5512bc22d2",
+      "Evidence": "This is a static recompilation of **Condemned 2: Bloodshot (Xbox 360)** for Native PC built through RexGlue-SDK.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Crackdown",
+      "Repository": "saulob/crackdown-xbox360-recompiled",
+      "SourceCommit": "33ab1b632e38cb5c1c39a3d56c479537b9e0d185",
+      "Evidence": "Crackdown Recompiled is a native PC recompilation of Crackdown for Xbox 360, with enhanced graphics, high frame rates, modern display support, keyboard and mouse support, a full launcher, offline achievements, language selection, and native Windows support plus experimental Linux / Steam Deck support. **Experimental.** Crackdown Recompiled includes a native Linux x86_64 build using ReXGlue's Vulkan backend. It does not use Proton or Wine, and the AppImage contains the same platform-neutral game and launcher features as the Windows build, including the keyboard and mouse implementation. It is built and checked by automated scripts and tests, but this release has not yet been fully validated o",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Crash: Mind over Mutant",
+      "Repository": "Maxilure/MindOver-Recomp",
+      "SourceCommit": "047e53451f4648638fd37fcd166cd38dc8151296",
+      "Evidence": "**An unofficial native PC port of *Crash: Mind over Mutant***<br> **[Download](#-download-and-play)** · **[Features](#-features)** · **[Going native](#-going-native)** · **[Building](#%EF%B8%8F-building-from-source)** · **[Docs](#-documentation)**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dead or Alive Extreme 2",
+      "Repository": "Revan67/DOAX2-Recomp",
+      "SourceCommit": "7664e2d7bdda7b7f202f16caf5806efceb761e17",
+      "Evidence": "An experimental native recompilation project for the Xbox 360 release of",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dead Rising 2: Case West",
+      "Repository": "wivi514/Dead_Rising_2_Case_West_Xenon_Recomp",
+      "SourceCommit": "ba78bde572d654022f35e00eb9860be6c4583456",
+      "Evidence": "into the Phenotrans facility) natively on Windows, Linux, Steam Deck, and Apple into a native program ([XenonRecomp](https://github.com/hedge-dev/XenonRecomp) /",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dead Rising 2: Case Zero",
+      "Repository": "wivi514/Dead_Rising_2_Case_Zero_Xenon_Recomp",
+      "SourceCommit": "10d45b0952dd1b7f53f29dbff0795a27abb81ff7",
+      "Evidence": "360 exclusive prologue to Dead Rising 2) natively on Windows, Linux, the Steam into a native program ([XenonRecomp](https://github.com/hedge-dev/XenonRecomp) /",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Deadly Premonition",
+      "Repository": "LittleBitUA/DPRecomp",
+      "SourceCommit": "e0624129c06b9437aa0278b58f2f3eb954192aec",
+      "Evidence": "**A native Windows port of *Deadly Premonition* (Xbox 360, 2010) by static recompilation. No emulator.**<br> | 🖼️ **2× supersampling on the fast ROV path**, AMD FSR 3 + FXAA presenter (or CAS, FSR 1, bilinear), anisotropic filtering, window / monitor / VRR settings. A **native Direct3D 12 renderer** is in preview next to the emulated path, with its own internal resolution up to 4×. | 🚀 **A launcher.** `PlayDeadlyPremonition.exe`: every setting in five tabs, English and Ukrainian, first-run `.iso` installer, one-click updates from GitHub, config self-healing. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Diablo III",
+      "Repository": "Boron853/Souls-of-the-Reaper",
+      "SourceCommit": "11650aec28bc1d86c221da4992bff3b4b5778ccb",
+      "Evidence": "Xbox 360 → PC port of Diablo III built on the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk) — an AOT recompiler that translates the Xbox 360 PPC binary to native x64 C++, with a Xenia-based kernel HLE.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dragon Age: Origins",
+      "Repository": "96dot/Dragon-Age-Origins-Recomp",
+      "SourceCommit": "fc1c2428ad8a7a9e388facc7a0f9cc120c0a4384",
+      "Evidence": "A static recompilation of the Xbox 360 version of *Dragon Age: Origins* into a native",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dragon Ball Z: Budokai 3 HD",
+      "Repository": "novapowers0/DBZ-Budokai-3-HD-Collection",
+      "SourceCommit": "b5bff8a9b92b13b5c470034f868834a875add755",
+      "Evidence": "A native PC port of *Dragon Ball Z: Budokai 3 HD Collection* (Xbox 360) built emulator. Native Linux builds use Vulkan and SDL3.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Earthworm Jim HD Recompiled",
+      "Repository": "TekRantGaming/earthworm-jim-hd-recompiled",
+      "SourceCommit": "a0203ce6287e305cf0eef4e97f3c598cc6d953ab",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Edge Of Time Recomp",
+      "Repository": "goliathret/EdgeOfTimeRecomp",
+      "SourceCommit": "340144e4c7979a9f46699bef368fe7d7c62fddc9",
+      "Evidence": "EdgeOfTimeRecompiled is an unofficial PC port of the Xbox 360 version of \"Spider-Man: Edge Of Time\" created through the process of static recompilation. The port offers Windows, macOS, and Linux support with goals for numerous built-in enhancements such as high resolutions, ultrawide support, high frame rates, improved performance and modding. EdgeOfTimeRecompiled uses the ReXGlue SDK to convert PowerPC Assembly to static C++ code that can be compiled to any platform, with a custom XenosRecomp fork to convert Xbox 360 Shaders from the compiled shader container to static shader code. EdgeOfTimeRecompiled contains a plethora of integrated features that far exceed the original PC Ports of the a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "F.E.A.R.",
+      "Repository": "Juansolo457/fear360-recomp",
+      "SourceCommit": "33716a1ae610ab2dd7b04e917d35cd2db740e7eb",
+      "Evidence": "The Xbox 360 F.E.A.R. and *F.E.A.R. Files*, running natively on PC. A native Direct3D 12 renderer, evenly paced high frame rates, a controller in your hands. ▶ **[Video: running natively on the Steam Deck](https://youtu.be/6rP_icfY-sM)**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "FIFA 09",
+      "Repository": "ChunchunQ/fifa09-recomp",
+      "SourceCommit": "4dba1063d742911a81c81aa53347e463c2dc75d5",
+      "Evidence": "The Xbox 360 game code is translated to native PC code with the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk). | **Native PC port** — no emulator, runs at full speed on everyday PCs | **Online again** — ranked 1v1 on NOBK.Online, with MMR, leagues, badges and monthly champions |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "FIFA Street",
+      "Repository": "samuelit0davila/fifa-street-pc-port",
+      "SourceCommit": "a5604adabf17be1bc415104a7299f52ec453f8f1",
+      "Evidence": "ReStreet runs on Linux through Proton, with a native Linux launcher that also installs the game. No terminal and nothing to install with a package manager, so it also suits SteamOS. Tested on CachyOS with an AMD GPU: online play works; launcher rooms and friend invites are still being tested, and the Steam Deck has not been tested yet.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Forza Horizon 2",
+      "Repository": "fabioap-cpu/Forza-Horizon-2-Recomp",
+      "SourceCommit": "00edb0b2b10e02af6e97d1361b4b9e474dc5df45",
+      "Evidence": "An experimental static recompilation of the Xbox 360 version of Forza Horizon 2, using [ReXGlue](https://github.com/rexglue/rexglue-sdk) (vendored in this repository under `rexglue-sdk/`, so a single `git clone` is enough to build -- no separate SDK checkout or submodule step).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Forza Motorsport 3",
+      "Repository": "0herculabs/hl360-forza3",
+      "SourceCommit": "861213069ae88042b573db099d9a5b42dcc78dd6",
+      "Evidence": "**A work-in-progress static recompilation of the Xbox 360 racing game for modern Windows PCs.** A work-in-progress static recompilation of *Forza Motorsport 3: Ultimate Collection* that runs natively on Windows PCs. The Xbox 360 PowerPC code is translated to C++ using the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk), while the runtime provides the console services required by the game, including graphics, audio, input, profiles, file-system access, and downloadable content.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Forza Motorsport 4",
+      "Repository": "GabrielCRadu/fm4-recomp",
+      "SourceCommit": "814f6c3e993f6f369cf1cb66eb75866e18f8e713",
+      "Evidence": "A work-in-progress native Windows static recompilation project for the Xbox 360 release of Forza Motorsport 4. FM4-Recomp translates Xbox 360 PowerPC guest code into native AMD64 instructions using the ReXGlue static recompilation runtime. The project provides an independent launcher, build orchestration, kernel emulation hooks, runtime diagnostics, and analysis configurations to run the game natively on modern 64-bit Windows systems.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Forza Motorsport 4",
+      "Repository": "0herculabs/hl360-forza4",
+      "SourceCommit": "8827db98eb23315e5549a49680d53df48831b4d9",
+      "Evidence": "This project translates the Xbox 360 game's PowerPC code into C++ with the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk). The resulting program runs natively on PC, with the runtime providing graphics, audio, input, profiles, storage and content services. Extra FOV, harder-AI and alternative high-FPS physics options from the mod are not currently exposed in the launcher. Full compatibility with every mod feature is not established. See [integration and uninstall details](doc/forza-plus.md).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Fuse",
+      "Repository": "nikolaygorb/FuseRecomp",
+      "SourceCommit": "788bba20ece17aed533c52e003d1428f87b7938c",
+      "Evidence": "A static recompilation of [**FUSE**](https://en.wikipedia.org/wiki/Fuse_(video_game)) (Insomniac Games, 2013, Xbox 360) to native x86-64 for Windows and Linux, built on the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Gears of War 2",
+      "Repository": "santiquiroz/gears-of-war-2-pc-port",
+      "SourceCommit": "e4a259a0811692337dcea994d9c903f323ce5655",
+      "Evidence": "Retail Xbox 360 Gears of War 2 statically recompiled from the player's own `default.xex` to native x64 code with the ReXGlue SDK. This is not emulation. Players must own the game. An earlier fan port (\"Hollow\") was built from a leaked 2008 development build; this one runs the complete retail game. Chapter 2 hospital, frame rate unlocked: about 260 fps at 1440p internal on a Ryzen 9 7900X3D + Radeon RX 7800 XT with the native renderer (0.3.8; 0.3.3-0.3.7 ran at about 150 because the native front end was on by default); 60 fps (the limit) with the GPU at about 55 % on a GTX 1070; about 46-53 fps from a cool start on a Galaxy S25 Ultra at 720p. Where the frame time goes on PC and Android, why t",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Gears of War 3",
+      "Repository": "Flippage/gears-of-war-3-recomp",
+      "SourceCommit": "f6d30a940986e761b075f4d2e0e211246699b1f9",
+      "Evidence": "native x64 code with the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk). This is not on wide displays; needs the Native or ROV renderer, whose emulated render memory is twice the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Gears of War: Judgment",
+      "Repository": "OverkillLabs3/gears-judgement-recomp",
+      "SourceCommit": "e56c475a75b1b703aee0e3422ffc18a27a05f66a",
+      "Evidence": "A native Windows build of **Gears of War: Judgment** (Xbox 360, People Can Fly, 2013), made by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Geometry Wars: Retro Evolved 2",
+      "Repository": "saulob/geometry-wars-retro-evolved-2-recompiled",
+      "SourceCommit": "cad0b7ccb4ad8502b76b67e5507bd4348df0de86",
+      "Evidence": "**Experimental.** This is a native Linux build (ReXGlue's Linux runtime with Vulkan), not Proton or Wine. Real-hardware testing so far is one report from a Steam Machine ([#1](https://github.com/saulob/geometry-wars-retro-evolved-2-recompiled/issues/1)), which found a very dark image and slow motion while the frame rate shows 60. The dark image was fixed in v0.2.3, and the reporter confirmed it. At about 30 FPS the game speed was mostly correct in v0.3.1, but short speed-ups were still seen when the frame rate rose toward about 45 FPS. v0.4.0 changes the game's timing to address that, but **it has not been confirmed on the affected Linux machine yet**, and why some Linux systems render aroun",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "GoldenEye 007",
+      "Repository": "ericksa1417/GoldenEye-Recomp",
+      "SourceCommit": "cc241d8543c80ecbb3b1fe0b397f646302810549",
+      "Evidence": "GoldenEye-Recomp brings the 007 experience to your modern Windows computer. This tool converts the original game code into a native application. You do not need an emulator. The game runs directly on your hardware for better speed and stability. This application runs natively, so it uses your computer hardware efficiently. If you see performance issues, check your system settings:",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "GoldenEye 007 XBLA PC Recomp",
+      "Repository": "CaiusCodes/GoldenEye-007-XBLA-PC-Recomp",
+      "SourceCommit": "527db75b613aaa305eac81a6358fe21341c58cdd",
+      "Evidence": "A native Windows PC version of **GoldenEye 007** based on the unreleased Xbox 360/XBLA remaster, created through static recompilation with",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "GoldenEye 007: Reloaded",
+      "Repository": "nikolaygorb/GoldenEye007ReloadedRecomp",
+      "SourceCommit": "8469f524ab119c06363cff737565389ee6640886",
+      "Evidence": "A static recompilation of [**GoldenEye 007: Reloaded**](https://en.wikipedia.org/wiki/GoldenEye_007:_Reloaded) (Xbox 360, 2011, Title ID `415608AF`) to native PC, built on the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Grand Theft Auto V",
+      "Repository": "OZORDI/SanRecomp",
+      "SourceCommit": "1685f88a733f9d0ebf69e40412901c873d44eb95",
+      "Evidence": "San Recompiled is an unofficial PC port of the Xbox 360 version of Grand Theft Auto V created through the process of static recompilation. The port aims to offer Windows, Linux, and macOS support.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Guitar Hero II",
+      "Repository": "sp00nznet/gh2",
+      "SourceCommit": "507d2d442dc492dcba816ed66fe02f8776adcdc2",
+      "Evidence": "**A native Windows 11 static recompilation of Guitar Hero II for Xbox 360.** **Now it's back. Running natively on Windows 11. No emulator. No compromises.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Halo 3",
+      "Repository": "george0815/halo-3-recomp",
+      "SourceCommit": "014f77e7056cfb61f38dd907e7a4386d7de8330e",
+      "Evidence": "An in-progress static recompilation of Halo 3 (Xbox 360) to native PC code, vsync, the render resolution (1x native 1280x720, 2x or 3x), anti-aliasing",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Halo: Reach",
+      "Repository": "Dyotson/RecompiledHaloReach",
+      "SourceCommit": "329148bb156e0710bcf7f89ced1044461ea7f18f",
+      "Evidence": "A native PC port of **Halo: Reach (Xbox 360)** built by statically recompiling the > Theater and custom games run natively with keyboard and mouse or a controller.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Hard Corps: Uprising",
+      "Repository": "saulob/hard-corps-uprising-recompiled",
+      "SourceCommit": "fe5ae9d60d7c0c41a42154423f471e7b9e80ab3b",
+      "Evidence": "**Experimental.** This is a native Linux build (ReXGlue's patched Linux runtime and Vulkan GPU plugin, with the same performance work as Windows where it applies), not Proton. A SteamOS tester has run it, but it has not been broadly tested on real Linux PCs or Steam Deck hardware. v0.5.0 fixes Linux/Vulkan texture brightness and glow rendering issues and improves Exit Game stability. v0.5.1 broadens Linux compatibility (the AppImage is built on Ubuntu 20.04 and needs glibc 2.31 or newer) and shows an error window when the Vulkan graphics system cannot start. v0.5.2 makes that error window self-contained (it no longer depends on zenity, so it also appears in minimal X11 environments) and rena",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Hydro Thunder Hurricane",
+      "Repository": "monscriser/HydroThunderPORT",
+      "SourceCommit": "a89722963685423cd3406eadf548027cc3cee546",
+      "Evidence": "**HydroThunderPORT** is an experimental, unofficial **Hydro Thunder Hurricane native PC port for Windows and Linux**, built using **static recompilation with ReXGlue**, a **Vulkan graphics backend**, and Xbox 360 compatibility work informed by **Xenia**. Play Hydro Thunder Hurricane on PC with a configuration launcher, controller and keyboard support, graphics scaling options, persistent shader caches, and support for your own legally obtained game files. The Windows version uses a native executable; the Linux version is distributed as an AppImage.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Hydro Thunder Hurricane",
+      "Repository": "visibou/htrecomp",
+      "SourceCommit": "0c11298cc170ca3dd5aaa9155dad1f88a387e55f",
+      "Evidence": "A native PC build of the Xbox 360 game *Hydro Thunder Hurricane*, produced by static recompilation with the [rexglue SDK](https://github.com/rexglue/rexglue-sdk).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Import Tuner Challenge",
+      "Repository": "Spooky098529/ITC-Recomp",
+      "SourceCommit": "b322c1d6be1fb01d427d035c18d142d1926ebaae",
+      "Evidence": "A native Linux and Windows port of *Import Tuner Challenge* (Xbox 360, 2006), made by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "James Bond games",
+      "Repository": "furqanagwan/007",
+      "SourceCommit": "f7764adc1f51d8c7a37942a110df7d5e37325870",
+      "Evidence": "The three Xbox 360 James Bond games, rebuilt as native Windows games with",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Kameo: Elements of Power",
+      "Repository": "MaxDeadBear/KameoRePowered",
+      "SourceCommit": "f3fc10331f42cfd0a44fe0a0d4ad2c996e212043",
+      "Evidence": "Static recompilation of **Kameo: Elements of Power** (Xbox 360) for Windows This project converts the Xbox 360 PowerPC `default.xex` into native x86_64",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "King Kong Recompiled",
+      "Repository": "TekRantGaming/king-kong-recompiled",
+      "SourceCommit": "505f22c004c7430af8d50a778e4c81449192e841",
+      "Evidence": "**This is an experimental Proton build, not native Linux support.** It's the Windows download running through Steam's **Proton**, so Linux and Steam Deck players can play now. A native Linux version is in development and will come in a future update. The Proton build was tested on a ROG Ally (Z1 Extreme) with Bazzite, where it held 120 FPS on the 10 W power profile. Pick **AMD FSR 1** or **NVIDIA NIS** under **Upscaler**. Both work on any graphics card, and the launcher picks NIS on an NVIDIA card and FSR 1 on any other to begin with. They scale the game's picture up to your screen and sharpen it, so drawing fewer pixels for a higher frame rate still looks crisp. **Upscaler mode** picks how ",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Left 4 Dead",
+      "Repository": "KeithKirenai/L4D-PC-Recomp",
+      "SourceCommit": "fb07de6ed9f690a7104661b5645acb8cd579247c",
+      "Evidence": "> Static binary recompilation of Left 4 Dead (Xbox 360) to native PC L4D PC Recomp converts the **Xbox 360 version of Left 4 Dead** into a fully native PC executable through **static binary recompilation** - no emulation, no Xbox 360 hardware required.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Lost Odyssey",
+      "Repository": "faligame/lost-odyssey-hd-remaster",
+      "SourceCommit": "4e2f963665b233bbffa6b9c97a59ed6bf690d10f",
+      "Evidence": "> Our friends at **[Lost Odyssey Recomp](https://github.com/freefrank/LostOdysseyRecomp)** have already achieved what we were aiming for, and more: a native port that is already at version 1.0, runs on Windows, Linux, macOS and Android, and has DLC, HD textures, DLSS/FSR/XeSS, HDR, high frame rates and an active community. **Please play and support their port.** **Lost Odyssey, running natively on PC. Up to 4K, 60 fps, and without the crashes it is known for.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Marvel: Ultimate Alliance 1 and 2",
+      "Repository": "saulob/marvel-ultimate-alliance-bundle-recompiled",
+      "SourceCommit": "9a081ed6cbeb03aa0e227c10e97e504c51efd725",
+      "Evidence": "**Experimental.** This is a native Linux build (ReXGlue's patched Linux runtime and Vulkan GPU plugin), not Proton or Wine, with the launcher and the runtimes of all three games in one x86_64 AppImage. It is built and checked by script on Ubuntu 20.04 (it needs glibc 2.31 or newer), but it has not been broadly validated on real Linux PCs or Steam Deck hardware: Steam Deck is expected to work through the AppImage, and testing and reports from real devices are welcome. The launcher offers the same settings as on Windows; the Graphics card selector lists the Vulkan devices, VSync follows Vulkan's present modes, and Upscaling offers AMD FSR 1. AMD FSR 3.1 and NVIDIA DLSS run in the Direct3D 12 g",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Midnight Club: Los Angeles",
+      "Repository": "BeemerCodes/MidnightclubLA-Recomp",
+      "SourceCommit": "4a3b134a95049aa8d81853912a79ba57e19d79ff",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Midnight Club: Los Angeles",
+      "Repository": "holdmysocks/mcla-recomp",
+      "SourceCommit": "9bfe542a95903bde4737484a4cbfdaf704147857",
+      "Evidence": "Static recompilation of *Midnight Club: Los Angeles Complete Edition* (Xbox 360, title 545407F8) to native code, for Windows, Linux and jailbroken PS5 consoles. | Linux, Vulkan | Builds and plays natively: free roam holds 30 FPS on an Intel Core Ultra 5 238V laptop (Mesa ANV). Tested by one user. |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Minecraft: Xbox 360 Edition",
+      "Repository": "DevZer0D4Y/MCX360-EDITION",
+      "SourceCommit": "607bc7f23d83b09561b0d58644e9bcaad2c104f2",
+      "Evidence": "A native iOS port of **Minecraft: Xbox 360 Edition (Title Update 9)**, built with the [ReXGlue](https://github.com/rexglue/rexglue-sdk) static recompilation SDK. The Xbox 360 code is recompiled ahead of time to run natively on iPhone. Graphics run through Vulkan on Metal via MoltenVK. **Developer mode MIGHT be required on older and newer iOS, enable it going trough: Settings > Privacy & Security, scroll to the bottom, toggle on Developer Mode, and restart your device.** *Alternatively:* copy the folders onto the iPhone some other way (iCloud Drive, AirDrop), then use the **Files** app to move them.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Mortal Kombat vs. DC Universe",
+      "Repository": "KawaiiBunga/MKVDCU-Recomp",
+      "SourceCommit": "47096fd1b2276166ada0fe88ae0f2ff2d9c6dc68",
+      "Evidence": "An unofficial PC port of the Xbox 360 game **Mortal Kombat vs. DC Universe**, made by statically recompiling the game with [ReXGlue](https://github.com/rexglue/rexglue-sdk). You supply your own copy of the game; the launcher builds the PC version on your machine. The Windows-native build is `scripts/build-switch-deko3d.ps1`. It uses portable",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Naruto: Rise of a Ninja",
+      "Repository": "jorjbarbosa/naruto-rise-recomp",
+      "SourceCommit": "2a22861618fb90e42265d108f7a570c256941e00",
+      "Evidence": "A static recompilation for PC powered by ReXGlue<br> > This project is a work in progress. Expect bugs, crashes, and visual issues; the native renderer, now the default, is the newest part, and Xenos remains available in the launcher if something does not look right. Keep a backup of your saves and report problems on the [Issues page](https://github.com/jorjbarbosa/naruto-rise-recomp/issues).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Naruto: The Broken Bond",
+      "Repository": "Auremana666/Naruto-The-Broken-Bond-PC-Port",
+      "SourceCommit": "fea268055002f630251fcd687bfb8a5c424b17db",
+      "Evidence": "An unofficial PC port of **Naruto: The Broken Bond** (Xbox 360, 2008), made by statically its recompilation, audio fixes and **native Direct3D 12 renderer** (higher frame rates, sharper",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "NFL Head Coach 09",
+      "Repository": "tools81/nfl-head-coach-09-static-recomp",
+      "SourceCommit": "82252bb83d8f3fbac1bf0f5ba696661580060fca",
+      "Evidence": "A native Windows port of NFL Head Coach 09 (Xbox 360, title ID `45410841`), built by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "NHL 2K8",
+      "Repository": "anishchandra24/NHL2K8-Recompiled",
+      "SourceCommit": "7b1c766bbf6fa300de08ecb1cb9de9adb1c56467",
+      "Evidence": "A native Windows port of 2K Sports NHL 2K8 for the Xbox 360, made with static recompilation via the ReXGlue SDK.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Pac-Man Championship Edition",
+      "Repository": "jedeyesniv-art/Pacman-CE-PC-Recomp",
+      "SourceCommit": "47d15962913edd4547afcbc396120a6a67b5c884",
+      "Evidence": "A native Windows build of **Pac-Man Championship Edition** (Xbox 360 Live Arcade, 2007), made by statically",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Perfect Dark Zero",
+      "Repository": "nikolaygorb/PerfectDarkZeroRecomp",
+      "SourceCommit": "c9b666f77793feb53f4fd7e0713abced0923e868",
+      "Evidence": "A static recompilation of [**Perfect Dark Zero**](https://en.wikipedia.org/wiki/Perfect_Dark_Zero) (Xbox 360, 2005, Title ID `4D5307D3`, **[PAL]**) to native PC, built on the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Pirates of the Caribbean: At World's End",
+      "Repository": "ElGuslml/PiratesAtWorldsEndRecomp",
+      "SourceCommit": "03ffacb429bdb7243d09f09362c4bdd2fc977d3f",
+      "Evidence": "🏴‍☠️ **Play Pirates of the Caribbean: At World's End on your PC, natively.** The Xbox 360 game by Eurocom (2007), > 🟥 **AMD graphics cards:** NativeXRenderer, the default renderer, has only been tested on NVIDIA cards so far.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Plants vs. Zombies",
+      "Repository": "ITSeniy/pvz-console-edition",
+      "SourceCommit": "b16fb496406a06f5799ce852144469ba426d05c4",
+      "Evidence": "This project is a static recompilation of that release. The original PowerPC code was",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Rayman 3 HD",
+      "Repository": "MysteriousAeon/rayman3-hd-recompiled",
+      "SourceCommit": "baa009539916eda9c166795d26b4080f0d6c0b71",
+      "Evidence": "A native Windows port of **Rayman 3 HD** for Xbox 360. The game's code has been statically recompiled to run directly on a PC, without an emulator. Rayman 3 was one of my favorite games growing up, and I wanted my wife to experience it too. I wanted her to be able to play it in Turkish, so I started working on a way to make that possible. What began as a personal project eventually grew into a native PC port of the Xbox 360 HD version.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Real Steel",
+      "Repository": "tokeneffortports/ReCompiledSteel",
+      "SourceCommit": "d16444f9c6e121f27fbc828140ae41c0a1cf6289",
+      "Evidence": "and compiled into a native program. Nothing is translated while you play, contributors: the static recompiler and the runtime the game runs on, which",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Resident Evil Code: Veronica",
+      "Repository": "psxrestore/VeronicaRecomp",
+      "SourceCommit": "277f19433e85e78b08495e3b8d5069bb06453947",
+      "Evidence": "This is a static recompilation of **Resident Evil CODE:Veronica** for Native PC built through RexGlue-SDK.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Ridge Racer 6",
+      "Repository": "Sirhalo23/RidgeRacer6-Recompilation",
+      "SourceCommit": "50d1c9d3268eff1ada34a413b026697a02331e0a",
+      "Evidence": "An unofficial, fan-made native Windows version of **Ridge Racer 6** (Xbox 360,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Rockstar Table Tennis",
+      "Repository": "davidptrssvea/Table-Tennis-Rockstar-PC",
+      "SourceCommit": "ee18b25eae16ed321aa9cd9e7a2eef7594fc825a",
+      "Evidence": "Bring the Xbox 360 classic to your PC with **up to 4K output, higher internal 3D resolution, high-refresh framerate options, and optional image filters**. The game code is recompiled to native Windows x64 with ReXGlue SDK v0.10.0 and DirectX 12 rendering. The installer builder validates every embedded source file against the public allowlist before compilation. It rejects extra or altered payload files. Native patch rules store offsets, hashes and replacement text rather than removed original function bodies. See [implementation and validation](reports/LOCAL_BUILD.md) and [changelog](CHANGELOG.md).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Rumble Roses XX",
+      "Repository": "Revan67/RumbleRosesXX-Recomp",
+      "SourceCommit": "2fe1790720bebca7c42c49fa0eaf96d54c3c839c",
+      "Evidence": "An educational, work-in-progress native PC recompilation of the Xbox 360 version of Rumble Roses XX. XenonRecomp translates the original PowerPC program into C++, while the project runtime supplies the host memory, kernel, filesystem, input, timing, and graphics interfaces expected by that code. The original CPU/runtime baseline builds and reaches an internal frame loop. An isolated ReXGlue/Xenos hybrid opens a native window and renders recognizable in-engine scenes with controller input and audio. Local tests confirmed two saves and one load. On October 25, 2026, a user reached and played a match with the native nonlocal-return repair and experimental safe shader loads enabled. This is a fi",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Skate (2007)",
+      "Repository": "cookingwithsimon/Skate1Recompiled",
+      "SourceCommit": "356fa346d45572b74d6600dce4755f2d5e54abe7",
+      "Evidence": "An unofficial native PC port of **skate** (EA Black Box, 2007) for Windows, made by",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Skate 3",
+      "Repository": "HelmXGaming/Skate-3-Recompiled--Work-in-Progress-",
+      "SourceCommit": "8ee61b4865a52d1273ae5b39be9c2d41cbfd1f20",
+      "Evidence": "This project is an early Skate 3 native Windows recompilation experiment using the XenonRecomp toolchain. The current milestone is a launchable Windows launcher UI that can select, extract, validate, and cache the required game files. Native game boot is not wired yet. The first native-game milestone is to produce generated C++ from the extracted Xbox 360 executable:",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Skate 3",
+      "Repository": "darchap/Skate3-Port",
+      "SourceCommit": "c71741831151102ecc1bfd49049012a7bec15292",
+      "Evidence": "*Skate 3* running natively on Android phones — not emulated. The Xbox 360 PowerPC code is statically recompiled ahead of time into native ARM64 and linked against a Vulkan runtime,",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Skate 3",
+      "Repository": "andrewnakas/skate3-ios-setup",
+      "SourceCommit": "ef19a6a50302a0aa2923b55d7e20ea61fdae891a",
+      "Evidence": "Recompilation translates the game's code to run natively, which is why it holds",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Skate 3",
+      "Repository": "whachuvr/Skate3VR",
+      "SourceCommit": "4ebce66df7041a3b083e15af382586f98cc23bfe",
+      "Evidence": "An unofficial VR mod for the native PC recompilation of **Skate 3**, bringing first-person skating, tracked hands, and full-body inverse kinematics to OpenXR. | Left stick | Native left-stick input; movement/steering according to game state |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Sonic the Hedgehog 2006",
+      "Repository": "sonicnext-dev/MarathonRecomp",
+      "SourceCommit": "dd91996040e37e1245729055f83d72c69c3b78f0",
+      "Evidence": "Marathon Recompiled is an unofficial PC port of the Xbox 360 version of Sonic the Hedgehog (2006) created through the process of static recompilation. The port offers Windows, Linux, and macOS support. Given it is not possible to run the game where the Flatpak is stored, the game data will be installed to `~/.var/app/io.github.sonicnext_dev.marathonrecomp/data`. The Flatpak build will only recognize this directory as valid. Feel free to reuse this data directory with a native Linux build if you wish to switch in the future.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Sonic Unleashed",
+      "Repository": "hedge-dev/UnleashedRecomp",
+      "SourceCommit": "cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c",
+      "Evidence": "Unleashed Recompiled is an unofficial PC port of the Xbox 360 version of Sonic Unleashed created through the process of static recompilation. The port offers Windows and Linux support with numerous built-in enhancements such as high resolutions, ultrawide support, high frame rates, improved performance and modding. As emulation of the Xbox 360's GPU is not required in a recompilation, many decisions were made to skip quirks of the original hardware that are not required in a PC port, resulting in great improvements to performance.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "South Park: Let's Go Tower Defense Play!",
+      "Repository": "TekRantGaming/south-park-tower-defense-recompiled",
+      "SourceCommit": "6b68caed6de37fd62ab585375b81e1b7287cf25c",
+      "Evidence": "| 🖥️ **Native Windows and Linux** builds, no emulator | 🎮 **Any controller**, or the keyboard with your own bindings | 🗂️ **Saves and settings** one click away in the launcher | | | Xbox 360 | PC port |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "South Park: Tenorman's Revenge",
+      "Repository": "TekRantGaming/south-park-tenormans-revenge-recompiled",
+      "SourceCommit": "1de5a89f6db722f922f4ead1a3ca5925da389ebd",
+      "Evidence": "| 🖥️ **Native Windows and Linux** builds, no emulator | 🎮 **Any controller**, or the keyboard with your own bindings | 🗂️ **Saves and settings** one click away in the launcher | | | Xbox 360 | PC port |",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Super Street Fighter II Turbo HD Remix",
+      "Repository": "saulob/ssf2t-hd-remix-recompiled",
+      "SourceCommit": "97a8fecb60ec3bb6504686fb5da2108fb37a9f37",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Tekken 6",
+      "Repository": "Ekspym/Tekken6-native-online",
+      "SourceCommit": "f68b65b253d85f2627f4501b6c35125243f770fe",
+      "Evidence": "Tekken 6 for Xbox 360 running natively on Windows (recompiled, no emulator) with rollback netcode (GGPO principle) and Download: see **Releases** (`tekken6_native_online.zip`). The package contains **no part of the game**. You build the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Tekken Tag Tournament 2",
+      "Repository": "shihabal3amri/tekken-tag-tournament-2-pc",
+      "SourceCommit": "007c523fae876079d74bd9265fb04009e17c6514",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Tekken Tag Tournament 2",
+      "Repository": "thatcalikid760/TTT2-Recomp",
+      "SourceCommit": "12d6fb9c0fc60a6c5a0e801179d2b357f345706e",
+      "Evidence": "**TTT2 Recomp** by ThatCaliKid760 is a patched build of the native PC static recompilation of *Tekken Tag Tournament 2* (Xbox 360), with fixes and quality-of-life improvements for online play. It's not an emulator: the game's own code runs natively on your PC. This project is built on **[shihabal3amri/tekken-tag-tournament-2-pc](https://github.com/shihabal3amri/tekken-tag-tournament-2-pc)**, the original native Windows port by static recompilation. All credit for the port itself goes to that project and the tools it builds on ([XenonRecomp](https://github.com/hedge-dev/XenonRecomp), with [Unleashed Recompiled](https://github.com/hedge-dev/UnleashedRecomp) and [Xenia](https://github.com/xenia",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "The Bigs 2",
+      "Repository": "mdomangue26/The-Bigs-2-Recompiled",
+      "SourceCommit": "4947e569b3d86cc11ead1ee485e88fc9a6ed9ac9",
+      "Evidence": "A native Linux and Windows port of *The Bigs 2* (Xbox 360, 2K Sports, 2009),",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "The Darkness",
+      "Repository": "invinceble55-wq/Estacado-The-Darkness-Recomp",
+      "SourceCommit": "b5603ac4202b4a8083c4f1476cd5fa258e93f133",
+      "Evidence": "natively on Windows, with a Direct3D 12 graphics layer built on native code by static recompilation. It does nothing on its own. It needs",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "The Simpsons Arcade",
+      "Repository": "sp00nznet/simpsonsarcade",
+      "SourceCommit": "527f163b697a3c72164d9330544777d9b0cd44db",
+      "Evidence": "A static recompilation of **The Simpsons Arcade** (Xbox 360 / XBLA) to native x86-64 PC using [XenonRecomp](https://github.com/hedge-dev/XenonRecomp) and the [ReXGlue SDK](https://github.com/hedge-dev/ReXGlue). Unlike emulation (which interprets instructions at runtime), static recompilation translates the entire PowerPC binary ahead of time into equivalent C++ source code. Each PPC instruction maps to C++ code operating on a CPU state struct. The result is a native executable that runs at full speed without an emulator.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "The Simpsons Game",
+      "Repository": "portingpete/the-simpsons-recomp",
+      "SourceCommit": "3f83acc5c555d2dad0d8f8abc9644c47a3dcec22",
+      "Evidence": "compiled ahead of time, handwritten native platform services, and a native renderer that runs on Direct3D 11 or, optionally, [Vulkan](docs/native-vulkan-renderer.md).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Trials HD",
+      "Repository": "snufflyyy/trials-hd-recompiled",
+      "SourceCommit": "17a76f5e674c6132d74f587567e0ecc1624ce3e6",
+      "Evidence": "A static recompilation of **Trials HD** (Xbox 360 / XBLA, title ID `5841095A`) for Linux (x86-64) and macOS (Apple Silicon / Intel), built with the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk). ReXGlue translates the game's PowerPC executable into C++ ahead of time and links it against a native runtime (kernel HLE, WebGPU or Vulkan GPU backend, SDL input/audio).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Viva Piñata",
+      "Repository": "crabinacrabic/VivaPinataRecomp",
+      "SourceCommit": "a510fc771505aa409d075e79e590e8a1d5cbf66c",
+      "Evidence": "**Viva Piñata (Xbox 360, 2006) running natively on Windows PC** The original Xbox 360 game, converted into a normal Windows program. It is **not an emulator**: the game's code was translated to C++ with [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk) (\"static recompilation\"). The game has a launcher and can optionally use a Russian translation.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Wet",
+      "Repository": "nikolaygorb/WetRecomp",
+      "SourceCommit": "6c2aee68aaba992e12375178c9366abe4245f549",
+      "Evidence": "A static recompilation of [**WET**](https://en.wikipedia.org/wiki/Wet_(video_game)) (2009, Xbox 360, Title ID `425307DB`) to native Windows/Linux x86-64, built on the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk).",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE '12",
+      "Repository": "iMrBurn/wwe12-pc",
+      "SourceCommit": "6fb1dbe1088608b79723345a662dcca34e1737e4",
+      "Evidence": "A native Windows port of **WWE '12** (Yuke's/THQ, 2011) from its **Xbox 360** version, made by **static recompilation** with the [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk), and a",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE '13",
+      "Repository": "PromethenDev/wwe13-recomp",
+      "SourceCommit": "d6574985f7e73ab2a4c09f68684aba49ba454d07",
+      "Evidence": "An unofficial static recompilation of the **Xbox 360 version of WWE '13** for 64-bit Windows and Linux. The original PowerPC game code is translated ahead of time to C++ and built into a native executable using the ReXGlue SDK; this is not an Xbox 360 emulator.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE 2K14",
+      "Repository": "Jarrodfeng/wwe2k14-recomp",
+      "SourceCommit": "4fc6031de78d8cc2fd68a5c8f505cce2be80ef00",
+      "Evidence": "A static recompilation of the **Xbox 360 version of WWE 2K14** into a native Windows x64 program, built with the",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE 2K14",
+      "Repository": "PromethenDev/wwe2k14-recomp",
+      "SourceCommit": "d16cbd6bab83a3bde8eacf12ad932879709f85d2",
+      "Evidence": "An unofficial static recompilation of the **Xbox 360 version of WWE 2K14** for 64-bit Windows and Linux. The original PowerPC game code is translated ahead of time to C++ and built into a native executable using the ReXGlue SDK; this is not an",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE 2K14",
+      "Repository": "itsbybanshee/wwe2k14-pc",
+      "SourceCommit": "064ebd8a55fabd25f0b78e500f7fdc9d39c8a921",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE 2K16",
+      "Repository": "itsbybanshee/wwe2k16-pc",
+      "SourceCommit": "be305ece6e866c96c327ac2f206307c69857e1d5",
+      "Evidence": "",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE All Stars",
+      "Repository": "shaneomac1337/WWE-AllStars-Recomp",
+      "SourceCommit": "34d7b71d926440262f14f6a6e2d9763494588498",
+      "Evidence": "is translated ahead of time to native x86-64 with [ReXGlue](https://github.com/rexglue/rexglue-sdk), and a native Vulkan renderer draws the game's own Direct3D 9 calls. It is not an emulator",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE SmackDown vs. Raw 2007",
+      "Repository": "HollywoodAkeem/SVR07-Recomp",
+      "SourceCommit": "2cd2793d5d235c83f90f109410ad75dad2aee857",
+      "Evidence": "A static recompilation of **WWE SmackDown vs. Raw 2007** (Xbox 360) that runs natively on Windows.",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE SmackDown vs. Raw 2007",
+      "Repository": "nefariousjosiah/WWE-SVR2007-RECOMP",
+      "SourceCommit": "ec3e37b86c04240892d03f30737cc382b9044ac4",
+      "Evidence": "The Xbox 360 version of **WWE SmackDown vs. Raw 2007**, recompiled to run natively on Windows, Linux **The goal is simple: bring the game back so people can play it again, natively on PC at 60 fps.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "WWE SmackDown vs. Raw 2008",
+      "Repository": "nefariousjosiah/WWE-SVR2008-RECOMP",
+      "SourceCommit": "92e93446954e5cbe15ffeb7f46f11f85dbc92dc2",
+      "Evidence": "The Xbox 360 version of **WWE SmackDown vs. Raw 2008**, recompiled to run natively on Windows, Linux **The goal is simple: bring the game back so people can play it again, natively on PC at 60 fps.**",
+      "Validation": "Documentation amont uniquement, pas de test de jeu"
+    }
+  ]
+}

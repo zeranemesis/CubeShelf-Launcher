@@ -1,0 +1,953 @@
+[
+  {
+    "Id": "3dge7161-jiggle-or-physics-dead-or-alive-jiggle-or-physics-",
+    "Title": "Dead or Alive ++",
+    "Project": "Jiggle-or-Physics",
+    "Repository": "3dge7161/Jiggle-or-Physics",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Dead or Alive ++ (Jiggle-or-Physics).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "9e42e3ba122249d14ec2acbcc22f9fca34330f68",
+    "ReadmeUrl": "https://github.com/3dge7161/Jiggle-or-Physics/blob/9e42e3ba122249d14ec2acbcc22f9fca34330f68/README.md",
+    "ReleaseUrl": "https://github.com/3dge7161/Jiggle-or-Physics/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "tekrantgaming-digdug-native-dig-dug",
+    "Title": "Dig Dug",
+    "Project": "digdug-native",
+    "Repository": "TekRantGaming/digdug-native",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "f39916ef85cb8080baa32a7a2e030abd19f1b8fb",
+    "ReadmeUrl": "https://github.com/TekRantGaming/digdug-native/blob/f39916ef85cb8080baa32a7a2e030abd19f1b8fb/README.md",
+    "ReleaseUrl": "https://github.com/TekRantGaming/digdug-native/releases/tag/v1.1.0",
+    "ReleaseTag": "v1.1.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DigDug-windows-x64.zip",
+        "Url": "https://github.com/TekRantGaming/digdug-native/releases/download/v1.1.0/DigDug-windows-x64.zip",
+        "Sha256": "72245abc39783147f06361292e793461c51136c6f2746e0ec8fa1b8be9cc778a",
+        "Size": 30628851,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "DigDug-x86_64.AppImage",
+        "Url": "https://github.com/TekRantGaming/digdug-native/releases/download/v1.1.0/DigDug-x86_64.AppImage",
+        "Sha256": "defbf4724c551dc3aee1b68a162a335d3927b1d59cf4e06d8da78990816044d3",
+        "Size": 30751224,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "thefixinhixon-ultracombo-killer-instinct-ultracombo-",
+    "Title": "Killer Instinct",
+    "Project": "UltraCombo",
+    "Repository": "thefixinhixon/UltraCombo",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Killer Instinct (UltraCombo).",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b7ae26e7605efbe53cb60433ade26d5579900d8e",
+    "ReadmeUrl": "https://github.com/thefixinhixon/UltraCombo/blob/b7ae26e7605efbe53cb60433ade26d5579900d8e/README.md",
+    "ReleaseUrl": "https://github.com/thefixinhixon/UltraCombo/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "djyt-cannonball-outrun",
+    "Title": "OutRun",
+    "Project": "cannonball",
+    "Repository": "djyt/cannonball",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "27493ebf62be3498dff93ed6a45e8e2db819bae1",
+    "ReadmeUrl": "https://github.com/djyt/cannonball/blob/27493ebf62be3498dff93ed6a45e8e2db819bae1/README.md",
+    "ReleaseUrl": "https://github.com/djyt/cannonball/releases/tag/v0.34",
+    "ReleaseTag": "v0.34",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "wilson-flores-pacmanrecomp-pac-man",
+    "Title": "Pac-Man",
+    "Project": "PacmanRecomp",
+    "Repository": "Wilson-Flores/PacmanRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "910c9ae6e588983c1266df8f2d578c55ac4cb2c4",
+    "ReadmeUrl": "https://github.com/Wilson-Flores/PacmanRecomp/blob/910c9ae6e588983c1266df8f2d578c55ac4cb2c4/README.md",
+    "ReleaseUrl": "https://github.com/Wilson-Flores/PacmanRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "spita90-konami-viper-recomp-thrill-drive-2",
+    "Title": "Thrill Drive 2",
+    "Project": "konami-viper-recomp",
+    "Repository": "spita90/konami-viper-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "f65fa785c032faf9ef4bb6423e1cceb307805477",
+    "ReadmeUrl": "https://github.com/spita90/konami-viper-recomp/blob/f65fa785c032faf9ef4bb6423e1cceb307805477/README.md",
+    "ReleaseUrl": "https://github.com/spita90/konami-viper-recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-super-street-fighter-ii-turbo",
+    "Title": "Super Street Fighter II Turbo",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-street-fighter-alpha",
+    "Title": "Street Fighter Alpha",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-street-fighter-alpha-2",
+    "Title": "Street Fighter Alpha 2",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-street-fighter-zero-2-alpha",
+    "Title": "Street Fighter Zero 2 Alpha",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-street-fighter-alpha-3",
+    "Title": "Street Fighter Alpha 3",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-super-gem-fighter-mini-mix",
+    "Title": "Super Gem Fighter Mini Mix",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-marvel-super-heroes",
+    "Title": "Marvel Super Heroes",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-x-men-vs-street-fighter",
+    "Title": "X-Men vs. Street Fighter",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-marvel-super-heroes-vs-street-fighter",
+    "Title": "Marvel Super Heroes vs. Street Fighter",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-marvel-vs-capcom",
+    "Title": "Marvel vs. Capcom",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-super-puzzle-fighter-ii-turbo",
+    "Title": "Super Puzzle Fighter II Turbo",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-vampire-savior",
+    "Title": "Vampire Savior",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-vampire-savior-2",
+    "Title": "Vampire Savior 2",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-vampire-hunter-2",
+    "Title": "Vampire Hunter 2",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-vampire-savior-definitive",
+    "Title": "Vampire Savior Definitive",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-alien-vs-predator",
+    "Title": "Alien vs. Predator",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tmcleroy-cps2recomp-cadillacs-and-dinosaurs",
+    "Title": "Cadillacs and Dinosaurs",
+    "Project": "cps2recomp",
+    "Repository": "tmcleroy/cps2recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "88f696e27db4f8f520c34e6c9f8c078612c81a63",
+    "ReadmeUrl": "https://github.com/tmcleroy/cps2recomp/blob/88f696e27db4f8f520c34e6c9f8c078612c81a63/README.md",
+    "ReleaseUrl": "https://github.com/tmcleroy/cps2recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "CPS2Recomp-linux-arm64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-arm64.tar.gz",
+        "Sha256": "2a140a704d34868032531146e8295eb05a21553bac5cea4e7d2f3ab421177c07",
+        "Size": 109475644,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "0db821e524c5e1bcdd3f2eb6305d2af511c02580d26f1a33d2dcfdab04aa3d12",
+        "Size": 108830118,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "CPS2Recomp-windows-x64.zip",
+        "Url": "https://github.com/tmcleroy/cps2recomp/releases/download/v1.0.0/CPS2Recomp-windows-x64.zip",
+        "Sha256": "849a46ddb747728944d71e328b3dc38eea86bce96d2fafbed083e28776eda1c1",
+        "Size": 81119684,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

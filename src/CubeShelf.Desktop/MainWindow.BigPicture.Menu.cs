@@ -29,13 +29,15 @@ public sealed partial class MainWindow
         };
         BigPictureMenuHelp.Text=P7("↑ ↓ Sélectionner     A Valider     B Retour     START Fermer",
             "↑ ↓ Select     A Confirm     B Back     START Close");
-        void Row(string text,Action action,string value="")
+        void Row(string text,Action action,string value="",ShelfProduct? platform=null)
         {
-            var content=new Grid { ColumnDefinitions=new ColumnDefinitions("*,Auto"),ColumnSpacing=18 };
-            content.Children.Add(new TextBlock { Text=text,TextWrapping=TextWrapping.Wrap,VerticalAlignment=VerticalAlignment.Center });
+            var content=new Grid { ColumnDefinitions=new ColumnDefinitions("Auto,*,Auto"),ColumnSpacing=14 };
+            if(platform is not null) content.Children.Add(new CubeShelf.Desktop.Controls.ConsoleBrandMark { Platform=platform.Id, Width=38, Height=38 });
+            var label = new TextBlock { Text=text,TextWrapping=TextWrapping.Wrap,VerticalAlignment=VerticalAlignment.Center };
+            Grid.SetColumn(label,1); content.Children.Add(label);
             var detail=new TextBlock { Text=value.Length>0?value:"›",FontSize=16,VerticalAlignment=VerticalAlignment.Center };
-            Grid.SetColumn(detail,1);content.Children.Add(detail);
-            var button=new Button { Content=content,FontSize=20,Padding=new Thickness(20,15),
+            Grid.SetColumn(detail,2);content.Children.Add(detail);
+            var button=new Button { Content=content,FontSize=20,Padding=new Thickness(20,15),CornerRadius=new CornerRadius(10),
                 HorizontalAlignment=HorizontalAlignment.Stretch,HorizontalContentAlignment=HorizontalAlignment.Stretch };
             var index=_bigPictureMenuButtons.Count;
             button.GotFocus+=(_,_)=>FocusBigPictureMenu(index);
@@ -57,8 +59,12 @@ public sealed partial class MainWindow
         }
         else if(page=="platform")
         {
-            foreach(var (name,index) in new[]{("GameCube",0),("Wii",1),("Switch",2),("Nintendo 64",3)})
-                Row(name,()=>Go(()=>BigPictureConsoleShelfPicker.SelectedIndex=index),BigPictureConsoleShelfPicker.SelectedIndex==index?"✓":"");
+            foreach(var (product,index) in ShelfProducts.Select((product,index)=>(product,index)))
+            {
+                var count=NativePortCatalog.ForConsole(_catalogGames,product.Id).Count();
+                var selected=BigPictureConsoleShelfPicker.SelectedIndex==index;
+                Row(product.Console,()=>Go(()=>BigPictureConsoleShelfPicker.SelectedIndex=index),$"{count} · {(selected ? "✓" : "›")}",product);
+            }
         }
         else if(page=="game")
         {
@@ -78,7 +84,7 @@ public sealed partial class MainWindow
         {
             Row(P7("Reprendre","Resume"),CloseBigPictureMenu);
             Row(P7("Options du jeu","Game options"),()=>ShowBigPictureMenu("game"));
-            Row(P7("Plateformes","Platforms"),()=>ShowBigPictureMenu("platform"));
+            Row(P7("Plateformes","Platforms"),ShowPlatformHome);
             Row(P7("Paramètres manette","Controller settings"),()=>ShowBigPictureMenu("controller"));
             Row(P7("Vue de la collection","Collection layout"),()=>{ToggleBigPictureLayout(this,new RoutedEventArgs());ShowBigPictureMenu();},_bigPictureRibbon?P7("Ruban","Ribbon"):P7("Rangée","Row"));
             Row(P7("Amis","Friends"),()=>Go(()=>OpenBigPictureFriends(this,new RoutedEventArgs())));
@@ -86,7 +92,7 @@ public sealed partial class MainWindow
             Row(P7("Retour au bureau","Return to desktop"),()=>Go(()=>ExitBigPicture(this,new RoutedEventArgs())));
         }
         if(page!="main") Row(P7("Retour","Back"),()=>ShowBigPictureMenu());
-        BigPictureMenuOverlay.IsVisible=true;FocusBigPictureMenu(0);
+        BigPictureMenuOverlay.IsVisible=true;FocusBigPictureMenu(page=="platform" ? Math.Max(0,BigPictureConsoleShelfPicker.SelectedIndex) : 0);
     }
 
     private void FocusBigPictureMenu(int index)
@@ -114,6 +120,14 @@ public sealed partial class MainWindow
     internal void HandleBigPictureControllerInput(int rawInput)
     {
         if(!_bigPictureActive)return;
+        if(PlatformHome.IsVisible)
+        {
+            if(rawInput is 1 or 11)PlatformHome.Move(-1);
+            else if(rawInput is 2 or 12)PlatformHome.Move(1);
+            else if(rawInput==5)PlatformHome.Choose();
+            else if(rawInput is 8 or 13)PlatformHome.CycleSort();
+            return;
+        }
         var input=Controls.BigPictureGamepad.MapNavigation(rawInput,_preferences.SwapBigPictureNavigation);
         if(LaunchTransition.IsVisible) { if(input==6)LaunchTransition.Stop();return; }
         if(BigPictureInputWindow()!=this) { if(input<11)HandleBigPicturePageInput(input);return; }
@@ -139,7 +153,7 @@ public sealed partial class MainWindow
             case 14:BigPictureConsoleShelfPicker.SelectedIndex=(BigPictureConsoleShelfPicker.SelectedIndex+BigPictureConsoleShelfPicker.ItemCount-1)%BigPictureConsoleShelfPicker.ItemCount;break;
             case >=1 and <=4:ShowBigPictureMenu();break;
             case 5:PlayBigPicture(this,new RoutedEventArgs());break;
-            case 6:ShowBigPictureMenu();break;
+            case 6:ShowPlatformHome();break;
             case 7:FlipBigPictureCase(this,new RoutedEventArgs());break;
             case 8:ToggleBigPictureLayout(this,new RoutedEventArgs());break;
         }

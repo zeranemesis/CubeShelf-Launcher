@@ -9,6 +9,13 @@ var root = Path.Combine(Path.GetTempPath(), "native-shelves-tests-" + Guid.NewGu
 Directory.CreateDirectory(root);
 try
 {
+    var expanded = ShelfProduct.All.Where(product => File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")))
+        .ToDictionary(product => product.Id, product => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")));
+    Check(expanded.Count >= 25 && expanded.Values.Sum(ports => ports.Count) > 400, "expanded console catalogues validate with safe package origins and checksums");
+    Check(expanded.Keys.All(id => ShelfProduct.Resolve(id).Id == id) && ShelfProduct.All.Select(product => product.Id).Distinct().Count() == ShelfProduct.All.Length,
+        "all platform identities resolve uniquely");
+    foreach (var entry in expanded.Where(pair => pair.Key is not ("gamecube" or "wii" or "switch" or "n64")))
+        Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40 && port.VerifiedAt == "2026-10-29" && port.ReadmeUrl.StartsWith(port.Homepage + "/blob/" + port.SourceCommit)), "primary-source provenance: " + entry.Key);
     var catalogs = new[] { "gamecube", "wii", "switch", "n64" }.ToDictionary(id => id, id => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory,"Catalogs",id+".json")));
     Check(catalogs["gamecube"].Count >= 19 && catalogs["wii"].Count >= 13 && catalogs["switch"].Count >= 20, "all four catalogues load with verified source references");
     Check(catalogs.Values.SelectMany(p=>p).All(p => p.ReadmeUrl.StartsWith(p.Homepage+"/") && p.SourceCommit.Length==40 && p.VerifiedAt=="2026-10-26"), "primary README provenance is retained");

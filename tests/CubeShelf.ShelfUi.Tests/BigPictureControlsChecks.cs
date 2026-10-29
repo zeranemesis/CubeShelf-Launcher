@@ -4,6 +4,7 @@ using Avalonia.Headless;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.LogicalTree;
+using Avalonia.Input;
 using CubeShelf.Core.Platform;
 using CubeShelf.Core.Library;
 using CubeShelf.Desktop;
@@ -26,6 +27,34 @@ static class BigPictureControlsChecks
         var consoles=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
         var position=window.FindControl<TextBlock>("BigPicturePosition")!;
         var menu=window.FindControl<Border>("BigPictureMenuOverlay")!;
+        Check(window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible,"Big Picture must open the 3D console carousel.");
+        Check(Grid.GetColumn(window.FindControl<PlatformHomeControl>("PlatformHome")!)==0 &&
+            Grid.GetColumnSpan(window.FindControl<PlatformHomeControl>("PlatformHome")!)==2 && !window.FindControl<Border>("DesktopSidebar")!.IsVisible,
+            "Big Picture console home must keep its fullscreen layout.");
+        Check(!window.FindControl<PlatformHomeControl>("PlatformHome")!.IsGrid &&
+            window.FindControl<PlatformHomeControl>("PlatformHome")!.Background is Avalonia.Media.ISolidColorBrush { Color: var homeColor } && homeColor==Avalonia.Media.Color.Parse("#F5F0EE"),
+            "Big Picture console carousel must use the game selection background.");
+        Save("startup-platforms.png");
+        window.HandleBigPictureControllerInput(5);
+        Check(!menu.IsVisible,"Confirming the current platform must open its catalogue.");
+        var consoleHome=window.FindControl<PlatformHomeControl>("PlatformHome")!;
+        var backToConsoles=window.FindControl<Button>("BigPictureConsolesButton")!;
+        Check(backToConsoles.IsEffectivelyVisible,"The game catalogue must offer a visible return to consoles.");
+        Save("games-with-console-back.png");
+        var originalConsole=((ComboBoxItem)consoles.SelectedItem!).Tag!.ToString();
+        backToConsoles.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Check(consoleHome.IsVisible && consoleHome.SelectedConsole==originalConsole,"Back must reopen the current console without leaving Big Picture.");
+        window.HandleBigPictureControllerInput(12);var anotherConsole=consoleHome.SelectedConsole;
+        window.HandleBigPictureControllerInput(5);
+        Check(!consoleHome.IsVisible && ((ComboBoxItem)consoles.SelectedItem!).Tag!.ToString()==anotherConsole && window.FindControl<Control>("BigPictureView")!.IsVisible,
+            "Returning to consoles must allow choosing a different catalogue in Big Picture.");
+        window.HandleBigPictureControllerInput(6);
+        Check(consoleHome.IsVisible&&!menu.IsVisible,"B must return directly from games to consoles.");
+        window.HandleBigPictureControllerInput(5);
+        window.RaiseEvent(new KeyEventArgs { RoutedEvent=InputElement.KeyDownEvent,Key=Key.Escape });
+        Check(consoleHome.IsVisible,"Escape must return from games to consoles.");
+        window.HandleBigPictureControllerInput(5);
+        consoles.SelectedIndex=3;
         var shelf=window.FindControl<GameShelfControl>("BigPictureShelf")!;
         Check(shelf.UseGpuTextures && shelf.UseCompositorScaling,"Big Picture did not enable the optimised renderer.");
         var selectedCase=shelf.Children.OfType<GameCaseControl>().Single(c=>c.IsInteractive);
@@ -48,6 +77,7 @@ static class BigPictureControlsChecks
         Check(hiddenCard.PlayLabel!=label,"Desktop status did not catch up when leaving Big Picture.");
         hiddenCard.Game.Executable=executable;refresh.Invoke(window,null);
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        window.HandleBigPictureControllerInput(5);
         void Input(int value)=>window.HandleBigPictureControllerInput(value);
         var console=consoles.SelectedIndex;Input(13);
         Check(consoles.SelectedIndex==(console+1)%consoles.ItemCount,"Stick up did not change platform.");

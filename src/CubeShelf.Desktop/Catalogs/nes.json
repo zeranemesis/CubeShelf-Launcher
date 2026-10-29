@@ -1,0 +1,270 @@
+[
+  {
+    "Id": "mstan-drmarionesrecomp-dr.-mario",
+    "Title": "Dr. Mario",
+    "Project": "DrMarioNesRecomp",
+    "Repository": "mstan/DrMarioNesRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "8742c953985b2f7fe6e9267068b748640304d66b",
+    "ReadmeUrl": "https://github.com/mstan/DrMarioNesRecomp/blob/8742c953985b2f7fe6e9267068b748640304d66b/README.md",
+    "ReleaseUrl": "https://github.com/mstan/DrMarioNesRecomp/releases/tag/v1.3.1",
+    "ReleaseTag": "v1.3.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DrMarioRecomp-eu-windows-x64.zip",
+        "Url": "https://github.com/mstan/DrMarioNesRecomp/releases/download/v1.3.1/DrMarioRecomp-eu-windows-x64.zip",
+        "Sha256": "b5b683f5b127dc4ef7b7471e20d53d03d77d81adbb66d039a92fd9bd2bd3a3f4",
+        "Size": 4728167,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "DrMarioRecomp-usa-windows-x64.zip",
+        "Url": "https://github.com/mstan/DrMarioNesRecomp/releases/download/v1.3.1/DrMarioRecomp-usa-windows-x64.zip",
+        "Sha256": "26f694557a977501206cc2395704de086d96af7c9972b5185315eee169a87aac",
+        "Size": 4701280,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-duckhuntnesrecomp-duck-hunt",
+    "Title": "Duck Hunt",
+    "Project": "DuckHuntNESRecomp",
+    "Repository": "mstan/DuckHuntNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "906d1496b3162d838274cc9307f9459895f419b3",
+    "ReadmeUrl": "https://github.com/mstan/DuckHuntNESRecomp/blob/906d1496b3162d838274cc9307f9459895f419b3/README.md",
+    "ReleaseUrl": "https://github.com/mstan/DuckHuntNESRecomp/releases/tag/v1.2.1",
+    "ReleaseTag": "v1.2.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DuckHuntRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/DuckHuntNESRecomp/releases/download/v1.2.1/DuckHuntRecomp-windows-x64.zip",
+        "Sha256": "b9d68fd918b0f021b4ad8861b0191cd5be3620f163df824bf725cfb7fac124fd",
+        "Size": 4486217,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-faxanadurecomp-faxanadu",
+    "Title": "Faxanadu",
+    "Project": "FaxanaduRecomp",
+    "Repository": "mstan/FaxanaduRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "f743ae4c87406947de7a6a61cacd2cc036ca631c",
+    "ReadmeUrl": "https://github.com/mstan/FaxanaduRecomp/blob/f743ae4c87406947de7a6a61cacd2cc036ca631c/README.md",
+    "ReleaseUrl": "https://github.com/mstan/FaxanaduRecomp/releases/tag/v2.5.0",
+    "ReleaseTag": "v2.5.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "FaxanaduRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/FaxanaduRecomp/releases/download/v2.5.0/FaxanaduRecomp-windows-x64.zip",
+        "Sha256": "55d380e0bbeb232fc9b4bff4d541020f1612af8101b787e245cda76a63165f9e",
+        "Size": 5153781,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-megaman3nesrecomp-mega-man-3",
+    "Title": "Mega Man 3",
+    "Project": "Megaman3NESRecomp",
+    "Repository": "mstan/Megaman3NESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b3d6d270018b9311cb39638fa39bf3ec2e7fd69a",
+    "ReadmeUrl": "https://github.com/mstan/Megaman3NESRecomp/blob/b3d6d270018b9311cb39638fa39bf3ec2e7fd69a/README.md",
+    "ReleaseUrl": "https://github.com/mstan/Megaman3NESRecomp/releases/tag/v0.1.3",
+    "ReleaseTag": "v0.1.3",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "MegaMan3Recomp-USA-v0.1.3-windows-x64.zip",
+        "Url": "https://github.com/mstan/Megaman3NESRecomp/releases/download/v0.1.3/MegaMan3Recomp-USA-v0.1.3-windows-x64.zip",
+        "Sha256": "964c0c452ac95219039b72049b88fdee75fe75b3c7b033c7d08734f7e9612641",
+        "Size": 5694732,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-metroidnesrecomp-metroid",
+    "Title": "Metroid",
+    "Project": "MetroidNESRecomp",
+    "Repository": "mstan/MetroidNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "caccee62a67daea083fac8af36b1d0065b902071",
+    "ReadmeUrl": "https://github.com/mstan/MetroidNESRecomp/blob/caccee62a67daea083fac8af36b1d0065b902071/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MetroidNESRecomp/releases/tag/v0.2.4",
+    "ReleaseTag": "v0.2.4",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "MetroidNESRecomp-USA-NTSC-cycle-preview-windows-x64.zip",
+        "Url": "https://github.com/mstan/MetroidNESRecomp/releases/download/v0.2.4/MetroidNESRecomp-USA-NTSC-cycle-preview-windows-x64.zip",
+        "Sha256": "a17b861c018c55098951ba7481300d0564ede4430985f6889c9bceadecfed030",
+        "Size": 6509465,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mr-shizzy-pacmanrecomp-pac-man",
+    "Title": "Pac-Man",
+    "Project": "PacManRecomp",
+    "Repository": "Mr-Shizzy/PacManRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "877c0ebce229e6308a4a7e8d28f5fde4714f7592",
+    "ReadmeUrl": "https://github.com/Mr-Shizzy/PacManRecomp/blob/877c0ebce229e6308a4a7e8d28f5fde4714f7592/README.md",
+    "ReleaseUrl": "https://github.com/Mr-Shizzy/PacManRecomp/releases/tag/v1.1.1",
+    "ReleaseTag": "v1.1.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "mstan-supermariobrosnesrecomp-super-mario-bros.",
+    "Title": "Super Mario Bros.",
+    "Project": "SuperMarioBrosNESRecomp",
+    "Repository": "mstan/SuperMarioBrosNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "45f95754f8ad6e04fc39966505c94af9783bd787",
+    "ReadmeUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/blob/45f95754f8ad6e04fc39966505c94af9783bd787/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/tag/v1.12.4",
+    "ReleaseTag": "v1.12.4",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SuperMarioBrosRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/download/v1.12.4/SuperMarioBrosRecomp-windows-x64.zip",
+        "Sha256": "77fc18e7a12310a1d0d393b3ddda748b867da5098c2cd79d2a8b111b6eb3f6e4",
+        "Size": 29777992,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-yoshinesrecomp-yoshi",
+    "Title": "Yoshi",
+    "Project": "YoshiNESRecomp",
+    "Repository": "mstan/YoshiNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "f219991df2e70d6bf41f4ba9a46c8ddf990b572e",
+    "ReadmeUrl": "https://github.com/mstan/YoshiNESRecomp/blob/f219991df2e70d6bf41f4ba9a46c8ddf990b572e/README.md",
+    "ReleaseUrl": "https://github.com/mstan/YoshiNESRecomp/releases/tag/v1.2.1",
+    "ReleaseTag": "v1.2.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "YoshiRecomp-USA-v1.2.1-windows-x64.zip",
+        "Url": "https://github.com/mstan/YoshiNESRecomp/releases/download/v1.2.1/YoshiRecomp-USA-v1.2.1-windows-x64.zip",
+        "Sha256": "fb81f3bb3d0be7d519482d36034a01d60ed76d3838a8c8212de1d67a70aca2dc",
+        "Size": 4773292,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-yoshiscookierecomp-yoshi-s-cookie",
+    "Title": "Yoshi's Cookie",
+    "Project": "YoshisCookieRecomp",
+    "Repository": "mstan/YoshisCookieRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "1abdd99dc21953f4188e2052675a7d21ee367420",
+    "ReadmeUrl": "https://github.com/mstan/YoshisCookieRecomp/blob/1abdd99dc21953f4188e2052675a7d21ee367420/README.md",
+    "ReleaseUrl": "https://github.com/mstan/YoshisCookieRecomp/releases/tag/v1.1.1",
+    "ReleaseTag": "v1.1.1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "YoshisCookieRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/YoshisCookieRecomp/releases/download/v1.1.1/YoshisCookieRecomp-windows-x64.zip",
+        "Sha256": "5238356ea207ba358602f01b6febd0569b9ffadbf70945e610d8a6c5cc231b98",
+        "Size": 4902569,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

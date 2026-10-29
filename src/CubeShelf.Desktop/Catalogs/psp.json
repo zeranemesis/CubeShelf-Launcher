@@ -1,0 +1,68 @@
+[
+  {
+    "Id": "elmasas-lcs-recomp-grand-theft-auto-liberty-city-stories",
+    "Title": "Grand Theft Auto: Liberty City Stories",
+    "Project": "lcs-recomp",
+    "Repository": "elmasas/lcs-recomp",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "1132a76e59a29d7395635a5239a0d4aadd948385",
+    "ReadmeUrl": "https://github.com/elmasas/lcs-recomp/blob/1132a76e59a29d7395635a5239a0d4aadd948385/README.md",
+    "ReleaseUrl": "https://github.com/elmasas/lcs-recomp/releases/tag/v0.1.6",
+    "ReleaseTag": "v0.1.6",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "zmbkilla-psp2i_recomp-phantasy-star-portable-2-infinity",
+    "Title": "Phantasy Star Portable 2 Infinity",
+    "Project": "PSP2I_Recomp",
+    "Repository": "zmbkilla/PSP2I_Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "c3ed2f4b6ecf81037a52fe699af7c1dcfab8f9a9",
+    "ReadmeUrl": "https://github.com/zmbkilla/PSP2I_Recomp/blob/c3ed2f4b6ecf81037a52fe699af7c1dcfab8f9a9/README.md",
+    "ReleaseUrl": "https://github.com/zmbkilla/PSP2I_Recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "gtteancum-starwars-renegadesquadron-pc-star-wars-battlefront-renegade-squadron",
+    "Title": "Star Wars Battlefront: Renegade Squadron",
+    "Project": "StarWars-RenegadeSquadron-PC",
+    "Repository": "GTTeancum/StarWars-RenegadeSquadron-PC",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "7c0e0db52d5076f5794284f000277525d11fe563",
+    "ReadmeUrl": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/blob/7c0e0db52d5076f5794284f000277525d11fe563/README.md",
+    "ReleaseUrl": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/releases/tag/v0.9.1",
+    "ReleaseTag": "v0.9.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "RenegadeSquadronPC-0.9.1-linux-ubuntu26.04-x86_64.tar.gz",
+        "Url": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/releases/download/v0.9.1/RenegadeSquadronPC-0.9.1-linux-ubuntu26.04-x86_64.tar.gz",
+        "Sha256": "7ae40f0478de38bb1f8f7ee4d96cb6c9bd524f653a1deeef94b47867f61b3f56",
+        "Size": 28274319,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  }
+]

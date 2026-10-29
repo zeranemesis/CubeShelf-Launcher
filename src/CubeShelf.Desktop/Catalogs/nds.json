@@ -1,0 +1,98 @@
+[
+  {
+    "Id": "jonathandc64-ffcceot-recomp-final-fantasy-crystal-chronicles-echoes-of-time",
+    "Title": "Final Fantasy Crystal Chronicles: Echoes of Time",
+    "Project": "FFCCEOT-Recomp",
+    "Repository": "JonathanDC64/FFCCEOT-Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "934c7434c9a6c2866fea17fa36098ef9c0652fc4",
+    "ReadmeUrl": "https://github.com/JonathanDC64/FFCCEOT-Recomp/blob/934c7434c9a6c2866fea17fa36098ef9c0652fc4/README.md",
+    "ReleaseUrl": "https://github.com/JonathanDC64/FFCCEOT-Recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "piuzera-jusdecomp-jump-ultimate-stars",
+    "Title": "Jump Ultimate Stars",
+    "Project": "JUSDecomp",
+    "Repository": "piuzera/JUSDecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "6a061e3897f10a8800bf7ec9afde82fa8c9dbe1b",
+    "ReadmeUrl": "https://github.com/piuzera/JUSDecomp/blob/6a061e3897f10a8800bf7ec9afde82fa8c9dbe1b/README.md",
+    "ReleaseUrl": "https://github.com/piuzera/JUSDecomp/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "yokimitsuro-khdays-port-kingdom-hearts-358-2-days",
+    "Title": "Kingdom Hearts 358/2 Days",
+    "Project": "khdays-port",
+    "Repository": "Yokimitsuro/khdays-port",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "b3965470b2426fc2edfdce2ab7334a5f459607be",
+    "ReadmeUrl": "https://github.com/Yokimitsuro/khdays-port/blob/b3965470b2426fc2edfdce2ab7334a5f459607be/README.md",
+    "ReleaseUrl": "https://github.com/Yokimitsuro/khdays-port/releases/tag/v0.1.4",
+    "ReleaseTag": "v0.1.4",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "callancampos-frigate-pok-mon-black-2",
+    "Title": "Pokémon Black 2",
+    "Project": "Frigate",
+    "Repository": "CallanCampos/Frigate",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "56a9ef2a1db0fde6ddb542f15013155a6e473478",
+    "ReadmeUrl": "https://github.com/CallanCampos/Frigate/blob/56a9ef2a1db0fde6ddb542f15013155a6e473478/README.md",
+    "ReleaseUrl": "https://github.com/CallanCampos/Frigate/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "callancampos-frigate-pok-mon-white-2",
+    "Title": "Pokémon White 2",
+    "Project": "Frigate",
+    "Repository": "CallanCampos/Frigate",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "56a9ef2a1db0fde6ddb542f15013155a6e473478",
+    "ReadmeUrl": "https://github.com/CallanCampos/Frigate/blob/56a9ef2a1db0fde6ddb542f15013155a6e473478/README.md",
+    "ReleaseUrl": "https://github.com/CallanCampos/Frigate/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  }
+]

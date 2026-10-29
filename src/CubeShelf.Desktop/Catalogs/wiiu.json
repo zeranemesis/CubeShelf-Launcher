@@ -1,0 +1,124 @@
+[
+  {
+    "Id": "ishaankalra2103-botwrecomp-the-legend-of-zelda-breath-of-the-wild",
+    "Title": "The Legend of Zelda: Breath of the Wild",
+    "Project": "BotWRecomp",
+    "Repository": "IshaanKalra2103/BotWRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "2b84b82dbe7efe41707d236fdbac9ec5e98c8d3d",
+    "ReadmeUrl": "https://github.com/IshaanKalra2103/BotWRecomp/blob/2b84b82dbe7efe41707d236fdbac9ec5e98c8d3d/README.md",
+    "ReleaseUrl": "https://github.com/IshaanKalra2103/BotWRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "zeldawwhdrecomp-zeldawwhdrecomp-the-legend-of-zelda-the-wind-waker-hd",
+    "Title": "The Legend of Zelda: The Wind Waker HD",
+    "Project": "ZeldaWWHDRecomp",
+    "Repository": "ZeldaWWHDRecomp/ZeldaWWHDRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "0a53327a6876d2c404406ac74fe11ac6a3333a99",
+    "ReadmeUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/blob/0a53327a6876d2c404406ac74fe11ac6a3333a99/README.md",
+    "ReleaseUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/tag/v0.4.0",
+    "ReleaseTag": "v0.4.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "WindWakerHD-v0.4.0-linux-aarch64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-linux-aarch64.AppImage",
+        "Sha256": "328b33bd42b2439e86f4d59bf36a497090ac07e85a474163d1ff3b694301e3c5",
+        "Size": 103561736,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-linux-aarch64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-linux-aarch64.zip",
+        "Sha256": "00300dbbe0834fa85217579c28949e88c2b0244a546765d4fe0edf948d17e0a7",
+        "Size": 120462350,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-linux-x86_64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-linux-x86_64.AppImage",
+        "Sha256": "885aac1a3d51338db256148a6249a74ab0aca69ebc9a98fa8e4290ac1ad2b67a",
+        "Size": 102394360,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-linux-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-linux-x86_64.zip",
+        "Sha256": "7d636b7e60f5adff6f9d0afb152d3d0a4c13ba92d7651c28f4bf8151c66592bc",
+        "Size": 117804998,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-macos-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-macos-arm64.zip",
+        "Sha256": "6e58fd5838685c47fb6ca02d7272513a2754f9b9baacf97d5532d23e37e12004",
+        "Size": 28441682,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-windows-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-windows-arm64.zip",
+        "Sha256": "30fb05c684ab0681fa666d79846ea61edb99a6e4846c8004fbee3fcd584a8388",
+        "Size": 40424928,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.4.0-windows-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.4.0/WindWakerHD-v0.4.0-windows-x86_64.zip",
+        "Sha256": "ab7e69459a214455f90fd1d6cb0bd9d86f43a9167c2d53c6cfb4ce1acee50083",
+        "Size": 41817222,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "asadsi-twilight-princess-hd-recomp-the-legend-of-zelda-twilight-princess-hd",
+    "Title": "The Legend of Zelda: Twilight Princess HD",
+    "Project": "twilight-princess-hd-recomp",
+    "Repository": "AsadSi/twilight-princess-hd-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "1f208ec1bf7ea0519bbd0a1712fea8568cd1637d",
+    "ReadmeUrl": "https://github.com/AsadSi/twilight-princess-hd-recomp/blob/1f208ec1bf7ea0519bbd0a1712fea8568cd1637d/README.md",
+    "ReleaseUrl": "https://github.com/AsadSi/twilight-princess-hd-recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  }
+]

@@ -1,0 +1,498 @@
+[
+  {
+    "Id": "elliotttate-dkc1recomp-donkey-kong-country",
+    "Title": "Donkey Kong Country",
+    "Project": "DKC1Recomp",
+    "Repository": "elliotttate/DKC1Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "3eb9a10c49cb210df2bd63addafe2a78cf9f4e22",
+    "ReadmeUrl": "https://github.com/elliotttate/DKC1Recomp/blob/3eb9a10c49cb210df2bd63addafe2a78cf9f4e22/README.md",
+    "ReleaseUrl": "https://github.com/elliotttate/DKC1Recomp/releases/tag/v0.0.17",
+    "ReleaseTag": "v0.0.17",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DKC1Recomp-v0.0.15-macOS-arm64-HD-Preview.zip",
+        "Url": "https://github.com/elliotttate/DKC1Recomp/releases/download/v0.0.17/DKC1Recomp-v0.0.15-macOS-arm64-HD-Preview.zip",
+        "Sha256": "01c00aa8b410bacce08c08574ed6a41f649bb9e121dcef5e0447171a8953be0f",
+        "Size": 881657520,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "DKC1Recomp-v0.0.17-Windows-x64.zip",
+        "Url": "https://github.com/elliotttate/DKC1Recomp/releases/download/v0.0.17/DKC1Recomp-v0.0.17-Windows-x64.zip",
+        "Sha256": "adf90d506a255d6909906c512eacb7ab83a68b425a44373c289fe95cb489f5df",
+        "Size": 12927869,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "cacodemontube-doomsnesrecomp-doom",
+    "Title": "Doom",
+    "Project": "DoomSNESRecomp",
+    "Repository": "Cacodemontube/DoomSNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "23b7a495055516ab0b938de51ee51ac46634c96f",
+    "ReadmeUrl": "https://github.com/Cacodemontube/DoomSNESRecomp/blob/23b7a495055516ab0b938de51ee51ac46634c96f/README.md",
+    "ReleaseUrl": "https://github.com/Cacodemontube/DoomSNESRecomp/releases/tag/v0.04",
+    "ReleaseTag": "v0.04",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "DoomSNESRecomp-v0.04-Linux-x64.zip",
+        "Url": "https://github.com/Cacodemontube/DoomSNESRecomp/releases/download/v0.04/DoomSNESRecomp-v0.04-Linux-x64.zip",
+        "Sha256": "1b6bce96bf59ca5cb0bd29ace732e655bf5675d9830e87ed38bcdc2bd1352990",
+        "Size": 4776035,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "DoomSNESRecomp-v0.04-macOS-arm64.zip",
+        "Url": "https://github.com/Cacodemontube/DoomSNESRecomp/releases/download/v0.04/DoomSNESRecomp-v0.04-macOS-arm64.zip",
+        "Sha256": "eaa7ea688bda8e163fdf664ef5f7191b73ae69f26332ec9c5e91c7872751e31f",
+        "Size": 4078036,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "DoomSNESRecomp-v0.04-macOS-x64.zip",
+        "Url": "https://github.com/Cacodemontube/DoomSNESRecomp/releases/download/v0.04/DoomSNESRecomp-v0.04-macOS-x64.zip",
+        "Sha256": "0e8fbb8fb6a5209bd4703260b844ed7d1203063bfb3383940b344ff8f985852f",
+        "Size": 4378163,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "DoomSNESRecomp-v0.04-Windows-x64.zip",
+        "Url": "https://github.com/Cacodemontube/DoomSNESRecomp/releases/download/v0.04/DoomSNESRecomp-v0.04-Windows-x64.zip",
+        "Sha256": "5ee69d4e0ae3601d10c063febf7ce04b134b0cae59c91e56862004c0545d6446",
+        "Size": 6056260,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "rages4calm-earthbound-companion-earthbound",
+    "Title": "EarthBound",
+    "Project": "earthbound-companion",
+    "Repository": "rages4calm/earthbound-companion",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "993438440cd2e397e9ee70882c7a0d79c84f0a80",
+    "ReadmeUrl": "https://github.com/rages4calm/earthbound-companion/blob/993438440cd2e397e9ee70882c7a0d79c84f0a80/README.md",
+    "ReleaseUrl": "https://github.com/rages4calm/earthbound-companion/releases/tag/v1.0.13",
+    "ReleaseTag": "v1.0.13",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "craigshaw-fzerorecomp-f-zero",
+    "Title": "F-Zero",
+    "Project": "FZeroRecomp",
+    "Repository": "craigshaw/FZeroRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "5f37c22c7a2acef8b341545e9f2a4c5a4463990b",
+    "ReadmeUrl": "https://github.com/craigshaw/FZeroRecomp/blob/5f37c22c7a2acef8b341545e9f2a4c5a4463990b/README.md",
+    "ReleaseUrl": "https://github.com/craigshaw/FZeroRecomp/releases/tag/v0.6.0",
+    "ReleaseTag": "v0.6.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "FZeroRecomp-v0.6.0-Linux-x64.tar.gz",
+        "Url": "https://github.com/craigshaw/FZeroRecomp/releases/download/v0.6.0/FZeroRecomp-v0.6.0-Linux-x64.tar.gz",
+        "Sha256": "522dbff671e07b0e5fbfb16538fef2bd6993aeb2ed1dfea698bf55a460b405a5",
+        "Size": 5407126,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "FZeroRecomp-v0.6.0-macOS-arm64.zip",
+        "Url": "https://github.com/craigshaw/FZeroRecomp/releases/download/v0.6.0/FZeroRecomp-v0.6.0-macOS-arm64.zip",
+        "Sha256": "3ba7dbc7483aeed91871e9d4e9f2ad6ccbd672413ae483770c3566396699ff6a",
+        "Size": 6148103,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "FZeroRecomp-v0.6.0-Windows-x64.zip",
+        "Url": "https://github.com/craigshaw/FZeroRecomp/releases/download/v0.6.0/FZeroRecomp-v0.6.0-Windows-x64.zip",
+        "Sha256": "f3f2fd443c90c097fc281464fbfef7182eef5c557c3ef135f4689f4161c1b47a",
+        "Size": 4441359,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "omegakatana92-final-fight-3-recomp-final-fight-3",
+    "Title": "Final Fight 3",
+    "Project": "Final-Fight-3-Recomp",
+    "Repository": "omegakatana92/Final-Fight-3-Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "7041b443b70633f28bd9ea36ffaa0500e00530d0",
+    "ReadmeUrl": "https://github.com/omegakatana92/Final-Fight-3-Recomp/blob/7041b443b70633f28bd9ea36ffaa0500e00530d0/README.md",
+    "ReleaseUrl": "https://github.com/omegakatana92/Final-Fight-3-Recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "mstan-megamanx2recomp-mega-man-x2",
+    "Title": "Mega Man X2",
+    "Project": "MegaManX2Recomp",
+    "Repository": "mstan/MegaManX2Recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "9c3b374c4a0cf0a93748a52a74375d2b4af731a3",
+    "ReadmeUrl": "https://github.com/mstan/MegaManX2Recomp/blob/9c3b374c4a0cf0a93748a52a74375d2b4af731a3/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MegaManX2Recomp/releases/tag/v0.1.5",
+    "ReleaseTag": "v0.1.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MegaManX2SNESRecomp-windows-x64-v0.1.5.zip",
+        "Url": "https://github.com/mstan/MegaManX2Recomp/releases/download/v0.1.5/MegaManX2SNESRecomp-windows-x64-v0.1.5.zip",
+        "Sha256": "dcfc7bee4e817cff7fd95c315800732ab4cc877df1c5225afd314585eac9494d",
+        "Size": 13128270,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-megamanx3snesrecomp-mega-man-x3",
+    "Title": "Mega Man X3",
+    "Project": "MegamanX3SNESRecomp",
+    "Repository": "mstan/MegamanX3SNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "e88e5aabc940e0d64b0b8ea9474d528ee8fe8aed",
+    "ReadmeUrl": "https://github.com/mstan/MegamanX3SNESRecomp/blob/e88e5aabc940e0d64b0b8ea9474d528ee8fe8aed/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MegamanX3SNESRecomp/releases/tag/v0.0.7",
+    "ReleaseTag": "v0.0.7",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MegaManX3SNESRecomp-windows-x64-v0.0.7.zip",
+        "Url": "https://github.com/mstan/MegamanX3SNESRecomp/releases/download/v0.0.7/MegaManX3SNESRecomp-windows-x64-v0.0.7.zip",
+        "Sha256": "c1d69cf3a88c591aeb611ddcf6cfabb509da57b5afe7dd366dd0f58c12fceab6",
+        "Size": 13401226,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-supermarioworldrecomp-super-mario-world",
+    "Title": "Super Mario World",
+    "Project": "SuperMarioWorldRecomp",
+    "Repository": "mstan/SuperMarioWorldRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "324dfc8fb8359c7eb514259a16867e05e06129bb",
+    "ReadmeUrl": "https://github.com/mstan/SuperMarioWorldRecomp/blob/324dfc8fb8359c7eb514259a16867e05e06129bb/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioWorldRecomp/releases/tag/v0.15.1",
+    "ReleaseTag": "v0.15.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "SuperMarioWorldRecomp-linux-0.15.1-x86_64.AppImage",
+        "Url": "https://github.com/mstan/SuperMarioWorldRecomp/releases/download/v0.15.1/SuperMarioWorldRecomp-linux-0.15.1-x86_64.AppImage",
+        "Sha256": "6efc426be1629e5b6513cbbc5c4dd20174eb1c2c923003ea0867dbc6f66bac71",
+        "Size": 25180664,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SuperMarioWorldRecomp-windows-x64-v0.15.1.zip",
+        "Url": "https://github.com/mstan/SuperMarioWorldRecomp/releases/download/v0.15.1/SuperMarioWorldRecomp-windows-x64-v0.15.1.zip",
+        "Sha256": "d1c254308847a2391fc37b6c7ecd18c2622e9124774bb091d1d36196ab26608d",
+        "Size": 26146789,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "snesrev-smw-super-mario-world",
+    "Title": "Super Mario World",
+    "Project": "smw",
+    "Repository": "snesrev/smw",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "eae20c65c58930c8b62c76188d259579ad4130f1",
+    "ReadmeUrl": "https://github.com/snesrev/smw/blob/eae20c65c58930c8b62c76188d259579ad4130f1/README.md",
+    "ReleaseUrl": "https://github.com/snesrev/smw/releases/tag/v0.1",
+    "ReleaseTag": "v0.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "snesrev-sm-super-metroid",
+    "Title": "Super Metroid",
+    "Project": "sm",
+    "Repository": "snesrev/sm",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "578f90b3cc49557bb70060ad033bb90b8cf8ac50",
+    "ReadmeUrl": "https://github.com/snesrev/sm/blob/578f90b3cc49557bb70060ad033bb90b8cf8ac50/README.md",
+    "ReleaseUrl": "https://github.com/snesrev/sm/releases",
+    "ReleaseTag": "",
+    "Platforms": [],
+    "Assets": []
+  },
+  {
+    "Id": "yeoldpress-alttp-dx-the-legend-of-zelda-a-link-to-the-past",
+    "Title": "The Legend of Zelda: A Link to the Past",
+    "Project": "alttp-dx",
+    "Repository": "YeOldPress/alttp-dx",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "13d4cfeb71b2c67af592b26407e62bb66e8a6254",
+    "ReadmeUrl": "https://github.com/YeOldPress/alttp-dx/blob/13d4cfeb71b2c67af592b26407e62bb66e8a6254/README.md",
+    "ReleaseUrl": "https://github.com/YeOldPress/alttp-dx/releases/tag/v1.6",
+    "ReleaseTag": "v1.6",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "alttp-dx-v1.6-macos-arm64.zip",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/alttp-dx-v1.6-macos-arm64.zip",
+        "Sha256": "eaa50abdc7c6a17e777accbfe4cffbabfed8ca1bf2cd48c8136d99d69ac5f66c",
+        "Size": 2647389,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "alttp-dx-v1.6-windows-x86_64.zip",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/alttp-dx-v1.6-windows-x86_64.zip",
+        "Sha256": "7ea8247d82a4e50260294a0424e88aeab19f1a8f4b93bf4b4952fce07775e081",
+        "Size": 3690761,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "alttp-dx-v1.6-x86_64.AppImage",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/alttp-dx-v1.6-x86_64.AppImage",
+        "Sha256": "82a4b165b09b71e107c42f58dfd163d761e8115e47e942020fb42b291054f791",
+        "Size": 6654456,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "zelda3-tools-v1.6-macos-arm64.zip",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/zelda3-tools-v1.6-macos-arm64.zip",
+        "Sha256": "6bb742f464e23d5d4399c2ad98fc91a9811005fdeb29bfd2f2aa74090f6b4f5a",
+        "Size": 1661295,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "zelda3-tools-v1.6-windows-x86_64.zip",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/zelda3-tools-v1.6-windows-x86_64.zip",
+        "Sha256": "7947f55bbe729938617b9d58ad4546f4f5769952e9e77c2bc5341e5aa02b8bba",
+        "Size": 2741026,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "zelda3-tools-v1.6-x86_64.AppImage",
+        "Url": "https://github.com/YeOldPress/alttp-dx/releases/download/v1.6/zelda3-tools-v1.6-x86_64.AppImage",
+        "Sha256": "d1bfb54d6693cf5e2c9367044d4ed40e9785fddcd9a9aff4c97343f0ffc66f19",
+        "Size": 4221432,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-zeldaalttpsnesrecomp-the-legend-of-zelda-a-link-to-the-past",
+    "Title": "The Legend of Zelda: A Link to the Past",
+    "Project": "ZeldaAlttPSNESRecomp",
+    "Repository": "mstan/ZeldaAlttPSNESRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "8eee8b655c9d00c1fcd3bc825b5a53543417154d",
+    "ReadmeUrl": "https://github.com/mstan/ZeldaAlttPSNESRecomp/blob/8eee8b655c9d00c1fcd3bc825b5a53543417154d/README.md",
+    "ReleaseUrl": "https://github.com/mstan/ZeldaAlttPSNESRecomp/releases/tag/v0.6.6",
+    "ReleaseTag": "v0.6.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ZeldaALttPSNESRecomp-windows-x64-v0.6.6.zip",
+        "Url": "https://github.com/mstan/ZeldaAlttPSNESRecomp/releases/download/v0.6.6/ZeldaALttPSNESRecomp-windows-x64-v0.6.6.zip",
+        "Sha256": "53b613b86e87bfacc8462f485047c7fd22f82886dac69087aa0f0ef15eca7be2",
+        "Size": 12990200,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "snesrev-zelda3-the-legend-of-zelda-a-link-to-the-past",
+    "Title": "The Legend of Zelda: A Link to the Past",
+    "Project": "zelda3",
+    "Repository": "snesrev/zelda3",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "45a149d8b4bb8098f53d1009f76e76e7d8b79bbf",
+    "ReadmeUrl": "https://github.com/snesrev/zelda3/blob/45a149d8b4bb8098f53d1009f76e76e7d8b79bbf/README.md",
+    "ReleaseUrl": "https://github.com/snesrev/zelda3/releases/tag/v0.3",
+    "ReleaseTag": "v0.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "darhkfox-busterbustsloose-tiny-toon-adventures-buster-busts-loose-",
+    "Title": "Tiny Toon Adventures: Buster Busts Loose!",
+    "Project": "BusterBustsLoose",
+    "Repository": "Darhkfox/BusterBustsLoose",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "10aa80dea7fbdae31f0c38f51199c136ed0172d2",
+    "ReadmeUrl": "https://github.com/Darhkfox/BusterBustsLoose/blob/10aa80dea7fbdae31f0c38f51199c136ed0172d2/README.md",
+    "ReleaseUrl": "https://github.com/Darhkfox/BusterBustsLoose/releases/tag/v1.0",
+    "ReleaseTag": "v1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BusterBustsLoose-V1.0-win64.zip",
+        "Url": "https://github.com/Darhkfox/BusterBustsLoose/releases/download/v1.0/BusterBustsLoose-V1.0-win64.zip",
+        "Sha256": "baea2c19c4eb249fe1b26334295fda983133db866b1b557d17d1c64a1a8e38a1",
+        "Size": 1066034,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "moshferatu-zombies-ate-my-neighbors-pc-port-zombies-ate-my-neighbors",
+    "Title": "Zombies Ate My Neighbors",
+    "Project": "zombies-ate-my-neighbors-pc-port",
+    "Repository": "moshferatu/zombies-ate-my-neighbors-pc-port",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "08fb9f3cca20139a48dc13d90348ed59325be345",
+    "ReadmeUrl": "https://github.com/moshferatu/zombies-ate-my-neighbors-pc-port/blob/08fb9f3cca20139a48dc13d90348ed59325be345/README.md",
+    "ReleaseUrl": "https://github.com/moshferatu/zombies-ate-my-neighbors-pc-port/releases/tag/20261028",
+    "ReleaseTag": "20261028",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "zamn-linux-x86_64.tar.gz",
+        "Url": "https://github.com/moshferatu/zombies-ate-my-neighbors-pc-port/releases/download/20261028/zamn-linux-x86_64.tar.gz",
+        "Sha256": "c3b8b84c48925fe2c0e0347b1c835322dc0654695e21c497faa9c52fabb99938",
+        "Size": 2366478,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "zamn-windows-x86_64.zip",
+        "Url": "https://github.com/moshferatu/zombies-ate-my-neighbors-pc-port/releases/download/20261028/zamn-windows-x86_64.zip",
+        "Sha256": "e4fdfed4e898c939e99fdbc132bda9bcc6a12deba0b84e6e0a0eb099dbffeffb",
+        "Size": 1580223,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

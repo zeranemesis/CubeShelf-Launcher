@@ -1,0 +1,302 @@
+[
+  {
+    "Console": "gamecube",
+    "File": "gamecube.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:GameCube-Console-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/GameCube-Console-Set.png/500px-GameCube-Console-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "826d8b2eca1a5d69342b962252ae19a489fc53e861cfd185f6cc236258bfcee6"
+  },
+  {
+    "Console": "wii",
+    "File": "wii.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Wii-Console.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Wii-Console.png/500px-Wii-Console.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "f5d980bdf393a37341497645735a75b554a2cb8c4993d5b368092274af9d07c1"
+  },
+  {
+    "Console": "switch",
+    "File": "switch.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo-Switch-Console-Docked-wJoyConRB.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Nintendo-Switch-Console-Docked-wJoyConRB.jpg/500px-Nintendo-Switch-Console-Docked-wJoyConRB.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "fe56fa31dec01f1342ea1917e9de3a9dd2a15314e7ea43e4ad539cb82432a53b"
+  },
+  {
+    "Console": "n64",
+    "File": "n64.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:N64-Console-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/N64-Console-Set.png/500px-N64-Console-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "7dff564538d91ef2e4a8c5d6cb6cde76a69874d27b01fcaba5076031eded0101"
+  },
+  {
+    "Console": "nes",
+    "File": "nes.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:NES-Console-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/NES-Console-Set.png/500px-NES-Console-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "574a986f66edf150c77e452d30443904215f35b2a32b74af578147951ae9ab31"
+  },
+  {
+    "Console": "snes",
+    "File": "snes.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:SNES-Mod1-Console-Set.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/SNES-Mod1-Console-Set.jpg/500px-SNES-Mod1-Console-Set.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "7c7409097ae1b3d6011094117dfa79f12f23283b9e6c76805b93a964edc4fee7"
+  },
+  {
+    "Console": "gb",
+    "File": "gb.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Game-Boy-FL.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Game-Boy-FL.png/500px-Game-Boy-FL.png",
+    "Author": "Transfrom JPEG version and remove white background. Original by Evan-Amos.",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "be5e86ed1249d97d7c70744dc106a53cac77bd3187e85b7d0c77cbe1a27fcdd8"
+  },
+  {
+    "Console": "gbc",
+    "File": "gbc.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo-Game-Boy-Color-FL.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Nintendo-Game-Boy-Color-FL.png/500px-Nintendo-Game-Boy-Color-FL.png",
+    "Author": "Evan-Amos, modified by Gunnar.offel",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "0707859dbb4765ddc6a5751e0f03e39b5eff4513e26b57cfac05460f58b05d3d"
+  },
+  {
+    "Console": "gba",
+    "File": "gba.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo-Game-Boy-Advance-Purple-FL.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Nintendo-Game-Boy-Advance-Purple-FL.jpg/500px-Nintendo-Game-Boy-Advance-Purple-FL.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "f61684e240b6d5f50ad4feee2cbdcde39a3bcc9a1453ec26f79b18dfb549f363"
+  },
+  {
+    "Console": "nds",
+    "File": "nds.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo-DS-Fat-Blue.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Nintendo-DS-Fat-Blue.jpg/500px-Nintendo-DS-Fat-Blue.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "3c06fa875bbc884e5e3dafc9b1a2806dc39a5482ec029188a7338d56f0e6a039"
+  },
+  {
+    "Console": "3ds",
+    "File": "3ds.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo-3DS-AquaOpen.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Nintendo-3DS-AquaOpen.jpg/500px-Nintendo-3DS-AquaOpen.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "9e1157afe2296a31d2eb90794a15bcd793604cbdb7a09839313413a48d2a4e32"
+  },
+  {
+    "Console": "wiiu",
+    "File": "wiiu.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Wii_U_Console_and_Gamepad.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Wii_U_Console_and_Gamepad.png/500px-Wii_U_Console_and_Gamepad.png",
+    "Author": "Takimata　(edited by:Tokyoship)",
+    "License": "CC BY-SA 3.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "Sha256": "883b8935aafa44a7f0c5d8fb06984d6f61900ccc890b96ff122f8968f3f14a1d"
+  },
+  {
+    "Console": "virtualboy",
+    "File": "virtualboy.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Virtual-Boy-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Virtual-Boy-Set.png/500px-Virtual-Boy-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "b346d5354276f36b8d48845efd3e38b2d98e31ecd5dcbca3645678456798791b"
+  },
+  {
+    "Console": "mastersystem",
+    "File": "mastersystem.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-Master-System-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Sega-Master-System-Set.png/500px-Sega-Master-System-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "f4533db587a06c8b05f5ba39860d743d58a16252df3a235f5af064b2a9532122"
+  },
+  {
+    "Console": "megadrive",
+    "File": "megadrive.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-Genesis-Mk2-6button.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Sega-Genesis-Mk2-6button.jpg/500px-Sega-Genesis-Mk2-6button.jpg",
+    "Author": "Evan-Amos",
+    "License": "CC BY-SA 3.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "Sha256": "c2c95d00b1a1a08080346c7151da0de52981865bfd713f67d67ce34a94af0bd0"
+  },
+  {
+    "Console": "gamegear",
+    "File": "gamegear.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-Game-Gear-WB.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Sega-Game-Gear-WB.png/500px-Sega-Game-Gear-WB.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "02b66ba18c4d7bf75d763b346bf42393883f1a7efeced4d6a7b324fe7a2016df"
+  },
+  {
+    "Console": "32x",
+    "File": "32x.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-Genesis-Model2-32X.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Sega-Genesis-Model2-32X.jpg/500px-Sega-Genesis-Model2-32X.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "dc74ae6d08556ba522403fe559bc14d351218b6363c53722cc29999895947937"
+  },
+  {
+    "Console": "segacd",
+    "File": "segacd.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-CD-Model1-Set.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Sega-CD-Model1-Set.jpg/500px-Sega-CD-Model1-Set.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "02f62eeee3c5fe06b757d44537f55f71315f205e0db134ae58e427ca9fff301b"
+  },
+  {
+    "Console": "saturn",
+    "File": "saturn.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega-Saturn-Console-Set-Mk1.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Sega-Saturn-Console-Set-Mk1.png/500px-Sega-Saturn-Console-Set-Mk1.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "dbc3de01b5492e6f45e9ee44e60fb38cda8a8370295f43800288c8bf08399d63"
+  },
+  {
+    "Console": "dreamcast",
+    "File": "dreamcast.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Dreamcast-Console-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Dreamcast-Console-Set.png/500px-Dreamcast-Console-Set.png",
+    "Author": "Evan-Amos",
+    "License": "CC BY-SA 3.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "Sha256": "ec9ff8368fff447d0ad39c4464b27d8c9c6a1919872605123bdf8539678d2978"
+  },
+  {
+    "Console": "ps1",
+    "File": "ps1.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PSX-Console-wController.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/PSX-Console-wController.png/500px-PSX-Console-wController.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "fcacfa2798077d891204705e125f1719135595f3ea59e9d5973bdf0f299a5d2f"
+  },
+  {
+    "Console": "ps2",
+    "File": "ps2.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PS2-Versions.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/PS2-Versions.png/500px-PS2-Versions.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "c03f9bf4a85f597912e39bf9f4b7f81c80030cfacbb01c07e68fbca9154b262e"
+  },
+  {
+    "Console": "ps3",
+    "File": "ps3.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:PS3-Fat-Console-Set.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/PS3-Fat-Console-Set.jpg/500px-PS3-Fat-Console-Set.jpg",
+    "Author": "Evan-Amos",
+    "License": "CC BY-SA 3.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "Sha256": "02cbc899043aa04e369952d9ab2ab390c5ccb352f4ec6bb9f642023173a5cf9f"
+  },
+  {
+    "Console": "ps4",
+    "File": "ps4.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PS4-Console-wDS4.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/PS4-Console-wDS4.png/500px-PS4-Console-wDS4.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "9163adab37c5f206682856ad2bf71c7310c842a75f6d8d6df4d81e0531345972"
+  },
+  {
+    "Console": "psp",
+    "File": "psp.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sony-PSP-1000-Body.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Sony-PSP-1000-Body.png/500px-Sony-PSP-1000-Body.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "184afcf97208b00d5ae0b82516bb3699a13622956e456f389b79666c4ee75150"
+  },
+  {
+    "Console": "xbox",
+    "File": "xbox.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Xbox-Console-Set.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Xbox-Console-Set.png/500px-Xbox-Console-Set.png",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "fd204e33b0470f50f6d195bb5b20ba621f8305b8e376bfcb87aad7118472c743"
+  },
+  {
+    "Console": "xbox360",
+    "File": "xbox360.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Xbox-360-Pro-wController.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Xbox-360-Pro-wController.jpg/500px-Xbox-360-Pro-wController.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "2e224f43e6334a4cbb84b78598c84804626d24a7d7102fe170ba0a8189d070b6"
+  },
+  {
+    "Console": "neogeo",
+    "File": "neogeo.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Neo-Geo-AES-Console-Set.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Neo-Geo-AES-Console-Set.jpg/500px-Neo-Geo-AES-Console-Set.jpg",
+    "Author": "Evan-Amos",
+    "License": "CC BY-SA 3.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "Sha256": "79ee87dd8a4e8036117cd9e7e48e0fe9a54e4f637403f21d99d156ed862871c4"
+  },
+  {
+    "Console": "cdi",
+    "File": "cdi.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Philips-CDi-220-wController-FL.jpg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Philips-CDi-220-wController-FL.jpg/500px-Philips-CDi-220-wController-FL.jpg",
+    "Author": "Evan-Amos",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "977784b7ec9c11e0a05052c8d3415489ad62484a54813bc0c6a84991ded57ac8"
+  },
+  {
+    "Console": "arcade",
+    "File": "arcade.jpg",
+    "Source": "https://commons.wikimedia.org/wiki/File:Donkey_Kong_arcade.jpg",
+    "ImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Donkey_Kong_arcade.jpg",
+    "Author": "Joshua Driggs (ZapWizard) (take photo), bayo (remove the background)",
+    "License": "CC BY-SA 2.0",
+    "LicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "Sha256": "8e46e0909ddb3f74a0dc96dd5034cf47e40738574918d8d0f8dcee2438b6320a"
+  }
+]
