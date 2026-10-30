@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0-rc.3 — état du téléphone
+
+- Android : heure locale au format système, connexion Wi-Fi/mobile et batterie avec pourcentage et indicateur de charge, en haut à droite sur l’accueil, la bibliothèque et les fenêtres internes.
+- Actualisation toutes les cinq secondes au premier plan et immédiate au retour d’un jeu ; aucune interrogation en arrière-plan ni nouvelle permission.
+- Affichage 2G/3G/4G/5G selon le sous-type réseau exposé par Android ; « Mobile » si le détail n’est pas accessible. Les modes 5G NSA peuvent être signalés comme LTE par Android.
+- La barre conserve la zone sûre gérée par Avalonia ; l’animation d’ouverture tient compte de la hauteur restante. Android versionCode 52.
+
 ## 0.19.0-rc.2 — retour après une partie et catalogue Android ARM64
 
 - Correction du plantage du launcher à la fermeture d’un jeu : la lecture de l’état d’un processus peut déclencher sa finalisation et libérer son objet pendant la recherche. Les recherches utilisent maintenant un instantané et une lecture protégée du PID.

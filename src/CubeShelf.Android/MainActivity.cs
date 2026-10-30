@@ -216,6 +216,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
         public IRuntimeDownloads Downloads => NativeGameService.Downloads;
         public LauncherAppUpdates AppUpdates => AndroidAppUpdates.Instance;
         public IMobileNativePorts NativePorts => AndroidNativePorts.Instance;
+        public MobileDeviceStatus DeviceStatus => AndroidDeviceStatus.Read();
         public bool IsInstalled() => NativeGameService.IsInstalled();
         public bool DeviceSupportsPublishedGame() => NativeGameService.DeviceSupportsPublishedGame();
         public bool OpenGame() => NativeGameService.OpenGame();

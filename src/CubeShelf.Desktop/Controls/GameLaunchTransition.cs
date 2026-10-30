@@ -48,7 +48,8 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
         Stop();
         _openCase=openCase;
         _openingFinished=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var viewport=TopLevel.GetTopLevel(this)?.Bounds.Size??new Size(640,720);
+        var viewport=Parent is Control container&&container.Bounds.Width>0&&container.Bounds.Height>0
+            ?container.Bounds.Size:TopLevel.GetTopLevel(this)?.Bounds.Size??new Size(640,720);
         _case = new GameCaseControl { MinHeight=0, Width = openCase ? Math.Clamp(viewport.Width-72,120,540) : 210,
             Height = openCase ? Math.Clamp(viewport.Height*.48,90,Math.Max(90,Math.Min(430,viewport.Height-240))) : Math.Clamp(Bounds.Height * .48, 90, 250),
             CaseFormat=GameCaseControl.FormatForConsole(console),RealisticShell = true, UseImportedModel = true, IsInteractive = false,

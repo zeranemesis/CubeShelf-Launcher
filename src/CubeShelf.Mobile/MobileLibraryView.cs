@@ -126,7 +126,9 @@ public sealed partial class MobileLibraryView : UserControl
         var inspection = BuildInspectionOverlay();
         Grid.SetRowSpan(inspection, 3); content.Children.Add(inspection);
         Grid.SetRowSpan(_launchTransition, 3); content.Children.Add(_launchTransition);
-        Content = content;
+        var shell=new Grid {RowDefinitions=new RowDefinitions("Auto,*")};
+        shell.Children.Add(BuildDeviceStatusBar());Grid.SetRow(content,1);shell.Children.Add(content);
+        Content = shell;
         Grid.SetRowSpan(_platformHome,3);content.Children.Add(_platformHome);
         _platformHome.ConsoleChosen+=id=> { _consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);_platformHome.IsVisible=false;FocusPrimaryAction(); };
         UpdateInputHint();
@@ -163,8 +165,9 @@ public sealed partial class MobileLibraryView : UserControl
             InitializeShelf();
             SubscribeDownloads();
             SetAppUpdatesActive(true);
+            SetDeviceStatusActive(true);
         };
-        DetachedFromVisualTree += (_, _) => { SetAppUpdatesActive(false); UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
+        DetachedFromVisualTree += (_, _) => { SetDeviceStatusActive(false); SetAppUpdatesActive(false); UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         LayoutUpdated += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
@@ -328,6 +331,7 @@ public sealed partial class MobileLibraryView : UserControl
     public void SetActive(bool active)
     {
         SetAppUpdatesActive(active);
+        SetDeviceStatusActive(active);
         if (active) { InitializeShelf(); RefreshAvailability(); }
         else { FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
     }
@@ -565,7 +569,7 @@ public sealed partial class MobileLibraryView : UserControl
 
     private void UpdateResponsiveLayout()
     {
-        if (Content is not Grid root || root.Bounds.Width <= 0 || root.Bounds.Height <= 0) return;
+        if (_body.Parent is not Grid root || root.Bounds.Width <= 0 || root.Bounds.Height <= 0) return;
         var header = root.RowDefinitions[0].ActualHeight;
         var footer = root.RowDefinitions[2].ActualHeight;
         var key = (root.Bounds.Width, root.Bounds.Height, header, footer);

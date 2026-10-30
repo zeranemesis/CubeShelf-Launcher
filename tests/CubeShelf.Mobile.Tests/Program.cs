@@ -22,6 +22,8 @@ System.Xml.Linq.XNamespace android="http://schemas.android.com/apk/res/android";
 var visiblePackages=manifest.Root!.Element("queries")!.Elements("package").Select(p=>(string?)p.Attribute(android+"name")).ToHashSet();
 Check(ports.Where(p=>p.Id!="n64-sm64").All(p=>visiblePackages.Contains(p.PackageName)),"Android 11 can discover every external port package");
 Check(ports.Single(p=>p.Id=="wiiu-windwakerhd").RequiresVulkan13,"Wind Waker HD requires Vulkan 1.3");
+foreach(var (subtype,label) in new[]{(13,"4G"),(19,"4G"),(20,"5G"),(3,"3G"),(2,"2G"),(0,"Mobile"),(18,"Mobile")})
+    Check(MobileDeviceStatus.AndroidCellularLabel(subtype)==label,"cellular label preserves the reported network technology");
 var payload="APK fixture, never executed"u8.ToArray();
 MobileNativePort Fixture(byte[] bytes,string name="test.apk")=>new()
 {
@@ -92,6 +94,20 @@ void RunUi()
     var picker=Field<ComboBox>("_consolePicker");
     var home=Field<CubeShelf.Desktop.Controls.PlatformHomeControl>("_platformHome");
     Check(home.IsVisible,"Android starts with the 3D console carousel");
+    Check(Field<TextBlock>("_deviceTime").Text=="14:32"&&Field<TextBlock>("_deviceConnection").Text=="Wi-Fi"
+        &&Field<TextBlock>("_deviceBattery").Text=="82 %","console home shows the device status supplied by Android");
+    view.SetActive(false);Check(!Field<DispatcherTimer>("_deviceStatusTimer").IsEnabled,"device status polling stops while the game is in front");
+    host.DeviceStatus=new("21:05",12,true,"4G");view.SetActive(true);Jobs();
+    Check(Field<TextBlock>("_deviceTime").Text=="21:05"&&Field<TextBlock>("_deviceConnection").Text=="4G"
+        &&Field<TextBlock>("_deviceBattery").Text=="12 %"&&Field<Avalonia.Controls.Shapes.Path>("_chargingMark").IsVisible,
+        "resume immediately refreshes time, battery, charging and the active connection");
+    host.DeviceStatus=new("21:05",101,false,"Hors ligne");
+    view.GetType().GetMethod("RefreshDeviceStatus",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(view,null);Jobs();
+    Check(Field<TextBlock>("_deviceBattery").Text=="— %"&&!Field<Avalonia.Controls.Shapes.Path>("_chargingMark").IsVisible
+        &&Field<TextBlock>("_deviceConnection").Text=="Hors ligne","unavailable battery is not displayed as a fabricated percentage");
+    host.DeviceStatus=new("14:32",82,false,"Wi-Fi");view.SetActive(true);Jobs();
+    view.Padding=new Thickness(0,20,36,0);Jobs();CheckDeviceStatus();
+    view.Padding=default;Jobs();
     var selectedConsole=home.SelectedConsole;
     for(var sort=0;sort<5;sort++){home.CycleSort();Check(home.SelectedConsole==selectedConsole,"sorting preserves the selected console");}
     home.CycleSort();home.CycleSort();home.Move(1);
@@ -103,7 +119,7 @@ void RunUi()
     {
         Directory.CreateDirectory(startupFolder);
         foreach(var size in new[]{new Size(390,844),new Size(320,700),new Size(844,390)})
-        {window.Width=size.Width;window.Height=size.Height;Jobs();using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(startupFolder,$"mobile-platforms-{size.Width}.png"));}
+        {window.Width=size.Width;window.Height=size.Height;Jobs();CheckDeviceStatus();using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(startupFolder,$"mobile-platforms-{size.Width}.png"));}
         window.Width=390;window.Height=844;Jobs();
     }
     var platforms=CubeShelf.Core.Library.ShelfProduct.All.Where(p=>p.Id=="gamecube"||ports.Any(port=>port.ShelfConsole==p.Id)).ToArray();
@@ -175,6 +191,7 @@ void RunUi()
     {
         window.Width=size.Width;window.Height=size.Height;Jobs();
         var play=Field<Button>("_download");var origin=play.TranslatePoint(default,view)!.Value;
+        CheckDeviceStatus();
         Check(origin.Y>=0&&origin.Y+play.Bounds.Height<=view.Bounds.Height+1,"primary action fits in portrait and landscape");
         if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } folder)
         {Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"mobile-n64-{size.Width}.png"));}
@@ -192,6 +209,7 @@ void RunUi()
         Field<Button>("_play").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
         var transition=Field<CubeShelf.Desktop.Controls.GameLaunchTransition>("_launchTransition");
         transition.GetType().GetMethod("Advance",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(transition,[.8]);Jobs();
+        CheckDeviceStatus();
         var box=transition.GetType().GetField("_case",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(transition) as Control;
         Check(box!.Bounds.Width<=size.Width-48&&box.Bounds.Height<=size.Height-200,$"opening box fits the mobile viewport ({size}: {box.Bounds}; window {window.Bounds})");
         var back=transition.GetVisualDescendants().OfType<Button>().Single();
@@ -242,6 +260,15 @@ void RunUi()
         &&embeddedHost.Engines[ports[0].Id].Snapshot.State==RuntimeDownloadState.NotInstalled,
         "embedded ROM preparation enables Play without enqueuing or installing an APK");
     window.Close();
+    Check(!Field<DispatcherTimer>("_deviceStatusTimer").IsEnabled,"detaching the mobile view stops status polling");
+    void CheckDeviceStatus()
+    {
+        var time=Field<TextBlock>("_deviceTime");var origin=time.TranslatePoint(default,view)!.Value;
+        Check(Field<Border>("_deviceStatusBar").IsEffectivelyVisible&&origin.Y>=0&&origin.Y+time.Bounds.Height<=32
+            +view.Padding.Top&&origin.X>=0&&origin.X+time.Bounds.Width<=view.Bounds.Width-view.Padding.Right
+            &&origin.X+time.Bounds.Width>=view.Bounds.Width-32-view.Padding.Right,
+            "device status stays at the top right, above console home and game overlays");
+    }
     T Field<T>(string name)=>(T)typeof(MobileLibraryView).GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(view)!;
     void Jobs(){Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);Dispatcher.UIThread.RunJobs();}
 }
@@ -289,6 +316,7 @@ sealed class FakeGames:IMobileGameService
     public RuntimeDownloadQueue Queue {get;}
     public FakeNative Native {get;}
     public IMobileNativePorts NativePorts=>Native;
+    public MobileDeviceStatus? DeviceStatus {get;set;}=new("14:32",82,false,"Wi-Fi");
     public IRuntimeDownloads Downloads=>Queue;
     public string? LastError=>null;
     public bool IsInstalled()=>true;

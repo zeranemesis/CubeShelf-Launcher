@@ -13,4 +13,5 @@ public interface IMobileGameService
     IRuntimeDownloads? Downloads => null;
     LauncherAppUpdates? AppUpdates => null;
     IMobileNativePorts? NativePorts => null;
+    MobileDeviceStatus? DeviceStatus => null;
 }
