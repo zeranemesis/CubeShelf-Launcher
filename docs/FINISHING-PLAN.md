@@ -43,10 +43,11 @@ Les résultats détaillés et les liens de contrôle sont dans [le rapport de va
 ## Distribution
 
 - [x] README, démarrage, commandes Big Picture, catalogues, crédits, mises à jour et documentation Android actualisés.
-- [x] Six suites locales et validation GitHub Windows/Linux réussies sur la révision applicative `0602e32`.
+- [x] Six suites locales et validation GitHub Windows/Linux réussies sur la révision applicative `b25c9d4`.
 - [x] Configuration de signature vérifiée : Android avec clé de développement persistante ; aucun certificat Authenticode de distribution annoncé pour Windows.
 - [x] Premier installateur candidat : mise à niveau depuis 0.18.0, contrôle des fichiers installés, désinstallation et conservation du profil réussis sur runner jetable.
-- [ ] Répétition du contrôle sur les paquets finaux Windows, six builds PC complets et vérification finale des signatures/manifestes/empreintes avant publication.
+- [x] Répétition du contrôle sur le paquet final Windows et six builds PC complets.
+- [ ] Vérification finale des signatures Android, manifestes et empreintes par le workflow de publication.
 - [ ] Publication de la candidate avec notes de version et contrôles des fichiers mis à disposition.
 
 ## Condition de sortie

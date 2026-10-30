@@ -2,6 +2,8 @@
 
 ## 0.19.0-rc.1 — consolidation multi-consoles
 
+- Un second Échap sur l’accueil conserve le choix des consoles ; l’en-tête des fiches suit le jeu sélectionné après changement de plateforme.
+
 - Candidate de validation : 30 catalogues PC, six plateformes Android avec ports identifiés ; Bip conservé sans changement.
 - Accueil et tri français/anglais ; menu latéral défilant en petite fenêtre ; configuration manuelle explicite sans paquet compatible.
 - 19 jaquettes supplémentaires sur correspondances exactes ; 54 images restent indisponibles.
