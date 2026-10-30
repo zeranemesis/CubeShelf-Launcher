@@ -27,6 +27,20 @@
     <package android:name="com.bigodao.warioland" />
     <package android:name="org.wwhdrecomp.wwhd" />
     <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
+    <package android:name="com.izzy.kart" />
+    <package android:name="com.starship.android" />
+    <package android:name="com.perfectdark.port" />
+    <package android:name="com.aure.banjorecomp" />
+    <package android:name="com.deivid22srk.dk64recomp" />
+    <package android:name="io.github.hm64recomp" />
+    <package android:name="com.goemon64.recomp" />
+    <package android:name="com.mstan.supermarioland2recomp" />
+    <package android:name="com.lordingard.sacredstonesrecomp" />
+    <package android:name="io.github.doutorraposo.moonpearl" />
+    <package android:name="dev.twilitrealm.dusk" />
+    <package android:name="org.metroidprime.port" />
+    <package android:name="com.mp6.game" />
+    <package android:name="com.driftdroid.android" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">

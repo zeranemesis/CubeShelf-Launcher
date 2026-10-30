@@ -1,9 +1,12 @@
 # Changelog
 
-## 0.19.0-rc.2 — retour après une partie
+## 0.19.0-rc.2 — retour après une partie et catalogue Android ARM64
 
 - Correction du plantage du launcher à la fermeture d’un jeu : la lecture de l’état d’un processus peut déclencher sa finalisation et libérer son objet pendant la recherche. Les recherches utilisent maintenant un instantané et une lecture protégée du PID.
 - Régression reproduite avec un vrai processus enfant, puis corrigée pour la recherche par PID et la liste des jeux en cours.
+- Android : 14 ports ARM64 ajoutés avec APK épinglés et jaquettes exactes ; 23 entrées de ports plus PartyBoard, sur huit plateformes. Prérequis et limites affichés, aucune ROM ni BIOS fourni.
+- Correction de Jouer pour les ports hors Nintendo 64 ; maintien de la sélection au retour du jeu, relance et reprise après erreur vérifiés avec un hôte simulé.
+- Retour aux consoles par le retour Android/B ; ouverture GameCube/Wii et cartouche Nintendo 64 adaptée aux petits écrans, avec annulation avant lancement.
 - Android versionCode 51 ; mêmes identités et signature persistante. Les fonctions de Bip restent inchangées.
 
 

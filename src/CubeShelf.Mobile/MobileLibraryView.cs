@@ -225,17 +225,7 @@ public sealed partial class MobileLibraryView : UserControl
     {
         if(_platformHome.IsVisible)return;
         SetControllerInput(true);
-        if (_consolePicker.IsDropDownOpen) { _consolePicker.IsDropDownOpen = false; FocusPrimaryAction(); return; }
-        if(_nativePreparation is not null) {_nativePreparation.Cancel();return;}
-        if (_launching) { CancelLaunchTransition(); return; }
-        if (_downloadsOverlay.IsVisible) { CloseDownloads(); return; }
-        if (_inspectionCase is not null) { CloseInspection(); return; }
-        if (_invitationPanel.IsExpanded)
-        {
-            _invitationPanel.IsExpanded = false;
-            _invitationPanel.Focus();
-        }
-        else FocusPrimaryAction();
+        DismissOverlay();
     }
 
     public void FocusPrimaryAction()
@@ -540,15 +530,19 @@ public sealed partial class MobileLibraryView : UserControl
         {
             var game = _catalog[_selected];
             var cover = game.Covers.FirstOrDefault();
+            var native = SelectedNativePort;
+            var openCase = game.ShelfConsole is "gamecube" or "wii" or "switch" or "n64";
+            var media = game.Id == PartyBoardId ? "Assets/Covers/Media/gamecube-GMPE01.png" : cover?.Media;
             _launchTransition.Start(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine), "Lancement…", game.Id,
-                game.ShelfConsole,openCase:game.ShelfConsole=="n64",media:Cover(cover?.Media),right:Cover(cover?.Right),top:Cover(cover?.Top),bottom:Cover(cover?.Bottom));
-            if(game.ShelfConsole=="n64")
+                game.ShelfConsole,openCase:openCase,media:Cover(media),right:Cover(cover?.Right),top:Cover(cover?.Top),bottom:Cover(cover?.Bottom));
+            if(openCase)
             {
                 if(!await _launchTransition.WaitForOpeningAsync(cancellation.Token))return;
-                cancellation.Token.ThrowIfCancellationRequested();
-                _games.NativePorts!.Launch(game.Id);
             }
-            else { await Task.Delay(500,cancellation.Token);Run(_games.OpenGame); }
+            else await Task.Delay(500,cancellation.Token);
+            cancellation.Token.ThrowIfCancellationRequested();
+            if(native is not null) _games.NativePorts!.Launch(game.Id);
+            else Run(_games.OpenGame);
         }
         catch (OperationCanceledException) { }
         catch (Exception error) { SetStatus(error.Message); }

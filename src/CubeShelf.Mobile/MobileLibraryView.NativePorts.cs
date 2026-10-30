@@ -24,6 +24,7 @@ public sealed partial class MobileLibraryView
         var name=new StackPanel {Orientation=Orientation.Horizontal,Spacing=7};
         name.Children.Add(_consoleLogo);name.Children.Add(new TextBlock {Text="DecompShelf",FontSize=18,FontWeight=FontWeight.Bold,VerticalAlignment=VerticalAlignment.Center});
         var home=new Button {Content=name,Padding=new Thickness(0),Background=Brushes.Transparent,BorderThickness=new Thickness(0)};
+        Avalonia.Automation.AutomationProperties.SetName(home,"Retour aux consoles");
         home.Click+=(_,_)=>OpenPlatformHome();
         heading.Children.Add(home);heading.Children.Add(_consolePicker); heading.Children.Add(_platformCaption);
         _consolePicker.SelectionChanged+=(_,_)=>
@@ -38,7 +39,11 @@ public sealed partial class MobileLibraryView
         };
         return heading;
     }
-    private void OpenPlatformHome() => _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
+    private void OpenPlatformHome()
+    {
+        if(_launching || _nativePreparation is not null)return;
+        _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
+    }
     private IEnumerable<MobileGame> NativeCatalogGames() => (_games.NativePorts?.Catalog??[]).Select(p=>new MobileGame
     {
         Id=p.Id,Title=p.Title,ShelfConsole=p.ShelfConsole,Genre=p.Project,Players=p.Status,

@@ -1,6 +1,6 @@
 # Validation de DecompShelf 0.19.0-rc.2
 
-Candidate corrective du 30 octobre 2026, Android code **51**. Les catalogues, illustrations et fonctions restent ceux de la [candidate précédente](VALIDATION-0.19.0-rc.1.md). Bip n’a pas été modifié.
+Candidate corrective du 30 octobre 2026, Android code **51**. Elle complète la [candidate précédente](VALIDATION-0.19.0-rc.1.md) avec les ports Android ARM64 et les corrections ci-dessous. Bip n’a pas été modifié.
 
 ## Problème reproduit
 
@@ -14,7 +14,16 @@ Un vrai processus enfant attend l’ordre de terminer sur son entrée standard. 
 
 - Avant correction : échec avec la même exception que le test réel.
 - Après correction : recherche par PID et liste des jeux en cours réussies ; une seule notification de fin ; aucune attribution à un processus fermé.
-- Suites complètes et contrôle réel fermeture/relance : résultats à consigner après exécution.
+- Suite Core locale complète : 197 tests réussis. Suite ShelfUi réussie. Le contrôle réel fermeture/relance après correction reste à effectuer.
+
+## Android
+
+- [14 ports ARM64 supplémentaires](ANDROID-ARM64-CATALOG.md), 23 entrées de ports plus PartyBoard intégré, sur 8 plateformes : GameCube, Wii, Nintendo 64, Super Nintendo, Game Boy, Game Boy Color, Game Boy Advance et Wii U. Aucune plateforme PC sans port Android n’est exposée.
+- Vérification des tailles, SHA-256, signatures APK, manifestes et bibliothèques ELF64 AArch64 des 14 nouveaux paquets. Versions, prérequis, avertissements et illustrations exactes épinglés dans le catalogue. Aucun jeu ni BIOS distribué.
+- Correction du bouton Jouer qui ne lançait que les ports Nintendo 64 ; tous les ports du catalogue utilisent maintenant le service Android approprié.
+- Retour aux consoles par le retour Android ou B, annulation prioritaire des fenêtres et préparations, et maintien de la console/du jeu au retour d’une activité.
+- Mario Party 4 utilise l’ouverture du boîtier et son vrai disque avant de démarrer. L’ouverture s’adapte aux petits écrans portrait et paysage ; annuler empêche le lancement.
+- Suite Mobile : chargement des 23 ports, visibilité des paquets Android 11, présence des illustrations, lancement des 23 ports avec pause/reprise simulée, reprise après erreur et relance de PartyBoard. Cadrage et bouton Retour vérifiés à 320×700, 390×844 et 844×390 ; captures examinées. Ces tests utilisent un hôte simulé et ne valident pas le gameplay sur téléphone.
 
 ## Essai réel et limites
 

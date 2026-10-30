@@ -4,5 +4,6 @@
     <ProjectReference Include="../../src/CubeShelf.Mobile/CubeShelf.Mobile.csproj" />
     <PackageReference Include="Avalonia.Headless" Version="11.3.21" />
     <Content Include="../../src/CubeShelf.Mobile/Catalogs/android-ports.json" Link="android-ports.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../src/CubeShelf.Android/Properties/AndroidManifest.xml" Link="AndroidManifest.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

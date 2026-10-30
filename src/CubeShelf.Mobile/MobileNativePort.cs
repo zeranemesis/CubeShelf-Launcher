@@ -15,6 +15,7 @@ public sealed class MobileNativePort
     public long VersionCode { get; set; }
     public int MinimumSdk { get; set; }
     public string[] Abis { get; set; } = [];
+    public bool RequiresVulkan11 { get; set; }
     public bool RequiresVulkan12 { get; set; }
     public bool RequiresVulkan13 { get; set; }
     public bool RequiresGles3 { get; set; }

@@ -30,6 +30,7 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/*.png" Link="Assets/Logos/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Common/**/*" Link="Assets/Covers/Common/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Media/gamecube-GMPE01.png" Link="Assets/Covers/Media/gamecube-GMPE01.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/MarioParty4/**/*" Link="Assets/Covers/MarioParty4/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Shelf/**/*" Link="Assets/Covers/Shelf/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SoulcaliburII/**/*" Link="Assets/Covers/SoulcaliburII/%(RecursiveDir)%(Filename)%(Extension)" />

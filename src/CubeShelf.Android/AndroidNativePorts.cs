@@ -39,6 +39,8 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
             return "Ce port nécessite un pilote Vulkan 1.3.";
         if(port.RequiresVulkan12&&!Context.PackageManager!.HasSystemFeature("android.hardware.vulkan.version",0x00402000))
             return "Ce port nécessite un pilote Vulkan 1.2.";
+        if(port.RequiresVulkan11&&!Context.PackageManager!.HasSystemFeature("android.hardware.vulkan.version",0x00401000))
+            return "Ce port nécessite un pilote Vulkan 1.1.";
         if(port.RequiresGles3 && (Context.GetSystemService(Context.ActivityService) as ActivityManager)?.DeviceConfigurationInfo?.ReqGlEsVersion<0x30000)
             return "Ce port nécessite OpenGL ES 3.0.";
         return null;
