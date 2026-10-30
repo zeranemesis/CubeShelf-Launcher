@@ -47,8 +47,8 @@ Les résultats détaillés et les liens de contrôle sont dans [le rapport de va
 - [x] Configuration de signature vérifiée : Android avec clé de développement persistante ; aucun certificat Authenticode de distribution annoncé pour Windows.
 - [x] Premier installateur candidat : mise à niveau depuis 0.18.0, contrôle des fichiers installés, désinstallation et conservation du profil réussis sur runner jetable.
 - [x] Répétition du contrôle sur le paquet final Windows et six builds PC complets.
-- [ ] Vérification finale des signatures Android, manifestes et empreintes par le workflow de publication.
-- [ ] Publication de la candidate avec notes de version et contrôles des fichiers mis à disposition.
+- [x] Vérification finale des signatures Android, manifestes et empreintes par le workflow de publication.
+- [x] [Candidate publiée le 30 octobre 2026](https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/v0.19.0-rc.1), avec notes, 14 fichiers et recoupement des empreintes publiques.
 
 ## Condition de sortie
 

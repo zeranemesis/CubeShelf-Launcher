@@ -32,7 +32,7 @@ La campagne précédente (`0602e32`) a réussi intégralement, y compris la mise
 - [APK ARM64 et x86-64](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41015565829) : dernière campagne de compilation, tests mobile et contrôle des moteurs intégrés.
 - [Suites Windows et Linux](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41015568808).
 
-La publication vérifie la même révision applicative pour PC/Android, les SHA-256, le contenu des archives, les ABI, le certificat Android historique, l’identifiant et le code 50. Son résultat doit être consigné après exécution ; le simple lancement d’un workflow n’est pas une validation.
+La publication vérifie la même révision applicative pour PC/Android, les SHA-256, le contenu des archives, les ABI, le certificat Android historique, l’identifiant et le code 50. Le [workflow de publication](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41016706977) a réussi le 30 octobre 2026. La [candidate publiée](https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/v0.19.0-rc.1) contient 14 fichiers ; les 13 empreintes et les six entrées du manifeste ont aussi été recoupées avec les métadonnées publiques après publication. La stable 0.18.0 reste la dernière version proposée automatiquement.
 
 La tentative complémentaire de lancement réel de Mario Party 4 a été suspendue après verrouillage de Windows : aucun lancement de jeu ni parcours de sauvegarde ne doit être déduit de cette tentative.
 
