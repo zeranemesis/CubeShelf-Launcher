@@ -25,8 +25,6 @@ Un vrai processus enfant attend l’ordre de terminer sur son entrée standard. 
 - Mario Party 4 utilise l’ouverture du boîtier et son vrai disque avant de démarrer. L’ouverture s’adapte aux petits écrans portrait et paysage ; annuler empêche le lancement.
 - Suite Mobile : chargement des 23 ports, visibilité des paquets Android 11, présence des illustrations, lancement des 23 ports avec pause/reprise simulée, reprise après erreur et relance de PartyBoard. Cadrage et bouton Retour vérifiés à 320×700, 390×844 et 844×390 ; captures examinées. Ces tests utilisent un hôte simulé et ne valident pas le gameplay sur téléphone.
 
-## Essai réel et limites
-
 ## Paquets et intégration continue
 
 Révision applicative : `6f48c985dc51336472a37636367935eb4fb30749`.
@@ -35,6 +33,7 @@ Révision applicative : `6f48c985dc51336472a37636367935eb4fb30749`.
 - [Deux APK Android](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41024194414) construits et signés, vérification des moteurs Ghostship et PartyBoard incluse. Contrôle local supplémentaire du paquet ARM64 final : identité, version/code 51, SHA-256, certificat historique et présence des 23 identités de ports.
 - APK ARM64 SHA-256 : `e379d8cc45348d0ae282ff6ceea8f3d794216cf6693f684b9d5edd6605073bd1`.
 - [Six cibles bureau](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41024199038) construites. Installateur Windows x64 : mise à niveau de 0.18.0, contrôle des fichiers installés, désinstallation et conservation du profil réussis sur un runner jetable.
+- [Publication vérifiée](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41025465159) réussie. La [candidate rc.2](https://github.com/zeranemesis/CubeShelf-Launcher/releases/tag/v0.19.0-rc.2) est publique, avec 14 fichiers. Contrôle indépendant des 13 empreintes du fichier checksums, des six entrées du manifeste et du digest de l’APK ARM64 ; la version stable 0.18.0 reste la dernière stable.
 
 ## Essai réel et limites
 
