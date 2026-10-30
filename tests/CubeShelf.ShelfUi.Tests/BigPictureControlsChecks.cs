@@ -58,6 +58,8 @@ static class BigPictureControlsChecks
         window.HandleBigPictureControllerInput(5);
         window.RaiseEvent(new KeyEventArgs { RoutedEvent=InputElement.KeyDownEvent,Key=Key.Escape });
         Check(consoleHome.IsVisible,"Escape must return from games to consoles.");
+        window.RaiseEvent(new KeyEventArgs { RoutedEvent=InputElement.KeyDownEvent,Key=Key.Escape });
+        Check(consoleHome.IsVisible && !window.FindControl<Control>("GameView")!.IsVisible,"A second Escape must keep the console home instead of opening stale game details.");
         window.HandleBigPictureControllerInput(5);
         consoles.SelectedIndex=3;
         var shelf=window.FindControl<GameShelfControl>("BigPictureShelf")!;

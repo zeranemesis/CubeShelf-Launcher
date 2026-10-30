@@ -266,6 +266,7 @@ public sealed partial class MainWindow
                 else EnterBigPicture(this,new RoutedEventArgs());
                 args.Handled=true;return;
             }
+            if(args.Key==Key.Escape){args.Handled=true;return;}
             if(PlatformHome.IsGrid)return;
             if(PlatformHome.SortHasFocus)return;
             if(args.Key is Key.Left or Key.Right)PlatformHome.Move(args.Key==Key.Left?-1:1);

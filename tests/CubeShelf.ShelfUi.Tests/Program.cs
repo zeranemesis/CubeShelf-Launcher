@@ -119,6 +119,8 @@ try
         selector.SelectedIndex = index;
         var id = ((ComboBoxItem)selector.SelectedItem!).Tag!.ToString()!;
         AssertBrand(id);
+        if(window.FindControl<TextBlock>("GameTitle")!.Text!=window.FindControl<TextBlock>("SelectedTitleText")!.Text)
+            throw new Exception("Console switching retained the previous game's detail header: "+id);
         if(id=="3ds" && cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card=>!card.PlayLabel.Contains("config",StringComparison.OrdinalIgnoreCase)))
             throw new Exception("Ports without a verified compatible package must offer configuration rather than automatic installation.");
         if (cards.Items.Count == 0 || fullscreen.SelectedIndex != index ||

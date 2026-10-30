@@ -330,6 +330,7 @@ public sealed partial class MainWindow
         var game = _selectedGame;
         var baseGame = GameVariants.BaseOf(_catalogGames, game);
         RefreshPortVersionPickers(baseGame);
+        GameTitle.Text = baseGame.Title;
         SelectedTitleText.Text = baseGame.Title;
         SelectedMetaText.Text = string.Join("  •  ", new[]
         {
