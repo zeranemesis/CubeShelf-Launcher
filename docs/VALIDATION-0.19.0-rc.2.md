@@ -27,6 +27,17 @@ Un vrai processus enfant attend l’ordre de terminer sur son entrée standard. 
 
 ## Essai réel et limites
 
+## Paquets et intégration continue
+
+Révision applicative : `6f48c985dc51336472a37636367935eb4fb30749`.
+
+- [CI Windows et Linux](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41024203357) réussie : construction et suites Core, archives/disques, NativePorts, ShelfUi, Mobile, AppUpdates et assistance existante.
+- [Deux APK Android](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41024194414) construits et signés, vérification des moteurs Ghostship et PartyBoard incluse. Contrôle local supplémentaire du paquet ARM64 final : identité, version/code 51, SHA-256, certificat historique et présence des 23 identités de ports.
+- APK ARM64 SHA-256 : `e379d8cc45348d0ae282ff6ceea8f3d794216cf6693f684b9d5edd6605073bd1`.
+- [Six cibles bureau](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41024199038) construites. Installateur Windows x64 : mise à niveau de 0.18.0, contrôle des fichiers installés, désinstallation et conservation du profil réussis sur un runner jetable.
+
+## Essai réel et limites
+
 Le test utilise une copie locale du runtime PartyBoard au commit `c79f0d4551a1ff3c771225dafefecfae6fdbfdcb` (version affichée `v0.20.0-9-dirty`), le disque personnel Mario Party 4 USA Rev 1 et des dossiers de profil distincts. Aucun fichier du disque ou de carte mémoire n’est publié.
 
 L’écran titre est rendu et la carte mémoire du profil de test est créée (16 744 448 octets). Son empreinte est conservée après le premier arrêt. Le clavier neuf n’a pas de touches attribuées ; les tentatives d’affectation par l’outil d’automatisation n’ont pas été enregistrées. Cela ne permet pas de valider les commandes physiques, une partie complète ou la sauvegarde d’une progression.
