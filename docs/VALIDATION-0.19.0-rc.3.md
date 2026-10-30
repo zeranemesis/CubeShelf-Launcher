@@ -17,4 +17,14 @@ Le réseau utilise les capacités de la connexion par défaut, puis le [sous-typ
 - L’animation d’ouverture utilise l’espace de son conteneur plutôt que la hauteur totale de l’écran, pour conserver le bouton Retour sous la nouvelle barre.
 - [Construction Android signée](https://github.com/zeranemesis/CubeShelf-Launcher/actions/runs/41032594115) réussie pour ARM64 et x86-64, au commit applicatif `e23bda6`. Tests Mobile, AppUpdates, assistance existante et conditionnement des deux moteurs intégrés réussis. Le contrôle du paquet ARM64 téléchargé confirme version `0.19.0-rc.3`, code 52, certificat historique et SHA-256 `796c1f47f10c05997a88753eb9406b55342002c6e3e3e140ad7804ea51220a95`. Ces APK sont des artefacts de test ; aucune nouvelle release publique n’a été créée.
 
-Le téléphone réel n’a pas été utilisé : précision du sous-type fourni par son opérateur et comportement autour de son encoche restent à vérifier sur l’appareil. Cette modification ne rend pas la barre visible au-dessus des jeux externes ; elle concerne l’interface DecompShelf.
+## Contrôle sur téléphone réel — 30 octobre 2026
+
+Après autorisation USB par l’utilisateur, mise à jour sur son Samsung SM-S936B depuis `0.18.1-preview.5` (code 49) vers `0.19.0-rc.3` (code 52), avec `adb install -r`, sans désinstallation ni effacement des données. L’installation a réussi et la bibliothèque précédente est toujours accessible.
+
+- Accueil des consoles et bibliothèque : barre visible, lisible et dégagée de l’encoche. Le téléphone affiche 4G, batterie en charge et heure locale.
+- Valeurs comparées aux commandes système : 34 % puis 35 % en charge USB, heure 10:30 puis 10:33. La connexion par défaut est bien cellulaire ; le libellé 4G n’est pas déduit de l’état de l’interrupteur Wi-Fi.
+- Actualisation observée sans redémarrage : passage des minutes et progression de la batterie pendant la charge.
+- Rotation portrait → paysage : barre et bouton Jouer visibles, catalogue conservé. Réglages de rotation rétablis et vérifiés après le test.
+- Passage sur l’accueil Android puis retour à DecompShelf : même bibliothèque, barre actualisée à 36 % et 10:34, sans erreur visible.
+
+Le basculement vers une connexion Wi-Fi et la 5G restent à vérifier sur réseau réel. Cette modification concerne l’interface DecompShelf ; la barre n’est pas superposée aux jeux externes. Aucune conclusion nouvelle sur la jouabilité des ports ne découle de ce contrôle.
