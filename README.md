@@ -2,7 +2,7 @@
 
 DecompShelf regroupe des ports natifs de jeux de consoles dans une application Windows et Android. Il propose un accueil par console, une bibliothèque, les téléchargements, les favoris et un mode Big Picture à la manette.
 
-**Version candidate : `0.19.0-rc.1`.** Le numéro utilisé par les compilations est défini dans [VERSION](VERSION). Une compilation réussie ne valide pas la jouabilité de tous les projets tiers. Les essais matériels encore nécessaires sont consignés dans [le plan de finition](docs/FINISHING-PLAN.md).
+**Version candidate : `0.19.0-rc.2`.** Le numéro utilisé par les compilations est défini dans [VERSION](VERSION). Cette candidate corrige le plantage constaté au retour d’un jeu. Une compilation réussie ne valide pas la jouabilité de tous les projets tiers. Les essais matériels encore nécessaires sont consignés dans [le plan de finition](docs/FINISHING-PLAN.md).
 
 Aucun disque, ROM, BIOS, firmware, clé ou fichier extrait d'un jeu n'est fourni. Chaque port utilise les fichiers de la copie personnelle du joueur, selon les instructions de son auteur. Les mods destinés uniquement à une ISO émulée ne sont pas ajoutés au catalogue des ports natifs.
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0-rc.2 — retour après une partie
+
+- Correction du plantage du launcher à la fermeture d’un jeu : la lecture de l’état d’un processus peut déclencher sa finalisation et libérer son objet pendant la recherche. Les recherches utilisent maintenant un instantané et une lecture protégée du PID.
+- Régression reproduite avec un vrai processus enfant, puis corrigée pour la recherche par PID et la liste des jeux en cours.
+- Android versionCode 51 ; mêmes identités et signature persistante. Les fonctions de Bip restent inchangées.
+
+
 ## 0.19.0-rc.1 — consolidation multi-consoles
 
 - Un second Échap sur l’accueil conserve le choix des consoles ; l’en-tête des fiches suit le jeu sélectionné après changement de plateforme.

@@ -8,9 +8,12 @@ using CubeShelf.Core.Mods;
 using CubeShelf.Core.Downloads;
 using CubeShelf.Core.Social;
 
+if (args.Contains("--session-exit-fixture")) { Console.ReadLine(); return 0; }
+
 var failures = new List<string>();
 var executed = 0;
 Run("capture: only tracked game processes are eligible", GameCaptureSessionTests.OnlyTrackedProcesses);
+Run("sessions: lookups safely finalize an exited process", GameSessionTrackerTests.ExitedLookups);
 Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
 Run("quick play: install and prepare finish before launch", GamePlayFlowTests.PreparationIsOrderedAndAwaited);
 Run("quick play: double clicks keep one request", GamePlayFlowTests.DoubleClickDoesNotQueueTwoGames);

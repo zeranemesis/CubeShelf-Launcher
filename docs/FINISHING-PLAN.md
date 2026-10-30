@@ -1,8 +1,8 @@
 # DecompShelf — état de la finition
 
-Candidate : **0.19.0-rc.1**, Android code **50**. Périmètre confirmé : bureau Windows, Big Picture, catalogue Android et distribution ; **Bip reste inchangé et hors de cette passe**.
+Candidate corrective en préparation : **0.19.0-rc.2**, Android code **51**. Périmètre confirmé : bureau Windows, Big Picture, catalogue Android et distribution ; **Bip reste inchangé et hors de cette passe**.
 
-Les résultats détaillés et les liens de contrôle sont dans [le rapport de validation](VALIDATION-0.19.0-rc.1.md). Les cases non cochées restent des limites, pas des essais réussis.
+Les résultats détaillés et les liens de contrôle sont dans [le rapport de validation](VALIDATION-0.19.0-rc.2.md). Les cases non cochées restent des limites, pas des essais réussis.
 
 ## Consolidation et navigation
 
@@ -12,7 +12,7 @@ Les résultats détaillés et les liens de contrôle sont dans [le rapport de va
 - [x] Menu gauche conservé, défilant en petite hauteur ; Bibliothèque, Consoles, Téléchargements et Paramètres couverts par les tests.
 - [x] Retour des jeux aux consoles par bouton, B et Échap, avec sélection conservée ; F11 fonctionne depuis le carrousel.
 - [x] Tri, proportions des jaquettes, logos dans les sélecteurs et l’en-tête ; accueil français/anglais et thèmes clair/sombre vérifiés automatiquement.
-- [ ] Dernier parcours manuel complet à la souris et au clavier, à toutes les résolutions de référence. La session Windows s’est verrouillée pendant la passe complémentaire : paramètres et F11 vérifiés, test de jeu supplémentaire non exécuté.
+- [ ] Dernier parcours manuel complet à la souris et au clavier, à toutes les résolutions de référence. La session Windows s’est verrouillée pendant la passe complémentaire : paramètres et F11 vérifiés, test complémentaire de Mario Party 4 effectué jusqu’à l’écran titre et au panneau de configuration. Un plantage au retour a été reproduit et corrigé ; fermeture/relance de la correction à vérifier.
 - [ ] Essai de la navigation et de l’inversion stick/croix sur une manette physique.
 
 ## Catalogues et fiabilité
@@ -41,6 +41,8 @@ Les résultats détaillés et les liens de contrôle sont dans [le rapport de va
 - [ ] Jouabilité des nouveaux ports et refus Android/ARM64/Vulkan sur les appareils concernés. Un APK vérifié ne suffit pas.
 
 ## Distribution
+
+La candidate 0.19.0-rc.1 reste consultable avec son problème connu documenté. Les résultats cochés ci-dessous concernent cette première distribution ; la correction RC2 doit repasser les vérifications avant publication.
 
 - [x] README, démarrage, commandes Big Picture, catalogues, crédits, mises à jour et documentation Android actualisés.
 - [x] Six suites locales et validation GitHub Windows/Linux réussies sur la révision applicative `b25c9d4`.

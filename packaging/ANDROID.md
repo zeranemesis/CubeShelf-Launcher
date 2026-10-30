@@ -3,7 +3,7 @@
 DecompShelf Android est un projet Avalonia distinct du launcher PC :
 `src/CubeShelf.Android/CubeShelf.Android.csproj`, .NET 8 pour Android,
 Avalonia 11.3.21, identifiant `io.github.zeranemesis.cubeshelf`.
-La version candidate 0.19.0-rc.1 porte le code Android `50` et comprend la mise à jour
+La version candidate 0.19.0-rc.2 porte le code Android `51` et comprend la mise à jour
 de l'application depuis les releases GitHub.
 
 ## Catalogue et état de la candidate

@@ -44,13 +44,13 @@ public sealed class GameSessionTracker : IDisposable
         get
         {
             lock (_gate)
-                return _running.Where(pair => IsAlive(pair.Value.Process)).Select(pair => pair.Key).ToArray();
+                return _running.ToArray().Where(pair => IsAlive(pair.Value.Process)).Select(pair => pair.Key).ToArray();
         }
     }
 
     public string? GameIdForProcess(int processId)
     {
-        lock (_gate) return _running.FirstOrDefault(pair => IsAlive(pair.Value.Process) && pair.Value.Process.Id == processId).Key;
+        lock (_gate) return _running.ToArray().FirstOrDefault(pair => LiveProcessId(pair.Value.Process) == processId).Key;
     }
 
     public Process Start(
@@ -145,10 +145,13 @@ public sealed class GameSessionTracker : IDisposable
         try { process.Dispose(); } catch { }
     }
 
-    private static bool IsAlive(Process process)
+    private static bool IsAlive(Process process) => LiveProcessId(process) is not null;
+
+    private static int? LiveProcessId(Process process)
     {
-        try { return !process.HasExited; }
-        catch { return false; }
+        // HasExited can synchronously finalize and dispose this process through Exited.
+        try { return process.HasExited ? null : process.Id; }
+        catch { return null; }
     }
 
     public void Dispose()
