@@ -8,17 +8,18 @@ RATE = 24000
 OUT = Path(__file__).resolve().parents[1] / "src/CubeShelf.Desktop/Assets/Sounds"
 
 
-def tone(t, frequency, length, gain):
+def tone(t, frequency, length, gain, attack):
     if t < 0 or t >= length:
         return 0
-    envelope = min(1, t / .004) * (1 - t / length) ** 2
-    return gain * envelope * (math.sin(2 * math.pi * frequency * t)
-                              + .12 * math.sin(4 * math.pi * frequency * t))
+    envelope = math.sin(min(1, t / attack) * math.pi / 2) ** 2 * math.cos(t / length * math.pi / 2) ** 4
+    return gain * envelope * math.sin(2 * math.pi * frequency * t)
 
 
 def write(name, length, sample):
     values = [sample(i / RATE) for i in range(round(length * RATE))]
-    assert 0 < max(abs(v) for v in values) < .3, "Keep cues quiet and free of clipping"
+    assert 0 < max(abs(v) for v in values) < .12, "Keep cues quiet and free of clipping"
+    assert abs(values[0]) < 1e-9 and abs(values[-1]) < 1e-5, "Fade both boundaries to silence"
+    assert max(abs(b - a) for a, b in zip(values, values[1:])) < .012, "Avoid abrupt waveform edges"
     data = b"".join(struct.pack("<h", round(v * 32767)) for v in values)
     with wave.open(str(OUT / name), "wb") as output:
         output.setparams((1, 2, RATE, 0, "NONE", "not compressed"))
@@ -29,8 +30,8 @@ def write(name, length, sample):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    write("click.wav", .055, lambda t: tone(t, 880, .055, .12) + tone(t, 440, .035, .04))
-    write("launch.wav", .42, lambda t: sum(tone(t - start, frequency, duration, .11)
-          for start, frequency, duration in [(0, 523.25, .22), (.06, 783.99, .25), (.13, 1046.5, .29)]))
+    write("click.wav", .065, lambda t: tone(t, 235, .065, .045, .009) + tone(t, 410, .045, .008, .007))
+    write("launch.wav", .42, lambda t: sum(tone(t, frequency, .42, gain, .07)
+          for frequency, gain in [(196, .04), (246.94, .025), (293.66, .03)]))
     assert (OUT / "click.wav").read_bytes() != (OUT / "launch.wav").read_bytes()
-    print("Generated click (55 ms) and launch (420 ms), mono PCM, 24 kHz.")
+    print("Generated soft tap (65 ms) and warm launch pad (420 ms), mono PCM, 24 kHz.")

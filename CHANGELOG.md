@@ -2,6 +2,7 @@
 
 ## En cours — sons Big Picture sur Windows
 
+- Révision sonore plus douce : toucher grave et feutré, accord de lancement fondu, attaques progressives et volume réduit ; retrait des notes aiguës successives.
 - Clic discret sur les commandes, la navigation clavier/manette et le choix des jeux ou plateformes ; aucune lecture dans le mode bureau.
 - Tonalité différente après le démarrage réussi d'un jeu, après l'animation du boîtier ; aucune tonalité de réussite pour une annulation ou un démarrage échoué.
 - Sons originaux courts, lecture asynchrone sans dépendance ajoutée, clics limités pour éviter les répétitions et priorité au son de lancement.
