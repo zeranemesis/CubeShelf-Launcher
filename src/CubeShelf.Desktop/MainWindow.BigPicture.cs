@@ -30,6 +30,7 @@ public sealed partial class MainWindow
 
     private void InitializeBigPicture()
     {
+        InitializeBigPictureSounds();
         AddHandler(KeyDownEvent, BigPictureKeyDown, RoutingStrategies.Tunnel);
         BigPictureShelf.SelectionRequested += SelectBigPictureGame;
         InitializeBigPictureTextFocus();
@@ -161,6 +162,7 @@ public sealed partial class MainWindow
     private void ExitBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        PlayBigPictureSound();
         PlatformHome.IsVisible=false;
         CloseBigPictureMenu();
         _bigPictureActive = false;
@@ -191,6 +193,7 @@ public sealed partial class MainWindow
         if (_bigPictureGames.Length == 0) return;
         index = Math.Clamp(index, 0, _bigPictureGames.Length - 1);
         if (_bigPictureIndex == index) return;
+        PlayBigPictureSound();
         _bigPictureIndex = index;
         RefreshBigPictureGame();
         FocusBigPictureAction(0);
@@ -273,6 +276,7 @@ public sealed partial class MainWindow
             else if(args.Key==Key.Enter)PlatformHome.Choose();
             else if(args.Key==Key.F3)PlatformHome.CycleSort();
             else return;
+            PlayBigPictureSound();
             args.Handled=true;return;
         }
         if (LaunchTransition.IsVisible)
@@ -332,6 +336,7 @@ public sealed partial class MainWindow
             case Key.Tab: return; // Native focus traversal remains available.
             default: args.Handled = true; return;
         }
+        PlayBigPictureSound();
         args.Handled = true;
     }
 

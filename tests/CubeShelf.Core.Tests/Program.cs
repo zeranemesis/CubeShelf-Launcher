@@ -742,13 +742,17 @@ void TestPreferences()
     {
         var store = new UserPreferencesStore(new TestPaths(root));
         store.Save(new UserPreferences(Language: "en", Theme: "light", RefreshModsOnOpen: false,
-            DownloadBandwidthLimit: 5 * 1024 * 1024));
+            DownloadBandwidthLimit: 5 * 1024 * 1024, BigPictureSounds: false));
         var loaded = store.Load();
         Assert(loaded.Language == "en" && loaded.Theme == "light" && !loaded.RefreshModsOnOpen);
         Assert(loaded.DownloadBandwidthLimit == 5 * 1024 * 1024);
+        Assert(!loaded.BigPictureSounds);
+        File.WriteAllText(store.SettingsFile, "{\"Language\":\"en\",\"Theme\":\"light\"}");
+        Assert(store.Load() is { Language: "en", Theme: "light", BigPictureSounds: true });
         store.Reset();
         // Nothing chosen: follow the language of Windows.
         Assert(store.Load().Language == "auto");
+        Assert(store.Load().BigPictureSounds);
     });
 }
 

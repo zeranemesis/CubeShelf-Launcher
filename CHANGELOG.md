@@ -1,5 +1,12 @@
 # Changelog
 
+## En cours — sons Big Picture sur Windows
+
+- Clic discret sur les commandes, la navigation clavier/manette et le choix des jeux ou plateformes ; aucune lecture dans le mode bureau.
+- Tonalité différente après le démarrage réussi d'un jeu, après l'animation du boîtier ; aucune tonalité de réussite pour une annulation ou un démarrage échoué.
+- Sons originaux courts, lecture asynchrone sans dépendance ajoutée, clics limités pour éviter les répétitions et priorité au son de lancement.
+- Réglage « Sons de Big Picture » dans le menu et les paramètres, conservé entre les sessions ; désactivation immédiate, volume et silence Windows respectés.
+
 ## En cours — catalogue Windows du 1er novembre 2026
 
 - 408 références Windows existantes contrôlées ; 126 versions de release et 162 listes de paquets actualisées, avec taille et SHA-256 conservés.

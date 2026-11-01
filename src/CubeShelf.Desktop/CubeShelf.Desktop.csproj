@@ -25,6 +25,7 @@
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Catalogs/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets/Consoles/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Sounds/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
     <AvaloniaResource Include="Assets/Brand/Consoles/*.png" />

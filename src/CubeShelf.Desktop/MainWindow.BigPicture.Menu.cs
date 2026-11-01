@@ -90,6 +90,12 @@ public sealed partial class MainWindow
             Row(P7("Amis","Friends"),()=>Go(()=>OpenBigPictureFriends(this,new RoutedEventArgs())));
             Row(P7("Paramètres avancés","Advanced settings"),()=>Go(()=>ParityShowSettings(this,new RoutedEventArgs())));
             Row(P7("Retour au bureau","Return to desktop"),()=>Go(()=>ExitBigPicture(this,new RoutedEventArgs())));
+            var soundIndex = _bigPictureMenuButtons.Count;
+            Row(P7("Sons de Big Picture","Big Picture sounds"),()=>
+            {
+                BigPictureSoundsBox.IsChecked = !_preferences.BigPictureSounds;
+                ShowBigPictureMenu();FocusBigPictureMenu(soundIndex);
+            },_preferences.BigPictureSounds?P7("OUI","ON"):P7("NON","OFF"));
         }
         if(page!="main") Row(P7("Retour","Back"),()=>ShowBigPictureMenu());
         BigPictureMenuOverlay.IsVisible=true;FocusBigPictureMenu(page=="platform" ? Math.Max(0,BigPictureConsoleShelfPicker.SelectedIndex) : 0);
@@ -120,6 +126,7 @@ public sealed partial class MainWindow
     internal void HandleBigPictureControllerInput(int rawInput)
     {
         if(!_bigPictureActive)return;
+        if(rawInput is >=1 and <=15)PlayBigPictureSound();
         if(PlatformHome.IsVisible)
         {
             if(rawInput is 1 or 11)PlatformHome.Move(-1);

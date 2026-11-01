@@ -18,7 +18,9 @@ var snapshotDirectory = Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHO
 var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).UseSkia();
 builder.SetupWithoutStarting();
 if(args.Contains("--render-benchmark")) { RenderBenchmark.Run();return; }
-var window = new MainWindow();
+long soundTime = 0;
+var playedSounds = new List<string?>();
+var window = new MainWindow(new BigPictureSounds(cue => playedSounds.Add(cue), () => soundTime));
 try
 {
     var selector=window.FindControl<ComboBox>("ConsoleShelfPicker")!;
@@ -286,6 +288,7 @@ try
         }
     }
     BigPictureControlsChecks.Run(window,snapshotDirectory);
+    BigPictureSoundChecks.Run(window,playedSounds,() => soundTime += 1000,snapshotDirectory);
     if (snapshotDirectory is not null)
     {
         foreach (var console in new[] { "nes", "gba", "ps1", "xbox360" })

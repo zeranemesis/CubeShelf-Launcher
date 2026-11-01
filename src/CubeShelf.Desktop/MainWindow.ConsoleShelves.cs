@@ -204,6 +204,7 @@ public sealed partial class MainWindow
     {
         if (!_consoleShelfReady || sender is not ComboBox { SelectedItem: ComboBoxItem { Tag: string console } }
             || console == _activeShelfConsole) return;
+        PlayBigPictureSound();
         var direction = ConsoleIndex(console) > ConsoleIndex(_activeShelfConsole) ? 1 : -1;
         Grid.SetColumn(ShelfTransition, _bigPictureActive ? 0 : 1);
         Grid.SetColumnSpan(ShelfTransition, _bigPictureActive ? 2 : 1);

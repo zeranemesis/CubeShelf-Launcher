@@ -51,8 +51,11 @@ public sealed partial class MainWindow : Window
     private DesktopModItem? _selectedMod;
     private Bitmap? _modPreviewBitmap;
 
-    public MainWindow()
+    public MainWindow() : this(new Controls.BigPictureSounds()) { }
+
+    internal MainWindow(Controls.BigPictureSounds sounds)
     {
+        _bigPictureSounds = sounds;
         InitializeComponent();
         var paths = new PlatformPaths();
         _paths = paths;
@@ -214,6 +217,7 @@ public sealed partial class MainWindow : Window
             environment, launch.Arguments,
             game.LogOutput ? Path.Combine(_paths.DataDirectory, "Logs", game.Id + ".log") : null);
 
+        PlayBigPictureSound(launching: true);
         game.PlayCount++;
         game.LastPlayedAt = DateTimeOffset.Now;
         PersistCatalog();
@@ -892,6 +896,7 @@ public sealed partial class MainWindow : Window
         RefreshModsBox.IsChecked = _preferences.RefreshModsOnOpen;
         StartInBigPictureBox.IsChecked = _preferences.StartInBigPicture;
         ReduceShelfMotionBox.IsChecked = _preferences.ReduceShelfMotion;
+        BigPictureSoundsBox.IsChecked = _preferences.BigPictureSounds;
         ApplyPresencePreferences();
         if (_preferences.WindowWidth >= MinWidth) Width = _preferences.WindowWidth;
         if (_preferences.WindowHeight >= MinHeight) Height = _preferences.WindowHeight;
@@ -913,11 +918,13 @@ public sealed partial class MainWindow : Window
             ShowGameUpdatePopup = UpdatePopupBox.IsChecked == true,
             RefreshModsOnOpen = RefreshModsBox.IsChecked == true,
             StartInBigPicture = StartInBigPictureBox.IsChecked == true,
-            ReduceShelfMotion = ReduceShelfMotionBox.IsChecked == true
+            ReduceShelfMotion = ReduceShelfMotionBox.IsChecked == true,
+            BigPictureSounds = BigPictureSoundsBox.IsChecked == true
         };
         SavePresencePreferences();
         _preferencesStore.Save(_preferences);
         if (_preferences.ReduceShelfMotion) ShelfTransition.Stop();
+        if (!_preferences.BigPictureSounds) _bigPictureSounds.Stop();
         if (Avalonia.Application.Current is { } application)
             application.RequestedThemeVariant = theme == "light" ? ThemeVariant.Light : ThemeVariant.Dark;
         SettingsStatus.Text = UiLocalization.IsEnglish(language) ? "Settings saved." : "Paramètres enregistrés.";
