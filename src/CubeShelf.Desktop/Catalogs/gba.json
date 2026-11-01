@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ccc81d732eb6937421cf9ae0b6347308d06cd09c",
     "ReadmeUrl": "https://github.com/mstan/DragonBallZBuusFuryRecomp/blob/ccc81d732eb6937421cf9ae0b6347308d06cd09c/README.md",
     "ReleaseUrl": "https://github.com/mstan/DragonBallZBuusFuryRecomp/releases/tag/v0.0.4",
@@ -35,7 +35,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "de4026b22bfc824822fe9f01353937cc129afa5d",
     "ReadmeUrl": "https://github.com/mstan/DragonBallZLegacyOfGokuRecomp/blob/de4026b22bfc824822fe9f01353937cc129afa5d/README.md",
     "ReleaseUrl": "https://github.com/mstan/DragonBallZLegacyOfGokuRecomp/releases/tag/v0.0.3",
@@ -63,7 +63,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "1ebd9c9283a7af1e54af551df44194ce07e9381c",
     "ReadmeUrl": "https://github.com/mstan/DragonBallZLegacyofGokuIIRecomp/blob/1ebd9c9283a7af1e54af551df44194ce07e9381c/README.md",
     "ReleaseUrl": "https://github.com/mstan/DragonBallZLegacyofGokuIIRecomp/releases/tag/v0.0.3",
@@ -91,11 +91,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "fcc38cc46084793f29136419a8a15e6914a570ce",
-    "ReadmeUrl": "https://github.com/Jorge262007/FFTARecomp/blob/fcc38cc46084793f29136419a8a15e6914a570ce/README.md",
-    "ReleaseUrl": "https://github.com/Jorge262007/FFTARecomp/releases/tag/v3.0",
-    "ReleaseTag": "v3.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "6bdddbc559ac459c4a18325c15c28d040d87f407",
+    "ReadmeUrl": "https://github.com/Jorge262007/FFTARecomp/blob/6bdddbc559ac459c4a18325c15c28d040d87f407/README.md",
+    "ReleaseUrl": "https://github.com/Jorge262007/FFTARecomp/releases/tag/3.1",
+    "ReleaseTag": "3.1",
     "Platforms": [
       "Windows",
       "Linux"
@@ -103,27 +103,27 @@
     "Assets": [
       {
         "Name": "FFTARecomp-linux-x86_64.tar.gz",
-        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/v3.0/FFTARecomp-linux-x86_64.tar.gz",
-        "Sha256": "957ec44303043c6fa21a9a99182819a5819380302bb02f98cfa0e43f07d8032b",
-        "Size": 15849961,
+        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/3.1/FFTARecomp-linux-x86_64.tar.gz",
+        "Sha256": "3ef3bd1a29729b10801ea5a21f761e80e448ddc2dfeac7370336ad09af38071e",
+        "Size": 14728598,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
         "Name": "FFTARecomp-SteamDeck-linux-x86_64.tar.gz",
-        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/v3.0/FFTARecomp-SteamDeck-linux-x86_64.tar.gz",
-        "Sha256": "667f3b8da7cbd67a6bbb186188f056531302f6ae801896a0dacc09daabd7077a",
-        "Size": 15850186,
+        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/3.1/FFTARecomp-SteamDeck-linux-x86_64.tar.gz",
+        "Sha256": "f17fb6a026917743e944e1be4bafd73e9c7f370850b3fbae64f4ba485dd214e8",
+        "Size": 14728464,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
         "Name": "FFTARecomp-windows-x86_64.zip",
-        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/v3.0/FFTARecomp-windows-x86_64.zip",
-        "Sha256": "4fa1b6f5fd20debae5222d62c601f6b06468f5f701689b8edcd184526c80b2cd",
-        "Size": 11668058,
+        "Url": "https://github.com/Jorge262007/FFTARecomp/releases/download/3.1/FFTARecomp-windows-x86_64.zip",
+        "Sha256": "ca5c1416dabbd79de9161708fce2025dda76e4eeb0df6bd67856e565ea7be6f5",
+        "Size": 10763274,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -138,7 +138,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "214b273aeabb3e46a85d24cadc62f5b30b40a8df",
     "ReadmeUrl": "https://github.com/Lordingard/SacredStonesRecomp/blob/214b273aeabb3e46a85d24cadc62f5b30b40a8df/README.md",
     "ReleaseUrl": "https://github.com/Lordingard/SacredStonesRecomp/releases/tag/v0.1.20",
@@ -166,16 +166,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "c22c8aeead65fae05b765a494bf360e070cabb46",
     "ReadmeUrl": "https://github.com/Shmargus/GSRecomp/blob/c22c8aeead65fae05b765a494bf360e070cabb46/README.md",
-    "ReleaseUrl": "https://github.com/Shmargus/GSRecomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/Shmargus/GSRecomp/releases/tag/0.6.1",
+    "ReleaseTag": "0.6.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "GoldenSunRecompiled-0.6.1-linux.zip",
+        "Url": "https://github.com/Shmargus/GSRecomp/releases/download/0.6.1/GoldenSunRecompiled-0.6.1-linux.zip",
+        "Sha256": "0da0d84c68fe7ebc3ea65c9458ccde7ab32d1c2643459b1b8b6b10ea142f9097",
+        "Size": 61219909,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "GoldenSunRecompiled-0.6.1-windows.zip",
+        "Url": "https://github.com/Shmargus/GSRecomp/releases/download/0.6.1/GoldenSunRecompiled-0.6.1-windows.zip",
+        "Sha256": "977cfcc500cf17b0ce415b4b3fcd4360d804f98da662a20a1b4c1b5b17ff5f10",
+        "Size": 89736568,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "shmargus-gsrecomp-golden-sun-the-lost-age",
@@ -185,16 +204,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "c22c8aeead65fae05b765a494bf360e070cabb46",
     "ReadmeUrl": "https://github.com/Shmargus/GSRecomp/blob/c22c8aeead65fae05b765a494bf360e070cabb46/README.md",
-    "ReleaseUrl": "https://github.com/Shmargus/GSRecomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/Shmargus/GSRecomp/releases/tag/0.6.1",
+    "ReleaseTag": "0.6.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "GoldenSunRecompiled-0.6.1-linux.zip",
+        "Url": "https://github.com/Shmargus/GSRecomp/releases/download/0.6.1/GoldenSunRecompiled-0.6.1-linux.zip",
+        "Sha256": "0da0d84c68fe7ebc3ea65c9458ccde7ab32d1c2643459b1b8b6b10ea142f9097",
+        "Size": 61219909,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "GoldenSunRecompiled-0.6.1-windows.zip",
+        "Url": "https://github.com/Shmargus/GSRecomp/releases/download/0.6.1/GoldenSunRecompiled-0.6.1-windows.zip",
+        "Sha256": "977cfcc500cf17b0ce415b4b3fcd4360d804f98da662a20a1b4c1b5b17ff5f10",
+        "Size": 89736568,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mstan-mariokartsupercircuitrecomp-mario-kart-super-circuit",
@@ -204,30 +242,30 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "37fd0805386bb771f7c6746402b6bb173f41b2a7",
-    "ReadmeUrl": "https://github.com/mstan/MarioKartSuperCircuitRecomp/blob/37fd0805386bb771f7c6746402b6bb173f41b2a7/README.md",
-    "ReleaseUrl": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/tag/v0.1.11",
-    "ReleaseTag": "v0.1.11",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "83f3b71e93512ae6a3c080ca311bae424d76d2da",
+    "ReadmeUrl": "https://github.com/mstan/MarioKartSuperCircuitRecomp/blob/83f3b71e93512ae6a3c080ca311bae424d76d2da/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/tag/v0.1.13",
+    "ReleaseTag": "v0.1.13",
     "Platforms": [
       "Windows",
       "Linux"
     ],
     "Assets": [
       {
-        "Name": "MarioKartSuperCircuitRecomp-linux-x86_64-v0.1.11.AppImage",
-        "Url": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/download/v0.1.11/MarioKartSuperCircuitRecomp-linux-x86_64-v0.1.11.AppImage",
-        "Sha256": "4e247368dd7b7525ff78155d845cab004f673ef8d1070f319d3fafc18558f38c",
-        "Size": 20150776,
+        "Name": "MarioKartSuperCircuitRecomp-linux-x86_64-v0.1.13.AppImage",
+        "Url": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/download/v0.1.13/MarioKartSuperCircuitRecomp-linux-x86_64-v0.1.13.AppImage",
+        "Sha256": "dd63ada8eb35eeeadf5c344336de6b44bf9163e0145adb5df36d04a7a9edfcf9",
+        "Size": 20146680,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "MarioKartSuperCircuitRecomp-windows-x64-v0.1.11.zip",
-        "Url": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/download/v0.1.11/MarioKartSuperCircuitRecomp-windows-x64-v0.1.11.zip",
-        "Sha256": "3dc06655a40474aeee6bfeae9726eebe0b33561483d2e6cc5bc3f2d58f1cfa42",
-        "Size": 20986366,
+        "Name": "MarioKartSuperCircuitRecomp-windows-x64-v0.1.13.zip",
+        "Url": "https://github.com/mstan/MarioKartSuperCircuitRecomp/releases/download/v0.1.13/MarioKartSuperCircuitRecomp-windows-x64-v0.1.13.zip",
+        "Sha256": "11d817ad5297a299a25b6504d271080dc8d2303b822fa8f99c0799ec248c4a14",
+        "Size": 20991565,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -242,20 +280,20 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "3418f7e02624ff027ff52cc3189d6007e3769b29",
-    "ReadmeUrl": "https://github.com/mstan/MegaManZeroRecomp/blob/3418f7e02624ff027ff52cc3189d6007e3769b29/README.md",
-    "ReleaseUrl": "https://github.com/mstan/MegaManZeroRecomp/releases/tag/v0.0.9",
-    "ReleaseTag": "v0.0.9",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1a4ea6c7e826a38371db4904351e18df439e61b2",
+    "ReadmeUrl": "https://github.com/mstan/MegaManZeroRecomp/blob/1a4ea6c7e826a38371db4904351e18df439e61b2/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MegaManZeroRecomp/releases/tag/v0.0.11",
+    "ReleaseTag": "v0.0.11",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "MegaManZeroRecomp-windows-x64-v0.0.9.zip",
-        "Url": "https://github.com/mstan/MegaManZeroRecomp/releases/download/v0.0.9/MegaManZeroRecomp-windows-x64-v0.0.9.zip",
-        "Sha256": "6304461fd2b335b625fa46bc99a6996f27063a6d30e838abdc3b63fc22acd700",
-        "Size": 18024640,
+        "Name": "MegaManZeroRecomp-windows-x64-v0.0.11.zip",
+        "Url": "https://github.com/mstan/MegaManZeroRecomp/releases/download/v0.0.11/MegaManZeroRecomp-windows-x64-v0.0.11.zip",
+        "Sha256": "51067ba7f7b8340d8f16efee14da3fab6ac4324f890003842dcc75ff6c32d7df",
+        "Size": 18379699,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -270,7 +308,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "58b0783eb7b5335dc20e4d3b47226819da5cc32a",
     "ReadmeUrl": "https://github.com/NTx86/pokeemerald-sdl2pc/blob/58b0783eb7b5335dc20e4d3b47226819da5cc32a/README.md",
     "ReleaseUrl": "https://github.com/NTx86/pokeemerald-sdl2pc/releases",
@@ -289,7 +327,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "e65f7e79a44edfe5b2abe1efee2184247f1eb112",
     "ReadmeUrl": "https://github.com/Asphaltian/pmd-green/blob/e65f7e79a44edfe5b2abe1efee2184247f1eb112/README.md",
     "ReleaseUrl": "https://github.com/Asphaltian/pmd-green/releases/tag/v0.1.0",
@@ -299,7 +337,26 @@
       "Linux",
       "macOS"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "GreenRescueTeam-v0.1.0-Linux.zip",
+        "Url": "https://github.com/Asphaltian/pmd-green/releases/download/v0.1.0/GreenRescueTeam-v0.1.0-Linux.zip",
+        "Sha256": "966070a00680fe3f01913461cd729027462cf9e7a752f257215fbd1befc73d7d",
+        "Size": 57632592,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "GreenRescueTeam-v0.1.0-Windows.zip",
+        "Url": "https://github.com/Asphaltian/pmd-green/releases/download/v0.1.0/GreenRescueTeam-v0.1.0-Windows.zip",
+        "Sha256": "ae483d746305c1d5151aee5eca3fdaf3289cbdd6883e580253c315f26a1329a0",
+        "Size": 54562241,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "smiluredev-sonicadvancerecomp-sonic-advance",
@@ -309,7 +366,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "e637fc89861b66b291ce3a1b02cdb151ca53bc22",
     "ReadmeUrl": "https://github.com/smiluredev/SonicAdvanceRecomp/blob/e637fc89861b66b291ce3a1b02cdb151ca53bc22/README.md",
     "ReleaseUrl": "https://github.com/smiluredev/SonicAdvanceRecomp/releases/tag/V1",
@@ -329,15 +386,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "71f360f52190a466109de75c60585bc49b7599f9",
     "ReadmeUrl": "https://github.com/mstan/SuperMarioAdvance2Recomp/blob/71f360f52190a466109de75c60585bc49b7599f9/README.md",
-    "ReleaseUrl": "https://github.com/mstan/SuperMarioAdvance2Recomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioAdvance2Recomp/releases/tag/v0.0.4",
+    "ReleaseTag": "v0.0.4",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "SuperMarioAdvance2Recomp-windows-x64-v0.0.4.zip",
+        "Url": "https://github.com/mstan/SuperMarioAdvance2Recomp/releases/download/v0.0.4/SuperMarioAdvance2Recomp-windows-x64-v0.0.4.zip",
+        "Sha256": "d1b3d287b5cc88f412f035b58491c10748ee6c6d5fc86d41f181332d028f8135",
+        "Size": 29427675,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mstan-supermarioadvance4recomp-super-mario-advance-4-super-mario-bros.-3",
@@ -347,15 +414,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f9344ab09c4e2e14fa7fbeba378d97b3d0477f12",
     "ReadmeUrl": "https://github.com/mstan/SuperMarioAdvance4Recomp/blob/f9344ab09c4e2e14fa7fbeba378d97b3d0477f12/README.md",
-    "ReleaseUrl": "https://github.com/mstan/SuperMarioAdvance4Recomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioAdvance4Recomp/releases/tag/v0.0.3",
+    "ReleaseTag": "v0.0.3",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "SuperMarioAdvance4Recomp-windows-x64-v0.0.3.zip",
+        "Url": "https://github.com/mstan/SuperMarioAdvance4Recomp/releases/download/v0.0.3/SuperMarioAdvance4Recomp-windows-x64-v0.0.3.zip",
+        "Sha256": "4cd3929c95027cfbd6804fe98040d9560b78cd6a7e3f260cb108f86c05d1056e",
+        "Size": 37105553,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mstan-wariowaretwistedrecomp-warioware-twisted-",
@@ -365,14 +442,80 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "e959da47db510917971e19adf0e6e9d20adbbcf0",
     "ReadmeUrl": "https://github.com/mstan/WarioWareTwistedRecomp/blob/e959da47db510917971e19adf0e6e9d20adbbcf0/README.md",
-    "ReleaseUrl": "https://github.com/mstan/WarioWareTwistedRecomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/mstan/WarioWareTwistedRecomp/releases/tag/v0.0.2",
+    "ReleaseTag": "v0.0.2",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "WarioWareTwistedRecomp-windows-x64-v0.0.2.zip",
+        "Url": "https://github.com/mstan/WarioWareTwistedRecomp/releases/download/v0.0.2/WarioWareTwistedRecomp-windows-x64-v0.0.2.zip",
+        "Sha256": "a48da73783b0992daa639eb6195a8f4e9e2be790fa7c8fa4bbe25ac7e2345ff1",
+        "Size": 36188251,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "james2doyle-ffta-recomp-final-fantasy-tactics-advance",
+    "Title": "Final Fantasy Tactics Advance",
+    "Project": "ffta-recomp",
+    "Repository": "james2doyle/ffta-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c2d618208098d14a4afa1a87f888cd6310bbd476",
+    "ReadmeUrl": "https://github.com/james2doyle/ffta-recomp/blob/c2d618208098d14a4afa1a87f888cd6310bbd476/README.md",
+    "ReleaseUrl": "https://github.com/james2doyle/ffta-recomp/releases/tag/v2.1",
+    "ReleaseTag": "v2.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "FFTARecomp-v2.1-windows-x64.zip",
+        "Url": "https://github.com/james2doyle/ffta-recomp/releases/download/v2.1/FFTARecomp-v2.1-windows-x64.zip",
+        "Sha256": "67b20afd742c43556abc46693ab41b9a38fc98f4ff976f6902da5d34eab6ebb2",
+        "Size": 41004463,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "zallaxdev-emerald-3ds-pokemon-emerald",
+    "Title": "Pokémon Emerald",
+    "Project": "emerald-3ds",
+    "Repository": "ZallaxDev/emerald-3ds",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "bcae4b70dac61419fc933084084469f6cfbe344b",
+    "ReadmeUrl": "https://github.com/ZallaxDev/emerald-3ds/blob/bcae4b70dac61419fc933084084469f6cfbe344b/README.md",
+    "ReleaseUrl": "https://github.com/ZallaxDev/emerald-3ds/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Emerald3DS-v0.5.0-Windows.zip",
+        "Url": "https://github.com/ZallaxDev/emerald-3ds/releases/download/v0.5.0/Emerald3DS-v0.5.0-Windows.zip",
+        "Sha256": "b6f28ed15a327acafb73214543b69bfe7058990c7fbd5fb9796c59e3d9a7d590",
+        "Size": 51742129,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

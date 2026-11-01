@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "0e3ed718e33e5e2df570fc10bbab246cd28b28ba",
     "ReadmeUrl": "https://github.com/ThePlayer14/project-eleven-recomp/blob/0e3ed718e33e5e2df570fc10bbab246cd28b28ba/README.md",
     "ReleaseUrl": "https://github.com/ThePlayer14/project-eleven-recomp/releases/tag/linux-rex-0.10",
@@ -26,15 +26,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "1cd53ed476ccd849effb8527f713c22f82c0b761",
-    "ReadmeUrl": "https://github.com/HossEz/fifa-world-cup-2014-recompiled/blob/1cd53ed476ccd849effb8527f713c22f82c0b761/README.md",
-    "ReleaseUrl": "https://github.com/HossEz/fifa-world-cup-2014-recompiled/releases/tag/v0.1.10",
-    "ReleaseTag": "v0.1.10",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "6167d07d2661f460099c175a6dee93edc0925b63",
+    "ReadmeUrl": "https://github.com/HossEz/fifa-world-cup-2014-recompiled/blob/6167d07d2661f460099c175a6dee93edc0925b63/README.md",
+    "ReleaseUrl": "https://github.com/HossEz/fifa-world-cup-2014-recompiled/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "fifa-world-cup-2014-recompiled-0.2.0-setup.exe",
+        "Url": "https://github.com/HossEz/fifa-world-cup-2014-recompiled/releases/download/v0.2.0/fifa-world-cup-2014-recompiled-0.2.0-setup.exe",
+        "Sha256": "6c3030418ea03b21476dcbad39bda7d25cf0fef15fa20d0b6f0573b0b74c673a",
+        "Size": 30706185,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "wndwsqrrl-3on3nhl-recomp-3-on-3-nhl-arcade",
@@ -44,7 +54,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "0abd1d0d4322b4cc282697380e2cbcf517f27001",
     "ReadmeUrl": "https://github.com/Wndwsqrrl/3on3NHL-recomp/blob/0abd1d0d4322b4cc282697380e2cbcf517f27001/README.md",
     "ReleaseUrl": "https://github.com/Wndwsqrrl/3on3NHL-recomp/releases/tag/v0.1.1",
@@ -72,7 +82,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "d6dc5c48087c5f18c9395cc9bc4e5f1ec0c514b7",
     "ReadmeUrl": "https://github.com/nikolaygorb/ArmyOfTwoRecomp/blob/d6dc5c48087c5f18c9395cc9bc4e5f1ec0c514b7/README.md",
     "ReleaseUrl": "https://github.com/nikolaygorb/ArmyOfTwoRecomp/releases/tag/1.4",
@@ -101,9 +111,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "37924cdc34199af3ab3d74773022b4ab7e294859",
-    "ReadmeUrl": "https://github.com/OpenPortroid/ArmyOfTwoRecompilation/blob/37924cdc34199af3ab3d74773022b4ab7e294859/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8c1194bf01bf0059c1cdc10ab58cd52f22310d02",
+    "ReadmeUrl": "https://github.com/OpenPortroid/ArmyOfTwoRecompilation/blob/8c1194bf01bf0059c1cdc10ab58cd52f22310d02/README.md",
     "ReleaseUrl": "https://github.com/OpenPortroid/ArmyOfTwoRecompilation/releases/tag/v1.3.5",
     "ReleaseTag": "v1.3.5",
     "Platforms": [
@@ -119,7 +129,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "bd7e07472acfe9d8563a318502f4d399b6d4d791",
     "ReadmeUrl": "https://github.com/Genesis5500/ArmyOfTwo-Recomp/blob/bd7e07472acfe9d8563a318502f4d399b6d4d791/README.md",
     "ReleaseUrl": "https://github.com/Genesis5500/ArmyOfTwo-Recomp/releases/tag/v0.1.0",
@@ -149,7 +159,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Army of Two: The 40th Day (Libre40).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "497fac9c84dbe46ad907af44415bbca3a1ddc21c",
     "ReadmeUrl": "https://github.com/automoto/Libre40/blob/497fac9c84dbe46ad907af44415bbca3a1ddc21c/README.md",
     "ReleaseUrl": "https://github.com/automoto/Libre40/releases",
@@ -167,7 +177,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "856b4cd98fb591a67b7a312c6c6b6b90da12a66e",
     "ReadmeUrl": "https://github.com/coole42-pixel/BullyRecomp/blob/856b4cd98fb591a67b7a312c6c6b6b90da12a66e/README.md",
     "ReleaseUrl": "https://github.com/coole42-pixel/BullyRecomp/releases",
@@ -185,7 +195,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ac11bd1043e13db61bd0a8171043ac053a1ac88f",
     "ReadmeUrl": "https://github.com/kiesxoxo/burnout-crash-recomp/blob/ac11bd1043e13db61bd0a8171043ac053a1ac88f/README.md",
     "ReleaseUrl": "https://github.com/kiesxoxo/burnout-crash-recomp/releases/tag/v0.1.1",
@@ -203,27 +213,37 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "3c3178a85075cfa6e0703de5e553ff472acc7916",
     "ReadmeUrl": "https://github.com/FrankHUN88453/CoD3Recomp/blob/3c3178a85075cfa6e0703de5e553ff472acc7916/README.md",
-    "ReleaseUrl": "https://github.com/FrankHUN88453/CoD3Recomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/FrankHUN88453/CoD3Recomp/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "CoD3SP_s.exe",
+        "Url": "https://github.com/FrankHUN88453/CoD3Recomp/releases/download/v0.5.0/CoD3SP_s.exe",
+        "Sha256": "33bf5f1c884856ea69934d249bacd537acedc664f37d0faca621d74ff6f59a12",
+        "Size": 257373696,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "zenit2893-cmyk-project-1944-call-of-duty-3",
     "Title": "Call of Duty 3",
     "Project": "project-1944",
-    "Repository": "zenit2893-cmyk/project-1944",
+    "Repository": "zenit2893-cmyk/Call-of-Duty-3-PC-Editon",
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "62ab3b08e4db1a5f21fb0c13b49d4a3ebd004812",
-    "ReadmeUrl": "https://github.com/zenit2893-cmyk/project-1944/blob/62ab3b08e4db1a5f21fb0c13b49d4a3ebd004812/README.md",
+    "ReadmeUrl": "https://github.com/zenit2893-cmyk/Call-of-Duty-3-PC-Editon/blob/62ab3b08e4db1a5f21fb0c13b49d4a3ebd004812/README.md",
     "ReleaseUrl": "https://github.com/zenit2893-cmyk/project-1944/releases/tag/v2.0",
     "ReleaseTag": "v2.0",
     "Platforms": [
@@ -239,7 +259,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ef7048c568fd0756ffa4856ff6d3d9e0bc90ac2e",
     "ReadmeUrl": "https://github.com/jxnplays/cod3-recomp/blob/ef7048c568fd0756ffa4856ff6d3d9e0bc90ac2e/README.md",
     "ReleaseUrl": "https://github.com/jxnplays/cod3-recomp/releases/tag/remaster-pass-2026-10-15",
@@ -257,11 +277,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "7b1e7a0a81de6dfc344fdce1b9a7c2166727a33a",
-    "ReadmeUrl": "https://github.com/ReRevvedRecomp/rerevved/blob/7b1e7a0a81de6dfc344fdce1b9a7c2166727a33a/README.md",
-    "ReleaseUrl": "https://github.com/ReRevvedRecomp/rerevved/releases/tag/v0.6.0",
-    "ReleaseTag": "v0.6.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1c5d758b19070ee48306b865706eddba4bd1c208",
+    "ReadmeUrl": "https://github.com/ReRevvedRecomp/rerevved/blob/1c5d758b19070ee48306b865706eddba4bd1c208/README.md",
+    "ReleaseUrl": "https://github.com/ReRevvedRecomp/rerevved/releases/tag/v0.6.1",
+    "ReleaseTag": "v0.6.1",
     "Platforms": [
       "Windows",
       "Linux",
@@ -269,28 +289,28 @@
     ],
     "Assets": [
       {
-        "Name": "rerevved-v0.6.0-linux-x64.tar.gz",
-        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.0/rerevved-v0.6.0-linux-x64.tar.gz",
-        "Sha256": "0aa4c12f094ae764e44a05ba00f8751fb2598ae65de74c3f4808e236f33c7b6e",
-        "Size": 60069168,
+        "Name": "rerevved-v0.6.1-linux-x64.tar.gz",
+        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.1/rerevved-v0.6.1-linux-x64.tar.gz",
+        "Sha256": "06b3bf746b61d304e7ff590bee34910a737841912ce79d63ac0c49a48b044703",
+        "Size": 60086406,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "rerevved-v0.6.0-macos-arm64.tar.gz",
-        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.0/rerevved-v0.6.0-macos-arm64.tar.gz",
-        "Sha256": "315b6e592cbeb79a0a6dec8e57f78a44b93bd0b0172729812f952164b96f39c1",
-        "Size": 34914816,
+        "Name": "rerevved-v0.6.1-macos-arm64.tar.gz",
+        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.1/rerevved-v0.6.1-macos-arm64.tar.gz",
+        "Sha256": "37d2503ec3c86668e3059f1f43ca42b19146fb6dccf6a1d3133c758f61e96197",
+        "Size": 34910972,
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "rerevved-v0.6.0-windows-x64.zip",
-        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.0/rerevved-v0.6.0-windows-x64.zip",
-        "Sha256": "a0839ecde2d1fece358663698b8e5cc064c030e85fe5475d3caef9ca678bc30f",
-        "Size": 32180976,
+        "Name": "rerevved-v0.6.1-windows-x64.zip",
+        "Url": "https://github.com/ReRevvedRecomp/rerevved/releases/download/v0.6.1/rerevved-v0.6.1-windows-x64.zip",
+        "Sha256": "2b655b5273bd4280cf9a7eb09f74a7bc65e13b4adfd28b3dfd00655aa2230a6a",
+        "Size": 32192714,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -305,7 +325,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Comix Zone (XBLA).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "c59735a4a2c18a98ea9c32075742a0f43a1a271f",
     "ReadmeUrl": "https://github.com/sp00nznet/comixzone/blob/c59735a4a2c18a98ea9c32075742a0f43a1a271f/README.md",
     "ReleaseUrl": "https://github.com/sp00nznet/comixzone/releases",
@@ -323,16 +343,26 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "30634b2eccf48a099c147f3e365afa5512bc22d2",
-    "ReadmeUrl": "https://github.com/psxrestore/Condemned2Recomp/blob/30634b2eccf48a099c147f3e365afa5512bc22d2/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3a64f2212ffe01f06b39e08852e9335a78b507f4",
+    "ReadmeUrl": "https://github.com/psxrestore/Condemned2Recomp/blob/3a64f2212ffe01f06b39e08852e9335a78b507f4/README.md",
     "ReleaseUrl": "https://github.com/psxrestore/Condemned2Recomp/releases/tag/0.5.1",
     "ReleaseTag": "0.5.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "condemned2recompV0.5.1_windows.zip",
+        "Url": "https://github.com/psxrestore/Condemned2Recomp/releases/download/0.5.1/condemned2recompV0.5.1_windows.zip",
+        "Sha256": "87812b1475435296e95240a54e4e462e5abba9124c8c3234275bbddb19c8be74",
+        "Size": 19703180,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "saulob-crackdown-xbox360-recompiled-crackdown",
@@ -342,7 +372,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "33ab1b632e38cb5c1c39a3d56c479537b9e0d185",
     "ReadmeUrl": "https://github.com/saulob/crackdown-xbox360-recompiled/blob/33ab1b632e38cb5c1c39a3d56c479537b9e0d185/README.md",
     "ReleaseUrl": "https://github.com/saulob/crackdown-xbox360-recompiled/releases/tag/v0.6.2",
@@ -380,9 +410,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "047e53451f4648638fd37fcd166cd38dc8151296",
-    "ReadmeUrl": "https://github.com/Maxilure/MindOver-Recomp/blob/047e53451f4648638fd37fcd166cd38dc8151296/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f503f4e5aec551c73691cef7cdf8d3b02829fde9",
+    "ReadmeUrl": "https://github.com/Maxilure/MindOver-Recomp/blob/f503f4e5aec551c73691cef7cdf8d3b02829fde9/README.md",
     "ReleaseUrl": "https://github.com/Maxilure/MindOver-Recomp/releases/tag/v0.1.0-alpha",
     "ReleaseTag": "v0.1.0-alpha",
     "Platforms": [
@@ -418,7 +448,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "7664e2d7bdda7b7f202f16caf5806efceb761e17",
     "ReadmeUrl": "https://github.com/Revan67/DOAX2-Recomp/blob/7664e2d7bdda7b7f202f16caf5806efceb761e17/README.md",
     "ReleaseUrl": "https://github.com/Revan67/DOAX2-Recomp/releases",
@@ -436,7 +466,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ba78bde572d654022f35e00eb9860be6c4583456",
     "ReadmeUrl": "https://github.com/wivi514/Dead_Rising_2_Case_West_Xenon_Recomp/blob/ba78bde572d654022f35e00eb9860be6c4583456/README.md",
     "ReleaseUrl": "https://github.com/wivi514/Dead_Rising_2_Case_West_Xenon_Recomp/releases/tag/v1.1.2",
@@ -484,7 +514,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "10d45b0952dd1b7f53f29dbff0795a27abb81ff7",
     "ReadmeUrl": "https://github.com/wivi514/Dead_Rising_2_Case_Zero_Xenon_Recomp/blob/10d45b0952dd1b7f53f29dbff0795a27abb81ff7/README.md",
     "ReleaseUrl": "https://github.com/wivi514/Dead_Rising_2_Case_Zero_Xenon_Recomp/releases/tag/v1.1.3",
@@ -532,7 +562,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "e0624129c06b9437aa0278b58f2f3eb954192aec",
     "ReadmeUrl": "https://github.com/LittleBitUA/DPRecomp/blob/e0624129c06b9437aa0278b58f2f3eb954192aec/README.md",
     "ReleaseUrl": "https://github.com/LittleBitUA/DPRecomp/releases/tag/v2.0.14",
@@ -561,7 +591,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "11650aec28bc1d86c221da4992bff3b4b5778ccb",
     "ReadmeUrl": "https://github.com/Boron853/Souls-of-the-Reaper/blob/11650aec28bc1d86c221da4992bff3b4b5778ccb/README.md",
     "ReleaseUrl": "https://github.com/Boron853/Souls-of-the-Reaper/releases/tag/beta-1.3",
@@ -569,7 +599,17 @@
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "SoulsOfTheReaper_Setup.exe",
+        "Url": "https://github.com/Boron853/Souls-of-the-Reaper/releases/download/beta-1.3/SoulsOfTheReaper_Setup.exe",
+        "Sha256": "51d902e7fddfab16246403a4fa17998a05f593f3217079cf513fc4c175b0f353",
+        "Size": 23435514,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "96dot-dragon-age-origins-recomp-dragon-age-origins",
@@ -579,16 +619,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "fc1c2428ad8a7a9e388facc7a0f9cc120c0a4384",
-    "ReadmeUrl": "https://github.com/96dot/Dragon-Age-Origins-Recomp/blob/fc1c2428ad8a7a9e388facc7a0f9cc120c0a4384/README.md",
-    "ReleaseUrl": "https://github.com/96dot/Dragon-Age-Origins-Recomp/releases",
-    "ReleaseTag": "",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d27dfc3bb116eecba451d42707dd58469acab443",
+    "ReadmeUrl": "https://github.com/96dot/Dragon-Age-Origins-Recomp/blob/d27dfc3bb116eecba451d42707dd58469acab443/README.md",
+    "ReleaseUrl": "https://github.com/96dot/Dragon-Age-Origins-Recomp/releases/tag/v1.0.0-dev.1",
+    "ReleaseTag": "v1.0.0-dev.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "DAORecomp-Installer.exe",
+        "Url": "https://github.com/96dot/Dragon-Age-Origins-Recomp/releases/download/v1.0.0-dev.1/DAORecomp-Installer.exe",
+        "Sha256": "ffcc098b4a7b7092a460b0da79b012a03a9dec154a176c5acc9d7e3aad98e403",
+        "Size": 33551081,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "DAORecomp.exe",
+        "Url": "https://github.com/96dot/Dragon-Age-Origins-Recomp/releases/download/v1.0.0-dev.1/DAORecomp.exe",
+        "Sha256": "ffcc098b4a7b7092a460b0da79b012a03a9dec154a176c5acc9d7e3aad98e403",
+        "Size": 33551081,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "novapowers0-dbz-budokai-3-hd-collection-dragon-ball-z-budokai-3-hd",
@@ -598,7 +657,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b5bff8a9b92b13b5c470034f868834a875add755",
     "ReadmeUrl": "https://github.com/novapowers0/DBZ-Budokai-3-HD-Collection/blob/b5bff8a9b92b13b5c470034f868834a875add755/README.md",
     "ReleaseUrl": "https://github.com/novapowers0/DBZ-Budokai-3-HD-Collection/releases/tag/v1.5.5.5",
@@ -616,6 +675,15 @@
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
+      },
+      {
+        "Name": "DBZ-Budokai-3-HD-Collection-v1.5.5.5.zip",
+        "Url": "https://github.com/novapowers0/DBZ-Budokai-3-HD-Collection/releases/download/v1.5.5.5/DBZ-Budokai-3-HD-Collection-v1.5.5.5.zip",
+        "Sha256": "cfc5e7d4825f44c62eff9973bd79f4e88746312d12d82abd50b9bc518de79b5f",
+        "Size": 91591702,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
       }
     ]
   },
@@ -627,7 +695,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "a0203ce6287e305cf0eef4e97f3c598cc6d953ab",
     "ReadmeUrl": "https://github.com/TekRantGaming/earthworm-jim-hd-recompiled/blob/a0203ce6287e305cf0eef4e97f3c598cc6d953ab/README.md",
     "ReleaseUrl": "https://github.com/TekRantGaming/earthworm-jim-hd-recompiled/releases/tag/v0.9.6",
@@ -665,11 +733,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "340144e4c7979a9f46699bef368fe7d7c62fddc9",
-    "ReadmeUrl": "https://github.com/goliathret/EdgeOfTimeRecomp/blob/340144e4c7979a9f46699bef368fe7d7c62fddc9/README.md",
-    "ReleaseUrl": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/tag/v1.0.0",
-    "ReleaseTag": "v1.0.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "ebf7bb904d88062a3bd5b1d59ea642cdc2c1b780",
+    "ReadmeUrl": "https://github.com/goliathret/EdgeOfTimeRecomp/blob/ebf7bb904d88062a3bd5b1d59ea642cdc2c1b780/README.md",
+    "ReleaseUrl": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/tag/v1.1",
+    "ReleaseTag": "v1.1",
     "Platforms": [
       "Windows",
       "Linux",
@@ -677,30 +745,39 @@
     ],
     "Assets": [
       {
-        "Name": "EdgeOfTimeRecomp-v1.0.0-20261004_2039-mac-arm64.zip",
-        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.0.0/EdgeOfTimeRecomp-v1.0.0-20261004_2039-mac-arm64.zip",
-        "Sha256": "f28dd4cace4873c60643c228cf12846d0d514101111ee9bcae2f3544f2a94884",
-        "Size": 146918168,
+        "Name": "EdgeOfTimeRecomp-v1.0.0-20261030_1818-x86_64.AppImage",
+        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.1/EdgeOfTimeRecomp-v1.0.0-20261030_1818-x86_64.AppImage",
+        "Sha256": "1853bf1373cae1e14fcff2ae82159cfe96bf5a8a3c644f49a24e0f193ffa8e34",
+        "Size": 146901496,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "EdgeOfTimeRecomp-v1.0.0-20261030_1828-mac-arm64.dmg",
+        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.1/EdgeOfTimeRecomp-v1.0.0-20261030_1828-mac-arm64.dmg",
+        "Sha256": "c424474af6fe5a95516b93b9909e4e880e1d1fc1cf10050d821c8a010c01cae2",
+        "Size": 145769680,
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "EdgeOfTimeRecomp-v1.0.0-20261004_2039-win-amd64.zip",
-        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.0.0/EdgeOfTimeRecomp-v1.0.0-20261004_2039-win-amd64.zip",
-        "Sha256": "c756dd362aaeabf982a701b2cb5feeb2444e8eba446c311329ee85d2f27fdf69",
-        "Size": 194606176,
+        "Name": "EdgeOfTimeRecomp-v1.0.0-20261030_1828-mac-arm64.zip",
+        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.1/EdgeOfTimeRecomp-v1.0.0-20261030_1828-mac-arm64.zip",
+        "Sha256": "7dfd9937bff0d9048a378fb6ec7a5d99f53239f4945a74a19ccb2869813277f9",
+        "Size": 144464030,
         "RuntimeIdentifiers": [
-          "win-x64"
+          "osx-arm64"
         ]
       },
       {
-        "Name": "EdgeOfTimeRecomp-v1.0.0-20261004_2040-x86_64.AppImage",
-        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.0.0/EdgeOfTimeRecomp-v1.0.0-20261004_2040-x86_64.AppImage",
-        "Sha256": "633fff9d4d3841f0ce058ddf30f625dfcff17080c08bc243273c586e2cfb8533",
-        "Size": 149187064,
+        "Name": "EdgeOfTimeRecomp-v1.0.0-20261030_1906-win-amd64.zip",
+        "Url": "https://github.com/goliathret/EdgeOfTimeRecomp/releases/download/v1.1/EdgeOfTimeRecomp-v1.0.0-20261030_1906-win-amd64.zip",
+        "Sha256": "bed8dd834db8a44e46647e5cc988947ecac16ff3ab48daed619f8279045585fa",
+        "Size": 192213315,
         "RuntimeIdentifiers": [
-          "linux-x64"
+          "win-x64"
         ]
       }
     ]
@@ -713,16 +790,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "33716a1ae610ab2dd7b04e917d35cd2db740e7eb",
-    "ReadmeUrl": "https://github.com/Juansolo457/fear360-recomp/blob/33716a1ae610ab2dd7b04e917d35cd2db740e7eb/README.md",
-    "ReleaseUrl": "https://github.com/Juansolo457/fear360-recomp/releases/tag/v0.1.5",
-    "ReleaseTag": "v0.1.5",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e872580ebe5d695b942f78d92d9c944ad143afe4",
+    "ReadmeUrl": "https://github.com/Juansolo457/fear360-recomp/blob/e872580ebe5d695b942f78d92d9c944ad143afe4/README.md",
+    "ReleaseUrl": "https://github.com/Juansolo457/fear360-recomp/releases/tag/v1.5.1",
+    "ReleaseTag": "v1.5.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "FEAR360-Recompiled-1.5.1-Linux.zip",
+        "Url": "https://github.com/Juansolo457/fear360-recomp/releases/download/v1.5.1/FEAR360-Recompiled-1.5.1-Linux.zip",
+        "Sha256": "e81f6920d3c2cd7f9cc3cfdf0d27dcc2067312080aaf1684189f64f57e6c8e1d",
+        "Size": 81096639,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "FEAR360-Recompiled-1.5.1-Windows.zip",
+        "Url": "https://github.com/Juansolo457/fear360-recomp/releases/download/v1.5.1/FEAR360-Recompiled-1.5.1-Windows.zip",
+        "Sha256": "eba9d73d8e23b0e36e5bc956962c4a4cef5ccf664ba445a7be15ff6ea0867871",
+        "Size": 25340681,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "chunchunq-fifa09-recomp-fifa-09",
@@ -732,7 +828,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "4dba1063d742911a81c81aa53347e463c2dc75d5",
     "ReadmeUrl": "https://github.com/ChunchunQ/fifa09-recomp/blob/4dba1063d742911a81c81aa53347e463c2dc75d5/README.md",
     "ReleaseUrl": "https://github.com/ChunchunQ/fifa09-recomp/releases/tag/v1.4.0",
@@ -750,16 +846,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "a5604adabf17be1bc415104a7299f52ec453f8f1",
-    "ReadmeUrl": "https://github.com/samuelit0davila/fifa-street-pc-port/blob/a5604adabf17be1bc415104a7299f52ec453f8f1/README.md",
-    "ReleaseUrl": "https://github.com/samuelit0davila/fifa-street-pc-port/releases/tag/v2.1.3-online-beta",
-    "ReleaseTag": "v2.1.3-online-beta",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0b554e377ef565a23641e5fe98dad4b569836ca4",
+    "ReadmeUrl": "https://github.com/samuelit0davila/fifa-street-pc-port/blob/0b554e377ef565a23641e5fe98dad4b569836ca4/README.md",
+    "ReleaseUrl": "https://github.com/samuelit0davila/fifa-street-pc-port/releases/tag/v2.1.4-online-beta",
+    "ReleaseTag": "v2.1.4-online-beta",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "ReStreet-2.1.4-Setup.exe",
+        "Url": "https://github.com/samuelit0davila/fifa-street-pc-port/releases/download/v2.1.4-online-beta/ReStreet-2.1.4-Setup.exe",
+        "Sha256": "467930dcbecb1f4d24e5489b19eb6139a0131cecb29a31036838b8843453f149",
+        "Size": 453799435,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "ReStreet-Linux-launcher.tar.gz",
+        "Url": "https://github.com/samuelit0davila/fifa-street-pc-port/releases/download/v2.1.4-online-beta/ReStreet-Linux-launcher.tar.gz",
+        "Sha256": "55b2dfd1204a2eca626526110cb063021979af5480db103f37948fb58ce1c19c",
+        "Size": 33726110,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "fabioap-cpu-forza-horizon-2-recomp-forza-horizon-2",
@@ -769,7 +884,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "00edb0b2b10e02af6e97d1361b4b9e474dc5df45",
     "ReadmeUrl": "https://github.com/fabioap-cpu/Forza-Horizon-2-Recomp/blob/00edb0b2b10e02af6e97d1361b4b9e474dc5df45/README.md",
     "ReleaseUrl": "https://github.com/fabioap-cpu/Forza-Horizon-2-Recomp/releases",
@@ -787,7 +902,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Forza Motorsport 3 (hl360-forza3).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "861213069ae88042b573db099d9a5b42dcc78dd6",
     "ReadmeUrl": "https://github.com/0herculabs/hl360-forza3/blob/861213069ae88042b573db099d9a5b42dcc78dd6/README.md",
     "ReleaseUrl": "https://github.com/0herculabs/hl360-forza3/releases/tag/0.1.3",
@@ -805,7 +920,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "814f6c3e993f6f369cf1cb66eb75866e18f8e713",
     "ReadmeUrl": "https://github.com/GabrielCRadu/fm4-recomp/blob/814f6c3e993f6f369cf1cb66eb75866e18f8e713/README.md",
     "ReleaseUrl": "https://github.com/GabrielCRadu/fm4-recomp/releases",
@@ -823,20 +938,20 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub. Intitulé amont : Forza Motorsport 4 (hl360-forza4).",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "8827db98eb23315e5549a49680d53df48831b4d9",
-    "ReadmeUrl": "https://github.com/0herculabs/hl360-forza4/blob/8827db98eb23315e5549a49680d53df48831b4d9/README.md",
-    "ReleaseUrl": "https://github.com/0herculabs/hl360-forza4/releases/tag/v0.3.9",
-    "ReleaseTag": "v0.3.9",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d6597d7d58d5f64bd171fd67b4f90562333d5d27",
+    "ReadmeUrl": "https://github.com/0herculabs/hl360-forza4/blob/d6597d7d58d5f64bd171fd67b4f90562333d5d27/README.md",
+    "ReleaseUrl": "https://github.com/0herculabs/hl360-forza4/releases/tag/v0.3.10",
+    "ReleaseTag": "v0.3.10",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "FM4-v0.3.9-windows-x64.zip",
-        "Url": "https://github.com/0herculabs/hl360-forza4/releases/download/v0.3.9/FM4-v0.3.9-windows-x64.zip",
-        "Sha256": "402c55a08f5880f636d5106945cf4bcea6a791231bef8bf74830d5434dec2ebc",
-        "Size": 44735046,
+        "Name": "FM4-v0.3.10-windows-x64.zip",
+        "Url": "https://github.com/0herculabs/hl360-forza4/releases/download/v0.3.10/FM4-v0.3.10-windows-x64.zip",
+        "Sha256": "20733dd305e05562c4086b9b239e9313ce338cbdc0774a83823280cee2de6c44",
+        "Size": 82353269,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -851,7 +966,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "788bba20ece17aed533c52e003d1428f87b7938c",
     "ReadmeUrl": "https://github.com/nikolaygorb/FuseRecomp/blob/788bba20ece17aed533c52e003d1428f87b7938c/README.md",
     "ReleaseUrl": "https://github.com/nikolaygorb/FuseRecomp/releases/tag/1.2",
@@ -880,20 +995,20 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "e4a259a0811692337dcea994d9c903f323ce5655",
-    "ReadmeUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/blob/e4a259a0811692337dcea994d9c903f323ce5655/README.md",
-    "ReleaseUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/tag/v0.3.9",
-    "ReleaseTag": "v0.3.9",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "21016e0a02b541fb732c75b700c970ec48136c69",
+    "ReadmeUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/blob/21016e0a02b541fb732c75b700c970ec48136c69/README.md",
+    "ReleaseUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/tag/v0.3.12",
+    "ReleaseTag": "v0.3.12",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "gow2-recomp-0.3.9-win64.zip",
-        "Url": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/download/v0.3.9/gow2-recomp-0.3.9-win64.zip",
-        "Sha256": "3e1d0d053072fec942d315621f962648f9d93ad7a91456785e6352bec9e820fa",
-        "Size": 79720558,
+        "Name": "gow2-recomp-0.3.12-win64.zip",
+        "Url": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/download/v0.3.12/gow2-recomp-0.3.12-win64.zip",
+        "Sha256": "816eeca163c7b599d1e4ade9c675b957913472f38b7049a98b35ac5b60689bd1",
+        "Size": 83431723,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -908,20 +1023,20 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "f6d30a940986e761b075f4d2e0e211246699b1f9",
-    "ReadmeUrl": "https://github.com/Flippage/gears-of-war-3-recomp/blob/f6d30a940986e761b075f4d2e0e211246699b1f9/README.md",
-    "ReleaseUrl": "https://github.com/Flippage/gears-of-war-3-recomp/releases/tag/v0.2.2",
-    "ReleaseTag": "v0.2.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "81076705bb35e1ae18641af5425bf30f8c310259",
+    "ReadmeUrl": "https://github.com/Flippage/gears-of-war-3-recomp/blob/81076705bb35e1ae18641af5425bf30f8c310259/README.md",
+    "ReleaseUrl": "https://github.com/Flippage/gears-of-war-3-recomp/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "gow3-recomp-0.2.2-win64.zip",
-        "Url": "https://github.com/Flippage/gears-of-war-3-recomp/releases/download/v0.2.2/gow3-recomp-0.2.2-win64.zip",
-        "Sha256": "7c10509989bf7b78ed462d79350b27262980f75ea08517c614b8c4ff81f9f320",
-        "Size": 47768050,
+        "Name": "gow3-recomp-0.3.1-win64.zip",
+        "Url": "https://github.com/Flippage/gears-of-war-3-recomp/releases/download/v0.3.1/gow3-recomp-0.3.1-win64.zip",
+        "Sha256": "063dc28b19879e684fbd682b559c69e1ca9e831e7b41fa5bb95a236bd04a600c",
+        "Size": 96568449,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -936,7 +1051,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "e56c475a75b1b703aee0e3422ffc18a27a05f66a",
     "ReadmeUrl": "https://github.com/OverkillLabs3/gears-judgement-recomp/blob/e56c475a75b1b703aee0e3422ffc18a27a05f66a/README.md",
     "ReleaseUrl": "https://github.com/OverkillLabs3/gears-judgement-recomp/releases/tag/v0.2.1",
@@ -954,7 +1069,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "cad0b7ccb4ad8502b76b67e5507bd4348df0de86",
     "ReadmeUrl": "https://github.com/saulob/geometry-wars-retro-evolved-2-recompiled/blob/cad0b7ccb4ad8502b76b67e5507bd4348df0de86/README.md",
     "ReleaseUrl": "https://github.com/saulob/geometry-wars-retro-evolved-2-recompiled/releases/tag/v0.6.1",
@@ -992,7 +1107,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : GoldenEye 007 (XBLA).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "cc241d8543c80ecbb3b1fe0b397f646302810549",
     "ReadmeUrl": "https://github.com/ericksa1417/GoldenEye-Recomp/blob/cc241d8543c80ecbb3b1fe0b397f646302810549/README.md",
     "ReleaseUrl": "https://github.com/ericksa1417/GoldenEye-Recomp/releases",
@@ -1010,7 +1125,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "527db75b613aaa305eac81a6358fe21341c58cdd",
     "ReadmeUrl": "https://github.com/CaiusCodes/GoldenEye-007-XBLA-PC-Recomp/blob/527db75b613aaa305eac81a6358fe21341c58cdd/README.md",
     "ReleaseUrl": "https://github.com/CaiusCodes/GoldenEye-007-XBLA-PC-Recomp/releases/tag/v0.9.6c",
@@ -1028,7 +1143,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "8469f524ab119c06363cff737565389ee6640886",
     "ReadmeUrl": "https://github.com/nikolaygorb/GoldenEye007ReloadedRecomp/blob/8469f524ab119c06363cff737565389ee6640886/README.md",
     "ReleaseUrl": "https://github.com/nikolaygorb/GoldenEye007ReloadedRecomp/releases/tag/1.4",
@@ -1058,7 +1173,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "1685f88a733f9d0ebf69e40412901c873d44eb95",
     "ReadmeUrl": "https://github.com/OZORDI/SanRecomp/blob/1685f88a733f9d0ebf69e40412901c873d44eb95/README.md",
     "ReleaseUrl": "https://github.com/OZORDI/SanRecomp/releases",
@@ -1078,7 +1193,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "507d2d442dc492dcba816ed66fe02f8776adcdc2",
     "ReadmeUrl": "https://github.com/sp00nznet/gh2/blob/507d2d442dc492dcba816ed66fe02f8776adcdc2/README.md",
     "ReleaseUrl": "https://github.com/sp00nznet/gh2/releases",
@@ -1114,7 +1229,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "329148bb156e0710bcf7f89ced1044461ea7f18f",
     "ReadmeUrl": "https://github.com/Dyotson/RecompiledHaloReach/blob/329148bb156e0710bcf7f89ced1044461ea7f18f/README.md",
     "ReleaseUrl": "https://github.com/Dyotson/RecompiledHaloReach/releases",
@@ -1133,7 +1248,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "fe5ae9d60d7c0c41a42154423f471e7b9e80ab3b",
     "ReadmeUrl": "https://github.com/saulob/hard-corps-uprising-recompiled/blob/fe5ae9d60d7c0c41a42154423f471e7b9e80ab3b/README.md",
     "ReleaseUrl": "https://github.com/saulob/hard-corps-uprising-recompiled/releases/tag/v0.7.1",
@@ -1171,7 +1286,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "a89722963685423cd3406eadf548027cc3cee546",
     "ReadmeUrl": "https://github.com/monscriser/HydroThunderPORT/blob/a89722963685423cd3406eadf548027cc3cee546/README.md",
     "ReleaseUrl": "https://github.com/monscriser/HydroThunderPORT/releases/tag/v0.9.1-experimentalbuild",
@@ -1180,7 +1295,26 @@
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "Hydro-Thunder-Windows-revisao-9.1.0.zip",
+        "Url": "https://github.com/monscriser/HydroThunderPORT/releases/download/v0.9.1-experimentalbuild/Hydro-Thunder-Windows-revisao-9.1.0.zip",
+        "Sha256": "88ddf105ede1e77e190405830f531fff7cc7addad7992b573b7bc0503eec95a0",
+        "Size": 32332439,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "HydroThunder-revisao-9.1.0.AppImage",
+        "Url": "https://github.com/monscriser/HydroThunderPORT/releases/download/v0.9.1-experimentalbuild/HydroThunder-revisao-9.1.0.AppImage",
+        "Sha256": "e2cf93e11bacb82c0dab616d55ceba3f11306f9defc6a16d1cab923697ae138c",
+        "Size": 26888696,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "visibou-htrecomp-hydro-thunder-hurricane",
@@ -1190,9 +1324,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "0c11298cc170ca3dd5aaa9155dad1f88a387e55f",
-    "ReadmeUrl": "https://github.com/visibou/htrecomp/blob/0c11298cc170ca3dd5aaa9155dad1f88a387e55f/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "177a5fa713526e138b858cbccd2b7c8256485382",
+    "ReadmeUrl": "https://github.com/visibou/htrecomp/blob/177a5fa713526e138b858cbccd2b7c8256485382/README.md",
     "ReleaseUrl": "https://github.com/visibou/htrecomp/releases/tag/2.0.0",
     "ReleaseTag": "2.0.0",
     "Platforms": [
@@ -1208,7 +1342,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b322c1d6be1fb01d427d035c18d142d1926ebaae",
     "ReadmeUrl": "https://github.com/Spooky098529/ITC-Recomp/blob/b322c1d6be1fb01d427d035c18d142d1926ebaae/README.md",
     "ReleaseUrl": "https://github.com/Spooky098529/ITC-Recomp/releases/tag/v0.5.0",
@@ -1246,15 +1380,43 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : James Bond games (007).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f7764adc1f51d8c7a37942a110df7d5e37325870",
     "ReadmeUrl": "https://github.com/furqanagwan/007/blob/f7764adc1f51d8c7a37942a110df7d5e37325870/README.md",
-    "ReleaseUrl": "https://github.com/furqanagwan/007/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/furqanagwan/007/releases/tag/v0.1.0-alpha.3",
+    "ReleaseTag": "v0.1.0-alpha.3",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "007-BloodStone-0.1.0-alpha.3-win-x64.zip",
+        "Url": "https://github.com/furqanagwan/007/releases/download/v0.1.0-alpha.3/007-BloodStone-0.1.0-alpha.3-win-x64.zip",
+        "Sha256": "9f495e719c9ee1ec47f846836d22f3ac921b62278026ee10ef2f334aa7ee09c9",
+        "Size": 49476831,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "007-Legends-0.1.0-alpha.3-win-x64.zip",
+        "Url": "https://github.com/furqanagwan/007/releases/download/v0.1.0-alpha.3/007-Legends-0.1.0-alpha.3-win-x64.zip",
+        "Sha256": "44171b95985687876c931a9ec07fe3d0d628161c9cb4481aadbb3adcc4b761cc",
+        "Size": 37519757,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "007-QuantumOfSolace-0.1.0-alpha.3-win-x64.zip",
+        "Url": "https://github.com/furqanagwan/007/releases/download/v0.1.0-alpha.3/007-QuantumOfSolace-0.1.0-alpha.3-win-x64.zip",
+        "Sha256": "7f7b263b5a32f45f0b1c9178505c863bc5c3cd9e50715501cbb9e955770829a2",
+        "Size": 28665130,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "maxdeadbear-kameorepowered-kameo-elements-of-power",
@@ -1264,48 +1426,30 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f3fc10331f42cfd0a44fe0a0d4ad2c996e212043",
     "ReadmeUrl": "https://github.com/MaxDeadBear/KameoRePowered/blob/f3fc10331f42cfd0a44fe0a0d4ad2c996e212043/README.md",
-    "ReleaseUrl": "https://github.com/MaxDeadBear/KameoRePowered/releases/tag/v0.2.1",
-    "ReleaseTag": "v0.2.1",
+    "ReleaseUrl": "https://github.com/MaxDeadBear/KameoRePowered/releases/tag/v0.3.2",
+    "ReleaseTag": "v0.3.2",
     "Platforms": [
       "Windows",
       "Linux"
     ],
     "Assets": [
       {
-        "Name": "kameorepowered-tu-v0.2.1-linux-x64.tar.gz",
-        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.2.1/kameorepowered-tu-v0.2.1-linux-x64.tar.gz",
-        "Sha256": "da3daaa0b46251656a544faa1e11139bc0ef09a5280156b127d8b41269c0db0e",
-        "Size": 84701105,
+        "Name": "kameorepowered-v0.3.2-linux-x64.tar.gz",
+        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.3.2/kameorepowered-v0.3.2-linux-x64.tar.gz",
+        "Sha256": "e0ebb734c6943f4e7012c43c5617a220c5862e15ac6d51a9c61ff129429d5d92",
+        "Size": 51031523,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "kameorepowered-tu-v0.2.1-windows-x64.zip",
-        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.2.1/kameorepowered-tu-v0.2.1-windows-x64.zip",
-        "Sha256": "b9006fc094dc2c1c37f13cd460c76a73331e6b3a24676de87388ce101e868fe5",
-        "Size": 25065511,
-        "RuntimeIdentifiers": [
-          "win-x64"
-        ]
-      },
-      {
-        "Name": "kameorepowered-v0.2.1-linux-x64.tar.gz",
-        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.2.1/kameorepowered-v0.2.1-linux-x64.tar.gz",
-        "Sha256": "f6f7e5e52bd19fccb298128a6b37ddeb5f851faf738c9fad8fe1d6a6960a6372",
-        "Size": 84383606,
-        "RuntimeIdentifiers": [
-          "linux-x64"
-        ]
-      },
-      {
-        "Name": "kameorepowered-v0.2.1-windows-x64.zip",
-        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.2.1/kameorepowered-v0.2.1-windows-x64.zip",
-        "Sha256": "0b5728f05db7b18aa0cbe49f0dea01229a8a5ea94d935d2b49b6935ead6eedac",
-        "Size": 24755464,
+        "Name": "kameorepowered-v0.3.2-windows-x64.zip",
+        "Url": "https://github.com/MaxDeadBear/KameoRePowered/releases/download/v0.3.2/kameorepowered-v0.3.2-windows-x64.zip",
+        "Sha256": "f2cea2c6be38591fdc06124f3940c3cad13fa8060d0191fe3c7ebdf22094a417",
+        "Size": 52860152,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -1320,21 +1464,30 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "505f22c004c7430af8d50a778e4c81449192e841",
-    "ReadmeUrl": "https://github.com/TekRantGaming/king-kong-recompiled/blob/505f22c004c7430af8d50a778e4c81449192e841/README.md",
-    "ReleaseUrl": "https://github.com/TekRantGaming/king-kong-recompiled/releases/tag/v1.9.13",
-    "ReleaseTag": "v1.9.13",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b162e45769e7cd9b8cd4faf74f95b597b9ceec85",
+    "ReadmeUrl": "https://github.com/TekRantGaming/king-kong-recompiled/blob/b162e45769e7cd9b8cd4faf74f95b597b9ceec85/README.md",
+    "ReleaseUrl": "https://github.com/TekRantGaming/king-kong-recompiled/releases/tag/v2.0.8",
+    "ReleaseTag": "v2.0.8",
     "Platforms": [
       "Windows",
       "Linux"
     ],
     "Assets": [
       {
-        "Name": "KingKong-v1.9.13-windows-x64.zip",
-        "Url": "https://github.com/TekRantGaming/king-kong-recompiled/releases/download/v1.9.13/KingKong-v1.9.13-windows-x64.zip",
-        "Sha256": "b9d72901f9a6c619782f9cde1a9533cb5256ec8fcf8f0b015c2a35caa056e104",
-        "Size": 22914490,
+        "Name": "KingKong-linux-x86_64.AppImage",
+        "Url": "https://github.com/TekRantGaming/king-kong-recompiled/releases/download/v2.0.8/KingKong-linux-x86_64.AppImage",
+        "Sha256": "5531760fc4ba5dc18506cf8ccca695a1cb6f7cdaa666825d4e0c1dd50773b3ce",
+        "Size": 227625464,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "KingKong-v2.0.8-windows-x64.zip",
+        "Url": "https://github.com/TekRantGaming/king-kong-recompiled/releases/download/v2.0.8/KingKong-v2.0.8-windows-x64.zip",
+        "Sha256": "ecbacdd35ed3744ba384b28a60243240c5dafcc519261c48944e4141c4492c6d",
+        "Size": 420303868,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -1349,7 +1502,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "fb07de6ed9f690a7104661b5645acb8cd579247c",
     "ReadmeUrl": "https://github.com/KeithKirenai/L4D-PC-Recomp/blob/fb07de6ed9f690a7104661b5645acb8cd579247c/README.md",
     "ReleaseUrl": "https://github.com/KeithKirenai/L4D-PC-Recomp/releases",
@@ -1368,7 +1521,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "4e2f963665b233bbffa6b9c97a59ed6bf690d10f",
     "ReadmeUrl": "https://github.com/faligame/lost-odyssey-hd-remaster/blob/4e2f963665b233bbffa6b9c97a59ed6bf690d10f/README.md",
     "ReleaseUrl": "https://github.com/faligame/lost-odyssey-hd-remaster/releases/tag/v0.2.0",
@@ -1398,7 +1551,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "9a081ed6cbeb03aa0e227c10e97e504c51efd725",
     "ReadmeUrl": "https://github.com/saulob/marvel-ultimate-alliance-bundle-recompiled/blob/9a081ed6cbeb03aa0e227c10e97e504c51efd725/README.md",
     "ReleaseUrl": "https://github.com/saulob/marvel-ultimate-alliance-bundle-recompiled/releases/tag/v0.2.0",
@@ -1436,9 +1589,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "4a3b134a95049aa8d81853912a79ba57e19d79ff",
-    "ReadmeUrl": "https://github.com/BeemerCodes/MidnightclubLA-Recomp/blob/4a3b134a95049aa8d81853912a79ba57e19d79ff/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c88556c98d46bbc1f6602edfdb2dd17930d9d51d",
+    "ReadmeUrl": "https://github.com/BeemerCodes/MidnightclubLA-Recomp/blob/c88556c98d46bbc1f6602edfdb2dd17930d9d51d/README.md",
     "ReleaseUrl": "https://github.com/BeemerCodes/MidnightclubLA-Recomp/releases/tag/v1.1.1",
     "ReleaseTag": "v1.1.1",
     "Platforms": [
@@ -1454,9 +1607,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "9bfe542a95903bde4737484a4cbfdaf704147857",
-    "ReadmeUrl": "https://github.com/holdmysocks/mcla-recomp/blob/9bfe542a95903bde4737484a4cbfdaf704147857/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2ed208199fcab064e67a83c5ab8f7e8f2aece444",
+    "ReadmeUrl": "https://github.com/holdmysocks/mcla-recomp/blob/2ed208199fcab064e67a83c5ab8f7e8f2aece444/README.md",
     "ReleaseUrl": "https://github.com/holdmysocks/mcla-recomp/releases/tag/v1.0.13",
     "ReleaseTag": "v1.0.13",
     "Platforms": [
@@ -1473,7 +1626,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "607bc7f23d83b09561b0d58644e9bcaad2c104f2",
     "ReadmeUrl": "https://github.com/DevZer0D4Y/MCX360-EDITION/blob/607bc7f23d83b09561b0d58644e9bcaad2c104f2/README.md",
     "ReleaseUrl": "https://github.com/DevZer0D4Y/MCX360-EDITION/releases/tag/R2",
@@ -1491,15 +1644,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "47096fd1b2276166ada0fe88ae0f2ff2d9c6dc68",
-    "ReadmeUrl": "https://github.com/KawaiiBunga/MKVDCU-Recomp/blob/47096fd1b2276166ada0fe88ae0f2ff2d9c6dc68/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9611129bf36b7a3876441b5cb150f2d6884f2d4e",
+    "ReadmeUrl": "https://github.com/KawaiiBunga/MKVDCU-Recomp/blob/9611129bf36b7a3876441b5cb150f2d6884f2d4e/README.md",
     "ReleaseUrl": "https://github.com/KawaiiBunga/MKVDCU-Recomp/releases/tag/v0.2.1",
     "ReleaseTag": "v0.2.1",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "MKVDCU-Recomp.exe",
+        "Url": "https://github.com/KawaiiBunga/MKVDCU-Recomp/releases/download/v0.2.1/MKVDCU-Recomp.exe",
+        "Sha256": "7774a4aeb21c49971eaf75b6b9233f2c681195363164a4ec92e1a937573d2e2a",
+        "Size": 145144134,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "jorjbarbosa-naruto-rise-recomp-naruto-rise-of-a-ninja",
@@ -1509,11 +1672,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "2a22861618fb90e42265d108f7a570c256941e00",
-    "ReadmeUrl": "https://github.com/jorjbarbosa/naruto-rise-recomp/blob/2a22861618fb90e42265d108f7a570c256941e00/README.md",
-    "ReleaseUrl": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/tag/v0.3.0-beta",
-    "ReleaseTag": "v0.3.0-beta",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "421bd5500059cf2d00f37276949d51db767f76b8",
+    "ReadmeUrl": "https://github.com/jorjbarbosa/naruto-rise-recomp/blob/421bd5500059cf2d00f37276949d51db767f76b8/README.md",
+    "ReleaseUrl": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/tag/v0.4.2-beta",
+    "ReleaseTag": "v0.4.2-beta",
     "Platforms": [
       "Windows",
       "Linux"
@@ -1521,9 +1684,27 @@
     "Assets": [
       {
         "Name": "naruto-rise-recomp-win-amd64.zip",
-        "Url": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/download/v0.3.0-beta/naruto-rise-recomp-win-amd64.zip",
-        "Sha256": "d30f94cc8c69441476a2c67b1e2126dbe15dca345ef45323a5e056136b33d409",
-        "Size": 53418354,
+        "Url": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/download/v0.4.2-beta/naruto-rise-recomp-win-amd64.zip",
+        "Sha256": "197f61e10f5a28a2b9c0fca6dfc73ab0dfdff4748c2971c423ccd4e1ee87dfaf",
+        "Size": 53428102,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "NarutoRise-0.4.2-beta-Linux-x86_64.AppImage",
+        "Url": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/download/v0.4.2-beta/NarutoRise-0.4.2-beta-Linux-x86_64.AppImage",
+        "Sha256": "c0774a475731dbf3c70f98d2547bf370700b33d06a2cceeb01f3e0b54746cbf5",
+        "Size": 68258296,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "NarutoRiseInstaller.exe",
+        "Url": "https://github.com/jorjbarbosa/naruto-rise-recomp/releases/download/v0.4.2-beta/NarutoRiseInstaller.exe",
+        "Sha256": "f3c59d708a3af21a76c12a3ab23eea7868fa8f5a6e38d736ffb4146677bea87a",
+        "Size": 36215373,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -1538,9 +1719,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "fea268055002f630251fcd687bfb8a5c424b17db",
-    "ReadmeUrl": "https://github.com/Auremana666/Naruto-The-Broken-Bond-PC-Port/blob/fea268055002f630251fcd687bfb8a5c424b17db/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "570142f98b7f852fce944776bee2dd3369d1cd10",
+    "ReadmeUrl": "https://github.com/Auremana666/Naruto-The-Broken-Bond-PC-Port/blob/570142f98b7f852fce944776bee2dd3369d1cd10/README.md",
     "ReleaseUrl": "https://github.com/Auremana666/Naruto-The-Broken-Bond-PC-Port/releases/tag/v2.5",
     "ReleaseTag": "v2.5",
     "Platforms": [
@@ -1557,15 +1738,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "82252bb83d8f3fbac1bf0f5ba696661580060fca",
-    "ReadmeUrl": "https://github.com/tools81/nfl-head-coach-09-static-recomp/blob/82252bb83d8f3fbac1bf0f5ba696661580060fca/README.md",
-    "ReleaseUrl": "https://github.com/tools81/nfl-head-coach-09-static-recomp/releases/tag/v0.8.1",
-    "ReleaseTag": "v0.8.1",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "04b79e3e35ee0be6aee5eb63a073be0e8432a34a",
+    "ReadmeUrl": "https://github.com/tools81/nfl-head-coach-09-static-recomp/blob/04b79e3e35ee0be6aee5eb63a073be0e8432a34a/README.md",
+    "ReleaseUrl": "https://github.com/tools81/nfl-head-coach-09-static-recomp/releases/tag/v0.8.2",
+    "ReleaseTag": "v0.8.2",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "HC09Setup.exe",
+        "Url": "https://github.com/tools81/nfl-head-coach-09-static-recomp/releases/download/v0.8.2/HC09Setup.exe",
+        "Sha256": "d5e1d290870e1f55419ee7a962962f09b6f91c695d3731570af70d877f1daf84",
+        "Size": 494592,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "anishchandra24-nhl2k8-recompiled-nhl-2k8",
@@ -1575,15 +1766,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "7b1c766bbf6fa300de08ecb1cb9de9adb1c56467",
-    "ReadmeUrl": "https://github.com/anishchandra24/NHL2K8-Recompiled/blob/7b1c766bbf6fa300de08ecb1cb9de9adb1c56467/README.md",
-    "ReleaseUrl": "https://github.com/anishchandra24/NHL2K8-Recompiled/releases/tag/v1.1.0",
-    "ReleaseTag": "v1.1.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e3bc58dd3de8ee6c4d34de7866cfc02788950799",
+    "ReadmeUrl": "https://github.com/anishchandra24/NHL2K8-Recompiled/blob/e3bc58dd3de8ee6c4d34de7866cfc02788950799/README.md",
+    "ReleaseUrl": "https://github.com/anishchandra24/NHL2K8-Recompiled/releases/tag/v1.3.0",
+    "ReleaseTag": "v1.3.0",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "NHL2K8-Recompiled-Setup.exe",
+        "Url": "https://github.com/anishchandra24/NHL2K8-Recompiled/releases/download/v1.3.0/NHL2K8-Recompiled-Setup.exe",
+        "Sha256": "bf3ddd85ccb22a7b20662ab88d2d727a6eb7df5a4fdb60aa1e5a734e71989174",
+        "Size": 131584,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "jedeyesniv-art-pacman-ce-pc-recomp-pac-man-championship-edition",
@@ -1593,7 +1794,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "47d15962913edd4547afcbc396120a6a67b5c884",
     "ReadmeUrl": "https://github.com/jedeyesniv-art/Pacman-CE-PC-Recomp/blob/47d15962913edd4547afcbc396120a6a67b5c884/README.md",
     "ReleaseUrl": "https://github.com/jedeyesniv-art/Pacman-CE-PC-Recomp/releases/tag/v1.0.0",
@@ -1601,7 +1802,17 @@
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "PacManCE-1.0.0-windows.zip",
+        "Url": "https://github.com/jedeyesniv-art/Pacman-CE-PC-Recomp/releases/download/v1.0.0/PacManCE-1.0.0-windows.zip",
+        "Sha256": "d056f96e5e69746b0d56aa9d11317ac96cf48922282c97bbf388ecf53e2214a8",
+        "Size": 8913751,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "nikolaygorb-perfectdarkzerorecomp-perfect-dark-zero",
@@ -1611,11 +1822,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "c9b666f77793feb53f4fd7e0713abced0923e868",
-    "ReadmeUrl": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/blob/c9b666f77793feb53f4fd7e0713abced0923e868/README.md",
-    "ReleaseUrl": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/releases/tag/1.8",
-    "ReleaseTag": "1.8",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "5bcd8d85cb32a7fbf065131a8d718332cf5c498a",
+    "ReadmeUrl": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/blob/5bcd8d85cb32a7fbf065131a8d718332cf5c498a/README.md",
+    "ReleaseUrl": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/releases/tag/1.9",
+    "ReleaseTag": "1.9",
     "Platforms": [
       "Windows",
       "Linux",
@@ -1624,9 +1835,9 @@
     "Assets": [
       {
         "Name": "PDZrecomp-win64.zip",
-        "Url": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/releases/download/1.8/PDZrecomp-win64.zip",
-        "Sha256": "b9c08fe82b4235150e130a0a72ae7a282ad4746f759f10e1075c5a9befe42448",
-        "Size": 31430326,
+        "Url": "https://github.com/nikolaygorb/PerfectDarkZeroRecomp/releases/download/1.9/PDZrecomp-win64.zip",
+        "Sha256": "21be8e1d9836546846f002cf80d0a9170cea8149bbf8f51d29d46c1cce823f6a",
+        "Size": 31948491,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -1641,15 +1852,24 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "03ffacb429bdb7243d09f09362c4bdd2fc977d3f",
-    "ReadmeUrl": "https://github.com/ElGuslml/PiratesAtWorldsEndRecomp/blob/03ffacb429bdb7243d09f09362c4bdd2fc977d3f/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e4758c3cc23a9515b8266d557e58456c3021dc3c",
+    "ReadmeUrl": "https://github.com/ElGuslml/PiratesAtWorldsEndRecomp/blob/e4758c3cc23a9515b8266d557e58456c3021dc3c/README.md",
     "ReleaseUrl": "https://github.com/ElGuslml/PiratesAtWorldsEndRecomp/releases/tag/v0.3.0",
     "ReleaseTag": "v0.3.0",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
+      {
+        "Name": "PiratesAtWorldsEndRecomp-v0.3.0-setup.exe",
+        "Url": "https://github.com/ElGuslml/PiratesAtWorldsEndRecomp/releases/download/v0.3.0/PiratesAtWorldsEndRecomp-v0.3.0-setup.exe",
+        "Sha256": "e4650961eef5cb93d77fa0b4548e77768eed61850e9f9c8d96c06681fbd5e8a0",
+        "Size": 33262937,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
       {
         "Name": "PiratesAtWorldsEndRecomp-v0.3.0-windows-x64.zip",
         "Url": "https://github.com/ElGuslml/PiratesAtWorldsEndRecomp/releases/download/v0.3.0/PiratesAtWorldsEndRecomp-v0.3.0-windows-x64.zip",
@@ -1669,17 +1889,27 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b16fb496406a06f5799ce852144469ba426d05c4",
     "ReadmeUrl": "https://github.com/ITSeniy/pvz-console-edition/blob/b16fb496406a06f5799ce852144469ba426d05c4/README.md",
-    "ReleaseUrl": "https://github.com/ITSeniy/pvz-console-edition/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/ITSeniy/pvz-console-edition/releases/tag/v0.7.0",
+    "ReleaseTag": "v0.7.0",
     "Platforms": [
       "Windows",
       "Linux",
       "macOS"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "pvz-console-edition-0.7.0-win-x64.zip",
+        "Url": "https://github.com/ITSeniy/pvz-console-edition/releases/download/v0.7.0/pvz-console-edition-0.7.0-win-x64.zip",
+        "Sha256": "6999fd2521c4775c06c086fef080a30f539115b300d8c365e668fa72b750466d",
+        "Size": 20707931,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mysteriousaeon-rayman3-hd-recompiled-rayman-3-hd",
@@ -1689,15 +1919,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "baa009539916eda9c166795d26b4080f0d6c0b71",
-    "ReadmeUrl": "https://github.com/MysteriousAeon/rayman3-hd-recompiled/blob/baa009539916eda9c166795d26b4080f0d6c0b71/README.md",
-    "ReleaseUrl": "https://github.com/MysteriousAeon/rayman3-hd-recompiled/releases/tag/v1.0.2",
-    "ReleaseTag": "v1.0.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a93b1f54b184aa5494c84147e6ee5d94d06d5d88",
+    "ReadmeUrl": "https://github.com/MysteriousAeon/rayman3-hd-recompiled/blob/a93b1f54b184aa5494c84147e6ee5d94d06d5d88/README.md",
+    "ReleaseUrl": "https://github.com/MysteriousAeon/rayman3-hd-recompiled/releases/tag/v1.1.0",
+    "ReleaseTag": "v1.1.0",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "Rayman3HDRecompiled-1.1.0-setup.exe",
+        "Url": "https://github.com/MysteriousAeon/rayman3-hd-recompiled/releases/download/v1.1.0/Rayman3HDRecompiled-1.1.0-setup.exe",
+        "Sha256": "ff7b51cf00c56a78a66a8bdbe29d24b55d093ce3b72b25b328f2da4b27e0963b",
+        "Size": 17194467,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "tokeneffortports-recompiledsteel-real-steel",
@@ -1707,7 +1947,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "d16444f9c6e121f27fbc828140ae41c0a1cf6289",
     "ReadmeUrl": "https://github.com/tokeneffortports/ReCompiledSteel/blob/d16444f9c6e121f27fbc828140ae41c0a1cf6289/README.md",
     "ReleaseUrl": "https://github.com/tokeneffortports/ReCompiledSteel/releases/tag/v0.2.0",
@@ -1745,7 +1985,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "277f19433e85e78b08495e3b8d5069bb06453947",
     "ReadmeUrl": "https://github.com/psxrestore/VeronicaRecomp/blob/277f19433e85e78b08495e3b8d5069bb06453947/README.md",
     "ReleaseUrl": "https://github.com/psxrestore/VeronicaRecomp/releases",
@@ -1764,7 +2004,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "50d1c9d3268eff1ada34a413b026697a02331e0a",
     "ReadmeUrl": "https://github.com/Sirhalo23/RidgeRacer6-Recompilation/blob/50d1c9d3268eff1ada34a413b026697a02331e0a/README.md",
     "ReleaseUrl": "https://github.com/Sirhalo23/RidgeRacer6-Recompilation/releases/tag/v0.1.5",
@@ -1783,15 +2023,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ee18b25eae16ed321aa9cd9e7a2eef7594fc825a",
     "ReadmeUrl": "https://github.com/davidptrssvea/Table-Tennis-Rockstar-PC/blob/ee18b25eae16ed321aa9cd9e7a2eef7594fc825a/README.md",
-    "ReleaseUrl": "https://github.com/davidptrssvea/Table-Tennis-Rockstar-PC/releases/tag/v1.0.1",
-    "ReleaseTag": "v1.0.1",
+    "ReleaseUrl": "https://github.com/davidptrssvea/Table-Tennis-Rockstar-PC/releases/tag/v1.0.5",
+    "ReleaseTag": "v1.0.5",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "Install-Table-Tennis.exe",
+        "Url": "https://github.com/davidptrssvea/Table-Tennis-Rockstar-PC/releases/download/v1.0.5/Install-Table-Tennis.exe",
+        "Sha256": "4e3cdbcf1f18d209dcfb753115eaed1ab8bd77ecbefcba222c880d56a7dee7f3",
+        "Size": 277504,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "revan67-rumblerosesxx-recomp-rumble-roses-xx",
@@ -1801,7 +2051,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "2fe1790720bebca7c42c49fa0eaf96d54c3c839c",
     "ReadmeUrl": "https://github.com/Revan67/RumbleRosesXX-Recomp/blob/2fe1790720bebca7c42c49fa0eaf96d54c3c839c/README.md",
     "ReleaseUrl": "https://github.com/Revan67/RumbleRosesXX-Recomp/releases",
@@ -1819,7 +2069,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "356fa346d45572b74d6600dce4755f2d5e54abe7",
     "ReadmeUrl": "https://github.com/cookingwithsimon/Skate1Recompiled/blob/356fa346d45572b74d6600dce4755f2d5e54abe7/README.md",
     "ReleaseUrl": "https://github.com/cookingwithsimon/Skate1Recompiled/releases/tag/v0.2.0",
@@ -1838,7 +2088,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "8ee61b4865a52d1273ae5b39be9c2d41cbfd1f20",
     "ReadmeUrl": "https://github.com/HelmXGaming/Skate-3-Recompiled--Work-in-Progress-/blob/8ee61b4865a52d1273ae5b39be9c2d41cbfd1f20/README.md",
     "ReleaseUrl": "https://github.com/HelmXGaming/Skate-3-Recompiled--Work-in-Progress-/releases",
@@ -1856,7 +2106,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "c71741831151102ecc1bfd49049012a7bec15292",
     "ReadmeUrl": "https://github.com/darchap/Skate3-Port/blob/c71741831151102ecc1bfd49049012a7bec15292/README.md",
     "ReleaseUrl": "https://github.com/darchap/Skate3-Port/releases/tag/v1.3.3",
@@ -1894,7 +2144,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Skate 3 (VR).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "4ebce66df7041a3b083e15af382586f98cc23bfe",
     "ReadmeUrl": "https://github.com/whachuvr/Skate3VR/blob/4ebce66df7041a3b083e15af382586f98cc23bfe/README.md",
     "ReleaseUrl": "https://github.com/whachuvr/Skate3VR/releases",
@@ -1912,9 +2162,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "dd91996040e37e1245729055f83d72c69c3b78f0",
-    "ReadmeUrl": "https://github.com/sonicnext-dev/MarathonRecomp/blob/dd91996040e37e1245729055f83d72c69c3b78f0/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f3aff5a134f78e6f153cd07b50ab32d825b2bb61",
+    "ReadmeUrl": "https://github.com/sonicnext-dev/MarathonRecomp/blob/f3aff5a134f78e6f153cd07b50ab32d825b2bb61/README.md",
     "ReleaseUrl": "https://github.com/sonicnext-dev/MarathonRecomp/releases",
     "ReleaseTag": "",
     "Platforms": [
@@ -1932,7 +2182,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c",
     "ReadmeUrl": "https://github.com/hedge-dev/UnleashedRecomp/blob/cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c/README.md",
     "ReleaseUrl": "https://github.com/hedge-dev/UnleashedRecomp/releases/tag/v1.0.3",
@@ -1952,7 +2202,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "6b68caed6de37fd62ab585375b81e1b7287cf25c",
     "ReadmeUrl": "https://github.com/TekRantGaming/south-park-tower-defense-recompiled/blob/6b68caed6de37fd62ab585375b81e1b7287cf25c/README.md",
     "ReleaseUrl": "https://github.com/TekRantGaming/south-park-tower-defense-recompiled/releases/tag/v0.1.0",
@@ -1990,7 +2240,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "1de5a89f6db722f922f4ead1a3ca5925da389ebd",
     "ReadmeUrl": "https://github.com/TekRantGaming/south-park-tenormans-revenge-recompiled/blob/1de5a89f6db722f922f4ead1a3ca5925da389ebd/README.md",
     "ReleaseUrl": "https://github.com/TekRantGaming/south-park-tenormans-revenge-recompiled/releases/tag/v0.1.0",
@@ -2028,30 +2278,30 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "97a8fecb60ec3bb6504686fb5da2108fb37a9f37",
-    "ReadmeUrl": "https://github.com/saulob/ssf2t-hd-remix-recompiled/blob/97a8fecb60ec3bb6504686fb5da2108fb37a9f37/README.md",
-    "ReleaseUrl": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/tag/v0.2.2",
-    "ReleaseTag": "v0.2.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "10f029c69e436cb1701e89551ff685faaa1f5a3e",
+    "ReadmeUrl": "https://github.com/saulob/ssf2t-hd-remix-recompiled/blob/10f029c69e436cb1701e89551ff685faaa1f5a3e/README.md",
+    "ReleaseUrl": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/tag/v0.3.0",
+    "ReleaseTag": "v0.3.0",
     "Platforms": [
       "Windows",
       "Linux"
     ],
     "Assets": [
       {
-        "Name": "SSF2THDRemix-v0.2.2-windows-x64.zip",
-        "Url": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/download/v0.2.2/SSF2THDRemix-v0.2.2-windows-x64.zip",
-        "Sha256": "e23ad87fb57ec27edd79b42597a080d2bf78d2630542b3350c52ba0c940df8c2",
-        "Size": 18192951,
+        "Name": "SSF2THDRemix-v0.3.0-windows-x64.zip",
+        "Url": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/download/v0.3.0/SSF2THDRemix-v0.3.0-windows-x64.zip",
+        "Sha256": "d8d77de616fbb35d00f50af966f92008d192da5fe5f9f376fcb7fbc81c2a4ce7",
+        "Size": 29582392,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
       },
       {
-        "Name": "SSF2THDRemix-v0.2.2-x86_64.AppImage",
-        "Url": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/download/v0.2.2/SSF2THDRemix-v0.2.2-x86_64.AppImage",
-        "Sha256": "d83ff83095ce58600cee1ca4c5274b0ac80e943cb2e59490f95f7285907f4616",
-        "Size": 17180992,
+        "Name": "SSF2THDRemix-v0.3.0-x86_64.AppImage",
+        "Url": "https://github.com/saulob/ssf2t-hd-remix-recompiled/releases/download/v0.3.0/SSF2THDRemix-v0.3.0-x86_64.AppImage",
+        "Sha256": "c59887aba4afd98609aa37d6df7438942a648047b0cdbfbab8b27831d46e4372",
+        "Size": 25389376,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
@@ -2066,7 +2316,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : Tekken 6 (Tekken6-native-online).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f68b65b253d85f2627f4501b6c35125243f770fe",
     "ReadmeUrl": "https://github.com/Ekspym/Tekken6-native-online/blob/f68b65b253d85f2627f4501b6c35125243f770fe/README.md",
     "ReleaseUrl": "https://github.com/Ekspym/Tekken6-native-online/releases/tag/v2.5.0",
@@ -2084,9 +2334,9 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "007c523fae876079d74bd9265fb04009e17c6514",
-    "ReadmeUrl": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/blob/007c523fae876079d74bd9265fb04009e17c6514/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8fc8036a4bd8309905b1311310cee5bddc199bc6",
+    "ReadmeUrl": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/blob/8fc8036a4bd8309905b1311310cee5bddc199bc6/README.md",
     "ReleaseUrl": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/releases/tag/v0.1.7",
     "ReleaseTag": "v0.1.7",
     "Platforms": [
@@ -2095,28 +2345,10 @@
     ],
     "Assets": [
       {
-        "Name": "ttt2-server-0.1.7-linux-amd64.tar.gz",
-        "Url": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/releases/download/v0.1.7/ttt2-server-0.1.7-linux-amd64.tar.gz",
-        "Sha256": "a235483d80754bfe7fceb7ab5c62b0e0ab36df00856f9ef6069c6d772ac0cc4e",
-        "Size": 6187171,
-        "RuntimeIdentifiers": [
-          "linux-x64"
-        ]
-      },
-      {
-        "Name": "ttt2-server-0.1.7-linux-arm64.tar.gz",
-        "Url": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/releases/download/v0.1.7/ttt2-server-0.1.7-linux-arm64.tar.gz",
-        "Sha256": "32e12313b7f4a46c4effc2bb79df5057c9935b24495420c3f1609378f4585317",
-        "Size": 5708852,
-        "RuntimeIdentifiers": [
-          "linux-arm64"
-        ]
-      },
-      {
-        "Name": "ttt2-server-0.1.7-windows-amd64.zip",
-        "Url": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/releases/download/v0.1.7/ttt2-server-0.1.7-windows-amd64.zip",
-        "Sha256": "a5d9595b044d28b73c51e9c6f006a404ef360a0e80c0561da0c4e8f88d04ff3f",
-        "Size": 6257361,
+        "Name": "ttt2_setup.exe",
+        "Url": "https://github.com/shihabal3amri/tekken-tag-tournament-2-pc/releases/download/v0.1.7/ttt2_setup.exe",
+        "Sha256": "2649442f5a82122bbb432cad93f612b241aa842c4dfb68330a7ad14b97638941",
+        "Size": 66564096,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -2131,15 +2363,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "12d6fb9c0fc60a6c5a0e801179d2b357f345706e",
-    "ReadmeUrl": "https://github.com/thatcalikid760/TTT2-Recomp/blob/12d6fb9c0fc60a6c5a0e801179d2b357f345706e/README.md",
-    "ReleaseUrl": "https://github.com/thatcalikid760/TTT2-Recomp/releases/tag/v0.2.7",
-    "ReleaseTag": "v0.2.7",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e0063a27862fd1a415af1fbfba54e0d1239b6357",
+    "ReadmeUrl": "https://github.com/thatcalikid760/TTT2-Recomp/blob/e0063a27862fd1a415af1fbfba54e0d1239b6357/README.md",
+    "ReleaseUrl": "https://github.com/thatcalikid760/TTT2-Recomp/releases/tag/v0.2.8",
+    "ReleaseTag": "v0.2.8",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "ttt2_setup.exe",
+        "Url": "https://github.com/thatcalikid760/TTT2-Recomp/releases/download/v0.2.8/ttt2_setup.exe",
+        "Sha256": "5a05c8b8f0749191db8668c699baf83c7f13d9a31ce9c78a7bbad7c974c42f94",
+        "Size": 82909184,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mdomangue26-the-bigs-2-recompiled-the-bigs-2",
@@ -2149,7 +2391,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "4947e569b3d86cc11ead1ee485e88fc9a6ed9ac9",
     "ReadmeUrl": "https://github.com/mdomangue26/The-Bigs-2-Recompiled/blob/4947e569b3d86cc11ead1ee485e88fc9a6ed9ac9/README.md",
     "ReleaseUrl": "https://github.com/mdomangue26/The-Bigs-2-Recompiled/releases/tag/v1.1",
@@ -2196,15 +2438,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b5603ac4202b4a8083c4f1476cd5fa258e93f133",
     "ReadmeUrl": "https://github.com/invinceble55-wq/Estacado-The-Darkness-Recomp/blob/b5603ac4202b4a8083c4f1476cd5fa258e93f133/README.md",
-    "ReleaseUrl": "https://github.com/invinceble55-wq/Estacado-The-Darkness-Recomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/invinceble55-wq/Estacado-The-Darkness-Recomp/releases/tag/v0.9.8",
+    "ReleaseTag": "v0.9.8",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "Estacado-0.9.8-windows-x64.zip",
+        "Url": "https://github.com/invinceble55-wq/Estacado-The-Darkness-Recomp/releases/download/v0.9.8/Estacado-0.9.8-windows-x64.zip",
+        "Sha256": "b30cab28fe41491c05db7a156f2357f32afdaec1bd8adb826960a47b6100d613",
+        "Size": 123003992,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "sp00nznet-simpsonsarcade-the-simpsons-arcade",
@@ -2214,7 +2466,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "527f163b697a3c72164d9330544777d9b0cd44db",
     "ReadmeUrl": "https://github.com/sp00nznet/simpsonsarcade/blob/527f163b697a3c72164d9330544777d9b0cd44db/README.md",
     "ReleaseUrl": "https://github.com/sp00nznet/simpsonsarcade/releases",
@@ -2232,7 +2484,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "3f83acc5c555d2dad0d8f8abc9644c47a3dcec22",
     "ReadmeUrl": "https://github.com/portingpete/the-simpsons-recomp/blob/3f83acc5c555d2dad0d8f8abc9644c47a3dcec22/README.md",
     "ReleaseUrl": "https://github.com/portingpete/the-simpsons-recomp/releases",
@@ -2269,7 +2521,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "a510fc771505aa409d075e79e590e8a1d5cbf66c",
     "ReadmeUrl": "https://github.com/crabinacrabic/VivaPinataRecomp/blob/a510fc771505aa409d075e79e590e8a1d5cbf66c/README.md",
     "ReleaseUrl": "https://github.com/crabinacrabic/VivaPinataRecomp/releases",
@@ -2287,7 +2539,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "6c2aee68aaba992e12375178c9366abe4245f549",
     "ReadmeUrl": "https://github.com/nikolaygorb/WetRecomp/blob/6c2aee68aaba992e12375178c9366abe4245f549/README.md",
     "ReleaseUrl": "https://github.com/nikolaygorb/WetRecomp/releases/tag/1.5",
@@ -2316,9 +2568,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : WWE '12 (wwe12-pc).",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "6fb1dbe1088608b79723345a662dcca34e1737e4",
-    "ReadmeUrl": "https://github.com/iMrBurn/wwe12-pc/blob/6fb1dbe1088608b79723345a662dcca34e1737e4/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d94a44b4e96756e7a0d4fbd714a37d52f451c8e1",
+    "ReadmeUrl": "https://github.com/iMrBurn/wwe12-pc/blob/d94a44b4e96756e7a0d4fbd714a37d52f451c8e1/README.md",
     "ReleaseUrl": "https://github.com/iMrBurn/wwe12-pc/releases/tag/v0.9.0-beta",
     "ReleaseTag": "v0.9.0-beta",
     "Platforms": [
@@ -2334,7 +2586,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "d6574985f7e73ab2a4c09f68684aba49ba454d07",
     "ReadmeUrl": "https://github.com/PromethenDev/wwe13-recomp/blob/d6574985f7e73ab2a4c09f68684aba49ba454d07/README.md",
     "ReleaseUrl": "https://github.com/PromethenDev/wwe13-recomp/releases/tag/v1.5",
@@ -2353,9 +2605,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "4fc6031de78d8cc2fd68a5c8f505cce2be80ef00",
-    "ReadmeUrl": "https://github.com/Jarrodfeng/wwe2k14-recomp/blob/4fc6031de78d8cc2fd68a5c8f505cce2be80ef00/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8d84affa091b839401c0126146f0ade955d2ac78",
+    "ReadmeUrl": "https://github.com/Jarrodfeng/wwe2k14-recomp/blob/8d84affa091b839401c0126146f0ade955d2ac78/README.md",
     "ReleaseUrl": "https://github.com/Jarrodfeng/wwe2k14-recomp/releases/tag/v0.2.12",
     "ReleaseTag": "v0.2.12",
     "Platforms": [
@@ -2371,9 +2623,9 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "d16cbd6bab83a3bde8eacf12ad932879709f85d2",
-    "ReadmeUrl": "https://github.com/PromethenDev/wwe2k14-recomp/blob/d16cbd6bab83a3bde8eacf12ad932879709f85d2/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "24c471c8155aaa08d7266519be75ea6df440e536",
+    "ReadmeUrl": "https://github.com/PromethenDev/wwe2k14-recomp/blob/24c471c8155aaa08d7266519be75ea6df440e536/README.md",
     "ReleaseUrl": "https://github.com/PromethenDev/wwe2k14-recomp/releases/tag/v1.4.2",
     "ReleaseTag": "v1.4.2",
     "Platforms": [
@@ -2390,7 +2642,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme. Intitulé amont : WWE 2K14 (WWE2K14-PC).",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "064ebd8a55fabd25f0b78e500f7fdc9d39c8a921",
     "ReadmeUrl": "https://github.com/itsbybanshee/wwe2k14-pc/blob/064ebd8a55fabd25f0b78e500f7fdc9d39c8a921/README.md",
     "ReleaseUrl": "https://github.com/itsbybanshee/wwe2k14-pc/releases/tag/v1.1.0",
@@ -2408,7 +2660,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "be305ece6e866c96c327ac2f206307c69857e1d5",
     "ReadmeUrl": "https://github.com/itsbybanshee/wwe2k16-pc/blob/be305ece6e866c96c327ac2f206307c69857e1d5/README.md",
     "ReleaseUrl": "https://github.com/itsbybanshee/wwe2k16-pc/releases/tag/v1.1.0",
@@ -2426,7 +2678,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "34d7b71d926440262f14f6a6e2d9763494588498",
     "ReadmeUrl": "https://github.com/shaneomac1337/WWE-AllStars-Recomp/blob/34d7b71d926440262f14f6a6e2d9763494588498/README.md",
     "ReleaseUrl": "https://github.com/shaneomac1337/WWE-AllStars-Recomp/releases/tag/v1.7.0",
@@ -2455,15 +2707,25 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "2cd2793d5d235c83f90f109410ad75dad2aee857",
     "ReadmeUrl": "https://github.com/HollywoodAkeem/SVR07-Recomp/blob/2cd2793d5d235c83f90f109410ad75dad2aee857/README.md",
-    "ReleaseUrl": "https://github.com/HollywoodAkeem/SVR07-Recomp/releases/tag/v1.0",
-    "ReleaseTag": "v1.0",
+    "ReleaseUrl": "https://github.com/HollywoodAkeem/SVR07-Recomp/releases/tag/v0.5a",
+    "ReleaseTag": "v0.5a",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "svr07.exe",
+        "Url": "https://github.com/HollywoodAkeem/SVR07-Recomp/releases/download/v0.5a/svr07.exe",
+        "Sha256": "51c47cb773af2a57d3ba09723499e85a3e63f05e14fb1ec69b2c8fa2929206a7",
+        "Size": 48019456,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "nefariousjosiah-wwe-svr2007-recomp-wwe-smackdown-vs.-raw-2007",
@@ -2473,7 +2735,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ec3e37b86c04240892d03f30737cc382b9044ac4",
     "ReadmeUrl": "https://github.com/nefariousjosiah/WWE-SVR2007-RECOMP/blob/ec3e37b86c04240892d03f30737cc382b9044ac4/README.md",
     "ReleaseUrl": "https://github.com/nefariousjosiah/WWE-SVR2007-RECOMP/releases/tag/v2.2.1",
@@ -2492,7 +2754,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "92e93446954e5cbe15ffeb7f46f11f85dbc92dc2",
     "ReadmeUrl": "https://github.com/nefariousjosiah/WWE-SVR2008-RECOMP/blob/92e93446954e5cbe15ffeb7f46f11f85dbc92dc2/README.md",
     "ReleaseUrl": "https://github.com/nefariousjosiah/WWE-SVR2008-RECOMP/releases/tag/v2.2.1",
@@ -2502,5 +2764,1021 @@
       "Linux"
     ],
     "Assets": []
+  },
+  {
+    "Id": "nlwstein-skullburglar-50-cent-blood-on-the-sand",
+    "Title": "50 Cent: Blood on the Sand",
+    "Project": "skullburglar",
+    "Repository": "nlwstein/skullburglar",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f6311247bda2255e81057d23fe8fa88f95726251",
+    "ReadmeUrl": "https://github.com/nlwstein/skullburglar/blob/f6311247bda2255e81057d23fe8fa88f95726251/README.md",
+    "ReleaseUrl": "https://github.com/nlwstein/skullburglar/releases/tag/issue-12-test-build",
+    "ReleaseTag": "issue-12-test-build",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NOT-A-RELEASE-issue12-test-only-windows.zip",
+        "Url": "https://github.com/nlwstein/skullburglar/releases/download/issue-12-test-build/NOT-A-RELEASE-issue12-test-only-windows.zip",
+        "Sha256": "652033d0fb523cee5e36a1ea4fb13ece5dd2a924bf550d3aa6d279ea1783705d",
+        "Size": 1303844,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "pauloubirajara-asuras-wrath-recomp-asura-s-wrath",
+    "Title": "Asura's Wrath",
+    "Project": "asuras-wrath-recomp",
+    "Repository": "PauloUbirajara/asuras-wrath-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "92989e4d81731c17cecacbdf4414ef12ae5a8100",
+    "ReadmeUrl": "https://github.com/PauloUbirajara/asuras-wrath-recomp/blob/92989e4d81731c17cecacbdf4414ef12ae5a8100/README.md",
+    "ReleaseUrl": "https://github.com/PauloUbirajara/asuras-wrath-recomp/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "asura_wrath_recomp_windows_x86_64.zip",
+        "Url": "https://github.com/PauloUbirajara/asuras-wrath-recomp/releases/download/v0.3.1/asura_wrath_recomp_windows_x86_64.zip",
+        "Sha256": "283c34878135366a217dea33b61a652097b65d104d11e42de919085f7ba59da1",
+        "Size": 26889654,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "iron-jay-banjo-tooie-xbla-recomp-banjo-tooie",
+    "Title": "Banjo-Tooie",
+    "Project": "banjo_tooie_xbla_recomp",
+    "Repository": "iron-jay/banjo_tooie_xbla_recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "72c23973337398b361272fd4949d6d6274746585",
+    "ReadmeUrl": "https://github.com/iron-jay/banjo_tooie_xbla_recomp/blob/72c23973337398b361272fd4949d6d6274746585/README.md",
+    "ReleaseUrl": "https://github.com/iron-jay/banjo_tooie_xbla_recomp/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Banjo-Tooie.exe",
+        "Url": "https://github.com/iron-jay/banjo_tooie_xbla_recomp/releases/download/v0.1.1/Banjo-Tooie.exe",
+        "Sha256": "bb6959bc01e361a504e95814d760441a37282305799d301e3a88756261f3bd6f",
+        "Size": 27760579,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "goshavindtburg-nx1recomp-call-of-duty-future-warfare",
+    "Title": "Call of Duty: Future Warfare",
+    "Project": "NX1recomp",
+    "Repository": "goshavindtburg/NX1recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "4b427572e0d27689614bb7c55f05934fd8b1b95c",
+    "ReadmeUrl": "https://github.com/goshavindtburg/NX1recomp/blob/4b427572e0d27689614bb7c55f05934fd8b1b95c/README.md",
+    "ReleaseUrl": "https://github.com/goshavindtburg/NX1recomp/releases/tag/0.9.2",
+    "ReleaseTag": "0.9.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "nx1_mp.exe",
+        "Url": "https://github.com/goshavindtburg/NX1recomp/releases/download/0.9.2/nx1_mp.exe",
+        "Sha256": "68515cbe19fe391872b58eddfc988fd71c4d3cb34972980166457d8e163b4685",
+        "Size": 57855488,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "paulcombal-mw2-recompiled-call-of-duty-modern-warfare-2",
+    "Title": "Call of Duty: Modern Warfare 2",
+    "Project": "mw2-recompiled",
+    "Repository": "PaulCombal/mw2-recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b",
+    "ReadmeUrl": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/README.md",
+    "ReleaseUrl": "https://github.com/PaulCombal/mw2-recompiled/releases/tag/v0.8.2",
+    "ReleaseTag": "v0.8.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "mw2-v0.8.2-windows-lan.zip",
+        "Url": "https://github.com/PaulCombal/mw2-recompiled/releases/download/v0.8.2/mw2-v0.8.2-windows-lan.zip",
+        "Sha256": "45d7bd0ba529f00bd7288f2f159a5036aaf76b08b1945b0e427da8b4415e4795",
+        "Size": 19096141,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "mw2-v0.8.2-windows-steam.zip",
+        "Url": "https://github.com/PaulCombal/mw2-recompiled/releases/download/v0.8.2/mw2-v0.8.2-windows-steam.zip",
+        "Sha256": "45d7bd0ba529f00bd7288f2f159a5036aaf76b08b1945b0e427da8b4415e4795",
+        "Size": 19096141,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "mw2-v0.8.2-windows.zip",
+        "Url": "https://github.com/PaulCombal/mw2-recompiled/releases/download/v0.8.2/mw2-v0.8.2-windows.zip",
+        "Sha256": "45d7bd0ba529f00bd7288f2f159a5036aaf76b08b1945b0e427da8b4415e4795",
+        "Size": 19096141,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "florinp93-hells-gate-recomp-dante-s-inferno",
+    "Title": "Dante's Inferno",
+    "Project": "hells-gate-recomp",
+    "Repository": "florinp93/hells-gate-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "dff9962fb8e7d76577238f420da2260d2885189f",
+    "ReadmeUrl": "https://github.com/florinp93/hells-gate-recomp/blob/dff9962fb8e7d76577238f420da2260d2885189f/README.md",
+    "ReleaseUrl": "https://github.com/florinp93/hells-gate-recomp/releases/tag/v0.8.5-beta",
+    "ReleaseTag": "v0.8.5-beta",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DantesInfernoInstaller.exe",
+        "Url": "https://github.com/florinp93/hells-gate-recomp/releases/download/v0.8.5-beta/DantesInfernoInstaller.exe",
+        "Sha256": "27f5def7e7151083b156758eacee6429c962a5f5cf7caddc580bca654c0359d9",
+        "Size": 19669315,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "portingpete-the-darkness-recomp-the-darkness",
+    "Title": "The Darkness",
+    "Project": "The-Darkness-Recomp",
+    "Repository": "portingpete/The-Darkness-Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "eda604756517c567c6a581e440a959c7c2c0bf2c",
+    "ReadmeUrl": "https://github.com/portingpete/The-Darkness-Recomp/blob/eda604756517c567c6a581e440a959c7c2c0bf2c/README.md",
+    "ReleaseUrl": "https://github.com/portingpete/The-Darkness-Recomp/releases/tag/v0.1.8",
+    "ReleaseTag": "v0.1.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "The-Darkness-Recomp-v0.1.8-windows-x64.zip",
+        "Url": "https://github.com/portingpete/The-Darkness-Recomp/releases/download/v0.1.8/The-Darkness-Recomp-v0.1.8-windows-x64.zip",
+        "Sha256": "8b623e36b1a1c28d8a0dc5ed3c0bd7a4426e5a50f6598245eed7e29834d981b5",
+        "Size": 44570424,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bifftannen1-dead-space-2-recomp-dead-space-2",
+    "Title": "Dead Space 2",
+    "Project": "Dead-Space-2-Recomp",
+    "Repository": "bifftannen1/Dead-Space-2-Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "97b9dac62ad10175874774ea0dcc8a9fd632893f",
+    "ReadmeUrl": "https://github.com/bifftannen1/Dead-Space-2-Recomp/blob/97b9dac62ad10175874774ea0dcc8a9fd632893f/README.md",
+    "ReleaseUrl": "https://github.com/bifftannen1/Dead-Space-2-Recomp/releases/tag/tu2-playtest-20261017",
+    "ReleaseTag": "tu2-playtest-20261017",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DS2-TU2-Playtest-20261017-Setup.exe",
+        "Url": "https://github.com/bifftannen1/Dead-Space-2-Recomp/releases/download/tu2-playtest-20261017/DS2-TU2-Playtest-20261017-Setup.exe",
+        "Sha256": "8faa90abff45bde8552111dea2bff044559c7ed20ae60858643561cdc8108409",
+        "Size": 29777721,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "djultra64-fight-night-round-3-recomp-fight-night-round-3",
+    "Title": "Fight Night Round 3",
+    "Project": "Fight-Night-Round-3-Recomp",
+    "Repository": "djultra64/Fight-Night-Round-3-Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "94ed19a5343cb7a80aaf93e56c896462d6150f8e",
+    "ReadmeUrl": "https://github.com/djultra64/Fight-Night-Round-3-Recomp/blob/94ed19a5343cb7a80aaf93e56c896462d6150f8e/README.md",
+    "ReleaseUrl": "https://github.com/djultra64/Fight-Night-Round-3-Recomp/releases/tag/v1.0.3",
+    "ReleaseTag": "v1.0.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Fight-Night-Round-3-Recomp-v1.0.3-win-amd64.zip",
+        "Url": "https://github.com/djultra64/Fight-Night-Round-3-Recomp/releases/download/v1.0.3/Fight-Night-Round-3-Recomp-v1.0.3-win-amd64.zip",
+        "Sha256": "4f51f3be12f3c3d6b5c07fdbf0a0a9fe0d4d1e0912aa1adfcd31aed5e02bdf61",
+        "Size": 17615248,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "fh1-reimagined-forzahorizon1-reimagined-forza-horizon",
+    "Title": "Forza Horizon",
+    "Project": "ForzaHorizon1-ReImagined",
+    "Repository": "FH1-ReImagined/ForzaHorizon1-ReImagined",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "ac77a379348850d50833fc2b0023096c73081f47",
+    "ReadmeUrl": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/blob/ac77a379348850d50833fc2b0023096c73081f47/README.md",
+    "ReleaseUrl": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/releases/tag/v0.2.3",
+    "ReleaseTag": "v0.2.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ForzaHorizon1-ReImagined-Setup-0.2.3.exe",
+        "Url": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/releases/download/v0.2.3/ForzaHorizon1-ReImagined-Setup-0.2.3.exe",
+        "Sha256": "ad7db65db259d056b793d30cc4a567df2ad2723a3363549aad17707643e8012e",
+        "Size": 83156889,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "fh1-reimagined-forzahorizon1-reimagined-forza-horizon-1",
+    "Title": "Forza Horizon 1",
+    "Project": "ForzaHorizon1-ReImagined",
+    "Repository": "FH1-ReImagined/ForzaHorizon1-ReImagined",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "ac77a379348850d50833fc2b0023096c73081f47",
+    "ReadmeUrl": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/blob/ac77a379348850d50833fc2b0023096c73081f47/README.md",
+    "ReleaseUrl": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/releases/tag/v0.2.3",
+    "ReleaseTag": "v0.2.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ForzaHorizon1-ReImagined-Setup-0.2.3.exe",
+        "Url": "https://github.com/FH1-ReImagined/ForzaHorizon1-ReImagined/releases/download/v0.2.3/ForzaHorizon1-ReImagined-Setup-0.2.3.exe",
+        "Sha256": "ad7db65db259d056b793d30cc4a567df2ad2723a3363549aad17707643e8012e",
+        "Size": 83156889,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "0herculabs-hl360-forza2-forza-motorsport-2",
+    "Title": "Forza Motorsport 2",
+    "Project": "hl360-Forza2",
+    "Repository": "0herculabs/hl360-Forza2",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "19400fe359214ce62f56cd4fa1f6c3605dca4b8e",
+    "ReadmeUrl": "https://github.com/0herculabs/hl360-Forza2/blob/19400fe359214ce62f56cd4fa1f6c3605dca4b8e/README.md",
+    "ReleaseUrl": "https://github.com/0herculabs/hl360-Forza2/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Forza2-Native-0.3.1-windows-x64.zip",
+        "Url": "https://github.com/0herculabs/hl360-Forza2/releases/download/v0.3.1/Forza2-Native-0.3.1-windows-x64.zip",
+        "Sha256": "9bf7689a6f3c4c8af3fcdd14ca57410503f0b395ecf7a0c0dca1ac5c8358609a",
+        "Size": 21028374,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "zer0ducksgiven-forza-motorsport-2-regpu-forza-motorsport-2",
+    "Title": "Forza Motorsport 2",
+    "Project": "Forza-Motorsport-2-ReGPU",
+    "Repository": "zer0ducksgiven/Forza-Motorsport-2-ReGPU",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0623b1fc407ff1aa41ed46c9b16bffc39d6ae960",
+    "ReadmeUrl": "https://github.com/zer0ducksgiven/Forza-Motorsport-2-ReGPU/blob/0623b1fc407ff1aa41ed46c9b16bffc39d6ae960/README.md",
+    "ReleaseUrl": "https://github.com/zer0ducksgiven/Forza-Motorsport-2-ReGPU/releases/tag/v0.10.5",
+    "ReleaseTag": "v0.10.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "FM2-Setup-0.10.5.exe",
+        "Url": "https://github.com/zer0ducksgiven/Forza-Motorsport-2-ReGPU/releases/download/v0.10.5/FM2-Setup-0.10.5.exe",
+        "Sha256": "f95c868f50d10330500fa82e2a1448cf5bc7f1fb8e2c52c8e64d30943f2f4876",
+        "Size": 74560000,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "alexbeav-fm4-recomp-forza-motorsport-4",
+    "Title": "Forza Motorsport 4",
+    "Project": "fm4-recomp",
+    "Repository": "Alexbeav/fm4-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e2108085cdf28a4a289bc03aa1212b314911ff1c",
+    "ReadmeUrl": "https://github.com/Alexbeav/fm4-recomp/blob/e2108085cdf28a4a289bc03aa1212b314911ff1c/README.md",
+    "ReleaseUrl": "https://github.com/Alexbeav/fm4-recomp/releases/tag/v0.1.0-alpha.2",
+    "ReleaseTag": "v0.1.0-alpha.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "fm4-recomp-0.1.0-alpha.2-win-x64.zip",
+        "Url": "https://github.com/Alexbeav/fm4-recomp/releases/download/v0.1.0-alpha.2/fm4-recomp-0.1.0-alpha.2-win-x64.zip",
+        "Sha256": "b4564292c3c137475de2b05974cb3cd1ba98a9ecd28434f46e3da3bf98f0f02a",
+        "Size": 54753905,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "i2kiselev-fm4-static-recomp-forza-motorsport-4",
+    "Title": "Forza Motorsport 4",
+    "Project": "fm4-static-recomp",
+    "Repository": "i2kiselev/fm4-static-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "241c26dd5723541f121ed999a30d03caa319e392",
+    "ReadmeUrl": "https://github.com/i2kiselev/fm4-static-recomp/blob/241c26dd5723541f121ed999a30d03caa319e392/README.md",
+    "ReleaseUrl": "https://github.com/i2kiselev/fm4-static-recomp/releases/tag/v0.3.0",
+    "ReleaseTag": "v0.3.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "FM4StaticRecompLauncher.exe",
+        "Url": "https://github.com/i2kiselev/fm4-static-recomp/releases/download/v0.3.0/FM4StaticRecompLauncher.exe",
+        "Sha256": "7ba649178a51901244dd60dd08909ced8ecfc8d2770fbe7493dea5a91f6ab643",
+        "Size": 45187443,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "missingthepixel-mtr-gwre2-geometry-wars-retro-evolved-2",
+    "Title": "Geometry Wars: Retro Evolved 2",
+    "Project": "MTR-GWRE2",
+    "Repository": "MissingThePixel/MTR-GWRE2",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f88c0a2d953ff06727829cb3840c29b4333a4d2e",
+    "ReadmeUrl": "https://github.com/MissingThePixel/MTR-GWRE2/blob/f88c0a2d953ff06727829cb3840c29b4333a4d2e/README.md",
+    "ReleaseUrl": "https://github.com/MissingThePixel/MTR-GWRE2/releases/tag/v0.1.3",
+    "ReleaseTag": "v0.1.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MTR-GWRE2-windows-x64.zip",
+        "Url": "https://github.com/MissingThePixel/MTR-GWRE2/releases/download/v0.1.3/MTR-GWRE2-windows-x64.zip",
+        "Sha256": "7045bc55d65f26eff92bf0b03d8fc75500978250fa3c09339c66f5d8e3af1ef2",
+        "Size": 8443739,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "MTR-GWRE2.exe",
+        "Url": "https://github.com/MissingThePixel/MTR-GWRE2/releases/download/v0.1.3/MTR-GWRE2.exe",
+        "Sha256": "8d62d8b60787cf524cdcec2a22943f495a4f5676930b96ee218193671c5fe6a1",
+        "Size": 720896,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "anishchandra24-juiced2-recompiled-juiced-2-hot-import-nights",
+    "Title": "Juiced 2: Hot Import Nights",
+    "Project": "Juiced2-Recompiled",
+    "Repository": "anishchandra24/Juiced2-Recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "cd5cb875673fa13b0654bed26869341ae30aab19",
+    "ReadmeUrl": "https://github.com/anishchandra24/Juiced2-Recompiled/blob/cd5cb875673fa13b0654bed26869341ae30aab19/README.md",
+    "ReleaseUrl": "https://github.com/anishchandra24/Juiced2-Recompiled/releases/tag/v0.1.0-preview",
+    "ReleaseTag": "v0.1.0-preview",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Juiced2-Recompiled-Setup.exe",
+        "Url": "https://github.com/anishchandra24/Juiced2-Recompiled/releases/download/v0.1.0-preview/Juiced2-Recompiled-Setup.exe",
+        "Sha256": "a4455e4d416689b8c6b780881dbe51df8bb9716a2a8c713b2adb7ae7f627300a",
+        "Size": 44544,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "nevercookfirst-dimensionsrecomp-lego-dimensions",
+    "Title": "LEGO Dimensions",
+    "Project": "DimensionsRecomp",
+    "Repository": "NeverCookFirst/DimensionsRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a56de4245dbe2ea7f0d7aa6fb7637ebc29a3bed7",
+    "ReadmeUrl": "https://github.com/NeverCookFirst/DimensionsRecomp/blob/a56de4245dbe2ea7f0d7aa6fb7637ebc29a3bed7/README.md",
+    "ReleaseUrl": "https://github.com/NeverCookFirst/DimensionsRecomp/releases/tag/v0.1.38",
+    "ReleaseTag": "v0.1.38",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DimensionsRecompiled-Setup.exe",
+        "Url": "https://github.com/NeverCookFirst/DimensionsRecomp/releases/download/v0.1.38/DimensionsRecompiled-Setup.exe",
+        "Sha256": "e9c23cd75ffce9b90e90bdc411d6b0084155cda398548baed36a0a2bf7f16d9c",
+        "Size": 322021827,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "freefrank-lostodysseyrecomp-lost-odyssey",
+    "Title": "Lost Odyssey",
+    "Project": "LostOdysseyRecomp",
+    "Repository": "freefrank/LostOdysseyRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f9da0ae9bdd481a5ea4fe6431f3a4724d8261147",
+    "ReadmeUrl": "https://github.com/freefrank/LostOdysseyRecomp/blob/f9da0ae9bdd481a5ea4fe6431f3a4724d8261147/README.md",
+    "ReleaseUrl": "https://github.com/freefrank/LostOdysseyRecomp/releases/tag/v1.1.0",
+    "ReleaseTag": "v1.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LostOdysseyRecomp-windows-x64-v1.1.0.zip",
+        "Url": "https://github.com/freefrank/LostOdysseyRecomp/releases/download/v1.1.0/LostOdysseyRecomp-windows-x64-v1.1.0.zip",
+        "Sha256": "df82ac4e111f4c23ef925e6c044676e045bca421b657efbb4234591ddc6cb9ab",
+        "Size": 154696631,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "anishchandra24-maddennfl08-recompiled-madden-nfl-08",
+    "Title": "Madden NFL 08",
+    "Project": "MaddenNFL08-Recompiled",
+    "Repository": "anishchandra24/MaddenNFL08-Recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "be27a45ee6d3b5cc2c6c60ae0dc23db132f8ee8b",
+    "ReadmeUrl": "https://github.com/anishchandra24/MaddenNFL08-Recompiled/blob/be27a45ee6d3b5cc2c6c60ae0dc23db132f8ee8b/README.md",
+    "ReleaseUrl": "https://github.com/anishchandra24/MaddenNFL08-Recompiled/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MaddenNFL08-Recompiled-Setup.exe",
+        "Url": "https://github.com/anishchandra24/MaddenNFL08-Recompiled/releases/download/v0.1.0/MaddenNFL08-Recompiled-Setup.exe",
+        "Sha256": "d47bdd5fd48f4dab41c9f5d7eb3847fa280e22e089792a8fb2ddcc137207d3fb",
+        "Size": 530432,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jorjbarbosa-broken-bond-recomp-naruto-the-broken-bond",
+    "Title": "Naruto: The Broken Bond",
+    "Project": "broken-bond-recomp",
+    "Repository": "jorjbarbosa/broken-bond-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c6b3fac7e6867f810ff8258a5d1dc73ce2edad5a",
+    "ReadmeUrl": "https://github.com/jorjbarbosa/broken-bond-recomp/blob/c6b3fac7e6867f810ff8258a5d1dc73ce2edad5a/README.md",
+    "ReleaseUrl": "https://github.com/jorjbarbosa/broken-bond-recomp/releases/tag/v0.1.0-beta",
+    "ReleaseTag": "v0.1.0-beta",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "broken-bond-recomp-win-amd64.zip",
+        "Url": "https://github.com/jorjbarbosa/broken-bond-recomp/releases/download/v0.1.0-beta/broken-bond-recomp-win-amd64.zip",
+        "Sha256": "5f38c9d52da3027d9b882055d10298aaaaa36022ff3a5277854ce7a5074ce6c7",
+        "Size": 69721490,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "BrokenBondInstaller.exe",
+        "Url": "https://github.com/jorjbarbosa/broken-bond-recomp/releases/download/v0.1.0-beta/BrokenBondInstaller.exe",
+        "Sha256": "0d82daf0660635ffd67d75097799b69ab557d09dc0e3176b01165b5575a9b5eb",
+        "Size": 59186070,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "madelrandel-blip-nfsmw-recompiled-need-for-speed-most-wanted",
+    "Title": "Need for Speed: Most Wanted",
+    "Project": "NFSMW-Recompiled",
+    "Repository": "madelrandel-blip/NFSMW-Recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e58cdf389ddb8ba655d9edbeb41811ea57a45012",
+    "ReadmeUrl": "https://github.com/madelrandel-blip/NFSMW-Recompiled/blob/e58cdf389ddb8ba655d9edbeb41811ea57a45012/README.md",
+    "ReleaseUrl": "https://github.com/madelrandel-blip/NFSMW-Recompiled/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NFSMW-Recomp-1.0.2-Windows-x64.zip",
+        "Url": "https://github.com/madelrandel-blip/NFSMW-Recompiled/releases/download/v1.0.2/NFSMW-Recomp-1.0.2-Windows-x64.zip",
+        "Sha256": "fc8483f9bb7792941f6d4076cedaacb3c9db7cb0aeaa6fd80579e9a608de7b97",
+        "Size": 57321784,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "tekrantgaming-outpost-kaloki-x-recompiled-outpost-kaloki-x",
+    "Title": "Outpost Kaloki X",
+    "Project": "outpost-kaloki-x-recompiled",
+    "Repository": "TekRantGaming/outpost-kaloki-x-recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3ab8fef1da00490e8d6d42f034b9771d39ed6e02",
+    "ReadmeUrl": "https://github.com/TekRantGaming/outpost-kaloki-x-recompiled/blob/3ab8fef1da00490e8d6d42f034b9771d39ed6e02/README.md",
+    "ReleaseUrl": "https://github.com/TekRantGaming/outpost-kaloki-x-recompiled/releases/tag/v1.1.1",
+    "ReleaseTag": "v1.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "OutpostKalokiX-v1.1.1-windows-x64.zip",
+        "Url": "https://github.com/TekRantGaming/outpost-kaloki-x-recompiled/releases/download/v1.1.1/OutpostKalokiX-v1.1.1-windows-x64.zip",
+        "Sha256": "0ea63e834df5d565479b473c8671a3088ba9f8a1fc8c76a44174d33371ba9ca0",
+        "Size": 9505124,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "nikolaygorb-perfectdarkremasterrecomp-perfect-dark-remaster",
+    "Title": "Perfect Dark Remaster",
+    "Project": "PerfectDarkRemasterRecomp",
+    "Repository": "nikolaygorb/PerfectDarkRemasterRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0407258f3e5ee511458d7ccb1878e0605146ff9b",
+    "ReadmeUrl": "https://github.com/nikolaygorb/PerfectDarkRemasterRecomp/blob/0407258f3e5ee511458d7ccb1878e0605146ff9b/README.md",
+    "ReleaseUrl": "https://github.com/nikolaygorb/PerfectDarkRemasterRecomp/releases/tag/1.5",
+    "ReleaseTag": "1.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PerfectDarkRemaster-win64.zip",
+        "Url": "https://github.com/nikolaygorb/PerfectDarkRemasterRecomp/releases/download/1.5/PerfectDarkRemaster-win64.zip",
+        "Sha256": "0d89798369277e19e2328c9a56ab414e75bd6c9c1800ad6d34ccee53a92ce74e",
+        "Size": 17409966,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "matt-code-d-saw2recomp-saw-ii-flesh-blood",
+    "Title": "Saw II: Flesh & Blood",
+    "Project": "Saw2Recomp",
+    "Repository": "Matt-code-d/Saw2Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "29d2ac98ee667dc7dbb7badd4d1036cbec216e18",
+    "ReadmeUrl": "https://github.com/Matt-code-d/Saw2Recomp/blob/29d2ac98ee667dc7dbb7badd4d1036cbec216e18/README.md",
+    "ReleaseUrl": "https://github.com/Matt-code-d/Saw2Recomp/releases/tag/v0.1.7",
+    "ReleaseTag": "v0.1.7",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Saw2Recomp-0.1.7-win-amd64.zip",
+        "Url": "https://github.com/Matt-code-d/Saw2Recomp/releases/download/v0.1.7/Saw2Recomp-0.1.7-win-amd64.zip",
+        "Sha256": "57f75cf568af64320338135520439d783e56f315923eb431bc802b17b98589ef",
+        "Size": 31855925,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "christianortel-skate2-recompile-pc-skate-2",
+    "Title": "Skate 2",
+    "Project": "skate2-recompile-pc",
+    "Repository": "christianortel/skate2-recompile-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1202c9ae8d0a40b37727467f9ccf53140cb0dbdc",
+    "ReadmeUrl": "https://github.com/christianortel/skate2-recompile-pc/blob/1202c9ae8d0a40b37727467f9ccf53140cb0dbdc/README.md",
+    "ReleaseUrl": "https://github.com/christianortel/skate2-recompile-pc/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Skate2-PC-v0.1.1-Windows-x64.zip",
+        "Url": "https://github.com/christianortel/skate2-recompile-pc/releases/download/v0.1.1/Skate2-PC-v0.1.1-Windows-x64.zip",
+        "Sha256": "55a1062c6d0e6ed74a1bf291617a60a1b74cdd6c6bdad9366652516ca17bd270",
+        "Size": 23315343,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mchughalex-skate3recomp-skate-3",
+    "Title": "Skate 3",
+    "Project": "skate3recomp",
+    "Repository": "mchughalex/skate3recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd",
+    "ReadmeUrl": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/README.md",
+    "ReleaseUrl": "https://github.com/mchughalex/skate3recomp/releases/tag/v2.0.2",
+    "ReleaseTag": "v2.0.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Skate3Recomp-Windows.zip",
+        "Url": "https://github.com/mchughalex/skate3recomp/releases/download/v2.0.2/Skate3Recomp-Windows.zip",
+        "Sha256": "b9785b9f3ba6f8180268dc5ea26ed2ec7b64af46a4c04219a33236c64bc65a17",
+        "Size": 30292532,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "yuutatsubasa-free-riders-recompiled-sonic-free-riders",
+    "Title": "Sonic Free Riders",
+    "Project": "Free-Riders-Recompiled",
+    "Repository": "YuutaTsubasa/Free-Riders-Recompiled",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9391a91bdee3ab171d14aee3348cad212645351c",
+    "ReadmeUrl": "https://github.com/YuutaTsubasa/Free-Riders-Recompiled/blob/9391a91bdee3ab171d14aee3348cad212645351c/README.md",
+    "ReleaseUrl": "https://github.com/YuutaTsubasa/Free-Riders-Recompiled/releases/tag/v0.10.41",
+    "ReleaseTag": "v0.10.41",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "FreeRidersRecompiled-0.10.41-windows-x64.zip",
+        "Url": "https://github.com/YuutaTsubasa/Free-Riders-Recompiled/releases/download/v0.10.41/FreeRidersRecompiled-0.10.41-windows-x64.zip",
+        "Sha256": "a11cf43391bd595253f7e605b7b3c8d23431b2b667178d0b24d28e8dc8067747",
+        "Size": 47619414,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "n0madic-soulcalibur2hd-recomp-soulcalibur-ii-hd-online",
+    "Title": "SoulCalibur II HD Online",
+    "Project": "Soulcalibur2HD-recomp",
+    "Repository": "n0madic/Soulcalibur2HD-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3e96e66aebdf33671e9f6a44fd0c77f0d7b95f07",
+    "ReadmeUrl": "https://github.com/n0madic/Soulcalibur2HD-recomp/blob/3e96e66aebdf33671e9f6a44fd0c77f0d7b95f07/README.md",
+    "ReleaseUrl": "https://github.com/n0madic/Soulcalibur2HD-recomp/releases/tag/v0.3.0",
+    "ReleaseTag": "v0.3.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "sc2hd-0.3.0-windows-x86_64.zip",
+        "Url": "https://github.com/n0madic/Soulcalibur2HD-recomp/releases/download/v0.3.0/sc2hd-0.3.0-windows-x86_64.zip",
+        "Sha256": "89d777a3a7410e254e162686f27a02c41a1fdbfb8c050a47b0e3b89c21a10b9c",
+        "Size": 13544633,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "giangra-stuntdouble-reignition-stuntman-ignition",
+    "Title": "Stuntman: Ignition",
+    "Project": "stuntdouble-reignition",
+    "Repository": "giangra/stuntdouble-reignition",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b65211e04e63a3770e639c5fabd9de2aca4a5bd3",
+    "ReadmeUrl": "https://github.com/giangra/stuntdouble-reignition/blob/b65211e04e63a3770e639c5fabd9de2aca4a5bd3/README.md",
+    "ReleaseUrl": "https://github.com/giangra/stuntdouble-reignition/releases/tag/v0.3.0",
+    "ReleaseTag": "v0.3.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "StuntmanSetup-0.3.0.exe",
+        "Url": "https://github.com/giangra/stuntdouble-reignition/releases/download/v0.3.0/StuntmanSetup-0.3.0.exe",
+        "Sha256": "841aa0afacb19cf8359c304824e298e4f10f917bc903651b98d67f4dc660ac16",
+        "Size": 64821852,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "genrythefox0-project-iron-6-tekken-6",
+    "Title": "Tekken 6",
+    "Project": "Project-Iron-6",
+    "Repository": "GenryTheFox0/Project-Iron-6",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "770e0e02b24236a7148a07ff1bc8f7d95a898868",
+    "ReadmeUrl": "https://github.com/GenryTheFox0/Project-Iron-6/blob/770e0e02b24236a7148a07ff1bc8f7d95a898868/README.md",
+    "ReleaseUrl": "https://github.com/GenryTheFox0/Project-Iron-6/releases/tag/v1.0.0-beta.2.0.1",
+    "ReleaseTag": "v1.0.0-beta.2.0.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Iron6Installer-v1.0.0-beta.2.0.1.exe",
+        "Url": "https://github.com/GenryTheFox0/Project-Iron-6/releases/download/v1.0.0-beta.2.0.1/Iron6Installer-v1.0.0-beta.2.0.1.exe",
+        "Sha256": "9a446813b358c4a04f111cd52444f14c4fa1b229bbd2b4a02c0119987dbd5aff",
+        "Size": 4534272,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "llamapixels-tenchuzrecomp-tenchu-z",
+    "Title": "Tenchu Z",
+    "Project": "TenchuZRecomp",
+    "Repository": "Llamapixels/TenchuZRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "17fc156e29bdb7c2a93c4b886998acba4fc123a3",
+    "ReadmeUrl": "https://github.com/Llamapixels/TenchuZRecomp/blob/17fc156e29bdb7c2a93c4b886998acba4fc123a3/README.md",
+    "ReleaseUrl": "https://github.com/Llamapixels/TenchuZRecomp/releases/tag/v0.1.4-alpha",
+    "ReleaseTag": "v0.1.4-alpha",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "TenchuZ-HoloCattRecomp-0.1.4-alpha-windows.zip",
+        "Url": "https://github.com/Llamapixels/TenchuZRecomp/releases/download/v0.1.4-alpha/TenchuZ-HoloCattRecomp-0.1.4-alpha-windows.zip",
+        "Sha256": "3fe8d00b2e309a1bc300249f8e42c1bd0ddd9c45b8196e2967073049d5770b22",
+        "Size": 17759389,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "8bitninja64-tenchuz-pc-tenchu-z",
+    "Title": "Tenchu Z",
+    "Project": "TenchuZ-PC",
+    "Repository": "8bitninja64/TenchuZ-PC",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "617eeda08a48b20a90a04fa724fcfde4102368a5",
+    "ReadmeUrl": "https://github.com/8bitninja64/TenchuZ-PC/blob/617eeda08a48b20a90a04fa724fcfde4102368a5/README.md",
+    "ReleaseUrl": "https://github.com/8bitninja64/TenchuZ-PC/releases/tag/v0.3.2",
+    "ReleaseTag": "v0.3.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "TenchuZ-windows-x64.zip",
+        "Url": "https://github.com/8bitninja64/TenchuZ-PC/releases/download/v0.3.2/TenchuZ-windows-x64.zip",
+        "Sha256": "18dbda10dbb3b81836e96b1b8ae8f739cabd82446da4e40f83e4674cee2a74c1",
+        "Size": 4461451,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "theokyr-project8recomp-tony-hawk-s-project-8",
+    "Title": "Tony Hawk's Project 8",
+    "Project": "Project8Recomp",
+    "Repository": "theokyr/Project8Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c8c21e2781acd134de6b2ccf12b666145e00ea6c",
+    "ReadmeUrl": "https://github.com/theokyr/Project8Recomp/blob/c8c21e2781acd134de6b2ccf12b666145e00ea6c/README.md",
+    "ReleaseUrl": "https://github.com/theokyr/Project8Recomp/releases/tag/v0.3.0",
+    "ReleaseTag": "v0.3.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Project8Recomp-v0.3.0-windows-x86_64.zip",
+        "Url": "https://github.com/theokyr/Project8Recomp/releases/download/v0.3.0/Project8Recomp-v0.3.0-windows-x86_64.zip",
+        "Sha256": "f255842b916a98c8188259fa3da5931bcea639b6c656e82d26f8b274b69be436",
+        "Size": 21674894,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "crownparkcomputing-xbox360-native-ports-xbox-360-native-ports-collection",
+    "Title": "Xbox 360 native ports collection",
+    "Project": "Xbox360-Native-Ports",
+    "Repository": "CrownParkComputing/Xbox360-Native-Ports",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2675c16edd4b0854badb30f9cd519ab899798388",
+    "ReadmeUrl": "https://github.com/CrownParkComputing/Xbox360-Native-Ports/blob/2675c16edd4b0854badb30f9cd519ab899798388/README.md",
+    "ReleaseUrl": "https://github.com/CrownParkComputing/Xbox360-Native-Ports/releases/tag/splitsecond-v1",
+    "ReleaseTag": "splitsecond-v1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "splitsecond-launcher-windows-x86_64.zip",
+        "Url": "https://github.com/CrownParkComputing/Xbox360-Native-Ports/releases/download/splitsecond-v1/splitsecond-launcher-windows-x86_64.zip",
+        "Sha256": "d8b4b8ee3aeba5dfa91667ed6faf06389b51b0f15aefa4e0bbf69912cd884c32",
+        "Size": 60850128,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

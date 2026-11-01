@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "28995d368538559005aaaf9a78ab8e35eacecd71",
     "ReadmeUrl": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/blob/28995d368538559005aaaf9a78ab8e35eacecd71/README.md",
     "ReleaseUrl": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/releases/tag/v0.2.3",
@@ -23,6 +23,43 @@
         "Url": "https://github.com/mstan/MarioTennisVirtualBoyRecomp/releases/download/v0.2.3/MarioTennisVirtualBoyRecomp-windows-x64.zip",
         "Sha256": "4f951d8c313e3cb7c3822cafb1eedad4b04362385a8e1568720b8d7e1c3789de",
         "Size": 8198020,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-zeroracersvirtualboyrecomp-zero-racers",
+    "Title": "Zero Racers",
+    "Project": "ZeroRacersVirtualBoyRecomp",
+    "Repository": "mstan/ZeroRacersVirtualBoyRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "12a05d5a8aad9688f457ec13c19061d745acf4e4",
+    "ReadmeUrl": "https://github.com/mstan/ZeroRacersVirtualBoyRecomp/blob/12a05d5a8aad9688f457ec13c19061d745acf4e4/README.md",
+    "ReleaseUrl": "https://github.com/mstan/ZeroRacersVirtualBoyRecomp/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ZeroRacersVirtualBoyRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/ZeroRacersVirtualBoyRecomp/releases/download/v0.1.1/ZeroRacersVirtualBoyRecomp-windows-x64.zip",
+        "Sha256": "5be19288a121da7a4891baeb2749c06f27b12a68e6bba9c4eb8baa85bbcc70c0",
+        "Size": 8618751,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "ZeroRacersVirtualBoyRecomp.exe",
+        "Url": "https://github.com/mstan/ZeroRacersVirtualBoyRecomp/releases/download/v0.1.1/ZeroRacersVirtualBoyRecomp.exe",
+        "Sha256": "301b1ed0cf47a3836cbe3f602b9c9df7160da763953ea1ffc588b6429a4db842",
+        "Size": 19749897,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

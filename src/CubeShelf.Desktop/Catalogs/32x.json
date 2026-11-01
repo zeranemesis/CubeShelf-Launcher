@@ -7,11 +7,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "f2d1f94d1ca16ddf216aed89962f4d2144d3b6d5",
-    "ReadmeUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/blob/f2d1f94d1ca16ddf216aed89962f4d2144d3b6d5/README.md",
-    "ReleaseUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/tag/v0.15.10",
-    "ReleaseTag": "v0.15.10",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d85cff341e3b8cbacb8a0cfd839a7633779ad672",
+    "ReadmeUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/blob/d85cff341e3b8cbacb8a0cfd839a7633779ad672/README.md",
+    "ReleaseUrl": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/tag/v0.15.17",
+    "ReleaseTag": "v0.15.17",
     "Platforms": [
       "Windows",
       "Linux",
@@ -19,28 +19,28 @@
     ],
     "Assets": [
       {
-        "Name": "ChaotixRecompiled-0.15.10-linux-x64.tar.gz",
-        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-linux-x64.tar.gz",
-        "Sha256": "dca2eb9584a2adb2e6cbcf6e7d5138a32e9ea111ff3cdf02dc47475159bf123b",
-        "Size": 5276764,
+        "Name": "ChaotixRecompiled-0.15.17-linux-x64.tar.gz",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.17/ChaotixRecompiled-0.15.17-linux-x64.tar.gz",
+        "Sha256": "407b0cefabdfe7f5536f8e89be33acf4563b101647cb45f7bb87ed0b2455a939",
+        "Size": 5347642,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "ChaotixRecompiled-0.15.10-macos-arm64.zip",
-        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-macos-arm64.zip",
-        "Sha256": "4eecf58249feacfb46632151cd75e1e2540c84a0b46372153171f8489d397bff",
-        "Size": 5157804,
+        "Name": "ChaotixRecompiled-0.15.17-macos-arm64.zip",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.17/ChaotixRecompiled-0.15.17-macos-arm64.zip",
+        "Sha256": "872f4c7b2c76586db384415840b81dc5ddc97c70f79c949aaeb37b3015f1a2cc",
+        "Size": 5205156,
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "ChaotixRecompiled-0.15.10-windows-x64.zip",
-        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.10/ChaotixRecompiled-0.15.10-windows-x64.zip",
-        "Sha256": "1a07ced555ebe69ddf0cfba0a1d0205fe232e5b642020aaa274f8bd7182b8369",
-        "Size": 9728716,
+        "Name": "ChaotixRecompiled-0.15.17-windows-x64.zip",
+        "Url": "https://github.com/YuutaTsubasa/ChaotixRecompiled/releases/download/v0.15.17/ChaotixRecompiled-0.15.17-windows-x64.zip",
+        "Sha256": "88bce4d1021727b39d0a1a4d9fdcdad89dcf3f6300ae0dc23fb66d0ac16f0fd6",
+        "Size": 9860067,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

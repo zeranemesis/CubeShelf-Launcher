@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "be57e210f1c1a11d777b5482076dbbc371468ea1",
     "ReadmeUrl": "https://github.com/mstan/SuperMarioLand2Recomp/blob/be57e210f1c1a11d777b5482076dbbc371468ea1/README.md",
     "ReleaseUrl": "https://github.com/mstan/SuperMarioLand2Recomp/releases/tag/v0.2.0",
@@ -46,15 +46,99 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "491b62989922582ff97fb3ce6c7dec6be3835cce",
-    "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/491b62989922582ff97fb3ce6c7dec6be3835cce/README.md",
-    "ReleaseUrl": "https://github.com/GABRIELNNK/Bigodao/releases/tag/1.6.0",
-    "ReleaseTag": "1.6.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c4fecfe7dafaff5f2e5cd5f425a46fd172b7a424",
+    "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/c4fecfe7dafaff5f2e5cd5f425a46fd172b7a424/README.md",
+    "ReleaseUrl": "https://github.com/GABRIELNNK/Bigodao/releases/tag/1.7.0",
+    "ReleaseTag": "1.7.0",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "bigodao_1.7_linux_x86.zip",
+        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.7.0/bigodao_1.7_linux_x86.zip",
+        "Sha256": "29c39cd6b5a7b4ec75aae7a41c48297e3026fb4b98364411f219b115f4b743ae",
+        "Size": 13651198,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "bigodao_1.7_win.zip",
+        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.7.0/bigodao_1.7_win.zip",
+        "Sha256": "21e13616bbc0d62dcf1341be10d392694b1f6033965dc4c9ab15f13a8f028ac6",
+        "Size": 18714973,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bryanthaboi-gen1recomp-pokemon-rby-gsc-frlf-rse",
+    "Title": "Pokemon RBY / GSC / FRLF / RSE",
+    "Project": "gen1recomp",
+    "Repository": "bryanthaboi/gen1recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "7e736db2fb585554948f4046c23f7ee4922dda8f",
+    "ReadmeUrl": "https://github.com/bryanthaboi/gen1recomp/blob/7e736db2fb585554948f4046c23f7ee4922dda8f/README.md",
+    "ReleaseUrl": "https://github.com/bryanthaboi/gen1recomp/releases/tag/v0.3.99",
+    "ReleaseTag": "v0.3.99",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "gen1recomp-0.3.99-windows.zip",
+        "Url": "https://github.com/bryanthaboi/gen1recomp/releases/download/v0.3.99/gen1recomp-0.3.99-windows.zip",
+        "Sha256": "556334a056ed917209ecc41ac2ee81b704f2fa6b2508e3c1894c43b7a3c5a4c4",
+        "Size": 39657949,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "etroimcasso-kirpich-tetris",
+    "Title": "Tetris",
+    "Project": "Kirpich",
+    "Repository": "etroimcasso/Kirpich",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "61e0a0fe08aa26af7fc1d2f6ca02665934c9a0fd",
+    "ReadmeUrl": "https://github.com/etroimcasso/Kirpich/blob/61e0a0fe08aa26af7fc1d2f6ca02665934c9a0fd/README.md",
+    "ReleaseUrl": "https://github.com/etroimcasso/Kirpich/releases/tag/v0.10.2",
+    "ReleaseTag": "v0.10.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Kirpich-windows-arm64.zip",
+        "Url": "https://github.com/etroimcasso/Kirpich/releases/download/v0.10.2/Kirpich-windows-arm64.zip",
+        "Sha256": "b73cd356f63826305f8371d01af17b1daf7e99d79db2d05edaf80f03ea5cc4cd",
+        "Size": 1736722,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "Kirpich-windows-x64.zip",
+        "Url": "https://github.com/etroimcasso/Kirpich/releases/download/v0.10.2/Kirpich-windows-x64.zip",
+        "Sha256": "f52ccc8f5b3f2cf6d634ffa5f24be2316710a23e2e257c32b352fc0de0d3d635",
+        "Size": 1915043,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

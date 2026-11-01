@@ -7,14 +7,24 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b643f5422c2023532dda5f0c97fd64c901db27e8",
     "ReadmeUrl": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/blob/b643f5422c2023532dda5f0c97fd64c901db27e8/README.md",
-    "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/releases/tag/v0.0.3",
+    "ReleaseTag": "v0.0.3",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "SonicTheHedgehogSMSRecomp-windows-x64.zip",
+        "Url": "https://github.com/mstan/SonicTheHedgehogSMSRecomp/releases/download/v0.0.3/SonicTheHedgehogSMSRecomp-windows-x64.zip",
+        "Sha256": "3dfb0258062cc518595fe6af62c94e0f5e9232841ec2d6a12c008ab53b899351",
+        "Size": 1703781,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

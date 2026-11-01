@@ -1,5 +1,12 @@
 # Changelog
 
+## En cours — catalogue Windows du 1er novembre 2026
+
+- 408 références Windows existantes contrôlées ; 126 versions de release et 162 listes de paquets actualisées, avec taille et SHA-256 conservés.
+- 218 références ajoutées sur les plateformes existantes, regroupées par jeu ; 138 jaquettes exactes supplémentaires. Les nouveaux ports restent indiqués « partie non testée ».
+- Installation automatique suspendue pour HWDER, dont le dépôt public est inaccessible. Aucun port natif Windows Switch 2 public vérifié dans cette passe ; aucun émulateur ajouté.
+- Tests catalogues et bibliothèque/Big Picture réussis, compilation Windows x64 autonome réussie. Détails dans `docs/WINDOWS-CATALOG-2026-11-01.md`.
+
 ## 0.19.0-rc.3 — état du téléphone
 
 - Android : heure locale au format système, connexion Wi-Fi/mobile et batterie avec pourcentage et indicateur de charge, en haut à droite sur l’accueil, la bibliothèque et les fenêtres internes.

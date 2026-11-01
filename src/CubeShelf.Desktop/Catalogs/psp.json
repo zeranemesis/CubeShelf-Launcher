@@ -7,9 +7,9 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "1132a76e59a29d7395635a5239a0d4aadd948385",
-    "ReadmeUrl": "https://github.com/elmasas/lcs-recomp/blob/1132a76e59a29d7395635a5239a0d4aadd948385/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0d4a1f38403dcfa5f017b41837a24813998065fe",
+    "ReadmeUrl": "https://github.com/elmasas/lcs-recomp/blob/0d4a1f38403dcfa5f017b41837a24813998065fe/README.md",
     "ReleaseUrl": "https://github.com/elmasas/lcs-recomp/releases/tag/v0.1.6",
     "ReleaseTag": "v0.1.6",
     "Platforms": [
@@ -26,7 +26,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "c3ed2f4b6ecf81037a52fe699af7c1dcfab8f9a9",
     "ReadmeUrl": "https://github.com/zmbkilla/PSP2I_Recomp/blob/c3ed2f4b6ecf81037a52fe699af7c1dcfab8f9a9/README.md",
     "ReleaseUrl": "https://github.com/zmbkilla/PSP2I_Recomp/releases",
@@ -45,7 +45,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "7c0e0db52d5076f5794284f000277525d11fe563",
     "ReadmeUrl": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/blob/7c0e0db52d5076f5794284f000277525d11fe563/README.md",
     "ReleaseUrl": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/releases/tag/v0.9.1",
@@ -61,6 +61,220 @@
         "Size": 28274319,
         "RuntimeIdentifiers": [
           "linux-x64"
+        ]
+      },
+      {
+        "Name": "RenegadeSquadronPC-0.9.1.zip",
+        "Url": "https://github.com/GTTeancum/StarWars-RenegadeSquadron-PC/releases/download/v0.9.1/RenegadeSquadronPC-0.9.1.zip",
+        "Sha256": "6f7d040267d6bdda6850173cfc24cdca85258541995dd2c8d943694535bffd7e",
+        "Size": 55703966,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "arnaldolima1-gow-ghost-of-sparta-pc-god-of-war-ghost-of-sparta",
+    "Title": "God of War: Ghost of Sparta",
+    "Project": "gow-ghost-of-sparta-pc",
+    "Repository": "arnaldolima1/gow-ghost-of-sparta-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0704a8d7e6d94490e26e076c4743f64d688cc4f3",
+    "ReadmeUrl": "https://github.com/arnaldolima1/gow-ghost-of-sparta-pc/blob/0704a8d7e6d94490e26e076c4743f64d688cc4f3/README.md",
+    "ReleaseUrl": "https://github.com/arnaldolima1/gow-ghost-of-sparta-pc/releases/tag/v0.1.7",
+    "ReleaseTag": "v0.1.7",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "sparta-0.1.7-windows-x64.zip",
+        "Url": "https://github.com/arnaldolima1/gow-ghost-of-sparta-pc/releases/download/v0.1.7/sparta-0.1.7-windows-x64.zip",
+        "Sha256": "d1dd63c2e9cf612cbd0c349851ce5db66ca4d5aae3e1652338f555a9c14ee7d2",
+        "Size": 45152114,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "overkilllabs3-vice-city-stories-recomp-grand-theft-auto-vice-city-stories",
+    "Title": "Grand Theft Auto: Vice City Stories",
+    "Project": "vice-city-stories-recomp",
+    "Repository": "OverkillLabs3/vice-city-stories-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8d15d832841aaf2072bb00a021f273d8b2664674",
+    "ReadmeUrl": "https://github.com/OverkillLabs3/vice-city-stories-recomp/blob/8d15d832841aaf2072bb00a021f273d8b2664674/README.md",
+    "ReleaseUrl": "https://github.com/OverkillLabs3/vice-city-stories-recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "VCSNative-Windows.zip",
+        "Url": "https://github.com/OverkillLabs3/vice-city-stories-recomp/releases/download/v1.0.0/VCSNative-Windows.zip",
+        "Sha256": "eeaf4f01eb1458987119ecfc4bda0555865357a10bc59c4f2a3378a45eb56587",
+        "Size": 20855739,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jstar269-nakagawa-recomp-hot-shots-tennis-get-a-grip",
+    "Title": "Hot Shots Tennis: Get a Grip",
+    "Project": "nakagawa-recomp",
+    "Repository": "Jstar269/nakagawa-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "7e7f33d7fb4ff70de12a0033dd9dc8a286c78957",
+    "ReadmeUrl": "https://github.com/Jstar269/nakagawa-recomp/blob/7e7f33d7fb4ff70de12a0033dd9dc8a286c78957/README.md",
+    "ReleaseUrl": "https://github.com/Jstar269/nakagawa-recomp/releases/tag/v0.0.1",
+    "ReleaseTag": "v0.0.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "nakagawa-recomp-0.0.1-windows-x64.zip",
+        "Url": "https://github.com/Jstar269/nakagawa-recomp/releases/download/v0.0.1/nakagawa-recomp-0.0.1-windows-x64.zip",
+        "Sha256": "032afce5b9b4713e6c4fa065c299f72ab732f59967624cffc25484f83516ab9f",
+        "Size": 284758051,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mango77x-mhforever-monster-hunter-freedom-unite",
+    "Title": "Monster Hunter Freedom Unite",
+    "Project": "MHForever",
+    "Repository": "Mango77x/MHForever",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b5cf14184ce6c77288d37131c34d88b07faba919",
+    "ReadmeUrl": "https://github.com/Mango77x/MHForever/blob/b5cf14184ce6c77288d37131c34d88b07faba919/README.md",
+    "ReleaseUrl": "https://github.com/Mango77x/MHForever/releases/tag/v0.8.2",
+    "ReleaseTag": "v0.8.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MHForever-0.8.2-windows-x64.zip",
+        "Url": "https://github.com/Mango77x/MHForever/releases/download/v0.8.2/MHForever-0.8.2-windows-x64.zip",
+        "Sha256": "21d7d6baad522abfeaad60bf20ce56b653a295bbc8007b8b326f465e9f1bdc7c",
+        "Size": 101532679,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "erreib-pure-recomp-wipeout-pure",
+    "Title": "Wipeout Pure",
+    "Project": "pure-recomp",
+    "Repository": "erreib/pure-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "aaa1726d52a1fa25c74fd8c8cedc008f2b1b655d",
+    "ReadmeUrl": "https://github.com/erreib/pure-recomp/blob/aaa1726d52a1fa25c74fd8c8cedc008f2b1b655d/README.md",
+    "ReleaseUrl": "https://github.com/erreib/pure-recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "pure-recomp-0.2.0-windows-x64.zip",
+        "Url": "https://github.com/erreib/pure-recomp/releases/download/v0.2.0/pure-recomp-0.2.0-windows-x64.zip",
+        "Sha256": "f573ea2780c525e2f10c7dbe3b4a155efff28701b62dec34ccdbbb1e0fa67c48",
+        "Size": 43340532,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "teamgdb-yakumo-yakumo",
+    "Title": "Yakumo",
+    "Project": "Yakumo",
+    "Repository": "TeamGDB/Yakumo",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b61852aef10870400320b96d92a14136ac17b051",
+    "ReadmeUrl": "https://github.com/TeamGDB/Yakumo/blob/b61852aef10870400320b96d92a14136ac17b051/README.md",
+    "ReleaseUrl": "https://github.com/TeamGDB/Yakumo/releases/tag/v0.7.5",
+    "ReleaseTag": "v0.7.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "yakumo-0.7.5-windows-x86_64-portable.zip",
+        "Url": "https://github.com/TeamGDB/Yakumo/releases/download/v0.7.5/yakumo-0.7.5-windows-x86_64-portable.zip",
+        "Sha256": "7927e3f1e30afcd6f908038ced4a9c99ca58c92510920ec9f36a7b2b1d2ed69c",
+        "Size": 220399914,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "yakumo-0.7.5-windows-x86_64.zip",
+        "Url": "https://github.com/TeamGDB/Yakumo/releases/download/v0.7.5/yakumo-0.7.5-windows-x86_64.zip",
+        "Sha256": "0b792af0fb627831da88a88d90c117fd15f59fb6d940e47054f6e83a703717dd",
+        "Size": 220392646,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "artknighty-tagforcerecomp-preview-yu-gi-oh-gx-tag-force",
+    "Title": "Yu-Gi-Oh! GX Tag Force",
+    "Project": "tagforcerecomp-preview",
+    "Repository": "Artknighty/tagforcerecomp-preview",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "46a3955b189cdfc1e7b090a5add0cf1ada6ebc83",
+    "ReadmeUrl": "https://github.com/Artknighty/tagforcerecomp-preview/blob/46a3955b189cdfc1e7b090a5add0cf1ada6ebc83/README.md",
+    "ReleaseUrl": "https://github.com/Artknighty/tagforcerecomp-preview/releases/tag/v0.5.2",
+    "ReleaseTag": "v0.5.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "TagForceRecomp-0.5.2-win64.zip",
+        "Url": "https://github.com/Artknighty/tagforcerecomp-preview/releases/download/v0.5.2/TagForceRecomp-0.5.2-win64.zip",
+        "Sha256": "4951b0680a86e72abdb2e5427e39b0ac1f297f17162427e5ab9eae5cf002b3aa",
+        "Size": 13265370,
+        "RuntimeIdentifiers": [
+          "win-x64"
         ]
       }
     ]

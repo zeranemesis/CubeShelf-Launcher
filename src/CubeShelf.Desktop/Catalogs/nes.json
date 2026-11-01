@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "8742c953985b2f7fe6e9267068b748640304d66b",
     "ReadmeUrl": "https://github.com/mstan/DrMarioNesRecomp/blob/8742c953985b2f7fe6e9267068b748640304d66b/README.md",
     "ReleaseUrl": "https://github.com/mstan/DrMarioNesRecomp/releases/tag/v1.3.1",
@@ -46,7 +46,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "906d1496b3162d838274cc9307f9459895f419b3",
     "ReadmeUrl": "https://github.com/mstan/DuckHuntNESRecomp/blob/906d1496b3162d838274cc9307f9459895f419b3/README.md",
     "ReleaseUrl": "https://github.com/mstan/DuckHuntNESRecomp/releases/tag/v1.2.1",
@@ -76,7 +76,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f743ae4c87406947de7a6a61cacd2cc036ca631c",
     "ReadmeUrl": "https://github.com/mstan/FaxanaduRecomp/blob/f743ae4c87406947de7a6a61cacd2cc036ca631c/README.md",
     "ReleaseUrl": "https://github.com/mstan/FaxanaduRecomp/releases/tag/v2.5.0",
@@ -106,7 +106,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b3d6d270018b9311cb39638fa39bf3ec2e7fd69a",
     "ReadmeUrl": "https://github.com/mstan/Megaman3NESRecomp/blob/b3d6d270018b9311cb39638fa39bf3ec2e7fd69a/README.md",
     "ReleaseUrl": "https://github.com/mstan/Megaman3NESRecomp/releases/tag/v0.1.3",
@@ -136,11 +136,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "caccee62a67daea083fac8af36b1d0065b902071",
-    "ReadmeUrl": "https://github.com/mstan/MetroidNESRecomp/blob/caccee62a67daea083fac8af36b1d0065b902071/README.md",
-    "ReleaseUrl": "https://github.com/mstan/MetroidNESRecomp/releases/tag/v0.2.4",
-    "ReleaseTag": "v0.2.4",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "458cbc3e841600d84a2791b9df1050162d26d7ad",
+    "ReadmeUrl": "https://github.com/mstan/MetroidNESRecomp/blob/458cbc3e841600d84a2791b9df1050162d26d7ad/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MetroidNESRecomp/releases/tag/v0.2.5",
+    "ReleaseTag": "v0.2.5",
     "Platforms": [
       "Windows",
       "Linux",
@@ -148,10 +148,10 @@
     ],
     "Assets": [
       {
-        "Name": "MetroidNESRecomp-USA-NTSC-cycle-preview-windows-x64.zip",
-        "Url": "https://github.com/mstan/MetroidNESRecomp/releases/download/v0.2.4/MetroidNESRecomp-USA-NTSC-cycle-preview-windows-x64.zip",
-        "Sha256": "a17b861c018c55098951ba7481300d0564ede4430985f6889c9bceadecfed030",
-        "Size": 6509465,
+        "Name": "MetroidNESRecomp-0.2.5-USA-NTSC-windows-x64.zip",
+        "Url": "https://github.com/mstan/MetroidNESRecomp/releases/download/v0.2.5/MetroidNESRecomp-0.2.5-USA-NTSC-windows-x64.zip",
+        "Sha256": "b030656354aefce66a44267d7c1be50731665e38db3a0530c2a99267d191f059",
+        "Size": 9415338,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -166,7 +166,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "877c0ebce229e6308a4a7e8d28f5fde4714f7592",
     "ReadmeUrl": "https://github.com/Mr-Shizzy/PacManRecomp/blob/877c0ebce229e6308a4a7e8d28f5fde4714f7592/README.md",
     "ReleaseUrl": "https://github.com/Mr-Shizzy/PacManRecomp/releases/tag/v1.1.1",
@@ -175,7 +175,17 @@
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "PacManRecomp-1.1.1-Windows.zip",
+        "Url": "https://github.com/Mr-Shizzy/PacManRecomp/releases/download/v1.1.1/PacManRecomp-1.1.1-Windows.zip",
+        "Sha256": "9d37d46796efdd8690313027f79674cad2a57e5fdf94ef7f11a0c6b86a513796",
+        "Size": 5185666,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "mstan-supermariobrosnesrecomp-super-mario-bros.",
@@ -185,11 +195,11 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "45f95754f8ad6e04fc39966505c94af9783bd787",
-    "ReadmeUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/blob/45f95754f8ad6e04fc39966505c94af9783bd787/README.md",
-    "ReleaseUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/tag/v1.12.4",
-    "ReleaseTag": "v1.12.4",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "89e4d5d308d6e962142ae38d941c65635d7dea30",
+    "ReadmeUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/blob/89e4d5d308d6e962142ae38d941c65635d7dea30/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/tag/v1.12.5",
+    "ReleaseTag": "v1.12.5",
     "Platforms": [
       "Windows",
       "Linux",
@@ -197,10 +207,10 @@
     ],
     "Assets": [
       {
-        "Name": "SuperMarioBrosRecomp-windows-x64.zip",
-        "Url": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/download/v1.12.4/SuperMarioBrosRecomp-windows-x64.zip",
-        "Sha256": "77fc18e7a12310a1d0d393b3ddda748b867da5098c2cd79d2a8b111b6eb3f6e4",
-        "Size": 29777992,
+        "Name": "SuperMarioBrosRecomp-1.12.5-windows-x64.zip",
+        "Url": "https://github.com/mstan/SuperMarioBrosNESRecomp/releases/download/v1.12.5/SuperMarioBrosRecomp-1.12.5-windows-x64.zip",
+        "Sha256": "7519c518703ec61632e4ebc79aac891f8ed70fa1cd3b2cdfe038a4a1bf7365c4",
+        "Size": 30118844,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -215,7 +225,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "f219991df2e70d6bf41f4ba9a46c8ddf990b572e",
     "ReadmeUrl": "https://github.com/mstan/YoshiNESRecomp/blob/f219991df2e70d6bf41f4ba9a46c8ddf990b572e/README.md",
     "ReleaseUrl": "https://github.com/mstan/YoshiNESRecomp/releases/tag/v1.2.1",
@@ -245,7 +255,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "1abdd99dc21953f4188e2052675a7d21ee367420",
     "ReadmeUrl": "https://github.com/mstan/YoshisCookieRecomp/blob/1abdd99dc21953f4188e2052675a7d21ee367420/README.md",
     "ReleaseUrl": "https://github.com/mstan/YoshisCookieRecomp/releases/tag/v1.1.1",
@@ -261,6 +271,62 @@
         "Url": "https://github.com/mstan/YoshisCookieRecomp/releases/download/v1.1.1/YoshisCookieRecomp-windows-x64.zip",
         "Sha256": "5238356ea207ba358602f01b6febd0569b9ffadbf70945e610d8a6c5cc231b98",
         "Size": 4902569,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "junior-jones-adventure-island-ii-nes-static-recomp-adventure-island-ii",
+    "Title": "Adventure Island II",
+    "Project": "Adventure-Island-II-NES-Static-Recomp",
+    "Repository": "Junior-Jones/Adventure-Island-II-NES-Static-Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8e5fa91ec08a6de5ad52df648ad6d6a4a6533ecd",
+    "ReadmeUrl": "https://github.com/Junior-Jones/Adventure-Island-II-NES-Static-Recomp/blob/8e5fa91ec08a6de5ad52df648ad6d6a4a6533ecd/README.md",
+    "ReleaseUrl": "https://github.com/Junior-Jones/Adventure-Island-II-NES-Static-Recomp/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Adventure-Island-II-NES-Static-Recomp-1.0.0-Windows.zip",
+        "Url": "https://github.com/Junior-Jones/Adventure-Island-II-NES-Static-Recomp/releases/download/v1.0.0/Adventure-Island-II-NES-Static-Recomp-1.0.0-Windows.zip",
+        "Sha256": "19ef61618f3594ffbda4a4ac42c99d182e2777ea92397aba72acd9c3a41d87d0",
+        "Size": 1527099,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "junior-jones-bubble-bobble-nes-static-recomp-bubble-bobble",
+    "Title": "Bubble Bobble",
+    "Project": "Bubble-Bobble-NES-Static-Recomp",
+    "Repository": "Junior-Jones/Bubble-Bobble-NES-Static-Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "5980e1a5f1731181ced5d195d85f9551d5ac7f28",
+    "ReadmeUrl": "https://github.com/Junior-Jones/Bubble-Bobble-NES-Static-Recomp/blob/5980e1a5f1731181ced5d195d85f9551d5ac7f28/README.md",
+    "ReleaseUrl": "https://github.com/Junior-Jones/Bubble-Bobble-NES-Static-Recomp/releases/tag/v1.1.0",
+    "ReleaseTag": "v1.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Bubble-Bobble-NES-Static-Recomp-Windows-v1.1.0.zip",
+        "Url": "https://github.com/Junior-Jones/Bubble-Bobble-NES-Static-Recomp/releases/download/v1.1.0/Bubble-Bobble-NES-Static-Recomp-Windows-v1.1.0.zip",
+        "Sha256": "7ce151085b677809883f0aadde9aa548d301ac976e193fe031f831c94f11b1d2",
+        "Size": 1489164,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

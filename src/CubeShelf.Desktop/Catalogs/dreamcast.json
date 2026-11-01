@@ -7,17 +7,27 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "73e9e854cde6fe8b158779c0c0a70c6cec4828ff",
     "ReadmeUrl": "https://github.com/sonicfreak1337/SARecomp/blob/73e9e854cde6fe8b158779c0c0a70c6cec4828ff/README.md",
-    "ReleaseUrl": "https://github.com/sonicfreak1337/SARecomp/releases/tag/v0.52.1",
-    "ReleaseTag": "v0.52.1",
+    "ReleaseUrl": "https://github.com/sonicfreak1337/SARecomp/releases/tag/v0.52.0",
+    "ReleaseTag": "v0.52.0",
     "Platforms": [
       "Windows",
       "Linux",
       "macOS"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "SonicAdventureRecompiled-0.52.0-Windows.exe",
+        "Url": "https://github.com/sonicfreak1337/SARecomp/releases/download/v0.52.0/SonicAdventureRecompiled-0.52.0-Windows.exe",
+        "Sha256": "3914664cb20d7f6029e4b4b56ccd4eaaa6bff02d62c9c6b97b1448bff4ab9452",
+        "Size": 257381884,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "enrique363-voldorium-soulcalibur",
@@ -27,16 +37,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "b7e4cb6e213bf7fe31c35b0eee168f357e8a530e",
-    "ReadmeUrl": "https://github.com/enrique363/voldorium/blob/b7e4cb6e213bf7fe31c35b0eee168f357e8a530e/README.md",
-    "ReleaseUrl": "https://github.com/enrique363/voldorium/releases/tag/v1.1.0",
-    "ReleaseTag": "v1.1.0",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f02cfc9e448757670695f011362b3ed2c3d8b191",
+    "ReadmeUrl": "https://github.com/enrique363/voldorium/blob/f02cfc9e448757670695f011362b3ed2c3d8b191/README.md",
+    "ReleaseUrl": "https://github.com/enrique363/voldorium/releases/tag/v1.1.3",
+    "ReleaseTag": "v1.1.3",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "Voldorium-1.1.3-linux.tar.gz",
+        "Url": "https://github.com/enrique363/voldorium/releases/download/v1.1.3/Voldorium-1.1.3-linux.tar.gz",
+        "Sha256": "45ce2551e54ee16b40158fee3eaa70b131e94809c5d775228346f26a2bd181ba",
+        "Size": 485765,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Voldorium-1.1.3-windows.zip",
+        "Url": "https://github.com/enrique363/voldorium/releases/download/v1.1.3/Voldorium-1.1.3-windows.zip",
+        "Sha256": "01e1cbb32c3eb208b2f76a8e9d05e754c175f079c31c65e981b32f912bf7a4ea",
+        "Size": 1749291,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "zoomieszaggy-space-channel-5-space-channel-5",
@@ -46,7 +75,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "ff246d27baabeee6c7a342fd7ce69f6755e2d5cd",
     "ReadmeUrl": "https://github.com/ZoomiesZaggy/Space-Channel-5/blob/ff246d27baabeee6c7a342fd7ce69f6755e2d5cd/README.md",
     "ReleaseUrl": "https://github.com/ZoomiesZaggy/Space-Channel-5/releases/tag/v0.1.0-preview.2",

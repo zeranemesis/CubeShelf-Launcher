@@ -11,17 +11,31 @@ try
 {
     var expanded = ShelfProduct.All.Where(product => File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")))
         .ToDictionary(product => product.Id, product => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")));
-    Check(expanded.Count >= 25 && expanded.Values.Sum(ports => ports.Count) > 400, "expanded console catalogues validate with safe package origins and checksums");
+    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 650, "every console catalogue validates with safe package origins and checksums");
     Check(expanded.Keys.All(id => ShelfProduct.Resolve(id).Id == id) && ShelfProduct.All.Select(product => product.Id).Distinct().Count() == ShelfProduct.All.Length,
         "all platform identities resolve uniquely");
-    foreach (var entry in expanded.Where(pair => pair.Key is not ("gamecube" or "wii" or "switch" or "n64")))
-        Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40 && port.VerifiedAt == "2026-10-29" && port.ReadmeUrl.StartsWith(port.Homepage + "/blob/" + port.SourceCommit)), "primary-source provenance: " + entry.Key);
+    using var audit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","windows-refresh-audit.json")));
+    var checkedAt=DateOnly.ParseExact(audit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
+    foreach (var entry in expanded)
+        Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40
+            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=checkedAt
+            && port.ReadmeUrl.StartsWith(port.Homepage + "/blob/")), "dated primary-source provenance: " + entry.Key);
+    var additions=audit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
+    Check(additions.Length==218&&additions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
+        is {VerifiedAt:var date,Assets:var assets,ReadmeUrl:var url,SourceCommit:var commit}&&date==checkedAt.ToString("yyyy-MM-dd")
+        &&url.Contains("/blob/"+commit+"/")&&assets.Count>0&&assets.All(a=>a.RuntimeIdentifiers.Any(r=>r.StartsWith("win-")))),
+        "new references have pinned primary documentation and verified Windows package metadata");
+    Check(expanded.Values.SelectMany(ports=>ports).All(p=>!p.Repository.Equals("Mabec-games/F-ZERO-GLINUX",StringComparison.OrdinalIgnoreCase)
+        &&!p.Repository.Equals("walz0/Melee-3D",StringComparison.OrdinalIgnoreCase)),"previously declined emulator and mod projects remain excluded");
+    Check(expanded["gamecube"].Where(p=>p.Repository=="sonsegajp/Kirby-Air-Ride-Recompiled").All(p=>p.Assets.All(a=>!a.Name.Contains("MapEditor",StringComparison.OrdinalIgnoreCase))),
+        "map editors are not offered as game runtime packages");
     var catalogs = new[] { "gamecube", "wii", "switch", "n64" }.ToDictionary(id => id, id => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory,"Catalogs",id+".json")));
     Check(catalogs["gamecube"].Count >= 19 && catalogs["wii"].Count >= 13 && catalogs["switch"].Count >= 20, "all four catalogues load with verified source references");
-    Check(catalogs.Values.SelectMany(p=>p).All(p => p.ReadmeUrl.StartsWith(p.Homepage+"/") && p.SourceCommit.Length==40 && p.VerifiedAt=="2026-10-26"), "primary README provenance is retained");
+    Check(catalogs.Values.SelectMany(p=>p).All(p => p.ReadmeUrl.StartsWith(p.Homepage+"/") && p.SourceCommit.Length==40 && DateOnly.TryParseExact(p.VerifiedAt,"yyyy-MM-dd",out _)), "primary README provenance is retained");
     Check(catalogs.Values.SelectMany(p=>p).All(p => !p.Repository.Contains("nxnative")), "mobile-only project is not labelled as a desktop port");
     Check(ShelfProduct.Resolve("wii").CreatePaths().DataDirectory != ShelfProduct.Resolve("switch").CreatePaths().DataDirectory, "WiiShelf and SwitchShelf profiles are isolated");
-    Check(catalogs["n64"].Count == 34 && catalogs["n64"].Select(p=>p.Title).Distinct().Count()==29, "Nintendo 64 native ports group into 29 unique games");
+    Check(catalogs["n64"].Select(p=>p.Title).Distinct().Count()>29
+        &&new[]{"Super Mario 64","Banjo-Kazooie","Virtual Pro Wrestling 2"}.All(title=>catalogs["n64"].Any(p=>p.Title==title)), "Nintendo 64 expands while retaining existing games");
     Check(ShelfProduct.Resolve("n64").Console=="Nintendo 64", "Nintendo 64 identity resolves");
     var suiteGames = new[] {
         new GameCatalogEntry {Id="legacy",Title="Legacy"},

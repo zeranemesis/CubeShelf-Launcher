@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "bd946a70dd56c15ec101b4fa7a8b71ff3ade9b95",
     "ReadmeUrl": "https://github.com/AlmazProud/metal-slug-x-recomp/blob/bd946a70dd56c15ec101b4fa7a8b71ff3ade9b95/README.md",
     "ReleaseUrl": "https://github.com/AlmazProud/metal-slug-x-recomp/releases/tag/v2.0.0",

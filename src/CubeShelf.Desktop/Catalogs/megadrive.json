@@ -7,7 +7,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "d3a00f15a220dec107790e2282c974425bfaed34",
     "ReadmeUrl": "https://github.com/kruzeman/RROP/blob/d3a00f15a220dec107790e2282c974425bfaed34/README.md",
     "ReleaseUrl": "https://github.com/kruzeman/RROP/releases",
@@ -26,7 +26,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "1f346407d342beeba97d7d042653f13b49b02792",
     "ReadmeUrl": "https://github.com/heyjoeway/sonic3air/blob/1f346407d342beeba97d7d042653f13b49b02792/README.md",
     "ReleaseUrl": "https://github.com/heyjoeway/sonic3air/releases",
@@ -45,7 +45,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "510679e66abc435f12a29d66c2d6788f4e1008f9",
     "ReadmeUrl": "https://github.com/mstan/SonicTheHedgehogRecomp/blob/510679e66abc435f12a29d66c2d6788f4e1008f9/README.md",
     "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehogRecomp/releases/tag/v0.7.3",
@@ -61,6 +61,80 @@
         "Url": "https://github.com/mstan/SonicTheHedgehogRecomp/releases/download/v0.7.3/SonicTheHedgehogRecomp-windows-x64-v0.7.3.zip",
         "Sha256": "082cfb48e1d35a5ae05f054ad663e4eee46b21e5d920ec7e7d6628bce32a3fc8",
         "Size": 4750567,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-sonic3andknucklesrecomp-sonic-3-knuckles",
+    "Title": "Sonic 3 & Knuckles",
+    "Project": "Sonic3AndKnucklesRecomp",
+    "Repository": "mstan/Sonic3AndKnucklesRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "5303dfe1a51f9afaa7191a4b4073b04c53c02f60",
+    "ReadmeUrl": "https://github.com/mstan/Sonic3AndKnucklesRecomp/blob/5303dfe1a51f9afaa7191a4b4073b04c53c02f60/README.md",
+    "ReleaseUrl": "https://github.com/mstan/Sonic3AndKnucklesRecomp/releases/tag/v0.6.3",
+    "ReleaseTag": "v0.6.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Sonic3KRecomp-windows-x64-v0.6.3.zip",
+        "Url": "https://github.com/mstan/Sonic3AndKnucklesRecomp/releases/download/v0.6.3/Sonic3KRecomp-windows-x64-v0.6.3.zip",
+        "Sha256": "ad3b994ec9e22f09016ec17c928fee025072f6740787227de6bd38919057035b",
+        "Size": 17310522,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Sonic3Recomp-windows-x64-v0.6.3.zip",
+        "Url": "https://github.com/mstan/Sonic3AndKnucklesRecomp/releases/download/v0.6.3/Sonic3Recomp-windows-x64-v0.6.3.zip",
+        "Sha256": "24290bb61664b7f9053c6512576a1890899dfccd506ac0dc5f8c1249996ee33f",
+        "Size": 8215794,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SonicAndKnucklesRecomp-windows-x64-v0.6.3.zip",
+        "Url": "https://github.com/mstan/Sonic3AndKnucklesRecomp/releases/download/v0.6.3/SonicAndKnucklesRecomp-windows-x64-v0.6.3.zip",
+        "Sha256": "cd9d83202d7142b2b7e2f5cd1b395d4344aa03fa1b99da3edd3efe448c4ca270",
+        "Size": 11641838,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-sonicthehedgehog2recomp-sonic-the-hedgehog-2",
+    "Title": "Sonic the Hedgehog 2",
+    "Project": "SonicTheHedgehog2Recomp",
+    "Repository": "mstan/SonicTheHedgehog2Recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c593d5ffc765e69c2bf1f3ba958c7c7b48572890",
+    "ReadmeUrl": "https://github.com/mstan/SonicTheHedgehog2Recomp/blob/c593d5ffc765e69c2bf1f3ba958c7c7b48572890/README.md",
+    "ReleaseUrl": "https://github.com/mstan/SonicTheHedgehog2Recomp/releases/tag/v0.9.2",
+    "ReleaseTag": "v0.9.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SonicTheHedgehog2Recomp-windows-x64-v0.9.2.zip",
+        "Url": "https://github.com/mstan/SonicTheHedgehog2Recomp/releases/download/v0.9.2/SonicTheHedgehog2Recomp-windows-x64-v0.9.2.zip",
+        "Sha256": "1d86cdda661a69d90d7fc26681cf4e40e2b8b5cb1821ce2595432a2ac38dc182",
+        "Size": 7051816,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

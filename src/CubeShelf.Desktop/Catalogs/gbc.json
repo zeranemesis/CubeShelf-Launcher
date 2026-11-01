@@ -7,11 +7,11 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
-    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/cebff309ec646e6f54f175866b209233cd8eb4b7/README.md",
-    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.2",
-    "ReleaseTag": "v1.0.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3d4d0f1ad1b0a2d6358db4bfeec999978912935e",
+    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/3d4d0f1ad1b0a2d6358db4bfeec999978912935e/README.md",
+    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.5",
+    "ReleaseTag": "v1.0.5",
     "Platforms": [
       "Windows",
       "Linux",
@@ -20,8 +20,8 @@
     "Assets": [
       {
         "Name": "Oracles-linux-x86_64.AppImage",
-        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-linux-x86_64.AppImage",
-        "Sha256": "5ea9f20bbf518086713c00f5057f9484facc857273f1f7167eaec3b93eb81dc5",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.5/Oracles-linux-x86_64.AppImage",
+        "Sha256": "087a16d5d49f1deaddc1486456c83879b13d79596a9c85415d4ad982b94232cb",
         "Size": 10275320,
         "RuntimeIdentifiers": [
           "linux-x64"
@@ -29,9 +29,9 @@
       },
       {
         "Name": "Oracles-windows-x64.zip",
-        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-windows-x64.zip",
-        "Sha256": "6e3a63c18b0a40672f824dbb8ce6629e62242ae73f15a4fbc5b45f149da1ab67",
-        "Size": 10979036,
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.5/Oracles-windows-x64.zip",
+        "Sha256": "4115711490c0a91d7d1ffeb5531da61f8d481129f69a4dd4225fe5fb977f5299",
+        "Size": 10995552,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -46,11 +46,11 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "cebff309ec646e6f54f175866b209233cd8eb4b7",
-    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/cebff309ec646e6f54f175866b209233cd8eb4b7/README.md",
-    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.2",
-    "ReleaseTag": "v1.0.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3d4d0f1ad1b0a2d6358db4bfeec999978912935e",
+    "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/3d4d0f1ad1b0a2d6358db4bfeec999978912935e/README.md",
+    "ReleaseUrl": "https://github.com/kirby-letsgo/oracles-decomp/releases/tag/v1.0.5",
+    "ReleaseTag": "v1.0.5",
     "Platforms": [
       "Windows",
       "Linux",
@@ -59,8 +59,8 @@
     "Assets": [
       {
         "Name": "Oracles-linux-x86_64.AppImage",
-        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-linux-x86_64.AppImage",
-        "Sha256": "5ea9f20bbf518086713c00f5057f9484facc857273f1f7167eaec3b93eb81dc5",
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.5/Oracles-linux-x86_64.AppImage",
+        "Sha256": "087a16d5d49f1deaddc1486456c83879b13d79596a9c85415d4ad982b94232cb",
         "Size": 10275320,
         "RuntimeIdentifiers": [
           "linux-x64"
@@ -68,9 +68,111 @@
       },
       {
         "Name": "Oracles-windows-x64.zip",
-        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.2/Oracles-windows-x64.zip",
-        "Sha256": "6e3a63c18b0a40672f824dbb8ce6629e62242ae73f15a4fbc5b45f149da1ab67",
-        "Size": 10979036,
+        "Url": "https://github.com/kirby-letsgo/oracles-decomp/releases/download/v1.0.5/Oracles-windows-x64.zip",
+        "Sha256": "4115711490c0a91d7d1ffeb5531da61f8d481129f69a4dd4225fe5fb977f5299",
+        "Size": 10995552,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "thibautbus-top-the-legend-of-zelda-oracle-of-ages-seasons",
+    "Title": "The Legend of Zelda: Oracle of Ages/Seasons",
+    "Project": "top",
+    "Repository": "thibautbus/top",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a2c98d6efadcc714b79464353672dd70e78de649",
+    "ReadmeUrl": "https://github.com/thibautbus/top/blob/a2c98d6efadcc714b79464353672dd70e78de649/README.md",
+    "ReleaseUrl": "https://github.com/thibautbus/top/releases/tag/v1.3.0",
+    "ReleaseTag": "v1.3.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "the-oracles-project-1.3.0-windows.zip",
+        "Url": "https://github.com/thibautbus/top/releases/download/v1.3.0/the-oracles-project-1.3.0-windows.zip",
+        "Sha256": "66cd883136e70d41bad025df4cf1b89afaf6b90927e179aa51af9d26c7a0f561",
+        "Size": 3899197,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "underdecoded-gen2recomped-pokemon-gold-silver-crystal",
+    "Title": "Pokemon Gold / Silver / Crystal",
+    "Project": "Gen2Recomped",
+    "Repository": "UNDERdecoded/Gen2Recomped",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8d5b4387420cc1fdcadf58ad4ca78a7d8596e41d",
+    "ReadmeUrl": "https://github.com/UNDERdecoded/Gen2Recomped/blob/8d5b4387420cc1fdcadf58ad4ca78a7d8596e41d/README.md",
+    "ReleaseUrl": "https://github.com/UNDERdecoded/Gen2Recomped/releases/tag/v0.8.47",
+    "ReleaseTag": "v0.8.47",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Gen2Recomped-0.8.47-windows.zip",
+        "Url": "https://github.com/UNDERdecoded/Gen2Recomped/releases/download/v0.8.47/Gen2Recomped-0.8.47-windows.zip",
+        "Sha256": "c6b9694cd9ebc525a4cd3c0ffaa329f3b7d54cd81eb74792880f0a96de192341",
+        "Size": 70810503,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "vibecodekun-shantaerecomp-shantae",
+    "Title": "Shantae",
+    "Project": "shantaerecomp",
+    "Repository": "vibecodekun/shantaerecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d870bd2e9969135adb7277bf5b02445a3cd50871",
+    "ReadmeUrl": "https://github.com/vibecodekun/shantaerecomp/blob/d870bd2e9969135adb7277bf5b02445a3cd50871/README.md",
+    "ReleaseUrl": "https://github.com/vibecodekun/shantaerecomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "shantae-recomp-0.2.0-windows-arm64.zip",
+        "Url": "https://github.com/vibecodekun/shantaerecomp/releases/download/v0.2.0/shantae-recomp-0.2.0-windows-arm64.zip",
+        "Sha256": "89d6574096dfd143cd1f11089443b53683201433782522c70bf56d2d2fdacbbd",
+        "Size": 78965790,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "shantae-recomp-0.2.0-windows-x64.zip",
+        "Url": "https://github.com/vibecodekun/shantaerecomp/releases/download/v0.2.0/shantae-recomp-0.2.0-windows-x64.zip",
+        "Sha256": "d85e17f17b2f25415ae5be237c29a3eba7b48b96d53a591b84aa1e84fa76a3e3",
+        "Size": 85452643,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "shantae-recomp-0.2.0-windows-x86.zip",
+        "Url": "https://github.com/vibecodekun/shantaerecomp/releases/download/v0.2.0/shantae-recomp-0.2.0-windows-x86.zip",
+        "Sha256": "9f5b359d3ec2f755ff86d8b2b41cfbca9a087819a773cfcb5ca15e9016a64651",
+        "Size": 83888162,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

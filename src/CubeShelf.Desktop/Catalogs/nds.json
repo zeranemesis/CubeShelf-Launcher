@@ -7,16 +7,35 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "934c7434c9a6c2866fea17fa36098ef9c0652fc4",
     "ReadmeUrl": "https://github.com/JonathanDC64/FFCCEOT-Recomp/blob/934c7434c9a6c2866fea17fa36098ef9c0652fc4/README.md",
-    "ReleaseUrl": "https://github.com/JonathanDC64/FFCCEOT-Recomp/releases",
-    "ReleaseTag": "",
+    "ReleaseUrl": "https://github.com/JonathanDC64/FFCCEOT-Recomp/releases/tag/v0.3.1-alpha",
+    "ReleaseTag": "v0.3.1-alpha",
     "Platforms": [
       "Windows",
       "Linux"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "FFCCEOT-Recomp-0.3.1-alpha-windows-x64.zip",
+        "Url": "https://github.com/JonathanDC64/FFCCEOT-Recomp/releases/download/v0.3.1-alpha/FFCCEOT-Recomp-0.3.1-alpha-windows-x64.zip",
+        "Sha256": "817f2a12385db4c81d32e7cfd73fb22344955e4f914ba0ba2374f77044ed995e",
+        "Size": 92362395,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "FFCCEOT-Recomp-0.3.1-alpha-x86_64.AppImage",
+        "Url": "https://github.com/JonathanDC64/FFCCEOT-Recomp/releases/download/v0.3.1-alpha/FFCCEOT-Recomp-0.3.1-alpha-x86_64.AppImage",
+        "Sha256": "d0520c4ae663d0ecfa6fc8e78141f7b875aa24943fd1c1a114f222e6413c5b7c",
+        "Size": 223877624,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "piuzera-jusdecomp-jump-ultimate-stars",
@@ -26,7 +45,7 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "6a061e3897f10a8800bf7ec9afde82fa8c9dbe1b",
     "ReadmeUrl": "https://github.com/piuzera/JUSDecomp/blob/6a061e3897f10a8800bf7ec9afde82fa8c9dbe1b/README.md",
     "ReleaseUrl": "https://github.com/piuzera/JUSDecomp/releases/tag/v0.3.1",
@@ -45,7 +64,7 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-10-29",
+    "VerifiedAt": "2026-11-01",
     "SourceCommit": "b3965470b2426fc2edfdce2ab7334a5f459607be",
     "ReadmeUrl": "https://github.com/Yokimitsuro/khdays-port/blob/b3965470b2426fc2edfdce2ab7334a5f459607be/README.md",
     "ReleaseUrl": "https://github.com/Yokimitsuro/khdays-port/releases/tag/v0.1.4",
@@ -55,7 +74,17 @@
       "Linux",
       "macOS"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "KH358-2-Days-Port-Setup-0.1.4.exe",
+        "Url": "https://github.com/Yokimitsuro/khdays-port/releases/download/v0.1.4/KH358-2-Days-Port-Setup-0.1.4.exe",
+        "Sha256": "0524bd116aa9fd7db6e5d6784debc495952560cca067be76b1555aa59f4d70af",
+        "Size": 29024052,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   },
   {
     "Id": "callancampos-frigate-pok-mon-black-2",
@@ -94,5 +123,89 @@
       "macOS"
     ],
     "Assets": []
+  },
+  {
+    "Id": "official-kryo-to-ctw-native-grand-theft-auto-chinatown-wars",
+    "Title": "Grand Theft Auto: Chinatown Wars",
+    "Project": "ctw-native",
+    "Repository": "official-kryo-to/ctw-native",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "108320b137c3ca748d697838f86c8919c12b3f2c",
+    "ReadmeUrl": "https://github.com/official-kryo-to/ctw-native/blob/108320b137c3ca748d697838f86c8919c12b3f2c/README.md",
+    "ReleaseUrl": "https://github.com/official-kryo-to/ctw-native/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "CTW-Native-Porter.exe",
+        "Url": "https://github.com/official-kryo-to/ctw-native/releases/download/v0.5.0/CTW-Native-Porter.exe",
+        "Sha256": "1dc7f4391262db261b69f81ce3ba556e3406ae5d6802ac4e0a475b2fbe53094a",
+        "Size": 19677184,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mstan-metroidprimehuntersrecomp-metroid-prime-hunters",
+    "Title": "Metroid Prime Hunters",
+    "Project": "MetroidPrimeHuntersRecomp",
+    "Repository": "mstan/MetroidPrimeHuntersRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "61ac84aac262645e446ea28e3d4db3567e2dba8c",
+    "ReadmeUrl": "https://github.com/mstan/MetroidPrimeHuntersRecomp/blob/61ac84aac262645e446ea28e3d4db3567e2dba8c/README.md",
+    "ReleaseUrl": "https://github.com/mstan/MetroidPrimeHuntersRecomp/releases/tag/v0.7.12-alpha",
+    "ReleaseTag": "v0.7.12-alpha",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MetroidPrimeHuntersRecomp-windows-x64-v0.7.12.zip",
+        "Url": "https://github.com/mstan/MetroidPrimeHuntersRecomp/releases/download/v0.7.12-alpha/MetroidPrimeHuntersRecomp-windows-x64-v0.7.12.zip",
+        "Sha256": "c811daf82dc630678025cab04e6fe1a7862e5e362169fbb16407c0522398058c",
+        "Size": 137754437,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "clickingmaster-pokeheartgold-single-screen-pokemon-heartgold-and-soulsilver",
+    "Title": "Pokémon HeartGold and SoulSilver",
+    "Project": "pokeheartgold-single-screen",
+    "Repository": "ClickingMaster/pokeheartgold-single-screen",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "6984a3d67592157195940049be2e4bbbf933f9ff",
+    "ReadmeUrl": "https://github.com/ClickingMaster/pokeheartgold-single-screen/blob/6984a3d67592157195940049be2e4bbbf933f9ff/README.md",
+    "ReleaseUrl": "https://github.com/ClickingMaster/pokeheartgold-single-screen/releases/tag/v0.1.4",
+    "ReleaseTag": "v0.1.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "pokeheartgold-single-screen-setup-windows-x86_64.exe",
+        "Url": "https://github.com/ClickingMaster/pokeheartgold-single-screen/releases/download/v0.1.4/pokeheartgold-single-screen-setup-windows-x86_64.exe",
+        "Sha256": "2fbcb7faa4a8d7887d5fd7775a2c6ba170731e71187dad0855ef7d6654f32524",
+        "Size": 68347410,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

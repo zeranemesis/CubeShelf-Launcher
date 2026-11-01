@@ -36,6 +36,8 @@ L'application PC possède 30 catalogues de plateformes, dont Nintendo, Sega, Pla
 
 [Catalogues et provenance](docs/CONSOLE-CATALOGS.md) · [Inventaire d'origine](docs/NATIVE-PORT-INVENTORY.md) · [Sources des jaquettes](docs/COVER-SOURCES.md).
 
+[Actualisation Windows du 1er novembre 2026](docs/WINDOWS-CATALOG-2026-11-01.md) : 218 références supplémentaires et 138 jaquettes ; aucun port natif Windows Switch 2 vérifié dans cette passe. La présence d'un paquet ne vaut pas validation de sa jouabilité.
+
 Les photos et logos des consoles sont inclus dans les paquets et fonctionnent hors connexion. Leurs crédits sont livrés dans `Assets/Consoles/` et `Assets/Brand/Consoles/`. Les jaquettes absentes sont indiquées ; aucune illustration d'un autre jeu ne leur est substituée. Les modèles 3D de consoles restent stylisés et certaines silhouettes simplifiées.
 
 ## Android

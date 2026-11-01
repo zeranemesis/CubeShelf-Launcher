@@ -43,29 +43,29 @@ try
             && !Avalonia.Platform.AssetLoader.Exists(new Uri($"avares://CubeShelf/Assets/Brand/Consoles/{id}.gif")))
             throw new Exception("Missing console logo artwork: "+id);
     }
-    if(cubeCount!=21)throw new Exception($"GameCube catalogue should contain 21 unique games, got {cubeCount}.");
+    if(cubeCount!=26)throw new Exception($"GameCube catalogue should contain 26 unique games, got {cubeCount}.");
     AssertCovers();
     selector.SelectedIndex=1;
     AssertBrand("wii");
-    if(cards.Items.Count!=13 || fullscreen.SelectedIndex!=1 || !window.Title!.Contains("Wii"))throw new Exception("Wii selector did not update the existing library.");
+    if(cards.Items.Count!=14 || fullscreen.SelectedIndex!=1 || !window.Title!.Contains("Wii"))throw new Exception("Wii selector did not update the existing library.");
     AssertCovers();
     selector.SelectedIndex=2;
     AssertBrand("switch");
-    if(cards.Items.Count!=16 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
+    if(cards.Items.Count!=18 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
     if(!window.FindControl<TextBlock>("LibrarySectionTitle")!.Text!.Contains("Switch"))throw new Exception("Library heading does not match selected console.");
     var multi = cards.Items.Cast<MainWindow.DesktopGameCard>().First(card => card.HasVersionChoice);
     var alternative = multi.Versions.First(choice => choice.GameId != multi.Game.Id);
     var versionPicker = new ComboBox { Tag = multi, ItemsSource = multi.Versions };
     versionPicker.SelectionChanged += (sender, args) => typeof(MainWindow).GetMethod("CardPortVersionChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [sender, args]);
     versionPicker.SelectedItem = alternative;
-    if(cards.Items.Count!=16 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
+    if(cards.Items.Count!=18 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
         throw new Exception("Choosing another port duplicated the game or did not replace its version.");
     if(!File.ReadAllText(Path.Combine(profile,"selected-port-versions.json")).Contains(alternative.GameId))
         throw new Exception("Selected port version was not persisted.");
     AssertCovers();
     selector.SelectedIndex=3;
     AssertBrand("n64");
-    if(cards.Items.Count!=29 || fullscreen.SelectedIndex!=3)throw new Exception("Nintendo 64 catalogue or selectors incorrect.");
+    if(cards.Items.Count!=68 || fullscreen.SelectedIndex!=3)throw new Exception("Nintendo 64 catalogue or selectors incorrect.");
     AssertCovers();
     var japanese=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Virtual Pro Wrestling 2").Game.Covers.First();
     var landscapeCard=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Banjo-Kazooie");
@@ -104,13 +104,13 @@ try
     window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     fullscreen.SelectedIndex=1;
     AssertBrand("wii");
-    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=13 || selector.SelectedIndex!=1)
+    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=14 || selector.SelectedIndex!=1)
         throw new Exception("Changing console left Big Picture or used the wrong catalogue.");
     fullscreen.SelectedIndex=2;
     AssertBrand("switch");
-    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=16)
+    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=18)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
-    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (13) → Switch (16) → Nintendo 64 (29) → GameCube ({cubeCount})");
+    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (18) → Nintendo 64 (68) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
@@ -121,7 +121,9 @@ try
         AssertBrand(id);
         if(window.FindControl<TextBlock>("GameTitle")!.Text!=window.FindControl<TextBlock>("SelectedTitleText")!.Text)
             throw new Exception("Console switching retained the previous game's detail header: "+id);
-        if(id=="3ds" && cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card=>!card.PlayLabel.Contains("config",StringComparison.OrdinalIgnoreCase)))
+        var sourceOnly=CubeShelf.Core.Library.NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory,"Catalogs",id+".json"))
+            .Where(port=>!port.Assets.Any(asset=>asset.MatchesCurrentPlatform)).Select(port=>port.Id).ToHashSet();
+        if(cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card=>sourceOnly.Contains(card.Game.NativePortId) && !card.PlayLabel.Contains("config",StringComparison.OrdinalIgnoreCase)))
             throw new Exception("Ports without a verified compatible package must offer configuration rather than automatic installation.");
         if (cards.Items.Count == 0 || fullscreen.SelectedIndex != index ||
             cards.Items.Cast<MainWindow.DesktopGameCard>().Select(card => card.Title).Distinct().Count() != cards.Items.Count)
@@ -202,7 +204,7 @@ try
     var transition=window.FindControl<ShelfTransitionControl>("ShelfTransition")!;
     var host=window.FindControl<Grid>("LibraryView")!;
     selector.SelectedIndex=1;
-    if(!transition.IsRunning || cards.Items.Count!=13)throw new Exception("Console transition did not start with the new catalogue ready.");
+    if(!transition.IsRunning || cards.Items.Count!=14)throw new Exception("Console transition did not start with the new catalogue ready.");
     transition.Advance(ShelfTransitionControl.Duration/2);
     if(host.Opacity<=0 || host.Opacity>=1)throw new Exception("Transition did not reveal the incoming library progressively.");
     if(snapshotDirectory is not null)
@@ -214,7 +216,7 @@ try
     }
     selector.SelectedIndex=0;selector.SelectedIndex=2;
     transition.Advance(1);
-    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=16)
+    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=18)
         throw new Exception("Rapid switching left stale content, opacity or transforms.");
     var decodes=CoverBitmapCache.DecodeCount;
     var search=window.FindControl<TextBox>("LibrarySearchBox")!;
@@ -222,7 +224,7 @@ try
     if(CoverBitmapCache.DecodeCount!=decodes)throw new Exception("A warm search decoded cover images again.");
     var reduce=window.FindControl<CheckBox>("ReduceShelfMotionBox")!;
     reduce.IsChecked=true;selector.SelectedIndex=1;
-    if(transition.IsRunning || host.Opacity!=1 || cards.Items.Count!=13)throw new Exception("Reduced motion did not switch immediately.");
+    if(transition.IsRunning || host.Opacity!=1 || cards.Items.Count!=14)throw new Exception("Reduced motion did not switch immediately.");
     reduce.IsChecked=false;
     selector.SelectedIndex=2;
     window.Hide();

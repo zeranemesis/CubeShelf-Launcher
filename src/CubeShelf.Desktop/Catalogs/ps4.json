@@ -7,20 +7,626 @@
     "Method": "Réimplémentation native (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-10-29",
-    "SourceCommit": "ba850846bf711d655e2cc810647317c6547aa6ac",
-    "ReadmeUrl": "https://github.com/OverkillLabs3/driveclub-recomp/blob/ba850846bf711d655e2cc810647317c6547aa6ac/README.md",
-    "ReleaseUrl": "https://github.com/OverkillLabs3/driveclub-recomp/releases/tag/v0.3.2",
-    "ReleaseTag": "v0.3.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9578f8687da5710d7f5a7fcd7413c0f2febba256",
+    "ReadmeUrl": "https://github.com/OverkillLabs3/driveclub-recomp/blob/9578f8687da5710d7f5a7fcd7413c0f2febba256/README.md",
+    "ReleaseUrl": "https://github.com/OverkillLabs3/driveclub-recomp/releases/tag/v0.4.0",
+    "ReleaseTag": "v0.4.0",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "driveclub-recomp-0.3.2-win64.zip",
-        "Url": "https://github.com/OverkillLabs3/driveclub-recomp/releases/download/v0.3.2/driveclub-recomp-0.3.2-win64.zip",
-        "Sha256": "a4bdf0041e9bdf02457cd1cd028fe759eed8047a2a750c5a3cfca5375e6495e1",
-        "Size": 96801711,
+        "Name": "driveclub-recomp-0.4.0-win64.zip",
+        "Url": "https://github.com/OverkillLabs3/driveclub-recomp/releases/download/v0.4.0/driveclub-recomp-0.4.0-win64.zip",
+        "Sha256": "60bc08bf031a39302daa78a6a12edec714228803564e674c79e23333e84d0ff3",
+        "Size": 131489823,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "deadinside28-bloodborne-pc-bloodborne",
+    "Title": "Bloodborne",
+    "Project": "bloodborne_pc",
+    "Repository": "deadinside28/bloodborne_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0fc2921c45f8ff3900f6bfa43a299e9a4f532af4",
+    "ReadmeUrl": "https://github.com/deadinside28/bloodborne_pc/blob/0fc2921c45f8ff3900f6bfa43a299e9a4f532af4/README.md",
+    "ReleaseUrl": "https://github.com/deadinside28/bloodborne_pc/releases/tag/0.7",
+    "ReleaseTag": "0.7",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Bloodborne-bbport-0.7-windows-x64.zip",
+        "Url": "https://github.com/deadinside28/bloodborne_pc/releases/download/0.7/Bloodborne-bbport-0.7-windows-x64.zip",
+        "Sha256": "db7c518fcb6c6c8c9538762dad3657e6945d084bd34b40b88416ec683ce796d0",
+        "Size": 179620136,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "awakenchan-lanternengine-bloodborne",
+    "Title": "Bloodborne",
+    "Project": "LanternEngine",
+    "Repository": "Awakenchan/LanternEngine",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e6b943dd969d99561545315f3d801f10e4a6cf8d",
+    "ReadmeUrl": "https://github.com/Awakenchan/LanternEngine/blob/e6b943dd969d99561545315f3d801f10e4a6cf8d/README.md",
+    "ReleaseUrl": "https://github.com/Awakenchan/LanternEngine/releases/tag/v0.9.39-beta.29",
+    "ReleaseTag": "v0.9.39-beta.29",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Bloodborne.Launcher.exe",
+        "Url": "https://github.com/Awakenchan/LanternEngine/releases/download/v0.9.39-beta.29/Bloodborne.Launcher.exe",
+        "Sha256": "785a9e1d32bc80d772401630966833e6001a2239fed73b0be203fdf2cdfc9ffe",
+        "Size": 77129447,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Lantern.Engine.exe",
+        "Url": "https://github.com/Awakenchan/LanternEngine/releases/download/v0.9.39-beta.29/Lantern.Engine.exe",
+        "Sha256": "785a9e1d32bc80d772401630966833e6001a2239fed73b0be203fdf2cdfc9ffe",
+        "Size": 77129447,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "LanternEngine-v0.9.39-beta.29-win64.zip",
+        "Url": "https://github.com/Awakenchan/LanternEngine/releases/download/v0.9.39-beta.29/LanternEngine-v0.9.39-beta.29-win64.zip",
+        "Sha256": "e208370d0f7db38c91f5b9169cca8c57eee8a1f3f7621ac9756a0c9f65d83c85",
+        "Size": 233244324,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mrsuss60-bloodborne-pc-windows-port-bloodborne",
+    "Title": "Bloodborne",
+    "Project": "bloodborne_pc_windows_port",
+    "Repository": "Mrsuss60/bloodborne_pc_windows_port",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0176a88b3fad98fda0eebcc980bd9743349df604",
+    "ReadmeUrl": "https://github.com/Mrsuss60/bloodborne_pc_windows_port/blob/0176a88b3fad98fda0eebcc980bd9743349df604/README.md",
+    "ReleaseUrl": "https://github.com/Mrsuss60/bloodborne_pc_windows_port/releases/tag/v0.8.0",
+    "ReleaseTag": "v0.8.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "bloodborne_pc_windows_port_v0.8.0_release.zip",
+        "Url": "https://github.com/Mrsuss60/bloodborne_pc_windows_port/releases/download/v0.8.0/bloodborne_pc_windows_port_v0.8.0_release.zip",
+        "Sha256": "7b1293e0f2f249ae28e7f44731092b49005049d5b8a35f8a9c53270ab2bb1caa",
+        "Size": 162904588,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "ryu7w7-octr-nitrofueled-pc-crash-team-racing-nitro-fueled",
+    "Title": "Crash Team Racing Nitro-Fueled",
+    "Project": "OCTR-NitroFueled-PC",
+    "Repository": "Ryu7w7/OCTR-NitroFueled-PC",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3885d1aea24d19ed9b31f96fba57a5cce92183cd",
+    "ReadmeUrl": "https://github.com/Ryu7w7/OCTR-NitroFueled-PC/blob/3885d1aea24d19ed9b31f96fba57a5cce92183cd/README.md",
+    "ReleaseUrl": "https://github.com/Ryu7w7/OCTR-NitroFueled-PC/releases/tag/v0.7.5",
+    "ReleaseTag": "v0.7.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "CTR-NitroFueled-PC-portable-v0.7.5-windows.zip",
+        "Url": "https://github.com/Ryu7w7/OCTR-NitroFueled-PC/releases/download/v0.7.5/CTR-NitroFueled-PC-portable-v0.7.5-windows.zip",
+        "Sha256": "b5f462e2e46ae0fa5cc31fc3c85b210586630ab68a70fc755c83dd5b8c3b1c14",
+        "Size": 138654499,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "saulob-dragons-crown-pro-pc-dragon-s-crown-pro",
+    "Title": "Dragon's Crown Pro",
+    "Project": "dragons-crown-pro-pc",
+    "Repository": "saulob/dragons-crown-pro-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "032bbd0a60a40f6f2e85152ba1ebccfa9ce9a255",
+    "ReadmeUrl": "https://github.com/saulob/dragons-crown-pro-pc/blob/032bbd0a60a40f6f2e85152ba1ebccfa9ce9a255/README.md",
+    "ReleaseUrl": "https://github.com/saulob/dragons-crown-pro-pc/releases/tag/v0.9.1",
+    "ReleaseTag": "v0.9.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DragonsCrownProPC-v0.9.1-windows-x64.zip",
+        "Url": "https://github.com/saulob/dragons-crown-pro-pc/releases/download/v0.9.1/DragonsCrownProPC-v0.9.1-windows-x64.zip",
+        "Sha256": "d5c4a632109d66ae6778fff17ddb533eacbe1e7eb820092cec03d0e4d09493df",
+        "Size": 17236475,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "gnsb-ufc-3-ps4-port-linux-windows-ea-sports-ufc-3",
+    "Title": "EA Sports UFC 3",
+    "Project": "UFC-3-PS4-PORT-LINUX-WINDOWS",
+    "Repository": "GNSB/UFC-3-PS4-PORT-LINUX-WINDOWS",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "23e9875c04babdee5535f4a33842c41f2a79e9a1",
+    "ReadmeUrl": "https://github.com/GNSB/UFC-3-PS4-PORT-LINUX-WINDOWS/blob/23e9875c04babdee5535f4a33842c41f2a79e9a1/README.md",
+    "ReleaseUrl": "https://github.com/GNSB/UFC-3-PS4-PORT-LINUX-WINDOWS/releases/tag/ufc3-v0.1.14",
+    "ReleaseTag": "ufc3-v0.1.14",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "UFC3Native-ufc3-v0.1.14-windows-x86_64.zip",
+        "Url": "https://github.com/GNSB/UFC-3-PS4-PORT-LINUX-WINDOWS/releases/download/ufc3-v0.1.14/UFC3Native-ufc3-v0.1.14-windows-x86_64.zip",
+        "Sha256": "3f6f8163dc19a3cbc7c7465bf32f3e74fc04728e3c7d9a0614d7bfc048fdf404",
+        "Size": 21206880,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "felipeprado0-spartanport-god-of-war-iii-remastered",
+    "Title": "God of War III Remastered",
+    "Project": "SpartanPort",
+    "Repository": "FelipePrado0/SpartanPort",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c4594385ba8cd4f02285b0ad1f434ba64bf78771",
+    "ReadmeUrl": "https://github.com/FelipePrado0/SpartanPort/blob/c4594385ba8cd4f02285b0ad1f434ba64bf78771/README.md",
+    "ReleaseUrl": "https://github.com/FelipePrado0/SpartanPort/releases/tag/windows-v3.0.0",
+    "ReleaseTag": "windows-v3.0.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "spartanport-windows.zip",
+        "Url": "https://github.com/FelipePrado0/SpartanPort/releases/download/windows-v3.0.0/spartanport-windows.zip",
+        "Sha256": "5fdc28e3c993b2f434c189d5bb5a00dff0117715d17990153b09707fb8367638",
+        "Size": 100867042,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hayatog-gr2-pc-gravity-rush-2",
+    "Title": "Gravity Rush 2",
+    "Project": "gr2_pc",
+    "Repository": "HayatoG/gr2_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a2e69a1bc506865716cb4e16f2c50f047bf65e57",
+    "ReadmeUrl": "https://github.com/HayatoG/gr2_pc/blob/a2e69a1bc506865716cb4e16f2c50f047bf65e57/README.md",
+    "ReleaseUrl": "https://github.com/HayatoG/gr2_pc/releases/tag/v2026.10.24-a2e69a1",
+    "ReleaseTag": "v2026.10.24-a2e69a1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "gr2-windows-x86_64.zip",
+        "Url": "https://github.com/HayatoG/gr2_pc/releases/download/v2026.10.24-a2e69a1/gr2-windows-x86_64.zip",
+        "Sha256": "4fe3d0e2da7e1fa0a9dfaa231b2b35b62ce08e9ebf31c5cea75584c41dd253c6",
+        "Size": 113543088,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "lucapazienza-gravityrush-pc-gravity-rush-remastered",
+    "Title": "Gravity Rush Remastered",
+    "Project": "gravityrush_pc",
+    "Repository": "LucaPazienza/gravityrush_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9108d33eeeb25910ce484a64df535028fe8824e0",
+    "ReadmeUrl": "https://github.com/LucaPazienza/gravityrush_pc/blob/9108d33eeeb25910ce484a64df535028fe8824e0/README.md",
+    "ReleaseUrl": "https://github.com/LucaPazienza/gravityrush_pc/releases/tag/v0.1.10",
+    "ReleaseTag": "v0.1.10",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "GravityRush-PC-0.1.10-Windows.zip",
+        "Url": "https://github.com/LucaPazienza/gravityrush_pc/releases/download/v0.1.10/GravityRush-PC-0.1.10-Windows.zip",
+        "Sha256": "30e310dbc96ebecaf69895be10e62bcc16b37a226e1a65d6a804ce36608bfe7b",
+        "Size": 112179433,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hayatog-iss-pc-infamous-second-son",
+    "Title": "inFAMOUS Second Son",
+    "Project": "iss_pc",
+    "Repository": "HayatoG/iss_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "37c05ba21bb328f5962edfbc42bb5360f7db42ed",
+    "ReadmeUrl": "https://github.com/HayatoG/iss_pc/blob/37c05ba21bb328f5962edfbc42bb5360f7db42ed/README.md",
+    "ReleaseUrl": "https://github.com/HayatoG/iss_pc/releases/tag/v1.0",
+    "ReleaseTag": "v1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "infamous-windows-x86_64.zip",
+        "Url": "https://github.com/HayatoG/iss_pc/releases/download/v1.0/infamous-windows-x86_64.zip",
+        "Sha256": "25cf4c6a27547b0d714efee15ceb7058165f316ae65348d2a8e583650154e4ca",
+        "Size": 122650527,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "lesca-191204-killzone-shadowfall-pc-killzone-shadow-fall",
+    "Title": "Killzone: Shadow Fall",
+    "Project": "killzone-shadowfall-pc",
+    "Repository": "lesca-191204/killzone-shadowfall-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3594ad51cb8a6d2e0495fd7c6b242d6486cbf32a",
+    "ReadmeUrl": "https://github.com/lesca-191204/killzone-shadowfall-pc/blob/3594ad51cb8a6d2e0495fd7c6b242d6486cbf32a/README.md",
+    "ReleaseUrl": "https://github.com/lesca-191204/killzone-shadowfall-pc/releases/tag/v0.8.1",
+    "ReleaseTag": "v0.8.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "KillzoneShadowFall-v0.8.1-windows.zip",
+        "Url": "https://github.com/lesca-191204/killzone-shadowfall-pc/releases/download/v0.8.1/KillzoneShadowFall-v0.8.1-windows.zip",
+        "Sha256": "5aa6133e964cc2db133d24645d1291339753603bae8b18097aec08de0b00907b",
+        "Size": 120431879,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hayatog-tlg-pc-the-last-guardian",
+    "Title": "The Last Guardian",
+    "Project": "tlg_pc",
+    "Repository": "HayatoG/tlg_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "4825a991c2ac8fd8865b3c340a18b2f54628c0f0",
+    "ReadmeUrl": "https://github.com/HayatoG/tlg_pc/blob/4825a991c2ac8fd8865b3c340a18b2f54628c0f0/README.md",
+    "ReleaseUrl": "https://github.com/HayatoG/tlg_pc/releases/tag/v2026.10.27-4825a99",
+    "ReleaseTag": "v2026.10.27-4825a99",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "tlg-windows-x86_64.zip",
+        "Url": "https://github.com/HayatoG/tlg_pc/releases/download/v2026.10.27-4825a99/tlg-windows-x86_64.zip",
+        "Sha256": "fbae777ac5d63abeba2d20112be41181ce50d1c05f358b6fa531d7e700b1c9dd",
+        "Size": 146215342,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hayatog-tlou-pc-the-last-of-us",
+    "Title": "The Last of Us",
+    "Project": "tlou_pc",
+    "Repository": "HayatoG/tlou_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a8dd0b84e30a780a4d0802c63db68a45d10a53cc",
+    "ReadmeUrl": "https://github.com/HayatoG/tlou_pc/blob/a8dd0b84e30a780a4d0802c63db68a45d10a53cc/README.md",
+    "ReleaseUrl": "https://github.com/HayatoG/tlou_pc/releases/tag/v2026.10.17-a8dd0b8",
+    "ReleaseTag": "v2026.10.17-a8dd0b8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "tlou-windows-x86_64.zip",
+        "Url": "https://github.com/HayatoG/tlou_pc/releases/download/v2026.10.17-a8dd0b8/tlou-windows-x86_64.zip",
+        "Sha256": "78405f438d01708f20eaedc8a82601793adcd5616b7d1b15cdb1974111c3e2fd",
+        "Size": 67786986,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "vascon-es-lego-dimensions-pc-lego-dimensions",
+    "Title": "LEGO Dimensions",
+    "Project": "lego-dimensions-pc",
+    "Repository": "vascon-es/lego-dimensions-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a43386fbe31aaffafef58126557355b7d6702f17",
+    "ReadmeUrl": "https://github.com/vascon-es/lego-dimensions-pc/blob/a43386fbe31aaffafef58126557355b7d6702f17/README.md",
+    "ReleaseUrl": "https://github.com/vascon-es/lego-dimensions-pc/releases/tag/v1.8.8",
+    "ReleaseTag": "v1.8.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LEGO_Dimensions_PC_Setup.exe",
+        "Url": "https://github.com/vascon-es/lego-dimensions-pc/releases/download/v1.8.8/LEGO_Dimensions_PC_Setup.exe",
+        "Sha256": "647cc1e7034f50cb829971da752f571c7c60c8654e79527df27822853abd68bf",
+        "Size": 105946633,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bc160201983-medievil-2019-pc-port-medievil",
+    "Title": "MediEvil",
+    "Project": "medievil_2019_pc_port",
+    "Repository": "bc160201983/medievil_2019_pc_port",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "424f3ea8dbdcb02754a31e5225ef42e2f77f8e94",
+    "ReadmeUrl": "https://github.com/bc160201983/medievil_2019_pc_port/blob/424f3ea8dbdcb02754a31e5225ef42e2f77f8e94/README.md",
+    "ReleaseUrl": "https://github.com/bc160201983/medievil_2019_pc_port/releases/tag/v1.3.8",
+    "ReleaseTag": "v1.3.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "medievil-windows.zip",
+        "Url": "https://github.com/bc160201983/medievil_2019_pc_port/releases/download/v1.3.8/medievil-windows.zip",
+        "Sha256": "0930ada458c0eb04855049519ff8af3dbc12e2140760fc46bbe0b683978e42a6",
+        "Size": 78406334,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "saulob-odin-sphere-leifthrasir-pc-odin-sphere-leifthrasir",
+    "Title": "Odin Sphere Leifthrasir",
+    "Project": "odin-sphere-leifthrasir-pc",
+    "Repository": "saulob/odin-sphere-leifthrasir-pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "63e863935310957ccc2659d6a374a0f62eed9272",
+    "ReadmeUrl": "https://github.com/saulob/odin-sphere-leifthrasir-pc/blob/63e863935310957ccc2659d6a374a0f62eed9272/README.md",
+    "ReleaseUrl": "https://github.com/saulob/odin-sphere-leifthrasir-pc/releases/tag/v0.2.1",
+    "ReleaseTag": "v0.2.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "OdinSphereLeifthrasirPC-v0.2.1-windows-x64.zip",
+        "Url": "https://github.com/saulob/odin-sphere-leifthrasir-pc/releases/download/v0.2.1/OdinSphereLeifthrasirPC-v0.2.1-windows-x64.zip",
+        "Sha256": "45a401a227b8e2e9444e0c0d3edd38a2c1faf34b5edbc7e361f19cf5b6c58014",
+        "Size": 16035315,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mateussmeneses-theorder1886-port-the-order-1886",
+    "Title": "The Order: 1886",
+    "Project": "theorder1886-port",
+    "Repository": "mateussmeneses/theorder1886-port",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "83079e0b660b044254028aa1b27a9c856a387210",
+    "ReadmeUrl": "https://github.com/mateussmeneses/theorder1886-port/blob/83079e0b660b044254028aa1b27a9c856a387210/README.md",
+    "ReleaseUrl": "https://github.com/mateussmeneses/theorder1886-port/releases/tag/windows-v0.7.9",
+    "ReleaseTag": "windows-v0.7.9",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "theorder1886-windows.zip",
+        "Url": "https://github.com/mateussmeneses/theorder1886-port/releases/download/windows-v0.7.9/theorder1886-windows.zip",
+        "Sha256": "0358f98cd0a9d7686b332cf1b6d2e961e799b22cc2eef8247026da9e4ae8c2ba",
+        "Size": 73237268,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "supermedo-uncharted-pc-uncharted-the-nathan-drake-collection",
+    "Title": "Uncharted: The Nathan Drake Collection",
+    "Project": "uncharted_pc",
+    "Repository": "Supermedo/uncharted_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "bbd1b3ac1019b22c332d059fda0cecb5a96c0bd9",
+    "ReadmeUrl": "https://github.com/Supermedo/uncharted_pc/blob/bbd1b3ac1019b22c332d059fda0cecb5a96c0bd9/README.md",
+    "ReleaseUrl": "https://github.com/Supermedo/uncharted_pc/releases/tag/v0.3.11",
+    "ReleaseTag": "v0.3.11",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "uncharted-windows.zip",
+        "Url": "https://github.com/Supermedo/uncharted_pc/releases/download/v0.3.11/uncharted-windows.zip",
+        "Sha256": "df161cab9272484f0f652ad9ef597a61f80fc52e1c83a5790489798fc22f0c07",
+        "Size": 122897652,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bc160201983-uncharted-the-nathan-drake-collection-pc-port-uncharted-the-nathan-drake-collection",
+    "Title": "Uncharted: The Nathan Drake Collection",
+    "Project": "Uncharted-The-Nathan-Drake-Collection-PC-port",
+    "Repository": "bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "6b2f6c5442f58b1dd895b1c46447f175e3f20e01",
+    "ReadmeUrl": "https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port/blob/6b2f6c5442f58b1dd895b1c46447f175e3f20e01/README.md",
+    "ReleaseUrl": "https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port/releases/tag/v0.8.0",
+    "ReleaseTag": "v0.8.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Uncharted-windows.zip",
+        "Url": "https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port/releases/download/v0.8.0/Uncharted-windows.zip",
+        "Sha256": "46b478aec0f1cc95dda82a2a9d1eb892a2f6d9e9236533aa4424be6a644d9a6a",
+        "Size": 121096751,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "zorde23-uncharted-collection-pc-uncharted-the-nathan-drake-collection",
+    "Title": "Uncharted: The Nathan Drake Collection",
+    "Project": "Uncharted_Collection_PC",
+    "Repository": "zorde23/Uncharted_Collection_PC",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f52ec77693ea4f2603958478cd45bb2f34082d5a",
+    "ReadmeUrl": "https://github.com/zorde23/Uncharted_Collection_PC/blob/f52ec77693ea4f2603958478cd45bb2f34082d5a/README.md",
+    "ReleaseUrl": "https://github.com/zorde23/Uncharted_Collection_PC/releases/tag/v0.3.8",
+    "ReleaseTag": "v0.3.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ucndc_pc-v0.3.8-windows.zip",
+        "Url": "https://github.com/zorde23/Uncharted_Collection_PC/releases/download/v0.3.8/ucndc_pc-v0.3.8-windows.zip",
+        "Sha256": "674793ae389c26271843d1b684a8f525bc7f158d36ac87da3e7b97f8e4e837e6",
+        "Size": 74876357,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "abdelmoumendeghbouche-wipeout-pc-wipeout-omega-collection",
+    "Title": "WipEout Omega Collection",
+    "Project": "wipeout_pc",
+    "Repository": "AbdelmoumenDeghbouche/wipeout_pc",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e56904d27a1e78dcb967eb222cbe3954a0f08fdd",
+    "ReadmeUrl": "https://github.com/AbdelmoumenDeghbouche/wipeout_pc/blob/e56904d27a1e78dcb967eb222cbe3954a0f08fdd/README.md",
+    "ReleaseUrl": "https://github.com/AbdelmoumenDeghbouche/wipeout_pc/releases/tag/windows-v0.2.49",
+    "ReleaseTag": "windows-v0.2.49",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "wipeout-windows.zip",
+        "Url": "https://github.com/AbdelmoumenDeghbouche/wipeout_pc/releases/download/windows-v0.2.49/wipeout-windows.zip",
+        "Sha256": "65eecaf9c74d1e30485f37d323d2682e9dc267bb929e85cae37ffc888e0627f9",
+        "Size": 75775308,
         "RuntimeIdentifiers": [
           "win-x64"
         ]

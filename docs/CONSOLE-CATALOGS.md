@@ -1,5 +1,7 @@
 # Catalogues PC — extension du 29 octobre 2026
 
+Actualisation Windows du 1er novembre : **218 références ajoutées**, 408 références existantes contrôlées et 138 jaquettes supplémentaires. Le catalogue commun contient désormais 650 références, dont 626 déclarent Windows, regroupées avec les moteurs intégrés en 557 cartes. [Résultats, provenance et limites Switch 2](WINDOWS-CATALOG-2026-11-01.md). Les chiffres ci-dessous décrivent l'import initial du 29 octobre ; le registre des images manquantes contient maintenant 81 fronts absents.
+
 Les quatre catalogues existants restent à leurs positions : GameCube, Wii, Switch, Nintendo 64. Le sélecteur commun au bureau et au Big Picture ajoute 26 plateformes : NES, Super Nintendo, Game Boy, Game Boy Color, Game Boy Advance, Nintendo DS, Nintendo 3DS, Wii U, Virtual Boy, Master System, Mega Drive, Game Gear, Sega 32X, Sega CD, Saturn, Dreamcast, PlayStation, PlayStation 2, PlayStation 3, PlayStation 4, PSP, Xbox, Xbox 360, Arcade, Neo Geo et Philips CD-i.
 
 L’extension contient 346 références de ports regroupées en 313 jeux. Les éditions, variantes de projets et noms de dépôts entre parenthèses ne créent pas de cartes supplémentaires : les versions se choisissent sur la carte du jeu. Les titres distincts pris en charge par un même projet, comme Oracle of Ages / Seasons ou les jeux CPS-2, ont chacun leur carte.

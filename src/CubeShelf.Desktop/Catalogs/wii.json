@@ -7,9 +7,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "ca608d928df4762e5566fc543b4ea8d8d7f79089",
-    "ReadmeUrl": "https://github.com/ExpansionPak/ModernGekko/blob/master/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a2e4e2b026a68d4848f20ebf16f0e0ddeb573957",
+    "ReadmeUrl": "https://github.com/ExpansionPak/ModernGekko/blob/a2e4e2b026a68d4848f20ebf16f0e0ddeb573957/README.md",
     "ReleaseUrl": "https://github.com/ExpansionPak/ModernGekko/releases/tag/kirby",
     "ReleaseTag": "kirby",
     "Platforms": [
@@ -82,9 +82,9 @@
     "Method": "Static recompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "50ae9c1884484f83cbd2da40158174166ac33a00",
-    "ReadmeUrl": "https://github.com/patchzyy/Wiicompiled/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0d5c402d0366640a294bf9c699068299591f7eff",
+    "ReadmeUrl": "https://github.com/patchzyy/Wiicompiled/blob/0d5c402d0366640a294bf9c699068299591f7eff/README.md",
     "ReleaseUrl": "https://github.com/patchzyy/Wiicompiled/releases/tag/v0.9.3",
     "ReleaseTag": "v0.9.3",
     "Platforms": [
@@ -140,11 +140,11 @@
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.Le dépôt amont a été déplacé vers previouslevelgames/recharged ; les paquets pointent vers ce dépôt canonique.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "cc5494843e3fc877adf52e8d2dcbc33fa1b0885a",
-    "ReadmeUrl": "https://github.com/previouslevelgames/recharged/blob/stable/README.md",
-    "ReleaseUrl": "https://github.com/previouslevelgames/recharged/releases/tag/v1.0.15",
-    "ReleaseTag": "v1.0.15",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "f3664f7789553b0d4ba497a75d7963916704c670",
+    "ReadmeUrl": "https://github.com/previouslevelgames/recharged/blob/f3664f7789553b0d4ba497a75d7963916704c670/README.md",
+    "ReleaseUrl": "https://github.com/previouslevelgames/recharged/releases/tag/v1.1.1",
+    "ReleaseTag": "v1.1.1",
     "Platforms": [
       "Linux",
       "Windows",
@@ -152,46 +152,57 @@
     ],
     "Assets": [
       {
-        "Name": "recharged-1.0.15+gb0b21c6b2647-linux-x86_64.tar.gz",
-        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.0.15/recharged-1.0.15%2Bgb0b21c6b2647-linux-x86_64.tar.gz",
-        "Sha256": "ddb3748a26183572e9b1734d9b661fcf202836f1fba732de540c17d38dda7c0d",
-        "Size": 23167186,
+        "Name": "recharged-1.1.1+gf3664f778955-linux-x86_64.tar.gz",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-linux-x86_64.tar.gz",
+        "Sha256": "f010bd4810b93d4e9e1ac527b4d7b355ab04227dd3c6525def0b030175905103",
+        "Size": 32053219,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "recharged-1.0.15+gb0b21c6b2647-macos-arm64.tar.gz",
-        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.0.15/recharged-1.0.15%2Bgb0b21c6b2647-macos-arm64.tar.gz",
-        "Sha256": "69ec0fc6fa38f1519df13e670433d195cfc509c94e5753b39b3f2e5710839ae6",
-        "Size": 15865916,
+        "Name": "recharged-1.1.1+gf3664f778955-macos-arm64.tar.gz",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-macos-arm64.tar.gz",
+        "Sha256": "366ff647e55e2a33926c0feecc2209790274c01de46365e3d9aebefbf71c40c9",
+        "Size": 25517584,
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "recharged-1.0.15+gb0b21c6b2647-macos-x86_64.tar.gz",
-        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.0.15/recharged-1.0.15%2Bgb0b21c6b2647-macos-x86_64.tar.gz",
-        "Sha256": "c07017128dfc5ebb6dc2faa77d3cea4f08824344b59f9e8329e439b69a30b85b",
-        "Size": 16993222,
+        "Name": "recharged-1.1.1+gf3664f778955-macos-universal.dmg",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-macos-universal.dmg",
+        "Sha256": "cdc2b54ffe382cdcd6b13c4310a74cc5046b15d0f8f8029a7d7cc4976b1b73e0",
+        "Size": 48718618,
+        "RuntimeIdentifiers": [
+          "osx-arm64",
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "recharged-1.1.1+gf3664f778955-macos-universal.tar.gz",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-macos-universal.tar.gz",
+        "Sha256": "8969b679d6d17bf7474132378009477f660c086414e9c9105030d43e52681ce4",
+        "Size": 44354050,
+        "RuntimeIdentifiers": [
+          "osx-arm64",
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "recharged-1.1.1+gf3664f778955-macos-x86_64.tar.gz",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-macos-x86_64.tar.gz",
+        "Sha256": "290ac01820cfb5ef5221bb393f866064732e3712a4d2a5417135606928dbf4e1",
+        "Size": 27180380,
         "RuntimeIdentifiers": [
           "osx-x64"
         ]
       },
       {
-        "Name": "recharged-1.0.15+gb0b21c6b2647-steamdeck-x86_64.tar.gz",
-        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.0.15/recharged-1.0.15%2Bgb0b21c6b2647-steamdeck-x86_64.tar.gz",
-        "Sha256": "a43f342ffe3fc514ce6101d55c2063bb35f1fe2b20bb7f2c5bd70e9c22fdab82",
-        "Size": 22448192,
-        "RuntimeIdentifiers": [
-          "linux-x64"
-        ]
-      },
-      {
-        "Name": "recharged-1.0.15+gb0b21c6b2647-windows-x86_64.zip",
-        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.0.15/recharged-1.0.15%2Bgb0b21c6b2647-windows-x86_64.zip",
-        "Sha256": "8881b0422fcb155bb69c590612b82bd7e537e29bc79f2ab9dc8e0582c3bbe46e",
-        "Size": 33800463,
+        "Name": "recharged-1.1.1+gf3664f778955-windows-x86_64.zip",
+        "Url": "https://github.com/previouslevelgames/recharged/releases/download/v1.1.1/recharged-1.1.1%2Bgf3664f778955-windows-x86_64.zip",
+        "Sha256": "bcdd3ef197af355ac17581a30ded5a29add666137a4755a87f8546cdc5a6e182",
+        "Size": 44048825,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -206,9 +217,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Aperçu / expérimental",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "7baff1143dc648a57b49b121b2eb242dd72b0f8b",
-    "ReadmeUrl": "https://github.com/tmcleroy/muscle-march-recomp/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "cf30a56ba033ec0e3ed1feb38aa806913eec3796",
+    "ReadmeUrl": "https://github.com/tmcleroy/muscle-march-recomp/blob/cf30a56ba033ec0e3ed1feb38aa806913eec3796/README.md",
     "ReleaseUrl": "https://github.com/tmcleroy/muscle-march-recomp/releases/tag/v0.1.0-beta.5",
     "ReleaseTag": "v0.1.0-beta.5",
     "Platforms": [
@@ -254,30 +265,30 @@
     "Method": "Static recompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "38eac997ab3b59cc5a96c474d98b01399ceec978",
-    "ReadmeUrl": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/blob/main/README.md",
-    "ReleaseUrl": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/tag/v0.2.2",
-    "ReleaseTag": "v0.2.2",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "63b7215b4cfeca1600eab0815a1982862b7a37e0",
+    "ReadmeUrl": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/blob/63b7215b4cfeca1600eab0815a1982862b7a37e0/README.md",
+    "ReleaseUrl": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
     "Platforms": [
       "Linux",
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "NSMBW-0.2.2-linux-x86_64.tar.gz",
-        "Url": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/download/v0.2.2/NSMBW-0.2.2-linux-x86_64.tar.gz",
-        "Sha256": "9deeba089d203f124f2b05643b37f5e39f20f7cb72d61ab8b441a823f6c606d1",
-        "Size": 74767722,
+        "Name": "NSMBW-0.3.1-linux-x86_64.tar.gz",
+        "Url": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/download/v0.3.1/NSMBW-0.3.1-linux-x86_64.tar.gz",
+        "Sha256": "08f762afe464fa1a529bf9ed1687a747dc715d42ac07ab74666baf748a177a64",
+        "Size": 74691830,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "NSMBW-0.2.2-windows-x64.zip",
-        "Url": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/download/v0.2.2/NSMBW-0.2.2-windows-x64.zip",
-        "Sha256": "63589bbb6116a1a15a825244fba183bc6913643607f1d720026d098f1ba52dab",
-        "Size": 74462458,
+        "Name": "NSMBW-0.3.1-windows-x64.zip",
+        "Url": "https://github.com/WitherBlitz/NSMB-Wii-Multiplayer-Recompilation/releases/download/v0.3.1/NSMBW-0.3.1-windows-x64.zip",
+        "Sha256": "7f418b708a48900201076c4f92fe6147e012d3b43506d0ea1bd16cbc5036223e",
+        "Size": 76526975,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -292,9 +303,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "aa471d2fa487a192a79d7ece120889c3aa7a9628",
-    "ReadmeUrl": "https://github.com/yunophilia/BlackKnightRecomp/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2a9613696556f097c4c706ccc1fe6094461e99f5",
+    "ReadmeUrl": "https://github.com/yunophilia/BlackKnightRecomp/blob/2a9613696556f097c4c706ccc1fe6094461e99f5/README.md",
     "ReleaseUrl": "https://github.com/yunophilia/BlackKnightRecomp/releases/tag/v1.0.1",
     "ReleaseTag": "v1.0.1",
     "Platforms": [
@@ -320,9 +331,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "ab472f4fb4ca97b67e32dbbd6a3c8c4c6533c788",
-    "ReadmeUrl": "https://github.com/kumapauz/project-reignition/blob/dev/v1.0.x/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "e13abfa9a3c42d21b7b247d660153b779364551c",
+    "ReadmeUrl": "https://github.com/kumapauz/project-reignition/blob/e13abfa9a3c42d21b7b247d660153b779364551c/README.md",
     "ReleaseUrl": "https://github.com/kumapauz/project-reignition/releases/tag/v0.4.2",
     "ReleaseTag": "v0.4.2",
     "Platforms": [
@@ -358,20 +369,20 @@
     "Method": "Static recompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "7c9d980deb1f05a64f6803ae32a9275d5e1f17ec",
-    "ReadmeUrl": "https://github.com/keepvaibin/nebula/blob/main/README.md",
-    "ReleaseUrl": "https://github.com/keepvaibin/nebula/releases/tag/v1.0.1",
-    "ReleaseTag": "v1.0.1",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8a84b249c16e61f773632f477ac440b184e2af70",
+    "ReadmeUrl": "https://github.com/keepvaibin/nebula/blob/8a84b249c16e61f773632f477ac440b184e2af70/README.md",
+    "ReleaseUrl": "https://github.com/keepvaibin/nebula/releases/tag/v1.0.2",
+    "ReleaseTag": "v1.0.2",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
         "Name": "Nebula-Setup.exe",
-        "Url": "https://github.com/keepvaibin/nebula/releases/download/v1.0.1/Nebula-Setup.exe",
-        "Sha256": "93d2542de34147f3808469e02067e2c42a822bb2380eca3c33388a70834bf9c8",
-        "Size": 35131392,
+        "Url": "https://github.com/keepvaibin/nebula/releases/download/v1.0.2/Nebula-Setup.exe",
+        "Sha256": "40eee81e1ba4df8f3f4701023f4c4d7ed8b43c1d0296f60872f10dde169812f8",
+        "Size": 14495744,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -386,11 +397,11 @@
     "Method": "Static recompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "e53cc4c38dd898354cfc3aa479c42287901e0551",
-    "ReadmeUrl": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/blob/main/README.md",
-    "ReleaseUrl": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/tag/v1.0.4",
-    "ReleaseTag": "v1.0.4",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1f961e7db18586655f647f1027eb86ca706088cc",
+    "ReadmeUrl": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/blob/1f961e7db18586655f647f1027eb86ca706088cc/README.md",
+    "ReleaseUrl": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/tag/v1.0.8",
+    "ReleaseTag": "v1.0.8",
     "Platforms": [
       "Linux",
       "Windows"
@@ -398,18 +409,18 @@
     "Assets": [
       {
         "Name": "NewSuperPaperBros-linux.tar.gz",
-        "Url": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/download/v1.0.4/NewSuperPaperBros-linux.tar.gz",
-        "Sha256": "88dd1739e8258d587eb3bd26a9d0cf6538fb1bcfa73039bf737b9a8903a3ed0e",
-        "Size": 349240921,
+        "Url": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/download/v1.0.8/NewSuperPaperBros-linux.tar.gz",
+        "Sha256": "4f9ec19b50aca768397c747f4c2fc1870bcf1414080108931f91bab28f5a314b",
+        "Size": 350679045,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
         "Name": "NewSuperPaperBros.zip",
-        "Url": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/download/v1.0.4/NewSuperPaperBros.zip",
-        "Sha256": "5a9eaccae7a9f084964b8b9c3d62b13e0e61af1b19e263da6be1c9ca46567bb2",
-        "Size": 371902714,
+        "Url": "https://github.com/josiahg2502-glitch/NewSuperPaperBros/releases/download/v1.0.8/NewSuperPaperBros.zip",
+        "Sha256": "2acd168996f603be77fafc797959d6fd5dfd69ea220d9c9aa684efef7f52e99e",
+        "Size": 373391295,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -424,9 +435,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Aperçu / expérimental",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "3df6981b93743f1db3dffd6db03b739553810423",
-    "ReadmeUrl": "https://github.com/Kyra422/skybreak/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "3d53ea3b864825cd2acf4881da3e68fbb7620d88",
+    "ReadmeUrl": "https://github.com/Kyra422/skybreak/blob/3d53ea3b864825cd2acf4881da3e68fbb7620d88/README.md",
     "ReleaseUrl": "https://github.com/Kyra422/skybreak/releases/tag/v0.23.0-alpha.3",
     "ReleaseTag": "v0.23.0-alpha.3",
     "Platforms": [
@@ -461,9 +472,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.Accepte les disques Wii compatibles, mais utilise le HUD et les spécificités de la version GameCube.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "7445e43ea9fbdbf35d5a905c5ecf48998cdf7147",
-    "ReadmeUrl": "https://github.com/TwilitRealm/dusklight/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "77705f8bb95ef7b7dca4675b149c4bcb6a48da34",
+    "ReadmeUrl": "https://github.com/TwilitRealm/dusklight/blob/77705f8bb95ef7b7dca4675b149c4bcb6a48da34/README.md",
     "ReleaseUrl": "https://github.com/TwilitRealm/dusklight/releases/tag/v2.0.3",
     "ReleaseTag": "v2.0.3",
     "Platforms": [
@@ -536,9 +547,9 @@
     "Method": "Port natif (projet amont)",
     "Status": "Aperçu / expérimental",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-10-26",
-    "SourceCommit": "51255daf1727bcc93df4e7bbc4e4bcc3b52434bf",
-    "ReadmeUrl": "https://github.com/arelkair/wiiparty-recomp/blob/main/README.md",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "5c5d544f49412a5e54a658839e98ddd7b5326013",
+    "ReadmeUrl": "https://github.com/arelkair/wiiparty-recomp/blob/5c5d544f49412a5e54a658839e98ddd7b5326013/README.md",
     "ReleaseUrl": "https://github.com/arelkair/wiiparty-recomp/releases/tag/v0.1.19-alpha",
     "ReleaseTag": "v0.1.19-alpha",
     "Platforms": [
@@ -560,6 +571,43 @@
         "Url": "https://github.com/arelkair/wiiparty-recomp/releases/download/v0.1.19-alpha/wiipartyrecomp-launcher.exe",
         "Sha256": "1b95beb401621b6b0d38de260054696cc6cd85724801f164dce2f48bed1cadf6",
         "Size": 5094912,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "wiipartyrecomp-offline-windows.zip",
+        "Url": "https://github.com/arelkair/wiiparty-recomp/releases/download/v0.1.19-alpha/wiipartyrecomp-offline-windows.zip",
+        "Sha256": "5a18ae098f8515853ccb0b1994d141a060261966071581d95671077c7536841f",
+        "Size": 184796194,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "santiagovalencia109-wario-land-shake-it-native-pc-wario-land-shake-it",
+    "Title": "Wario Land: Shake It!",
+    "Project": "Wario-Land-Shake-It-Native-PC",
+    "Repository": "santiagovalencia109/Wario-Land-Shake-It-Native-PC",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "071ccaec5ec2d6f8136379419c6f9166cae66d3e",
+    "ReadmeUrl": "https://github.com/santiagovalencia109/Wario-Land-Shake-It-Native-PC/blob/071ccaec5ec2d6f8136379419c6f9166cae66d3e/README.md",
+    "ReleaseUrl": "https://github.com/santiagovalencia109/Wario-Land-Shake-It-Native-PC/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "WarioLauncher.exe",
+        "Url": "https://github.com/santiagovalencia109/Wario-Land-Shake-It-Native-PC/releases/download/v0.2.0/WarioLauncher.exe",
+        "Sha256": "d432bb91fe8894b1a871c3168fe6d5ce9ff91dfdd45d06f116744df006b588cd",
+        "Size": 302592,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
