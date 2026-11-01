@@ -5080,7 +5080,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/AeroGauge%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/aerogauge.png",
+    "Front": "Assets/Covers/N64/aerogauge.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "975040e9534258fe20a018d1d467561c14c89365c342745b875810e5af97c3dc"
@@ -5091,7 +5091,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Automobili%20Lamborghini%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/automobililamborghini.png",
+    "Front": "Assets/Covers/N64/automobililamborghini.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "03da338f34a224d5b74f016eb0a33e2da99c9c021439f7e9f318b060962e6095"
@@ -5102,7 +5102,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/BattleTanx%20-%20Global%20Assault%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/battletanxglobalassault.png",
+    "Front": "Assets/Covers/N64/battletanxglobalassault.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "3ae559ede6ea279f4a095e456bd6d6192809d1c5d010d125ca81cbaf9f98a7b9"
@@ -5113,7 +5113,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Battlezone%20-%20Rise%20of%20the%20Black%20Dogs%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/battlezoneriseofblackdogs.png",
+    "Front": "Assets/Covers/N64/battlezoneriseofblackdogs.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "0ee65c0e816d22cd0ed862fee451e99a7083758938aa8f2a4fc0679711735141"
@@ -5124,7 +5124,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Beetle%20Adventure%20Racing%21%20%28USA%29%20%28En%2CFr%2CDe%29.png",
-    "Front": "Assets/Covers/n64/beetleadventureracing.png",
+    "Front": "Assets/Covers/N64/beetleadventureracing.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "17a44a1412afbdd3e0184ee819ddfd4eca2a895d85e2bc0b4ad2b859098b7cb7"
@@ -5135,7 +5135,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Blast%20Corps%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/blastcorps.png",
+    "Front": "Assets/Covers/N64/blastcorps.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "ffb50b3b342fd45ab586af1592469eb74c616c890b1eb1792c0be13854a0a534"
@@ -5146,7 +5146,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Body%20Harvest%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/bodyharvest.png",
+    "Front": "Assets/Covers/N64/bodyharvest.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "89deb4a65ef9bad6f4b5b314b02d9eacf97af0463c219c4ca060ee6eaba0304e"
@@ -5157,7 +5157,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Bomberman%2064%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/bomberman64.png",
+    "Front": "Assets/Covers/N64/bomberman64.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "18d82be72f41df6914877b50591dbb2cd6992738c0377f0872e23079f79fba91"
@@ -5168,7 +5168,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Bomberman%20Hero%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/bombermanhero.png",
+    "Front": "Assets/Covers/N64/bombermanhero.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "3bcaa483357019ee7dc31d82e145b8168648b51f7693ff2fb8e5fba4d95212bf"
@@ -5179,7 +5179,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Clay%20Fighter%20-%20Sculptor%27s%20Cut%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/clayfightersculptorscut.png",
+    "Front": "Assets/Covers/N64/clayfightersculptorscut.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "7ff16a462cf6ea109724bcbde767d1f0945ec49067ff0d2b4403d0578cbccbdb"
@@ -5190,7 +5190,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Dinosaur%20Planet%20%28USA%29%20%28Proto%29%20%282000-12-01%29.png",
-    "Front": "Assets/Covers/n64/dinosaurplanet.png",
+    "Front": "Assets/Covers/N64/dinosaurplanet.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "bcc0381481a3c9abf909f4a3dbd8661362f86fffb60110300c11bb2badcd29b5"
@@ -5201,7 +5201,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Doraemon%203%20-%20Nobita%20no%20Machi%20SOS%21%20%28Japan%29.png",
-    "Front": "Assets/Covers/n64/doraemon3nobitanomachisos.png",
+    "Front": "Assets/Covers/N64/doraemon3nobitanomachisos.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "71f1ee306723ca0acbccf2d9fc87e6e3832b0fa4620c9ad3867883686c38995c"
@@ -5212,7 +5212,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Duke%20Nukem%20-%20Zero%20Hour%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/dukenukemzerohour.png",
+    "Front": "Assets/Covers/N64/dukenukemzerohour.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "9a3b5e596fbf63f64f4aed893c7710ddda8ef071d95ad6119c093263bd5abe4d"
@@ -5223,7 +5223,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/F-Zero%20X%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/fzerox.png",
+    "Front": "Assets/Covers/N64/fzerox.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "f2c8de2a5ceb2b562b75e88278bc218b6bf594c4db6579f360937a83615f9893"
@@ -5234,7 +5234,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Glover%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/glover.png",
+    "Front": "Assets/Covers/N64/glover.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "b2f66223d55c71783574d44d174f559800d608e23bba7ac42263d337e6eefb06"
@@ -5245,7 +5245,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Hybrid%20Heaven%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/hybridheaven.png",
+    "Front": "Assets/Covers/N64/hybridheaven.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "e3b36e7119ae0085a0fc99d0c2ba29c5cbc587db955e6f7a1aa5e9eb2e0c2e29"
@@ -5256,7 +5256,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/International%20Superstar%20Soccer%202000%20%28USA%29%20%28En%2CEs%29.png",
-    "Front": "Assets/Covers/n64/internationalsuperstarsoccer2000.png",
+    "Front": "Assets/Covers/N64/internationalsuperstarsoccer2000.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "8cad1e2968e777423eef7100b6c13a1b6df38a10eb9cca5a849aa17a07e10d7d"
@@ -5267,7 +5267,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Jet%20Force%20Gemini%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/jetforcegemini.png",
+    "Front": "Assets/Covers/N64/jetforcegemini.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "655eed12a51505418ef9beafe77309e9c8d6d2f7d4b7fa9f35b9cae4d7224030"
@@ -5278,7 +5278,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Mischief%20Makers%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/mischiefmakers.png",
+    "Front": "Assets/Covers/N64/mischiefmakers.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "c168b1fdac2125f8e035ba81933976a93b4a3a71ee0483ea5a73431b101a46b0"
@@ -5289,7 +5289,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/NBA%20Hangtime%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/nbahangtime.png",
+    "Front": "Assets/Covers/N64/nbahangtime.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "3be2a46c4e296f80a417a254b56bd2b877b6c2a04b21f1fa1ae4ab31d6d7937a"
@@ -5300,7 +5300,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Pokemon%20Stadium%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/pokemonstadium.png",
+    "Front": "Assets/Covers/N64/pokemonstadium.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "efec928bbb0f1be0cfcc83e8a75c98226449a903e3744df3d5ee5e91214f264e"
@@ -5311,7 +5311,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Rocket%20-%20Robot%20on%20Wheels%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/rocketrobotonwheels.png",
+    "Front": "Assets/Covers/N64/rocketrobotonwheels.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "156e1564055c8dd40b77c711668bf0e7c3816fc0d74e4a6d335f3611525c893b"
@@ -5322,7 +5322,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/San%20Francisco%20Rush%202049%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/sanfranciscorush2049.png",
+    "Front": "Assets/Covers/N64/sanfranciscorush2049.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "0beac301a09ebbdbe857dddb10835b5129fddc0984d1ee76ff512aad1c3b084d"
@@ -5333,7 +5333,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Sin%20and%20Punishment%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/sinandpunishment.png",
+    "Front": "Assets/Covers/N64/sinandpunishment.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "999115f146aab70b450a4109654e68e4896f70fc2bf32439063342ae3af32eb0"
@@ -5344,7 +5344,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Snowboard%20Kids%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/snowboardkids.png",
+    "Front": "Assets/Covers/N64/snowboardkids.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "6efc29705c2aea38f30021df9437ee53d03e368bb71cb4fa7c1bd35c7e85433e"
@@ -5355,7 +5355,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/SpaceStation%20Silicon%20Valley%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/spacestationsiliconvalley.png",
+    "Front": "Assets/Covers/N64/spacestationsiliconvalley.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "d80a97a564f577fbd1beb78481fbfce53c0cfffacbd82bb13ac4c449e3b70d7f"
@@ -5366,7 +5366,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Star%20Wars%20Episode%20I%20-%20Racer%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/starwarsepisodeiracer.png",
+    "Front": "Assets/Covers/N64/starwarsepisodeiracer.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "eda2ba7744fa1db6d9d706acf487577a7586b05fcbe300e9853a9675590d41a7"
@@ -5377,7 +5377,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/StarCraft%2064%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/starcraft64.png",
+    "Front": "Assets/Covers/N64/starcraft64.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "2dd0dd68bbe29722562b2de86fe5866fd17c5f5023593feecec8bc7301ab3d62"
@@ -5388,7 +5388,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Tony%20Hawk%27s%20Pro%20Skater%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/tonyhawksproskater.png",
+    "Front": "Assets/Covers/N64/tonyhawksproskater.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "553bf4fc6ecf727a5fed4409485f8e6528decf041cab566bab1b81420a81d3e3"
@@ -5399,7 +5399,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Toy%20Story%202%20-%20Buzz%20Lightyear%20to%20the%20Rescue%21%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/toystory2buzzlightyeartorescue.png",
+    "Front": "Assets/Covers/N64/toystory2buzzlightyeartorescue.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "2796d86339f0ef32108dd06aebba8095b0a1d93a76807cfa72377d8ef8b040a0"
@@ -5410,7 +5410,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Turok%20-%20Rage%20Wars%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/turokragewars.png",
+    "Front": "Assets/Covers/N64/turokragewars.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "361d99e1328ea7629a0795d13d36273428fe9e5fcd7318d808eb51be4c78ba26"
@@ -5421,7 +5421,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Wayne%20Gretzky%27s%203D%20Hockey%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/waynegretzkys3dhockey.png",
+    "Front": "Assets/Covers/N64/waynegretzkys3dhockey.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "edc2d6766e1e4cdc72760b83fe23a40342f16e6358ddacdd022918dcda241d80"
@@ -5432,7 +5432,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/World%20Driver%20Championship%20%28USA%29.png",
-    "Front": "Assets/Covers/n64/worlddriverchampionship.png",
+    "Front": "Assets/Covers/N64/worlddriverchampionship.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "6f3e25774707c8c2f59eded414eb2d37fc9330f65967cdf786dc2f820fa94835"
@@ -5443,7 +5443,7 @@
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
     "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_64/master/Named_Boxarts/Yoshi%27s%20Story%20%28USA%29%20%28En%2CJa%29.png",
-    "Front": "Assets/Covers/n64/yoshisstory.png",
+    "Front": "Assets/Covers/N64/yoshisstory.png",
     "Back": "",
     "Spine": "",
     "FrontFileSha256": "2dcf60add82251d0f60d82aaa58b9194c9bb451d78619e1bc6278e19bb1a40bb"
