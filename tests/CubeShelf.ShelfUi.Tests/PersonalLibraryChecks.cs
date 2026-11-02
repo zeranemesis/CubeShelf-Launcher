@@ -58,6 +58,11 @@ static class PersonalLibraryChecks
             Check(Cards().Single(card=>card.Game.Id==owned.Id).Versions.All(choice=>choice.GameId==owned.Id),
                 "Uninstalled alternative ports must not masquerade as owned versions.");
             Save("my-games-desktop.png");
+            var covers=library.GetVisualDescendants().OfType<GameCoverControl>().Where(cover=>cover.IsEffectivelyVisible).ToArray();
+            Check(covers.Length==4 && covers.All(cover=>cover.Bounds.Width<=232.01 && cover.Bounds.Height<=260.01),
+                "Mixed-format personal covers must fit the shared thumbnail well.");
+            var bottoms=covers.Select(cover=>cover.TranslatePoint(new Point(0,cover.Bounds.Height),window)!.Value.Y).ToArray();
+            Check(bottoms.Max()-bottoms.Min()<.5,"Portrait, square and landscape boxes must share a visual baseline.");
             var width=window.Width;var height=window.Height;
             window.Width=960;window.Height=700;Dispatcher.UIThread.RunJobs();
             var heading=window.FindControl<StackPanel>("LibraryHeaderText")!;

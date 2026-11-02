@@ -621,9 +621,9 @@
     "Title": "Crash Team Racing Nitro-Fueled",
     "GameTdbId": "AST4A",
     "Front": "Assets/Covers/Shelf/switch-AST4A.jpg",
-    "Source": "https://art.gametdb.com/switch/coverHQ/EN/AST4A.jpg",
-    "Sha256": "1663639761980ae6dfc3a10d96858eb10b55b027197bf05931c6e5f0a274c989",
-    "FrontFileSha256": "1663639761980ae6dfc3a10d96858eb10b55b027197bf05931c6e5f0a274c989",
+    "Source": "https://art.gametdb.com/switch/coverHQ/US/AST4A.jpg",
+    "Sha256": "bf3cebedee96f53a92e31eddc7e9138c05b2194825a70cae3fe99432e2536d02",
+    "FrontFileSha256": "bf3cebedee96f53a92e31eddc7e9138c05b2194825a70cae3fe99432e2536d02",
     "Media": "Assets/Covers/Media/switch-AST4A.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/EN/AST4A.png",
     "MediaFileSha256": "c4583ac97fffc7e0f32b6cf704c54cfe49b836f34b5904b779b84f9e40f839f8"
@@ -834,9 +834,9 @@
     "Title": "Unicorn Overlord",
     "GameTdbId": "BACCC",
     "Front": "Assets/Covers/Shelf/switch-BACCC.jpg",
-    "Source": "https://art.gametdb.com/switch/cover/EN/BACCC.jpg",
-    "Sha256": "f735a42f6bf42e06dab8889083753417dc577cd49361329b59564575825fef0a",
-    "FrontFileSha256": "f735a42f6bf42e06dab8889083753417dc577cd49361329b59564575825fef0a",
+    "Source": "https://art.gametdb.com/switch/coverHQ/US/BACCC.jpg",
+    "Sha256": "fcd255e048aacd5316cd22cc94251142673261783d73386aea8deaafa55f8894",
+    "FrontFileSha256": "fcd255e048aacd5316cd22cc94251142673261783d73386aea8deaafa55f8894",
     "Media": "Assets/Covers/Media/switch-BACCC.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/US/BACCC.png",
     "MediaFileSha256": "e1e0bb052c35e2efb37df0fa5ef951f6078f36a3715b644ac0aacd04d81fe528"
@@ -2693,10 +2693,11 @@
     "Title": "Kingdom Hearts 358/2 Days",
     "GameTdbId": "",
     "Source": "libretro-thumbnails",
-    "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Kingdom%20Hearts%20-%20358-2%20Days%20%28USA%29.png",
+    "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Kingdom%20Hearts%20-%20358-2%20Days%20%28USA%29%20%28En%2CFr%29.png",
     "Front": "Assets/Covers/nds/kingdomhearts3582days.png",
     "Back": "",
-    "Spine": ""
+    "Spine": "",
+    "FrontFileSha256": "504c43056094633957f1ce40caa282f17b6d0f4a00b7e261b8fe9284c695c241"
   },
   {
     "Console": "wiiu",

@@ -620,7 +620,6 @@ public sealed partial class MainWindow
         public bool HasVersionChoice => Versions.Length > 1;
         public Controls.GameCaseFormat CaseFormat => Controls.GameCaseControl.FormatForConsole(Game.ShelfConsole);
         public bool HasFavorite => Favorite.Length > 0;
-        public double CoverWidth => Game.ShelfConsole == "switch" ? 202 : 234;
         public Bitmap? Cover { get; }
         public string Title => Game.Title;
         public string Subtitle => string.Join(" • ", new[] { Game.Year > 0 ? Game.Year.ToString() : "", Game.Genre }.Where(value => value.Length > 0));

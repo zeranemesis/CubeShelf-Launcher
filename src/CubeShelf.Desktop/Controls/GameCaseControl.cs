@@ -17,9 +17,13 @@ public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64, OriginalBox }
 public sealed partial class GameCaseControl : Control, IDisposable
 {
     private bool PortraitNintendo64 => CaseFormat == GameCaseFormat.Nintendo64 && _front is { } front && front.PixelSize.Height > front.PixelSize.Width;
-    private double CaseWidth => CaseFormat switch { GameCaseFormat.OriginalBox => 2.92 * Math.Clamp(_front is { } art ? art.Size.Width / art.Size.Height : .72, .55, 1.6), GameCaseFormat.Nintendo64 => PortraitNintendo64 ? 2.08 : 2.92, GameCaseFormat.Switch => 1.79, _ => 2.08 };
+    private bool PrintedBox => CaseFormat is GameCaseFormat.Nintendo64 or GameCaseFormat.OriginalBox;
+    private double PrintedAspect => _front is { PixelSize.Height: >0 } art ? (double)art.PixelSize.Width/art.PixelSize.Height
+        : CaseFormat==GameCaseFormat.Nintendo64 ? 2.92/2.08 : .72;
+    private double CaseWidth => PrintedBox ? StandardCaseHeight*Math.Min(1,PrintedAspect)
+        : CaseFormat==GameCaseFormat.Switch ? 1.79 : 2.08;
     private const double StandardCaseHeight = 2.92;
-    private double CaseHeight => CaseFormat == GameCaseFormat.Nintendo64 && !PortraitNintendo64 ? 2.08 : StandardCaseHeight;
+    private double CaseHeight => PrintedBox ? StandardCaseHeight/Math.Max(1,PrintedAspect) : StandardCaseHeight;
     private double CaseDepth => CaseFormat switch { GameCaseFormat.Nintendo64 => .48, GameCaseFormat.Switch => .174, _ => .215 };
     private const double CameraDistance = 5.75;
     private const double FieldOfViewDegrees = 32;
@@ -386,7 +390,22 @@ public sealed partial class GameCaseControl : Control, IDisposable
             new Vec3( x, -y, -z), new Vec3(-x, -y, -z)
         };
 
-        return source.Select(ProjectVertex).ToArray();
+        var vertices=source.Select(ProjectVertex).ToArray();
+        if(PrintedBox && Bounds.Width>16 && Bounds.Height>16)
+        {
+            // Fit the projected corners too: a square or rotated carton can exceed a portrait viewport.
+            var center=new Point(Bounds.Width/2,Bounds.Height/2);
+            var extentX=vertices.Max(vertex=>Math.Abs(vertex.Screen.X-center.X));
+            var extentY=vertices.Max(vertex=>Math.Abs(vertex.Screen.Y-center.Y));
+            var scale=Math.Min(1,Math.Min((center.X-8)/extentX,(center.Y-8)/extentY));
+            if(scale<1)
+                for(var i=0;i<vertices.Length;i++)
+                {
+                    var point=vertices[i].Screen;
+                    vertices[i]=vertices[i] with {Screen=new Point(center.X+(point.X-center.X)*scale,center.Y+(point.Y-center.Y)*scale)};
+                }
+        }
+        return vertices;
     }
 
     private ProjectedVertex ProjectVertex(Vec3 point)

@@ -33,12 +33,16 @@ public sealed class GameCoverControl : Control
     public GameCoverControl() => RenderOptions.SetBitmapInterpolationMode(this,BitmapInterpolationMode.HighQuality);
     protected override Size MeasureOverride(Size availableSize)
     {
-        var width=double.IsFinite(availableSize.Width)?availableSize.Width:234;
-        var cardboard=Format==GameCaseFormat.Nintendo64;
-        var inset=cardboard?6:Format==GameCaseFormat.Switch?14:16;
+        var maximumWidth=double.IsFinite(availableSize.Width)?Math.Max(0,availableSize.Width):234;
+        var maximumHeight=double.IsFinite(availableSize.Height)?Math.Max(0,availableSize.Height):double.PositiveInfinity;
+        var printedBox=Format is GameCaseFormat.Nintendo64 or GameCaseFormat.OriginalBox;
+        var inset=printedBox?6:Format==GameCaseFormat.Switch?14:16;
+        var verticalInset=printedBox?8:14;
         var ratio=Cover is { PixelSize.Width: >0 } cover?(double)cover.PixelSize.Height/cover.PixelSize.Width
             :Format switch {GameCaseFormat.Nintendo64=>2.08/2.92,GameCaseFormat.Switch=>2.92/1.79,_=>2.92/2.08};
-        return new Size(width,Math.Max(0,width-inset)*ratio+(cardboard?8:14));
+        if(maximumWidth<=inset || maximumHeight<=verticalInset)return default;
+        var width=Math.Min(maximumWidth,(maximumHeight-verticalInset)/ratio+inset);
+        return new Size(width,(width-inset)*ratio+verticalInset);
     }
     public override void Render(DrawingContext context)
     {
@@ -51,11 +55,11 @@ public sealed class GameCoverControl : Control
             context.DrawText(MissingCover, new Point(box.X + (box.Width - MissingCover.Width) / 2, box.Y + (box.Height - MissingCover.Height) / 2));
             return;
         }
-        if(Format==GameCaseFormat.Nintendo64)
+        if(Format is GameCaseFormat.Nintendo64 or GameCaseFormat.OriginalBox)
         {
-            if(Cover is { } print)context.DrawImage(print,new Rect(print.Size),box);
-            else context.DrawRectangle(DarkShell,null,box);
-            context.DrawRectangle(null,Seam,box);
+            var target=FitArtwork(Cover,box);
+            context.DrawImage(Cover,new Rect(Cover.Size),target);
+            context.DrawRectangle(null,Seam,target);
             return;
         }
         var shell = Format switch { GameCaseFormat.Wii => WhiteShell, GameCaseFormat.Switch => ClearShell, _ => DarkShell };
@@ -65,14 +69,19 @@ public sealed class GameCoverControl : Control
         if(Cover is { } cover)
         {
             // Uniform fit preserves the complete printed insert, including platform/rating marks.
-            var scale = Math.Min(artwork.Width / cover.Size.Width, artwork.Height / cover.Size.Height);
-            var size = cover.Size * scale;
-            var target = new Rect(artwork.Center.X-size.Width/2,artwork.Center.Y-size.Height/2,size.Width,size.Height);
+            var target=FitArtwork(cover,artwork);
             context.DrawImage(cover,new Rect(cover.Size),target);
             context.DrawRectangle(Sleeve,null,target);
         }
         context.DrawLine(Seam,new Point(box.X+hinge,box.Y+3),new Point(box.X+hinge,box.Bottom-3));
         context.DrawLine(Edge,new Point(box.X+hinge+1,box.Y+3),new Point(box.X+hinge+1,box.Bottom-3));
         context.DrawLine(Edge,new Point(box.X+2,box.Y+1),new Point(box.Right-2,box.Y+1));
+    }
+
+    private static Rect FitArtwork(Bitmap image,Rect bounds)
+    {
+        var scale=Math.Min(bounds.Width/image.PixelSize.Width,bounds.Height/image.PixelSize.Height);
+        var size=new Size(image.PixelSize.Width*scale,image.PixelSize.Height*scale);
+        return new Rect(bounds.Center.X-size.Width/2,bounds.Center.Y-size.Height/2,size.Width,size.Height);
     }
 }

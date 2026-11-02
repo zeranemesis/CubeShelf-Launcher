@@ -211,15 +211,17 @@
                   <StackPanel Margin="10">
                     <Border Width="260" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="18" Padding="13">
                       <StackPanel>
-                        <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
-                        <Grid>
-                          <controls:GameCoverControl Width="{Binding CoverWidth}" HorizontalAlignment="Center" Cover="{Binding Cover}" Format="{Binding CaseFormat}" />
+                        <Button Classes="game-card" Tag="{Binding}" Click="SelectLibraryGame" AutomationProperties.Name="{Binding Title}" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
+                        <Grid Width="232" Height="260">
+                         <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                          <controls:GameCoverControl MaxWidth="232" MaxHeight="260" HorizontalAlignment="Center" VerticalAlignment="Bottom" Cover="{Binding Cover}" Format="{Binding CaseFormat}" />
                           <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC101524" CornerRadius="9" Padding="8,5" Margin="8" IsVisible="{Binding HasFavorite}">
                             <TextBlock Text="{Binding Favorite}" Foreground="#FFD86B" FontSize="14" FontWeight="Bold" />
                           </Border>
+                         </Grid>
                         </Grid>
                         </Button>
-                        <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" Margin="3,13,3,0" />
+                        <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" LineHeight="22" MinHeight="44" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="3,13,3,0" ToolTip.Tip="{Binding Title}" />
                         <StackPanel IsVisible="{Binding ShowConsole}" Orientation="Horizontal" Spacing="6" Margin="3,6,3,0">
                           <controls:ConsoleBrandMark Platform="{Binding Game.ShelfConsole}" Width="18" Height="18" />
                           <TextBlock Text="{Binding ConsoleName}" Foreground="{DynamicResource Muted}" FontSize="12" VerticalAlignment="Center" />

@@ -1,5 +1,13 @@
 # Changelog
 
+## En cours — proportions et confort des jaquettes sur Windows
+
+- Contrôle des 474 faces présentes : décodage et dimensions valides, résolution suffisante pour la taille normale des vignettes.
+- Emplacement de jaquette limité à 232 × 260, boîtes alignées par le bas et titres sur deux lignes. Les affiches restent entières, sans étirement ni charnière DVD ajoutée aux autres formats.
+- Nintendo 64 et boîtes des autres plateformes : proportions issues de l'image, dimensions 3D normalisées et projection contenue dans la vue, y compris pendant l'inclinaison.
+- Jaquettes authentiques de meilleure définition : Crash Team Racing Nitro-Fueled et Unicorn Overlord en 1166 × 1888, Kingdom Hearts 358/2 Days en 512 × 459. Provenance et empreintes mises à jour.
+- Contrôles de proportions, alignement mixte, contraintes réduites, inclinaison 3D et captures bureau/Big Picture ajoutés à la suite ShelfUi.
+
 ## En cours — bibliothèque personnelle sur Windows
 
 - Accès « Mes jeux » dans le menu de gauche, sur l'accueil des consoles et dans le menu Big Picture ; X à la manette ou F2 au clavier depuis l'accueil.
