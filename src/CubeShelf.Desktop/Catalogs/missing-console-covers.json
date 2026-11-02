@@ -12,14 +12,6 @@
     "Title": "Pokemon Gold / Silver / Crystal"
   },
   {
-    "Console": "nds",
-    "Title": "Pokémon HeartGold and SoulSilver"
-  },
-  {
-    "Console": "virtualboy",
-    "Title": "Zero Racers"
-  },
-  {
     "Console": "megadrive",
     "Title": "Sonic 3 & Knuckles"
   },
@@ -28,104 +20,8 @@
     "Title": "Vigilante 8 / Vigilante 8: 2nd Offense"
   },
   {
-    "Console": "ps2",
-    "Title": "DQ8 Recompiled"
-  },
-  {
-    "Console": "ps3",
-    "Title": "Dragon Ball Z: Budokai HD"
-  },
-  {
-    "Console": "ps3",
-    "Title": "Imabikisou"
-  },
-  {
-    "Console": "ps3",
-    "Title": "Twisted Metal"
-  },
-  {
-    "Console": "ps3",
-    "Title": "God of War II HD"
-  },
-  {
-    "Console": "ps3",
-    "Title": "inFamous"
-  },
-  {
-    "Console": "ps3",
-    "Title": "Killzone 3"
-  },
-  {
-    "Console": "ps4",
-    "Title": "Dragon's Crown Pro"
-  },
-  {
-    "Console": "ps4",
-    "Title": "God of War III Remastered"
-  },
-  {
-    "Console": "ps4",
-    "Title": "Gravity Rush 2"
-  },
-  {
-    "Console": "ps4",
-    "Title": "inFAMOUS Second Son"
-  },
-  {
-    "Console": "ps4",
-    "Title": "Killzone: Shadow Fall"
-  },
-  {
-    "Console": "ps4",
-    "Title": "The Last Guardian"
-  },
-  {
-    "Console": "ps4",
-    "Title": "The Last of Us"
-  },
-  {
-    "Console": "ps4",
-    "Title": "LEGO Dimensions"
-  },
-  {
-    "Console": "ps4",
-    "Title": "The Order: 1886"
-  },
-  {
-    "Console": "ps4",
-    "Title": "Uncharted: The Nathan Drake Collection"
-  },
-  {
-    "Console": "ps4",
-    "Title": "WipEout Omega Collection"
-  },
-  {
-    "Console": "psp",
-    "Title": "Star Wars Battlefront: Renegade Squadron"
-  },
-  {
     "Console": "psp",
     "Title": "Yakumo"
-  },
-  {
-    "Console": "xbox",
-    "Title": "Dead or Alive 2 Ultimate"
-  },
-  {
-    "Console": "xbox",
-    "Title": "StarCraft: Ghost"
-  },
-  {
-    "Console": "xbox360",
-    "Title": "Dead Rising 2: Case West"
-  },
-  {
-    "Console": "xbox360",
-    "Title": "Dead Rising 2: Case Zero"
-  },
-  {
-    "Console": "xbox360",
-    "Title": "Dragon Ball Z: Budokai 3 HD"
   },
   {
     "Console": "xbox360",
@@ -145,54 +41,10 @@
   },
   {
     "Console": "xbox360",
-    "Title": "Midnight Club: Los Angeles"
-  },
-  {
-    "Console": "xbox360",
     "Title": "Call of Duty: Future Warfare"
   },
   {
     "Console": "xbox360",
-    "Title": "Need for Speed: Most Wanted"
-  },
-  {
-    "Console": "xbox360",
     "Title": "Xbox 360 native ports collection"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Thrill Drive 2"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Street Fighter Alpha"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Marvel vs. Capcom"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Vampire Savior"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Vampire Savior 2"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Vampire Hunter 2"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Vampire Savior Definitive"
-  },
-  {
-    "Console": "arcade",
-    "Title": "Tekken 6"
-  },
-  {
-    "Console": "ps4",
-    "Title": "MediEvil"
   }
 ]

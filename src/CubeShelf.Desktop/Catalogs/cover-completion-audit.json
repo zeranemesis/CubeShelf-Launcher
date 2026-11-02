@@ -1,0 +1,657 @@
+{
+  "CheckedAt": "2026-11-02",
+  "Requested": 49,
+  "Added": [
+    {
+      "Console": "ps4",
+      "Title": "Gravity Rush 2",
+      "PreviousTitle": "Gravity Rush 2",
+      "Front": "Assets/Covers/ps4/d0f43b19f93a6d75.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/76560-gravity-rush-2",
+      "OriginUrl": "https://images.launchbox-app.com/8fed13ff-158e-42d8-a924-7e42a9879399.jpg",
+      "Sha256": "b89080ae8d9711dc7e82f7e5e06819b88843389472dc12a2c9c821ee2333e0f5",
+      "Dimensions": [
+        1099,
+        1369
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "inFAMOUS Second Son",
+      "PreviousTitle": "inFAMOUS Second Son",
+      "Front": "Assets/Covers/ps4/c5565175b327a19a.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/18960-infamous-second-son",
+      "OriginUrl": "https://images.launchbox-app.com/e010c903-085e-483a-b156-0bc2cde12c41.jpg",
+      "Sha256": "bca7d09fd8ee08da4540a8e259bc4ce3b240db4321b4f8a837abdbc36d8e009f",
+      "Dimensions": [
+        1204,
+        1500
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "Killzone: Shadow Fall",
+      "PreviousTitle": "Killzone: Shadow Fall",
+      "Front": "Assets/Covers/ps4/5117c186ea2fc3e9.png",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/17653-killzone-shadow-fall",
+      "OriginUrl": "https://images.launchbox-app.com/9ffca23f-3f15-4153-a396-c0e955373dbc.png",
+      "Sha256": "5a8bb8e5ac875b4d331099469f71813d42ab78489ad456b395be55e5f359ace0",
+      "Dimensions": [
+        2000,
+        2495
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "The Last Guardian",
+      "PreviousTitle": "The Last Guardian",
+      "Front": "Assets/Covers/ps4/996ac008ab3115fe.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/34539-the-last-guardian",
+      "OriginUrl": "https://images.launchbox-app.com/c5376a22-9de3-43c7-a12c-83d2fbaa161e.jpg",
+      "Sha256": "1a1b1f038bb558eb2ebf67937f1b0b7492fadc08c7d309c74e7052cecf0cd86d",
+      "Dimensions": [
+        1523,
+        1904
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "MediEvil",
+      "PreviousTitle": "MediEvil",
+      "Front": "Assets/Covers/ps4/b5e097a6c266c1e1.jpg",
+      "Source": "LaunchBox · original retail front",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/123150-medievil",
+      "OriginUrl": "https://images.launchbox-app.com/bca37539-cad6-4655-8ed8-bb7402aa336e.jpg",
+      "Sha256": "1e32074aa615ee1e60be9c3a95d67588da27663fd125ce4f82cdc08b85ef1030",
+      "Dimensions": [
+        1216,
+        1511
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Imabikisou",
+      "PreviousTitle": "Imabikisou",
+      "Front": "Assets/Covers/ps3/e0b4ab66c307b333.jpg",
+      "Source": "Wikipedia original cover",
+      "SourcePage": "https://en.wikipedia.org/wiki/Imabikis%C5%8D",
+      "OriginUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Imabikis%C5%8D_cover.jpg",
+      "Sha256": "522a29158b4305e01c34e146ddf413b6a0233604286bfbdacb63ea4c877b160d",
+      "Dimensions": [
+        293,
+        340
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "Dragon's Crown Pro",
+      "PreviousTitle": "Dragon's Crown Pro",
+      "Front": "Assets/Covers/ps4/351e88709d80e170.jpg",
+      "Source": "LaunchBox · original retail front",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/100875-dragons-crown-pro",
+      "OriginUrl": "https://images.launchbox-app.com/bd1615cd-8677-43db-897f-02b3f01a26b9.jpg",
+      "Sha256": "a83a261a9232a27bbe01342ed22d6e40d265f49e6ecf069f4d62e36be9e09d20",
+      "Dimensions": [
+        2055,
+        2560
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "God of War III Remastered",
+      "PreviousTitle": "God of War III Remastered",
+      "Front": "Assets/Covers/ps4/aac15dd51e42f123.jpg",
+      "Source": "LaunchBox · original retail front",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/30720-god-of-war-iii-remastered",
+      "OriginUrl": "https://images.launchbox-app.com/r2_6f46d8a0-cdc3-4f98-9725-940501f5805c.jpg",
+      "Sha256": "e97ad73e76bb9e8f86cbe55a00c10c1ae2ca0c12dcbe3c64ceb0edbb6cad8bb7",
+      "Dimensions": [
+        1780,
+        2214
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps2",
+      "Title": "DQ8 Recompiled",
+      "PreviousTitle": "DQ8 Recompiled",
+      "Front": "Assets/Covers/ps2/8a6744b9f0cf42e9.png",
+      "Source": "libretro-thumbnails",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Sony_-_PlayStation_2/master/Named_Boxarts/Dragon%20Quest%20VIII%20-%20Journey%20of%20the%20Cursed%20King%20%28USA%29.png",
+      "Sha256": "efe9e28c8ea368b05ed1a050b0657b3d66f649e6860628b4053d2816466a34eb",
+      "Dimensions": [
+        512,
+        731
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "xbox",
+      "Title": "Dead or Alive 2 Ultimate",
+      "PreviousTitle": "Dead or Alive 2 Ultimate",
+      "Front": "Assets/Covers/xbox/ceb4e8d15a8db32c.png",
+      "Source": "libretro-thumbnails",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_Xbox/master/Named_Boxarts/Dead%20or%20Alive%20Ultimate%20%28Disc%202%29%20%28USA%29.png",
+      "Sha256": "d705a58b71210144102f64314c21cd507adb9dbefeeaeccb7152864e79321e6a",
+      "Dimensions": [
+        320,
+        448
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Street Fighter Alpha",
+      "PreviousTitle": "Street Fighter Alpha",
+      "Front": "Assets/Covers/arcade/ae7ae7ba1d53a5c9.png",
+      "Source": "libretro-thumbnails · arcade artwork",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Street%20Fighter%20Alpha_%20Warriors%27%20Dreams%20%28Europe%20950605%29.png",
+      "Sha256": "830fb13ee511abfe3849dfef994946ab70f9d12883518451c089efe4d3c1c3f4",
+      "Dimensions": [
+        512,
+        733
+      ],
+      "ArtworkKind": "Arcade artwork"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Marvel vs. Capcom",
+      "PreviousTitle": "Marvel vs. Capcom",
+      "Front": "Assets/Covers/arcade/21e8ba779f1051c4.png",
+      "Source": "libretro-thumbnails · arcade artwork",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Marvel%20Vs.%20Capcom_%20Clash%20of%20Super%20Heroes%20%28USA%20980123%29.png",
+      "Sha256": "0da89112e719a8b74b2da2574d6b22498561b9e7564b124fb2e50a0a3516cdc4",
+      "Dimensions": [
+        512,
+        713
+      ],
+      "ArtworkKind": "Arcade artwork"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior",
+      "PreviousTitle": "Vampire Savior",
+      "Front": "Assets/Covers/arcade/d12caeee4fb70331.png",
+      "Source": "libretro-thumbnails · arcade artwork",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Vampire%20Savior_%20The%20Lord%20of%20Vampire%20%28USA%20970519%29.png",
+      "Sha256": "f76d312bd015ce05d1ec2e7ad5e4a67bb9260515d8a79857bb156d96bae3192d",
+      "Dimensions": [
+        512,
+        714
+      ],
+      "ArtworkKind": "Arcade artwork"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior 2",
+      "PreviousTitle": "Vampire Savior 2",
+      "Front": "Assets/Covers/arcade/a0d035e358745ca8.png",
+      "Source": "libretro-thumbnails · arcade artwork",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Vampire%20Savior%202_%20The%20Lord%20of%20Vampire%20%28Japan%20970913%29.png",
+      "Sha256": "f25ff36a54712f660d44e5a1559310b32106bb9d336cf76f93f00edc256d348b",
+      "Dimensions": [
+        512,
+        360
+      ],
+      "ArtworkKind": "Arcade artwork"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Hunter 2",
+      "PreviousTitle": "Vampire Hunter 2",
+      "Front": "Assets/Covers/arcade/0cc8ff7088490334.png",
+      "Source": "libretro-thumbnails · arcade artwork",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Vampire%20Hunter%202_%20Darkstalkers%20Revenge%20%28Japan%20970929%29.png",
+      "Sha256": "f88c53b53f9235c0dfe1b12c6c0d9503bae3595e4c1fc49f5c44c82bbf3c79cd",
+      "Dimensions": [
+        512,
+        723
+      ],
+      "ArtworkKind": "Arcade artwork"
+    },
+    {
+      "Console": "ps4",
+      "Title": "The Last of Us",
+      "PreviousTitle": "The Last of Us",
+      "Front": "Assets/Covers/ps4/205d7c67715d4e92.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/20551-the-last-of-us-remastered",
+      "OriginUrl": "https://images.launchbox-app.com/a1039e5b-ae29-4015-a105-04fde1be7bd6.jpg",
+      "Sha256": "3c68a82600f3e67f09ac962989a551d317c0a69bef61aa9f98db996eec3384fa",
+      "Dimensions": [
+        401,
+        500
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "LEGO Dimensions",
+      "PreviousTitle": "LEGO Dimensions",
+      "Front": "Assets/Covers/ps4/6e533c329f569cc9.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/27367-lego-dimensions",
+      "OriginUrl": "https://images.launchbox-app.com/d079f006-7a8b-4fad-afbf-d7e949de3805.jpg",
+      "Sha256": "4beae5ae693a85de6ed2a352f76dfa967a38518018aefc75a35f07e65b444c9c",
+      "Dimensions": [
+        1500,
+        1088
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "The Order: 1886",
+      "PreviousTitle": "The Order: 1886",
+      "Front": "Assets/Covers/ps4/48a10ff30b54a1b6.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/17489-the-order-1886",
+      "OriginUrl": "https://images.launchbox-app.com/r2_893136de-6027-4834-9873-06fd326b7149.jpg",
+      "Sha256": "3f3d82bcc6d12e570146041ac13964cf485fd415a036a9619aa395205aac3fda",
+      "Dimensions": [
+        1612,
+        1999
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "Uncharted: The Nathan Drake Collection",
+      "PreviousTitle": "Uncharted: The Nathan Drake Collection",
+      "Front": "Assets/Covers/ps4/922f2d0cdff80135.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/31658-uncharted-the-nathan-drake-collection",
+      "OriginUrl": "https://images.launchbox-app.com/r2_a76edf08-a53f-4a7e-b0be-2cd464009094.jpg",
+      "Sha256": "6b97bf1b95f80f64bf9059b4cea96c2ab8cc85c19c692bf65a475f1ec2bcacd9",
+      "Dimensions": [
+        640,
+        800
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps4",
+      "Title": "WipEout Omega Collection",
+      "PreviousTitle": "WipEout Omega Collection",
+      "Front": "Assets/Covers/ps4/59e56c355e46b00a.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/92272-wipeout-omega-collection",
+      "OriginUrl": "https://images.launchbox-app.com/d2174d4d-a740-4319-9b37-a254432ac1ed.jpg",
+      "Sha256": "b545bb2c1b1fb6c8047a7fa34dfb056e6238f58ef5b2c82437379c09ba4d5c2e",
+      "Dimensions": [
+        2008,
+        2516
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Twisted Metal",
+      "PreviousTitle": "Twisted Metal",
+      "Front": "Assets/Covers/ps3/cb6ec1dc53f6c3e9.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/6358-twisted-metal",
+      "OriginUrl": "https://images.launchbox-app.com/4b557194-f938-47d7-898e-b5f30f375511.jpg",
+      "Sha256": "5375bba7625de1fb154fed0d6ef4db884cf7567baba656e539961a1b335ffe7b",
+      "Dimensions": [
+        1523,
+        1755
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "inFamous",
+      "PreviousTitle": "inFamous",
+      "Front": "Assets/Covers/ps3/067f691fac0f08cf.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/791-infamous",
+      "OriginUrl": "https://images.launchbox-app.com/d22e2edb-c0be-4062-8e2e-5ae3ee108cd0.jpg",
+      "Sha256": "3720ee86df870598d3c1267777c5995c443d5bd813a634c2aa872af5aee44381",
+      "Dimensions": [
+        2295,
+        2638
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Killzone 3",
+      "PreviousTitle": "Killzone 3",
+      "Front": "Assets/Covers/ps3/d00f4e88981f2d51.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/888-killzone-3",
+      "OriginUrl": "https://images.launchbox-app.com/b884c9cc-7b57-46dd-9223-d52e00f5179a.jpg",
+      "Sha256": "5dcaa7338f8dbbe5170a853934eda3e5b14020f68b04aa9bbd3e474111a74a19",
+      "Dimensions": [
+        928,
+        1080
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "Dragon Ball Z: Budokai HD",
+      "PreviousTitle": "Dragon Ball Z: Budokai HD",
+      "Front": "Assets/Covers/ps3/2ce79ef7de01cf94.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/11411-dragon-ball-z-budokai-hd-collection",
+      "OriginUrl": "https://images.launchbox-app.com/cba3078a-1dfc-4671-a618-331e0cccfc1f.jpg",
+      "Sha256": "01f5e6ee37c762feb1468c047f6dbba38f50af9db21e61508785fdf76701d80a",
+      "Dimensions": [
+        928,
+        1080
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "ps3",
+      "Title": "God of War II HD",
+      "PreviousTitle": "God of War II HD",
+      "Front": "Assets/Covers/ps3/10b484dbc7b71d6a.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/92462-god-of-war-ii-hd",
+      "OriginUrl": "https://images.launchbox-app.com/9443938e-5e73-4285-b2e6-0cbfe987e15d.jpg",
+      "Sha256": "31e5917553aee02b4eb5a03c5b5a256b6f9403700223146e53e6259f6d8a1ad4",
+      "Dimensions": [
+        1530,
+        1760
+      ],
+      "ArtworkKind": "Digital cover"
+    },
+    {
+      "Console": "psp",
+      "Title": "Star Wars Battlefront: Renegade Squadron",
+      "PreviousTitle": "Star Wars Battlefront: Renegade Squadron",
+      "Front": "Assets/Covers/psp/f21094034a178b92.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/6778-star-wars-battlefront-renegade-squadron",
+      "OriginUrl": "https://images.launchbox-app.com/56881c41-6a2d-4ce6-8742-6535ba6f32ad.jpg",
+      "Sha256": "9a58fabe2636a32a3293e277cb79746e4a7f14cb3d0375015ce75e08fa17ddd1",
+      "Dimensions": [
+        1139,
+        1978
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dead Rising 2: Case West",
+      "PreviousTitle": "Dead Rising 2: Case West",
+      "Front": "Assets/Covers/xbox360/10578fc2184fdf09.png",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/17020-dead-rising-2-case-west",
+      "OriginUrl": "https://images.launchbox-app.com/8552ec8c-6321-42fc-90b3-d88b6fd23f97.png",
+      "Sha256": "426434348f5d8e4a8f6c0302a84a0679f2fbedb623dee5d8a758147209c5d6b4",
+      "Dimensions": [
+        584,
+        800
+      ],
+      "ArtworkKind": "Digital cover"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dead Rising 2: Case Zero",
+      "PreviousTitle": "Dead Rising 2: Case Zero",
+      "Front": "Assets/Covers/xbox360/0bdff292cd104e05.png",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/19071-dead-rising-2-case-zero",
+      "OriginUrl": "https://images.launchbox-app.com/f921b4d1-c9fd-48e7-b330-fe801edf9ba4.png",
+      "Sha256": "81658bd2613847a25d90a376b042af902204d6a93e105fab89b14dbf5820e6a7",
+      "Dimensions": [
+        742,
+        1055
+      ],
+      "ArtworkKind": "Digital cover"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Dragon Ball Z: Budokai 3 HD",
+      "PreviousTitle": "Dragon Ball Z: Budokai 3 HD",
+      "Front": "Assets/Covers/xbox360/a3a5fcace84c5d9d.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/26990-dragon-ball-z-budokai-hd-collection",
+      "OriginUrl": "https://images.launchbox-app.com/4267ea9f-3274-4ab8-8ef9-219a9dcec9d0.jpg",
+      "Sha256": "cde461232d2757608125481901ccc10bb31af5e19916cc18e1561898743b3529",
+      "Dimensions": [
+        1517,
+        2148
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Midnight Club: Los Angeles",
+      "PreviousTitle": "Midnight Club: Los Angeles",
+      "Front": "Assets/Covers/xbox360/016c531913a32ee0.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/15392-midnight-club-los-angeles",
+      "OriginUrl": "https://images.launchbox-app.com/r2_07a0ca19-d267-4200-84ba-520f61b492f9.jpg",
+      "Sha256": "cc508ced57bf108e6cbadd89620ecf103bec117710e7bb3db39a1f7010b268a8",
+      "Dimensions": [
+        600,
+        850
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Need for Speed: Most Wanted",
+      "PreviousTitle": "Need for Speed: Most Wanted",
+      "Front": "Assets/Covers/xbox360/ac056e518d6884ba.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/369388-need-for-speed-most-wanted-2005",
+      "OriginUrl": "https://images.launchbox-app.com/80e7c117-9007-4bc3-bb49-f04308a1e592.jpg",
+      "Sha256": "c45e19811cb012b2cf070cb37e5b7c429e8ebe22cf57dfda22fd3d42e2a2e47a",
+      "Dimensions": [
+        640,
+        916
+      ],
+      "ArtworkKind": "Box front"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Thrill Drive 2",
+      "PreviousTitle": "Thrill Drive 2",
+      "Front": "Assets/Covers/arcade/1a66f123c722544a.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/39642-thrill-drive-2",
+      "OriginUrl": "https://images.launchbox-app.com/fdfd2a22-fef9-4f43-9d4d-15b202011e39.jpg",
+      "Sha256": "c43900904ff32b18d237148bad5aca5a2bcd8327d2f78220525b9cd096877b10",
+      "Dimensions": [
+        850,
+        1187
+      ],
+      "ArtworkKind": "Arcade flyer"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Tekken 6",
+      "PreviousTitle": "Tekken 6",
+      "Front": "Assets/Covers/arcade/0b3b8c4947272466.jpg",
+      "Source": "LaunchBox · original artwork",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/156177-tekken-6",
+      "OriginUrl": "https://images.launchbox-app.com/813687ac-7082-470c-83ff-d362f8d82805.jpg",
+      "Sha256": "2822ab227581c43ed33824bb02fb34fbe85a0ed3426091492d401f1e8f50e094",
+      "Dimensions": [
+        2122,
+        3000
+      ],
+      "ArtworkKind": "Arcade flyer"
+    },
+    {
+      "Console": "virtualboy",
+      "Title": "Zero Racers",
+      "PreviousTitle": "Zero Racers",
+      "Front": "Assets/Covers/virtualboy/5be39489f7b29b5c.jpg",
+      "Source": "Nintendo · visuel officiel Nintendo Classics",
+      "SourcePage": "https://www.nintendo.com/en-gb/Nintendo-Switch-Online/Classic-games/Classic-games-Nintendo-Switch-Online-2719182.html",
+      "OriginUrl": "https://www.nintendo.com/eu/media/images/services/nintendo_switch_online_2/classic_games/virtual_boy/VB_ZeroRacers_image380w.jpg",
+      "Sha256": "6da89a2e8a0cce7b986a210a4fd6cd52a85cb1a6ba3aecee1bfc10c9babd79e5",
+      "Dimensions": [
+        380,
+        380
+      ],
+      "ArtworkKind": "Official title image"
+    },
+    {
+      "Console": "xbox",
+      "Title": "StarCraft: Ghost",
+      "PreviousTitle": "StarCraft: Ghost",
+      "Front": "Assets/Covers/xbox/0dfe63c8492e03f7.jpg",
+      "Source": "Blizzard · flyer promotionnel archivé par LaunchBox",
+      "SourcePage": "https://gamesdb.launchbox-app.com/games/images/155050-starcraft-ghost",
+      "OriginUrl": "https://images.launchbox-app.com/r2_2c764b6f-e8d9-4dbe-ab8a-a92402acef83.jpg",
+      "Sha256": "443aa13844f3b67144aceb4f3d68cf2bb4444d176df1b767ce3ace68af5d347e",
+      "Dimensions": [
+        2703,
+        2117
+      ],
+      "ArtworkKind": "Promotional flyer"
+    },
+    {
+      "Console": "arcade",
+      "Title": "Vampire Savior Definitive",
+      "PreviousTitle": "Vampire Savior Definitive",
+      "Front": "Assets/Covers/arcade/d12caeee4fb70331.png",
+      "Source": "Flyer original de Vampire Savior · variante Definitive",
+      "SourcePage": "",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/MAME/master/Named_Boxarts/Vampire%20Savior_%20The%20Lord%20of%20Vampire%20%28USA%20970519%29.png",
+      "Sha256": "f76d312bd015ce05d1ec2e7ad5e4a67bb9260515d8a79857bb156d96bae3192d",
+      "Dimensions": [
+        512,
+        714
+      ],
+      "ArtworkKind": "Base game flyer"
+    },
+    {
+      "Console": "nds",
+      "Title": "Pokémon SoulSilver",
+      "PreviousTitle": "Pokémon HeartGold and SoulSilver",
+      "Front": "Assets/Covers/nds/44f5241a0c7697d5.png",
+      "Source": "libretro-thumbnails",
+      "SourcePage": "https://github.com/ClickingMaster/pokeheartgold-single-screen",
+      "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20SoulSilver%20Version%20%28USA%29.png",
+      "Sha256": "f236af4b4b049e132c81e66a4735a8f2808453dc020ca8f329b483383c04d084",
+      "Dimensions": [
+        512,
+        467
+      ],
+      "ArtworkKind": "Box front"
+    }
+  ],
+  "Remaining": [
+    {
+      "Console": "gb",
+      "Title": "Pokemon RBY / GSC / FRLF / RSE",
+      "Status": "Multi-game engine",
+      "Reason": "Plusieurs éditions de trois consoles sont regroupées. Aucune boîte unique originale correspondant à cet ensemble.",
+      "PrimarySource": "https://github.com/bryanthaboi/gen1recomp/blob/7e736db2fb585554948f4046c23f7ee4922dda8f/README.md"
+    },
+    {
+      "Console": "gbc",
+      "Title": "The Legend of Zelda: Oracle of Ages/Seasons",
+      "Status": "Multiple original games",
+      "Reason": "Ages et Seasons ont des jaquettes distinctes. Les montages combinant les deux ne sont pas une boîte originale de cette entrée.",
+      "PrimarySource": "https://github.com/thibautbus/top/blob/a2c98d6efadcc714b79464353672dd70e78de649/README.md"
+    },
+    {
+      "Console": "gbc",
+      "Title": "Pokemon Gold / Silver / Crystal",
+      "Status": "Multiple original games",
+      "Reason": "Trois éditions distinctes regroupées ; pas de jaquette unique originale vérifiée pour cet ensemble.",
+      "PrimarySource": "https://github.com/UNDERdecoded/Gen2Recomped/blob/8d5b4387420cc1fdcadf58ad4ca78a7d8596e41d/README.md"
+    },
+    {
+      "Console": "megadrive",
+      "Title": "Sonic 3 & Knuckles",
+      "Status": "Combined cartridges",
+      "Reason": "Le jeu combiné utilise Sonic 3 et Sonic & Knuckles. Les boîtes des cartouches séparées existent ; aucune boîte Mega Drive dédiée au jeu combiné vérifiée.",
+      "PrimarySource": "https://github.com/mstan/Sonic3AndKnucklesRecomp/blob/5303dfe1a51f9afaa7191a4b4073b04c53c02f60/README.md"
+    },
+    {
+      "Console": "ps1",
+      "Title": "Vigilante 8 / Vigilante 8: 2nd Offense",
+      "Status": "Multiple original games",
+      "Reason": "Le port annonce deux jeux réunis. Les originaux ont chacun leur boîte ; pas de boîte originale commune vérifiée.",
+      "PrimarySource": "https://github.com/GTTeancum/Vigilante-8-recomp/blob/54805112186f970b05777540627ab5bdd084ddb7/README.md"
+    },
+    {
+      "Console": "psp",
+      "Title": "Yakumo",
+      "Status": "Identity and platform need correction",
+      "Reason": "Yakumo est le nom du port. Son README désigne Monster Hunter Portable 3rd HD Ver. (NPJB-40001). Le classement PSP doit être clarifié avant une jaquette de l’édition HD PS3.",
+      "PrimarySource": "https://github.com/TeamGDB/Yakumo/blob/b61852aef10870400320b96d92a14136ac17b051/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "GoldenEye 007",
+      "Status": "Original version not established",
+      "Reason": "La description du dépôt ne suffit pas à distinguer la version originale du prototype XBLA. Ne pas associer arbitrairement une boîte N64 à une entrée Xbox 360.",
+      "PrimarySource": "https://github.com/ericksa1417/GoldenEye-Recomp/blob/cc241d8543c80ecbb3b1fe0b397f646302810549/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "GoldenEye 007 XBLA PC Recomp",
+      "Status": "Unverified archival cover",
+      "Reason": "Prototype XBLA non commercialisé. Visuel trouvé dans x360db (584108A9), mais provenance comme jaquette officielle non établie ; exclu des originaux.",
+      "PrimarySource": "https://github.com/CaiusCodes/GoldenEye-007-XBLA-PC-Recomp/blob/527db75b613aaa305eac81a6358fe21341c58cdd/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "James Bond games",
+      "Status": "Multiple original games",
+      "Reason": "Le dépôt réunit Quantum of Solace, Blood Stone et 007 Legends. Pas de jaquette Xbox 360 originale commune vérifiée.",
+      "PrimarySource": "https://github.com/furqanagwan/007/blob/f7764adc1f51d8c7a37942a110df7d5e37325870/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Marvel: Ultimate Alliance 1 and 2",
+      "Status": "Multiple original games",
+      "Reason": "Deux jeux originaux regroupés ; les visuels du bundle Xbox One ne correspondent pas à la plateforme Xbox 360.",
+      "PrimarySource": "https://github.com/saulob/marvel-ultimate-alliance-bundle-recompiled/blob/9a081ed6cbeb03aa0e227c10e97e504c51efd725/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Call of Duty: Future Warfare",
+      "Status": "Unreleased prototype",
+      "Reason": "Projet NX1 annulé ; aucune jaquette commerciale originale vérifiée. Ne pas reprendre une boîte d’un autre Call of Duty.",
+      "PrimarySource": "https://github.com/goshavindtburg/NX1recomp/blob/4b427572e0d27689614bb7c55f05934fd8b1b95c/README.md"
+    },
+    {
+      "Console": "xbox360",
+      "Title": "Xbox 360 native ports collection",
+      "Status": "Multi-game engine",
+      "Reason": "Collection de lanceurs de jeux différents, sans boîte originale unique.",
+      "PrimarySource": "https://github.com/CrownParkComputing/Xbox360-Native-Ports/blob/2675c16edd4b0854badb30f9cd519ab899798388/README.md"
+    }
+  ],
+  "TitleCorrections": [
+    {
+      "Console": "nds",
+      "Id": "clickingmaster-pokeheartgold-single-screen-pokemon-heartgold-and-soulsilver",
+      "PreviousTitle": "Pokémon HeartGold and SoulSilver",
+      "Title": "Pokémon SoulSilver",
+      "Reason": "Le port natif et la ROM requis sont SoulSilver USA.",
+      "PrimarySource": "https://github.com/ClickingMaster/pokeheartgold-single-screen/blob/6984a3d67592157195940049be2e4bbbf933f9ff/README.md"
+    }
+  ]
+}

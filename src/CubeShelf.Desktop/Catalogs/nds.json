@@ -182,7 +182,7 @@
   },
   {
     "Id": "clickingmaster-pokeheartgold-single-screen-pokemon-heartgold-and-soulsilver",
-    "Title": "Pokémon HeartGold and SoulSilver",
+    "Title": "Pokémon SoulSilver",
     "Project": "pokeheartgold-single-screen",
     "Repository": "ClickingMaster/pokeheartgold-single-screen",
     "Method": "Port natif Windows déclaré par le projet",

@@ -18,7 +18,8 @@ static class CoverLayoutChecks
         using var sources=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs/covers.json")));
         var samples=new[]{("snes","Super Mario World"),("snes","Dragon Ball Z: Super Saiya Densetsu"),
             ("ps1","Crash Bandicoot"),("n64","Banjo-Kazooie"),("n64","Virtual Pro Wrestling 2"),
-            ("switch","Unicorn Overlord"),("nds","Kingdom Hearts 358/2 Days")};
+            ("switch","Unicorn Overlord"),("nds","Kingdom Hearts 358/2 Days"),("nds","Pokémon SoulSilver"),
+            ("ps4","MediEvil"),("virtualboy","Zero Racers"),("xbox","StarCraft: Ghost"),("arcade","Vampire Savior 2")};
         foreach(var (console,title) in samples)
         {
             var record=sources.RootElement.EnumerateArray().Single(p=>p.GetProperty("Console").GetString()==console && p.GetProperty("Title").GetString()==title);
@@ -62,7 +63,7 @@ static class CoverLayoutChecks
             try
             {
                 var picker=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
-                foreach(var (console,title) in samples.Where(sample=>sample.Item1 is "snes" or "ps1" or "switch"))
+                foreach(var (console,title) in samples.Where(sample=>sample.Item1 is "snes" or "ps1" or "switch" or "ps4" or "virtualboy" or "xbox" or "arcade"))
                 {
                     picker.SelectedIndex=picker.Items.OfType<ComboBoxItem>().Select((item,index)=>(item,index)).Single(p=>p.item.Tag?.ToString()==console).index;
                     window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Stop();
