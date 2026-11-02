@@ -14,7 +14,9 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==23&&ports.Select(p=>p.PackageName).Distinct().Count()==23,"23 distinct Android ports and package identities");
+Check(ports.Length==24&&ports.Select(p=>p.PackageName).Distinct().Count()==24,"24 distinct Android ports and package identities");
+Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:346}
+    &&ports.Single(p=>p.Id=="switch-mhgu").Notes.Contains("pas de commandes tactiles"),"Switch Android package retains verified hardware requirements and controller limitation");
 Check(ports.All(p=>p.Abis.Contains("arm64-v8a")),"all published mobile ports have a verified ARM64 build");
 Check(ports.Single(p=>p.Id=="n64-dk64").RequiresVulkan11 && ports.Single(p=>p.Id=="n64-harvestmoon").RequiresVulkan11,"Vulkan 1.1 requirements survive catalogue loading");
 var manifest=System.Xml.Linq.XDocument.Load(Path.Combine(AppContext.BaseDirectory,"AndroidManifest.xml"));
@@ -113,6 +115,7 @@ void RunUi()
     home.CycleSort();home.CycleSort();home.Move(1);
     Check(home.SelectedConsole=="wii","chronological sorting puts Wii after GameCube among Android platforms");
     home.Move(1);Check(home.SelectedConsole=="wiiu","chronological sorting puts Wii U after Wii");
+    home.Move(1);Check(home.SelectedConsole=="switch","chronological sorting puts Switch after Wii U");
     home.Move(1);Check(home.SelectedConsole=="gb","chronological sorting wraps from the latest to the oldest platform");
     for(var sort=0;sort<3;sort++)home.CycleSort();
     if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } startupFolder)
@@ -127,7 +130,7 @@ void RunUi()
     var n64Count=ports.Count(p=>p.ShelfConsole=="n64");
     for(var step=0;step<platforms.Length&&home.SelectedConsole!="n64";step++)view.BrowseFromController(1);
     view.ActivateFromController();Check(!home.IsVisible&&picker.SelectedIndex==n64,"controller confirms the 3D console and opens its games");Jobs();
-    Check(picker.ItemCount == 8 && picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
+    Check(picker.ItemCount == 9 && picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
     Check(Field<TextBlock>("_platformCaption").Text == $"{n64Count} jeu(x) · Android", "platform caption reflects the Android catalogue");
     for(var index=0;index<platforms.Length;index++)
     {
@@ -136,6 +139,40 @@ void RunUi()
         Check(Field<CubeShelf.Desktop.Controls.ConsoleBrandMark>("_consoleLogo").Platform==platform &&
             Field<TextBlock>("_platformCaption").Text==$"{ports.Count(p=>p.ShelfConsole==platform)+(platform=="gamecube"?1:0)} jeu(x) · Android", "verified Android platform selects its own catalogue: "+platform);
     }
+    host.PartyBoardInstalled=false;
+    host.Native.Embedded.Add(ports[0].Id);host.Engines[ports[0].Id].Complete();
+    view.OpenPersonalLibrary();Jobs();
+    Check(Field<Array>("_catalog").Length==0&&Field<TextBlock>("_emptyLibrary").IsEffectivelyVisible
+        &&!Field<Grid>("_gamePanel").IsVisible&&!picker.IsVisible,"personal library excludes uninstalled ports and bundled engines without prepared game files");
+    host.Native.Installed.Add(ports[0].Id);host.Native.Installed.Add("gb-warioland");
+    view.OpenPersonalLibrary();Jobs();
+    Check(Field<Array>("_catalog").Length==2&&!Field<TextBlock>("_emptyLibrary").IsVisible
+        &&Field<TextBlock>("_platformCaption").Text!.Contains("Toutes consoles"),"personal games include installed ports across consoles only");
+    host.Engines["switch-mhgu"].Complete();Jobs();
+    Check(Field<Array>("_catalog").Length==3,"a verified APK joins personal games when its download completes");
+    if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } personalFolder)
+    {
+        foreach(var size in new[]{new Size(390,844),new Size(320,700),new Size(844,390)})
+        {
+            window.Width=size.Width;window.Height=size.Height;Jobs();CheckDeviceStatus();
+            var button=Field<Button>("_libraryButton");var origin=button.TranslatePoint(default,view)!.Value;
+            Check(button.IsEffectivelyVisible&&origin.X>=0&&origin.X+button.Bounds.Width<=view.Bounds.Width,"personal-library access fits the phone header");
+            using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(personalFolder,$"mobile-my-games-{size.Width}.png"));
+        }
+        window.Width=390;window.Height=844;Jobs();
+    }
+    Field<Button>("_downloadsButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(Field<Grid>("_downloadsOverlay").IsVisible,"downloads remain available from personal games");
+    view.OpenPersonalLibrary();Jobs();
+    Check(!Field<Grid>("_downloadsOverlay").IsVisible&&Field<Array>("_catalog").Length==3,"personal games remain accessible from downloads");
+    view.BackFromController();Jobs();
+    Check(picker.IsVisible&&Field<Array>("_catalog").Length==ports.Count(p=>p.ShelfConsole==platforms[picker.SelectedIndex].Id),"B returns from personal games to the console catalog");
+    view.GetType().GetMethod("OpenPlatformHome",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,null);Jobs();
+    home.GetVisualDescendants().OfType<Button>().Single(button=>button.Name=="PlatformHomeLibraryButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(!home.IsVisible&&Field<Array>("_catalog").Length==3,"console-home personal-library button is connected");
+    Field<Button>("_libraryButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(picker.IsVisible,"persistent header button returns to catalog");
+    host.PartyBoardInstalled=true;host.Native.Installed.Clear();host.Native.Embedded.Clear();host.Engines[ports[0].Id].Cancel();host.Engines["switch-mhgu"].Cancel();
     foreach(var port in ports)host.Native.Installed.Add(port.Id);
     host.Native.OnLaunch=()=>{view.SetActive(false);view.SetActive(true);};
     foreach(var native in ports)
@@ -319,7 +356,8 @@ sealed class FakeGames:IMobileGameService
     public MobileDeviceStatus? DeviceStatus {get;set;}=new("14:32",82,false,"Wi-Fi");
     public IRuntimeDownloads Downloads=>Queue;
     public string? LastError=>null;
-    public bool IsInstalled()=>true;
+    public bool PartyBoardInstalled {get;set;}=true;
+    public bool IsInstalled()=>PartyBoardInstalled;
     public bool DeviceSupportsPublishedGame()=>true;
     public int Opened {get;private set;}
     public Action? OnOpen {get;set;}

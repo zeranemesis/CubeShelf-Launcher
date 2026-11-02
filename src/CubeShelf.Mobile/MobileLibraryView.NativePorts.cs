@@ -32,10 +32,11 @@ public sealed partial class MobileLibraryView
             if(!_realized||_launching||_nativePreparation is not null)return;
             if (_consolePicker.SelectedIndex < 0 || _consolePicker.SelectedIndex >= _mobilePlatforms.Length) return;
             var console=_mobilePlatforms[_consolePicker.SelectedIndex].Id;
-            if(console==_activeConsole)return;
+            if(console==_activeConsole&&!_personalLibrary)return;
+            _personalLibrary=false;
             CloseInspection(false);ResetTouch();_activeConsole=console;_consoleLogo.Platform=console;
             _catalog=_allCatalog.Where(game=>game.ShelfConsole==console).ToArray();_selected=0;
-            RebuildMobileShelf();Select(0,false); UpdatePlatformCaption();
+            RebuildMobileShelf();UpdatePersonalLibraryUi();Select(0,false);
         };
         return heading;
     }
@@ -50,7 +51,8 @@ public sealed partial class MobileLibraryView
         Year=p.Year > 0 ? p.Year : p.Id switch {"n64-sm64" or "n64-pilotwings"=>1996,"n64-oot"=>1998,"n64-mm"=>2000,_=>1999},
         Covers=[new MobileCover {Front=p.Front,Back=p.Back,Spine=p.Spine,Right=p.Right,Top=p.Top,Bottom=p.Bottom,Media=p.Media}]
     });
-    private void UpdatePlatformCaption() => _platformCaption.Text = $"{_catalog.Length} jeu(x) · Android";
+    private void UpdatePlatformCaption() => _platformCaption.Text = _personalLibrary
+        ?$"Mes jeux · {_catalog.Length} jeu(x) · Toutes consoles":$"{_catalog.Length} jeu(x) · Android";
     private void RebuildMobileShelf()
     {
         _consoleLogo.Platform=_activeConsole;
@@ -94,11 +96,12 @@ public sealed partial class MobileLibraryView
         {
             _nativePreparation=preparation;
             _download.IsEnabled=false;_consolePicker.IsEnabled=false;
+            _libraryButton.IsEnabled=false;
             _downloadsButton.IsEnabled=false;_appUpdatesButton.IsEnabled=false;
             _cancelNativePreparation.IsVisible=true;
             _nativePreparationProgress.IsVisible=true;
             RefreshAvailability();
-            SetStatus("Préparation de ta ROM… Cela peut prendre quelques minutes.");
+            SetStatus("");
         }
         try
         {
@@ -114,6 +117,7 @@ public sealed partial class MobileLibraryView
             if(embedded)
             {
                 _nativePreparation=null;_download.IsEnabled=true;_consolePicker.IsEnabled=true;
+                _libraryButton.IsEnabled=true;
                 _downloadsButton.IsEnabled=true;_appUpdatesButton.IsEnabled=true;
                 _cancelNativePreparation.IsVisible=false;
                 _nativePreparationProgress.IsVisible=false;

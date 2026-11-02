@@ -74,6 +74,7 @@ public sealed partial class MobileLibraryView
             return true;
         }
         if (_platformHome.IsVisible) return false;
+        if(_personalLibrary){ShowPersonalLibrary(false);return true;}
         OpenPlatformHome();
         return true;
     }

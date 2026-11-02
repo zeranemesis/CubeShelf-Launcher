@@ -711,5 +711,37 @@
     "Top": "",
     "Bottom": "",
     "Media": "Assets/Covers/AndroidPorts/wii-mariokart-media.png"
+  },
+  {
+    "Id": "switch-mhgu",
+    "ShelfConsole": "switch",
+    "Year": 2018,
+    "Title": "Monster Hunter Generations Ultimate",
+    "Project": "MHGU Recomp Android",
+    "Repository": "morerokk/MHGURecomp",
+    "Version": "0.13.1",
+    "PackageName": "io.github.morerokk.mhgurecomp",
+    "VersionCode": 346,
+    "MinimumSdk": 29,
+    "Abis": [
+      "arm64-v8a"
+    ],
+    "RequiresVulkan12": true,
+    "RequiresGles3": false,
+    "Status": "Expérimental · partie non testée",
+    "Notes": "Android 10 minimum, Vulkan 1.2, 6 Go de RAM recommandés et manette requise : pas de commandes tactiles. Prévois environ 13 Go pour tes fichiers personnels (26 Go pendant leur import). Le projet indique uniquement un essai dans un émulateur Android, pas sur un téléphone réel. Fournis les dossiers exefs et romfs de ta propre copie 1.4.0 ; aucun jeu fourni.",
+    "Name": "Android-MHGURecomp.0.13.1.apk",
+    "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.13.1/Android-MHGURecomp.0.13.1.apk",
+    "Size": 136684642,
+    "Sha256": "4d3f425c269eed69de6ba8311088e7bac5d0c476ea6b524e17f6eb678b729a94",
+    "ApkSha256": "4d3f425c269eed69de6ba8311088e7bac5d0c476ea6b524e17f6eb678b729a94",
+    "ApkSize": 136684642,
+    "Front": "Assets/Covers/AndroidPorts/mhgu-c7947da5d52c-front.jpg",
+    "Back": "",
+    "Spine": "",
+    "Right": "",
+    "Top": "",
+    "Bottom": "",
+    "Media": ""
   }
 ]

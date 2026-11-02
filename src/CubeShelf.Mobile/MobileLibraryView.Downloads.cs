@@ -37,6 +37,7 @@ public sealed partial class MobileLibraryView
         TextWrapping = TextWrapping.Wrap, Margin = new Thickness(16, 8) };
     private readonly Dictionary<string, Bitmap> _downloadCovers = [];
     private RuntimeDownloadState? _lastDownloadState;
+    private string _personalReadyStamp="";
     private bool _downloadsSubscribed;
     private string _displayedDownloadId = "partyboard", _rowsStamp = "";
     private IRuntimeDownloadManager? DownloadManager => _games.Downloads as IRuntimeDownloadManager;
@@ -199,7 +200,10 @@ public sealed partial class MobileLibraryView
         var entries = DownloadManager?.Entries ?? Array.Empty<RuntimeQueueEntry>();
         var primaryState = entries.FirstOrDefault(item => item.GameId == (_catalog.Length>0?_catalog[_selected].Id:PartyBoardId))?.Transfer.State ?? snapshot.State;
         var changed = _lastDownloadState != primaryState; _lastDownloadState = primaryState;
-        if (changed) RefreshAvailability();
+        var readyStamp=string.Join("|",entries.Where(item=>item.Transfer.State==RuntimeDownloadState.Ready).Select(item=>item.GameId));
+        var personalChanged=readyStamp!=_personalReadyStamp;_personalReadyStamp=readyStamp;
+        if(_personalLibrary&&personalChanged&&!_launching&&_nativePreparation is null)ReloadVisibleCatalog();
+        else if (changed) RefreshAvailability();
         if (!_downloadsOverlay.IsVisible) return;
         var manager = DownloadManager;
         var entry = entries.FirstOrDefault(item => item.Transfer.IsBusy)

@@ -23,9 +23,22 @@ public sealed partial class MobileLibraryView
             CornerRadius=new CornerRadius(3),Padding=new Thickness(2),Child=_batteryFill,VerticalAlignment=VerticalAlignment.Center};
         var indicators=new StackPanel {Orientation=Orientation.Horizontal,Spacing=6,VerticalAlignment=VerticalAlignment.Center};
         indicators.Children.Add(battery);indicators.Children.Add(_chargingMark);indicators.Children.Add(_deviceBattery);
-        var row=new StackPanel {Orientation=Orientation.Horizontal,Spacing=12,HorizontalAlignment=HorizontalAlignment.Right};
+        var row=new StackPanel {Orientation=Orientation.Horizontal,Spacing=12,HorizontalAlignment=HorizontalAlignment.Right,VerticalAlignment=VerticalAlignment.Top};
         row.Children.Add(_deviceConnection);row.Children.Add(indicators);row.Children.Add(_deviceTime);
-        _deviceStatusBar.Child=row;
+        var layout=new Grid {ColumnDefinitions=new ColumnDefinitions("Auto,*"),ColumnSpacing=8};
+        layout.Children.Add(_libraryButton);Grid.SetColumn(row,1);layout.Children.Add(row);
+        bool? compact=null;
+        layout.SizeChanged+=(_,_)=>
+        {
+            var narrow=layout.Bounds.Width<300;
+            if(compact==narrow)return;
+            compact=narrow;
+            layout.RowDefinitions=new RowDefinitions(narrow?"Auto,Auto":"Auto");
+            Grid.SetRow(_libraryButton,narrow?1:0);Grid.SetColumnSpan(_libraryButton,narrow?2:1);
+            Grid.SetColumn(row,narrow?0:1);Grid.SetColumnSpan(row,narrow?2:1);
+        };
+        _libraryButton.Click+=(_,_)=>ShowPersonalLibrary(!_personalLibrary);
+        _deviceStatusBar.Child=layout;
         _deviceStatusTimer.Tick+=(_,_)=>RefreshDeviceStatus();
         return _deviceStatusBar;
     }

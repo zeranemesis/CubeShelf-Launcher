@@ -105,6 +105,7 @@ public sealed partial class MobileLibraryView : UserControl
         _details.Children.Add(_nativeNotes);
         _details.Children.Add(_onlinePanel);
         _body.Children.Add(_shelf);
+        Grid.SetColumnSpan(_emptyLibrary,2);Grid.SetRowSpan(_emptyLibrary,2);_body.Children.Add(_emptyLibrary);
         _detailsScroll = new ScrollViewer { Content = _details, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, Margin = new Thickness(0, 12, 0, 8) };
         _gamePanel.Children.Add(_summary);
         Grid.SetRow(_detailsScroll, 1); _gamePanel.Children.Add(_detailsScroll);
@@ -130,7 +131,8 @@ public sealed partial class MobileLibraryView : UserControl
         shell.Children.Add(BuildDeviceStatusBar());Grid.SetRow(content,1);shell.Children.Add(content);
         Content = shell;
         Grid.SetRowSpan(_platformHome,3);content.Children.Add(_platformHome);
-        _platformHome.ConsoleChosen+=id=> { _consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);_platformHome.IsVisible=false;FocusPrimaryAction(); };
+        _platformHome.ConsoleChosen+=id=> { if(_personalLibrary)ShowPersonalLibrary(false);_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);_platformHome.IsVisible=false;FocusPrimaryAction(); };
+        _platformHome.LibraryRequested+=OpenPersonalLibrary;
         UpdateInputHint();
         AddHandler(PointerPressedEvent, (_, args) =>
         {
@@ -172,6 +174,7 @@ public sealed partial class MobileLibraryView : UserControl
         LayoutUpdated += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
+            if(args.Key==Key.F2){OpenPersonalLibrary();args.Handled=true;return;}
             if(_platformHome.IsVisible)
             {
                 if(_platformHome.SortHasFocus)return;
@@ -233,6 +236,7 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void FocusPrimaryAction()
     {
+        if(_emptyLibrary.IsVisible){_libraryButton.Focus();return;}
         if (_play.IsVisible) _play.Focus();
         else if (_download.IsVisible) _download.Focus();
         else _downloadsButton.Focus();
@@ -250,7 +254,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
-        Control[] candidates = [_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download,_cancelNativePreparation];
+        Control[] candidates = [_libraryButton,_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download,_cancelNativePreparation];
         var actions = candidates.Where(control => control.IsEffectivelyVisible && control.IsEnabled
             && (control != _invite && control != _join || _invitationPanel.IsExpanded)).ToArray();
         if (actions.Length == 0) return;
@@ -436,11 +440,12 @@ public sealed partial class MobileLibraryView : UserControl
             _consolePicker.IsVisible = _mobilePlatforms.Length > 1;
             _activeConsole = _mobilePlatforms.Any(product => product.Id == _savedState?.Console) ? _savedState!.Console : _mobilePlatforms.FirstOrDefault()?.Id ?? "gamecube";
             _consolePicker.SelectedIndex = Array.FindIndex(_mobilePlatforms, product => product.Id == _activeConsole);
-            _catalog=_allCatalog.Where(g=>g.ShelfConsole==_activeConsole).ToArray();
+            _catalog=VisibleCatalog();
             UpdatePlatformCaption();
             var remembered = Array.FindIndex(_catalog, game => game.Id == _rememberedGame);
             if (remembered >= 0) _selected = remembered;
             RebuildMobileShelf();
+            UpdatePersonalLibraryUi();
             _realized = true;
             Select(_selected, false);
             if (!_startupPlatformChoiceShown && _mobilePlatforms.Length > 1)
@@ -459,6 +464,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_catalog.Length == 0) return;
         _selected = (index % _catalog.Length + _catalog.Length) % _catalog.Length;
         var game = _catalog[_selected];
+        if(_personalLibrary)_consoleLogo.Platform=game.ShelfConsole;
         _position.Text = $"{_selected + 1} / {_catalog.Length}";
         _title.SetGame(game.Id, game.Title);
         _info.Text = $"{game.Year} · {game.Genre} · {game.Players}";
@@ -527,7 +533,7 @@ public sealed partial class MobileLibraryView : UserControl
     private async Task LaunchSelectedGameAsync()
     {
         if (_launching || !_play.IsVisible || _catalog.Length == 0) return;
-        _launching = true;_consolePicker.IsEnabled=false;
+        _launching = true;_consolePicker.IsEnabled=false;_libraryButton.IsEnabled=false;
         using var cancellation = new CancellationTokenSource();
         _launchCancellation = cancellation;
         try
@@ -552,7 +558,7 @@ public sealed partial class MobileLibraryView : UserControl
         catch (Exception error) { SetStatus(error.Message); }
         finally
         {
-            _launchTransition.Stop(); _launchCancellation = null; _launching = false;_consolePicker.IsEnabled=true;
+            _launchTransition.Stop(); _launchCancellation = null; _launching = false;_consolePicker.IsEnabled=true;_libraryButton.IsEnabled=true;
         }
     }
 
@@ -576,7 +582,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_layoutKey == key) return;
         _layoutKey = key;
         var wide = root.Bounds.Width >= 600 && root.Bounds.Width > root.Bounds.Height;
-        var narrow = root.Bounds.Width < 360;
+        var narrow = root.Bounds.Width < 480;
         _heading.RowDefinitions = new RowDefinitions(narrow ? "Auto,Auto" : "Auto");
         Grid.SetColumnSpan(_heading.Children[0], narrow ? 5 : 1);
         foreach (var control in _heading.Children.Skip(1)) Grid.SetRow(control, narrow ? 1 : 0);

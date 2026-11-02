@@ -34,6 +34,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
             Action? action = keyEvent.KeyCode switch
             {
                 global::Android.Views.Keycode.ButtonA => view.ActivateFromController,
+                global::Android.Views.Keycode.ButtonSelect => view.OpenPersonalLibrary,
                 global::Android.Views.Keycode.ButtonB => view.BackFromController,
                 global::Android.Views.Keycode.ButtonX => view.FlipFromController,
                 global::Android.Views.Keycode.ButtonY => view.OpenOnlineFromController,
