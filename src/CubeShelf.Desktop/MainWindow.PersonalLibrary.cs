@@ -11,7 +11,10 @@ public sealed partial class MainWindow
 
     private void OpenPersonalLibrary(object? sender, RoutedEventArgs args)
     {
-        _personalLibraryReturnToConsoles = PlatformHome.IsVisible;
+        if (OwnedWindows.Any(window => window.IsVisible)) return;
+        LaunchTransition.Stop();
+        if (!_personalLibrary || !LibraryView.IsVisible)
+            _personalLibraryReturnToConsoles = PlatformHome.IsVisible;
         _personalLibrary = true;
         _favoritesOnly = false;
         CloseBigPictureMenu();

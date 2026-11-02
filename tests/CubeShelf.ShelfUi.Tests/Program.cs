@@ -53,14 +53,14 @@ try
     AssertCovers();
     selector.SelectedIndex=2;
     AssertBrand("switch");
-    if(cards.Items.Count!=18 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
+    if(cards.Items.Count!=25 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
     if(!window.FindControl<TextBlock>("LibrarySectionTitle")!.Text!.Contains("Switch"))throw new Exception("Library heading does not match selected console.");
     var multi = cards.Items.Cast<MainWindow.DesktopGameCard>().First(card => card.HasVersionChoice);
     var alternative = multi.Versions.First(choice => choice.GameId != multi.Game.Id);
     var versionPicker = new ComboBox { Tag = multi, ItemsSource = multi.Versions };
     versionPicker.SelectionChanged += (sender, args) => typeof(MainWindow).GetMethod("CardPortVersionChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [sender, args]);
     versionPicker.SelectedItem = alternative;
-    if(cards.Items.Count!=18 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
+    if(cards.Items.Count!=25 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
         throw new Exception("Choosing another port duplicated the game or did not replace its version.");
     if(!File.ReadAllText(Path.Combine(profile,"selected-port-versions.json")).Contains(alternative.GameId))
         throw new Exception("Selected port version was not persisted.");
@@ -110,9 +110,9 @@ try
         throw new Exception("Changing console left Big Picture or used the wrong catalogue.");
     fullscreen.SelectedIndex=2;
     AssertBrand("switch");
-    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=18)
+    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=25)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
-    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (18) → Nintendo 64 (68) → GameCube ({cubeCount})");
+    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (25) → Nintendo 64 (68) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
@@ -218,7 +218,7 @@ try
     }
     selector.SelectedIndex=0;selector.SelectedIndex=2;
     transition.Advance(1);
-    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=18)
+    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=25)
         throw new Exception("Rapid switching left stale content, opacity or transforms.");
     var decodes=CoverBitmapCache.DecodeCount;
     var search=window.FindControl<TextBox>("LibrarySearchBox")!;

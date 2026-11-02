@@ -261,6 +261,10 @@ public sealed partial class MainWindow
 
     private void BigPictureKeyDown(object? sender, KeyEventArgs args)
     {
+        if(args.Key==Key.F2 && !OwnedWindows.Any(window=>window.IsVisible))
+        {
+            OpenPersonalLibrary(this,new RoutedEventArgs());args.Handled=true;return;
+        }
         if(PlatformHome.IsVisible && !BigPictureMenuOverlay.IsVisible)
         {
             if(args.Key==Key.F11)
@@ -271,7 +275,6 @@ public sealed partial class MainWindow
             }
             if(args.Key==Key.Escape){args.Handled=true;return;}
             if(_bigPictureActive && args.Key==Key.F10){ShowBigPictureMenu();args.Handled=true;return;}
-            if(args.Key==Key.F2){OpenPersonalLibrary(this,new RoutedEventArgs());args.Handled=true;return;}
             if(PlatformHome.IsGrid)return;
             if(PlatformHome.SortHasFocus || PlatformHome.LibraryHasFocus)return;
             if(args.Key is Key.Left or Key.Right)PlatformHome.Move(args.Key==Key.Left?-1:1);
@@ -342,7 +345,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureConsolesButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureConsolesButton, BigPictureMyGamesButton, BigPictureExitButton }
         .Where(button => button.IsEffectivelyVisible && button.IsEffectivelyEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -388,7 +391,8 @@ public sealed partial class MainWindow
                 ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
                 : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
             : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
-        help += connected ? "   •   B Consoles" : P7("   •   Échap Consoles", "   •   Esc Consoles");
+        help += connected ? P7("   •   VIEW Mes jeux   •   B Consoles", "   •   VIEW My games   •   B Consoles")
+            : P7("   •   F2 Mes jeux   •   Échap Consoles", "   •   F2 My games   •   Esc Consoles");
         if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;

@@ -30,6 +30,13 @@ static class PersonalLibraryChecks
             "Personal library and catalog need distinct navigation states.");
         Check(!window.FindControl<ComboBox>("ConsoleShelfPicker")!.IsVisible && window.Title!.Contains("Mes jeux"),
             "The all-console library must not appear scoped to the last console.");
+        foreach(var page in new[]{"NavSettingsButton","NavDownloadsButton","NavLibraryButton"})
+        {
+            Click(page);
+            window.RaiseEvent(new KeyEventArgs {RoutedEvent=InputElement.KeyDownEvent,Key=Key.F2});
+            Check(window.FindControl<Control>("LibraryView")!.IsVisible && personal.Classes.Contains("selected"),
+                "F2 must open personal games from every desktop page: "+page);
+        }
         var ports=catalog.Where(game=>game.ShelfConsole=="n64" && game.RuntimeOwnsSetup)
             .GroupBy(NativePortCatalog.GameKey).First(group=>group.Count()>1).ToArray();
         var owned=ports[^1];
@@ -58,6 +65,7 @@ static class PersonalLibraryChecks
             Check(Cards().Single(card=>card.Game.Id==owned.Id).Versions.All(choice=>choice.GameId==owned.Id),
                 "Uninstalled alternative ports must not masquerade as owned versions.");
             Save("my-games-desktop.png");
+            Dispatcher.UIThread.RunJobs();
             var covers=library.GetVisualDescendants().OfType<GameCoverControl>().Where(cover=>cover.IsEffectivelyVisible).ToArray();
             Check(covers.Length==4 && covers.All(cover=>cover.Bounds.Width<=232.01 && cover.Bounds.Height<=260.01),
                 "Mixed-format personal covers must fit the shared thumbnail well.");
@@ -116,6 +124,7 @@ static class PersonalLibraryChecks
             Check(window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible,"B must return from the personal library to console home.");
             window.RaiseEvent(new KeyEventArgs {RoutedEvent=InputElement.KeyDownEvent,Key=Key.F2});
             Check(window.FindControl<Control>("LibraryView")!.IsVisible,"F2 must open personal games from console home.");
+            window.RaiseEvent(new KeyEventArgs {RoutedEvent=InputElement.KeyDownEvent,Key=Key.F2});
             window.HandleBigPictureControllerInput(6);window.HandleBigPictureControllerInput(15);
             var menu=window.FindControl<Border>("BigPictureMenuOverlay")!;
             Check(menu.IsVisible,"Start must work on console home.");
@@ -127,6 +136,38 @@ static class PersonalLibraryChecks
             window.HandleBigPictureControllerInput(4);window.HandleBigPictureControllerInput(5);
             Check(!menu.IsVisible && window.FindControl<Control>("LibraryView")!.IsVisible,"Personal library must be selectable through the controller menu.");
             window.HandleBigPictureControllerInput(6);window.HandleBigPictureControllerInput(5);
+            Check(window.FindControl<Button>("BigPictureMyGamesButton")!.IsEffectivelyVisible,"Big Picture game shelf needs a visible personal-library button.");
+            Click("BigPictureMyGamesButton");
+            Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"Big Picture button must open all owned games.");
+            Click("NavSettingsButton");
+            Check(window.FindControl<Button>("BigPictureSubnavLibraryButton")!.IsEffectivelyVisible,"Big Picture settings need a visible personal-library button.");
+            Click("BigPictureSubnavLibraryButton");
+            Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"Subpage button must open personal games.");
+            Click("NavDownloadsButton");window.HandleBigPictureControllerInput(16);
+            Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"View / Select must open personal games from any Big Picture page.");
+            Click("NavSettingsButton");
+            var dialog=new Window {Width=160,Height=100};dialog.Show(window);
+            try
+            {
+                window.HandleBigPictureControllerInput(16);
+                Check(window.FindControl<Control>("SettingsView")!.IsVisible,"Personal navigation must not bypass an open dialog.");
+            }
+            finally {dialog.Close();}
+            var opening=window.FindControl<GameLaunchTransition>("LaunchTransition")!;
+            opening.Start("Not executed","","","","",openCase:true);
+            var pending=opening.WaitForOpeningAsync(CancellationToken.None);
+            window.RaiseEvent(new KeyEventArgs {RoutedEvent=InputElement.KeyDownEvent,Key=Key.F2});
+            Check(!opening.IsVisible && pending.IsCompletedSuccessfully && !pending.Result && window.FindControl<Control>("LibraryView")!.IsVisible,
+                "Opening personal games must cancel a pending launch animation.");
+            var stateType=typeof(BigPictureGamepad).GetNestedType("State",BindingFlags.NonPublic)!;
+            var state=Activator.CreateInstance(stateType)!;
+            var input=typeof(BigPictureGamepad).GetMethod("Input",BindingFlags.Static|BindingFlags.NonPublic)!;
+            foreach(var (buttons,expected) in new[]{((ushort)0x20,16),((ushort)0x10,15)})
+            {
+                stateType.GetField("Buttons")!.SetValue(state,buttons);
+                Check((int)input.Invoke(null,[state])! ==expected,"XInput View and Start must remain separate actions.");
+            }
+            window.HandleBigPictureControllerInput(6);Click("BigPictureConsolesButton");window.HandleBigPictureControllerInput(5);
             Click("BigPictureExitButton");
             Check(!window.FindControl<TextBlock>("LibrarySectionTitle")!.Text!.Equals("Mes jeux"),"Choosing a console must leave the personal-library filter.");
             Console.WriteLine("OK  personal games across consoles, configured/profile/custom paths, missing files, owned variants without duplicates, search, desktop and Big Picture access, and B return.");

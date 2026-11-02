@@ -127,7 +127,8 @@ public sealed partial class MainWindow
     internal void HandleBigPictureControllerInput(int rawInput)
     {
         if(!_bigPictureActive)return;
-        if(rawInput is >=1 and <=15)PlayBigPictureSound();
+        if(rawInput is >=1 and <=16)PlayBigPictureSound();
+        if(rawInput==16){OpenPersonalLibrary(this,new RoutedEventArgs());return;}
         if(PlatformHome.IsVisible && !BigPictureMenuOverlay.IsVisible)
         {
             if(rawInput is 1 or 11)PlatformHome.Move(-1);

@@ -54,6 +54,7 @@ public sealed partial class MainWindow
         if (window == this && BigPictureReturnButton.IsEffectivelyVisible)
         {
             if (BigPictureKeyboardButton.IsEffectivelyEnabled) controls.Add(BigPictureKeyboardButton);
+            if (BigPictureSubnavLibraryButton.IsEffectivelyEnabled) controls.Add(BigPictureSubnavLibraryButton);
             if (BigPictureReturnButton.IsEffectivelyEnabled) controls.Add(BigPictureReturnButton);
         }
         return controls.ToArray();

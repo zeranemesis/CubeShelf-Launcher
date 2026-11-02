@@ -97,7 +97,8 @@ internal sealed class SdlGamepad : IDisposable
         if (Pressed(3)) return 8;
         if (Pressed(9)) return 9;
         if (Pressed(10)) return 10;
-        if (Pressed(6) || Pressed(4)) return 15;
+        if (Pressed(4)) return 16;
+        if (Pressed(6)) return 15;
         var dpad=Pressed(13)?1:Pressed(14)?2:Pressed(11)?3:Pressed(12)?4:0;
         return BigPictureGamepad.DirectionInput(dpad,_axis(_controller,0),-(int)_axis(_controller,1));
     }

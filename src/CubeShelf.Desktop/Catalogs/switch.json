@@ -762,5 +762,209 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "morerokk-mhgurecomp-monster-hunter-generations-ultimate",
+    "Title": "Monster Hunter Generations Ultimate",
+    "Project": "MHGURecomp",
+    "Repository": "morerokk/MHGURecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Le projet déclare le jeu jouable ; Windows x64 AVX2 et Vulkan requis, copie 1.4.0. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "41e143d823cfd2ddb4e0c1b6c8aad1e344782858",
+    "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/41e143d823cfd2ddb4e0c1b6c8aad1e344782858/README.md",
+    "ReleaseUrl": "https://github.com/morerokk/MHGURecomp/releases/tag/0.13.1",
+    "ReleaseTag": "0.13.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Windows-MHGURecomp.0.13.1.zip",
+        "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.13.1/Windows-MHGURecomp.0.13.1.zip",
+        "Sha256": "ddf450f33068b4c1c284e7ca57608a01e3680bdf2c7875c55d0fd5da9063e8bb",
+        "Size": 42047665,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-swsh-recomp-pok-mon-sword",
+    "Title": "Pokémon Sword",
+    "Project": "swsh-recomp",
+    "Repository": "raulzrrs/swsh-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Copie personnelle de Pokémon Sword 1.3.2 ; compilation initiale et cache de shaders requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+    "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/swsh-recomp/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SwShRecomp-0.1.0-windows.zip",
+        "Url": "https://github.com/raulzrrs/swsh-recomp/releases/download/v0.1.0/SwShRecomp-0.1.0-windows.zip",
+        "Sha256": "5878e562c37da8bdc67c977b8c55083e606be6ada42b84eb382051dfde15577f",
+        "Size": 88606202,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-swsh-recomp-pok-mon-shield",
+    "Title": "Pokémon Shield",
+    "Project": "swsh-recomp",
+    "Repository": "raulzrrs/swsh-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Copie personnelle de Pokémon Shield 1.3.2 ; compilation initiale et cache de shaders requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+    "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/swsh-recomp/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SwShRecomp-0.1.0-windows.zip",
+        "Url": "https://github.com/raulzrrs/swsh-recomp/releases/download/v0.1.0/SwShRecomp-0.1.0-windows.zip",
+        "Sha256": "5878e562c37da8bdc67c977b8c55083e606be6ada42b84eb382051dfde15577f",
+        "Size": 88606202,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "yozander2009-stack-metroid-dread-recomp-metroid-dread",
+    "Title": "Metroid Dread",
+    "Project": "Metroid-Dread-Recomp",
+    "Repository": "yozander2009-stack/Metroid-Dread-Recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Aperçu 0.x : plantages possibles. Copie personnelle 2.1.0, ExeFS et RomFS ; compilation au premier démarrage. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "a48624c57e4fc165fd85f83fd7f0fc2868d247bc",
+    "ReadmeUrl": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/blob/a48624c57e4fc165fd85f83fd7f0fc2868d247bc/README.md",
+    "ReleaseUrl": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MetroidDread-PC-v0.5.0.zip",
+        "Url": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/releases/download/v0.5.0/MetroidDread-PC-v0.5.0.zip",
+        "Sha256": "d01a030e00f8eab5b0f2fa6af1ffda41eee549e4210642544f77b47f8ee116b6",
+        "Size": 75715063,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-letsgo-recomp-pok-mon-let-s-go-pikachu",
+    "Title": "Pokémon: Let’s Go, Pikachu!",
+    "Project": "letsgo-recomp",
+    "Repository": "raulzrrs/letsgo-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Le même moteur prend en charge Pikachu et Évoli ; fichiers de ta propre édition requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "1a70f777c7abac6834ca54bd69b1235471193e1e",
+    "ReadmeUrl": "https://github.com/raulzrrs/letsgo-recomp/blob/1a70f777c7abac6834ca54bd69b1235471193e1e/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/letsgo-recomp/releases/tag/v0.7.6",
+    "ReleaseTag": "v0.7.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LetsGoRecomp-0.7.6-windows.zip",
+        "Url": "https://github.com/raulzrrs/letsgo-recomp/releases/download/v0.7.6/LetsGoRecomp-0.7.6-windows.zip",
+        "Sha256": "7fd5b18a6efc3440eb3611d0556066691c5ca404b7908e9f2a010558c94177b0",
+        "Size": 92219246,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hexveil404-pokez-arecomp-pok-mon-legends-z-a",
+    "Title": "Pokémon Legends: Z-A",
+    "Project": "PokeZ-ARecomp",
+    "Repository": "Hexveil404/PokeZ-ARecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port de la version Switch originale, Windows x64 Vulkan ; fichiers de ta propre copie requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "1675d036a12ce566f0e15285592800f803aafe8e",
+    "ReadmeUrl": "https://github.com/Hexveil404/PokeZ-ARecomp/blob/1675d036a12ce566f0e15285592800f803aafe8e/README.md",
+    "ReleaseUrl": "https://github.com/Hexveil404/PokeZ-ARecomp/releases/tag/v0.1.14",
+    "ReleaseTag": "v0.1.14",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ZA-Recomp-windows.zip",
+        "Url": "https://github.com/Hexveil404/PokeZ-ARecomp/releases/download/v0.1.14/ZA-Recomp-windows.zip",
+        "Sha256": "18d9675e2cdbf2cba30129c4f91692688bc6818b22bb842a83fef51f6c73471e",
+        "Size": 152143623,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bluetufiebugado-supermariowonderrecomp-super-mario-bros-wonder",
+    "Title": "Super Mario Bros. Wonder",
+    "Project": "SuperMarioWonderRecomp",
+    "Repository": "BluetufieBugado/SuperMarioWonderRecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Compilation manuelle · expérimental",
+    "Notes": "Windows x64 Vulkan 1.3 déclaré testé par le projet. Compilation manuelle depuis les sources, copie 1.0.0 et prérequis personnels indiqués dans le README. Aucun paquet Windows publié. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "9ecad0cef164008a474b5ff0fa50e6ef55edba60",
+    "ReadmeUrl": "https://github.com/BluetufieBugado/SuperMarioWonderRecomp/blob/9ecad0cef164008a474b5ff0fa50e6ef55edba60/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "puddz-astralchain-pc-astral-chain",
+    "Title": "Astral Chain",
+    "Project": "AstralChain-PC",
+    "Repository": "Puddz/AstralChain-PC",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Compilation manuelle · expérimental",
+    "Notes": "Compilation manuelle Windows x64. Le projet indique avoir testé File 01 jusqu’au boss, pas la suite du jeu. Aucun paquet Windows publié. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "9f3db2838e4cc84b19f81ec7bcc56ae621e1c554",
+    "ReadmeUrl": "https://github.com/Puddz/AstralChain-PC/blob/9f3db2838e4cc84b19f81ec7bcc56ae621e1c554/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
   }
 ]

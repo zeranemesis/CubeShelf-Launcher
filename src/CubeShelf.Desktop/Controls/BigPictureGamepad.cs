@@ -73,7 +73,8 @@ internal sealed class BigPictureGamepad : IDisposable
         if ((state.Buttons & 0x8000) != 0) return 8;
         if ((state.Buttons & 0x0100) != 0) return 9;
         if ((state.Buttons & 0x0200) != 0) return 10;
-        if ((state.Buttons & 0x0030) != 0) return 15; // Start / Back opens the menu.
+        if ((state.Buttons & 0x0020) != 0) return 16; // View / Select opens the personal library.
+        if ((state.Buttons & 0x0010) != 0) return 15;
         var dpad = (state.Buttons & 4) != 0 ? 1 : (state.Buttons & 8) != 0 ? 2
             : (state.Buttons & 1) != 0 ? 3 : (state.Buttons & 2) != 0 ? 4 : 0;
         return DirectionInput(dpad,state.LeftX,state.LeftY);

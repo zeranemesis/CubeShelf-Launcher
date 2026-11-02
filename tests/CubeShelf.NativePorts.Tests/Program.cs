@@ -11,20 +11,29 @@ try
 {
     var expanded = ShelfProduct.All.Where(product => File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")))
         .ToDictionary(product => product.Id, product => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")));
-    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 650, "every console catalogue validates with safe package origins and checksums");
+    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 658, "every console catalogue validates with safe package origins and checksums");
     Check(expanded.Keys.All(id => ShelfProduct.Resolve(id).Id == id) && ShelfProduct.All.Select(product => product.Id).Distinct().Count() == ShelfProduct.All.Length,
         "all platform identities resolve uniquely");
     using var audit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","windows-refresh-audit.json")));
     var checkedAt=DateOnly.ParseExact(audit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
+    using var switchAudit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","switch-refresh-audit.json")));
+    var switchCheckedAt=DateOnly.ParseExact(switchAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
     foreach (var entry in expanded)
         Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40
-            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=checkedAt
+            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=switchCheckedAt
             && port.ReadmeUrl.StartsWith(port.Homepage + "/blob/")), "dated primary-source provenance: " + entry.Key);
     var additions=audit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
     Check(additions.Length==218&&additions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
         is {VerifiedAt:var date,Assets:var assets,ReadmeUrl:var url,SourceCommit:var commit}&&date==checkedAt.ToString("yyyy-MM-dd")
         &&url.Contains("/blob/"+commit+"/")&&assets.Count>0&&assets.All(a=>a.RuntimeIdentifiers.Any(r=>r.StartsWith("win-")))),
         "new references have pinned primary documentation and verified Windows package metadata");
+    var switchAdditions=switchAudit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
+    Check(switchAdditions.Length==8 && switchAdditions.All(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString())
+        is {VerifiedAt:"2026-11-02",ReadmeUrl:var readme,SourceCommit:var source,Platforms:var platforms}
+        && readme.Contains("/blob/"+source+"/") && platforms.Contains("Windows")),"new Switch ports retain pinned Windows primary-source evidence");
+    Check(expanded["switch"].Count==32 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==25
+        && switchAdditions.Count(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString()).Assets.Count==0)==2,
+        "Switch has 25 games without duplicate variants, with manual builds distinguished from six packaged additions");
     Check(expanded.Values.SelectMany(ports=>ports).All(p=>!p.Repository.Equals("Mabec-games/F-ZERO-GLINUX",StringComparison.OrdinalIgnoreCase)
         &&!p.Repository.Equals("walz0/Melee-3D",StringComparison.OrdinalIgnoreCase)),"previously declined emulator and mod projects remain excluded");
     Check(expanded["gamecube"].Where(p=>p.Repository=="sonsegajp/Kirby-Air-Ride-Recompiled").All(p=>p.Assets.All(a=>!a.Name.Contains("MapEditor",StringComparison.OrdinalIgnoreCase))),

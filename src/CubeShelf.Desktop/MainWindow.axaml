@@ -143,14 +143,15 @@
             </StackPanel>
           </ScrollViewer>
         </Grid>
-        <Grid Grid.Row="2" Margin="32,16,32,24" ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="12">
+        <Grid Grid.Row="2" Margin="32,16,32,24" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="12">
           <Button x:Name="BigPictureConsolesButton" Click="OpenPlatformHome" Padding="16,10" />
-          <Button x:Name="BigPicturePreviousButton" Grid.Column="1" Content="❮" Click="PreviousBigPictureGame" Padding="16,8" />
-          <Border Grid.Column="2" CornerRadius="8" Background="#EFDDD8" Padding="16,10">
+          <Button x:Name="BigPictureMyGamesButton" Grid.Column="1" Content="{DynamicResource MyGames}" Click="OpenPersonalLibrary" Padding="16,10" ToolTip.Tip="F2 · View / Select" />
+          <Button x:Name="BigPicturePreviousButton" Grid.Column="2" Content="❮" Click="PreviousBigPictureGame" Padding="16,8" />
+          <Border Grid.Column="3" CornerRadius="8" Background="#EFDDD8" Padding="16,10">
             <TextBlock x:Name="BigPicturePosition" Foreground="#80594E" FontSize="13" VerticalAlignment="Center" />
           </Border>
-          <Button x:Name="BigPictureNextButton" Grid.Column="3" Content="❯" Click="NextBigPictureGame" Padding="16,8" />
-          <TextBlock x:Name="BigPictureHelp" Grid.Column="4" Foreground="#706671" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" />
+          <Button x:Name="BigPictureNextButton" Grid.Column="4" Content="❯" Click="NextBigPictureGame" Padding="16,8" />
+          <TextBlock x:Name="BigPictureHelp" Grid.Column="5" Foreground="#706671" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" />
         </Grid>
       </Grid>
       </ThemeVariantScope>
@@ -1077,6 +1078,7 @@
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock x:Name="BigPictureSubnavTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Button x:Name="BigPictureSubnavLibraryButton" Content="{DynamicResource MyGames}" Click="OpenPersonalLibrary" Padding="16,10" ToolTip.Tip="F2 · View / Select" />
             <Button x:Name="BigPictureKeyboardButton" Click="OpenFocusedBigPictureKeyboard" Padding="16,10" />
             <Button x:Name="BigPictureReturnButton" Click="ReturnToBigPicture" Padding="18,10" />
           </StackPanel>
