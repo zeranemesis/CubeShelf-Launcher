@@ -32,6 +32,8 @@ Un paquet sans variante compatible avec l'appareil n'est pas installé automatiq
 
 ## Catalogues et illustrations
 
+**Mes jeux** rassemble les jeux installés ou déjà ajoutés, toutes consoles confondues, avec leurs jaquettes et le logo de leur plateforme. L'accès se trouve dans le menu latéral et sur l'accueil des consoles. En Big Picture : bouton « Mes jeux », X ou F2 depuis l'accueil, ou menu principal. Le **Catalogue des ports** conserve les projets disponibles à installer. Un jeu externe doit être ajouté ou associé une fois ; les fichiers du PC ne sont pas parcourus automatiquement.
+
 L'application PC possède 30 catalogues de plateformes, dont Nintendo, Sega, PlayStation, Xbox et Arcade. L'inventaire est documenté mais ne garantit pas l'exhaustivité de tous les ports existants ni leur fonctionnement sur Windows.
 
 [Catalogues et provenance](docs/CONSOLE-CATALOGS.md) · [Inventaire d'origine](docs/NATIVE-PORT-INVENTORY.md) · [Sources des jaquettes](docs/COVER-SOURCES.md).

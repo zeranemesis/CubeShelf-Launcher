@@ -261,7 +261,7 @@ public sealed partial class MainWindow
     private void RefreshQuickPlayUi()
     {
         if (_quickPlayClosing) return;
-        if (!_bigPictureActive)
+        if (!_bigPictureActive || LibraryView.IsVisible)
             foreach (var card in _parityCards) ApplyQuickPlayCard(card);
         RefreshBigPictureStatus();
         RefreshBigPictureResumeStatus();
@@ -277,7 +277,12 @@ public sealed partial class MainWindow
     {
         var game = GameVariants.Resolve(_catalogGames, card.Game, _paths);
         HydrateGamePathsPhase3(game);
-        card.UpdatePlay(QuickPlayLabel(game), QuickPlayHint(game), PlayIntentFor(game) is null);
+        var hint = QuickPlayHint(game);
+        if (card.ShowConsole && game.RuntimeOwnsSetup && PlayIntentFor(game) is null && RunningGameFor(game) is null)
+            hint = File.Exists(game.Executable)
+                ? P7("Port installé · programme associé", "Installed port · linked executable")
+                : P7("Programme introuvable. Ouvre les détails pour le réassocier.", "Program not found. Open details to link it again.");
+        card.UpdatePlay(QuickPlayLabel(game), hint, PlayIntentFor(game) is null);
     }
 
     private void CancelQuickPlay(object? sender, RoutedEventArgs args)

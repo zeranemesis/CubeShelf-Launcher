@@ -28,8 +28,11 @@ public sealed partial class MainWindow
         if (!show) return;
         _bigPicturePageMargins[view] = view.Margin;
         view.Margin = new Thickness(view.Margin.Left, view.Margin.Top + 64, view.Margin.Right, view.Margin.Bottom);
-        BigPictureSubnavTitle.Text = "DecompShelf · " + P7("Big Picture", "Big Picture");
-        BigPictureReturnButton.Content = view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
+        BigPictureSubnavTitle.Text = "DecompShelf · " + (_personalLibrary && (view == LibraryView || view == GameView)
+            ? P7("Mes jeux", "My games") : P7("Big Picture", "Big Picture"));
+        BigPictureReturnButton.Content = _personalLibrary && view == LibraryView && _personalLibraryReturnToConsoles
+            ? P7("← Consoles · Échap / B", "← Consoles · Esc / B")
+            : view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
             : _bigPictureBackStack.TryPeek(out var previous) && previous.View != BigPictureView && previous.View != BigPictureHomeView
                 ? P7("← Retour · Échap / B", "← Back · Esc / B")
             : _bigPictureReturnHome ? P7("← Accueil · Échap / B", "← Home · Esc / B")
@@ -40,6 +43,7 @@ public sealed partial class MainWindow
     private void ReturnToBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        if (_personalLibrary && LibraryView.IsVisible && _personalLibraryReturnToConsoles) { ShowPlatformHome(); return; }
         if (BigPictureHomeView.IsVisible) { ExitBigPicture(this, args); return; }
         if (TryReturnBigPicturePage()) return;
         if (_bigPictureReturnHome) { OpenBigPictureHome(this, args); return; }

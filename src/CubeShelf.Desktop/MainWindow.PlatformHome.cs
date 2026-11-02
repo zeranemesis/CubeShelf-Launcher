@@ -14,9 +14,13 @@ public sealed partial class MainWindow
         if(!_platformHomeWired)
         {
             _platformHomeWired=true;
+            PlatformHome.LibraryRequested += () => OpenPersonalLibrary(this, new RoutedEventArgs());
             PlatformHome.ConsoleChosen+=id=>
             {
+                var sameConsole = _activeShelfConsole == id;
+                _personalLibrary = false;
                 ConsoleShelfPicker.SelectedIndex=ConsoleIndex(id);
+                if(sameConsole)RefreshLibraryParity();
                 ShowParityView(_bigPictureActive?BigPictureView:LibraryView);
                 if(_bigPictureActive)BigPicturePlayButton.Focus();
             };

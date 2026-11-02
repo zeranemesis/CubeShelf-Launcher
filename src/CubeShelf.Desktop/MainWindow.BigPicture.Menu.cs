@@ -83,6 +83,7 @@ public sealed partial class MainWindow
         else
         {
             Row(P7("Reprendre","Resume"),CloseBigPictureMenu);
+            Row(P7("Mes jeux","My games"),()=>OpenPersonalLibrary(this,new RoutedEventArgs()));
             Row(P7("Options du jeu","Game options"),()=>ShowBigPictureMenu("game"));
             Row(P7("Plateformes","Platforms"),ShowPlatformHome);
             Row(P7("Paramètres manette","Controller settings"),()=>ShowBigPictureMenu("controller"));
@@ -127,11 +128,13 @@ public sealed partial class MainWindow
     {
         if(!_bigPictureActive)return;
         if(rawInput is >=1 and <=15)PlayBigPictureSound();
-        if(PlatformHome.IsVisible)
+        if(PlatformHome.IsVisible && !BigPictureMenuOverlay.IsVisible)
         {
             if(rawInput is 1 or 11)PlatformHome.Move(-1);
             else if(rawInput is 2 or 12)PlatformHome.Move(1);
             else if(rawInput==5)PlatformHome.Choose();
+            else if(rawInput==7)OpenPersonalLibrary(this,new RoutedEventArgs());
+            else if(rawInput==15)ShowBigPictureMenu();
             else if(rawInput is 8 or 13)PlatformHome.CycleSort();
             return;
         }

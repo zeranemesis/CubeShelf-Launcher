@@ -261,7 +261,7 @@ public sealed partial class MainWindow
 
     private void BigPictureKeyDown(object? sender, KeyEventArgs args)
     {
-        if(PlatformHome.IsVisible)
+        if(PlatformHome.IsVisible && !BigPictureMenuOverlay.IsVisible)
         {
             if(args.Key==Key.F11)
             {
@@ -270,8 +270,10 @@ public sealed partial class MainWindow
                 args.Handled=true;return;
             }
             if(args.Key==Key.Escape){args.Handled=true;return;}
+            if(_bigPictureActive && args.Key==Key.F10){ShowBigPictureMenu();args.Handled=true;return;}
+            if(args.Key==Key.F2){OpenPersonalLibrary(this,new RoutedEventArgs());args.Handled=true;return;}
             if(PlatformHome.IsGrid)return;
-            if(PlatformHome.SortHasFocus)return;
+            if(PlatformHome.SortHasFocus || PlatformHome.LibraryHasFocus)return;
             if(args.Key is Key.Left or Key.Right)PlatformHome.Move(args.Key==Key.Left?-1:1);
             else if(args.Key==Key.Enter)PlatformHome.Choose();
             else if(args.Key==Key.F3)PlatformHome.CycleSort();

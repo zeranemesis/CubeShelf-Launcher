@@ -499,7 +499,8 @@ public sealed partial class MainWindow
         {
             Id = id,
             Title = Path.GetFileNameWithoutExtension(executable),
-            Genre = "GameCube",
+            ShelfConsole = _activeShelfConsole,
+            Genre = ShelfProduct.Resolve(_activeShelfConsole).Console,
             Description = P6("Jeu ajouté manuellement. Les intégrations GitHub/GameBanana restent optionnelles.", "Manually added game. GitHub/GameBanana integrations remain optional."),
             Executable = Path.GetFullPath(executable),
             GameRoot = Path.GetDirectoryName(Path.GetFullPath(executable)) ?? "",

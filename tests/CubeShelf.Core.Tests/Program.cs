@@ -311,6 +311,10 @@ void TestProfilePersistence()
         store.Save(new GameProfileEntry("game", "/runtime/new", "/games/disc.iso"));
         var loaded = store.Load("GAME");
         Assert(loaded is { Executable: "/runtime/new", DiscImage: "/games/disc.iso" });
+        var snapshot = store.LoadAll();
+        Assert(snapshot.Count == 1 && snapshot[0].Id == "game");
+        snapshot.Clear();
+        Assert(store.Load("game") is not null);
     });
 }
 

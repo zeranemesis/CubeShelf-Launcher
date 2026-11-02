@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Avalonia;
+using CubeShelf.Core.Library;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
@@ -224,8 +225,14 @@ public sealed partial class MainWindow
     private void UpdateNavigationStatePhase5()
     {
         var consoles=PlatformHome.IsVisible&&!_bigPictureActive;
+        var personal = !PlatformHome.IsVisible && _personalLibrary && (LibraryView.IsVisible || GameView.IsVisible);
+        ConsoleShelfPicker.IsVisible = !personal;
+        SidebarShelfSubtitle.Text = personal ? P7("Bibliothèque personnelle", "Personal library") : ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarConsoleLogo.Platform = personal ? "gamecube" : _activeShelfConsole;
+        Title = Program.DisplayName + " · " + (personal ? P7("Mes jeux", "My games") : ShelfProduct.Resolve(_activeShelfConsole).Console);
         SetNavSelectedPhase5(NavConsolesButton,consoles);
-        SetNavSelectedPhase5(NavLibraryButton, !consoles && (GameView.IsVisible || (LibraryView.IsVisible && !_favoritesOnly)));
+        SetNavSelectedPhase5(NavMyGamesButton, !consoles && _personalLibrary && (LibraryView.IsVisible || GameView.IsVisible));
+        SetNavSelectedPhase5(NavLibraryButton, !consoles && !_personalLibrary && (GameView.IsVisible || (LibraryView.IsVisible && !_favoritesOnly)));
         SetNavSelectedPhase5(NavFavoritesButton, !consoles && LibraryView.IsVisible && _favoritesOnly);
         SetNavSelectedPhase5(NavModsButton, !consoles && ModsView.IsVisible);
         SetNavSelectedPhase5(NavDownloadsButton, !consoles && DownloadsView.IsVisible);

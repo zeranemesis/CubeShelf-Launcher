@@ -289,6 +289,7 @@ try
     }
     BigPictureControlsChecks.Run(window,snapshotDirectory);
     BigPictureSoundChecks.Run(window,playedSounds,() => soundTime += 1000,snapshotDirectory);
+    PersonalLibraryChecks.Run(window,snapshotDirectory);
     if (snapshotDirectory is not null)
     {
         foreach (var console in new[] { "nes", "gba", "ps1", "xbox360" })

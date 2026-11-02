@@ -83,6 +83,16 @@ public sealed partial class MainWindow
     {
         if (GameCase is null || SelectedTitleText is null) return;
         var width = Bounds.Width;
+        var compactLibrary = width - (_bigPictureActive ? 0 : 225) < 1000;
+        LibraryView.RowDefinitions[0].Height = new GridLength(compactLibrary ? 205 : 155);
+        if (Grid.GetRow(LibraryHeaderTools) != (compactLibrary ? 1 : 0))
+        {
+            LibraryHeaderGrid.RowDefinitions = new RowDefinitions(compactLibrary ? "*,Auto" : "*");
+            Grid.SetRow(LibraryHeaderTools, compactLibrary ? 1 : 0);
+            Grid.SetColumn(LibraryHeaderTools, compactLibrary ? 0 : 1);
+            Grid.SetColumnSpan(LibraryHeaderTools, compactLibrary ? 2 : 1);
+            Grid.SetColumnSpan(LibraryHeaderText, compactLibrary ? 2 : 1);
+        }
         if (width < 1120)
         {
             GameCase.Width = 300;
@@ -105,6 +115,7 @@ public sealed partial class MainWindow
 
     private void ParityShowLibrary(object? sender, RoutedEventArgs args)
     {
+        if (ReferenceEquals(sender, NavLibraryButton)) _personalLibrary = false;
         _favoritesOnly = false;
         LibrarySectionTitle.Text = UiLocalization.Get(_preferences.Language, "LibraryTitle");
         RefreshLibraryParity();
@@ -113,6 +124,7 @@ public sealed partial class MainWindow
 
     private void ParityShowFavorites(object? sender, RoutedEventArgs args)
     {
+        _personalLibrary = false;
         _favoritesOnly = true;
         LibrarySectionTitle.Text = UiLocalization.Get(_preferences.Language, "FavoritesTitle");
         RefreshLibraryParity();
@@ -173,6 +185,7 @@ public sealed partial class MainWindow
         PlatformHome.IsVisible=false;
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
+        UpdateResponsiveParity();
         UpdateBigPictureSubnav(view);
         UpdateNavigationStatePhase5();
     }
@@ -204,7 +217,7 @@ public sealed partial class MainWindow
         _parityCards.Clear();
 
         // Keep the original game on the shelf; active mods only select its launch configuration.
-        IEnumerable<GameCatalogEntry> query = ShelfGames;
+        IEnumerable<GameCatalogEntry> query = _personalLibrary ? PersonalLibraryGames() : ShelfGames;
         if (_favoritesOnly) query = query.Where(game => game.IsFavorite);
 
         var search = LibrarySearchBox?.Text?.Trim() ?? "";
@@ -213,7 +226,8 @@ public sealed partial class MainWindow
             query = query.Where(game =>
                 game.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
                 game.Id.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                game.Genre.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+                game.Genre.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                _personalLibrary && ShelfProduct.Resolve(game.ShelfConsole).Console.Contains(search, StringComparison.CurrentCultureIgnoreCase));
         }
 
         query = (LibrarySortCombo?.SelectedIndex ?? 1) switch
@@ -239,8 +253,12 @@ public sealed partial class MainWindow
         var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
         Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;
         Resources["SelectedGame"] = (console.StartsWith("Nintendo ", StringComparison.Ordinal) ? "" : "NINTENDO ") + console.ToUpperInvariant() + (english ? " • SELECTED GAME" : " • JEU SÉLECTIONNÉ");
-        LibrarySectionTitle.Text = _favoritesOnly ? UiLocalization.Get(_preferences.Language, "FavoritesTitle")
-            : english ? "Your " + console + " games" : "Tes jeux " + console;
+        LibrarySectionTitle.Text = _personalLibrary ? UiLocalization.Get(_preferences.Language, "MyGames")
+            : _favoritesOnly ? UiLocalization.Get(_preferences.Language, "FavoritesTitle")
+            : english ? console + " ports" : "Ports " + console;
+        LibrarySubtitleText.Text = UiLocalization.Get(_preferences.Language, _personalLibrary ? "MyGamesSubtitle" : "LibrarySubtitle");
+        EmptyLibraryText.Text = UiLocalization.Get(_preferences.Language,
+            _personalLibrary && search.Length == 0 ? "MyGamesEmpty" : "NoLibraryMatch");
         LibraryUpdatesText.Text = _favoritesOnly
             ? english ? $"{_parityCards.Count} favorite(s)" : $"{_parityCards.Count} favori(s)"
             : english ? $"{_parityCards.Count} game(s)" : $"{_parityCards.Count} jeu(x)";
@@ -285,6 +303,8 @@ public sealed partial class MainWindow
                 : $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • {last}",
             update);
         card.Versions = PortVersionsFor(game);
+        if (_personalLibrary) card.Versions = card.Versions.Where(choice => _personalGameIds.Contains(choice.GameId)).ToArray();
+        card.ShowConsole = _personalLibrary;
         card.SelectedVersion = card.Versions.FirstOrDefault(choice => choice.GameId == game.Id);
         return card;
     }
@@ -593,6 +613,8 @@ public sealed partial class MainWindow
         }
 
         public GameCatalogEntry Game { get; }
+        public bool ShowConsole { get; set; }
+        public string ConsoleName => ShelfProduct.Resolve(Game.ShelfConsole).Console;
         public PortVersionChoice[] Versions { get; set; } = [];
         public PortVersionChoice? SelectedVersion { get; set; }
         public bool HasVersionChoice => Versions.Length > 1;

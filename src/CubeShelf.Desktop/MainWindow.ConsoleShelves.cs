@@ -75,7 +75,7 @@ public sealed partial class MainWindow
     private void SelectPortVersion(string id)
     {
         var game = _catalogGames.FirstOrDefault(candidate => candidate.Id == id);
-        if (game is null || game.ShelfConsole != _activeShelfConsole
+        if (game is null || (!_personalLibrary && game.ShelfConsole != _activeShelfConsole)
             || _selectedPortVersions.GetValueOrDefault(NativePortCatalog.GameKey(game)) == id) return;
         _selectedPortVersions[NativePortCatalog.GameKey(game)] = id;
         File.WriteAllText(Path.Combine(_paths.ConfigurationDirectory, "selected-port-versions.json"), JsonSerializer.Serialize(_selectedPortVersions));
@@ -204,6 +204,7 @@ public sealed partial class MainWindow
     {
         if (!_consoleShelfReady || sender is not ComboBox { SelectedItem: ComboBoxItem { Tag: string console } }
             || console == _activeShelfConsole) return;
+        _personalLibrary = false;
         PlayBigPictureSound();
         var direction = ConsoleIndex(console) > ConsoleIndex(_activeShelfConsole) ? 1 : -1;
         Grid.SetColumn(ShelfTransition, _bigPictureActive ? 0 : 1);

@@ -91,7 +91,7 @@ static class BigPictureControlsChecks
         var game=position.Text;Input(12);Check(game!=position.Text,"Stick right did not change game.");
         game=position.Text;Input(4);Check(menu.IsVisible && game==position.Text,"D-pad changed game instead of opening menus.");
         Input(15);Check(!menu.IsVisible,"Start did not close the menu.");
-        Input(15);Input(4);Input(4);Input(4);Input(5);Input(5);
+        Input(15);Input(4);Input(4);Input(4);Input(4);Input(5);Input(5);
         Check(new UserPreferencesStore(new PlatformPaths()).Load().SwapBigPictureNavigation,"Control inversion did not persist.");
         Save("controller-menu.png");
         Input(6);Input(6);game=position.Text;Input(2);
@@ -99,7 +99,7 @@ static class BigPictureControlsChecks
         console=consoles.SelectedIndex;Input(13);
         Check(menu.IsVisible && consoles.SelectedIndex==console,"Swapped stick still changed platform.");
         Save("main-menu.png");
-        Input(15);Input(15);Input(14);Input(14);Input(14);Input(5);Input(5);
+        Input(15);Input(15);Input(14);Input(14);Input(14);Input(14);Input(5);Input(5);
         Check(!new UserPreferencesStore(new PlatformPaths()).Load().SwapBigPictureNavigation,"Could not restore original navigation.");
         Input(6);Input(6);
         var launch=window.FindControl<GameLaunchTransition>("LaunchTransition")!;

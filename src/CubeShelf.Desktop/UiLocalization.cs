@@ -7,6 +7,10 @@ internal static class UiLocalization
     private static readonly IReadOnlyDictionary<string, string> French = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["AppLibrary"] = "Bibliothèque",
+        ["MyGames"] = "Mes jeux",
+        ["MyGamesSubtitle"] = "Installés ou ajoutés · toutes les consoles",
+        ["MyGamesEmpty"] = "Ta bibliothèque est vide. Ajoute un jeu ou installe un port depuis le catalogue.",
+        ["AvailableCatalog"] = "Catalogue des ports",
         ["GameDetails"] = "Détails",
         ["AdvancedGameOptions"] = "Options avancées",
         ["CancelGameLaunch"] = "Annuler le lancement",
@@ -266,6 +270,10 @@ internal static class UiLocalization
     private static readonly IReadOnlyDictionary<string, string> English = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["AppLibrary"] = "Library",
+        ["MyGames"] = "My games",
+        ["MyGamesSubtitle"] = "Installed or added · all consoles",
+        ["MyGamesEmpty"] = "Your library is empty. Add a game or install a port from the catalog.",
+        ["AvailableCatalog"] = "Port catalog",
         ["GameDetails"] = "Details",
         ["AdvancedGameOptions"] = "Advanced options",
         ["CancelGameLaunch"] = "Cancel launch",

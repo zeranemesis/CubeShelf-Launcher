@@ -1,5 +1,13 @@
 # Changelog
 
+## En cours — bibliothèque personnelle sur Windows
+
+- Accès « Mes jeux » dans le menu de gauche, sur l'accueil des consoles et dans le menu Big Picture ; X à la manette ou F2 au clavier depuis l'accueil.
+- Grille commune aux jeux installés, aux ports associés et aux ajouts manuels de toutes les consoles, avec recherche par titre ou console, tri et logos de plateforme. Le catalogue des ports disponibles reste séparé.
+- Variantes regroupées, choix limité aux versions présentes dans la bibliothèque ; retour depuis les détails et vers les consoles sans quitter Big Picture.
+- Les chemins explicitement ajoutés restent visibles si le disque ou le programme manque ; la bibliothèque peut ainsi proposer de terminer la configuration. Aucun scan complet du PC.
+- Lecture des profils en une seule fois pour le regroupement ; actualisation des commandes des cartes visibles également en Big Picture. Les ajouts manuels prennent désormais la console sélectionnée.
+
 ## En cours — sons Big Picture sur Windows
 
 - Révision sonore plus douce : toucher grave et feutré, accord de lancement fondu, attaques progressives et volume réduit ; retrait des notes aiguës successives.

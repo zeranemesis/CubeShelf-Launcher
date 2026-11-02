@@ -21,6 +21,7 @@ public sealed class PlatformHomeControl : UserControl
     private bool _desktop;
     private bool _english;
     private readonly Button _previous, _choose, _next;
+    private readonly Button _library = new() { Name="PlatformHomeLibraryButton", Content="Mes jeux", MinHeight=44, Margin=new Thickness(12,0) };
     public bool IsGrid { get; private set; }
     private readonly TextBlock _heading = new() { Text="Consoles",FontSize=24,FontWeight=FontWeight.Bold,VerticalAlignment=VerticalAlignment.Center };
     private readonly TextBlock _sortLabel = new() { Text="Trier par",FontSize=14,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(0,0,12,0),IsVisible=false };
@@ -31,16 +32,20 @@ public sealed class PlatformHomeControl : UserControl
     private readonly Dictionary<string,Bitmap> _images = new();
     private readonly ThemeVariantScope _theme = new();
     public bool SortHasFocus => _sort.IsKeyboardFocusWithin;
+    public bool LibraryHasFocus => _library.IsKeyboardFocusWithin;
     public string? SelectedConsole => _items.ElementAtOrDefault(_selected).Product?.Id;
     public event Action<string>? ConsoleChosen;
+    public event Action? LibraryRequested;
     public PlatformHomeControl()
     {
         Background=new SolidColorBrush(Color.Parse("#0B101B"));
         var root=new Grid { RowDefinitions=new RowDefinitions("Auto,*,Auto"),Margin=new Thickness(16) };
-        var heading=new Grid { ColumnDefinitions=new ColumnDefinitions("*,Auto,Auto") };
+        var heading=new Grid { ColumnDefinitions=new ColumnDefinitions("*,Auto,Auto,Auto") };
         heading.Children.Add(_heading);
-        Grid.SetColumn(_sortLabel,1);heading.Children.Add(_sortLabel);
-        Grid.SetColumn(_sort,2);heading.Children.Add(_sort);root.Children.Add(heading);
+        Grid.SetColumn(_library,1);heading.Children.Add(_library);
+        _library.Click+=(_,_)=>LibraryRequested?.Invoke();
+        Grid.SetColumn(_sortLabel,2);heading.Children.Add(_sortLabel);
+        Grid.SetColumn(_sort,3);heading.Children.Add(_sort);root.Children.Add(heading);
         Avalonia.Automation.AutomationProperties.SetName(_sort,"Trier les consoles");
         Grid.SetRow(_shelf,1);root.Children.Add(_shelf);
         _gridScroll=new ScrollViewer { Content=_cards,HorizontalScrollBarVisibility=Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,IsVisible=false,Margin=new Thickness(0,24,0,0) };
@@ -79,10 +84,11 @@ public sealed class PlatformHomeControl : UserControl
             _sort.SelectedIndex=Math.Max(0,sort);
         }
         _previous.Content=english?"Previous":"Précédente";
+        _library.Content=english?"My games":"Mes jeux";
         _choose.Content=english?"View games":"Voir les jeux";
         _next.Content=english?"Next":"Suivante";
         _sortLabel.Text=english?"Sort by":"Trier par";
-        _hint.Text=english?"Stylised 3D models · Swipe or use the arrow keys to browse":"Modèles 3D stylisés · Glisse ou utilise les flèches pour parcourir";
+        _hint.Text=english?"Swipe or use the arrow keys to browse · X / F2: My games":"Glisse ou utilise les flèches pour parcourir · X / F2 : Mes jeux";
         Avalonia.Automation.AutomationProperties.SetName(_sort,english?"Sort consoles":"Trier les consoles");
         _theme.RequestedThemeVariant=desktop&&!grid?ThemeVariant.Light:ThemeVariant.Default;
         ApplyBackdrop();

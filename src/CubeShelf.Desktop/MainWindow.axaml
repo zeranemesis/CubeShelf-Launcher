@@ -26,8 +26,9 @@
                     MinHeight="44" SelectionChanged="ConsoleShelfChanged">
           </ComboBox>
           <Button x:Name="NavConsolesButton" Classes="nav" Content="Consoles" Click="OpenPlatformHome" HorizontalAlignment="Stretch" Margin="0,0,0,12" />
+          <Button x:Name="NavMyGamesButton" Classes="nav" Content="{DynamicResource MyGames}" Click="OpenPersonalLibrary" HorizontalAlignment="Stretch" />
           <Button x:Name="NavLibraryButton" Classes="nav selected" TabIndex="1" Click="ParityShowLibrary">
-            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▦" Width="18" /><TextBlock Text="{DynamicResource AppLibrary}" /></StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▦" Width="18" /><TextBlock Text="{DynamicResource AvailableCatalog}" /></StackPanel>
           </Button>
           <Button x:Name="NavFavoritesButton" Classes="nav" TabIndex="2" Click="ParityShowFavorites">
             <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="★" Width="18" /><TextBlock Text="{DynamicResource AppFavorites}" /></StackPanel>
@@ -174,13 +175,13 @@
       <!-- LIBRARY -->
       <Grid x:Name="LibraryView" Classes="view" RowDefinitions="155,*">
         <Border Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
-          <Grid Margin="34,24" ColumnDefinitions="*,Auto">
-            <StackPanel VerticalAlignment="Center" Spacing="5">
+          <Grid x:Name="LibraryHeaderGrid" Margin="34,24" ColumnDefinitions="*,Auto" RowSpacing="12">
+            <StackPanel x:Name="LibraryHeaderText" VerticalAlignment="Center" Spacing="5">
               <TextBlock Text="{DynamicResource LibraryEyebrow}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" />
               <TextBlock x:Name="LibrarySectionTitle" Text="{DynamicResource LibraryTitle}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="34" />
-              <TextBlock Text="{DynamicResource LibrarySubtitle}" Foreground="{DynamicResource Muted}" FontSize="13" />
+              <TextBlock x:Name="LibrarySubtitleText" Text="{DynamicResource LibrarySubtitle}" Foreground="{DynamicResource Muted}" FontSize="13" />
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="7">
+            <StackPanel x:Name="LibraryHeaderTools" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="7">
               <TextBox x:Name="LibrarySearchBox" Width="210" TabIndex="10" Watermark="{DynamicResource SearchGame}" TextChanged="LibrarySearchChanged" />
               <ComboBox x:Name="LibrarySortCombo" Width="170" TabIndex="11" SelectionChanged="LibrarySortChanged">
                 <ComboBoxItem Content="{DynamicResource SortName}" />
@@ -219,6 +220,10 @@
                         </Grid>
                         </Button>
                         <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Text}" FontWeight="Bold" FontSize="18" Margin="3,13,3,0" />
+                        <StackPanel IsVisible="{Binding ShowConsole}" Orientation="Horizontal" Spacing="6" Margin="3,6,3,0">
+                          <controls:ConsoleBrandMark Platform="{Binding Game.ShelfConsole}" Width="18" Height="18" />
+                          <TextBlock Text="{Binding ConsoleName}" Foreground="{DynamicResource Muted}" FontSize="12" VerticalAlignment="Center" />
+                        </StackPanel>
                         <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource Muted}" FontSize="11" Margin="3,4,3,0" />
                         <ComboBox ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=OneWay}"
                                   IsVisible="{Binding HasVersionChoice}" Tag="{Binding}" SelectionChanged="CardPortVersionChanged"
@@ -239,7 +244,7 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <TextBlock x:Name="EmptyLibraryText" Text="{DynamicResource NoLibraryMatch}" Foreground="{DynamicResource Muted}" FontSize="18" HorizontalAlignment="Center" Margin="0,80" IsVisible="False" />
+            <TextBlock x:Name="EmptyLibraryText" Text="{DynamicResource NoLibraryMatch}" Foreground="{DynamicResource Muted}" FontSize="18" HorizontalAlignment="Center" MaxWidth="560" TextWrapping="Wrap" TextAlignment="Center" Margin="16,80" IsVisible="False" />
           </Grid>
         </ScrollViewer>
       </Grid>
@@ -1075,18 +1080,6 @@
           </StackPanel>
         </Grid>
       </Border>
-      <Border x:Name="BigPictureMenuOverlay" IsVisible="False" Background="#B8000000" ZIndex="80">
-        <Border Width="650" MaxWidth="900" MaxHeight="820" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#EDEDEB" CornerRadius="12" BoxShadow="0 12 40 0 #80000000">
-          <Grid RowDefinitions="Auto,*,Auto">
-            <Border Background="#303A44" Padding="30,22" CornerRadius="12,12,0,0">
-              <TextBlock x:Name="BigPictureMenuTitle" Foreground="White" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
-            </Border>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="BigPictureMenuRows" Margin="14,12" Spacing="3" /></ScrollViewer>
-            <TextBlock x:Name="BigPictureMenuHelp" Grid.Row="2" Margin="26,12,26,22" Foreground="#59616A" FontSize="15" TextAlignment="Center" TextWrapping="Wrap" />
-          </Grid>
-        </Border>
-      </Border>
       <!-- THEME TRANSITION -->
       <Border x:Name="ThemeTransitionOverlay" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource OverlayBrush}">
         <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.14" /></Transitions></Border.Transitions>
@@ -1101,5 +1094,17 @@
     </Grid>
     <controls:ShelfTransitionControl x:Name="ShelfTransition" Grid.Column="1" ZIndex="100" />
     <controls:PlatformHomeControl x:Name="PlatformHome" IsVisible="False" Grid.Column="1" ZIndex="110" />
+    <Border x:Name="BigPictureMenuOverlay" IsVisible="False" Background="#B8000000" Grid.ColumnSpan="2" ZIndex="120">
+      <Border Width="650" MaxWidth="900" MaxHeight="820" HorizontalAlignment="Center" VerticalAlignment="Center"
+              Background="#EDEDEB" CornerRadius="12" BoxShadow="0 12 40 0 #80000000">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <Border Background="#303A44" Padding="30,22" CornerRadius="12,12,0,0">
+            <TextBlock x:Name="BigPictureMenuTitle" Foreground="White" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
+          </Border>
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="BigPictureMenuRows" Margin="14,12" Spacing="3" /></ScrollViewer>
+          <TextBlock x:Name="BigPictureMenuHelp" Grid.Row="2" Margin="26,12,26,22" Foreground="#59616A" FontSize="15" TextAlignment="Center" TextWrapping="Wrap" />
+        </Grid>
+      </Border>
+    </Border>
   </Grid>
 </Window>
