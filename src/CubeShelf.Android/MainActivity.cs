@@ -32,8 +32,22 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
                 == global::Android.Views.InputSourceType.Gamepad
                 || (keyEvent.Source & global::Android.Views.InputSourceType.Dpad)
                 == global::Android.Views.InputSourceType.Dpad;
-            Action? action = keyEvent.KeyCode switch
+            var key = keyEvent.KeyCode;
+            // Nintendo layout (AYN Thor option, like iiSU): the right button confirms.
+            if (view.SwapFaceButtons)
+                key = key switch
+                {
+                    global::Android.Views.Keycode.ButtonA => global::Android.Views.Keycode.ButtonB,
+                    global::Android.Views.Keycode.ButtonB => global::Android.Views.Keycode.ButtonA,
+                    global::Android.Views.Keycode.ButtonX => global::Android.Views.Keycode.ButtonY,
+                    global::Android.Views.Keycode.ButtonY => global::Android.Views.Keycode.ButtonX,
+                    _ => key
+                };
+            Action? action = key switch
             {
+                global::Android.Views.Keycode.ButtonL1 => () => view.PageFromController(-1),
+                global::Android.Views.Keycode.ButtonR1 => () => view.PageFromController(1),
+                global::Android.Views.Keycode.ButtonStart => view.ShowDownloads,
                 global::Android.Views.Keycode.ButtonA => view.ActivateFromController,
                 global::Android.Views.Keycode.ButtonSelect => view.OpenPersonalLibrary,
                 global::Android.Views.Keycode.ButtonB => view.BackFromController,

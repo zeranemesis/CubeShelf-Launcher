@@ -93,8 +93,9 @@
               <TextBlock x:Name="QueueSidebarText" Text="{DynamicResource QueueEmpty}" Foreground="{DynamicResource Text}" FontSize="12" />
             </StackPanel>
           </Border>
-          <TextBlock x:Name="PlatformStatus" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
-          <TextBlock x:Name="DataPath" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" MaxHeight="55" />
+          <!-- Diagnostics stay in Settings (SettingsDataPath); not shown to players in the sidebar. -->
+          <TextBlock x:Name="PlatformStatus" IsVisible="False" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock x:Name="DataPath" IsVisible="False" Foreground="{DynamicResource Muted}" FontSize="10" TextWrapping="Wrap" MaxHeight="55" />
           <TextBlock x:Name="VersionText" Foreground="{DynamicResource Muted}" FontSize="10" />
         </StackPanel>
       </DockPanel>

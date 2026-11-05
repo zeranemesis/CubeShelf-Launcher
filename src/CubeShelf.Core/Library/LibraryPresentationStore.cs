@@ -6,7 +6,8 @@ namespace CubeShelf.Core.Library;
 
 public sealed class LibraryPresentationStore
 {
-    private sealed record Settings(string Style="classic",bool MusicEnabled=true,Dictionary<string,string>? Music=null,bool SoundsEnabled=true,bool LightHome=true,bool SecondaryDisplay=true);
+    // Style null = never chosen: a dual-screen device may then adopt HOME automatically.
+    private sealed record Settings(string? Style=null,bool MusicEnabled=true,Dictionary<string,string>? Music=null,bool SoundsEnabled=true,bool LightHome=true,bool SecondaryDisplay=true,bool SwapFaceButtons=false,string? LastPlayed=null);
     private readonly object _gate=new();
     private readonly string _file,_musicRoot;
     private Settings _settings;
@@ -15,6 +16,12 @@ public sealed class LibraryPresentationStore
     public bool SoundsEnabled=>_settings.SoundsEnabled;
     public bool LightHome=>_settings.LightHome;
     public bool SecondaryDisplay=>_settings.SecondaryDisplay;
+    public bool HasStyleChoice=>_settings.Style is not null;
+    /// <summary>Nintendo layout: the right face button confirms (A/B and X/Y swapped).</summary>
+    public bool SwapFaceButtons=>_settings.SwapFaceButtons;
+    public string? LastPlayed=>_settings.LastPlayed;
+    public void SetSwapFaceButtons(bool swap){lock(_gate){_settings=_settings with{SwapFaceButtons=swap};Save();}}
+    public void SetLastPlayed(string id){lock(_gate){if(_settings.LastPlayed==id)return;_settings=_settings with{LastPlayed=id};Save();}}
     public void SetSecondaryDisplay(bool enabled){lock(_gate){_settings=_settings with{SecondaryDisplay=enabled};Save();}}
     public string BundledAudioDirectory=>Path.Combine(_musicRoot,"home-v1");
     public LibraryPresentationStore(string directory)

@@ -42,12 +42,11 @@ internal sealed class AndroidHomeDisplays : Java.Lang.Object,DisplayManager.IDis
     private void Refresh()
     {
         if(_disposed||_refreshing)return;
+        if(_resumed&&SecondaryDisplay() is not null)_library.PreferHomeForDualScreen();
         _refreshing=true;
         try
         {
-            var own=_activity.Window?.DecorView.Display?.DisplayId??Display.DefaultDisplay;
-            var display=_resumed&&_library.WantsSecondaryScreen
-                ?_manager?.GetDisplays(DisplayManager.DisplayCategoryPresentation)?.FirstOrDefault(d=>d.IsValid&&d.DisplayId!=own&&d.State!=DisplayState.Off):null;
+            var display=_resumed&&_library.WantsSecondaryScreen?SecondaryDisplay():null;
             if(display is null){Close();return;}
             if(_presentation is {IsShowing:true} current&&current.Display?.DisplayId==display.DisplayId)return;
             Close();
@@ -66,6 +65,11 @@ internal sealed class AndroidHomeDisplays : Java.Lang.Object,DisplayManager.IDis
             Close();global::Android.Util.Log.Warn("DecompShelf.Home","Second écran indisponible : "+error.Message);
         }
         finally{_refreshing=false;}
+    }
+    private Display? SecondaryDisplay()
+    {
+        var own=_activity.Window?.DecorView.Display?.DisplayId??Display.DefaultDisplay;
+        return _manager?.GetDisplays(DisplayManager.DisplayCategoryPresentation)?.FirstOrDefault(d=>d.IsValid&&d.DisplayId!=own&&d.State!=DisplayState.Off);
     }
     private void Close()
     {

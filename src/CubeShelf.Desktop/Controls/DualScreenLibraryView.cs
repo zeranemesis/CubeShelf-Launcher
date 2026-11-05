@@ -208,7 +208,7 @@ public sealed partial class DualScreenLibraryView : UserControl
         _appearance.Content=light?"Affichage : clair":"Affichage : sombre";
         AppearanceChanged?.Invoke(light);
         foreach(var tile in this.GetVisualDescendants().OfType<HomeArtworkControl>())tile.LightPalette=light;
-        if(_selected is {} item)_title.SetGame(_platforms||ScreenRole==HomeScreenRole.Navigation?null:item.Id,item.Title,_platforms?null:item.Console);
+        if(_selected is {} item)SetTitle(item);
     }
     private void ResizeHome()
     {
@@ -278,7 +278,14 @@ public sealed partial class DualScreenLibraryView : UserControl
         _previous.IsEnabled=_page>0;_next.IsEnabled=(_page+1)*PageSize<_filtered.Length;
         _pageLabel.Text=_filtered.Length==0?"Aucun résultat":$"{_filtered.Length} · {_page+1}/{Math.Max(1,(_filtered.Length+PageSize-1)/PageSize)}";
     }
-    private void ChangePage(int step)
+    /// <summary>Id prefix of the "Continue" tile placed before the consoles.</summary>
+    public const string ResumePrefix="resume:";
+    private void SetTitle(DualScreenItem item)
+    {
+        var resume=item.Id.StartsWith(ResumePrefix,StringComparison.Ordinal);
+        _title.SetGame(resume?item.Id[ResumePrefix.Length..]:_platforms||ScreenRole==HomeScreenRole.Navigation?null:item.Id,item.Title,_platforms&&!resume?null:item.Console);
+    }
+    public void ChangePage(int step)
     {
         var target=_page+step;if(target<0||target*PageSize>=_filtered.Length)return;_page=target;_selected=_filtered[target*PageSize];ShowPage();Select(_selected,true);
     }
@@ -289,7 +296,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     }
     private void Select(DualScreenItem item,bool notify)
     {
-        var changed=_displayedId!=item.Id;_displayedId=item.Id;_selected=item;_title.SetGame(_platforms||ScreenRole==HomeScreenRole.Navigation?null:item.Id,item.Title,_platforms?null:item.Console);_selectedName.Text=item.Title;_status.Text=item.Status;_message.Text="";
+        var changed=_displayedId!=item.Id;_displayedId=item.Id;_selected=item;SetTitle(item);_selectedName.Text=item.Title;_status.Text=item.Status;_message.Text="";
         ResizeHome();_import.IsEnabled=!_platforms;
         _launch.Content=item.Action;AutomationProperties.SetName(_launch,item.Action);_launch.IsEnabled=item.CanLaunch;
         foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>())tile.IsSelected=Equals(tile.Tag,item.Id);
@@ -378,7 +385,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     public bool HandleKey(Key key)
     {
         if(IsPopupOpen||_search.IsKeyboardFocusWithin)return false;
-        switch(key){case Key.Left:Move(-1,0);break;case Key.Right:Move(1,0);break;case Key.Up:Move(0,-1);break;case Key.Down:Move(0,1);break;default:return false;}return true;
+        switch(key){case Key.PageUp:ChangePage(-1);break;case Key.PageDown:ChangePage(1);break;case Key.Left:Move(-1,0);break;case Key.Right:Move(1,0);break;case Key.Up:Move(0,-1);break;case Key.Down:Move(0,1);break;default:return false;}return true;
     }
     public void SetPlaybackActive(bool active){_playbackActive=active;if(_casePreview is {} preview)preview.IsInteractive=active&&!ReduceMotion;if(active)UpdateMusic();else{StopMusic();_playSound?.Invoke(null);}}
     private void UpdateMusic(){_mute.Content=_settings?.MusicEnabled==true?"Musique : oui":"Musique : non";_soundToggle.Content=_settings?.SoundsEnabled==true?"Sons : oui":"Sons : non";_musicDelay.Stop();if(_playMusic is not null&&_settings?.MusicEnabled==true&&_playbackActive&&IsEffectivelyVisible)_musicDelay.Start();else StopMusic();}

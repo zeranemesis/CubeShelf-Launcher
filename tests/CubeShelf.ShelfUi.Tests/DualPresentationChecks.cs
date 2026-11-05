@@ -51,6 +51,14 @@ internal static class DualPresentationChecks
         Check(picker.ItemCount==2,"Windows exposes two library themes");picker.SelectedIndex=1;Jobs();
         var dual=window.FindControl<DualScreenLibraryView>("DualScreenView")!;
         Check(dual.IsEffectivelyVisible&&dual.IsPlatforms&&sidebar.IsVisible,"the second Windows theme preserves the left menus and console choice");
+        var catalog=(IEnumerable<CubeShelf.Core.Library.GameCatalogEntry>)typeof(MainWindow).GetField("_catalogGames",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(window)!;
+        var played=catalog.First(g=>g.ShelfConsole=="n64");played.LastPlayedAt=DateTimeOffset.Now;
+        window.FindControl<ComboBox>("ConsoleShelfPicker")!.SelectedIndex=1;picker.SelectedIndex=0;picker.SelectedIndex=1;Jobs();
+        var homeItems=dual.GetVisualDescendants().OfType<ListBox>().Single().Items.Cast<DualScreenItem>().ToArray();
+        Check(homeItems[0].Id==DualScreenLibraryView.ResumePrefix+played.Id&&homeItems[0].Title==played.Title&&dual.SelectedId!=homeItems[0].Id,
+            "the last played game leads HOME as a Continue tile without stealing the current console selection");
+        if(snapshots is not null){dual.Move(-999,0);Jobs();using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-desktop-continue-light.png"));}
+        played.LastPlayedAt=null;window.FindControl<ComboBox>("ConsoleShelfPicker")!.SelectedIndex=0;picker.SelectedIndex=0;picker.SelectedIndex=1;Jobs();
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-desktop-consoles-light.png"));}
         dual.Activate();Jobs();Check(dual.IsVisible&&!dual.IsPlatforms,"a console opens its native PC port grid");
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-desktop-games-light.png"));}

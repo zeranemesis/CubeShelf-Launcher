@@ -589,6 +589,7 @@ public sealed partial class MobileLibraryView : UserControl
             }
             else await Task.Delay(500,cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
+            try{_presentation.SetLastPlayed(game.Id);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
             if(native is not null) _games.NativePorts!.Launch(game.Id);
             else Run(_games.OpenGame);
         }

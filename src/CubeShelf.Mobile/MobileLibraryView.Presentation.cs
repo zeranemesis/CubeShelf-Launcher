@@ -49,7 +49,16 @@ public sealed partial class MobileLibraryView
         surface.LaunchRequested+=id=>
         {
             if(_launching||_nativePreparation is not null)return;
-            if(surface.IsPlatforms)
+            if(id.StartsWith(DualScreenLibraryView.ResumePrefix,StringComparison.Ordinal))
+            {
+                var gameId=id[DualScreenLibraryView.ResumePrefix.Length..];
+                if(_allCatalog.FirstOrDefault(g=>g.Id==gameId) is not {} last)return;
+                _dualPlatforms=false;_personalLibrary=false;_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==last.ShelfConsole);
+                ReloadVisibleCatalog();RefreshDualLibrary(false);
+                var resumed=Array.FindIndex(_catalog,g=>g.Id==gameId);if(resumed<0)return;
+                Select(resumed,false);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();
+            }
+            else if(surface.IsPlatforms)
             {
                 _dualPlatforms=false;_personalLibrary=false;_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);
                 ReloadVisibleCatalog();RefreshDualLibrary(false);
@@ -88,6 +97,9 @@ public sealed partial class MobileLibraryView
         content.Children.Add(picker);
         var secondary=new CheckBox{Content="Second écran automatique · AYN Thor / écran compatible",IsChecked=_presentation.SecondaryDisplay,MinHeight=48};
         content.Children.Add(secondary);
+        var swap=new CheckBox{Content="Disposition Nintendo · A à droite, B en bas",IsChecked=_presentation.SwapFaceButtons,MinHeight=48};
+        content.Children.Add(swap);
+        swap.IsCheckedChanged+=(_,_)=>{try{_presentation.SetSwapFaceButtons(swap.IsChecked==true);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){SetStatus(error.Message);}};
         secondary.IsCheckedChanged+=(_,_)=>{try{_presentation.SetSecondaryDisplay(secondary.IsChecked==true);SecondaryScreenStateChanged?.Invoke();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){SetStatus(error.Message);}};
         picker.SelectionChanged+=(_,_)=>
         {
@@ -105,17 +117,32 @@ public sealed partial class MobileLibraryView
         var platformSelection=_dualLibrary.IsPlatforms?_dualLibrary.SelectedId??_activeConsole:_activeConsole;
         foreach(var surface in new[]{_dualLibrary,_secondaryHome}.OfType<DualScreenLibraryView>())
         if(_dualPlatforms)
-            surface.SetItems(_mobilePlatforms.Select(p=>new DualScreenItem(p.Id,p.Console,p.Id,"",$"{_allCatalog.Count(g=>g.ShelfConsole==p.Id)} port(s) Android","Voir les jeux")),"Consoles",true,platformSelection);
+            surface.SetItems(ResumeTile().Concat(_mobilePlatforms.Select(p=>new DualScreenItem(p.Id,p.Console,p.Id,"",$"{_allCatalog.Count(g=>g.ShelfConsole==p.Id)} jeux","Voir les jeux"))),"Accueil",true,platformSelection);
         else
             surface.SetItems(_catalog.Select(g=>
             {
                 var cover=g.Covers.FirstOrDefault();
                 return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,Cover(cover?.Front),"Port Android · "+g.Genre,
                     Back:cover?.Back??"",Spine:cover?.Spine??"",Right:cover?.Right??"",Top:cover?.Top??"",Bottom:cover?.Bottom??"");
-            }),_personalLibrary?"Mes jeux":"Catalogue Android",false,_catalog.ElementAtOrDefault(_selected)?.Id);
+            }),_personalLibrary?"Mes jeux":_mobilePlatforms.FirstOrDefault(p=>p.Id==_activeConsole)?.Console??"Jeux",false,_catalog.ElementAtOrDefault(_selected)?.Id);
         RefreshDualSelection();
         SecondaryScreenStateChanged?.Invoke();
     }
+    /// <summary>The last launched game leads the HOME grid: one A press resumes it.</summary>
+    private IEnumerable<DualScreenItem> ResumeTile()
+    {
+        if(_allCatalog.FirstOrDefault(g=>g.Id==_presentation.LastPlayed) is not {} last)yield break;
+        yield return new DualScreenItem(DualScreenLibraryView.ResumePrefix+last.Id,last.Title,last.ShelfConsole,Cover(last.Covers.FirstOrDefault()?.Front),"Continuer · dernier jeu lancé","▶ Continuer");
+    }
+    /// <summary>Dual-screen devices (AYN Thor…) open on HOME unless the player already picked a theme.</summary>
+    public void PreferHomeForDualScreen()
+    {
+        if(_presentation.HasStyleChoice||_launching||_downloadsOverlay.IsVisible)return;
+        try{_presentation.SetStyle(true);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){return;}
+        _dualDetail=false;_platformHome.IsVisible=false;RefreshDualLibrary(true);
+    }
+    public bool SwapFaceButtons=>_presentation.SwapFaceButtons;
+    public void PageFromController(int step){SetControllerInput(true);if(DualInputActive&&!HomeInput.IsPopupOpen)HomeInput.ChangePage(step);}
     private void RefreshDualSelection()
     {
         if(!_presentation.IsDual||_dualPlatforms)return;

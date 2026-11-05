@@ -114,6 +114,9 @@ internal static class DualDisplayTests
             mobile.SetActive(true);mobile.SetSecondaryScreenAttached(true);Jobs();mobile.BackFromController();Jobs();
             Check(preview.IsPlatforms&&navigation.IsPlatforms&&preview.SelectedId=="n64"&&navigation.SelectedId=="n64",
                 "Back returns both displays to the console just browsed rather than the first console");
+            navigation.Move(-999,0);Jobs();
+            Check(navigation.SelectedId==DualScreenLibraryView.ResumePrefix+target.Id&&preview.SelectedId==navigation.SelectedId,
+                "the last launched game leads HOME as a Continue tile on both displays");
             mobile.ShowDownloads();Jobs();Check(!mobile.WantsSecondaryScreen,"settings suspend the secondary HOME surface");
             mobile.SetSecondaryScreenAttached(false);
             mobile.GetVisualDescendants().OfType<ComboBox>().Single(picker=>picker.Name=="LibraryStylePicker").SelectedIndex=0;Jobs();
@@ -122,6 +125,16 @@ internal static class DualDisplayTests
             mobile.ActivateFromController();mobile.OptionsFromController();Jobs();
             Check(Field<Border>(mobile,"_gameOptionsOverlay").IsVisible,"controller X also opens game options in the Classic catalogue");
             mobile.BackFromController();Jobs();
+            mobile.PreferHomeForDualScreen();
+            Check(!new LibraryPresentationStore(games.DataDirectory).IsDual,"an explicit Classic choice is never overridden by a second screen");
+            var freshGames=new FakeGames(Path.Combine(root,"thor-first-start"),ports);var fresh=new MobileLibraryView(freshGames);
+            var freshWindow=new Window{Content=fresh,Width=960,Height=540};freshWindow.Show();Jobs();
+            Check(!Field<DualScreenLibraryView>(fresh,"_dualLibrary").IsVisible,"a single-screen first start keeps the Classic theme");
+            fresh.PreferHomeForDualScreen();Jobs();
+            Check(Field<DualScreenLibraryView>(fresh,"_dualLibrary").IsVisible&&Field<DualScreenLibraryView>(fresh,"_dualLibrary").IsPlatforms
+                &&new LibraryPresentationStore(freshGames.DataDirectory).HasStyleChoice,
+                "a dual-screen device without a theme choice opens HOME on the consoles and remembers it");
+            freshWindow.Close();
         }
         finally{mobile.SetSecondaryScreenAttached(false);bottom.Content=null;bottom.Close();top.Close();}
     }

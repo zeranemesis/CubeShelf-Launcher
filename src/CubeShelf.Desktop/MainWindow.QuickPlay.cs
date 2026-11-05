@@ -250,7 +250,7 @@ public sealed partial class MainWindow
             ? P7(" Les salons s’ouvriront automatiquement.", " The room list will open automatically.")
             : P7(" Le jeu se lancera automatiquement.", " The game will start automatically."));
         if (!DiscImageService.Inspect(game.DiscImage, game).Supported)
-            return P7("Choisis ton fichier de jeu une fois. CubeShelf s’occupe de la suite.", "Choose your game file once. CubeShelf handles the rest.");
+            return P7("Choisis ton fichier de jeu une fois. DecompShelf s’occupe de la suite.", "Choose your game file once. DecompShelf handles the rest.");
         if (!CanPlay(game))
             return P7("Les composants manquants seront installés avant le lancement.", "Missing components will be installed before launch.");
         return game.DataPreparation != GameDataPreparation.Runtime && !_gameData.IsPrepared(game, game.Executable)

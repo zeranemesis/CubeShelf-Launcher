@@ -26,7 +26,13 @@ public sealed partial class MainWindow
         DualScreenView.OptionsRequested+=id=>{if(_dualGames.FirstOrDefault(g=>g.Id==id) is {} game){if(_bigPictureActive){SelectDualGame(id);ShowBigPictureMenu("game");}else SelectCatalogGame(game);}};
         DualScreenView.LaunchRequested+=async id=>
         {
-            if(DualScreenView.IsPlatforms)
+            if(id.StartsWith(DualScreenLibraryView.ResumePrefix,StringComparison.Ordinal))
+            {
+                if(_catalogGames.FirstOrDefault(g=>g.Id==id[DualScreenLibraryView.ResumePrefix.Length..]) is not {} last)return;
+                _selectedGame=GameVariants.Resolve(_catalogGames,last,_paths);HydrateGamePathsPhase3(_selectedGame);
+                DualScreenView.StopMusic();await RequestPlayAsync(_selectedGame);
+            }
+            else if(DualScreenView.IsPlatforms)
             {
                 _personalLibrary=false;_favoritesOnly=false;ConsoleShelfPicker.SelectedIndex=ConsoleIndex(id);
                 ShowParityView(_bigPictureActive?BigPictureView:LibraryView);
@@ -51,7 +57,16 @@ public sealed partial class MainWindow
         if(_presentation?.IsDual!=true)return;
         DualScreenView.ReduceMotion=_preferences.ReduceShelfMotion;
         CloseBigPictureMenu();
-        DualScreenView.SetItems(ShelfProducts.Select(p=>new DualScreenItem(p.Id,p.Console,p.Id,"",$"{NativePortCatalog.ForConsole(_catalogGames,p.Id).Count()} port(s) Windows","Voir les jeux")).Where(i=>!i.Status.StartsWith("0 ",StringComparison.Ordinal)),"Consoles",true,_activeShelfConsole);
+        var consoles=ShelfProducts.Select(p=>new DualScreenItem(p.Id,p.Console,p.Id,"",P7($"{NativePortCatalog.ForConsole(_catalogGames,p.Id).Count()} jeux",$"{NativePortCatalog.ForConsole(_catalogGames,p.Id).Count()} games"),P7("Voir les jeux","Browse games"))).Where(i=>!i.Status.StartsWith("0 ",StringComparison.Ordinal));
+        // The most recently played game leads the grid, so one press resumes it (Steam / iiSU home).
+        var last=_catalogGames.Where(g=>g.LastPlayedAt is not null).MaxBy(g=>g.LastPlayedAt);
+        if(last is not null)
+        {
+            var cover=last.Covers.FirstOrDefault();
+            consoles=consoles.Prepend(new DualScreenItem(DualScreenLibraryView.ResumePrefix+last.Id,last.Title,last.ShelfConsole,ResolveCoverPath(cover?.Front),
+                P7("Continuer · joué le ","Continue · played ")+last.LastPlayedAt!.Value.ToLocalTime().ToString("dd/MM"),P7("▶ Continuer","▶ Continue")));
+        }
+        DualScreenView.SetItems(consoles,P7("Accueil","Home"),true,last is not null&&_activeShelfConsole==last.ShelfConsole?DualScreenLibraryView.ResumePrefix+last.Id:_activeShelfConsole);
         ShowParityView(DualScreenView);
     }
     private void BuildDualGames()
@@ -59,13 +74,15 @@ public sealed partial class MainWindow
         DualScreenView.ShowAchievements=_bigPictureActive;
         IEnumerable<GameCatalogEntry> source=_personalLibrary?PersonalLibraryGames():ShelfGames;
         if(_favoritesOnly)source=source.Where(g=>g.IsFavorite);
-        _dualGames=source.OrderBy(g=>g.Title,StringComparer.CurrentCultureIgnoreCase).ToArray();
+        // Games the player already has come first; the rest of the catalogue follows.
+        var owned=_personalLibrary?null:PersonalLibraryGames().Select(PlayKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _dualGames=source.OrderBy(g=>owned is null||owned.Contains(PlayKey(g))?0:1).ThenBy(g=>g.Title,StringComparer.CurrentCultureIgnoreCase).ToArray();
         DualScreenView.SetItems(_dualGames.Select(g=>
         {
             var cover=g.Covers.FirstOrDefault();
-            return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,ResolveCoverPath(cover?.Front),"Port Windows",
+            return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,ResolveCoverPath(cover?.Front),owned is null||owned.Contains(PlayKey(g))?P7("Dans ta bibliothèque","In your library"):P7("À installer","To install"),
                 Back:ResolveCoverPath(cover?.Back),Spine:ResolveCoverPath(cover?.Spine),Right:ResolveCoverPath(cover?.Right),Top:ResolveCoverPath(cover?.Top),Bottom:ResolveCoverPath(cover?.Bottom));
-        }),_personalLibrary?"Mes jeux":_favoritesOnly?"Favoris":"Catalogue Windows",false,_selectedGame?.Id);
+        }),_personalLibrary?P7("Mes jeux","My games"):_favoritesOnly?P7("Favoris","Favourites"):ShelfProduct.Resolve(_activeShelfConsole).Console,false,_selectedGame?.Id);
         if(DualScreenView.SelectedId is {} id)SelectDualGame(id);
     }
     private void SelectDualGame(string id)

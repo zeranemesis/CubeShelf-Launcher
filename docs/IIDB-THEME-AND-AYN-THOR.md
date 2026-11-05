@@ -66,3 +66,12 @@ L'APK ARM64 versionCode **69** a été installé par ADB sur le Samsung SM-S936B
 La grille secondaire a été utilisée pour sélectionner Ocarina of Time puis Majora's Mask : boîtier 3D et logo principal suivent la sélection. Les événements de boutons X/A/B injectés par ADB ouvrent les options, les détails du même port, puis le retour HOME. Le parcours accueil Android → retour rapide → retrait/reconnexion du second écran conserve le processus et restaure les deux zones sur l'écran principal. Le journal de crash de ce processus est vide à la fin. L'écran simulé, la veille forcée et les réglages temporaires de rotation ont été retirés ou restaurés à leur valeur initiale.
 
 La correction recrée l'arbre de navigation après fermeture, libère explicitement sa racine Avalonia et attend le rappel Android de fermeture avant de libérer le dialogue natif. Les tests automatisés couvrent aussi la recréation avec conservation de la sélection. Cet essai ne remplace ni une manette physique, ni le firmware et les écrans d'une AYN Thor réelle.
+
+## Commandes et démarrage sur double écran — 5 novembre 2026
+
+- **HOME automatique** : au premier écran secondaire détecté (Thor ou autre écran de présentation), HOME est choisi si le joueur n'a jamais choisi de thème. Un choix explicite de Classique n'est jamais remplacé.
+- **Continuer** : le dernier jeu lancé est la première tuile de l'accueil HOME (PC et Android) ; A le relance directement.
+- **Manette** : L1/R1 changent de page dans la grille HOME, START ouvre les réglages. L'option **Disposition Nintendo · A à droite, B en bas** (Réglages → Thème) inverse A/B et X/Y.
+- **Tri** : sur PC, les jeux déjà installés ou ajoutés passent avant le reste du catalogue dans la grille HOME, avec l'état « Dans ta bibliothèque » ou « À installer ».
+
+Vérifié par les suites Mobile et ShelfUi et la compilation Android ARM64. Pas d'essai sur une Thor réelle : le code des touches réellement envoyé par ses boutons reste à relever par ADB.

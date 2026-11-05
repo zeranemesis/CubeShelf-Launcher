@@ -29,7 +29,11 @@ internal static class PresentationTests
         logoWindow.Content=null;Check(((Grid)logoTitle.Content!).Children.OfType<Image>().Single().Source is null,"detaching the title releases its native bitmap");
         logoWindow.Content=logoTitle;Jobs();Check(logoTitle.HasArtwork,"reattaching the title restores its logo");logoWindow.Close();
         var directory=Path.Combine(root,"dual-theme");var settings=new LibraryPresentationStore(directory);
-        Check(!settings.IsDual,"existing installations keep the classic theme");settings.SetStyle(true);
+        Check(!settings.IsDual&&!settings.HasStyleChoice,"existing installations keep the classic theme without recording a choice");settings.SetStyle(true);
+        Check(new LibraryPresentationStore(directory).HasStyleChoice,"an explicit theme choice is remembered");
+        Check(!settings.SwapFaceButtons&&settings.LastPlayed is null,"Xbox button layout and no last game by default");
+        settings.SetSwapFaceButtons(true);settings.SetLastPlayed("n64-sm64");
+        Check(new LibraryPresentationStore(directory) is {SwapFaceButtons:true,LastPlayed:"n64-sm64"},"the Nintendo layout and the last launched game survive restart");
         Check(new LibraryPresentationStore(directory).IsDual,"the second theme survives restart independently of light/dark");
         Check(settings.LightHome,"the sober HOME theme defaults to the requested white appearance");
         settings.ToggleHomeAppearance();Check(!new LibraryPresentationStore(directory).LightHome,"the dark HOME appearance is persisted separately from Classic");settings.ToggleHomeAppearance();
