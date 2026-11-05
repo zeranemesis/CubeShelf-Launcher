@@ -157,6 +157,8 @@ public sealed partial class MobileLibraryView
         CloseGameOptions(false);
         _dualLibrary.SetPlaybackActive(false);
         _startupPlatformChoiceShown=true;_platformHome.IsVisible=false;
+        // HOME may have been chosen automatically (dual screen) after this card was built.
+        if (_stylePicker is { } picker) picker.SelectedIndex = _presentation.IsDual ? 1 : 0;
         CloseInspection(false); ResetTouch(); _body.IsVisible = false; _downloadsOverlay.IsVisible = true; _rowsStamp = "";
         ApplyDownloadSnapshot(_games.Downloads?.Snapshot ?? new(RuntimeDownloadState.Unavailable, 0, 0));
         UpdateInputHint(); if (_controllerInput) FocusDownloadAction();

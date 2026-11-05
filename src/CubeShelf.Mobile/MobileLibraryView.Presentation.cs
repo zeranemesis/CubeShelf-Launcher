@@ -11,9 +11,11 @@ public sealed partial class MobileLibraryView
     private readonly DualScreenLibraryView _dualLibrary=new(){IsVisible=false,ZIndex=50,ShowClock=false};
     private DualScreenLibraryView? _secondaryHome;
     private bool _secondaryAttached;
+    private ComboBox? _stylePicker;
     private DualScreenLibraryView HomeInput=>_secondaryAttached&&_secondaryHome is {} home?home:_dualLibrary;
     public event Action? SecondaryScreenStateChanged;
-    public bool WantsSecondaryScreen=>_presentation.IsDual&&_presentation.SecondaryDisplay&&_presentationActive&&DualInputActive;
+    // Overlays keep the bottom screen up (inert): dismissing the Presentation would expose the device's own launcher there.
+    public bool WantsSecondaryScreen=>_presentation.IsDual&&_presentation.SecondaryDisplay&&_presentationActive&&_dualLibrary.IsEffectivelyVisible&&!_launchTransition.IsVisible;
     private LibraryPresentationStore _presentation=null!;
     private bool _dualPlatforms=true,_dualDetail,_presentationActive=true;
     private bool DualInputActive=>_dualLibrary.IsEffectivelyVisible&&!_downloadsOverlay.IsVisible&&!_storageOverlay.IsVisible&&!_gameOptionsOverlay.IsVisible&&!_launchTransition.IsVisible;
@@ -33,7 +35,7 @@ public sealed partial class MobileLibraryView
         };
         WireHome(_dualLibrary);
         foreach(var overlay in new Control[]{_dualLibrary,_downloadsOverlay,_storageOverlay,_gameOptionsOverlay,_launchTransition})
-            overlay.PropertyChanged+=(_,e)=>{if(e.Property==IsVisibleProperty)SecondaryScreenStateChanged?.Invoke();};
+            overlay.PropertyChanged+=(_,e)=>{if(e.Property!=IsVisibleProperty)return;if(_secondaryHome is {} home)home.IsEnabled=DualInputActive;SecondaryScreenStateChanged?.Invoke();};
     }
     private void WireHome(DualScreenLibraryView surface)
     {
@@ -76,6 +78,7 @@ public sealed partial class MobileLibraryView
             _secondaryHome.PreferencesChanged+=()=>_dualLibrary.RefreshPreferences();
             _secondaryHome.SetPlaybackActive(false);
         }
+        _secondaryHome.IsEnabled=DualInputActive;
         RefreshDualLibrary();return _secondaryHome;
     }
     public void SetSecondaryScreenAttached(bool attached)
@@ -93,7 +96,7 @@ public sealed partial class MobileLibraryView
     private Control BuildPresentationSetting()
     {
         var content=new StackPanel{Spacing=8};content.Children.Add(new TextBlock{Text="Thème de la bibliothèque",FontSize=18});
-        var picker=new ComboBox{Name="LibraryStylePicker",ItemsSource=new[]{"Classique · boîtes 3D","Double écran · HOME"},SelectedIndex=_presentation.IsDual?1:0,MinHeight=48,HorizontalAlignment=HorizontalAlignment.Stretch};
+        var picker=_stylePicker=new ComboBox{Name="LibraryStylePicker",ItemsSource=new[]{"Classique · boîtes 3D","Double écran · HOME"},SelectedIndex=_presentation.IsDual?1:0,MinHeight=48,HorizontalAlignment=HorizontalAlignment.Stretch};
         content.Children.Add(picker);
         var secondary=new CheckBox{Content="Second écran automatique · AYN Thor / écran compatible",IsChecked=_presentation.SecondaryDisplay,MinHeight=48};
         content.Children.Add(secondary);
@@ -103,6 +106,7 @@ public sealed partial class MobileLibraryView
         secondary.IsCheckedChanged+=(_,_)=>{try{_presentation.SetSecondaryDisplay(secondary.IsChecked==true);SecondaryScreenStateChanged?.Invoke();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){SetStatus(error.Message);}};
         picker.SelectionChanged+=(_,_)=>
         {
+            if(picker.SelectedIndex==(_presentation.IsDual?1:0))return;
             try{_presentation.SetStyle(picker.SelectedIndex==1);_dualDetail=false;_dualPlatforms=true;CloseDownloads(false);_platformHome.IsVisible=false;RefreshDualLibrary();if(!_presentation.IsDual){RebuildMobileShelf();OpenPlatformHome();}}
             catch(Exception error) when(error is IOException or UnauthorizedAccessException){SetStatus(error.Message);}
         };

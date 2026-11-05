@@ -88,14 +88,14 @@ internal static class DualDisplayTests
                 "a recreated native window gets a fresh navigation tree and retains the current selection");
             mobile.OptionsFromController();Jobs();
             var options=Field<Border>(mobile,"_gameOptionsOverlay");var selectedGame=preview.SelectedId;
-            Check(options.IsVisible&&!mobile.WantsSecondaryScreen&&options.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text==target.Title),
-                "controller X opens options for the selected game and suspends the secondary screen");
+            Check(options.IsVisible&&mobile.WantsSecondaryScreen&&!navigation.IsEnabled&&options.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text==target.Title),
+                "controller X opens options for the selected game and keeps the bottom screen up but inert");
             mobile.BrowseFromController(1);Jobs();
             Check(preview.SelectedId==selectedGame&&games.Native.Launched.Count==0,"moving within game options never changes or launches the selected game");
             Check(options.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text?.Contains("pas encore disponible",StringComparison.Ordinal)==true),
                 "Android explicitly reports that mod management is unavailable");
             mobile.BackFromController();Jobs();
-            Check(!options.IsVisible&&mobile.WantsSecondaryScreen,"B returns from game options to HOME without losing the selection");
+            Check(!options.IsVisible&&mobile.WantsSecondaryScreen&&navigation.IsEnabled,"B returns from game options to HOME without losing the selection");
             mobile.OptionsFromController();mobile.ActivateFromController();Jobs();
             Check(!options.IsVisible&&!preview.IsVisible,"confirming game parameters opens the existing selected-game details");
             mobile.BackFromController();Jobs();
@@ -117,7 +117,9 @@ internal static class DualDisplayTests
             navigation.Move(-999,0);Jobs();
             Check(navigation.SelectedId==DualScreenLibraryView.ResumePrefix+target.Id&&preview.SelectedId==navigation.SelectedId,
                 "the last launched game leads HOME as a Continue tile on both displays");
-            mobile.ShowDownloads();Jobs();Check(!mobile.WantsSecondaryScreen,"settings suspend the secondary HOME surface");
+            mobile.ShowDownloads();Jobs();
+            Check(mobile.WantsSecondaryScreen&&!navigation.IsEnabled&&mobile.GetVisualDescendants().OfType<ComboBox>().Single(picker=>picker.Name=="LibraryStylePicker").SelectedIndex==1,
+                "settings keep the bottom screen up but inert, and the theme picker shows HOME");
             mobile.SetSecondaryScreenAttached(false);
             mobile.GetVisualDescendants().OfType<ComboBox>().Single(picker=>picker.Name=="LibraryStylePicker").SelectedIndex=0;Jobs();
             Check(!mobile.WantsSecondaryScreen&&!preview.IsVisible&&!new LibraryPresentationStore(games.DataDirectory).IsDual,
