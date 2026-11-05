@@ -74,13 +74,15 @@ public sealed partial class MainWindow
         DualScreenView.ShowAchievements=_bigPictureActive;
         IEnumerable<GameCatalogEntry> source=_personalLibrary?PersonalLibraryGames():ShelfGames;
         if(_favoritesOnly)source=source.Where(g=>g.IsFavorite);
-        // Games the player already has come first; the rest of the catalogue follows.
+        // Games the player already has come first, then the ones whose files a scan found; the rest of the catalogue follows.
         var owned=_personalLibrary?null:PersonalLibraryGames().Select(PlayKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        _dualGames=source.OrderBy(g=>owned is null||owned.Contains(PlayKey(g))?0:1).ThenBy(g=>g.Title,StringComparer.CurrentCultureIgnoreCase).ToArray();
+        var found=new FoundGamesStore(_paths.DataDirectory).Load();
+        int Rank(GameCatalogEntry g)=>owned is null||owned.Contains(PlayKey(g))?0:found.ContainsKey(PlayKey(g))||found.ContainsKey(g.Id)?1:2;
+        _dualGames=source.OrderBy(Rank).ThenBy(g=>g.Title,StringComparer.CurrentCultureIgnoreCase).ToArray();
         DualScreenView.SetItems(_dualGames.Select(g=>
         {
             var cover=g.Covers.FirstOrDefault();
-            return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,ResolveCoverPath(cover?.Front),owned is null||owned.Contains(PlayKey(g))?P7("Dans ta bibliothèque","In your library"):P7("À installer","To install"),
+            return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,ResolveCoverPath(cover?.Front),Rank(g) switch{0=>P7("Dans ta bibliothèque","In your library"),1=>P7("Fichier trouvé","File found"),_=>P7("À installer","To install")},
                 Back:ResolveCoverPath(cover?.Back),Spine:ResolveCoverPath(cover?.Spine),Right:ResolveCoverPath(cover?.Right),Top:ResolveCoverPath(cover?.Top),Bottom:ResolveCoverPath(cover?.Bottom));
         }),_personalLibrary?P7("Mes jeux","My games"):_favoritesOnly?P7("Favoris","Favourites"):ShelfProduct.Resolve(_activeShelfConsole).Console,false,_selectedGame?.Id);
         if(DualScreenView.SelectedId is {} id)SelectDualGame(id);

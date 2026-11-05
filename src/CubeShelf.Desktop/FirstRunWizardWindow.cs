@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Automation;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CubeShelf.Core.Achievements;
 using CubeShelf.Core.Platform;
@@ -22,19 +23,24 @@ public sealed class FirstRunWizardWindow : Window
     private readonly Button _later = new() { Content = "Plus tard", HorizontalAlignment = HorizontalAlignment.Left };
     private readonly Func<string, string, Task<RetroAchievementsLoginResult>>? _retroAchievementsLogin;
     private string? _retroAchievementsUser;
+    private readonly Func<IStorageFolder, Action<string>, Task<string>>? _scanGames;
+    private string _gamesSummary = "";
     private int _page;
 
     private const int PageCount = 6;
 
     /// <param name="retroAchievementsLogin">Logs in and keeps the session, as the settings page does; null hides the step.</param>
     /// <param name="retroAchievementsUser">Who is logged in already, when the wizard is run again.</param>
+    /// <param name="scanGames">Looks for the player's game files in a folder and returns a summary; null hides the button.</param>
     public FirstRunWizardWindow(
         IPlatformPaths paths,
         UserPreferencesStore store,
         UserPreferences preferences,
         Func<string, string, Task<RetroAchievementsLoginResult>>? retroAchievementsLogin = null,
-        string? retroAchievementsUser = null)
+        string? retroAchievementsUser = null,
+        Func<IStorageFolder, Action<string>, Task<string>>? scanGames = null)
     {
+        _scanGames = scanGames;
         _paths = paths;
         _store = store;
         _retroAchievementsLogin = retroAchievementsLogin;
@@ -69,8 +75,8 @@ public sealed class FirstRunWizardWindow : Window
         header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         var brand = new StackPanel { Spacing = 4 };
-        brand.Children.Add(new TextBlock { Text = "CUBESHELF", FontSize = 11, FontWeight = FontWeight.Bold });
-        brand.Children.Add(new TextBlock { Text = English ? "GameCube Library" : "Bibliothèque GameCube", FontSize = 20, FontWeight = FontWeight.SemiBold });
+        brand.Children.Add(new TextBlock { Text = "DECOMPSHELF", FontSize = 11, FontWeight = FontWeight.Bold });
+        brand.Children.Add(new TextBlock { Text = English ? "First setup" : "Premier démarrage", FontSize = 20, FontWeight = FontWeight.SemiBold });
         Grid.SetColumn(_step, 1);
         _step.VerticalAlignment = VerticalAlignment.Center;
         header.Children.Add(brand);
@@ -109,14 +115,14 @@ public sealed class FirstRunWizardWindow : Window
             2 => StoragePage(),
             3 => NetworkPage(),
             4 => RetroAchievementsPage(),
-            _ => GamePage()
+            _ => GamesPage()
         });
         _step.Text = English ? $"Step {_page + 1} of {PageCount}" : $"Étape {_page + 1} sur {PageCount}";
         _back.Content = English ? "Back" : "Retour";
         _later.Content = English ? "Later" : "Plus tard";
         _back.IsEnabled = _page > 0;
         _next.Content = _page == PageCount - 1
-            ? (English ? "Finish and configure Mario Party 4" : "Terminer et configurer Mario Party 4")
+            ? (English ? "Finish" : "Terminer")
             : (English ? "Continue" : "Continuer");
     }
 
@@ -272,16 +278,30 @@ public sealed class FirstRunWizardWindow : Window
         return stack;
     }
 
-    private Control GamePage()
+    /// <summary>Finds the games the player already owns, so HOME starts with them.</summary>
+    private Control GamesPage()
     {
         var stack = PageStack();
-        stack.Children.Add(Heading("Mario Party 4"));
+        stack.Children.Add(Heading(English ? "Your games" : "Tes jeux"));
         stack.Children.Add(Body(English
-            ? "DecompShelf will guide you from the game page: install PartyBoard, select ISO/RVZ, prepare data, then play."
-            : "DecompShelf va te guider depuis la page du jeu : installer PartyBoard, sélectionner ISO/RVZ, préparer les données puis jouer."));
-        stack.Children.Add(Body(English
-            ? "1  PartyBoard\n2  ISO / RVZ\n3  Local preparation\n4  Play"
-            : "1  PartyBoard\n2  ISO / RVZ\n3  Préparation locale\n4  Jouer"));
+            ? "DecompShelf looks for your own game files (ROMs, ISOs…) in the folder you choose. Nothing is uploaded and the files are not copied."
+            : "DecompShelf cherche tes propres fichiers de jeux (ROM, ISO…) dans le dossier que tu choisis. Rien n’est envoyé et les fichiers ne sont pas copiés."));
+        if (_scanGames is null) return stack;
+        var status = new TextBlock { Text = _gamesSummary, TextWrapping = TextWrapping.Wrap };
+        var choose = new Button { Content = English ? "Choose a games folder…" : "Choisir un dossier de jeux…", HorizontalAlignment = HorizontalAlignment.Left };
+        choose.Click += async (_, _) =>
+        {
+            var picked = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions { Title = English ? "Your games folder" : "Dossier de tes jeux", AllowMultiple = false });
+            if (picked.FirstOrDefault() is not { } folder) return;
+            choose.IsEnabled = false;
+            try { status.Text = _gamesSummary = await _scanGames(folder, text => status.Text = text); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { status.Text = e.Message; }
+            finally { choose.IsEnabled = true; }
+        };
+        var panel = new StackPanel { Spacing = 10 };
+        panel.Children.Add(choose);
+        panel.Children.Add(status);
+        stack.Children.Add(Card(English ? "Games folder" : "Dossier de jeux", panel));
         return stack;
     }
 

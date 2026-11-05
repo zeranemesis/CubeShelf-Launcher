@@ -467,7 +467,7 @@ public sealed partial class MainWindow
         if (!force && _preferences.FirstRunCompleted) return;
         string? raUser = null;
         if (_raStore is not null && _raStore.Load(out var rejected) is { } session && !rejected) raUser = session.User;
-        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser);
+        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser, ScanGameFolderAsync);
         await wizard.ShowDialog(this);
         // The network page decides on the spot, even in a wizard left half-way.
         _preferences = _preferences with
@@ -487,8 +487,7 @@ public sealed partial class MainWindow
         ApplyPreferences();
         RefreshRetroAchievementsUi();
         RefreshLibraryParity();
-        if (wizard.OpenGameAfterFinish && _catalogGames.FirstOrDefault() is { } game)
-            SelectCatalogGame(game);
+        if (wizard.OpenGameAfterFinish) ShowPlatformHome();
     }
 
 

@@ -127,6 +127,7 @@ public sealed partial class MainWindow
             Row(P7("Affichage et audio","Display and audio"),()=>ShowBigPictureMenu("appearance"),P7("Thème, apparence et sons.","Theme, appearance and sounds."));
             Row(P7("Manette","Controller"),()=>ShowBigPictureMenu("controller"),P7("Commandes du stick et de la croix.","Stick and D-pad navigation."));
             Section(P7("APPLICATION","APPLICATION"));
+            Row(P7("Chercher mes jeux…","Find my games…"),()=>FindMyGames(this,new RoutedEventArgs()),P7("Tes propres fichiers de jeux : rien n’est envoyé ni copié.","Your own game files: nothing is uploaded or copied."));
             Row(P7("Paramètres avancés","Advanced settings"),()=>Go(()=>ParityShowSettings(this,new RoutedEventArgs())),P7("Compte, réseau et préférences générales.","Account, network and general preferences."));
         }
         else if(page=="game" && game is not null)

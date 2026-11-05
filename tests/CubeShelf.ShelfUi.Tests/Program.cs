@@ -292,6 +292,7 @@ try
     PersonalLibraryChecks.Run(window,snapshotDirectory);
     CoverLayoutChecks.Run(window,snapshotDirectory);
     DualPresentationChecks.Run(window,snapshotDirectory);
+    FoundGamesChecks.Run(window,snapshotDirectory);
     BigPictureMenuChecks.Run(window,snapshotDirectory);
     if (snapshotDirectory is not null)
     {
