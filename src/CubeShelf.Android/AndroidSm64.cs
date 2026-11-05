@@ -17,7 +17,7 @@ internal static class AndroidSm64
     private static Context Context => global::Android.App.Application.Context;
     private static EmbeddedSm64Files Files => new(Context.FilesDir!.AbsolutePath);
     internal static bool EngineAvailable => global::Android.OS.Build.SupportedAbis?.Contains("arm64-v8a") == true
-        && File.Exists(Path.Combine(Context.ApplicationInfo!.NativeLibraryDir!, "libghostship.so"));
+        && NativeGameService.HasNativeLibrary("libghostship.so");
     internal static bool IsPrepared => EngineAvailable && Files.IsPrepared;
 
     internal static async Task<string> PrepareAsync(CancellationToken cancellation)

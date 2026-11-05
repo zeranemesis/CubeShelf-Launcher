@@ -38,8 +38,21 @@ public static class NativeGameService
     public static bool DeviceSupportsPublishedGame()
     {
         var context = global::Android.App.Application.Context;
-        return global::Android.OS.Build.SupportedAbis?.Contains("arm64-v8a") == true
-            && File.Exists(Path.Combine(context.ApplicationInfo!.NativeLibraryDir!, "libdol.so"));
+        return global::Android.OS.Build.SupportedAbis?.Contains("arm64-v8a") == true && HasNativeLibrary("libdol.so");
+    }
+
+    // Native libraries stay inside the APK (extractNativeLibs=false): PartyBoard dlopens its
+    // mini-game modules by bare name ("bootDll.so"), and Android only extracts files named lib*.so.
+    internal static bool HasNativeLibrary(string name)
+    {
+        var info = global::Android.App.Application.Context.ApplicationInfo!;
+        if (File.Exists(Path.Combine(info.NativeLibraryDir!, name))) return true;
+        try
+        {
+            using var apk = System.IO.Compression.ZipFile.OpenRead(info.SourceDir!);
+            return apk.GetEntry("lib/arm64-v8a/" + name) is not null;
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException) { return false; }
     }
 
     public static bool IsInstalled() => Engine.IsReady;
