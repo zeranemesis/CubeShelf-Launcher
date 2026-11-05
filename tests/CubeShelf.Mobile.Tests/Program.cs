@@ -90,6 +90,7 @@ RunUi();
 GameStorageUiTests.Run(root,ports);
 PresentationTests.Run(root,ports);
 DualDisplayTests.Run(root,ports);
+FoundGamesTests.Run(root,ports);
 Console.WriteLine("Mobile Android catalogue, download integrity, engine preparation, cancellation and layout checks passed.");
 void RunUi()
 {
