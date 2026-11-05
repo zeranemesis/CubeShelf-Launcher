@@ -41,7 +41,7 @@ public sealed partial class MainWindow
         try
         {
             if (previous.View == BigPictureView) RefreshBigPictureGame();
-            ShowParityView(previous.View);
+            if(previous.View==PlatformHome)ShowPlatformHome();else ShowParityView(previous.View);
             if (previous.Focus is { IsEffectivelyVisible: true, IsEffectivelyEnabled: true, Focusable: true } focus)
             {
                 focus.Focus();

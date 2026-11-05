@@ -12,6 +12,7 @@ if (args.Contains("--session-exit-fixture")) { Console.ReadLine(); return 0; }
 
 var failures = new List<string>();
 var executed = 0;
+Run("storage: game saves and owned engine cleanup", GameStorageTests.Run);
 Run("capture: only tracked game processes are eligible", GameCaptureSessionTests.OnlyTrackedProcesses);
 Run("sessions: lookups safely finalize an exited process", GameSessionTrackerTests.ExitedLookups);
 Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
@@ -2293,7 +2294,7 @@ void TestModStateSurvivesHostileInput()
         var paths = new TestPaths(root);
 
         // A catalog walk must not die on one entry, and must not be steered out of Mods/.
-        foreach (var hostile in new[] { "..", "../escape", "a/b", "a\\b", "with space", "", "   " })
+        foreach (var hostile in new[] { ".", "..", ".hidden", "trailing.", "a..b", "../escape", "a/b", "a\\b", "with space", "", "   " })
         {
             Assert(!PortableModState.IsValidGameId(hostile));
             Assert(PortableModState.ReadEffective(paths, hostile).Count == 0);
@@ -2301,6 +2302,11 @@ void TestModStateSurvivesHostileInput()
             Assert(PortableModState.ReadPlayerDisabled(paths, hostile).Count == 0);
         }
         Assert(PortableModState.IsValidGameId("GMPE01_00") && PortableModState.IsValidGameId("CUSTOM-1a2b"));
+        const string nativeId = "native-nes-mstan-drmarionesrecomp-dr.-mario";
+        Assert(PortableModState.IsValidGameId(nativeId));
+        var nativeMods = new PortableModManager(paths, nativeId);
+        Assert(Path.GetDirectoryName(nativeMods.ActiveListFile) == PortableModState.DirectoryFor(paths, nativeId));
+        Assert(new ModLoadoutStore(paths.ConfigurationDirectory, nativeId).Load().Count == 0);
 
         var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "BROKEN");
         Directory.CreateDirectory(modDirectory);

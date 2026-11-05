@@ -55,7 +55,7 @@ public sealed class GameLaunchTransition : UserControl, IDisposable
             CaseFormat=GameCaseControl.FormatForConsole(console),RealisticShell = true, UseImportedModel = true, IsInteractive = false,
             UseGpuTextures = openCase };
         _content.Children[0] = _case;
-        _title.SetGame(gameId, title); _status.Text = status;
+        _title.SetGame(gameId, title, console); _status.Text = status;
         _case.SetCover(front, back, spine, right, top, bottom);
         _case.SetShelfPose(28, false, false);
         if(openCase) { _case.SetOpeningMedia(media);_case.SetOpeningProgress(0,0); }

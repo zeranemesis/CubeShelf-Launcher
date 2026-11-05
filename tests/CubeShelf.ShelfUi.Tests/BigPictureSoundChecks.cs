@@ -56,13 +56,11 @@ static class BigPictureSoundChecks
 
         Next();window.HandleBigPictureControllerInput(15);
         var menu = window.FindControl<Border>("BigPictureMenuOverlay")!;
-        var muteRow = menu.GetLogicalDescendants().OfType<Button>().Single(button =>
-            button.GetLogicalDescendants().OfType<TextBlock>().Any(text => text.Text is "Sons de Big Picture" or "Big Picture sounds"));
-        muteRow.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        void Choose(string label)=>window.FindControl<StackPanel>("BigPictureMenuRows")!.Children.OfType<Button>()
+            .Single(button=>Avalonia.Automation.AutomationProperties.GetName(button)==label).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Choose("Paramètres");Choose("Affichage et audio");Choose("Effets sonores");
         Check(enabled.IsChecked == false, "Controller-menu mute and settings checkbox diverged.");
-        menu.GetLogicalDescendants().OfType<Button>().Single(button =>
-            button.GetLogicalDescendants().OfType<TextBlock>().Any(text => text.Text is "Sons de Big Picture" or "Big Picture sounds"))
-            .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Choose("Effets sonores");
         Check(enabled.IsChecked == true, "Controller menu could not restore audio.");
         if (snapshots is not null)
         {
@@ -78,7 +76,7 @@ static class BigPictureSoundChecks
         var launch = typeof(MainWindow).GetMethod("LaunchReadyGame",BindingFlags.NonPublic|BindingFlags.Instance)!;
         Next();launch.Invoke(window,[fixture]);
         Check(played.SequenceEqual(new[] { "launch.wav" }), "A successful process start did not play the distinct launch cue.");
-        Next();fixture.Executable=Path.Combine(Path.GetTempPath(),Guid.NewGuid()+"-missing.exe");
+        Next();fixture.Id="audio-missing-fixture";fixture.Executable=Path.Combine(Path.GetTempPath(),Guid.NewGuid()+"-missing.exe");
         try { launch.Invoke(window,[fixture]);throw new Exception("Missing launch unexpectedly succeeded."); }
         catch (TargetInvocationException) { }
         Check(played.Count == 0, "A failed process start played a success chime.");

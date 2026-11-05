@@ -11,7 +11,6 @@ namespace CubeShelf.Desktop;
 
 public sealed partial class MainWindow
 {
-    private readonly Dictionary<Control, Thickness> _bigPicturePageMargins = new();
     private GameCatalogEntry? _bigPictureModsGame;
     private bool _bigPictureReturnHome;
 
@@ -21,28 +20,30 @@ public sealed partial class MainWindow
         RecordBigPictureNavigation(view);
         if (view == BigPictureHomeView) _bigPictureReturnHome = true;
         else if (view == BigPictureView) _bigPictureReturnHome = false;
-        var show = _bigPictureActive && view != BigPictureView;
-        BigPictureSubnav.IsVisible = show;
-        foreach (var (page, margin) in _bigPicturePageMargins) page.Margin = margin;
-        _bigPicturePageMargins.Clear();
-        if (!show) return;
-        _bigPicturePageMargins[view] = view.Margin;
-        view.Margin = new Thickness(view.Margin.Left, view.Margin.Top + 64, view.Margin.Right, view.Margin.Bottom);
-        BigPictureSubnavTitle.Text = "DecompShelf · " + (_personalLibrary && (view == LibraryView || view == GameView)
-            ? P7("Mes jeux", "My games") : P7("Big Picture", "Big Picture"));
-        BigPictureReturnButton.Content = _personalLibrary && view == LibraryView && _personalLibraryReturnToConsoles
-            ? P7("← Consoles · Échap / B", "← Consoles · Esc / B")
-            : view == BigPictureHomeView ? P7("Bureau · Échap / B", "Desktop · Esc / B")
-            : _bigPictureBackStack.TryPeek(out var previous) && previous.View != BigPictureView && previous.View != BigPictureHomeView
-                ? P7("← Retour · Échap / B", "← Back · Esc / B")
-            : _bigPictureReturnHome ? P7("← Accueil · Échap / B", "← Home · Esc / B")
-            : P7("← Collection · Échap / B", "← Collection · Esc / B");
+        BigPictureSubnav.IsVisible = _bigPictureActive;
+        UpdateBigPictureChrome();
+        BigPictureSubnavTitle.Text = PlatformHome.IsVisible || view==DualScreenView&&DualScreenView.IsPlatforms
+            ?P7("Big Picture · Consoles","Big Picture · Consoles")
+            :_personalLibrary&&(view==LibraryView||view==DualScreenView)?P7("Big Picture · Mes jeux","Big Picture · My games")
+            :view==SettingsView?P7("Big Picture · Paramètres","Big Picture · Settings")
+            :view==DownloadsView?P7("Big Picture · Téléchargements","Big Picture · Downloads")
+            :"Big Picture";
+        BigPictureReturnButton.IsVisible=_bigPictureActive&&!PlatformHome.IsVisible&&view!=DualScreenView&&view!=BigPictureView&&view!=BigPictureHomeView;
+        BigPictureKeyboardButton.IsVisible=_bigPictureActive&&view!=BigPictureView&&view!=DualScreenView&&!PlatformHome.IsVisible;
+        BigPictureSettingsButton.Content=P7("Menu · F10","Menu · F10");
+        BigPictureConsolesButton.Content=P7("Consoles","Consoles");
+        BigPictureExitButton.Content=P7("Quitter Big Picture","Exit Big Picture");
+        ToolTip.SetTip(BigPictureExitButton,P7("Revenir au mode bureau · F11","Return to desktop mode · F11"));
+        BigPictureReturnButton.Content=P7("← Retour","← Back");
+        ToolTip.SetTip(BigPictureReturnButton,P7("Écran précédent · Échap / B","Previous screen · Esc / B"));
         BigPictureKeyboardButton.Content = P7("Clavier", "Keyboard");
     }
 
     private void ReturnToBigPicture(object? sender, RoutedEventArgs args)
     {
         if (!_bigPictureActive) return;
+        if(DualScreenView.IsVisible){ShowDualPlatforms();return;}
+        if(BigPictureView.IsVisible){ShowPlatformHome();return;}
         if (_personalLibrary && LibraryView.IsVisible && _personalLibraryReturnToConsoles) { ShowPlatformHome(); return; }
         if (BigPictureHomeView.IsVisible) { ExitBigPicture(this, args); return; }
         if (TryReturnBigPicturePage()) return;
@@ -144,6 +145,13 @@ public sealed partial class MainWindow
     {
         if (_bigPictureKeyboardWindow is not null) { HandleBigPictureKeyboardInput(input); return; }
         var window = BigPictureInputWindow();
+        if(window.Content is Controls.GameStorageView storage)
+        {
+            if(input==6)storage.BackFromController();
+            else if(input==5)storage.ActivateFromController();
+            else if(input is >=1 and <=4)storage.MoveFromController(input is 1 or 3?-1:1);
+            return;
+        }
         if (window == this && ModsView.IsVisible && HandleModControllerInput(input)) return;
         if (input == 6)
         {

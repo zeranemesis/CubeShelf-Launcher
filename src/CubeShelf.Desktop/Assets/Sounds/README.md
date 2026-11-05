@@ -1,5 +1,13 @@
 # Sons Big Picture
 
+## Thème Double écran · HOME
+
+Ambiance et trois effets originaux, générés par `python eng/generate-home-audio.py` : `home-ambience.wav` (boucle de 16 secondes), `home-move.wav` (120 ms), `home-open.wav` (300 ms) et `home-launch.wav` (700 ms). PCM mono 16 bits, 24 kHz ; aucune musique ni son extrait d'iiSU ou de Nintendo. Les assertions du générateur vérifient saturation et extrémités silencieuses.
+
+Ces quatre fichiers sont embarqués sur Windows et Android. L'ambiance prend le relais quand aucun extrait local n'est associé au jeu. Le bouton Audio permet de couper séparément musique et effets. La musique s'arrête quand le thème est masqué, que l'application perd son activité ou qu'un jeu démarre. Les répétitions de sélection sont limitées à un effet toutes les 85 ms ; l'animation d'aperçu dure 220 ms, sans boucle de rendu permanente. Le réglage de mouvement réduit du PC est respecté.
+
+Les sections suivantes décrivent les sons conservés pour le thème Classique.
+
 Sons originaux synthétisés pour DecompShelf, sans extrait audio de console ou de jeu.
 Régénération : `python eng/generate-big-picture-sounds.py`.
 

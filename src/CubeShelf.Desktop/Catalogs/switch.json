@@ -261,6 +261,37 @@
     ]
   },
   {
+    "Id": "zzzarathustra-dev-power-moon-recomp-super-mario-odyssey",
+    "Title": "Super Mario Odyssey",
+    "Project": "Power Moon Recomp",
+    "Repository": "zzzarathustra-dev/power-moon-recomp",
+    "Method": "Recompilation statique ARM64 vers C natif",
+    "Status": "Paquet Windows vérifié · partie non testée",
+    "Notes": "Fournis exefs et romfs de ta propre copie de Super Mario Odyssey 1.0.0, sans mise à jour. Recompilation au premier démarrage, environ 6 Go de données ; prévois au moins 7 Go libres. Windows x64 : AVX2, Vulkan 1.3, 8 Go de RAM minimum (16 Go recommandés). SHA-256 de la release GitLab et archive Windows contrôlés. Jouabilité déclarée par le projet, aucune partie complète testée dans DecompShelf. Aucun jeu fourni.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "cdbe05c9df0e2ff4bfbecece89ad3f0fd9806193",
+    "ReadmeUrl": "https://gitlab.com/zzzarathustra-dev/power-moon-recomp/-/blob/cdbe05c9df0e2ff4bfbecece89ad3f0fd9806193/README.md",
+    "ReleaseUrl": "https://gitlab.com/zzzarathustra-dev/power-moon-recomp/-/releases/v0.2.1",
+    "ReleaseTag": "v0.2.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "Power_Moon_Recomp-0.2.1-windows.zip",
+        "Url": "https://gitlab.com/api/v4/projects/zzzarathustra-dev%2Fpower-moon-recomp/uploads/c2943d662cc803b10ca028c02907c8c5/Power_Moon_Recomp-0.2.1-windows.zip",
+        "Size": 85502153,
+        "Sha256": "b14f6b7acdfa06915f383a9edaabd041e336e8a89f5e1a367615a3fae4837f44",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "Power Moon Recomp/PowerMoonRecomp.exe"
+      }
+    ],
+    "RepositoryHost": "gitlab.com"
+  },
+  {
     "Id": "ly05010419-macnativegames-super-mario-odyssey",
     "Title": "Super Mario Odyssey",
     "Project": "MacNativeGames",

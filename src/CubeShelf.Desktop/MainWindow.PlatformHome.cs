@@ -8,6 +8,8 @@ public sealed partial class MainWindow
     private void OpenPlatformHome(object? sender, RoutedEventArgs args) => ShowPlatformHome();
     private void ShowPlatformHome()
     {
+        if(_presentation?.IsDual==true){ShowDualPlatforms();return;}
+        DualScreenView.IsVisible=false;
         ConsoleShelfPicker.IsDropDownOpen=false;
         CloseBigPictureMenu();
         ShelfTransition.Stop();
@@ -28,6 +30,7 @@ public sealed partial class MainWindow
         Avalonia.Controls.Grid.SetColumn(PlatformHome,_bigPictureActive?0:1);
         Avalonia.Controls.Grid.SetColumnSpan(PlatformHome,_bigPictureActive?2:1);
         PlatformHome.Open(ShelfProducts.Select(p=>(p,NativePortCatalog.ForConsole(_catalogGames,p.Id).Count())),_activeShelfConsole,desktop:true,grid:!_bigPictureActive,english:UiLocalization.IsEnglish(_preferences.Language));
+        UpdateBigPictureSubnav(PlatformHome);
         UpdateNavigationStatePhase5();
     }
 }

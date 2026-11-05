@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>io.github.zeranemesis.cubeshelf</ApplicationId>
-    <ApplicationVersion>53</ApplicationVersion>
+    <ApplicationVersion>71</ApplicationVersion>
+    <AndroidManifest>Generated/NativeHost/AndroidManifest.xml</AndroidManifest>
     <ApplicationDisplayVersion>$(CubeShelfVersion)</ApplicationDisplayVersion>
     <ApplicationTitle>DecompShelf</ApplicationTitle>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
@@ -21,15 +22,32 @@
     <Compile Include="../../tests/CubeShelf.Assistance.Tests/AndroidOverlayProbe.cs" Link="Tests/AndroidOverlayProbe.cs" Condition="'$(Configuration)' == 'Debug'" />
     <AndroidNativeLibrary Remove="Generated/Assistance/**/*.so" />
     <AndroidJavaSource Remove="Generated/Ghostship/**/*.java" />
+    <AndroidJavaSource Remove="Generated/NativeHost/**/*.java" />
     <AndroidLibrary Remove="**/*.jar" />
     <AndroidLibrary Include="Generated/PartyBoard/partyboard-host.jar" Bind="false" />
     <AndroidLibrary Include="Generated/Ghostship/ghostship-host.jar" Bind="false" />
+    <AndroidLibrary Include="Generated/NativeHost/native-host.jar" Bind="false" />
     <AndroidAsset Include="../../vendor/ghostship-android/licenses/*" Link="ghostship/licenses/%(Filename)%(Extension)" />
     <AndroidAsset Include="../../vendor/assistance/*.txt" Link="assistance/licenses/%(Filename)%(Extension)" />
     <PackageReference Include="Avalonia.Android" Version="11.3.21" />
     <ProjectReference Include="../CubeShelf.Mobile/CubeShelf.Mobile.csproj" />
     <AndroidResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Resources/drawable/icon.png" />
   </ItemGroup>
+  <Target Name="PrepareNativeHosts" BeforeTargets="PrepareForBuild;_ComputeAndroidAssetsPaths" DependsOnTargets="_ResolveMonoAndroidSdks">
+    <PropertyGroup>
+      <NativeHostPython Condition="'$(OS)' == 'Windows_NT'">python</NativeHostPython>
+      <NativeHostPython Condition="'$(NativeHostPython)' == ''">python3</NativeHostPython>
+    </PropertyGroup>
+    <Exec Command="&quot;$(NativeHostPython)&quot; &quot;$(MSBuildProjectDirectory)/../../eng/prepare-native-host.py&quot; --java-home &quot;$(_JavaSdkDirectory).&quot; --sdk &quot;$(_AndroidSdkDirectory).&quot;" />
+    <ItemGroup>
+      <AndroidAsset Remove="Generated/NativeHost/assets/**/*" />
+      <NativeHostAsset Include="Generated/NativeHost/assets/nativehost/**/*" />
+      <NativeHostAsset>
+        <Link>nativehost/%(NativeHostAsset.RecursiveDir)%(NativeHostAsset.Filename)%(NativeHostAsset.Extension)</Link>
+      </NativeHostAsset>
+      <AndroidAsset Include="@(NativeHostAsset)" />
+    </ItemGroup>
+  </Target>
   <Target Name="PreparePartyBoardEngine" BeforeTargets="PrepareForBuild" DependsOnTargets="_ResolveMonoAndroidSdks">
     <PropertyGroup>
       <PartyBoardPython Condition="'$(OS)' == 'Windows_NT'">python</PartyBoardPython>

@@ -91,17 +91,25 @@ static class BigPictureControlsChecks
         var game=position.Text;Input(12);Check(game!=position.Text,"Stick right did not change game.");
         game=position.Text;Input(4);Check(menu.IsVisible && game==position.Text,"D-pad changed game instead of opening menus.");
         Input(15);Check(!menu.IsVisible,"Start did not close the menu.");
-        Input(15);Input(4);Input(4);Input(4);Input(4);Input(5);Input(5);
+        void ChooseMenu(string label)
+        {
+            Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);Dispatcher.UIThread.RunJobs();
+            var rows=window.FindControl<StackPanel>("BigPictureMenuRows")!.Children.OfType<Button>().ToArray();
+            var target=rows.SingleOrDefault(button=>Avalonia.Automation.AutomationProperties.GetName(button)==label)
+                ??throw new Exception("Missing menu row "+label+": "+string.Join(", ",rows.Select(Avalonia.Automation.AutomationProperties.GetName)));
+            Check(target.Focus(),"Menu row cannot receive focus: "+label);Input(5);
+        }
+        Input(15);ChooseMenu("Paramètres");ChooseMenu("Manette");Input(5);
         Check(new UserPreferencesStore(new PlatformPaths()).Load().SwapBigPictureNavigation,"Control inversion did not persist.");
         Save("controller-menu.png");
-        Input(6);Input(6);game=position.Text;Input(2);
+        Input(6);Input(6);Input(6);game=position.Text;Input(2);
         Check(!menu.IsVisible && game!=position.Text,"Swapped D-pad did not browse games.");
         console=consoles.SelectedIndex;Input(13);
         Check(menu.IsVisible && consoles.SelectedIndex==console,"Swapped stick still changed platform.");
         Save("main-menu.png");
-        Input(15);Input(15);Input(14);Input(14);Input(14);Input(14);Input(5);Input(5);
+        Input(15);Input(15);ChooseMenu("Paramètres");ChooseMenu("Manette");Input(5);
         Check(!new UserPreferencesStore(new PlatformPaths()).Load().SwapBigPictureNavigation,"Could not restore original navigation.");
-        Input(6);Input(6);
+        Input(6);Input(6);Input(6);
         var launch=window.FindControl<GameLaunchTransition>("LaunchTransition")!;
         var currentGame=typeof(MainWindow).GetProperty("BigPictureGame",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
         using var sources=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs/covers.json")));

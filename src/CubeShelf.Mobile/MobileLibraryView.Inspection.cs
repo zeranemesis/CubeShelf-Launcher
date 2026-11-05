@@ -62,11 +62,15 @@ public sealed partial class MobileLibraryView
 
     public bool DismissOverlay()
     {
+        if(_gameOptionsOverlay.IsVisible){CloseGameOptions();return true;}
+        if(_storageOverlay.IsVisible){_storageView?.BackFromController();return true;}
         if (_consolePicker.IsDropDownOpen) { _consolePicker.IsDropDownOpen = false; FocusPrimaryAction(); return true; }
         if(_nativePreparation is not null) {_nativePreparation.Cancel();return true;}
         if (_launching) { CancelLaunchTransition(); return true; }
         if (_downloadsOverlay.IsVisible) { CloseDownloads(); return true; }
         if (_inspectionCase is not null) { CloseInspection(); return true; }
+        if(_presentation.IsDual&&_dualDetail){_dualDetail=false;RefreshDualLibrary(false);return true;}
+        if(_presentation.IsDual&&_dualLibrary.IsVisible){if(_dualPlatforms)return false;RefreshDualLibrary(true);return true;}
         if (_invitationPanel.IsExpanded)
         {
             _invitationPanel.IsExpanded = false;

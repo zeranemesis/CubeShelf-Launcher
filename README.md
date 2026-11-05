@@ -2,7 +2,19 @@
 
 DecompShelf regroupe des ports natifs de jeux de consoles dans une application Windows et Android. Il propose un accueil par console, une bibliothèque, les téléchargements, les favoris et un mode Big Picture à la manette.
 
-**Version candidate : `0.19.0-rc.2`.** Le numéro utilisé par les compilations est défini dans [VERSION](VERSION). Cette candidate corrige le plantage constaté au retour d’un jeu. Une compilation réussie ne valide pas la jouabilité de tous les projets tiers. Les essais matériels encore nécessaires sont consignés dans [le plan de finition](docs/FINISHING-PLAN.md).
+Deux présentations sont disponibles : **Classique** et **Double écran · HOME**. Le choix se trouve dans les paramètres sur PC et Android (également accessibles par Téléchargements sur mobile). HOME propose un grand aperçu du jeu avec son boîtier 3D, une grille d'icônes, et deux apparences sobres dans **Personnaliser → Affichage**. Le même menu permet de couper la musique ou les effets et d'associer une piste locale au jeu. Android peut afficher la grille sur un second écran compatible : voir [l'adaptation AYN Thor et ses limites](docs/IIDB-THEME-AND-AYN-THOR.md). Voir aussi [les détails du thème](docs/HOME-THEME-2026-11-03.md).
+
+**X** ouvre les [options du jeu sélectionné](docs/GAME-OPTIONS-CONTROLLER.md) dans Big Picture sur PC, ou avec une manette sur Android. Windows donne accès aux paramètres et aux mods existants ; la gestion des mods Android reste indisponible et est signalée dans le menu.
+
+Le [bouton RetroAchievements](docs/RETROACHIEVEMENTS-MENU.md), sous les jeux dans Big Picture et sur Android, affiche uniquement les ports natifs dont la compatibilité est confirmée.
+
+Les [logos des jeux](docs/GAME-LOGOS-2026-11-04.md) proviennent de LaunchBox Games Database : 555 associations console/titre disponibles hors ligne sur PC ; Android embarque seulement les logos utiles à son catalogue compatible. Un titre lisible est conservé lorsqu'aucune correspondance fiable n'est disponible.
+
+Les [lancements et mises à jour sans forks](docs/NATIVE-UPDATES-WITHOUT-FORKS.md) utilisent les paquets officiels vérifiés, conservent les anciens moteurs Windows et préparent les révisions Android compatibles avec les adaptateurs de l'application. Après les [ajouts du 5 novembre](docs/NATIVE-PORTS-2026-11-05.md) et l'intégration de [Power Moon et Recharged](docs/USER-PROJECTS-2026-11-05.md), les catalogues comptent **664 références PC et 28 ports Android**, sans ajouter d'émulateur.
+
+Sur PC, Big Picture conserve un bandeau **Consoles · Mes jeux · Menu · Quitter Big Picture** dans les deux thèmes et sur les pages de gestion. **Menu (F10 / START)** regroupe bibliothèque, options du jeu sélectionné et gestion ; les réglages d'affichage/audio et de manette se trouvent dans **Paramètres**. **B / Échap** remonte d'un niveau. Le bouton de sortie et **F11** restaurent la fenêtre de bureau et ses dimensions, sans fermer DecompShelf.
+
+**Version candidate : `0.19.0-rc.3`.** Le numéro utilisé par les compilations est défini dans [VERSION](VERSION). Cette candidate corrige le plantage constaté au retour d’un jeu. Une compilation réussie ne valide pas la jouabilité de tous les projets tiers. Les essais matériels encore nécessaires sont consignés dans [le plan de finition](docs/FINISHING-PLAN.md).
 
 Aucun disque, ROM, BIOS, firmware, clé ou fichier extrait d'un jeu n'est fourni. Chaque port utilise les fichiers de la copie personnelle du joueur, selon les instructions de son auteur. Les mods destinés uniquement à une ISO émulée ne sont pas ajoutés au catalogue des ports natifs.
 
@@ -44,13 +56,15 @@ Les photos et logos des consoles sont inclus dans les paquets et fonctionnent ho
 
 ## Android
 
-Le catalogue mobile est distinct du PC : GameCube, Nintendo 64, Game Boy, Game Boy Color, Game Boy Advance et Wii U, uniquement pour les moteurs ou APK Android identifiés.
+La gestion locale du stockage et des sauvegardes est disponible dans **Réglages → Stockage et sauvegardes** sur PC et **Téléchargements → Stockage et sauvegardes** sur Android. Elle propose les tailles par jeu, des copies locales, l'export/import ZIP et un nettoyage protégé. [Fonctionnement et limites](docs/STORAGE-AND-SAVES-2026-11-03.md).
 
-Mario Party 4 / PartyBoard et Super Mario 64 disposent de moteurs intégrés sur ARM64. Les autres ports du catalogue s'installent comme applications Android séparées. Les confirmations d'installation et d'accès aux fichiers imposées par Android restent nécessaires.
+Le catalogue mobile est distinct du PC : 25 références sur neuf consoles, uniquement pour les moteurs Android identifiés.
 
-Les APK externes sont contrôlés par identité, taille et SHA-256 ; leur disponibilité ne constitue pas une validation sur téléphone. Les prérequis de version Android, d'architecture et de GPU dépendent du port. The Wind Waker HD exige notamment Android 13 et Vulkan 1.3.
+Mario Party 4 / PartyBoard et Super Mario 64 disposent de moteurs intégrés sur ARM64. Les 23 autres moteurs se téléchargent à la demande et se préparent dans les fichiers privés de DecompShelf, sans installer d'application de jeu séparée. Cet hébergement est expérimental et nécessite Android 9 minimum, ainsi que les prérequis propres au port. Le sélecteur de fichiers Android reste nécessaire pour importer sa propre copie du jeu.
 
-[Installation, signatures, versions et limites Android](packaging/ANDROID.md) · [PartyBoard Android](docs/ANDROID-PARTYBOARD.md).
+Les paquets des moteurs et leurs adaptateurs sont contrôlés par identité, taille et SHA-256 ; leur disponibilité ne constitue pas une validation en partie sur téléphone. Les prérequis de version Android, d'architecture et de GPU dépendent du port. The Wind Waker HD exige notamment Android 13 et Vulkan 1.3. Les anciennes applications et leurs sauvegardes sont conservées ; elles ne sont pas migrées automatiquement.
+
+[Installation, signatures, versions et limites Android](packaging/ANDROID.md) · [Moteurs hébergés](docs/ANDROID-NATIVE-HOST.md) · [PartyBoard Android](docs/ANDROID-PARTYBOARD.md).
 
 ## Fonctions existantes et limites
 

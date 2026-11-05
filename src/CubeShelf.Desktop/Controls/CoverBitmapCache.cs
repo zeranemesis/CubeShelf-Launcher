@@ -51,7 +51,8 @@ internal static class CoverBitmapCache
         // Decode outside the shared lock so texture preparation and release stay responsive.
         using var stream = File.OpenRead(file.FullName);
         using var codec = SKCodec.Create(stream);
-        var height = Math.Min(maximumHeight, codec?.Info.Height ?? maximumHeight);
+        if (codec is null) throw new IOException("Format d’illustration non pris en charge.");
+        var height = Math.Min(maximumHeight, codec.Info.Height);
         using var imageStream = File.OpenRead(file.FullName);
         var decoded = Bitmap.DecodeToHeight(imageStream, height, BitmapInterpolationMode.HighQuality);
         lock (Gate)

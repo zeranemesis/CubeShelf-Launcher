@@ -54,6 +54,7 @@ public sealed class NativePort
     public string Title { get; set; } = "";
     public string Project { get; set; } = "";
     public string Repository { get; set; } = "";
+    public string RepositoryHost { get; set; } = "github.com";
     public string Method { get; set; } = "";
     public string Status { get; set; } = "Expérimental";
     public string Notes { get; set; } = "";
@@ -64,7 +65,7 @@ public sealed class NativePort
     public string ReleaseTag { get; set; } = "";
     public List<string> Platforms { get; set; } = [];
     public List<NativePortAsset> Assets { get; set; } = [];
-    public string Homepage => "https://github.com/" + Repository;
+    public string Homepage => "https://" + RepositoryHost + "/" + Repository;
     public override string ToString() => Title + " · " + Project;
 }
 
@@ -75,6 +76,7 @@ public sealed class NativePortAsset
     public string Sha256 { get; set; } = "";
     public long Size { get; set; }
     public List<string> RuntimeIdentifiers { get; set; } = [];
+    public string ExecutableRelativePath { get; set; } = "";
     public bool MatchesCurrentPlatform => RuntimeIdentifiers.Contains(CurrentRuntimeIdentifier);
     public static string CurrentRuntimeIdentifier => (OperatingSystem.IsWindows() ? "win" : OperatingSystem.IsMacOS() ? "osx" : "linux")
         + "-" + (RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "arm64" : "x64");
@@ -83,8 +85,9 @@ public sealed class NativePortAsset
 
 public static class NativePortCatalog
 {
-    public static string GameKey(GameCatalogEntry game) => game.ShelfConsole + ":" +
-        string.Concat(game.Title.Normalize(System.Text.NormalizationForm.FormD).Where(char.IsLetterOrDigit)).ToUpperInvariant();
+    public static string GameKey(GameCatalogEntry game) => GameKey(game.ShelfConsole,game.Title);
+    public static string GameKey(string console,string title) => console + ":" +
+        string.Concat(title.Normalize(System.Text.NormalizationForm.FormD).Where(char.IsLetterOrDigit)).ToUpperInvariant();
 
     public static IEnumerable<GameCatalogEntry> VersionsOf(IEnumerable<GameCatalogEntry> games, GameCatalogEntry game) =>
         games.Where(candidate => !GameVariants.IsVariant(candidate) && GameKey(candidate) == GameKey(game));
@@ -104,7 +107,7 @@ public static class NativePortCatalog
         foreach (var port in ports)
         {
             if (!IsSafeId(port.Id) || !ids.Add(port.Id) || string.IsNullOrWhiteSpace(port.Title)
-                || port.Repository.Split('/') is not [var owner, var repo] || !IsSafeId(owner) || !IsSafeId(repo))
+                || !IsSafeRepository(port))
                 throw new InvalidDataException("Entrée de catalogue invalide ou dupliquée.");
             foreach (var asset in port.Assets) ValidateAsset(port, asset);
         }
@@ -114,23 +117,37 @@ public static class NativePortCatalog
     public static bool IsSafeId(string id) => id.Length is > 0 and <= 160 && id is not "." and not ".."
         && id.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' or '.');
 
+    public static bool IsSafeRepository(NativePort port) => port.RepositoryHost is "github.com" or "gitlab.com"
+        && port.Repository.Split('/') is [var owner,var repo] && IsSafeId(owner) && IsSafeId(repo);
+
     public static void ValidateAsset(NativePort port, NativePortAsset asset)
     {
-        var prefix = port.Homepage + "/releases/download/";
+        CubeShelf.Core.Storage.StorageFiles.ValidateRelative(asset.Name);
+        if(!IsSafeRepository(port))throw new InvalidDataException("Dépôt amont invalide.");
+        if(asset.ExecutableRelativePath.Length>0)
+        {
+            CubeShelf.Core.Storage.StorageFiles.ValidateRelative(asset.ExecutableRelativePath);
+            if(!asset.ExecutableRelativePath.EndsWith(".exe",StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Programme natif déclaré invalide.");
+        }
+        var prefix = port.RepositoryHost=="gitlab.com" ? "https://gitlab.com/api/v4/projects/"+Uri.EscapeDataString(port.Repository)+"/uploads/" : port.Homepage + "/releases/download/";
         if (!Uri.TryCreate(asset.Url, UriKind.Absolute, out var uri) || uri.Scheme != "https"
             || !asset.Url.StartsWith(prefix, StringComparison.Ordinal) || string.IsNullOrWhiteSpace(asset.Name)
             || Path.GetFileName(asset.Name) != asset.Name || asset.Name.Contains('\\')
             || asset.Size <= 0 || asset.Size > 2L * 1024 * 1024 * 1024
             || asset.Sha256.Length != 64 || !asset.Sha256.All(Uri.IsHexDigit))
             throw new InvalidDataException("Paquet sans origine ou empreinte vérifiable.");
+        if(port.RepositoryHost=="gitlab.com" && (uri.Query.Length>0||uri.Fragment.Length>0
+            ||asset.Url[prefix.Length..].Split('/') is not [var hash,var filename]||hash.Length!=32||!hash.All(Uri.IsHexDigit)
+            ||filename!=Uri.EscapeDataString(asset.Name)))throw new InvalidDataException("Pièce jointe GitLab étrangère ou invalide.");
     }
 }
 
-public sealed class NativePortLibrary
+public sealed partial class NativePortLibrary
 {
     private readonly IPlatformPaths _paths;
     private readonly string _file;
     private Dictionary<string, string> _executables = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly object ConfigurationGate = new();
     public NativePortLibrary(IPlatformPaths paths)
     {
         _paths = paths;
@@ -144,11 +161,15 @@ public sealed class NativePortLibrary
         var path = Path.GetFullPath(executable);
         if (!File.Exists(path) && !(OperatingSystem.IsMacOS() && Directory.Exists(path) && path.EndsWith(".app", StringComparison.OrdinalIgnoreCase)))
             throw new FileNotFoundException("Choisis le programme natif du port.", path);
-        _executables[port.Id] = path;
-        Directory.CreateDirectory(_paths.ConfigurationDirectory);
-        var temporary = _file + ".new";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(_executables));
-        File.Move(temporary, _file, true);
+        lock(ConfigurationGate)
+        {
+            _executables=File.Exists(_file)?JsonSerializer.Deserialize<Dictionary<string,string>>(File.ReadAllText(_file))??[]:[];
+            _executables[port.Id] = path;
+            Directory.CreateDirectory(_paths.ConfigurationDirectory);
+            var temporary = _file + ".new";
+            File.WriteAllText(temporary, JsonSerializer.Serialize(_executables));
+            File.Move(temporary, _file, true);
+        }
     }
     public void Launch(NativePort port)
     {
@@ -174,7 +195,9 @@ public sealed class NativePortLibrary
         if (!asset.MatchesCurrentPlatform) throw new InvalidOperationException("Ce paquet n'est pas déclaré compatible avec cette plateforme.");
         // A new directory for every attempt: never overwrite an installed runtime or its saves.
         var directory = Path.Combine(_paths.DataDirectory, "NativePorts", port.Id, Guid.NewGuid().ToString("N"));
+        CubeShelf.Core.Storage.StorageFiles.RequireOwned(Path.Combine(_paths.DataDirectory,"NativePorts"),directory);
         Directory.CreateDirectory(directory);
+        CubeShelf.Core.Storage.DiskSpaceGuard.Require(directory,asset.Size*2);
         var file = Path.Combine(directory, asset.Name);
         using var client = http is null ? new HttpClient { Timeout = TimeSpan.FromMinutes(30) } : null;
         var network = http ?? client!;
@@ -209,6 +232,11 @@ public sealed class NativePortLibrary
             if (asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) || asset.Name.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
             {
                 var extracted = Path.Combine(directory, "runtime");
+                if(asset.Name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase))
+                {
+                    using var archive=System.IO.Compression.ZipFile.OpenRead(file);
+                    CubeShelf.Core.Storage.DiskSpaceGuard.Require(extracted,archive.Entries.Sum(entry=>entry.Length));
+                }
                 await Task.Run(() => SecureArchiveExtractor.Extract(file, extracted,
                     new(100000, 8L * 1024 * 1024 * 1024, 2L * 1024 * 1024 * 1024)), cancellationToken).ConfigureAwait(false);
                 progress?.Report(1); return extracted;

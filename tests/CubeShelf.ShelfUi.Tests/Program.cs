@@ -67,7 +67,7 @@ try
     AssertCovers();
     selector.SelectedIndex=3;
     AssertBrand("n64");
-    if(cards.Items.Count!=68 || fullscreen.SelectedIndex!=3)throw new Exception("Nintendo 64 catalogue or selectors incorrect.");
+    if(cards.Items.Count!=69 || fullscreen.SelectedIndex!=3)throw new Exception("Nintendo 64 catalogue or selectors incorrect.");
     AssertCovers();
     var japanese=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Virtual Pro Wrestling 2").Game.Covers.First();
     var landscapeCard=cards.Items.Cast<MainWindow.DesktopGameCard>().Single(card=>card.Title=="Banjo-Kazooie");
@@ -112,7 +112,7 @@ try
     AssertBrand("switch");
     if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=25)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
-    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (25) → Nintendo 64 (68) → GameCube ({cubeCount})");
+    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (25) → Nintendo 64 (69) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
@@ -291,6 +291,8 @@ try
     BigPictureSoundChecks.Run(window,playedSounds,() => soundTime += 1000,snapshotDirectory);
     PersonalLibraryChecks.Run(window,snapshotDirectory);
     CoverLayoutChecks.Run(window,snapshotDirectory);
+    DualPresentationChecks.Run(window,snapshotDirectory);
+    BigPictureMenuChecks.Run(window,snapshotDirectory);
     if (snapshotDirectory is not null)
     {
         foreach (var console in new[] { "nes", "gba", "ps1", "xbox360" })

@@ -11,7 +11,7 @@ public sealed partial class MainWindow
 {
     private NativePortsWindow CreateNativePortsWindow(ShelfProduct product, string? selectedPort = null, Action? onLaunching = null)
     {
-        var window = new NativePortsWindow(product, selectedPort, _paths);
+        var window = new NativePortsWindow(product, selectedPort, _paths,port=>_maintenanceBusy||_catalogGames.Any(g=>_nativeShelfPorts.TryGetValue(g.Id,out var p)&&p.Id==port.Id&&_sessions.IsRunning(g.Id)));
         window.LaunchRequested += port =>
         {
             var game = _catalogGames.FirstOrDefault(candidate =>
@@ -19,6 +19,7 @@ public sealed partial class MainWindow
                 ?? throw new InvalidOperationException("Ce port n’est pas associé à un jeu de la bibliothèque.");
             onLaunching?.Invoke();
             window.Close();
+            if(onLaunching is not null&&port.Id==selectedPort)return;
             if (RunningGameFor(game) is not null) return;
             // Use the common launch path so process tracking, statistics and the help button agree.
             _ = RequestPlayAsync(game);
@@ -107,7 +108,7 @@ public sealed partial class MainWindow
                     Region = string.Join(", ", port.Platforms), Players = port.Status,
                     Description = port.Notes + "\nProjet : " + port.Repository,
                     DataPreparation = GameDataPreparation.Runtime, HomepageUrl = port.Homepage,
-                    LaunchArguments = [], LaunchEnvironment = [], DiscFormats = []
+                    LaunchArguments = [], LaunchEnvironment = [], DiscFormats = [],LogOutput=true
                 });
             }
         }
@@ -246,15 +247,28 @@ public sealed partial class MainWindow
     private bool _changingShelf;
     private static int ConsoleIndex(string console) => Array.FindIndex(ShelfProducts, product => product.Id == console);
 
-    private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false)
+    private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false,CancellationToken cancellation=default)
     {
         if (!_nativeShelfPorts.TryGetValue(game.Id, out var port)) return false;
         var library = new NativePortLibrary(_paths);
+        if(!alwaysShow&&!library.IsConfigured(port)&&OperatingSystem.IsWindows())
+        {
+            var assets=port.Assets.Where(a=>a.MatchesCurrentPlatform&&(a.Name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)||a.Name.EndsWith(".tar.gz",StringComparison.OrdinalIgnoreCase))).ToArray();
+            if(assets.Length==1)
+            {
+                var key="native-runtime:"+game.Id;
+                var item=PendingPlayPrerequisite(key)??_portableQueue!.Enqueue(key,game.Title,"NATIVE PORT",
+                    P7("Moteur officiel vérifié · installation avant de jouer","Verified upstream engine · install before playing"),
+                    async(progress,token)=>{await library.InstallManagedAsync(port,assets[0],progress,token);},referenceId:game.Id);
+                await AwaitPlayPrerequisiteAsync(item,cancellation);
+                library=new NativePortLibrary(_paths);
+            }
+        }
+        cancellation.ThrowIfCancellationRequested();
         if (alwaysShow || !library.IsConfigured(port))
         {
-            var launched = false;
-            await CreateNativePortsWindow(ShelfProduct.Resolve(game.ShelfConsole), port.Id, () => launched = true).ShowDialog(this);
-            if (launched) return false; // The dialog's Play action already owns the new launch request.
+            await CreateNativePortsWindow(ShelfProduct.Resolve(game.ShelfConsole), port.Id,PlayIntentFor(game) is not null?()=>{}:null).ShowDialog(this);
+            cancellation.ThrowIfCancellationRequested();
             library = new NativePortLibrary(_paths);
         }
         if (!library.IsConfigured(port)) return false;

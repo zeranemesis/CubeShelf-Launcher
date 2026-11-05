@@ -36,11 +36,13 @@ internal sealed class BigPictureSounds
     }
 
     private static void PlayWindowsSound(string? file)
+        =>PlayFile(file is null?null:Path.Combine(AppContext.BaseDirectory,"Assets","Sounds",file));
+
+    internal static void PlayFile(string? path)
     {
         if (!OperatingSystem.IsWindows()) return;
         const uint asyncFilenameNoDefault = 0x0001 | 0x00020000 | 0x0002;
-        _ = PlaySoundW(file is null ? null : Path.Combine(AppContext.BaseDirectory, "Assets", "Sounds", file),
-            0, file is null ? 0 : asyncFilenameNoDefault);
+        _ = PlaySoundW(path,0,path is null ? 0 : asyncFilenameNoDefault);
     }
 
     [DllImport("winmm.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]

@@ -182,6 +182,8 @@ public sealed partial class MainWindow
 
     private void ShowParityView(Control view)
     {
+        if(_presentation?.IsDual==true&&(ReferenceEquals(view,LibraryView)||ReferenceEquals(view,BigPictureView)))
+        {BuildDualGames();view=DualScreenView;}
         PlatformHome.IsVisible=false;
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
@@ -213,6 +215,7 @@ public sealed partial class MainWindow
     private void RefreshLibraryParity()
     {
         if (LibraryCards is null) return;
+        if(_presentation?.IsDual==true&&DualScreenView.IsVisible&&!DualScreenView.IsPlatforms)BuildDualGames();
         var previousCards = _parityCards.ToArray();
         _parityCards.Clear();
 

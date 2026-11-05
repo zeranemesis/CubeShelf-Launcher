@@ -48,20 +48,18 @@ public sealed partial class MainWindow
             return;
         }
 
-        if (game.RuntimeOwnsSetup)
-        {
-            if (!await EnsureNativeShelfPortAsync(game)) return;
-            if (!_bigPictureActive && OperatingSystem.IsMacOS() && Directory.Exists(game.Executable))
-            {
-                new NativePortLibrary(_paths).Launch(_nativeShelfPorts[game.Id]);
-                return;
-            }
-        }
         var intent = new PlayIntent(game, P7("Préparation…", "Getting ready…"), readyAction is not null);
         _playIntents.Add(key, intent);
         RefreshQuickPlayUi();
         try
         {
+            if(game.RuntimeOwnsSetup)
+            {
+                SetPlayStatus(intent,P7("Préparation du port natif…","Preparing native port…"));
+                if(!await EnsureNativeShelfPortAsync(game,cancellation:intent.Cancellation.Token))return;
+                if(!_bigPictureActive&&OperatingSystem.IsMacOS()&&Directory.Exists(game.Executable))
+                {new NativePortLibrary(_paths).Launch(_nativeShelfPorts[game.Id]);return;}
+            }
             await _quickPlay.RunAsync(key, new GamePlayActions(
                 ct => EnsurePlayDiscAsync(intent, ct),
                 ct => EnsurePlayRuntimeAsync(intent, ct),
@@ -243,6 +241,8 @@ public sealed partial class MainWindow
     private string QuickPlayHint(GameCatalogEntry game)
     {
         if (RunningGameFor(game) is not null) return P7("En cours de jeu", "Playing now");
+        if(PlayIntentFor(game) is {} preparing)return preparing.Status;
+        if(_nativeReleaseUpdates.TryGetValue(game.Id,out var update))return P7("Nouvelle version officielle : ","New upstream version: ")+update.ReleaseTag+P7(" · Moteur et mises à jour dans les options du jeu."," · Engine and updates in game options.");
         if (game.RuntimeOwnsSetup) return _nativeShelfPorts.TryGetValue(game.Id,out var port) && port.Assets.Any(asset=>asset.MatchesCurrentPlatform)
             ? P7("Port natif : installation et fichiers selon les instructions du projet.", "Native port: setup and game files follow the project's instructions.")
             : P7("Aucun paquet vérifié pour ce PC. Consulte les instructions du projet et associe un programme compatible.", "No verified package for this PC. Follow the project instructions and link a compatible program.");

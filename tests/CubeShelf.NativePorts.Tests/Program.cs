@@ -9,9 +9,25 @@ var root = Path.Combine(Path.GetTempPath(), "native-shelves-tests-" + Guid.NewGu
 Directory.CreateDirectory(root);
 try
 {
+    await ManagedPortChecks.Run(root);
+    await GitLabPortChecks.Run();
     var expanded = ShelfProduct.All.Where(product => File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")))
         .ToDictionary(product => product.Id, product => NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json")));
-    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 658, "every console catalogue validates with safe package origins and checksums");
+    if(args.Contains("--check-upstream"))
+    {
+        using var updates=new CubeShelf.Core.Updates.NativePortUpdateService();
+        foreach(var known in expanded.Values.SelectMany(p=>p).Where(p=>p.Repository is "zzzarathustra-dev/power-moon-recomp" or "previouslevelgames/recharged"))
+        {
+            var latest=await updates.CheckAsync(known);
+            Check(latest is {Assets.Count:>0}&&latest.Assets.Any(a=>a.MatchesCurrentPlatform),"live upstream package metadata: "+known.Project+" · "+latest?.ReleaseTag);
+        }
+    }
+    using var additionsAudit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","native-additions-2026-11-05.json")));
+    var nativeAdditions=additionsAudit.RootElement.GetProperty("Desktop").EnumerateArray().ToArray();
+    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 659+nativeAdditions.Length, "every console catalogue validates with safe package origins and checksums");
+    Check(nativeAdditions.Length==5&&nativeAdditions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
+        is {VerifiedAt:"2026-11-05",Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}&&readme.Contains("/blob/"+source+"/")
+        &&!item.GetProperty("GameplayTested").GetBoolean()),"new native ports retain pinned primary-source provenance and do not claim gameplay validation");
     Check(expanded.Keys.All(id => ShelfProduct.Resolve(id).Id == id) && ShelfProduct.All.Select(product => product.Id).Distinct().Count() == ShelfProduct.All.Length,
         "all platform identities resolve uniquely");
     using var audit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","windows-refresh-audit.json")));
@@ -20,8 +36,8 @@ try
     var switchCheckedAt=DateOnly.ParseExact(switchAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
     foreach (var entry in expanded)
         Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40
-            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=switchCheckedAt
-            && port.ReadmeUrl.StartsWith(port.Homepage + "/blob/")), "dated primary-source provenance: " + entry.Key);
+            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=DateOnly.ParseExact(additionsAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd")
+            && port.ReadmeUrl.StartsWith(port.Homepage + (port.RepositoryHost=="gitlab.com"?"/-/blob/":"/blob/"))), "dated primary-source provenance: " + entry.Key);
     var additions=audit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
     Check(additions.Length==218&&additions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
         is {VerifiedAt:var date,Assets:var assets,ReadmeUrl:var url,SourceCommit:var commit}&&date==checkedAt.ToString("yyyy-MM-dd")
@@ -31,9 +47,13 @@ try
     Check(switchAdditions.Length==8 && switchAdditions.All(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString())
         is {VerifiedAt:"2026-11-02",ReadmeUrl:var readme,SourceCommit:var source,Platforms:var platforms}
         && readme.Contains("/blob/"+source+"/") && platforms.Contains("Windows")),"new Switch ports retain pinned Windows primary-source evidence");
-    Check(expanded["switch"].Count==32 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==25
+    Check(expanded["switch"].Count==33 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==25
         && switchAdditions.Count(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString()).Assets.Count==0)==2,
         "Switch has 25 games without duplicate variants, with manual builds distinguished from six packaged additions");
+    var odyssey=expanded["switch"].First(p=>p.Title=="Super Mario Odyssey");
+    Check(odyssey is {RepositoryHost:"gitlab.com",ReleaseTag:"v0.2.1",Assets.Count:1}
+        &&odyssey.Assets[0].ExecutableRelativePath=="Power Moon Recomp/PowerMoonRecomp.exe"
+        &&expanded["wii"].Count(p=>p.Repository=="previouslevelgames/recharged")==1,"verified GitLab Odyssey is the default packaged variant and Recharged is not duplicated");
     Check(expanded.Values.SelectMany(ports=>ports).All(p=>!p.Repository.Equals("Mabec-games/F-ZERO-GLINUX",StringComparison.OrdinalIgnoreCase)
         &&!p.Repository.Equals("walz0/Melee-3D",StringComparison.OrdinalIgnoreCase)),"previously declined emulator and mod projects remain excluded");
     Check(expanded["gamecube"].Where(p=>p.Repository=="sonsegajp/Kirby-Air-Ride-Recompiled").All(p=>p.Assets.All(a=>!a.Name.Contains("MapEditor",StringComparison.OrdinalIgnoreCase))),

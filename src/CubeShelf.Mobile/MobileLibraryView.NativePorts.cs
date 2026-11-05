@@ -9,6 +9,7 @@ namespace CubeShelf.Mobile;
 
 public sealed partial class MobileLibraryView
 {
+    private void NativePortsChanged()=>Avalonia.Threading.Dispatcher.UIThread.Post(()=>{RefreshAvailability();RefreshDualSelection();});
     private readonly ComboBox _consolePicker=new() {MinHeight=44,FontSize=14,HorizontalAlignment=HorizontalAlignment.Stretch};
     private readonly ConsoleBrandMark _consoleLogo=new() {Width=30,Height=30};
     private readonly TextBlock _platformCaption = new() { FontSize = 12, Foreground = Brushes.LightGray };
@@ -43,6 +44,7 @@ public sealed partial class MobileLibraryView
     private void OpenPlatformHome()
     {
         if(_launching || _nativePreparation is not null)return;
+        if(_presentation.IsDual){RefreshDualLibrary(true);return;}
         _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
     }
     private IEnumerable<MobileGame> NativeCatalogGames() => (_games.NativePorts?.Catalog??[]).Select(p=>new MobileGame
@@ -55,6 +57,8 @@ public sealed partial class MobileLibraryView
         ?$"Mes jeux · {_catalog.Length} jeu(x) · Toutes consoles":$"{_catalog.Length} jeu(x) · Android";
     private void RebuildMobileShelf()
     {
+        RefreshDualLibrary();
+        if(_presentation.IsDual&&!_dualDetail){_shelf.Clear();return;}
         _consoleLogo.Platform=_activeConsole;
         _shelf.SetGames(_catalog.Select(game=>
         {
@@ -67,23 +71,29 @@ public sealed partial class MobileLibraryView
     {
         var native=_games.NativePorts!;
         var installed=native.IsInstalled(port.Id);var issue=native.CompatibilityError(port.Id);
+        var updating=native.IsUpdateAvailable(port.Id);var preparing=native.IsPreparing(port.Id);
         var embedded=native.IsEmbedded(port.Id);
+        var rom=embedded&&port.Id=="n64-sm64";
         var entry=DownloadManager?.Entries.FirstOrDefault(e=>e.GameId==port.Id);
         var state=entry?.Transfer.State??RuntimeDownloadState.NotInstalled;
         var ready=native.IsPackageReady(port.Id);
-        _info.Text=port.Project+" · "+port.Status;
-        _nativeNotes.Text=embedded?"Moteur intégré à DecompShelf. Choisis ta propre ROM Super Mario 64 US ou japonaise au format .z64 ; aucun APK de jeu à installer.":port.Notes;_nativeNotes.IsVisible=true;
-        _availability.Text=installed?"Prêt à jouer · "+port.Version:issue??(embedded?"Moteur intégré · Ta ROM est nécessaire":ready?"APK vérifié · Installation à confirmer":TransferLabel(state));
+        _info.Text=port.Project+" · "+(embedded&&!rom?"Intégration expérimentale · partie non testée":port.Status);
+        _nativeNotes.Text=rom?"Moteur intégré à DecompShelf. Choisis ta propre ROM Super Mario 64 US ou japonaise au format .z64 ; aucun APK de jeu à installer.":embedded?"Moteur hébergé dans DecompShelf. Au premier démarrage, importe les fichiers de ta propre copie du jeu.\n"+port.Notes:port.Notes;_nativeNotes.IsVisible=true;
+        _availability.Text=issue??(installed?"Moteur prêt · "+port.Version:rom?"Moteur intégré · Ta ROM est nécessaire":ready?"Moteur vérifié · Préparation nécessaire":TransferLabel(state));
         _availability.Foreground=installed?Brushes.LightGreen:Brushes.LightGray;
         if(embedded&&_nativePreparation is not null)_availability.Text="Préparation dans DecompShelf…";
-        _play.IsVisible=installed;
-        _download.IsVisible=_nativePreparation is null&&issue is null&&(!installed||native.IsUpdateAvailable(port.Id));
-        _download.Content=ActionLabel(embedded?"＋":ready?"＋":"↓",embedded?"Choisir ma ROM Super Mario 64":ready?"Installer l’APK":state is RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying
+        if(updating)_availability.Text="Mise à jour du moteur disponible · "+port.Version;
+        if(preparing)_availability.Text="Mise à jour du moteur dans DecompShelf…";
+        _play.IsVisible=installed&&issue is null;
+        _download.IsVisible=_nativePreparation is null&&!preparing&&issue is null&&(!installed||updating);
+        _download.Content=ActionLabel(rom?"＋":ready?"＋":"↓",rom?"Choisir ma ROM Super Mario 64":ready?embedded?"Préparer dans DecompShelf":"Installer l’APK":state is RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying
             ?"Voir le téléchargement":installed?"Mettre à jour le port":"Télécharger le port");
-        _unavailableAction.IsVisible=!installed&&issue is not null;_unavailableAction.Text=issue??"Port indisponible";
+        if(updating&&!preparing&&state is not (RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying))
+            _download.Content=ActionLabel(ready?"＋":"↓",ready?"Mettre à jour dans DecompShelf":"Télécharger la mise à jour du moteur");
+        _unavailableAction.IsVisible=issue is not null;_unavailableAction.Text=issue??"Port indisponible";
         _onlinePanel.IsVisible=false;_join.IsEnabled=false;
         ToolTip.SetTip(_download,_nativeNotes.Text);UpdateInputHint();
-        Avalonia.Automation.AutomationProperties.SetName(_download,embedded?"Préparer Super Mario 64 dans DecompShelf":"Installer "+port.Title);
+        Avalonia.Automation.AutomationProperties.SetName(_download,embedded?"Préparer "+port.Title+" dans DecompShelf":"Installer "+port.Title);
     }
     private async Task PrepareSelectedPortAsync()
     {
@@ -108,7 +118,11 @@ public sealed partial class MobileLibraryView
             var ready=native.IsPackageReady(port.Id);
             var message=await native.PrepareAsync(port.Id,preparation.Token);
             SetStatus(message);
-            if(!embedded&&!ready)ShowDownloads();
+            if(!ready&&(!embedded||port.Id!="n64-sm64"))
+            {
+                // The download remains in the queue after this short preparation request.
+                _nativePreparation=null;ShowDownloads();
+            }
         }
         catch(OperationCanceledException) {SetStatus("Préparation annulée. Tes sauvegardes sont conservées.");}
         catch(Exception error) {SetStatus(error.Message);}

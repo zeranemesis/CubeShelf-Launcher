@@ -93,6 +93,7 @@ public sealed partial class MainWindow : Window
         InitializePhase6Parity();
         InitializePhase7Finalization();
         InitializeBigPicture();
+        InitializeLibraryPresentation();
         RefreshMaintenanceLabels();
         PlatformStatus.Text = OperatingSystem.IsWindows()
             ? "Plateforme détectée : Windows"

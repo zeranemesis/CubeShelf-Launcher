@@ -15,7 +15,7 @@ public sealed partial class MobileLibraryView
     };
     private readonly TextBlock _emptyLibrary=new()
     {
-        Text="Ta bibliothèque est vide.\nInstalle un port Android ou prépare ton jeu depuis le catalogue.",
+        Text="Ta bibliothèque est vide.\nPrépare ton jeu depuis le catalogue.",
         FontSize=19,TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center,
         HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,
         MaxWidth=400,Margin=new Thickness(24),IsVisible=false
@@ -26,7 +26,7 @@ public sealed partial class MobileLibraryView
         if(!_personalLibrary)return game.ShelfConsole==_activeConsole;
         if(game.Id==PartyBoardId)return _games.IsInstalled();
         var native=_games.NativePorts;
-        return native is not null&&(native.IsInstalled(game.Id)||!native.IsEmbedded(game.Id)&&native.IsPackageReady(game.Id));
+        return native is not null&&native.IsAdded(game.Id);
     }).ToArray();
 
     public void OpenPersonalLibrary() => ShowPersonalLibrary(true);
@@ -34,6 +34,8 @@ public sealed partial class MobileLibraryView
     private void ShowPersonalLibrary(bool personal)
     {
         if(!_realized||_launching||_nativePreparation is not null)return;
+        CloseGameOptions(false);
+        _dualPlatforms=false;_dualDetail=false;
         _personalLibrary=personal;
         _consolePicker.IsDropDownOpen=false;
         _platformHome.IsVisible=false;

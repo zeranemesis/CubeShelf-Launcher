@@ -29,6 +29,7 @@ public sealed partial class MainWindow
         ModsList.SelectionChanged += Phase6ModSelectionChanged;
         Dispatcher.UIThread.Post(RefreshStoragePhase6, DispatcherPriority.Background);
         _ = Phase6UpdatePopupLoopAsync(_phase6Lifetime.Token);
+        _ = CheckInstalledNativeUpdatesAsync(_phase6Lifetime.Token);
     }
 
     private void DisposePhase6Parity()

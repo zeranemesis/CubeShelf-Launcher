@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 
 namespace CubeShelf.Mobile;
 
-/// <summary>Resumable, pinned APK transfer; Android alone performs application installation.</summary>
+/// <summary>Resumable, pinned engine-package transfer; executable hosting is prepared separately.</summary>
 public sealed class NativeApkDownload : IRuntimeDownloads
 {
     private readonly MobileNativePort _port;
@@ -75,6 +75,7 @@ public sealed class NativeApkDownload : IRuntimeDownloads
         try
         {
             var offset=PartialLength();if(offset>_port.Size) {File.Delete(_partial);offset=0;}
+            CubeShelf.Core.Storage.DiskSpaceGuard.Require(Path.GetDirectoryName(ApkFile)!,Math.Max(0,_port.Size-offset)+_port.ApkSize);
             if(offset<_port.Size)
             {
                 using var request=new HttpRequestMessage(HttpMethod.Get,_port.Url);

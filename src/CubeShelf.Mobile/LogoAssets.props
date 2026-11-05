@@ -1,0 +1,36 @@
+<Project>
+  <ItemGroup>
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/16cdd370-4448-41c5-8219-591e2985bb60.png" Link="Assets/Logos/Database/16cdd370-4448-41c5-8219-591e2985bb60.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/178ed6b5-6b19-422a-9aee-dfb7a9f2be0b.png" Link="Assets/Logos/Database/178ed6b5-6b19-422a-9aee-dfb7a9f2be0b.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/1c4810ab-0275-40d7-9d58-ab849f6d434c.png" Link="Assets/Logos/Database/1c4810ab-0275-40d7-9d58-ab849f6d434c.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/2dc1c145-efa4-4e37-ba4e-75c401db9212.png" Link="Assets/Logos/Database/2dc1c145-efa4-4e37-ba4e-75c401db9212.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/3f804f61-c03c-48db-b82c-76794eb49e12.png" Link="Assets/Logos/Database/3f804f61-c03c-48db-b82c-76794eb49e12.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/43eb9ec4-81ea-4e62-a835-1d7c09ab960b.png" Link="Assets/Logos/Database/43eb9ec4-81ea-4e62-a835-1d7c09ab960b.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/4a10749a-17b8-45e0-b003-1dcec42bf6a9.png" Link="Assets/Logos/Database/4a10749a-17b8-45e0-b003-1dcec42bf6a9.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/5c148e0b-4e34-4f50-9267-d2a62676b09d.png" Link="Assets/Logos/Database/5c148e0b-4e34-4f50-9267-d2a62676b09d.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/6c55de9e-a6f2-4321-995c-ed90490bc8b5.png" Link="Assets/Logos/Database/6c55de9e-a6f2-4321-995c-ed90490bc8b5.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/700a82c7-38f9-4166-a4e7-b7263b915762.png" Link="Assets/Logos/Database/700a82c7-38f9-4166-a4e7-b7263b915762.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/70ec21e1-d1bd-4f75-b55a-14a7b52a3c3c.png" Link="Assets/Logos/Database/70ec21e1-d1bd-4f75-b55a-14a7b52a3c3c.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/71ba184d-429f-468c-969f-0b2c68043e8f.png" Link="Assets/Logos/Database/71ba184d-429f-468c-969f-0b2c68043e8f.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/7600bf4c-904b-4fab-b066-dd7b3aa41b16.png" Link="Assets/Logos/Database/7600bf4c-904b-4fab-b066-dd7b3aa41b16.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/78986a5f-d8d8-4e37-9d2e-36b46e91d81f.png" Link="Assets/Logos/Database/78986a5f-d8d8-4e37-9d2e-36b46e91d81f.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/7fb01499-6790-457c-a7f2-095df784ec8b.png" Link="Assets/Logos/Database/7fb01499-6790-457c-a7f2-095df784ec8b.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/7ff416ac-7f49-4c82-98ad-205606cc1693.png" Link="Assets/Logos/Database/7ff416ac-7f49-4c82-98ad-205606cc1693.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/8d8a03f9-cbab-475a-9a8e-0062603b5336.png" Link="Assets/Logos/Database/8d8a03f9-cbab-475a-9a8e-0062603b5336.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/94a44033-a395-4c37-ac95-c4c18d70b0a1.png" Link="Assets/Logos/Database/94a44033-a395-4c37-ac95-c4c18d70b0a1.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/a56687ac-dd46-4f8d-9e6a-6617b64a8aba.png" Link="Assets/Logos/Database/a56687ac-dd46-4f8d-9e6a-6617b64a8aba.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/a865a58b-faf7-42e6-b0f5-be8e3837b3b0.png" Link="Assets/Logos/Database/a865a58b-faf7-42e6-b0f5-be8e3837b3b0.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/ac9441f0-afce-4243-9a33-102e240b58c1.png" Link="Assets/Logos/Database/ac9441f0-afce-4243-9a33-102e240b58c1.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/b1f8e018-d5aa-4535-8452-21899a529784.png" Link="Assets/Logos/Database/b1f8e018-d5aa-4535-8452-21899a529784.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/d9219d94-9050-402c-a03d-6bea43258cc5.png" Link="Assets/Logos/Database/d9219d94-9050-402c-a03d-6bea43258cc5.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/ee4c7a09-0c11-4719-8f16-d1bbc1206d60.png" Link="Assets/Logos/Database/ee4c7a09-0c11-4719-8f16-d1bbc1206d60.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/f5d37c8b-60cc-45c1-b459-27055dbe98e7.png" Link="Assets/Logos/Database/f5d37c8b-60cc-45c1-b459-27055dbe98e7.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/fad9439a-42b6-4e7c-9080-e50bc4a26ea4.png" Link="Assets/Logos/Database/fad9439a-42b6-4e7c-9080-e50bc4a26ea4.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/fb69715f-bc63-4a7a-af2b-32040e89cc95.png" Link="Assets/Logos/Database/fb69715f-bc63-4a7a-af2b-32040e89cc95.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/fdb6e3af-4a4f-4c89-a04f-e6eeef54376a.png" Link="Assets/Logos/Database/fdb6e3af-4a4f-4c89-a04f-e6eeef54376a.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_28a9b045-607d-42cb-a68d-ee6516c95f72.png" Link="Assets/Logos/Database/r2_28a9b045-607d-42cb-a68d-ee6516c95f72.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_78b5ccca-a898-4108-81f7-b623b0c5a094.png" Link="Assets/Logos/Database/r2_78b5ccca-a898-4108-81f7-b623b0c5a094.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" Link="Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" Link="Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" />
+  </ItemGroup>
+</Project>

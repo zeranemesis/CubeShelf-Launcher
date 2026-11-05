@@ -11,7 +11,7 @@ public sealed class ModLoadoutStore
     private readonly string _file;
     public ModLoadoutStore(string configurationDirectory, string libraryId)
     {
-        if (string.IsNullOrWhiteSpace(libraryId) || libraryId.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not '-' and not '_'))
+        if (!PortableModState.IsValidGameId(libraryId))
             throw new ArgumentException("Invalid mod library.", nameof(libraryId));
         _file = Path.Combine(configurationDirectory, "mod-profiles", libraryId + ".json");
     }

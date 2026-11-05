@@ -776,5 +776,33 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "ps2-zoe",
+    "Title": "Zone of the Enders",
+    "Project": "ZOE-Recompiled",
+    "Repository": "Yaz-Myst/ZOE-Recompiled",
+    "Method": "Décompilation / recompilation statique native (déclaration amont)",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf. Version précoce exigeant un processeur puissant ; navigation au clavier requise dans certains menus.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "fe89dd65c82a4b669b5034279263cd0636746d91",
+    "ReadmeUrl": "https://github.com/Yaz-Myst/ZOE-Recompiled/blob/fe89dd65c82a4b669b5034279263cd0636746d91/README.md",
+    "ReleaseUrl": "https://github.com/Yaz-Myst/ZOE-Recompiled/releases/tag/v1.0.1",
+    "ReleaseTag": "v1.0.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ZOE-Recompiled-v1.0.1-win64.zip",
+        "Url": "https://github.com/Yaz-Myst/ZOE-Recompiled/releases/download/v1.0.1/ZOE-Recompiled-v1.0.1-win64.zip",
+        "Size": 42497734,
+        "Sha256": "451ed0c8a4a1c21529d2ba22276a82aabfa49726e74352c72e9a3c26c9c7f19b",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

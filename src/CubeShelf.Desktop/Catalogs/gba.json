@@ -517,5 +517,61 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "gba-minishcap",
+    "Title": "The Legend of Zelda: The Minish Cap",
+    "Project": "tmc",
+    "Repository": "999sian/tmc",
+    "Method": "Décompilation / recompilation statique native (déclaration amont)",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "d377558d973c648e8d0dc491bf99af9aaa0d8067",
+    "ReadmeUrl": "https://github.com/999sian/tmc/blob/d377558d973c648e8d0dc491bf99af9aaa0d8067/README.md",
+    "ReleaseUrl": "https://github.com/999sian/tmc/releases/tag/v0.9.6",
+    "ReleaseTag": "v0.9.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "tmc-multi-windows-x86_64-v0.9.6.tar.gz",
+        "Url": "https://github.com/999sian/tmc/releases/download/v0.9.6/tmc-multi-windows-x86_64-v0.9.6.tar.gz",
+        "Size": 26500874,
+        "Sha256": "5e30fc0068b827a5fe526f744438ec729c297d9315b1c4254d8db79ba7197498",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "gba-rekhcom",
+    "Title": "Kingdom Hearts: Chain of Memories",
+    "Project": "ReKHCoM",
+    "Repository": "MatyMeatBoy/ReKHCoM",
+    "Method": "Décompilation / recompilation statique native (déclaration amont)",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "315db1e45cbfacb54c1786786917045c0100b2eb",
+    "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/315db1e45cbfacb54c1786786917045c0100b2eb/README.md",
+    "ReleaseUrl": "https://github.com/MatyMeatBoy/ReKHCoM/releases/tag/v2.8",
+    "ReleaseTag": "v2.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ReKHCoM-v2.8-windows-x86-x64.zip",
+        "Url": "https://github.com/MatyMeatBoy/ReKHCoM/releases/download/v2.8/ReKHCoM-v2.8-windows-x86-x64.zip",
+        "Size": 81310336,
+        "Sha256": "a7bd67bb29c9f9c1c569ff134cd6804e9c4911a03b19b1b113d86125a0957827",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Platform;
+using CubeShelf.Core.Updates;
 
 namespace CubeShelf.Desktop;
 
@@ -27,14 +28,22 @@ public sealed class NativePortsWindow : Window
         _configure = Button("Associer le programme"), _cancel = Button("Annuler"), _folder = Button("Ouvrir les fichiers"),
         _releases = Button("Versions officielles"), _source = Button("Projet et instructions"), _macApp = Button("Associer une application .app");
     private readonly ProgressBar _progress = new() { Minimum = 0, Maximum = 100, Height = 6, IsVisible = false };
+    private readonly Button _checkUpdates=Button("Rechercher une mise à jour"),_rollback=Button("Revenir au moteur précédent");
+    private readonly NativePortUpdateService _updates=new();
+    private readonly CancellationTokenSource _lifetime=new();
+    private readonly Func<NativePort,bool> _busy;
+    private bool IsBusy=>_selected is {} port&&_busy(port);
+    private bool _checking;
+    private NativePort? _candidate;
     private CancellationTokenSource? _installation;
     private NativePort? _selected;
     private string? _downloadDirectory;
     private readonly StackPanel _details = new() { Spacing = 18, Margin = new Thickness(28), MaxWidth = 850 };
 
-    public NativePortsWindow(ShelfProduct product, string? selectedPortId = null, IPlatformPaths? paths = null)
+    public NativePortsWindow(ShelfProduct product, string? selectedPortId = null, IPlatformPaths? paths = null,Func<NativePort,bool>? busy=null)
     {
         _product = product;
+        _busy=busy??(_=>false);
         paths ??= product.CreatePaths();
         _library = new NativePortLibrary(paths);
         _ports = NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json"));
@@ -63,7 +72,7 @@ public sealed class NativePortsWindow : Window
         _install.Background = accent; _install.Foreground = Brush("#121521");
         _launch.Background = accent; _launch.Foreground = Brush("#121521");
         var actions = new WrapPanel { Orientation = Orientation.Horizontal };
-        foreach (var button in new[] { _install, _cancel, _launch, _configure, _macApp, _folder, _releases, _source }) actions.Children.Add(button);
+        foreach (var button in new[] { _install, _cancel, _launch, _checkUpdates, _rollback, _configure, _macApp, _folder, _releases, _source }) actions.Children.Add(button);
         _details.Children.Add(actions); _details.Children.Add(_progress); _details.Children.Add(_status); _details.Children.Add(_configured);
         var notice = Text(12);
         notice.Text = "Les fichiers de ton jeu se préparent dans le port lui-même, selon ses instructions. Le launcher télécharge uniquement les paquets du projet. La présence d'une release ne garantit pas une partie complète sans bugs.";
@@ -84,6 +93,9 @@ public sealed class NativePortsWindow : Window
         _launch.Click += (_, _) => Run(() => { if (_selected is { } port) { if (LaunchRequested is { } launch) launch(port); else _library.Launch(port); _status.Text = "Programme démarré. La préparation des fichiers se fait dans le port."; } });
         _install.Click += async (_, _) => await InstallAsync();
         _cancel.Click += (_, _) => _installation?.Cancel();
+        _checkUpdates.Click+=async(_,_)=>await CheckUpdatesAsync();
+        _rollback.Click+=(_,_)=>Run(()=>{if(IsBusy)throw new InvalidOperationException("Ferme le jeu avant de changer de moteur.");if(_selected is {} port){_library.Rollback(port);_status.Text="Moteur précédent restauré. Les fichiers des deux versions sont conservés.";RefreshActions();}});
+        Closed+=(_,_)=>{_lifetime.Cancel();_lifetime.Dispose();_updates.Dispose();};
         _folder.Click += (_, _) => Run(() => { if (_downloadDirectory is { } directory) new ProcessLauncher().OpenDirectory(directory); });
         Closing += (_, args) =>
         {
@@ -121,7 +133,7 @@ public sealed class NativePortsWindow : Window
 
     private void Select(NativePort? port)
     {
-        _selected = port; _downloadDirectory = null;
+        _selected = port; _candidate=null; _downloadDirectory = null;
         _details.IsVisible = port is not null;
         if (port is null) return;
         _refreshingPortVersions = true;
@@ -143,12 +155,15 @@ public sealed class NativePortsWindow : Window
 
     private void RefreshActions()
     {
-        var busy = _installation is not null;
+        var busy = _installation is not null||_checking;
         _install.IsVisible = _packages.SelectedItem is NativePortAsset;
-        _install.IsEnabled = !busy; _cancel.IsVisible = busy;
+        _install.IsEnabled = !busy&&!IsBusy; _cancel.IsVisible = _installation is not null;
         _launch.IsEnabled = !busy && _selected is { } port && _library.IsConfigured(port);
         _configure.IsEnabled = _macApp.IsEnabled = _portVersions.IsEnabled = !busy;
         _macApp.IsVisible = OperatingSystem.IsMacOS();
+        _checkUpdates.IsEnabled=!busy&&_selected is not null;
+        _rollback.IsVisible=_selected is {} known&&_library.CanRollback(known);_rollback.IsEnabled=!busy&&!IsBusy;
+        _install.Content=_selected is {} installed&&_library.IsConfigured(installed)?"Installer / mettre à jour ce moteur":"Installer ce paquet";
         _folder.IsVisible = _downloadDirectory is not null;
         _list.IsEnabled = _search.IsEnabled = _compatible.IsEnabled = !busy;
         _configured.Text = _selected is { } selected && _library.Executable(selected) is { } path ? "Programme associé : " + path : "Aucun programme associé.";
@@ -156,19 +171,40 @@ public sealed class NativePortsWindow : Window
 
     private async Task InstallAsync()
     {
-        if (_installation is not null || _selected is not { } port || _packages.SelectedItem is not NativePortAsset asset) return;
+        if (_installation is not null || _checking||IsBusy || (_candidate??_selected) is not { } port || _packages.SelectedItem is not NativePortAsset asset) return;
         using var cancellation = new CancellationTokenSource();
         _installation = cancellation; _progress.IsVisible = true; _progress.Value = 0; RefreshActions();
         _status.Text = "Téléchargement de " + asset.Name + "…";
         try
         {
-            _downloadDirectory = await _library.InstallAsync(port, asset,
+            var result = await _library.InstallManagedAsync(port, asset,
                 new Progress<double>(value => _progress.Value = value * 100), cancellation.Token);
-            _status.Text = "Paquet vérifié et préparé. Associe son programme, puis touche Jouer. Les instructions restent disponibles sur la page du projet.";
+            _downloadDirectory=result.Directory;
+            _status.Text = result.Executable is not null?"Moteur vérifié et associé. Tu peux jouer ; l’ancien moteur et ses fichiers restent disponibles.":
+                "Paquet vérifié. Plusieurs programmes ou un installateur : associe le programme du jeu pour terminer.";
         }
         catch (OperationCanceledException) { _status.Text = "Téléchargement annulé. Tu peux réessayer."; }
         catch (Exception error) { _status.Text = "Installation interrompue : " + error.Message; }
         finally { _installation = null; _progress.IsVisible = false; RefreshActions(); }
+    }
+
+    private async Task CheckUpdatesAsync()
+    {
+        if(_selected is not {} port||_installation is not null||_checking)return;
+        _checking=true;RefreshActions();_status.Text="Recherche de la dernière version officielle…";
+        try
+        {
+            _candidate=await _updates.CheckAsync(port,_lifetime.Token);
+            if(_candidate is null){_packages.ItemsSource=port.Assets.Where(a=>a.MatchesCurrentPlatform).ToArray();_packages.SelectedIndex=0;_status.Text="Aucun paquet stable compatible et vérifiable ne correspond au paquet connu. La version actuelle est conservée.";return;}
+            var installed=_library.Installation(port);
+            if(installed is not null&&_candidate.Assets.Any(a=>a.Sha256.Equals(installed.PackageSha256,StringComparison.OrdinalIgnoreCase)))
+            {_packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;_status.Text="Le moteur installé correspond à la dernière version officielle disponible.";return;}
+            _packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;
+            _status.Text="Version officielle "+_candidate.ReleaseTag+" disponible. Paquet et SHA-256 publiés par le projet ; jouabilité de cette nouvelle version non testée dans DecompShelf.";
+        }
+        catch(OperationCanceledException){}
+        catch(Exception error){_status.Text="Vérification indisponible : "+error.Message;}
+        finally{_checking=false;RefreshActions();}
     }
 
     private async Task ConfigureAsync(bool applicationFolder)

@@ -2944,5 +2944,33 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "n64-battleship",
+    "Title": "Super Smash Bros.",
+    "Project": "BattleShip",
+    "Repository": "JRickey/BattleShip",
+    "Method": "Décompilation / recompilation statique native (déclaration amont)",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "af1f61bf7e4b919348e7f28b7ddaea08b1f8144c",
+    "ReadmeUrl": "https://github.com/JRickey/BattleShip/blob/af1f61bf7e4b919348e7f28b7ddaea08b1f8144c/README.md",
+    "ReleaseUrl": "https://github.com/JRickey/BattleShip/releases/tag/v1.6",
+    "ReleaseTag": "v1.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BattleShip-windows.zip",
+        "Url": "https://github.com/JRickey/BattleShip/releases/download/v1.6/BattleShip-windows.zip",
+        "Size": 8818427,
+        "Sha256": "a0c2ef997e7f561dc02da19b0e1134ecb9bfaac1d577d65ff04db3c7e27eadb4",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

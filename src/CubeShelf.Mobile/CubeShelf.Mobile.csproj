@@ -18,9 +18,18 @@
     <Compile Include="../CubeShelf.Desktop/Controls/GameCaseControl.Gpu.cs" Link="Controls/GameCaseControl.Gpu.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/CoverBitmapCache.cs" Link="Controls/CoverBitmapCache.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameShelfControl.cs" Link="Controls/GameShelfControl.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/GameStorageView.cs" Link="Controls/GameStorageView.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/GameStorageView.Inventory.cs" Link="Controls/GameStorageView.Inventory.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/DemandAnimation.cs" Link="Controls/DemandAnimation.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameLaunchTransition.cs" Link="Controls/GameLaunchTransition.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameTitleControl.cs" Link="Controls/GameTitleControl.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/DualScreenLibraryView.cs" Link="Controls/DualScreenLibraryView.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/DualScreenLibraryView.Displays.cs" Link="Controls/DualScreenLibraryView.Displays.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/HomeMenuBackdrop.cs" Link="Controls/HomeMenuBackdrop.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/HomeArtworkControl.cs" Link="Controls/HomeArtworkControl.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/RetroAchievementsButton.cs" Link="Controls/RetroAchievementsButton.cs" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Home/**/*" Link="Assets/Home/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Sounds/home-*.wav" Link="Assets/Sounds/%(Filename)%(Extension)" />
     <Compile Include="../CubeShelf.Desktop/Controls/ConsoleBrandMark.cs" Link="Controls/ConsoleBrandMark.cs" />
     <AvaloniaResource Include="Assets/Covers/**/*" />
     <AvaloniaResource Include="Catalogs/*.json" />
@@ -28,6 +37,8 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/Consoles/*.png" Link="Assets/Brand/Consoles/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/Consoles/*.gif" Link="Assets/Brand/Consoles/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/*.png" Link="Assets/Logos/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/catalog.json" Link="Assets/Logos/catalog.json" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/CREDITS.md" Link="Assets/Logos/CREDITS.md" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Models/Jaquette_GameCube_3D_vierge.glb" Link="Assets/Models/Jaquette_GameCube_3D_vierge.glb" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Common/**/*" Link="Assets/Covers/Common/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Media/gamecube-GMPE01.png" Link="Assets/Covers/Media/gamecube-GMPE01.png" />
@@ -39,4 +50,5 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/SuperMarioSunshine/**/*" Link="Assets/Covers/SuperMarioSunshine/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/games.json" Link="games.json" />
   </ItemGroup>
+  <Import Project="LogoAssets.props" />
 </Project>

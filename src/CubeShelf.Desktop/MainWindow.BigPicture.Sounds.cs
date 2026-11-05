@@ -22,6 +22,7 @@ public sealed partial class MainWindow
     private void PlayBigPictureSound(bool launching = false)
     {
         if (!_bigPictureActive || _bigPictureClosed || !_preferences.BigPictureSounds || _loadingSettings) return;
+        if(_presentation?.IsDual==true)return;
         if (launching) _bigPictureSounds.Launch();
         else if (!LaunchTransition.IsVisible) _bigPictureSounds.Click();
     }

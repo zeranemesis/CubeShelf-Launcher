@@ -4,6 +4,12 @@ public static class DiskSpaceGuard
 {
     public static void Require(string destination, long bytes)
     {
+        var available=AvailableBytes(destination);
+        if (available is { } free && free < Math.Max(0, bytes) + 16L * 1024 * 1024)
+            throw new IOException($"Espace disque insuffisant : {Math.Max(0, bytes) / 1048576d:F0} Mo requis, {free / 1048576d:F0} Mo disponibles (hors marge de sécurité).");
+    }
+    public static long? AvailableBytes(string destination)
+    {
         long? available = null;
         try
         {
@@ -20,7 +26,6 @@ public static class DiskSpaceGuard
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException) { }
         // An unmeasurable network/mounted volume remains usable; actual I/O errors
         // still surface normally. Never confuse an unavailable measurement with zero.
-        if (available is { } free && free < Math.Max(0, bytes) + 16L * 1024 * 1024)
-            throw new IOException($"Espace disque insuffisant : {Math.Max(0, bytes) / 1048576d:F0} Mo requis, {free / 1048576d:F0} Mo disponibles (hors marge de sécurité).");
+        return available;
     }
 }

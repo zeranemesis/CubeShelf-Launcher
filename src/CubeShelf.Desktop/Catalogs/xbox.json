@@ -1705,5 +1705,33 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "xbox-conker-reloaded",
+    "Title": "Conker: Live & Reloaded",
+    "Project": "Conker-Recomped-and-Reloaded",
+    "Repository": "Mabec-games/Conker-Recomped-and-Reloaded",
+    "Method": "Décompilation / recompilation statique native (déclaration amont)",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "99b37dfdcfa05226212cff0559023deaa5a4e394",
+    "ReadmeUrl": "https://github.com/Mabec-games/Conker-Recomped-and-Reloaded/blob/99b37dfdcfa05226212cff0559023deaa5a4e394/README.md",
+    "ReleaseUrl": "https://github.com/Mabec-games/Conker-Recomped-and-Reloaded/releases/tag/v1.4",
+    "ReleaseTag": "v1.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ConkerRecompedReloaded-windows-x64.zip",
+        "Url": "https://github.com/Mabec-games/Conker-Recomped-and-Reloaded/releases/download/v1.4/ConkerRecompedReloaded-windows-x64.zip",
+        "Size": 132916902,
+        "Sha256": "842d6bb659857b648855e373c03491e49e836004063de6c75d900fc7d532f957",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

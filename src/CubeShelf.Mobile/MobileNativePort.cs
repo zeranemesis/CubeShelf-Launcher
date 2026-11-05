@@ -67,11 +67,14 @@ public sealed class MobileNativePort
 
 public interface IMobileNativePorts
 {
+    event Action? Changed {add{} remove{}}
+    bool IsPreparing(string id)=>false;
     IReadOnlyList<MobileNativePort> Catalog { get; }
     bool IsInstalled(string id);
     bool IsUpdateAvailable(string id);
     bool IsPackageReady(string id);
     bool IsEmbedded(string id) => false;
+    bool IsAdded(string id) => IsInstalled(id) || id!="n64-sm64" && IsPackageReady(id);
     string? CompatibilityError(string id);
     Task<string> PrepareAsync(string id, CancellationToken cancellation = default);
     void Launch(string id);

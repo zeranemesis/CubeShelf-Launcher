@@ -1,0 +1,693 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-03T10:07:24.805Z",
+  "title": "Design System: DecompShelf",
+  "extensions": {
+    "colorMeta": {
+      "classic-dark-bg": {
+        "role": "neutral",
+        "displayName": "classic dark bg",
+        "canonical": "#050811",
+        "tonalRamp": [
+          "oklch(15% 0.0080 265.99)",
+          "oklch(26% 0.0139 265.99)",
+          "oklch(38% 0.0203 265.99)",
+          "oklch(50% 0.0214 265.99)",
+          "oklch(62% 0.0214 265.99)",
+          "oklch(74% 0.0214 265.99)",
+          "oklch(86% 0.0150 265.99)",
+          "oklch(95% 0.0053 265.99)"
+        ]
+      },
+      "classic-dark-sidebar": {
+        "role": "neutral",
+        "displayName": "classic dark sidebar",
+        "canonical": "#090E19",
+        "tonalRamp": [
+          "oklch(15% 0.0093 265.00)",
+          "oklch(26% 0.0161 265.00)",
+          "oklch(38% 0.0235 265.00)",
+          "oklch(50% 0.0247 265.00)",
+          "oklch(62% 0.0247 265.00)",
+          "oklch(74% 0.0247 265.00)",
+          "oklch(86% 0.0173 265.00)",
+          "oklch(95% 0.0062 265.00)"
+        ]
+      },
+      "classic-dark-panel": {
+        "role": "neutral",
+        "displayName": "classic dark panel",
+        "canonical": "#111827",
+        "tonalRamp": [
+          "oklch(15% 0.0119 264.66)",
+          "oklch(26% 0.0206 264.66)",
+          "oklch(38% 0.0302 264.66)",
+          "oklch(50% 0.0318 264.66)",
+          "oklch(62% 0.0318 264.66)",
+          "oklch(74% 0.0318 264.66)",
+          "oklch(86% 0.0222 264.66)",
+          "oklch(95% 0.0079 264.66)"
+        ]
+      },
+      "classic-dark-panel2": {
+        "role": "neutral",
+        "displayName": "classic dark panel2",
+        "canonical": "#1A2538",
+        "tonalRamp": [
+          "oklch(15% 0.0147 260.98)",
+          "oklch(26% 0.0254 260.98)",
+          "oklch(38% 0.0371 260.98)",
+          "oklch(50% 0.0391 260.98)",
+          "oklch(62% 0.0391 260.98)",
+          "oklch(74% 0.0391 260.98)",
+          "oklch(86% 0.0274 260.98)",
+          "oklch(95% 0.0098 260.98)"
+        ]
+      },
+      "classic-dark-border": {
+        "role": "neutral",
+        "displayName": "classic dark border",
+        "canonical": "#3B4B69",
+        "tonalRamp": [
+          "oklch(15% 0.0205 262.57)",
+          "oklch(26% 0.0355 262.57)",
+          "oklch(38% 0.0519 262.57)",
+          "oklch(50% 0.0546 262.57)",
+          "oklch(62% 0.0546 262.57)",
+          "oklch(74% 0.0546 262.57)",
+          "oklch(86% 0.0382 262.57)",
+          "oklch(95% 0.0136 262.57)"
+        ]
+      },
+      "classic-dark-text": {
+        "role": "neutral",
+        "displayName": "classic dark text",
+        "canonical": "#F8FAFF",
+        "tonalRamp": [
+          "oklch(15% 0.0026 268.55)",
+          "oklch(26% 0.0045 268.55)",
+          "oklch(38% 0.0066 268.55)",
+          "oklch(50% 0.0070 268.55)",
+          "oklch(62% 0.0070 268.55)",
+          "oklch(74% 0.0070 268.55)",
+          "oklch(86% 0.0049 268.55)",
+          "oklch(95% 0.0017 268.55)"
+        ]
+      },
+      "classic-dark-muted": {
+        "role": "neutral",
+        "displayName": "classic dark muted",
+        "canonical": "#B7C3DA",
+        "tonalRamp": [
+          "oklch(15% 0.0131 263.54)",
+          "oklch(26% 0.0228 263.54)",
+          "oklch(38% 0.0333 263.54)",
+          "oklch(50% 0.0350 263.54)",
+          "oklch(62% 0.0350 263.54)",
+          "oklch(74% 0.0350 263.54)",
+          "oklch(86% 0.0245 263.54)",
+          "oklch(95% 0.0088 263.54)"
+        ]
+      },
+      "classic-dark-input": {
+        "role": "neutral",
+        "displayName": "classic dark input",
+        "canonical": "#172235",
+        "tonalRamp": [
+          "oklch(15% 0.0148 260.94)",
+          "oklch(26% 0.0257 260.94)",
+          "oklch(38% 0.0375 260.94)",
+          "oklch(50% 0.0395 260.94)",
+          "oklch(62% 0.0395 260.94)",
+          "oklch(74% 0.0395 260.94)",
+          "oklch(86% 0.0277 260.94)",
+          "oklch(95% 0.0099 260.94)"
+        ]
+      },
+      "classic-dark-hover": {
+        "role": "neutral",
+        "displayName": "classic dark hover",
+        "canonical": "#2A3852",
+        "tonalRamp": [
+          "oklch(15% 0.0186 262.30)",
+          "oklch(26% 0.0323 262.30)",
+          "oklch(38% 0.0472 262.30)",
+          "oklch(50% 0.0497 262.30)",
+          "oklch(62% 0.0497 262.30)",
+          "oklch(74% 0.0497 262.30)",
+          "oklch(86% 0.0348 262.30)",
+          "oklch(95% 0.0124 262.30)"
+        ]
+      },
+      "classic-dark-accent": {
+        "role": "primary",
+        "displayName": "classic dark accent",
+        "canonical": "#8A76FF",
+        "tonalRamp": [
+          "oklch(15% 0.0734 286.30)",
+          "oklch(26% 0.1273 286.30)",
+          "oklch(38% 0.1860 286.30)",
+          "oklch(50% 0.1958 286.30)",
+          "oklch(62% 0.1958 286.30)",
+          "oklch(74% 0.1958 286.30)",
+          "oklch(86% 0.1371 286.30)",
+          "oklch(95% 0.0490 286.30)"
+        ]
+      },
+      "classic-dark-accent2": {
+        "role": "primary",
+        "displayName": "classic dark accent2",
+        "canonical": "#A895FF",
+        "tonalRamp": [
+          "oklch(15% 0.0566 290.39)",
+          "oklch(26% 0.0981 290.39)",
+          "oklch(38% 0.1434 290.39)",
+          "oklch(50% 0.1510 290.39)",
+          "oklch(62% 0.1510 290.39)",
+          "oklch(74% 0.1510 290.39)",
+          "oklch(86% 0.1057 290.39)",
+          "oklch(95% 0.0377 290.39)"
+        ]
+      },
+      "classic-dark-danger": {
+        "role": "neutral",
+        "displayName": "classic dark danger",
+        "canonical": "#F05A78",
+        "tonalRamp": [
+          "oklch(15% 0.0693 11.53)",
+          "oklch(26% 0.1202 11.53)",
+          "oklch(38% 0.1756 11.53)",
+          "oklch(50% 0.1849 11.53)",
+          "oklch(62% 0.1849 11.53)",
+          "oklch(74% 0.1849 11.53)",
+          "oklch(86% 0.1294 11.53)",
+          "oklch(95% 0.0462 11.53)"
+        ]
+      },
+      "classic-dark-success": {
+        "role": "neutral",
+        "displayName": "classic dark success",
+        "canonical": "#5DE09A",
+        "tonalRamp": [
+          "oklch(15% 0.0575 156.94)",
+          "oklch(26% 0.0997 156.94)",
+          "oklch(38% 0.1458 156.94)",
+          "oklch(50% 0.1534 156.94)",
+          "oklch(62% 0.1534 156.94)",
+          "oklch(74% 0.1534 156.94)",
+          "oklch(86% 0.1074 156.94)",
+          "oklch(95% 0.0384 156.94)"
+        ]
+      },
+      "classic-dark-warning": {
+        "role": "neutral",
+        "displayName": "classic dark warning",
+        "canonical": "#F2B45F",
+        "tonalRamp": [
+          "oklch(15% 0.0468 73.08)",
+          "oklch(26% 0.0812 73.08)",
+          "oklch(38% 0.1186 73.08)",
+          "oklch(50% 0.1248 73.08)",
+          "oklch(62% 0.1248 73.08)",
+          "oklch(74% 0.1248 73.08)",
+          "oklch(86% 0.0874 73.08)",
+          "oklch(95% 0.0312 73.08)"
+        ]
+      },
+      "classic-light-bg": {
+        "role": "neutral",
+        "displayName": "classic light bg",
+        "canonical": "#F2F4F9",
+        "tonalRamp": [
+          "oklch(15% 0.0026 268.55)",
+          "oklch(26% 0.0046 268.55)",
+          "oklch(38% 0.0067 268.55)",
+          "oklch(50% 0.0070 268.55)",
+          "oklch(62% 0.0070 268.55)",
+          "oklch(74% 0.0070 268.55)",
+          "oklch(86% 0.0049 268.55)",
+          "oklch(95% 0.0018 268.55)"
+        ]
+      },
+      "classic-light-sidebar": {
+        "role": "neutral",
+        "displayName": "classic light sidebar",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(50% 0.0000 89.88)",
+          "oklch(62% 0.0000 89.88)",
+          "oklch(74% 0.0000 89.88)",
+          "oklch(86% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "classic-light-panel": {
+        "role": "neutral",
+        "displayName": "classic light panel",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(50% 0.0000 89.88)",
+          "oklch(62% 0.0000 89.88)",
+          "oklch(74% 0.0000 89.88)",
+          "oklch(86% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "classic-light-panel2": {
+        "role": "neutral",
+        "displayName": "classic light panel2",
+        "canonical": "#F8F9FC",
+        "tonalRamp": [
+          "oklch(15% 0.0015 271.37)",
+          "oklch(26% 0.0027 271.37)",
+          "oklch(38% 0.0039 271.37)",
+          "oklch(50% 0.0041 271.37)",
+          "oklch(62% 0.0041 271.37)",
+          "oklch(74% 0.0041 271.37)",
+          "oklch(86% 0.0029 271.37)",
+          "oklch(95% 0.0010 271.37)"
+        ]
+      },
+      "classic-light-border": {
+        "role": "neutral",
+        "displayName": "classic light border",
+        "canonical": "#D8DEEA",
+        "tonalRamp": [
+          "oklch(15% 0.0066 264.48)",
+          "oklch(26% 0.0115 264.48)",
+          "oklch(38% 0.0168 264.48)",
+          "oklch(50% 0.0176 264.48)",
+          "oklch(62% 0.0176 264.48)",
+          "oklch(74% 0.0176 264.48)",
+          "oklch(86% 0.0123 264.48)",
+          "oklch(95% 0.0044 264.48)"
+        ]
+      },
+      "classic-light-text": {
+        "role": "neutral",
+        "displayName": "classic light text",
+        "canonical": "#151927",
+        "tonalRamp": [
+          "oklch(15% 0.0106 271.62)",
+          "oklch(26% 0.0184 271.62)",
+          "oklch(38% 0.0269 271.62)",
+          "oklch(50% 0.0283 271.62)",
+          "oklch(62% 0.0283 271.62)",
+          "oklch(74% 0.0283 271.62)",
+          "oklch(86% 0.0198 271.62)",
+          "oklch(95% 0.0071 271.62)"
+        ]
+      },
+      "classic-light-muted": {
+        "role": "neutral",
+        "displayName": "classic light muted",
+        "canonical": "#66718B",
+        "tonalRamp": [
+          "oklch(15% 0.0160 267.01)",
+          "oklch(26% 0.0278 267.01)",
+          "oklch(38% 0.0406 267.01)",
+          "oklch(50% 0.0428 267.01)",
+          "oklch(62% 0.0428 267.01)",
+          "oklch(74% 0.0428 267.01)",
+          "oklch(86% 0.0299 267.01)",
+          "oklch(95% 0.0107 267.01)"
+        ]
+      },
+      "classic-light-input": {
+        "role": "neutral",
+        "displayName": "classic light input",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(50% 0.0000 89.88)",
+          "oklch(62% 0.0000 89.88)",
+          "oklch(74% 0.0000 89.88)",
+          "oklch(86% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "classic-light-hover": {
+        "role": "neutral",
+        "displayName": "classic light hover",
+        "canonical": "#E9EDFA",
+        "tonalRamp": [
+          "oklch(15% 0.0068 272.31)",
+          "oklch(26% 0.0117 272.31)",
+          "oklch(38% 0.0171 272.31)",
+          "oklch(50% 0.0180 272.31)",
+          "oklch(62% 0.0180 272.31)",
+          "oklch(74% 0.0180 272.31)",
+          "oklch(86% 0.0126 272.31)",
+          "oklch(95% 0.0045 272.31)"
+        ]
+      },
+      "classic-light-accent": {
+        "role": "primary",
+        "displayName": "classic light accent",
+        "canonical": "#6347EE",
+        "tonalRamp": [
+          "oklch(15% 0.0885 282.58)",
+          "oklch(26% 0.1534 282.58)",
+          "oklch(38% 0.2243 282.58)",
+          "oklch(50% 0.2361 282.58)",
+          "oklch(62% 0.2361 282.58)",
+          "oklch(74% 0.2361 282.58)",
+          "oklch(86% 0.1653 282.58)",
+          "oklch(95% 0.0590 282.58)"
+        ]
+      },
+      "classic-light-accent2": {
+        "role": "primary",
+        "displayName": "classic light accent2",
+        "canonical": "#7359F0",
+        "tonalRamp": [
+          "oklch(15% 0.0811 285.25)",
+          "oklch(26% 0.1405 285.25)",
+          "oklch(38% 0.2054 285.25)",
+          "oklch(50% 0.2162 285.25)",
+          "oklch(62% 0.2162 285.25)",
+          "oklch(74% 0.2162 285.25)",
+          "oklch(86% 0.1514 285.25)",
+          "oklch(95% 0.0541 285.25)"
+        ]
+      },
+      "classic-light-danger": {
+        "role": "neutral",
+        "displayName": "classic light danger",
+        "canonical": "#D33C5D",
+        "tonalRamp": [
+          "oklch(15% 0.0702 12.54)",
+          "oklch(26% 0.1216 12.54)",
+          "oklch(38% 0.1778 12.54)",
+          "oklch(50% 0.1871 12.54)",
+          "oklch(62% 0.1871 12.54)",
+          "oklch(74% 0.1871 12.54)",
+          "oklch(86% 0.1310 12.54)",
+          "oklch(95% 0.0468 12.54)"
+        ]
+      },
+      "classic-light-success": {
+        "role": "neutral",
+        "displayName": "classic light success",
+        "canonical": "#299E63",
+        "tonalRamp": [
+          "oklch(15% 0.0508 156.14)",
+          "oklch(26% 0.0881 156.14)",
+          "oklch(38% 0.1288 156.14)",
+          "oklch(50% 0.1356 156.14)",
+          "oklch(62% 0.1356 156.14)",
+          "oklch(74% 0.1356 156.14)",
+          "oklch(86% 0.0949 156.14)",
+          "oklch(95% 0.0339 156.14)"
+        ]
+      },
+      "classic-light-warning": {
+        "role": "neutral",
+        "displayName": "classic light warning",
+        "canonical": "#B87416",
+        "tonalRamp": [
+          "oklch(15% 0.0486 67.53)",
+          "oklch(26% 0.0842 67.53)",
+          "oklch(38% 0.1230 67.53)",
+          "oklch(50% 0.1295 67.53)",
+          "oklch(62% 0.1295 67.53)",
+          "oklch(74% 0.1295 67.53)",
+          "oklch(86% 0.0906 67.53)",
+          "oklch(95% 0.0324 67.53)"
+        ]
+      },
+      "dual-light-bg": {
+        "role": "neutral",
+        "displayName": "dual light bg",
+        "canonical": "#E9EDF0",
+        "tonalRamp": [
+          "oklch(15% 0.0022 239.82)",
+          "oklch(26% 0.0038 239.82)",
+          "oklch(38% 0.0056 239.82)",
+          "oklch(50% 0.0059 239.82)",
+          "oklch(62% 0.0059 239.82)",
+          "oklch(74% 0.0059 239.82)",
+          "oklch(86% 0.0041 239.82)",
+          "oklch(95% 0.0015 239.82)"
+        ]
+      },
+      "dual-light-text": {
+        "role": "neutral",
+        "displayName": "dual light text",
+        "canonical": "#202E38",
+        "tonalRamp": [
+          "oklch(15% 0.0099 239.86)",
+          "oklch(26% 0.0171 239.86)",
+          "oklch(38% 0.0250 239.86)",
+          "oklch(50% 0.0263 239.86)",
+          "oklch(62% 0.0263 239.86)",
+          "oklch(74% 0.0263 239.86)",
+          "oklch(86% 0.0184 239.86)",
+          "oklch(95% 0.0066 239.86)"
+        ]
+      },
+      "dual-light-panel": {
+        "role": "neutral",
+        "displayName": "dual light panel",
+        "canonical": "#F8FAFC",
+        "tonalRamp": [
+          "oklch(15% 0.0013 247.86)",
+          "oklch(26% 0.0022 247.86)",
+          "oklch(38% 0.0032 247.86)",
+          "oklch(50% 0.0034 247.86)",
+          "oklch(62% 0.0034 247.86)",
+          "oklch(74% 0.0034 247.86)",
+          "oklch(86% 0.0024 247.86)",
+          "oklch(95% 0.0009 247.86)"
+        ]
+      },
+      "dual-light-border": {
+        "role": "neutral",
+        "displayName": "dual light border",
+        "canonical": "#B9C8D1",
+        "tonalRamp": [
+          "oklch(15% 0.0078 233.92)",
+          "oklch(26% 0.0135 233.92)",
+          "oklch(38% 0.0197 233.92)",
+          "oklch(50% 0.0207 233.92)",
+          "oklch(62% 0.0207 233.92)",
+          "oklch(74% 0.0207 233.92)",
+          "oklch(86% 0.0145 233.92)",
+          "oklch(95% 0.0052 233.92)"
+        ]
+      },
+      "dual-dark-bg": {
+        "role": "neutral",
+        "displayName": "dual dark bg",
+        "canonical": "#101820",
+        "tonalRamp": [
+          "oklch(15% 0.0075 248.83)",
+          "oklch(26% 0.0130 248.83)",
+          "oklch(38% 0.0190 248.83)",
+          "oklch(50% 0.0200 248.83)",
+          "oklch(62% 0.0200 248.83)",
+          "oklch(74% 0.0200 248.83)",
+          "oklch(86% 0.0140 248.83)",
+          "oklch(95% 0.0050 248.83)"
+        ]
+      },
+      "dual-dark-text": {
+        "role": "neutral",
+        "displayName": "dual dark text",
+        "canonical": "#F4F8FC",
+        "tonalRamp": [
+          "oklch(15% 0.0026 247.89)",
+          "oklch(26% 0.0044 247.89)",
+          "oklch(38% 0.0065 247.89)",
+          "oklch(50% 0.0068 247.89)",
+          "oklch(62% 0.0068 247.89)",
+          "oklch(74% 0.0068 247.89)",
+          "oklch(86% 0.0048 247.89)",
+          "oklch(95% 0.0017 247.89)"
+        ]
+      },
+      "dual-dark-panel": {
+        "role": "neutral",
+        "displayName": "dual dark panel",
+        "canonical": "#1A2632",
+        "tonalRamp": [
+          "oklch(15% 0.0106 248.94)",
+          "oklch(26% 0.0183 248.94)",
+          "oklch(38% 0.0267 248.94)",
+          "oklch(50% 0.0281 248.94)",
+          "oklch(62% 0.0281 248.94)",
+          "oklch(74% 0.0281 248.94)",
+          "oklch(86% 0.0197 248.94)",
+          "oklch(95% 0.0070 248.94)"
+        ]
+      },
+      "dual-dark-border": {
+        "role": "neutral",
+        "displayName": "dual dark border",
+        "canonical": "#52687A",
+        "tonalRamp": [
+          "oklch(15% 0.0146 243.28)",
+          "oklch(26% 0.0253 243.28)",
+          "oklch(38% 0.0370 243.28)",
+          "oklch(50% 0.0390 243.28)",
+          "oklch(62% 0.0390 243.28)",
+          "oklch(74% 0.0390 243.28)",
+          "oklch(86% 0.0273 243.28)",
+          "oklch(95% 0.0097 243.28)"
+        ]
+      },
+      "dual-selection": {
+        "role": "primary",
+        "displayName": "dual selection",
+        "canonical": "#1686BC",
+        "tonalRamp": [
+          "oklch(15% 0.0460 237.07)",
+          "oklch(26% 0.0798 237.07)",
+          "oklch(38% 0.1166 237.07)",
+          "oklch(50% 0.1228 237.07)",
+          "oklch(62% 0.1228 237.07)",
+          "oklch(74% 0.1228 237.07)",
+          "oklch(86% 0.0859 237.07)",
+          "oklch(95% 0.0307 237.07)"
+        ]
+      },
+      "dual-thumbnail": {
+        "role": "neutral",
+        "displayName": "dual thumbnail",
+        "canonical": "#E2EAF0",
+        "tonalRamp": [
+          "oklch(15% 0.0044 239.91)",
+          "oklch(26% 0.0077 239.91)",
+          "oklch(38% 0.0112 239.91)",
+          "oklch(50% 0.0118 239.91)",
+          "oklch(62% 0.0118 239.91)",
+          "oklch(74% 0.0118 239.91)",
+          "oklch(86% 0.0083 239.91)",
+          "oklch(95% 0.0030 239.91)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "dual-heading": {
+        "displayName": "Titre de collection",
+        "purpose": "Titre de la grille Double écran."
+      },
+      "dual-title": {
+        "displayName": "Titre du jeu",
+        "purpose": "Nom de repli gras lorsque le jeu ne possède pas de logo."
+      },
+      "dual-title-compact": {
+        "displayName": "Titre compact",
+        "purpose": "Nom de repli à une largeur du contrôle inférieure à 480 unités."
+      },
+      "dual-body": {
+        "displayName": "Texte et commandes",
+        "purpose": "État, messages, pagination et boutons Double écran."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "classic-desktop-control",
+        "value": "140ms",
+        "purpose": "Transitions existantes du bureau : fond, bordure, opacité et transformation des boutons ; bordure des champs. Aucune nouvelle animation Double écran."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "dual-title-compact",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Bouton bureau Classique sombre",
+      "kind": "button",
+      "refersTo": "classic-button-dark",
+      "description": "Traduction HTML du bouton Avalonia existant ; la police reste héritée.",
+      "html": "<button class=\"ds-classic-button\">Ouvrir</button>",
+      "css": ".ds-classic-button{color:#F8FAFF;background:#1A2538;border:1px solid #3B4B69;border-radius:10px;padding:9px 14px;min-height:40px;min-width:44px;margin:4px;font-weight:600;transition:background .14s,border-color .14s,opacity .14s,transform .14s;}.ds-classic-button:hover{background:#2A3852;border-color:#8A76FF;transform:scale(1.035)}.ds-classic-button:active{background:#8A76FF;color:white;transform:scale(.985)}.ds-classic-button:focus-visible{border:2px solid #8A76FF}.ds-classic-button:disabled{opacity:.56}"
+    },
+    {
+      "name": "Action principale Classique sombre",
+      "kind": "button",
+      "refersTo": "classic-button-primary-dark",
+      "description": "Variante primary existante du bureau, sans portée sur le bouton Double écran.",
+      "html": "<button class=\"ds-classic-primary\">Jouer</button>",
+      "css": ".ds-classic-primary{color:#F8FAFF;background:#1A2538;border:1px solid #3B4B69;border-radius:10px;padding:9px 14px;min-height:40px;min-width:44px;margin:4px;font-weight:600;transition:background .14s,border-color .14s,opacity .14s,transform .14s;background:#8A76FF;color:white;border-color:#8A76FF}.ds-classic-primary:hover{background:#2A3852;border-color:#8A76FF;transform:scale(1.035)}.ds-classic-primary:active{background:#8A76FF;color:white;transform:scale(.985)}.ds-classic-primary:focus-visible{border:2px solid #8A76FF}.ds-classic-primary:disabled{opacity:.56}"
+    },
+    {
+      "name": "Recherche bureau Classique sombre",
+      "kind": "input",
+      "refersTo": "classic-input-dark",
+      "description": "Champ natif, transcription des couleurs et du focus de App.axaml.",
+      "html": "<input class=\"ds-classic-search\" aria-label=\"Rechercher un jeu\" placeholder=\"Rechercher…\" />",
+      "css": ".ds-classic-search{color:#F8FAFF;background:#172235;border:1px solid #3B4B69;padding:9px 12px;min-height:40px;border-radius:10px;transition:border-color .14s}.ds-classic-search:focus-visible,.ds-classic-search:focus{outline:none;border:2px solid #8A76FF}.ds-classic-search::selection{background:#8A76FF}"
+    },
+    {
+      "name": "Navigation sélectionnée du bureau",
+      "kind": "nav",
+      "description": "Bouton nav.selected existant ; libellé sans reprendre les anciennes icônes Unicode.",
+      "html": "<button class=\"ds-classic-nav\" aria-current=\"page\">Mes jeux</button>",
+      "css": ".ds-classic-nav{color:#F8FAFF;background:#1A2538;border:1px solid #3B4B69;border-radius:10px;padding:9px 14px;min-height:40px;min-width:44px;margin:4px;font-weight:600;transition:background .14s,border-color .14s,opacity .14s,transform .14s;background:#2A3852;border-color:#8A76FF;margin:2px 0;text-align:left}.ds-classic-nav:hover{background:#2A3852;border-color:#8A76FF;transform:scale(1.035)}.ds-classic-nav:active{background:#8A76FF;color:white;transform:scale(.985)}.ds-classic-nav:focus-visible{border:2px solid #8A76FF}.ds-classic-nav:disabled{opacity:.56}"
+    },
+    {
+      "name": "Commande Double écran dans l'hôte Windows sombre",
+      "kind": "button",
+      "refersTo": "dual-action",
+      "description": "Dimensions du composant partagé avec les styles de bouton hérités du bureau ; Android conserve ses états natifs.",
+      "html": "<button class=\"ds-dual-action\">Options du jeu</button>",
+      "css": ".ds-dual-action{color:#F8FAFF;background:#1A2538;border:1px solid #3B4B69;border-radius:10px;padding:9px 14px;min-height:40px;min-width:44px;margin:4px;font-weight:600;transition:background .14s,border-color .14s,opacity .14s,transform .14s;padding:8px 12px;min-height:48px;font-size:13px}.ds-dual-action:hover{background:#2A3852;border-color:#8A76FF;transform:scale(1.035)}.ds-dual-action:active{background:#8A76FF;color:white;transform:scale(.985)}.ds-dual-action:focus-visible{border:2px solid #8A76FF}.ds-dual-action:disabled{opacity:.56}"
+    },
+    {
+      "name": "Panneau Double écran clair",
+      "kind": "card",
+      "refersTo": "dual-panel-light",
+      "description": "Surface plate de l'aperçu, contour d'une unité et marge intérieure de seize unités. Aucun effet d'interaction ajouté.",
+      "html": "<section class=\"ds-dual-panel\">Aperçu du jeu sélectionné</section>",
+      "css": ".ds-dual-panel{background:#F8FAFC;color:#202E38;border:1px solid #B9C8D1;border-radius:16px;padding:16px}"
+    },
+    {
+      "name": "Emplacement sélectionné Double écran",
+      "kind": "custom",
+      "refersTo": "dual-thumbnail",
+      "description": "Contour et cadre extraits de ListBoxItem et de la miniature. Le contenu de jeu est omis de cet échantillon ; en production l'image conserve son ratio.",
+      "html": "<div class=\"ds-dual-item\" role=\"option\" aria-selected=\"true\" aria-label=\"Jeu sélectionné\"><div class=\"ds-dual-thumbnail\"></div></div>",
+      "css": ".ds-dual-item{display:inline-block;border:2px solid #1686BC;border-radius:12px;padding:4px;margin:2px}.ds-dual-thumbnail{width:68px;height:68px;background:#E2EAF0;border-radius:8px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Deux façons de parcourir la même collection",
+    "overview": "DecompShelf conserve Classique et propose un deuxième thème optionnel, Double écran, inspiré de la 3DS. Les jaquettes et les logos existants donnent leur identité aux jeux ; les commandes natives restent lisibles et familières.\n\nClassique garde ses boîtes 3D et ses écrans existants. Double écran est une extension de bibliothèque à deux régions dans une même fenêtre, sur Windows, en Big Picture et sur smartphone. Ce choix de disposition est indépendant du clair/sombre ; il ne redéfinit pas toute l'application.",
+    "keyCharacteristics": [
+      "Deux thèmes explicites, Classique et Double écran.",
+      "Jaquettes complètes, logos existants et titre lisible en repli.",
+      "Navigation tactile, clavier et manette ; action de lancement explicite.",
+      "Musique locale volontaire, liée au jeu et arrêtée en quittant la vue."
+    ],
+    "rules": [],
+    "dos": [
+      "Do conserver Classique et proposer Double écran comme deuxième choix distinct du clair/sombre.",
+      "Do conserver les proportions des images, y compris les boîtes horizontales et verticales.",
+      "Do afficher le titre du jeu si aucun logo n'est fourni et conserver son nom accessible.",
+      "Do conserver la navigation latérale sur PC et les accès Consoles, Mes jeux et Paramètres.",
+      "Do garder une action de lancement explicite et afficher l'état réel du port pour l'appareil."
+    ],
+    "donts": [
+      "Don't étendre la composition Double écran aux autres écrans de gestion sans décision produit.",
+      "Don't redistribuer de bande-son de jeu ni importer des illustrations d'iiDB pour ce thème.",
+      "Don't présenter les rendus headless comme un essai sur téléphone ou sur AYN Thor.",
+      "Don't transformer les anciennes icônes Unicode de Classique en règle pour les nouveaux composants."
+    ]
+  }
+}
+

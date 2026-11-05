@@ -42,6 +42,10 @@
     <package android:name="org.metroidprime.port" />
     <package android:name="com.mp6.game" />
     <package android:name="com.driftdroid.android" />
+    <package android:name="com.jrickey.battleship" />
+    <package android:name="com.rekhcom.android" />
+    <package android:name="dev.picori.tmc" />
+    <package android:name="io.github.alondero.aerogaugerecomp" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="true" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">

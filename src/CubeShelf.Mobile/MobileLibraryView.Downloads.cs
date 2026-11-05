@@ -54,13 +54,16 @@ public sealed partial class MobileLibraryView
     private Grid BuildDownloadsOverlay()
     {
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(16, 10) };
-        header.Children.Add(new TextBlock { Text = "Téléchargements", FontSize = 21,
+        header.Children.Add(new TextBlock { Text = "Paramètres", FontSize = 21,
             FontWeight = FontWeight.SemiBold, VerticalAlignment = VerticalAlignment.Center });
         _closeDownloads.MinHeight = 48; _closeDownloads.FontSize = 14;
         _closeDownloads.Click += (_, _) => CloseDownloads();
         Grid.SetColumn(_closeDownloads, 1); header.Children.Add(_closeDownloads); _downloadsOverlay.Children.Add(header);
         var content = new StackPanel { Spacing = 18 };
+        content.Children.Add(BuildPresentationSetting());
         content.Children.Add(BuildAppUpdateCard());
+        _storageButton.IsVisible=_games.Storage is not null;
+        _storageButton.Click+=(_,_)=>OpenStorage();content.Children.Add(_storageButton);
         var telemetry = new StackPanel { Spacing = 12 };
         var metrics = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*"), ColumnSpacing = 10 };
         var labels = new[] { "RÉSEAU", "PIC", "RESTANT" };
@@ -139,6 +142,7 @@ public sealed partial class MobileLibraryView
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             HorizontalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
         Grid.SetRow(scroll, 1); _downloadsOverlay.Children.Add(scroll);
+        Grid.SetRowSpan(_storageOverlay,3);_downloadsOverlay.Children.Add(_storageOverlay);
         Grid.SetRow(_transferHint, 2); _downloadsOverlay.Children.Add(_transferHint);
         _downloadsButton.MinHeight = 48; _downloadsButton.FontSize = 12;
         _downloadsButton.Padding = new Thickness(10, 6); _downloadsButton.CornerRadius = new CornerRadius(14);
@@ -149,6 +153,9 @@ public sealed partial class MobileLibraryView
     public void ShowDownloads()
     {
         if (_launching) return;
+        CloseGameOptions(false);
+        _dualLibrary.SetPlaybackActive(false);
+        _startupPlatformChoiceShown=true;_platformHome.IsVisible=false;
         CloseInspection(false); ResetTouch(); _body.IsVisible = false; _downloadsOverlay.IsVisible = true; _rowsStamp = "";
         ApplyDownloadSnapshot(_games.Downloads?.Snapshot ?? new(RuntimeDownloadState.Unavailable, 0, 0));
         UpdateInputHint(); if (_controllerInput) FocusDownloadAction();
@@ -160,11 +167,14 @@ public sealed partial class MobileLibraryView
     }
     private void CloseDownloads(bool restoreFocus = true)
     {
+        if(_storageView?.IsBusy==true){_storageView.RequestClose();return;}
+        if(_storageOverlay.IsVisible)CloseStorage();
         if (!_downloadsOverlay.IsVisible) return;
         _downloadsOverlay.IsVisible = false; _transferProgress.IsIndeterminate = false;
+        _dualLibrary.SetPlaybackActive(_presentationActive);
         _transferCover.Source = null; _pendingTransfers.Children.Clear(); _completedTransfers.Children.Clear();
         foreach (var bitmap in _downloadCovers.Values) bitmap.Dispose();
-        _downloadCovers.Clear(); _rowsStamp = ""; _body.IsVisible = true;
+        _downloadCovers.Clear(); _rowsStamp = ""; _body.IsVisible = !_dualLibrary.IsVisible;
         if (restoreFocus)
         {
             _shelf.SetSelection(_selected, _ribbon, false);
@@ -219,8 +229,9 @@ public sealed partial class MobileLibraryView
         _transferCover.Height=_transferCover.Source is Bitmap artwork?82d*artwork.PixelSize.Height/artwork.PixelSize.Width:116;
         var needsInstall=entry is not null && _games.NativePorts?.Catalog.Any(p=>p.Id==entry.GameId)==true
             && (!_games.NativePorts.IsInstalled(entry.GameId)||_games.NativePorts.IsUpdateAvailable(entry.GameId));
-        _transferState.Text = snapshot.State==RuntimeDownloadState.Ready&&needsInstall?"APK prêt à installer":TransferLabel(snapshot.State);
-        _transferHeading.Text = snapshot.IsBusy ? "EN COURS" : snapshot.State == RuntimeDownloadState.Ready ? needsInstall?"APK VÉRIFIÉ":"INSTALLÉ" : "À TÉLÉCHARGER";
+        var embedded=entry is not null&&_games.NativePorts?.IsEmbedded(entry.GameId)==true;
+        _transferState.Text = snapshot.State==RuntimeDownloadState.Ready&&needsInstall?embedded?"Moteur prêt à préparer":"APK prêt à installer":TransferLabel(snapshot.State);
+        _transferHeading.Text = snapshot.IsBusy ? "EN COURS" : snapshot.State == RuntimeDownloadState.Ready ? needsInstall?embedded?"MOTEUR VÉRIFIÉ":"APK VÉRIFIÉ":"INSTALLÉ" : "À TÉLÉCHARGER";
         var percent = Math.Clamp(100d * snapshot.ReceivedBytes / Math.Max(1, snapshot.TotalBytes), 0, 100);
         _transferProgress.Value = percent;
         _transferProgress.IsIndeterminate = snapshot.State is RuntimeDownloadState.Verifying or RuntimeDownloadState.Installing;
@@ -231,7 +242,7 @@ public sealed partial class MobileLibraryView
             or RuntimeDownloadState.Failed or RuntimeDownloadState.Ready || snapshot.State == RuntimeDownloadState.Queued && manager?.IsPaused == true;
         var action = snapshot.State switch
         {
-            RuntimeDownloadState.Ready => needsInstall?"Installer l’APK":"Jouer", RuntimeDownloadState.Paused => "Reprendre",
+            RuntimeDownloadState.Ready => needsInstall?embedded?"Préparer dans DecompShelf":"Installer l’APK":"Jouer", RuntimeDownloadState.Paused => "Reprendre",
             RuntimeDownloadState.Queued => "Reprendre la file", RuntimeDownloadState.Failed => "Réessayer", _ => "Télécharger"
         };
         if ((_transferStart.Tag as string) != action)
@@ -240,7 +251,7 @@ public sealed partial class MobileLibraryView
         _transferPause.IsEnabled = snapshot.State == RuntimeDownloadState.Downloading;
         _transferCancel.IsVisible = snapshot.State is RuntimeDownloadState.Downloading or RuntimeDownloadState.Paused or RuntimeDownloadState.Failed or RuntimeDownloadState.Queued;
         _transferExplanation.Text = snapshot.Error ?? (snapshot.State == RuntimeDownloadState.Ready
-            ? needsInstall?"Installation à confirmer dans Android. Le port demandera ensuite les fichiers de ta propre copie du jeu.":"Les fichiers de ta propre copie se sélectionnent dans le port au premier lancement."
+            ? needsInstall?embedded?"Le moteur sera préparé dans les fichiers privés de DecompShelf. Importe ensuite ta propre copie du jeu au premier démarrage.":"Installation à confirmer dans Android. Le port demandera ensuite les fichiers de ta propre copie du jeu.":"Les fichiers de ta propre copie se sélectionnent dans le port au premier lancement."
             : snapshot.State == RuntimeDownloadState.Queued && manager?.IsPaused == true ? "La file est en pause. Reprends-la quand tu es prêt."
             : "Les fichiers sont préparés dans CubeShelf. Tu peux continuer à parcourir ta bibliothèque.");
         var rate = snapshot.State == RuntimeDownloadState.Downloading ? snapshot.BytesPerSecond : 0;

@@ -25,7 +25,7 @@ public sealed class PortableModManager
 
     public PortableModManager(IPlatformPaths paths, string gameId)
     {
-        if (string.IsNullOrWhiteSpace(gameId) || gameId.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '-' or '_')))
+        if (!PortableModState.IsValidGameId(gameId))
             throw new ArgumentException("Identifiant de jeu invalide.", nameof(gameId));
         _gameId = gameId;
         _root = Path.Combine(Path.GetFullPath(paths.DataDirectory), "Mods", gameId);

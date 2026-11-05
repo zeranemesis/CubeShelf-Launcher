@@ -14,7 +14,9 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==24&&ports.Select(p=>p.PackageName).Distinct().Count()==24,"24 distinct Android ports and package identities");
+Check(ports.Length==28&&ports.Select(p=>p.PackageName).Distinct().Count()==28,"28 distinct Android ports and package identities");
+Check(new[]{"gba-minishcap","gba-rekhcom","n64-battleship","n64-aerogauge"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
+    &&ports.Single(p=>p.Id=="n64-aerogauge").RequiresVulkan11,"new native Android ports retain their covers, pinned packages and Vulkan requirement");
 Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:346}
     &&ports.Single(p=>p.Id=="switch-mhgu").Notes.Contains("pas de commandes tactiles"),"Switch Android package retains verified hardware requirements and controller limitation");
 Check(ports.All(p=>p.Abis.Contains("arm64-v8a")),"all published mobile ports have a verified ARM64 build");
@@ -83,8 +85,12 @@ using(var http=new HttpClient(new SlowHttp()))
 }
 
 await Sm64Tests.Run(root);
+await EmbeddedModuleTests.Run(root);
 RunUi();
-Console.WriteLine("Mobile Android catalogue, download integrity, install handoff, cancellation and layout checks passed.");
+GameStorageUiTests.Run(root,ports);
+PresentationTests.Run(root,ports);
+DualDisplayTests.Run(root,ports);
+Console.WriteLine("Mobile Android catalogue, download integrity, engine preparation, cancellation and layout checks passed.");
 void RunUi()
 {
     AppBuilder.Configure<MobileApp>().UseHeadless(new AvaloniaHeadlessPlatformOptions {UseHeadlessDrawing=false}).UseSkia().SetupWithoutStarting();
@@ -126,6 +132,11 @@ void RunUi()
         window.Width=390;window.Height=844;Jobs();
     }
     var platforms=CubeShelf.Core.Library.ShelfProduct.All.Where(p=>p.Id=="gamecube"||ports.Any(port=>port.ShelfConsole==p.Id)).ToArray();
+    var library=Field<Button>("_libraryButton");var libraryPoint=library.TranslatePoint(new Point(library.Bounds.Width/2,library.Bounds.Height/2),window)!.Value;
+    window.MouseDown(libraryPoint,Avalonia.Input.MouseButton.Left);window.MouseUp(libraryPoint,Avalonia.Input.MouseButton.Left);Jobs();
+    Check(Field<bool>("_personalLibrary")&&!home.IsVisible,"the visible library button receives pointer input above console home");
+    window.MouseDown(libraryPoint,Avalonia.Input.MouseButton.Left);window.MouseUp(libraryPoint,Avalonia.Input.MouseButton.Left);Jobs();
+    home.Open(platforms.Select(p=>(p,ports.Count(port=>port.ShelfConsole==p.Id)+(p.Id=="gamecube"?1:0))),"n64");Jobs();
     var n64=Array.FindIndex(platforms,p=>p.Id=="n64");
     var n64Count=ports.Count(p=>p.ShelfConsole=="n64");
     for(var step=0;step<platforms.Length&&home.SelectedConsole!="n64";step++)view.BrowseFromController(1);
@@ -224,12 +235,14 @@ void RunUi()
     Check(!Field<StackPanel>("_onlinePanel").IsVisible,"PartyBoard online controls are hidden for native Nintendo 64 apps");
     host.Native.Blocked.Add(ports[0].Id);host.Native.Installed.Clear();view.RefreshAvailability();
     Check(!Field<Button>("_download").IsVisible,"incompatible port download is hidden");host.Native.Blocked.Clear();view.RefreshAvailability();
-    foreach(var size in new[]{new Size(320,700),new Size(390,844),new Size(844,390)})
+    typeof(MobileLibraryView).GetMethod("SetStatus",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(view,
+        [string.Join("\n",Enumerable.Repeat("Téléchargement terminé. Prépare le moteur dans DecompShelf.",8))]);
+    foreach(var size in new[]{new Size(320,700),new Size(390,844),new Size(844,390),new Size(832,360)})
     {
         window.Width=size.Width;window.Height=size.Height;Jobs();
         var play=Field<Button>("_download");var origin=play.TranslatePoint(default,view)!.Value;
         CheckDeviceStatus();
-        Check(origin.Y>=0&&origin.Y+play.Bounds.Height<=view.Bounds.Height+1,"primary action fits in portrait and landscape");
+        Check(origin.Y>=0&&origin.Y+play.Bounds.Height<=view.Bounds.Height+1,"primary action fits in portrait and landscape even with a long download or error message");
         if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } folder)
         {Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"mobile-n64-{size.Width}.png"));}
     }
@@ -296,6 +309,20 @@ void RunUi()
     Check(Field<Button>("_play").IsVisible&&!Field<Button>("_cancelNativePreparation").IsVisible
         &&embeddedHost.Engines[ports[0].Id].Snapshot.State==RuntimeDownloadState.NotInstalled,
         "embedded ROM preparation enables Play without enqueuing or installing an APK");
+    embeddedHost.Native.Embedded.Add("switch-mhgu");embeddedHost.Native.EmbeddedPreparation=null;
+    picker.SelectedIndex=Array.FindIndex(platforms,p=>p.Id=="switch");Jobs();
+    Field<Button>("_download").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(Field<Grid>("_downloadsOverlay").IsVisible&&embeddedHost.Engines["switch-mhgu"].Snapshot.State==RuntimeDownloadState.Downloading,
+        "hosted engine download stays in the normal queue");
+    embeddedHost.Engines["switch-mhgu"].Complete();Jobs();
+    Check(Field<TextBlock>("_transferState").Text=="Moteur prêt à préparer"&&Field<Button>("_transferStart").Content?.ToString()=="Préparer dans DecompShelf",
+        "a verified hosted engine offers internal preparation instead of Android installation");
+    Field<Button>("_transferStart").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+    Check(Field<Button>("_play").IsVisible&&embeddedHost.Native.Installed.Contains("switch-mhgu")&&!Field<Grid>("_downloadsOverlay").IsVisible,
+        "hosted preparation enables Play inside the same library");
+    embeddedHost.Native.Blocked.Add("switch-mhgu");view.RefreshAvailability();
+    Check(!Field<Button>("_play").IsVisible&&Field<TextBlock>("_unavailableAction").IsVisible&&Field<TextBlock>("_availability").Text=="Incompatible",
+        "a cached hosted engine cannot be launched on an incompatible device");
     window.Close();
     Check(!Field<DispatcherTimer>("_deviceStatusTimer").IsEnabled,"detaching the mobile view stops status polling");
     void CheckDeviceStatus()
@@ -354,6 +381,9 @@ sealed class FakeGames:IMobileGameService
     public FakeNative Native {get;}
     public IMobileNativePorts NativePorts=>Native;
     public MobileDeviceStatus? DeviceStatus {get;set;}=new("14:32",82,false,"Wi-Fi");
+    public CubeShelf.Core.Storage.GameStorageService? Storage {get;set;}
+    public HashSet<string> RetroAchievementsGames {get;}=[];
+    public bool SupportsRetroAchievements(string id)=>RetroAchievementsGames.Contains(id);
     public IRuntimeDownloads Downloads=>Queue;
     public string? LastError=>null;
     public bool PartyBoardInstalled {get;set;}=true;
@@ -364,6 +394,8 @@ sealed class FakeGames:IMobileGameService
     public bool OpenGame(){Opened++;OnOpen?.Invoke();return true;}
     public bool OpenOnline(string? invitation=null)=>true;
     public bool OpenDownloadPage()=>true;
+    public List<string?> PreviewMusic {get;}=[];
+    public void PlayPreviewMusic(string? file)=>PreviewMusic.Add(file);
 }
 sealed class FakeNative(MobileNativePort[] ports):IMobileNativePorts
 {
@@ -384,7 +416,11 @@ sealed class FakeNative(MobileNativePort[] ports):IMobileNativePorts
     public async Task<string> PrepareAsync(string id,CancellationToken cancellation=default)
     {
         Prepared.Add(id);
-        if(IsEmbedded(id)) {var message=await EmbeddedPreparation!.Task.WaitAsync(cancellation);Installed.Add(id);return message;}
+        if(IsEmbedded(id))
+        {
+            if(id!="n64-sm64"&&!IsPackageReady(id)){Queue.Enqueue(id);return "Téléchargement du moteur";}
+            var message=EmbeddedPreparation is null?"Moteur prêt":await EmbeddedPreparation.Task.WaitAsync(cancellation);Installed.Add(id);return message;
+        }
         if(!IsPackageReady(id))Queue.Enqueue(id);return "Confirmation Android requise";
     }
     public Action? OnLaunch {get;set;}

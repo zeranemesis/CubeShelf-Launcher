@@ -26,6 +26,7 @@
     <Content Include="Catalogs/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets/Consoles/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets/Sounds/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets/Sounds/home-*.wav" />
     <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
     <AvaloniaResource Include="Assets/Brand/Consoles/*.png" />
@@ -33,6 +34,12 @@
     <Content Include="Assets/Brand/Consoles/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <Content Include="Assets/Brand/Consoles/*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <AvaloniaResource Include="Assets/Logos/*.png" />
+    <AvaloniaResource Include="Assets/Logos/catalog.json" />
+    <Content Include="Assets/Logos/Database/*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Logos/CREDITS.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets/Home/**/*" />
+    <Content Include="Assets/Home/**/*.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Home/**/*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>
   <Target Name="VerifyPublishedCoverFiles" AfterTargets="Publish">

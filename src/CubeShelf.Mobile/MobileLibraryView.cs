@@ -28,6 +28,7 @@ public sealed partial class MobileLibraryView : UserControl
     private readonly GameTitleControl _title = new() { FontSize = 27, Foreground = Brushes.White };
     private readonly TextBlock _info = new() { FontSize = 15, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _availability = new() { FontSize = 16, TextWrapping = TextWrapping.Wrap };
+    private readonly RetroAchievementsButton _gameAchievements=new();
     private readonly TextBlock _status = new() { FontSize = 15, TextWrapping = TextWrapping.Wrap };
     private readonly TextBox _invite = new() { Watermark = "Invitation privée PB4…", MaxLength = 80, MinHeight = 48 };
     private readonly Button _play = MakeButton("Jouer");
@@ -68,6 +69,7 @@ public sealed partial class MobileLibraryView : UserControl
     public MobileLibraryView(IMobileGameService games)
     {
         _games = games;
+        InitializePresentation();
         _stateSaveTimer.Tick += (_, _) => FlushLibraryState();
         _holdTimer.Tick += (_, _) => InspectHeldCase();
         _launchTransition.DismissRequested += CancelLaunchTransition;
@@ -102,7 +104,10 @@ public sealed partial class MobileLibraryView : UserControl
         invitation.Children.Add(_invite); invitation.Children.Add(_join);
         _invitationPanel.Content = invitation;
         _onlinePanel.Children.Add(_invitationPanel);
+        _details.Children.Add(_status);
         _details.Children.Add(_nativeNotes);
+        _details.Children.Add(_gameAchievements);
+        _gameAchievements.Click+=(_,_)=>OpenRetroAchievements();
         _details.Children.Add(_onlinePanel);
         _body.Children.Add(_shelf);
         Grid.SetColumnSpan(_emptyLibrary,2);Grid.SetRowSpan(_emptyLibrary,2);_body.Children.Add(_emptyLibrary);
@@ -111,7 +116,6 @@ public sealed partial class MobileLibraryView : UserControl
         Grid.SetRow(_detailsScroll, 1); _gamePanel.Children.Add(_detailsScroll);
         var primaryActions = new StackPanel { Spacing = 6, Margin = new Thickness(0, 8, 0, 4) };
         _status.IsVisible = false;
-        primaryActions.Children.Add(_status);
         primaryActions.Children.Add(_nativePreparationProgress);
         primaryActions.Children.Add(_play); primaryActions.Children.Add(_download); primaryActions.Children.Add(_unavailableAction);
         _cancelNativePreparation.IsVisible=false;
@@ -130,7 +134,9 @@ public sealed partial class MobileLibraryView : UserControl
         var shell=new Grid {RowDefinitions=new RowDefinitions("Auto,*")};
         shell.Children.Add(BuildDeviceStatusBar());Grid.SetRow(content,1);shell.Children.Add(content);
         Content = shell;
+        Grid.SetRowSpan(_dualLibrary,3);content.Children.Add(_dualLibrary);
         Grid.SetRowSpan(_platformHome,3);content.Children.Add(_platformHome);
+        Grid.SetRowSpan(_gameOptionsOverlay,3);content.Children.Add(_gameOptionsOverlay);
         _platformHome.ConsoleChosen+=id=> { if(_personalLibrary)ShowPersonalLibrary(false);_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);_platformHome.IsVisible=false;FocusPrimaryAction(); };
         _platformHome.LibraryRequested+=OpenPersonalLibrary;
         UpdateInputHint();
@@ -166,14 +172,25 @@ public sealed partial class MobileLibraryView : UserControl
             }
             InitializeShelf();
             SubscribeDownloads();
+            if(_games.NativePorts is {} native)native.Changed+=NativePortsChanged;
             SetAppUpdatesActive(true);
             SetDeviceStatusActive(true);
         };
-        DetachedFromVisualTree += (_, _) => { SetDeviceStatusActive(false); SetAppUpdatesActive(false); UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
+        DetachedFromVisualTree += (_, _) => { if(_games.NativePorts is {} native)native.Changed-=NativePortsChanged; SetDeviceStatusActive(false); SetAppUpdatesActive(false); UnsubscribeDownloads(); FlushLibraryState(); CancelLaunchTransition(); if(!_storageOverlay.IsVisible)CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; };
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         LayoutUpdated += (_, _) => UpdateResponsiveLayout();
         KeyDown += (_, args) =>
         {
+            if(_gameOptionsOverlay.IsVisible)
+            {
+                if(args.Key is Key.Escape or Key.X)CloseGameOptions();
+                else if(args.Key==Key.Enter)ActivateGameOption();
+                else if(args.Key is Key.Up or Key.Down)MoveGameOption(args.Key==Key.Up?-1:1);
+                else return;
+                args.Handled=true;return;
+            }
+            if(DualInputActive&&HomeInput.HandleKey(args.Key)){args.Handled=true;return;}
+            if(DualInputActive&&!HomeInput.IsPopupOpen&&args.Key==Key.Enter){HomeInput.ActivateFocused();args.Handled=true;return;}
             if(args.Key==Key.F2){OpenPersonalLibrary();args.Handled=true;return;}
             if(_platformHome.IsVisible)
             {
@@ -196,6 +213,9 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void ActivateFromController()
     {
+        if(_gameOptionsOverlay.IsVisible){ActivateGameOption();return;}
+        if(_storageOverlay.IsVisible){_storageView?.ActivateFromController();return;}
+        if(DualInputActive){HomeInput.ActivateFocused();return;}
         if(_platformHome.IsVisible){_platformHome.Choose();return;}
         SetControllerInput(true);
         if (_consolePicker.IsDropDownOpen) { _consolePicker.IsDropDownOpen = false; FocusPrimaryAction(); return; }
@@ -229,6 +249,9 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void BackFromController()
     {
+        if(_gameOptionsOverlay.IsVisible){CloseGameOptions();return;}
+        if(DualInputActive&&HomeInput.DismissPopup())return;
+        if(_storageOverlay.IsVisible){_storageView?.BackFromController();return;}
         if(_platformHome.IsVisible)return;
         SetControllerInput(true);
         DismissOverlay();
@@ -244,6 +267,9 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void MoveActionFocus(int step)
     {
+        if(_gameOptionsOverlay.IsVisible){MoveGameOption(step);return;}
+        if(_storageOverlay.IsVisible){_storageView?.MoveFromController(step);return;}
+        if(DualInputActive){HomeInput.Move(0,step);return;}
         if(_platformHome.IsVisible){_platformHome.CycleSort();return;}
         SetControllerInput(true);
         if (_consolePicker.IsDropDownOpen)
@@ -254,7 +280,7 @@ public sealed partial class MobileLibraryView : UserControl
         if (_launching) return;
         if (_downloadsOverlay.IsVisible) { MoveDownloadFocus(step); return; }
         if (_inspectionCase is not null) { _closeInspection.Focus(); return; }
-        Control[] candidates = [_libraryButton,_consolePicker,_downloadsButton, _appUpdatesButton, _online, _invitationPanel, _invite, _join, _play, _download,_cancelNativePreparation];
+        Control[] candidates = [_libraryButton,_consolePicker,_downloadsButton, _appUpdatesButton, _gameAchievements,_online, _invitationPanel, _invite, _join, _play, _download,_cancelNativePreparation];
         var actions = candidates.Where(control => control.IsEffectivelyVisible && control.IsEnabled
             && (control != _invite && control != _join || _invitationPanel.IsExpanded)).ToArray();
         if (actions.Length == 0) return;
@@ -282,22 +308,24 @@ public sealed partial class MobileLibraryView : UserControl
     private void UpdateInputHint()
     {
         _hint.Text = _controllerInput
-            ? "Stick : parcourir · A : choisir · X : retourner · R3 : agrandir" + (_onlinePanel.IsVisible ? " · Y : en ligne" : "")
+            ? "Stick : parcourir · A : choisir · X : options du jeu · R3 : agrandir" + (_onlinePanel.IsVisible ? " · Y : en ligne" : "")
             : "Balaye pour choisir · Touche pour retourner · Maintiens pour agrandir";
-        _inspectionHint.Text = _controllerInput ? "X : retourner · B : fermer" : "Touche le boîtier pour le retourner";
+        _inspectionHint.Text = _controllerInput ? "Touche le boîtier pour le retourner · B : fermer" : "Touche le boîtier pour le retourner";
         _transferHint.Text = _controllerInput ? "Haut/bas : commandes · A : choisir · B : retour" : "Tu peux revenir à ta bibliothèque pendant le téléchargement.";
     }
 
     private void SetStatus(string? text)
     {
+        _dualLibrary.ShowMessage(text);
         _status.Text = text;
         _status.IsVisible = !string.IsNullOrWhiteSpace(text);
     }
 
     public void RefreshAvailability()
     {
-        if (_catalog.Length == 0) return;
-        if(SelectedNativePort is { } native) { RefreshNativeAvailability(native);return; }
+        if (_catalog.Length == 0){_gameAchievements.IsVisible=false;return;}
+        _gameAchievements.IsVisible=true;
+        if(SelectedNativePort is { } native) { RefreshNativeAvailability(native);RefreshDualSelection();return; }
         _nativeNotes.IsVisible=false;
         var supported = _catalog[_selected].Id == PartyBoardId;
         var installed = supported && _games.IsInstalled();
@@ -330,14 +358,19 @@ public sealed partial class MobileLibraryView : UserControl
         _join.IsEnabled = installed && _invite.Text?.Trim().Length == 72;
         ToolTip.SetTip(_download, "Télécharger et préparer les fichiers dans CubeShelf.");
         UpdateInputHint();
+        RefreshDualSelection();
     }
 
     public void SetActive(bool active)
     {
+        if(!active)CloseGameOptions(false);
+        _presentationActive=active;_dualLibrary.SetPlaybackActive(active&&!_downloadsOverlay.IsVisible);
+        _secondaryHome?.SetPlaybackActive(active&&_secondaryAttached);
         SetAppUpdatesActive(active);
         SetDeviceStatusActive(active);
         if (active) { InitializeShelf(); RefreshAvailability(); }
-        else { FlushLibraryState(); CancelLaunchTransition(); CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
+        else { FlushLibraryState(); CancelLaunchTransition(); if(!_storageOverlay.IsVisible)CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
+        SecondaryScreenStateChanged?.Invoke();
     }
 
     private void ShelfTouchPressed(object? sender, PointerPressedEventArgs args)
@@ -401,6 +434,9 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void BrowseFromController(int step)
     {
+        if(_gameOptionsOverlay.IsVisible){MoveGameOption(step);return;}
+        if(DualInputActive){HomeInput.Move(step,0);return;}
+        if(_storageOverlay.IsVisible){_storageView?.MoveFromController(step);return;}
         if(_platformHome.IsVisible){_platformHome.Move(step);return;}
         SetControllerInput(true);
         if (_launching) return;
@@ -451,7 +487,7 @@ public sealed partial class MobileLibraryView : UserControl
             if (!_startupPlatformChoiceShown && _mobilePlatforms.Length > 1)
             {
                 _startupPlatformChoiceShown = true;
-                Dispatcher.UIThread.Post(() => { if (_realized) OpenPlatformHome(); });
+                Dispatcher.UIThread.Post(() => { if (_realized&&!_downloadsOverlay.IsVisible) OpenPlatformHome(); });
             }
         }
         catch (Exception error) { SetStatus("Impossible de charger la bibliothèque : " + error.Message); }
@@ -466,7 +502,7 @@ public sealed partial class MobileLibraryView : UserControl
         var game = _catalog[_selected];
         if(_personalLibrary)_consoleLogo.Platform=game.ShelfConsole;
         _position.Text = $"{_selected + 1} / {_catalog.Length}";
-        _title.SetGame(game.Id, game.Title);
+        _title.SetGame(game.Id, game.Title, game.ShelfConsole);
         _info.Text = $"{game.Year} · {game.Genre} · {game.Players}";
         SetStatus("");
         _invitationPanel.IsExpanded = false;
@@ -514,6 +550,7 @@ public sealed partial class MobileLibraryView : UserControl
         var target = Path.Combine(_cache, relative.Replace('/', Path.DirectorySeparatorChar));
         if (!File.Exists(target))
         {
+            if(!AssetLoader.Exists(Resource(relative)))return "";
             Directory.CreateDirectory(Path.GetDirectoryName(target)!);
             using var source = AssetLoader.Open(Resource(relative));
             var temporary = target + ".tmp";
@@ -533,6 +570,7 @@ public sealed partial class MobileLibraryView : UserControl
     private async Task LaunchSelectedGameAsync()
     {
         if (_launching || !_play.IsVisible || _catalog.Length == 0) return;
+        _dualLibrary.StopMusic();
         _launching = true;_consolePicker.IsEnabled=false;_libraryButton.IsEnabled=false;
         using var cancellation = new CancellationTokenSource();
         _launchCancellation = cancellation;
@@ -607,7 +645,7 @@ public sealed partial class MobileLibraryView : UserControl
         _title.FontSize = wide ? 30 : 24;
     }
 
-    public string DescribeLayout() => $"Root={Bounds}; Body={_body.Bounds}; Shelf={_shelf.Bounds}; Details={_detailsScroll.Bounds}; Viewport={_detailsScroll.Viewport}; Extent={_detailsScroll.Extent}";
+    public string DescribeLayout() => $"Ready={_realized}; Personal={_personalLibrary}; Launching={_launching}; Preparing={_nativePreparation is not null}; Root={Bounds}; Body={_body.Bounds}; Shelf={_shelf.Bounds}; Details={_detailsScroll.Bounds}; Viewport={_detailsScroll.Viewport}; Extent={_detailsScroll.Extent}";
 
     private static Button MakeButton(string text) => new() { Content = text, FontSize = 17, MinHeight = 56,
         FontWeight = FontWeight.SemiBold, CornerRadius = new CornerRadius(18), Padding = new Thickness(18, 12),

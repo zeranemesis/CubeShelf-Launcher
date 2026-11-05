@@ -40,6 +40,8 @@ public sealed class ProfileBackupService(IPlatformPaths paths)
         long totalBytes = 0;
         Add("config", "settings.json");
         Add("config", "desktop-profile.json");
+        Add("config", "native-ports.json");
+        Add("config", "game-storage.json");
         Add("data", "games.json");
         var profiles = Safe(paths.ConfigurationDirectory, "mod-profiles");
         if (Directory.Exists(profiles))
@@ -161,7 +163,7 @@ public sealed class ProfileBackupService(IPlatformPaths paths)
         if (string.IsNullOrEmpty(name) || name.Contains('\\') || name.Contains(':'))
             throw new InvalidDataException("Nom de fichier de profil invalide.");
         var allowed = bucket == "data" && name == "games.json" || bucket == "config" &&
-            (name is "settings.json" or "desktop-profile.json" ||
+            (name is "settings.json" or "desktop-profile.json" or "native-ports.json" or "game-storage.json" ||
              name.StartsWith("mod-profiles/", StringComparison.Ordinal) && name.EndsWith(".json", StringComparison.Ordinal) &&
              name.Count(c => c == '/') == 1);
         if (!allowed) throw new InvalidDataException("Fichier absent du périmètre de restauration.");

@@ -139,7 +139,7 @@
     "Repository": "previouslevelgames/recharged",
     "Method": "Port natif (projet amont)",
     "Status": "Release disponible",
-    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.Le dépôt amont a été déplacé vers previouslevelgames/recharged ; les paquets pointent vers ce dépôt canonique.",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification. Le dépôt amont a été déplacé vers previouslevelgames/recharged ; les paquets pointent vers ce dépôt canonique.",
     "VerifiedAt": "2026-11-01",
     "SourceCommit": "f3664f7789553b0d4ba497a75d7963916704c670",
     "ReadmeUrl": "https://github.com/previouslevelgames/recharged/blob/f3664f7789553b0d4ba497a75d7963916704c670/README.md",
@@ -205,7 +205,8 @@
         "Size": 44048825,
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": "recharged.exe"
       }
     ]
   },

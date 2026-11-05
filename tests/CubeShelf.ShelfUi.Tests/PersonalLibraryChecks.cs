@@ -140,8 +140,8 @@ static class PersonalLibraryChecks
             Click("BigPictureMyGamesButton");
             Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"Big Picture button must open all owned games.");
             Click("NavSettingsButton");
-            Check(window.FindControl<Button>("BigPictureSubnavLibraryButton")!.IsEffectivelyVisible,"Big Picture settings need a visible personal-library button.");
-            Click("BigPictureSubnavLibraryButton");
+            Check(window.FindControl<Button>("BigPictureMyGamesButton")!.IsEffectivelyVisible,"Big Picture settings need a visible personal-library button.");
+            Click("BigPictureMyGamesButton");
             Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"Subpage button must open personal games.");
             Click("NavDownloadsButton");window.HandleBigPictureControllerInput(16);
             Check(window.FindControl<Control>("LibraryView")!.IsVisible && Cards().Length==4,"View / Select must open personal games from any Big Picture page.");

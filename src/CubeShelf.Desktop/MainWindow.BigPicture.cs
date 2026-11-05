@@ -62,7 +62,7 @@ public sealed partial class MainWindow
         };
     }
 
-    private GameCatalogEntry? BigPictureGame => _bigPictureGames.Length == 0 ? null
+    private GameCatalogEntry? BigPictureGame => DualScreenView.IsVisible&&!DualScreenView.IsPlatforms?_selectedGame:_bigPictureGames.Length == 0 ? null
         : GameVariants.Resolve(_catalogGames, _bigPictureGames[_bigPictureIndex], _paths);
 
     private void EnterBigPicture(object? sender, RoutedEventArgs args)
@@ -215,21 +215,20 @@ public sealed partial class MainWindow
         var game = BigPictureGame;
         RefreshPortVersionPickers(game is null ? null : GameVariants.BaseOf(_catalogGames, game));
         BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon);
-        BigPictureTitle.SetGame(game?.Id, game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty"));
+        BigPictureTitle.SetGame(game?.Id, game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty"), game?.ShelfConsole);
         BigPictureMetadata.Text = game is null ? "" : string.Join("  •  ", new[] { game.Genre, game.Players, game.Year > 0 ? game.Year.ToString() : "" }.Where(value => value.Length > 0));
         BigPictureDescription.Text = game?.Description ?? P7("Ajoute un jeu depuis la bibliothèque pour commencer.", "Add a game from the library to get started.");
         BigPictureCount.Text = P7("Bibliothèque", "Library") + $" · {_bigPictureGames.Length}";
         BigPicturePosition.Text = _bigPictureGames.Length == 0 ? "0 / 0" : $"{_bigPictureIndex + 1} / {_bigPictureGames.Length}";
-        BigPictureExitButton.Content = P7("Bureau · F11", "Desktop · F11");
-        BigPictureConsolesButton.Content = P7("Retour aux consoles", "Back to consoles");
+        BigPictureExitButton.Content = P7("Quitter Big Picture", "Exit Big Picture");
+        BigPictureConsolesButton.Content = P7("Consoles", "Consoles");
         BigPictureLayoutButton.Content = _bigPictureRibbon ? P7("Vue : Ruban · V", "View: Ribbon · V") : P7("Vue : Rangée · V", "View: Row · V");
         BigPictureFlipButton.Content = P7("↻ Retourner le boîtier · F", "↻ Flip case · F");
         BigPictureFlipButton.IsEnabled = game is not null;
         BigPictureCollectionLabel.Text = P7("TA COLLECTION", "YOUR COLLECTION");
         BigPictureCancelButton.Content = P7("Annuler le lancement", "Cancel launch");
         BigPictureModsButton.Content = P7("Mes mods · GameBanana", "My mods · GameBanana");
-        BigPictureFriendsButton.Content = P7("Amis", "Friends");
-        BigPictureSettingsButton.Content = P7("Paramètres", "Settings");
+        BigPictureSettingsButton.Content = P7("Menu · F10", "Menu · F10");
         BigPictureOnlineButton.Content = P7("◉ Jouer en ligne", "◉ Play online");
         BigPictureOnlineButton.IsVisible = OnlineCompanion.IsSupported(game);
         BigPicturePreviousButton.IsEnabled = BigPictureNextButton.IsEnabled = _bigPictureGames.Length > 1;
@@ -261,6 +260,21 @@ public sealed partial class MainWindow
 
     private void BigPictureKeyDown(object? sender, KeyEventArgs args)
     {
+        if(args.Key==Key.X)
+        {
+            if(args.KeyModifiers==KeyModifiers.None&&TryBigPictureXShortcut())
+            {PlayBigPictureSound();args.Handled=true;}
+            return;
+        }
+        if(!LaunchTransition.IsVisible&&!OwnedWindows.Any(window=>window.IsVisible))
+        {
+            if(args.Key==Key.F11){if(_bigPictureActive)ExitBigPicture(this,new RoutedEventArgs());else EnterBigPicture(this,new RoutedEventArgs());args.Handled=true;return;}
+            if(args.Key==Key.F10&&_bigPictureActive){if(BigPictureMenuOverlay.IsVisible)CloseBigPictureMenu();else ShowBigPictureMenu();args.Handled=true;return;}
+            if(args.Key==Key.Enter&&_bigPictureActive&&!BigPictureMenuOverlay.IsVisible&&BigPictureSubnav.IsKeyboardFocusWithin
+                &&FocusManager?.GetFocusedElement() is Button toolbarButton)
+            {toolbarButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));args.Handled=true;return;}
+        }
+        if(HandleDualKey(args.Key)){args.Handled=true;return;}
         if(args.Key==Key.F2 && !OwnedWindows.Any(window=>window.IsVisible))
         {
             OpenPersonalLibrary(this,new RoutedEventArgs());args.Handled=true;return;
@@ -345,7 +359,7 @@ public sealed partial class MainWindow
         args.Handled = true;
     }
 
-    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureFriendsButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureConsolesButton, BigPictureMyGamesButton, BigPictureExitButton }
+    private Button[] BigPictureActions => new[] { BigPicturePlayButton, BigPictureAchievements, BigPictureOnlineButton, BigPictureModsButton, BigPictureFlipButton, BigPictureCancelButton, BigPictureSettingsButton, BigPictureLayoutButton, BigPictureConsolesButton, BigPictureMyGamesButton, BigPictureReturnButton, BigPictureExitButton }
         .Where(button => button.IsEffectivelyVisible && button.IsEffectivelyEnabled).ToArray();
 
     private void FocusBigPictureAction(int step)
@@ -391,8 +405,8 @@ public sealed partial class MainWindow
                 ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
                 : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
             : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
-        help += connected ? P7("   •   VIEW Mes jeux   •   B Consoles", "   •   VIEW My games   •   B Consoles")
-            : P7("   •   F2 Mes jeux   •   Échap Consoles", "   •   F2 My games   •   Esc Consoles");
+        help += connected ? P7("   •   X Options du jeu   •   VIEW Mes jeux   •   B Consoles", "   •   X Game options   •   VIEW My games   •   B Consoles")
+            : P7("   •   X Options du jeu   •   F2 Mes jeux   •   Échap Consoles", "   •   X Game options   •   F2 My games   •   Esc Consoles");
         if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;

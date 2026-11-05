@@ -1,0 +1,119 @@
+{
+  "CheckedAt": "2026-11-05",
+  "Desktop": [
+    {
+      "Console": "gba",
+      "Id": "gba-minishcap",
+      "Title": "The Legend of Zelda: The Minish Cap",
+      "Repository": "999sian/tmc",
+      "Release": "v0.9.6",
+      "SourceCommit": "d377558d973c648e8d0dc491bf99af9aaa0d8067",
+      "ReadmeUrl": "https://github.com/999sian/tmc/blob/d377558d973c648e8d0dc491bf99af9aaa0d8067/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gba",
+      "Id": "gba-rekhcom",
+      "Title": "Kingdom Hearts: Chain of Memories",
+      "Repository": "MatyMeatBoy/ReKHCoM",
+      "Release": "v2.8",
+      "SourceCommit": "315db1e45cbfacb54c1786786917045c0100b2eb",
+      "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/315db1e45cbfacb54c1786786917045c0100b2eb/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Console": "n64",
+      "Id": "n64-battleship",
+      "Title": "Super Smash Bros.",
+      "Repository": "JRickey/BattleShip",
+      "Release": "v1.6",
+      "SourceCommit": "af1f61bf7e4b919348e7f28b7ddaea08b1f8144c",
+      "ReadmeUrl": "https://github.com/JRickey/BattleShip/blob/af1f61bf7e4b919348e7f28b7ddaea08b1f8144c/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Console": "xbox",
+      "Id": "xbox-conker-reloaded",
+      "Title": "Conker: Live & Reloaded",
+      "Repository": "Mabec-games/Conker-Recomped-and-Reloaded",
+      "Release": "v1.4",
+      "SourceCommit": "99b37dfdcfa05226212cff0559023deaa5a4e394",
+      "ReadmeUrl": "https://github.com/Mabec-games/Conker-Recomped-and-Reloaded/blob/99b37dfdcfa05226212cff0559023deaa5a4e394/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Console": "ps2",
+      "Id": "ps2-zoe",
+      "Title": "Zone of the Enders",
+      "Repository": "Yaz-Myst/ZOE-Recompiled",
+      "Release": "v1.0.1",
+      "SourceCommit": "fe89dd65c82a4b669b5034279263cd0636746d91",
+      "ReadmeUrl": "https://github.com/Yaz-Myst/ZOE-Recompiled/blob/fe89dd65c82a4b669b5034279263cd0636746d91/README.md",
+      "GameplayTested": false
+    }
+  ],
+  "Android": [
+    {
+      "Console": "gba",
+      "Id": "gba-minishcap",
+      "Title": "The Legend of Zelda: The Minish Cap",
+      "Repository": "999sian/tmc",
+      "Release": "v0.9.6",
+      "PackageName": "dev.picori.tmc",
+      "MinimumSdk": 21,
+      "ApkSha256": "aa709a3ecee34321a57ff83b20abcdf3b22a381e9b2b1e87ed9a9f1ea1acd2ea",
+      "ReadmeUrl": "https://github.com/999sian/tmc/blob/d377558d973c648e8d0dc491bf99af9aaa0d8067/README.md",
+      "SourceCommit": "d377558d973c648e8d0dc491bf99af9aaa0d8067",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gba",
+      "Id": "gba-rekhcom",
+      "Title": "Kingdom Hearts: Chain of Memories",
+      "Repository": "MatyMeatBoy/ReKHCoM",
+      "Release": "v2.8",
+      "PackageName": "com.rekhcom.android",
+      "MinimumSdk": 21,
+      "ApkSha256": "4c0dae8ce806c1685f0a42c4ca3a194a21f0692f175ecf2ca2de69bb290917f4",
+      "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/315db1e45cbfacb54c1786786917045c0100b2eb/README.md",
+      "SourceCommit": "315db1e45cbfacb54c1786786917045c0100b2eb",
+      "GameplayTested": false
+    },
+    {
+      "Console": "n64",
+      "Id": "n64-battleship",
+      "Title": "Super Smash Bros.",
+      "Repository": "JRickey/BattleShip",
+      "Release": "v1.6",
+      "PackageName": "com.jrickey.battleship",
+      "MinimumSdk": 24,
+      "ApkSha256": "310f2ff55454faf6b8cfb9a3088beba3ef98cefb75b92c7b6bc8183a108648b8",
+      "ReadmeUrl": "https://github.com/JRickey/BattleShip/blob/af1f61bf7e4b919348e7f28b7ddaea08b1f8144c/README.md",
+      "SourceCommit": "af1f61bf7e4b919348e7f28b7ddaea08b1f8144c",
+      "GameplayTested": false
+    },
+    {
+      "Console": "n64",
+      "Id": "n64-aerogauge",
+      "Title": "AeroGauge",
+      "Repository": "alondero/aerogauge-recomp",
+      "Release": "v0.7.0",
+      "PackageName": "io.github.alondero.aerogaugerecomp",
+      "MinimumSdk": 28,
+      "ApkSha256": "e0e42b9d391ca692f9a3f75c24b3413e9056a590eaba8e894bd58664569d58dc",
+      "ReadmeUrl": "https://github.com/alondero/aerogauge-recomp/blob/9d9cba7c0b7ac3136cb660a4d3096677c30f089a/README.md",
+      "SourceCommit": "9d9cba7c0b7ac3136cb660a4d3096677c30f089a",
+      "GameplayTested": false
+    }
+  ],
+  "Excluded": [
+    {
+      "Repository": "sergiomanzur/regaiden-recomp",
+      "Reason": "Runtime SM83 interpreter linked by generated CMake project; excluded from this strictly native batch."
+    },
+    {
+      "Repository": "mstan/WarioWareTwistedRecomp",
+      "Reason": "Native coverage still relies on the gbarecomp interpreter comparison/fallback; needs a separate strict-native review."
+    }
+  ]
+}

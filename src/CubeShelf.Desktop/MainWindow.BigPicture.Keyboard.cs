@@ -51,11 +51,10 @@ public sealed partial class MainWindow
                 && control is Button or TextBox or ComboBox or ListBox or Slider or TabItem)
             .Where(control => control is not TextBox { IsReadOnly: true }
                 && !control.GetVisualAncestors().Any(ancestor => ancestor is ComboBox or Slider)).ToList();
-        if (window == this && BigPictureReturnButton.IsEffectivelyVisible)
+        if (window == this && BigPictureSubnav.IsEffectivelyVisible)
         {
-            if (BigPictureKeyboardButton.IsEffectivelyEnabled) controls.Add(BigPictureKeyboardButton);
-            if (BigPictureSubnavLibraryButton.IsEffectivelyEnabled) controls.Add(BigPictureSubnavLibraryButton);
-            if (BigPictureReturnButton.IsEffectivelyEnabled) controls.Add(BigPictureReturnButton);
+            controls.AddRange(new[]{BigPictureConsolesButton,BigPictureMyGamesButton,BigPictureReturnButton,BigPictureKeyboardButton,BigPictureSettingsButton,BigPictureExitButton}
+                .Where(button=>button.IsEffectivelyVisible&&button.IsEffectivelyEnabled));
         }
         return controls.ToArray();
     }

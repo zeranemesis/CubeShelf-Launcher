@@ -52,17 +52,31 @@ public sealed partial class MobileLibraryView
 
     private void RefreshDeviceStatus()
     {
+        RefreshPresentationStatusBar();
         var status=_games.DeviceStatus;
         var percent=status?.BatteryPercent is >=0 and <=100?status.BatteryPercent:null;
         _deviceTime.Text=status?.Time??DateTime.Now.ToString("HH:mm");
         _deviceConnection.Text=status?.Connection??"Réseau —";
         _deviceBattery.Text=percent is { } value?$"{value} %":"— %";
         _batteryFill.Width=18*(percent??0)/100d;
-        _batteryFill.Background=percent<=15&&status?.IsCharging!=true?Brushes.Salmon:Brushes.LightGreen;
+        var light=_dualLibrary.IsVisible&&_presentation.LightHome;
+        _batteryFill.Background=new SolidColorBrush(Color.Parse(percent<=15&&status?.IsCharging!=true?(light?"#B4232E":"#FA8072"):(light?"#278047":"#90EE90")));
         _chargingMark.IsVisible=status?.IsCharging==true;
         var battery=percent is { } level?$"Batterie {level} %":"Batterie indisponible";
         var description=$"{_deviceConnection.Text}. {battery}{(status?.IsCharging==true?", en charge":"")}. Heure {_deviceTime.Text}.";
         AutomationProperties.SetName(_deviceStatusBar,description);
         ToolTip.SetTip(_deviceStatusBar,description);
+    }
+
+    private void RefreshPresentationStatusBar()
+    {
+        var light=_dualLibrary.IsVisible&&_presentation.LightHome;
+        _deviceStatusBar.Background=new SolidColorBrush(Color.Parse(light?"#F3F4F7":"#0B101B"));
+        Background=_deviceStatusBar.Background;
+        _deviceTime.Foreground=new SolidColorBrush(Color.Parse(light?"#222A39":"#FFFFFF"));
+        _deviceConnection.Foreground=_deviceBattery.Foreground=new SolidColorBrush(Color.Parse(light?"#515D71":"#D3D3D3"));
+        _chargingMark.Fill=new SolidColorBrush(Color.Parse(light?"#278047":"#90EE90"));
+        if(_batteryFill.Parent is Border outline)outline.BorderBrush=_deviceBattery.Foreground;
+        _libraryButton.IsVisible=!_dualLibrary.IsVisible;
     }
 }
