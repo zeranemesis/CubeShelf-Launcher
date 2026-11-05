@@ -11,10 +11,10 @@ namespace CubeShelf.Android;
 /// <summary>Downloads data only. All executable libraries are installed with CubeShelf.</summary>
 internal sealed class PartyBoardDownloads : IRuntimeDownloads
 {
-    internal const string Version = "v0.20.0";
-    internal const string PayloadHash = "7b11534b8e68d4386d03738c6f3fd97324ecf5a71dc212929128d0d8201c2374";
+    internal const string Version = "v0.21.0";
+    internal const string PayloadHash = "a1b8ca1c19939afd281189d3dec895972e05af2cbd42b4ffd5c90d9266237f39";
     internal const long PayloadSize = 52_716_096;
-    private const string Url = "https://github.com/zeranemesis/Marioparty4/releases/download/v0.20.0/PartyBoard-v0.20.0-phone-arm64-v8a.apk";
+    private const string Url = "https://github.com/zeranemesis/Marioparty4/releases/download/v0.21.0/PartyBoard-v0.21.0-phone-arm64-v8a.apk";
     private static readonly HttpClient Client = new() { Timeout = Timeout.InfiniteTimeSpan };
     private readonly object _gate = new();
     private readonly string _directory, _partial, _staging, _runtime, _marker;
@@ -38,10 +38,10 @@ internal sealed class PartyBoardDownloads : IRuntimeDownloads
     public PartyBoardDownloads(string filesDirectory, bool supported)
     {
         _directory = Path.Combine(filesDirectory, "partyboard-downloads");
-        _partial = Path.Combine(_directory, "v0.20.0.partial");
-        _staging = Path.Combine(_directory, "staging-v0.20.0");
+        _partial = Path.Combine(_directory, "v0.21.0.partial");
+        _staging = Path.Combine(_directory, "staging-v0.21.0");
         _runtime = Path.Combine(filesDirectory, "partyboard");
-        _marker = Path.Combine(_runtime, ".runtime-v0.20.0.json");
+        _marker = Path.Combine(_runtime, ".runtime-v0.21.0.json");
         var received = PartialLength();
         var ready = supported && HasInstalledFiles();
         _snapshot = new(!supported ? RuntimeDownloadState.Unavailable : ready

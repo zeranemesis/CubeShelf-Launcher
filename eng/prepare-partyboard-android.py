@@ -5,9 +5,9 @@ import urllib.request
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "v0.20.0"
-SHA256 = "7b11534b8e68d4386d03738c6f3fd97324ecf5a71dc212929128d0d8201c2374"
-NAME = "PartyBoard-v0.20.0-phone-arm64-v8a.apk"
+VERSION = "v0.21.0"
+SHA256 = "a1b8ca1c19939afd281189d3dec895972e05af2cbd42b4ffd5c90d9266237f39"
+NAME = "PartyBoard-v0.21.0-phone-arm64-v8a.apk"
 URL = f"https://github.com/zeranemesis/Marioparty4/releases/download/{VERSION}/{NAME}"
 
 

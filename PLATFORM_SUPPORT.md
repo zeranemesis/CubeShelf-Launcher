@@ -41,7 +41,7 @@ Sources : [projet Desktop](https://github.com/zeranemesis/CubeShelf-Launcher/blo
 | Super Paper Mario (`spm-decomp`) | Décompilation partielle ; port hors objectif annoncé | Aucun port Android prêt trouvé |
 
 Liens : [PartyBoard v0.19.0](https://github.com/zeranemesis/Marioparty4/releases/tag/v0.19.0),
-[PartyBoard v0.20.0](https://github.com/zeranemesis/Marioparty4/releases/tag/v0.20.0),
+[PartyBoard v0.21.0](https://github.com/zeranemesis/Marioparty4/releases/tag/v0.21.0),
 [Sunshine/Eclipse](https://github.com/zeranemesis/sms-port/releases/tag/cubeshelf-v0.3.1),
 [Strikers](https://github.com/new-coke/strikers/releases/tag/v1.3.0),
 [RingOut](https://github.com/jackpoison-prog/RingOut),
@@ -59,9 +59,9 @@ et releases peuvent évoluer après cet audit.
 
 ## Mario Party 4 Android : intégration possible sans émulateur
 
-Le port natif Android existe déjà. L’APK téléphone v0.20.0 fait 52 716 096 octets ;
+Le port natif Android existe déjà. L’APK téléphone v0.21.0 fait 52 716 096 octets ;
 le digest SHA256 fourni par l’API GitHub est
-`7b11534b8e68d4386d03738c6f3fd97324ecf5a71dc212929128d0d8201c2374`.
+`a1b8ca1c19939afd281189d3dec895972e05af2cbd42b4ffd5c90d9266237f39`.
 Ce digest n’a pas été recalculé sur un téléchargement local.
 
 Package : `com.mariopartyrd.partyboard`, minimum Android 8/API26 dans Gradle.

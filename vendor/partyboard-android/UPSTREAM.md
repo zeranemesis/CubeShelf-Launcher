@@ -1,6 +1,6 @@
 # PartyBoard Android host
 
-Source: https://github.com/zeranemesis/Marioparty4/tree/v0.20.0/platforms/android/app/src/main/java
+Source: https://github.com/zeranemesis/Marioparty4/tree/v0.21.0/platforms/android/app/src/main/java
 Commit: `10673868b69bbcdada496215656a5b7012145f5c`.
 
 SDL's original notices are retained. The engine is distributed by the upstream
