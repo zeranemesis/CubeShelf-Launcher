@@ -11,16 +11,17 @@ public sealed partial class MainWindow
 {
     private async void FindMyGames(object? sender,RoutedEventArgs args)
     {
-        var picked=await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions{Title=P7("Dossier de tes jeux","Your games folder"),AllowMultiple=false});
-        if(picked.FirstOrDefault() is not {} folder)return;
         FindGamesButton.IsEnabled=false;
         try
         {
+            var picked=await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions{Title=P7("Dossier de tes jeux","Your games folder"),AllowMultiple=false});
+            if(picked.FirstOrDefault() is not {} folder)return;
             var summary=await ScanGameFolderAsync(folder,text=>FindGamesStatusText.Text=text);
             FindGamesStatusText.Text=summary;
             if(!SettingsView.IsVisible)ShowToastParity(P7("Tes jeux","Your games"),summary);
         }
-        catch(Exception e) when(e is IOException or UnauthorizedAccessException){FindGamesStatusText.Text=e.Message;}
+        // async void: anything escaping here would take the whole launcher down.
+        catch(Exception e){FindGamesStatusText.Text=P7("Recherche impossible : ","Search failed: ")+e.Message;}
         finally{FindGamesButton.IsEnabled=true;}
     }
 
