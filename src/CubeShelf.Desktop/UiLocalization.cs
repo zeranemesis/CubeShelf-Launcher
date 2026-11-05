@@ -566,8 +566,11 @@ internal static class UiLocalization
         if (Application.Current is null) return;
         VerifyDictionariesMatch();
         var dictionary = IsEnglish(language) ? English : French;
+        var resources = Application.Current.Resources;
         foreach (var pair in dictionary)
-            Application.Current.Resources[pair.Key] = pair.Value;
+            // An unchanged value still notifies every control that uses resources: skip it.
+            if (!resources.TryGetValue(pair.Key, out var current) || !Equals(current, pair.Value))
+                resources[pair.Key] = pair.Value;
     }
 
     /// <summary>

@@ -1,4 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <!-- Precompiled code: the launcher JIT-compiled Avalonia and its own UI on every start. -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <AssemblyName>CubeShelf</AssemblyName>

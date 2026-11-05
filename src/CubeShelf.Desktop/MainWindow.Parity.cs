@@ -187,6 +187,7 @@ public sealed partial class MainWindow
         PlatformHome.IsVisible=false;
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
+        if (_libraryStale && LibraryOnScreen) RefreshLibraryParity();
         UpdateResponsiveParity();
         UpdateBigPictureSubnav(view);
         UpdateNavigationStatePhase5();
@@ -212,12 +213,24 @@ public sealed partial class MainWindow
     }
     private void LibrarySortChanged(object? sender, SelectionChangedEventArgs args) => RefreshLibraryParity();
 
+    private bool _libraryStale;
+    // The console home is an overlay above a still-"visible" LibraryView, and nothing is on screen before the window opens.
+    private bool LibraryOnScreen => LibraryView.IsEffectivelyVisible && !PlatformHome.IsVisible;
+    private void CatchUpLibrary(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs args)
+    {
+        // Posted: when the window opens, the console home covers the library right after this event.
+        if (args.Property == IsVisibleProperty && _libraryStale)
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => { if (_libraryStale && LibraryOnScreen) RefreshLibraryParity(); });
+    }
     private void RefreshLibraryParity()
     {
         if (LibraryCards is null) return;
         if(_presentation?.IsDual==true&&DualScreenView.IsVisible&&!DualScreenView.IsPlatforms)BuildDualGames();
-        var previousCards = _parityCards.ToArray();
-        _parityCards.Clear();
+        // Cards (and their cover decodes) are only built for a visible library; ShowParityView catches up (~1 s at startup).
+        var buildCards = LibraryOnScreen;
+        _libraryStale = !buildCards;
+        var previousCards = buildCards ? _parityCards.ToArray() : [];
+        if (buildCards) _parityCards.Clear();
 
         // Keep the original game on the shelf; active mods only select its launch configuration.
         IEnumerable<GameCatalogEntry> query = _personalLibrary ? PersonalLibraryGames() : ShelfGames;
@@ -242,16 +255,19 @@ public sealed partial class MainWindow
                       .ThenBy(game => game.Title, StringComparer.CurrentCultureIgnoreCase)
         };
 
-        foreach (var game in query)
+        if (buildCards)
         {
-            var card = BuildCard(game);
-            ApplyQuickPlayCard(card);
-            _parityCards.Add(card);
-        }
+            foreach (var game in query)
+            {
+                var card = BuildCard(game);
+                ApplyQuickPlayCard(card);
+                _parityCards.Add(card);
+            }
 
-        LibraryCards.ItemsSource = _parityCards.ToArray();
-        // Acquire the next cards before releasing the old ones, keeping reused art pinned in cache.
-        foreach (var card in previousCards) card.Dispose();
+            LibraryCards.ItemsSource = _parityCards.ToArray();
+            // Acquire the next cards before releasing the old ones, keeping reused art pinned in cache.
+            foreach (var card in previousCards) card.Dispose();
+        }
         var english = UiLocalization.IsEnglish(_preferences.Language);
         var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
         Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;

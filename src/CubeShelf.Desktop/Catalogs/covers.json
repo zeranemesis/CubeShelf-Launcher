@@ -592,7 +592,7 @@
     "Front": "Assets/Covers/Shelf/switch-AB48A.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AB48A.jpg",
     "Sha256": "66117e2ed43e5ff39bc73fdd2aa323844f4adcf3f3178c195a73b6f3526abcad",
-    "FrontFileSha256": "66117e2ed43e5ff39bc73fdd2aa323844f4adcf3f3178c195a73b6f3526abcad",
+    "FrontFileSha256": "d3ee546be1ad0f514a6c99ea41272f2b9440714a27192ebf9f8137f1eb2c1c64",
     "Media": "Assets/Covers/Media/switch-AB48A.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/EN/AB48A.png",
     "MediaFileSha256": "114cee3618b8c869a95b5875afe3f1bb5d14a2d31b7568d2e2e2bbc83685ea92"
@@ -623,7 +623,7 @@
     "Front": "Assets/Covers/Shelf/switch-AST4A.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/US/AST4A.jpg",
     "Sha256": "bf3cebedee96f53a92e31eddc7e9138c05b2194825a70cae3fe99432e2536d02",
-    "FrontFileSha256": "bf3cebedee96f53a92e31eddc7e9138c05b2194825a70cae3fe99432e2536d02",
+    "FrontFileSha256": "fe7cd9046098ede7f547472114fcb4d883eaf754a2424f63929e49ffd216637b",
     "Media": "Assets/Covers/Media/switch-AST4A.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/EN/AST4A.png",
     "MediaFileSha256": "c4583ac97fffc7e0f32b6cf704c54cfe49b836f34b5904b779b84f9e40f839f8"
@@ -635,7 +635,7 @@
     "Front": "Assets/Covers/Shelf/switch-A3JBA.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/A3JBA.jpg",
     "Sha256": "a078efff7b0db95d79638e27bd96a8d9840291970e8be112471ac28a007b9b11",
-    "FrontFileSha256": "a078efff7b0db95d79638e27bd96a8d9840291970e8be112471ac28a007b9b11"
+    "FrontFileSha256": "72ad710b504430c170f2645b764ca36373c5cb4055323d76498d2e611792ba3c"
   },
   {
     "Console": "switch",
@@ -644,7 +644,7 @@
     "Front": "Assets/Covers/Shelf/switch-AKUTB.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AKUTB.jpg",
     "Sha256": "3747c93cdf3e5f91f6b21109a1e15a81e99210758b325fe72be33480da676909",
-    "FrontFileSha256": "3747c93cdf3e5f91f6b21109a1e15a81e99210758b325fe72be33480da676909",
+    "FrontFileSha256": "38dd9e3194c1272e059d06fbc404601990a37a4e34c3459f1fe295f01cdc872a",
     "Media": "Assets/Covers/Media/switch-AKUTB.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/EN/AKUTB.png",
     "MediaFileSha256": "c7471e1fea3c3a96ef3eb3db782c15714a1c1ffe001797f41cbd7cd708f20d2e"
@@ -675,7 +675,7 @@
     "Front": "Assets/Covers/Shelf/switch-AYAMA.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/EN/AYAMA.jpg",
     "Sha256": "87728f28992022f696dd6d39f1d58d84fa9a48053efb0cad59879d45abf4662f",
-    "FrontFileSha256": "87728f28992022f696dd6d39f1d58d84fa9a48053efb0cad59879d45abf4662f"
+    "FrontFileSha256": "a7542bc8d2d13baebbc8566d2acdb29c870d7ba89a3347382a76d83fdb852e3a"
   },
   {
     "Console": "switch",
@@ -836,7 +836,7 @@
     "Front": "Assets/Covers/Shelf/switch-BACCC.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/US/BACCC.jpg",
     "Sha256": "fcd255e048aacd5316cd22cc94251142673261783d73386aea8deaafa55f8894",
-    "FrontFileSha256": "fcd255e048aacd5316cd22cc94251142673261783d73386aea8deaafa55f8894",
+    "FrontFileSha256": "fd6b6e29dfe2cd74265e4cbebcec47e326359ec0a2c8f85fa3ab4505a1678992",
     "Media": "Assets/Covers/Media/switch-BACCC.png",
     "MediaSource": "https://art.gametdb.com/switch/cart/US/BACCC.png",
     "MediaFileSha256": "e1e0bb052c35e2efb37df0fa5ef951f6078f36a3715b644ac0aacd04d81fe528"
@@ -5555,7 +5555,7 @@
     "Title": "Metroid Prime Remastered",
     "Front": "Assets/Covers/switch/A3SDA.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/US/A3SDA.jpg",
-    "FrontFileSha256": "69a132f37802ae167c6788ccfc0cf96fd5d1bf0ec85fd90fba3e35befdd2b51e",
+    "FrontFileSha256": "c1cc0a4aaca8b5b0d9b0fd3ac3ef9dd2b23d4799a7e51f125d4e4776fada3fb6",
     "GameTdbId": "A3SDA"
   },
   {
@@ -5563,7 +5563,7 @@
     "Title": "Pokémon: Let's Go, Eevee!",
     "Front": "Assets/Covers/switch/ADW3A.jpg",
     "Source": "https://art.gametdb.com/switch/coverHQ/US/ADW3A.jpg",
-    "FrontFileSha256": "0ab422cc0513dda3b4af2e43bd8957a862e067179358cdc478f42332e2a685f8",
+    "FrontFileSha256": "4d8f5a415a2bf620991eba9ce4244194a0f181ef74d43e9a54e884ebbfab715d",
     "GameTdbId": "ADW3A"
   },
   {
@@ -5762,7 +5762,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/AAB7B.jpg",
     "Front": "Assets/Covers/switch/59b31482444efd53.jpg",
-    "FrontFileSha256": "c7947da5d52c34196f4f5a6b3f46bbfd48fa0fc96f23e501632c53d2ff9355f4"
+    "FrontFileSha256": "8d0bbfadb57ac9cacf564cdf7171bc98d627f66a5a467c06743069880ecb568b"
   },
   {
     "Console": "switch",
@@ -5773,7 +5773,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/AYL8A.jpg",
     "Front": "Assets/Covers/switch/1ec18c344e1f18d7.jpg",
-    "FrontFileSha256": "be931433531099443e32b84f1f5b0a4690a7f99d958ef6f1bf79d16e107b853b"
+    "FrontFileSha256": "a04e0728b7ad882fb5da0db181f7ff1812b5693fad6b8d4592cf657a0c153edf"
   },
   {
     "Console": "switch",
@@ -5784,7 +5784,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/AQMXA.jpg",
     "Front": "Assets/Covers/switch/09be2bb0c5a45d83.jpg",
-    "FrontFileSha256": "c862d3a041e24a683c71dab4151c8336985fd715f0eef362db8c60d786bb1ae5"
+    "FrontFileSha256": "203034965c1b37c8e369d7ab6d4a08e82e88ad09eddc3c39ef7a79d8b268e959"
   },
   {
     "Console": "switch",
@@ -5795,7 +5795,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/ALZAA.jpg",
     "Front": "Assets/Covers/switch/03288b98c6465fe9.jpg",
-    "FrontFileSha256": "9c6d9cb2c8233aa04badab091074330d7dc8d6d61e28bae95ca5c28c1365feb9"
+    "FrontFileSha256": "f2197fae424f069a78c485eb82c77eeecaf6d6e8eaef5f18e4fd7738c063f560"
   },
   {
     "Console": "switch",
@@ -5806,7 +5806,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/ALZBA.jpg",
     "Front": "Assets/Covers/switch/7dbefb14f7adad22.jpg",
-    "FrontFileSha256": "35ebdd282ceaf63631926f2d9c2b8c17e742dcd06cbe08c0ecdc67254e01caa6"
+    "FrontFileSha256": "cefdcf88b4c97a17f51d4393daebdfc63b3bdd83873020ecde5036bcc5f3c01b"
   },
   {
     "Console": "switch",
@@ -5817,7 +5817,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/ADW2A.jpg",
     "Front": "Assets/Covers/switch/e6621a7c329c6953.jpg",
-    "FrontFileSha256": "118e7132d81121b0bb05c5cabc859721eb5fd55d16ad1d5537beffd1cf7e0344"
+    "FrontFileSha256": "a612775ea6b58140e9b369073442daada32ee6cb2350182472df2dfbc1b6780a"
   },
   {
     "Console": "switch",
@@ -5828,7 +5828,7 @@
     "Source": "GameTDB",
     "OriginUrl": "https://art.gametdb.com/switch/coverHQ/US/ALZLA.jpg",
     "Front": "Assets/Covers/switch/14d8b59005fe8784.jpg",
-    "FrontFileSha256": "5f8a96992f78ad0fa7291449c0c7214a02091e9d063f8076cba169dee176cab3"
+    "FrontFileSha256": "8a9b239ff743b3b47486d5164f727eb09f5dcabe3013933ea09f4d554a3bc3a7"
   },
   {
     "Console": "xbox360",
@@ -6197,7 +6197,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/8fed13ff-158e-42d8-a924-7e42a9879399.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/76560-gravity-rush-2",
-    "FrontFileSha256": "b89080ae8d9711dc7e82f7e5e06819b88843389472dc12a2c9c821ee2333e0f5",
+    "FrontFileSha256": "4f6b8af888ad97e4c2eba06050a33b97d7b1606e125456f498ac446d5c33f279",
     "ArtworkKind": "Box front",
     "SourceTitle": "Gravity Rush 2 - Box - Front Image (North America)"
   },
@@ -6211,7 +6211,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/e010c903-085e-483a-b156-0bc2cde12c41.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/18960-infamous-second-son",
-    "FrontFileSha256": "bca7d09fd8ee08da4540a8e259bc4ce3b240db4321b4f8a837abdbc36d8e009f",
+    "FrontFileSha256": "c657c7a878a0f5456545a9c0e50d1087a471397b12345867790d6abe363b868c",
     "ArtworkKind": "Box front",
     "SourceTitle": "inFAMOUS Second Son - Box - Front Image (North America)"
   },
@@ -6225,7 +6225,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/9ffca23f-3f15-4153-a396-c0e955373dbc.png",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/17653-killzone-shadow-fall",
-    "FrontFileSha256": "5a8bb8e5ac875b4d331099469f71813d42ab78489ad456b395be55e5f359ace0",
+    "FrontFileSha256": "430ca056c6365e2f30983969ac117eb6a7fc5b7ced7fb46175b4ea00c261eab7",
     "ArtworkKind": "Box front",
     "SourceTitle": "Killzone: Shadow Fall - Box - Front Image (North America)"
   },
@@ -6239,7 +6239,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/c5376a22-9de3-43c7-a12c-83d2fbaa161e.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/34539-the-last-guardian",
-    "FrontFileSha256": "1a1b1f038bb558eb2ebf67937f1b0b7492fadc08c7d309c74e7052cecf0cd86d",
+    "FrontFileSha256": "9013865d333cd8a0a9ee07c32da0ea6d5a969f1a5a1d39e9a678d3e274dea5c7",
     "ArtworkKind": "Box front",
     "SourceTitle": "The Last Guardian - Box - Front Image (North America)"
   },
@@ -6253,7 +6253,7 @@
     "Source": "LaunchBox · original retail front",
     "OriginUrl": "https://images.launchbox-app.com/bca37539-cad6-4655-8ed8-bb7402aa336e.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/123150-medievil",
-    "FrontFileSha256": "1e32074aa615ee1e60be9c3a95d67588da27663fd125ce4f82cdc08b85ef1030",
+    "FrontFileSha256": "b22a1161039d4534de058cecb3f3e5a995041820f1c7f03e6f1c0e44f11f51ec",
     "ArtworkKind": "Box front",
     "SourceTitle": "MediEvil - Box - Front Image (North America)"
   },
@@ -6280,7 +6280,7 @@
     "Source": "LaunchBox · original retail front",
     "OriginUrl": "https://images.launchbox-app.com/bd1615cd-8677-43db-897f-02b3f01a26b9.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/100875-dragons-crown-pro",
-    "FrontFileSha256": "a83a261a9232a27bbe01342ed22d6e40d265f49e6ecf069f4d62e36be9e09d20",
+    "FrontFileSha256": "b4045cd6b923b03719df3149f12b0c36f19dcca07926343dc8f4b1467c931699",
     "ArtworkKind": "Box front",
     "SourceTitle": "Dragon's Crown Pro - Box - Front Image (North America)"
   },
@@ -6294,7 +6294,7 @@
     "Source": "LaunchBox · original retail front",
     "OriginUrl": "https://images.launchbox-app.com/r2_6f46d8a0-cdc3-4f98-9725-940501f5805c.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/30720-god-of-war-iii-remastered",
-    "FrontFileSha256": "e97ad73e76bb9e8f86cbe55a00c10c1ae2ca0c12dcbe3c64ceb0edbb6cad8bb7",
+    "FrontFileSha256": "f39a78da2cc39921c5fc45108dc70b92f8262015ad203edb3178b5318bddff33",
     "ArtworkKind": "Box front",
     "SourceTitle": "God of War III: Remastered - Box - Front Image (North America)"
   },
@@ -6413,7 +6413,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/d079f006-7a8b-4fad-afbf-d7e949de3805.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/27367-lego-dimensions",
-    "FrontFileSha256": "4beae5ae693a85de6ed2a352f76dfa967a38518018aefc75a35f07e65b444c9c",
+    "FrontFileSha256": "5c2ca23e5e45ea4201d7d98a66e0a75f8d5333fc317310891532fcaf20022088",
     "ArtworkKind": "Box front",
     "SourceTitle": "LEGO Dimensions - Box - Front Image (North America)"
   },
@@ -6427,7 +6427,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/r2_893136de-6027-4834-9873-06fd326b7149.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/17489-the-order-1886",
-    "FrontFileSha256": "3f3d82bcc6d12e570146041ac13964cf485fd415a036a9619aa395205aac3fda",
+    "FrontFileSha256": "75315cdfd27e536d94a3cf25b1bb46abfa6bc21274d1951e6e91ba5a85fc37a2",
     "ArtworkKind": "Box front",
     "SourceTitle": "The Order: 1886 - Box - Front Image (North America)"
   },
@@ -6455,7 +6455,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/d2174d4d-a740-4319-9b37-a254432ac1ed.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/92272-wipeout-omega-collection",
-    "FrontFileSha256": "b545bb2c1b1fb6c8047a7fa34dfb056e6238f58ef5b2c82437379c09ba4d5c2e",
+    "FrontFileSha256": "88929d89040ebadc7d0351006663d00dd7db1d27b3491027f3f5f1bd78467794",
     "ArtworkKind": "Box front",
     "SourceTitle": "WipEout Omega Collection - Box - Front Image (North America)"
   },
@@ -6469,7 +6469,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/4b557194-f938-47d7-898e-b5f30f375511.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/6358-twisted-metal",
-    "FrontFileSha256": "5375bba7625de1fb154fed0d6ef4db884cf7567baba656e539961a1b335ffe7b",
+    "FrontFileSha256": "6beb14c8906a4f34a8da99bb2bedfa440a6445fa2c7297f97545c1d06223ffdf",
     "ArtworkKind": "Box front",
     "SourceTitle": "Twisted Metal - Box - Front Image (North America)"
   },
@@ -6483,7 +6483,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/d22e2edb-c0be-4062-8e2e-5ae3ee108cd0.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/791-infamous",
-    "FrontFileSha256": "3720ee86df870598d3c1267777c5995c443d5bd813a634c2aa872af5aee44381",
+    "FrontFileSha256": "4c2068664cfecc06b240d24ef491621c233fa714e65b4202912e9e158f21d8eb",
     "ArtworkKind": "Box front",
     "SourceTitle": "inFAMOUS - Box - Front Image (North America)"
   },
@@ -6525,7 +6525,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/9443938e-5e73-4285-b2e6-0cbfe987e15d.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/92462-god-of-war-ii-hd",
-    "FrontFileSha256": "31e5917553aee02b4eb5a03c5b5a256b6f9403700223146e53e6259f6d8a1ad4",
+    "FrontFileSha256": "51b05fdbc06262db3c87ac9bb05ebaa0774f9074799bc7c85bc1dade0436e16c",
     "ArtworkKind": "Digital cover",
     "SourceTitle": "God of War II HD - Box - Front Image (North America)"
   },
@@ -6539,7 +6539,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/56881c41-6a2d-4ce6-8742-6535ba6f32ad.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/6778-star-wars-battlefront-renegade-squadron",
-    "FrontFileSha256": "9a58fabe2636a32a3293e277cb79746e4a7f14cb3d0375015ce75e08fa17ddd1",
+    "FrontFileSha256": "a2133439b415dfd25124235d8ecbff4f35a0c1528cd7a1d6d06dd722f599afb4",
     "ArtworkKind": "Box front",
     "SourceTitle": "Star Wars Battlefront: Renegade Squadron - Box - Front Image (North America)"
   },
@@ -6581,7 +6581,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/4267ea9f-3274-4ab8-8ef9-219a9dcec9d0.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/26990-dragon-ball-z-budokai-hd-collection",
-    "FrontFileSha256": "cde461232d2757608125481901ccc10bb31af5e19916cc18e1561898743b3529",
+    "FrontFileSha256": "daf1617284c14243694a4dcd9928965f059ae7507ec286d10c0a2e8fe4ed5a38",
     "ArtworkKind": "Box front",
     "SourceTitle": "Dragon Ball Z: Budokai HD Collection - Box - Front Image (North America)",
     "ArtworkForTitle": "Dragon Ball Z: Budokai HD Collection",
@@ -6639,7 +6639,7 @@
     "Source": "LaunchBox · original artwork",
     "OriginUrl": "https://images.launchbox-app.com/813687ac-7082-470c-83ff-d362f8d82805.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/156177-tekken-6",
-    "FrontFileSha256": "2822ab227581c43ed33824bb02fb34fbe85a0ed3426091492d401f1e8f50e094",
+    "FrontFileSha256": "fe1399fcfeb7c3bac820081f34e4c28fd1c2c16bde7b0eaec9031daedc7ac7eb",
     "ArtworkKind": "Arcade flyer",
     "SourceTitle": "Tekken 6 - Advertisement Flyer - Front Image (Japan)"
   },
@@ -6666,7 +6666,7 @@
     "Source": "Blizzard · flyer promotionnel archivé par LaunchBox",
     "OriginUrl": "https://images.launchbox-app.com/r2_2c764b6f-e8d9-4dbe-ab8a-a92402acef83.jpg",
     "SourcePage": "https://gamesdb.launchbox-app.com/games/images/155050-starcraft-ghost",
-    "FrontFileSha256": "443aa13844f3b67144aceb4f3d68cf2bb4444d176df1b767ce3ace68af5d347e",
+    "FrontFileSha256": "1bd94143883b0d2a8245fdc700e9e068a87a680abc98b171524b2b1765e49127",
     "ArtworkKind": "Promotional flyer"
   },
   {

@@ -46,7 +46,9 @@ public sealed partial class MainWindow : Window
     private bool _loadingSettings;
     private GameCatalogEntry? _selectedGame;
     private PortableModManager? _modManager;
-    private readonly GameBananaClient _gameBanana = new();
+    // Its HttpClient setup costs ~0.2 s at startup; only the mod pages need it.
+    private GameBananaClient? _gameBananaClient;
+    private GameBananaClient _gameBanana => _gameBananaClient ??= new();
     private IReadOnlyList<GameBananaMod> _remoteMods = Array.Empty<GameBananaMod>();
     private DesktopModItem? _selectedMod;
     private Bitmap? _modPreviewBitmap;
@@ -56,7 +58,6 @@ public sealed partial class MainWindow : Window
     internal MainWindow(Controls.BigPictureSounds sounds)
     {
         _bigPictureSounds = sounds;
-        InitializeComponent();
         var paths = new PlatformPaths();
         _paths = paths;
         string? restoredProfileMessage = null;
@@ -79,6 +80,9 @@ public sealed partial class MainWindow : Window
         // us; it could not delete what it was running from. We can.
         LauncherUpdateService.RemoveDisplacedUpdaterImages();
         _preferences = _preferencesStore.Load();
+        // Strings first, then the tree: each resource change re-walks every built control (~1.4 s measured).
+        UiLocalization.Apply(_preferences.Language);
+        InitializeComponent();
         ApplyPreferences();
         _profileStore = new GameProfileStore(paths.ConfigurationDirectory);
         _installer = new PartyBoardInstaller(paths);

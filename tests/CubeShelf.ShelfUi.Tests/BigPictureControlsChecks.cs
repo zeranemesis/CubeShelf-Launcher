@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Interactivity;
@@ -74,15 +74,21 @@ static class BigPictureControlsChecks
         shelf.SetSelection(chosenIndex,true);
         Check((bool)flipped.GetValue(selectedCase)! && CoverBitmapCache.DecodeCount==beforeDecode,
             "Refreshing the same selection reset inspection or decoded textures again.");
-        var hiddenCard=window.FindControl<ItemsControl>("LibraryCards")!.Items.Cast<MainWindow.DesktopGameCard>().First(c=>c.Game.RuntimeOwnsSetup);
-        var executable=hiddenCard.Game.Executable;var label=hiddenCard.PlayLabel;
+        var libraryCards=window.FindControl<ItemsControl>("LibraryCards")!;var hiddenItems=libraryCards.ItemsSource;
+        var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+        var bpConsole=(string)typeof(MainWindow).GetField("_activeShelfConsole",flags)!.GetValue(window)!;
+        // Every own-setup port of the Big Picture console gets a linked program, then the desktop cards are compared.
+        var linked=((List<CubeShelf.Core.Library.GameCatalogEntry>)typeof(MainWindow).GetField("_catalogGames",flags)!.GetValue(window)!)
+            .Where(g=>g.ShelfConsole==bpConsole&&g.RuntimeOwnsSetup).ToDictionary(g=>g,g=>g.Executable);
         var placeholder=Path.Combine(new PlatformPaths().DataDirectory,"not-an-executable.txt");File.WriteAllText(placeholder,"test fixture, never executed");
-        var refresh=typeof(MainWindow).GetMethod("RefreshQuickPlayUi",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
-        hiddenCard.Game.Executable=placeholder;refresh.Invoke(window,null);
-        Check(hiddenCard.PlayLabel==label,"Background status refreshed the hidden desktop cards.");
+        var refresh=typeof(MainWindow).GetMethod("RefreshQuickPlayUi",flags)!;
+        foreach(var linkedGame in linked.Keys)linkedGame.Executable=placeholder;refresh.Invoke(window,null);
+        Check(ReferenceEquals(libraryCards.ItemsSource,hiddenItems),"Background status rebuilt the hidden desktop cards.");
         window.FindControl<Button>("BigPictureExitButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        Check(hiddenCard.PlayLabel!=label,"Desktop status did not catch up when leaving Big Picture.");
-        hiddenCard.Game.Executable=executable;refresh.Invoke(window,null);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var shown=libraryCards.Items.Cast<MainWindow.DesktopGameCard>().First(c=>c.Game.RuntimeOwnsSetup);
+        Check(shown.Game.ShelfConsole==bpConsole&&shown.PlayLabel.Contains("Jouer",StringComparison.Ordinal),"Desktop status did not catch up when leaving Big Picture.");
+        foreach(var (linkedGame,executable) in linked)linkedGame.Executable=executable;refresh.Invoke(window,null);
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         window.HandleBigPictureControllerInput(5);
         void Input(int value)=>window.HandleBigPictureControllerInput(value);

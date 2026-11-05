@@ -86,8 +86,10 @@ public sealed class NativePortAsset
 public static class NativePortCatalog
 {
     public static string GameKey(GameCatalogEntry game) => GameKey(game.ShelfConsole,game.Title);
-    public static string GameKey(string console,string title) => console + ":" +
-        string.Concat(title.Normalize(System.Text.NormalizationForm.FormD).Where(char.IsLetterOrDigit)).ToUpperInvariant();
+    // Called pairwise while grouping versions (O(n²) at startup): normalise each (console, title) once.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<(string,string),string> Keys=new();
+    public static string GameKey(string console,string title) => Keys.GetOrAdd((console,title),static pair => pair.Item1 + ":" +
+        string.Concat(pair.Item2.Normalize(System.Text.NormalizationForm.FormD).Where(char.IsLetterOrDigit)).ToUpperInvariant());
 
     public static IEnumerable<GameCatalogEntry> VersionsOf(IEnumerable<GameCatalogEntry> games, GameCatalogEntry game) =>
         games.Where(candidate => !GameVariants.IsVariant(candidate) && GameKey(candidate) == GameKey(game));

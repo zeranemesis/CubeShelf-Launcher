@@ -14,6 +14,7 @@ public sealed partial class MainWindow
     private bool _loadingPresentation;
     private void InitializeLibraryPresentation()
     {
+        PropertyChanged+=CatchUpLibrary;LibraryView.PropertyChanged+=CatchUpLibrary;PlatformHome.PropertyChanged+=CatchUpLibrary;
         _presentation=new(_paths.DataDirectory);DualScreenView.Configure(_presentation,_previewMusic.Play,BigPictureSounds.PlayFile);
         DualScreenView.AchievementsRequested+=()=>ShowBigPictureMenu("achievements");
         DualScreenView.ReduceMotion=_preferences.ReduceShelfMotion;

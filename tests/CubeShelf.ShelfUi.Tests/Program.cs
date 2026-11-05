@@ -18,6 +18,14 @@ var snapshotDirectory = Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHO
 var builder = AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).UseSkia();
 builder.SetupWithoutStarting();
 if(args.Contains("--render-benchmark")) { RenderBenchmark.Run();return; }
+if(args.Contains("--startup-benchmark"))
+{
+    // Window construction and first frame on this profile; compare medians over several runs, the machine is noisy.
+    var clock=System.Diagnostics.Stopwatch.StartNew();var probe=new MainWindow();var built=clock.ElapsedMilliseconds;
+    clock.Restart();probe.Show();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);Dispatcher.UIThread.RunJobs();
+    Console.WriteLine($"startup: window {built} ms, first frame {clock.ElapsedMilliseconds} ms, working set {Environment.WorkingSet/1048576} MB");
+    probe.Close();return;
+}
 long soundTime = 0;
 var playedSounds = new List<string?>();
 var window = new MainWindow(new BigPictureSounds(cue => playedSounds.Add(cue), () => soundTime));
@@ -106,16 +114,22 @@ try
     window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     fullscreen.SelectedIndex=1;
     AssertBrand("wii");
-    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=14 || selector.SelectedIndex!=1)
+    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || selector.SelectedIndex!=1)
         throw new Exception("Changing console left Big Picture or used the wrong catalogue.");
     fullscreen.SelectedIndex=2;
     AssertBrand("switch");
-    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || cards.Items.Count!=25)
+    if(!window.FindControl<Control>("BigPictureView")!.IsVisible || selector.SelectedIndex!=2)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
     Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (25) → Nintendo 64 (69) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
+    // Hidden desktop cards are no longer rebuilt behind Big Picture; they catch up once the library is back on screen.
+    typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
+    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible=false;Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+    if(cards.Items.Count!=25)throw new Exception($"The desktop library did not catch up with the Switch catalogue after Big Picture: {cards.Items.Count}.");
+    Console.WriteLine("OK  the hidden desktop library catches up with the console chosen in Big Picture.");
     foreach (var index in Enumerable.Range(4, selector.ItemCount - 4))
     {
         selector.SelectedIndex = index;
