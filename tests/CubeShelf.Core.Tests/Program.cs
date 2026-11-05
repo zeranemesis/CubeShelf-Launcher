@@ -13,6 +13,7 @@ if (args.Contains("--session-exit-fixture")) { Console.ReadLine(); return 0; }
 var failures = new List<string>();
 var executed = 0;
 Run("storage: game saves and owned engine cleanup", GameStorageTests.Run);
+Run("library: recognise the player's own game files", GameFileMatcherTests.Run);
 Run("capture: only tracked game processes are eligible", GameCaptureSessionTests.OnlyTrackedProcesses);
 Run("sessions: lookups safely finalize an exited process", GameSessionTrackerTests.ExitedLookups);
 Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
