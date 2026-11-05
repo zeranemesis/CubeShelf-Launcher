@@ -61,6 +61,7 @@ public sealed partial class MobileLibraryView
         Grid.SetColumn(_closeDownloads, 1); header.Children.Add(_closeDownloads); _downloadsOverlay.Children.Add(header);
         var content = new StackPanel { Spacing = 18 };
         content.Children.Add(BuildPresentationSetting());
+        content.Children.Add(BuildScanSetting());
         content.Children.Add(BuildAppUpdateCard());
         _storageButton.IsVisible=_games.Storage is not null;
         _storageButton.Click+=(_,_)=>OpenStorage();content.Children.Add(_storageButton);
@@ -170,7 +171,7 @@ public sealed partial class MobileLibraryView
         if(_storageView?.IsBusy==true){_storageView.RequestClose();return;}
         if(_storageOverlay.IsVisible)CloseStorage();
         if (!_downloadsOverlay.IsVisible) return;
-        _downloadsOverlay.IsVisible = false; _transferProgress.IsIndeterminate = false;
+        _downloadsOverlay.IsVisible = false; _transferProgress.IsIndeterminate = false; _scanCancel?.Cancel();
         _dualLibrary.SetPlaybackActive(_presentationActive);
         _transferCover.Source = null; _pendingTransfers.Children.Clear(); _completedTransfers.Children.Clear();
         foreach (var bitmap in _downloadCovers.Values) bitmap.Dispose();

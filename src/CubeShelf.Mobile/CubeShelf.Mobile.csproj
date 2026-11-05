@@ -31,6 +31,7 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Home/**/*" Link="Assets/Home/%(RecursiveDir)%(Filename)%(Extension)" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Sounds/home-*.wav" Link="Assets/Sounds/%(Filename)%(Extension)" />
     <Compile Include="../CubeShelf.Desktop/Controls/ConsoleBrandMark.cs" Link="Controls/ConsoleBrandMark.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/GameFolderWalker.cs" Link="Controls/GameFolderWalker.cs" />
     <AvaloniaResource Include="Assets/Covers/**/*" />
     <AvaloniaResource Include="Catalogs/*.json" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Assets/Brand/gamecube_logo.png" />

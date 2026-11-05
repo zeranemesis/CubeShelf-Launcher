@@ -119,12 +119,13 @@ public sealed partial class MobileLibraryView
         if(_dualPlatforms)
             surface.SetItems(ResumeTile().Concat(_mobilePlatforms.Select(p=>new DualScreenItem(p.Id,p.Console,p.Id,"",$"{_allCatalog.Count(g=>g.ShelfConsole==p.Id)} jeux","Voir les jeux"))),"Accueil",true,platformSelection);
         else
-            surface.SetItems(_catalog.Select(g=>
+            surface.SetItems(_catalog.OrderBy(g=>FoundGames.ContainsKey(g.Id)?0:1).Select(g=>
             {
                 var cover=g.Covers.FirstOrDefault();
-                return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,Cover(cover?.Front),"Port Android · "+g.Genre,
+                return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,Cover(cover?.Front),(FoundGames.ContainsKey(g.Id)?FoundPrefix:"")+"Port Android · "+g.Genre,
                     Back:cover?.Back??"",Spine:cover?.Spine??"",Right:cover?.Right??"",Top:cover?.Top??"",Bottom:cover?.Bottom??"");
             }),_personalLibrary?"Mes jeux":_mobilePlatforms.FirstOrDefault(p=>p.Id==_activeConsole)?.Console??"Jeux",false,_catalog.ElementAtOrDefault(_selected)?.Id);
+        if(_dualPlatforms&&ScanNeverRan)_dualLibrary.ShowMessage("Astuce : Réglages → Chercher mes jeux pour retrouver tes fichiers.");
         RefreshDualSelection();
         SecondaryScreenStateChanged?.Invoke();
     }
@@ -149,7 +150,7 @@ public sealed partial class MobileLibraryView
         foreach(var surface in new[]{_dualLibrary,_secondaryHome}.OfType<DualScreenLibraryView>())
         {
             if(_catalog.ElementAtOrDefault(_selected) is {} game)surface.SelectItem(game.Id);
-            surface.UpdateSelected(_availability.Text??"",_play.IsVisible?"Jouer":_download.IsVisible?"Préparer le jeu":"Indisponible",_nativePreparation is null&&(_play.IsVisible&&_play.IsEnabled||_download.IsVisible&&_download.IsEnabled));
+            surface.UpdateSelected((FoundGames.ContainsKey(_catalog.ElementAtOrDefault(_selected)?.Id??"")?FoundPrefix:"")+_availability.Text,_play.IsVisible?"Jouer":_download.IsVisible?"Préparer le jeu":"Indisponible",_nativePreparation is null&&(_play.IsVisible&&_play.IsEnabled||_download.IsVisible&&_download.IsEnabled));
         }
     }
 }
