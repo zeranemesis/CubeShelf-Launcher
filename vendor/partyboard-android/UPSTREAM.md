@@ -19,3 +19,8 @@ libraries are installed with CubeShelf, never loaded from runtime downloads.
 
 `RuntimePaths.java` and the phone `QuestVr.java` adapter are CubeShelf additions.
 Neither the proprietary game disc nor extracted disc data is distributed here.
+
+`DualScreen.java` (bottom-screen board map and settings) and its two hooks in
+`PartyBoardActivity` come ahead of a release from Marioparty4
+`feat/dual-screen-companion`. With an engine that lacks its native side the
+second screen is left alone.
