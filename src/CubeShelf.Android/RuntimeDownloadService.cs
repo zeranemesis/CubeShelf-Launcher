@@ -13,6 +13,7 @@ public sealed class RuntimeDownloadService : Service
     private const string Channel = "cubeshelf-downloads";
     private static bool _requested;
     private long _lastNotification;
+    private bool _foreground;
 
     internal static void Observe(RuntimeDownloadSnapshot snapshot)
     {
@@ -27,8 +28,10 @@ public sealed class RuntimeDownloadService : Service
             }
             else if (!snapshot.IsBusy)
             {
+                // The service stops itself once foreground (OnStartCommand, Update). Stopping it
+                // here, before startForeground, makes Android kill the app when a download fails
+                // at once, e.g. offline.
                 _requested = false;
-                context.StopService(new Intent(context, typeof(RuntimeDownloadService)));
             }
         }
         catch (Exception error)
@@ -51,6 +54,7 @@ public sealed class RuntimeDownloadService : Service
     {
         var snapshot = NativeGameService.Downloads.Snapshot;
         StartForeground(NotificationId, Notification(snapshot));
+        _foreground = true;
         if (!snapshot.IsBusy) StopSelf();
         return StartCommandResult.NotSticky;
     }
@@ -74,7 +78,8 @@ public sealed class RuntimeDownloadService : Service
 
     private void Update(RuntimeDownloadSnapshot snapshot)
     {
-        if (!snapshot.IsBusy) { StopSelf(); return; }
+        // Before OnStartCommand the service is not foreground yet; OnStartCommand stops it then.
+        if (!snapshot.IsBusy) { if (_foreground) StopSelf(); return; }
         var now = SystemClock.UptimeMillis();
         if (now - _lastNotification < 1000) return;
         _lastNotification = now;
