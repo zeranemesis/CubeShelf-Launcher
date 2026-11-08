@@ -47,12 +47,45 @@ public sealed partial class MobileLibraryView
         if(_presentation.IsDual){RefreshDualLibrary(true);return;}
         _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
     }
-    private IEnumerable<MobileGame> NativeCatalogGames() => (_games.NativePorts?.Catalog??[]).Select(p=>new MobileGame
+    private Dictionary<string,string>? _portRegions;
+    private string RegionsFile => Path.Combine(_games.DataDirectory,"port-regions.json");
+    // One package per region family: the one picked in the game's options, else an installed one, else the first.
+    private string ChosenRegion(string family,IReadOnlyList<MobileNativePort> variants)
+    {
+        if(_portRegions is null)
+        {
+            try{_portRegions=File.Exists(RegionsFile)&&new FileInfo(RegionsFile).Length<=16384
+                ?System.Text.Json.JsonSerializer.Deserialize<Dictionary<string,string>>(File.ReadAllText(RegionsFile)):null;}
+            catch(Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException){}
+            _portRegions??=[];
+        }
+        if(_portRegions.TryGetValue(family,out var id)&&variants.Any(p=>p.Id==id))return id;
+        return (variants.FirstOrDefault(p=>_games.NativePorts?.IsInstalled(p.Id)==true)??variants[0]).Id;
+    }
+    private MobileNativePort[] RegionVariants(MobileNativePort port)=>port.RegionOf.Length==0?[port]
+        :(_games.NativePorts?.Catalog??[]).Where(p=>p.RegionOf==port.RegionOf).ToArray();
+    private void SwitchRegion(MobileNativePort port)
+    {
+        var variants=RegionVariants(port);if(variants.Length<2)return;
+        var next=variants[(Array.FindIndex(variants,p=>p.Id==port.Id)+1)%variants.Length];
+        _portRegions![port.RegionOf]=next.Id;
+        try{File.WriteAllText(RegionsFile,System.Text.Json.JsonSerializer.Serialize(_portRegions));}
+        catch(Exception error) when (error is IOException or UnauthorizedAccessException){}
+        _allCatalog=_allCatalog.Select(g=>g.Id==port.Id?NativeGame(next):g).ToArray();
+        _catalog=VisibleCatalog();_selected=Math.Max(0,Array.FindIndex(_catalog,g=>g.Id==next.Id));
+        RebuildMobileShelf();Select(_selected,false);
+    }
+    private IEnumerable<MobileGame> NativeCatalogGames()
+    {
+        var ports=_games.NativePorts?.Catalog??[];
+        return ports.Where(p=>p.RegionOf.Length==0||p.Id==ChosenRegion(p.RegionOf,RegionVariants(p))).Select(NativeGame);
+    }
+    private static MobileGame NativeGame(MobileNativePort p) => new MobileGame
     {
         Id=p.Id,Title=p.Title,ShelfConsole=p.ShelfConsole,Genre=p.Project,Players=p.Status,
         Year=p.Year > 0 ? p.Year : p.Id switch {"n64-sm64" or "n64-pilotwings"=>1996,"n64-oot"=>1998,"n64-mm"=>2000,_=>1999},
         Covers=[new MobileCover {Front=p.Front,Back=p.Back,Spine=p.Spine,Right=p.Right,Top=p.Top,Bottom=p.Bottom,Media=p.Media}]
-    });
+    };
     private void UpdatePlatformCaption() => _platformCaption.Text = _personalLibrary
         ?$"Mes jeux · {_catalog.Length} jeu(x) · Toutes consoles":$"{_catalog.Length} jeu(x) · Android";
     private void RebuildMobileShelf()

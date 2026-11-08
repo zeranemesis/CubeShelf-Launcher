@@ -940,7 +940,7 @@
   },
   {
     "Id": "gc-papermario-ttyd-us",
-    "Title": "Paper Mario: The Thousand-Year Door (USA)",
+    "Title": "Paper Mario: The Thousand-Year Door",
     "Project": "Paper Cut",
     "Repository": "LLCOOLT/paper-cut",
     "Version": "v0.4.1",
@@ -951,7 +951,7 @@
       "arm64-v8a"
     ],
     "Status": "APK ARM64 vérifié · partie non testée",
-    "Notes": "Cette version ne lit que le disque USA (G8ME01) : prends celle de ton disque. Aucun jeu fourni. Partie non testée par DecompShelf.",
+    "Notes": "Version USA : elle ne lit que le disque USA (G8ME01). Change de région dans les options du jeu si ton disque est de l'autre région. Aucun jeu fourni. Partie non testée par DecompShelf.",
     "Name": "papercut-0.4.1-us-android-arm64.apk",
     "Url": "https://github.com/LLCOOLT/paper-cut/releases/download/v0.4.1/papercut-0.4.1-us-android-arm64.apk",
     "Size": 53224010,
@@ -968,11 +968,13 @@
     "Bottom": "",
     "Media": "",
     "RequiresVulkan12": false,
-    "RequiresGles3": false
+    "RequiresGles3": false,
+    "RegionOf": "gc-papermario-ttyd",
+    "Region": "USA"
   },
   {
     "Id": "gc-papermario-ttyd-eu",
-    "Title": "Paper Mario: The Thousand-Year Door (Europe)",
+    "Title": "Paper Mario: The Thousand-Year Door",
     "Project": "Paper Cut",
     "Repository": "LLCOOLT/paper-cut",
     "Version": "v0.4.1",
@@ -983,7 +985,7 @@
       "arm64-v8a"
     ],
     "Status": "APK ARM64 vérifié · partie non testée",
-    "Notes": "Cette version ne lit que le disque européen (G8MP01) : prends celle de ton disque. Aucun jeu fourni. Partie non testée par DecompShelf.",
+    "Notes": "Version Europe : elle ne lit que le disque européen (G8MP01). Change de région dans les options du jeu si ton disque est de l'autre région. Aucun jeu fourni. Partie non testée par DecompShelf.",
     "Name": "papercut-0.4.1-eu-android-arm64.apk",
     "Url": "https://github.com/LLCOOLT/paper-cut/releases/download/v0.4.1/papercut-0.4.1-eu-android-arm64.apk",
     "Size": 55930546,
@@ -1000,6 +1002,8 @@
     "Bottom": "",
     "Media": "",
     "RequiresVulkan12": false,
-    "RequiresGles3": false
+    "RequiresGles3": false,
+    "RegionOf": "gc-papermario-ttyd",
+    "Region": "Europe"
   }
 ]

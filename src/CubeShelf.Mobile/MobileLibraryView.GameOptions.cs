@@ -30,6 +30,11 @@ public sealed partial class MobileLibraryView
         }
         Action("Paramètres et préparation",ShowSelectedGameDetails);
         panel.Children.Add(new TextBlock{Text="Version, disponibilité et préparation du port.",FontSize=12,Foreground=Brushes.LightGray,TextWrapping=TextWrapping.Wrap});
+        if(SelectedNativePort is {RegionOf.Length:>0} regional&&RegionVariants(regional).Length>1)
+        {
+            Action("Région du disque : "+regional.Region,()=>SwitchRegion(regional));
+            panel.Children.Add(new TextBlock{Text="Chaque version ne lit que le disque de sa région. Change-la pour celle de ton disque.",FontSize=12,Foreground=Brushes.LightGray,TextWrapping=TextWrapping.Wrap});
+        }
         panel.Children.Add(new TextBlock{Text="Mods du jeu",FontSize=16,Foreground=Brushes.White});
         panel.Children.Add(new TextBlock{Text="La gestion des mods n’est pas encore disponible dans DecompShelf sur Android. Leur compatibilité dépend du port.",FontSize=13,Foreground=Brushes.LightGray,TextWrapping=TextWrapping.Wrap});
         if(_games.Storage is not null)Action("Stockage et sauvegardes",OpenStorage);

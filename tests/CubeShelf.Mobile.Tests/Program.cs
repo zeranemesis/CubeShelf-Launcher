@@ -90,6 +90,7 @@ RunUi();
 GameStorageUiTests.Run(root,ports);
 PresentationTests.Run(root,ports);
 DualDisplayTests.Run(root,ports);
+RegionVariantTests.Run(root,ports);
 FoundGamesTests.Run(root,ports);
 Console.WriteLine("Mobile Android catalogue, download integrity, engine preparation, cancellation and layout checks passed.");
 void RunUi()
@@ -149,7 +150,7 @@ void RunUi()
         picker.SelectedIndex=index;Jobs();
         var platform=platforms[index].Id;
         Check(Field<CubeShelf.Desktop.Controls.ConsoleBrandMark>("_consoleLogo").Platform==platform &&
-            Field<TextBlock>("_platformCaption").Text==$"{ports.Count(p=>p.ShelfConsole==platform)+(platform=="gamecube"?1:0)} jeu(x) · Android", "verified Android platform selects its own catalogue: "+platform);
+            Field<TextBlock>("_platformCaption").Text==$"{ports.Where(p=>p.ShelfConsole==platform).DistinctBy(p=>p.RegionOf.Length>0?p.RegionOf:p.Id).Count()+(platform=="gamecube"?1:0)} jeu(x) · Android", "verified Android platform selects its own catalogue: "+platform);
     }
     host.PartyBoardInstalled=false;
     host.Native.Embedded.Add(ports[0].Id);host.Engines[ports[0].Id].Complete();
@@ -178,7 +179,7 @@ void RunUi()
     view.OpenPersonalLibrary();Jobs();
     Check(!Field<Grid>("_downloadsOverlay").IsVisible&&Field<Array>("_catalog").Length==3,"personal games remain accessible from downloads");
     view.BackFromController();Jobs();
-    Check(picker.IsVisible&&Field<Array>("_catalog").Length==ports.Count(p=>p.ShelfConsole==platforms[picker.SelectedIndex].Id),"B returns from personal games to the console catalog");
+    Check(picker.IsVisible&&Field<Array>("_catalog").Length==ports.Where(p=>p.ShelfConsole==platforms[picker.SelectedIndex].Id).DistinctBy(p=>p.RegionOf.Length>0?p.RegionOf:p.Id).Count(),"B returns from personal games to the console catalog");
     view.GetType().GetMethod("OpenPlatformHome",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,null);Jobs();
     home.GetVisualDescendants().OfType<Button>().Single(button=>button.Name=="PlatformHomeLibraryButton").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
     Check(!home.IsVisible&&Field<Array>("_catalog").Length==3,"console-home personal-library button is connected");
@@ -187,7 +188,8 @@ void RunUi()
     host.PartyBoardInstalled=true;host.Native.Installed.Clear();host.Native.Embedded.Clear();host.Engines[ports[0].Id].Cancel();host.Engines["switch-mhgu"].Cancel();
     foreach(var port in ports)host.Native.Installed.Add(port.Id);
     host.Native.OnLaunch=()=>{view.SetActive(false);view.SetActive(true);};
-    foreach(var native in ports)
+    // A regional family shows one package at a time; RegionVariantTests covers switching between them.
+    foreach(var native in ports.Where(p=>p.RegionOf.Length==0||p.Id==ports.First(q=>q.RegionOf==p.RegionOf).Id))
     {
         var index=Array.FindIndex(platforms,p=>p.Id==native.ShelfConsole);
         picker.SelectedIndex=index;Jobs();

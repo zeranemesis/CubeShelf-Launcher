@@ -27,6 +27,9 @@ public sealed class MobileNativePort
     public string Sha256 { get; set; } = "";
     public string ApkSha256 { get; set; } = "";
     public long ApkSize { get; set; }
+    // Packages that each read one region's disc share a RegionOf family and show as one game.
+    public string RegionOf { get; set; } = "";
+    public string Region { get; set; } = "";
     public string Front { get; set; } = "";
     public string Back { get; set; } = "";
     public string Spine { get; set; } = "";
@@ -48,7 +51,8 @@ public sealed class MobileNativePort
             || uri.AbsolutePath.Split('/').Last()!=Uri.EscapeDataString(Name)
             || Size is <=0 or >268435456 || ApkSize is <=0 or >268435456 || !Hash(Sha256) || !Hash(ApkSha256)
             || PackageName=="io.github.zeranemesis.cubeshelf" || PackageName.Split('.').Length<2
-            || PackageName.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='.'&&c!='_') || VersionCode<=0 || MinimumSdk<24 || Abis.Length==0)
+            || PackageName.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='.'&&c!='_') || VersionCode<=0 || MinimumSdk<24 || Abis.Length==0
+            || RegionOf.Length>80 || RegionOf.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='-') || (RegionOf.Length>0)!=(Region.Length>0))
             throw new InvalidDataException("Entrée de port Android invalide.");
     }
 
