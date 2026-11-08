@@ -1,7 +1,7 @@
 # PartyBoard Android host
 
-Source: https://github.com/zeranemesis/Marioparty4/tree/v0.21.0/platforms/android/app/src/main/java
-Commit: `10673868b69bbcdada496215656a5b7012145f5c`.
+Source: https://github.com/zeranemesis/Marioparty4/tree/v0.21.1/platforms/android/app/src/main/java
+Commit: `e4c51af88cbede515591b2cd891bb4d8831bdcf0`.
 
 SDL's original notices are retained. The engine is distributed by the upstream
 project; `eng/prepare-partyboard-android.py` verifies the published APK's SHA256
@@ -20,7 +20,6 @@ libraries are installed with CubeShelf, never loaded from runtime downloads.
 `RuntimePaths.java` and the phone `QuestVr.java` adapter are CubeShelf additions.
 Neither the proprietary game disc nor extracted disc data is distributed here.
 
-`DualScreen.java` (bottom-screen board map and settings) and its two hooks in
-`PartyBoardActivity` come ahead of a release from Marioparty4
-`feat/dual-screen-companion`. With an engine that lacks its native side the
-second screen is left alone.
+`DualScreen.java` (bottom-screen board map and settings) is part of v0.21.1 and
+imported unchanged. With an engine that lacks its native side the second screen
+is left alone.

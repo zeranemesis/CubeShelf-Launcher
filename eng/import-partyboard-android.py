@@ -5,7 +5,7 @@ import urllib.request
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-COMMIT = "10673868b69bbcdada496215656a5b7012145f5c"
+COMMIT = "e4c51af88cbede515591b2cd891bb4d8831bdcf0"
 
 
 def replace_method(source, signature, replacement):

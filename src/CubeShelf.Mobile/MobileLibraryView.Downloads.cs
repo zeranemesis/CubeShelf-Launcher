@@ -226,7 +226,7 @@ public sealed partial class MobileLibraryView
         _displayedDownloadId = entry?.Id ?? "partyboard";
         var previousFocus = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
         _transferName.Text = entry?.Title ?? "Mario Party 4";
-        _transferVersion.Text = entry is null ? "PartyBoard · v0.21.0" : $"Moteur · {entry.Version}";
+        _transferVersion.Text = entry is null ? "PartyBoard · v0.21.1" : $"Moteur · {entry.Version}";
         _transferCover.Source = DownloadCover(entry?.GameId ?? PartyBoardId);
         _transferCover.Stretch=Stretch.Uniform;
         _transferCover.Height=_transferCover.Source is Bitmap artwork?82d*artwork.PixelSize.Height/artwork.PixelSize.Width:116;

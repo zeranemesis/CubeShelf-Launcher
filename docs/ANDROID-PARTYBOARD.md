@@ -11,7 +11,7 @@ Annuler retire le téléchargement partiel et sa préparation temporaire.
 Une fois prêt, **Jouer** ouvre le moteur dans CubeShelf. Le premier lancement
 demande le disque personnel de Mario Party 4 ; aucun disque ni données extraites
 du disque ne sont inclus. L'intégration concerne le moteur Android ARM64 de
-PartyBoard v0.21.0. Les autres jeux du catalogue n'acquièrent pas de port Android.
+PartyBoard v0.21.1. Les autres jeux du catalogue n'acquièrent pas de port Android.
 
 Le panneau est utilisable au tactile et avec le parcours de commandes existant :
 haut/bas pour choisir une action, A pour l'activer, B pour fermer.
@@ -47,7 +47,7 @@ du panneau ; la bibliothèque et les téléchargements continuent indépendammen
 - Les bibliothèques natives exécutables sont empaquetées et installées avec
   l'APK CubeShelf. Le gestionnaire ne charge aucun code téléchargé à l'exécution.
 - La distribution officielle épinglée est téléchargée comme conteneur de
-  ressources (52 716 096 octets). Sa somme SHA256 complète est vérifiée avant
+  ressources (52 732 480 octets). Sa somme SHA256 complète est vérifiée avant
   extraction. Seuls `assets/res/*` et `assets/initial_pipeline_cache.db` sont
   conservés ; les classes Java et bibliothèques natives du transfert sont ignorées.
 - Les ressources, réglages, sauvegardes et disques préparés par le moteur
