@@ -14,10 +14,10 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==28&&ports.Select(p=>p.PackageName).Distinct().Count()==28,"28 distinct Android ports and package identities");
+Check(ports.Length==32&&ports.Select(p=>p.PackageName).Distinct().Count()==32,"32 distinct Android ports and package identities");
 Check(new[]{"gba-minishcap","gba-rekhcom","n64-battleship","n64-aerogauge"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
     &&ports.Single(p=>p.Id=="n64-aerogauge").RequiresVulkan11,"new native Android ports retain their covers, pinned packages and Vulkan requirement");
-Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:346}
+Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:477}
     &&ports.Single(p=>p.Id=="switch-mhgu").Notes.Contains("pas de commandes tactiles"),"Switch Android package retains verified hardware requirements and controller limitation");
 Check(ports.All(p=>p.Abis.Contains("arm64-v8a")),"all published mobile ports have a verified ARM64 build");
 Check(ports.Single(p=>p.Id=="n64-dk64").RequiresVulkan11 && ports.Single(p=>p.Id=="n64-harvestmoon").RequiresVulkan11,"Vulkan 1.1 requirements survive catalogue loading");

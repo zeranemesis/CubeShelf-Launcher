@@ -997,5 +997,33 @@
       "Windows"
     ],
     "Assets": []
+  },
+  {
+    "Id": "drakolordx7-switch2-recomp-pokemon-pokopia",
+    "Title": "Pokémon Pokopia",
+    "Project": "Pokopia Recomp (Switch 2)",
+    "Repository": "drakolordx7/switch2-recomp",
+    "Method": "Static recompilation",
+    "Status": "Paquet Windows vérifié · partie non testée",
+    "Notes": "Jeu Nintendo Switch 2. Il faut ta propre copie en version 2.0.1a (dossier extrait, ou NSP/XCI avec tes clés), Windows 10/11 64 bits, un GPU Vulkan 1.3 et 16 Go de RAM. La première préparation compile le jeu (environ 7 min) puis le cache de shaders (1 à 2 h). Aucun jeu, firmware ou clé n'est fourni par le launcher. Paquet épinglé à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "5339bf85b05e84c34a7f18d8a43db1de1f1692b2",
+    "ReadmeUrl": "https://github.com/drakolordx7/switch2-recomp/blob/5339bf85b05e84c34a7f18d8a43db1de1f1692b2/README.md",
+    "ReleaseUrl": "https://github.com/drakolordx7/switch2-recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PokopiaRecomp-0.2.0-win64.zip",
+        "Url": "https://github.com/drakolordx7/switch2-recomp/releases/download/v0.2.0/PokopiaRecomp-0.2.0-win64.zip",
+        "Sha256": "fd2630b439917a874676ed8bea53d6aff95ece443ab999568633a1acc716572a",
+        "Size": 171179854,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
   }
 ]

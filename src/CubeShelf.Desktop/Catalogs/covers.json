@@ -5484,6 +5484,17 @@
   },
   {
     "Console": "gamecube",
+    "Title": "Paper Mario: The Thousand-Year Door",
+    "GameTdbId": "",
+    "Source": "libretro-thumbnails",
+    "OriginUrl": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_GameCube/master/Named_Boxarts/Paper%20Mario%20-%20The%20Thousand-Year%20Door%20%28USA%29.png",
+    "Front": "Assets/Covers/gamecube/papermariothethousandyeardoor.png",
+    "Back": "",
+    "Spine": "",
+    "FrontFileSha256": "ef966e7637689850eb8c3ebb5f48b1ed27ef8fe4e013bf8ed4dc896b639c95cc"
+  },
+  {
+    "Console": "gamecube",
     "Title": "NFL Blitz 2003",
     "GameTdbId": "",
     "Source": "libretro-thumbnails",

@@ -46,6 +46,10 @@
     <package android:name="com.rekhcom.android" />
     <package android:name="dev.picori.tmc" />
     <package android:name="io.github.alondero.aerogaugerecomp" />
+    <package android:name="com.flyngmt.nookery" />
+    <package android:name="org.metroidprime2.port" />
+    <package android:name="dev.ttyd.port.us" />
+    <package android:name="dev.ttyd.port.eu" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="false" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">

@@ -2,25 +2,72 @@
   {
     "Id": "flyngmt-acgc-pc-port-animal-crossing",
     "Title": "Animal Crossing",
-    "Project": "ACGC-PC-Port",
-    "Repository": "flyngmt/ACGC-PC-Port",
+    "Project": "Nookery (anciennement ACGC-PC-Port)",
+    "Repository": "flyngmt/Nookery",
     "Method": "Decompilation",
-    "Status": "Aperçu / expérimental",
+    "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "4099d246c927e75b4fd342ca13f4ac4395c55af5",
-    "ReadmeUrl": "https://github.com/flyngmt/ACGC-PC-Port/blob/4099d246c927e75b4fd342ca13f4ac4395c55af5/README.md",
-    "ReleaseUrl": "https://github.com/flyngmt/ACGC-PC-Port/releases/tag/v0.9.3-playtest",
-    "ReleaseTag": "v0.9.3-playtest",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "79f870a30b2f0743994d2ba2ead22e8f1c1e55f7",
+    "ReadmeUrl": "https://github.com/flyngmt/Nookery/blob/79f870a30b2f0743994d2ba2ead22e8f1c1e55f7/README.md",
+    "ReleaseUrl": "https://github.com/flyngmt/Nookery/releases/tag/v1.0.0",
+    "ReleaseTag": "v1.0.0",
     "Platforms": [
-      "Windows"
+      "Linux",
+      "Windows",
+      "macOS"
     ],
     "Assets": [
       {
-        "Name": "ACGC-PC-Port0.9.3.zip",
-        "Url": "https://github.com/flyngmt/ACGC-PC-Port/releases/download/v0.9.3-playtest/ACGC-PC-Port0.9.3.zip",
-        "Sha256": "4fe10763238596d8f1f278461cf3f3e49c7e99903b9fb4e1271e84e72e47976a",
-        "Size": 5117308,
+        "Name": "Nookery-v1.0.0-linux-arm64.AppImage",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-linux-arm64.AppImage",
+        "Sha256": "b51fe6f243d67324e8f269ead597a5e62a7d32699618d6043b3318a4463297e1",
+        "Size": 23448072,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Nookery-v1.0.0-linux-x86_64.AppImage",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-linux-x86_64.AppImage",
+        "Sha256": "ef3e6fac889eae99d3472a5cb65bc5be09363280e43099d4efb82cee17d03f4d",
+        "Size": 24492536,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Nookery-v1.0.0-macos-arm64.zip",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-macos-arm64.zip",
+        "Sha256": "61bcb87dcd60836aa18bc062c9fe653ff3461b0c166142664c77dc3d1ab1c6c6",
+        "Size": 17612839,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "Nookery-v1.0.0-macos-x86_64.zip",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-macos-x86_64.zip",
+        "Sha256": "7431c6c009e0e9bf0100723e762eeb218a3ef4a13b8cc881917b94a7efcbe3cd",
+        "Size": 18824087,
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "Nookery-v1.0.0-windows-arm64.zip",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-windows-arm64.zip",
+        "Sha256": "a52f9151f05fc9bce622077691e9cf70c525db8efb7df4eade5209b893d307bf",
+        "Size": 29849669,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "Nookery-v1.0.0-windows-x86_64.zip",
+        "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-windows-x86_64.zip",
+        "Sha256": "542fe6fc9a216b209fea5a75314d7bc453ce9d91d32a098ebab06a52455d9d68",
+        "Size": 32404132,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -222,11 +269,11 @@
     "Method": "Decompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "8f353245df9ce3b7ddec8bdd861bec88c8f24141",
-    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/8f353245df9ce3b7ddec8bdd861bec88c8f24141/README.md",
-    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrimePort/releases/tag/v0.37.0",
-    "ReleaseTag": "v0.37.0",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "b601be339ca16ab3b0e1ce9cbee0c2dba45f2500",
+    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/b601be339ca16ab3b0e1ce9cbee0c2dba45f2500/README.md",
+    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrimePort/releases/tag/v0.42.0",
+    "ReleaseTag": "v0.42.0",
     "Platforms": [
       "Linux",
       "Windows",
@@ -234,64 +281,64 @@
     ],
     "Assets": [
       {
-        "Name": "metroid-prime-port-0.37.0-linux-aarch64.tar.gz",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/metroid-prime-port-0.37.0-linux-aarch64.tar.gz",
-        "Sha256": "31d789d519eb4ca2fa23085d99337395948d89adc8955c0ff2481b4453585e8b",
-        "Size": 17789063,
+        "Name": "metroid-prime-port-0.42.0-linux-aarch64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-linux-aarch64.tar.gz",
+        "Sha256": "bd230d12604b919a0fa0a5772f27fb799ceff66daa12d407c48183db719279a5",
+        "Size": 18302009,
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.37.0-linux-x86_64.tar.gz",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/metroid-prime-port-0.37.0-linux-x86_64.tar.gz",
-        "Sha256": "d44dd04ea7268259ade61402a86748bd1591488eb873d8b0c66e1482697fe440",
-        "Size": 18703205,
+        "Name": "metroid-prime-port-0.42.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-linux-x86_64.tar.gz",
+        "Sha256": "86c42bf637b30778ecb32f28dd45e16310fbd150fab83f4b82f14889a9a74082",
+        "Size": 19245249,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.37.0-macos-arm64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/metroid-prime-port-0.37.0-macos-arm64.zip",
-        "Sha256": "856c8be4bcd9347c15c831b6cc7162c1028fd9cb0b671788e8f95f037a05d03e",
-        "Size": 18606115,
+        "Name": "metroid-prime-port-0.42.0-macos-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-macos-arm64.zip",
+        "Sha256": "05ab9947d590b4300bbabd9b72e813ba23e8ca7e1a3b3221c83dc61b7a16aa29",
+        "Size": 19061826,
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.37.0-windows-arm64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/metroid-prime-port-0.37.0-windows-arm64.zip",
-        "Sha256": "806055da5ec4a87e7f4e79dd635a151e1f9fdec20cfef973844f9eb19e3854ed",
-        "Size": 71802979,
+        "Name": "metroid-prime-port-0.42.0-windows-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-windows-arm64.zip",
+        "Sha256": "75042730d5e0d0c409b9350992f6d5bcfc6276978ca01452eb0f90a3b06cd02c",
+        "Size": 73815563,
         "RuntimeIdentifiers": [
           "win-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.37.0-windows-x86_64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/metroid-prime-port-0.37.0-windows-x86_64.zip",
-        "Sha256": "9e1d2ef01165df654858ff01aef0cbdc08cde7be29364dcd7a7bb6c48cf58c63",
-        "Size": 74028909,
+        "Name": "metroid-prime-port-0.42.0-windows-x86_64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-windows-x86_64.zip",
+        "Sha256": "2bacc35e7c5bd3d53874210c9cc472086452fea1684482c42d515a4a1e85f0c1",
+        "Size": 76013361,
         "RuntimeIdentifiers": [
           "win-x64"
         ]
       },
       {
         "Name": "MetroidPrime-aarch64.AppImage",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/MetroidPrime-aarch64.AppImage",
-        "Sha256": "ef7a6d448d4cbf32b6d22e5297b8f0435ed6b07825c1ec6f44edaa3bf9a2eff8",
-        "Size": 17099272,
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/MetroidPrime-aarch64.AppImage",
+        "Sha256": "307f69ca2f1eb04f24d46734155e6a8a40d78cbdec3ea7785b769275e145baef",
+        "Size": 17558024,
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
       },
       {
         "Name": "MetroidPrime-x86_64.AppImage",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.37.0/MetroidPrime-x86_64.AppImage",
-        "Sha256": "a7b0da987ab13efdf66c2b5a9e9f66626ae6b6ee3b2e69af3467444adecacf43",
-        "Size": 18041336,
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/MetroidPrime-x86_64.AppImage",
+        "Sha256": "a7f606bfc4e954cf7c824189f7ece5b82cc19e969c4b0ecd276eb87448902d9d",
+        "Size": 18475512,
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
@@ -652,9 +699,9 @@
     "Method": "Decompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "77705f8bb95ef7b7dca4675b149c4bcb6a48da34",
-    "ReadmeUrl": "https://github.com/TwilitRealm/dusklight/blob/77705f8bb95ef7b7dca4675b149c4bcb6a48da34/README.md",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "40457c6adb381928e4b5fef6ed459ed291edd5e2",
+    "ReadmeUrl": "https://github.com/TwilitRealm/dusklight/blob/40457c6adb381928e4b5fef6ed459ed291edd5e2/README.md",
     "ReleaseUrl": "https://github.com/TwilitRealm/dusklight/releases/tag/v2.0.3",
     "ReleaseTag": "v2.0.3",
     "Platforms": [
@@ -966,6 +1013,54 @@
         "Size": 339011664,
         "RuntimeIdentifiers": [
           "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "llcoolt-paper-cut-paper-mario-the-thousand-year-door",
+    "Title": "Paper Mario: The Thousand-Year Door",
+    "Project": "Paper Cut",
+    "Repository": "LLCOOLT/paper-cut",
+    "Method": "Decompilation",
+    "Status": "Release disponible",
+    "Notes": "Port natif de la décompilation, sur Aurora. Il lit ta propre image disque du jeu (USA G8ME01, Europe G8MP01 ou Japon G8MJ01) ; aucun jeu n'est fourni par le launcher. Paquet épinglé à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "21b0e32185427dd9fada006719e0c70220a92168",
+    "ReadmeUrl": "https://github.com/LLCOOLT/paper-cut/blob/21b0e32185427dd9fada006719e0c70220a92168/README.md",
+    "ReleaseUrl": "https://github.com/LLCOOLT/paper-cut/releases/tag/v0.4.1",
+    "ReleaseTag": "v0.4.1",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "papercut-0.4.1-windows-x64.zip",
+        "Url": "https://github.com/LLCOOLT/paper-cut/releases/download/v0.4.1/papercut-0.4.1-windows-x64.zip",
+        "Sha256": "de2efa1eb30f6de2c6c537edfd4f7f3aa9848dbbfa3848cbc20a8779f0292ce8",
+        "Size": 49459020,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "papercut-0.4.1-linux-x64.AppImage",
+        "Url": "https://github.com/LLCOOLT/paper-cut/releases/download/v0.4.1/papercut-0.4.1-linux-x64.AppImage",
+        "Sha256": "3a2b5a67c7ced93a44c83d9cf8e3b316c3727504a0e1289f5224a6ebd654970c",
+        "Size": 62224888,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "papercut-0.4.1-macos-arm64.zip",
+        "Url": "https://github.com/LLCOOLT/paper-cut/releases/download/v0.4.1/papercut-0.4.1-macos-arm64.zip",
+        "Sha256": "9a0ca1cc6a601d6dfe952e8abb9513ac69dfa3fd68891feb2f4f6a5c068efe51",
+        "Size": 42065334,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
         ]
       }
     ]
