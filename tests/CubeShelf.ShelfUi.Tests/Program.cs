@@ -40,6 +40,22 @@ try
     var fullscreen=window.FindControl<ComboBox>("BigPictureConsoleShelfPicker")!;
     var cards=window.FindControl<ItemsControl>("LibraryCards")!;
     var cubeCount=cards.Items.Count;
+    var switch2Index=selector.Items.Cast<ComboBoxItem>().Select((item,index)=>(item,index)).Single(pair=>(string)pair.item.Tag! == "switch2").index;
+    selector.SelectedIndex=switch2Index;
+    if(cards.Items.Count!=3||fullscreen.SelectedIndex!=switch2Index||!window.Title!.Contains("Switch 2"))throw new Exception("Switch 2 must show its three PC ports in both selectors.");
+    if(cards.Items.Cast<MainWindow.DesktopGameCard>().Where(card=>card.Title is "Donkey Kong Bananza" or "Mario Kart World").Any(card=>!card.Game.Genre.Contains("expérimental")))throw new Exception("Experimental Switch 2 ports must be labelled on their library cards.");
+    AssertCovers();
+    if(PlatformHomeControl.Facts("switch2")!=("Nintendo",2025))throw new Exception("Switch 2 must sort with Nintendo consoles by its own release year.");
+    if(args.Contains("--switch2-smoke"))
+    {
+        window.Width=1440;window.Height=1000;window.Show();
+        window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible=false;
+        window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Advance(1);
+        Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(2);Dispatcher.UIThread.RunJobs();
+        if(snapshotDirectory is not null){Directory.CreateDirectory(snapshotDirectory);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshotDirectory,"switch2-library.png"));}
+        Console.WriteLine("Switch 2 desktop and Big Picture selectors, three game cards, covers and hardware year verified.");return;
+    }
+    selector.SelectedIndex=0;
     AssertBrand("gamecube");
     if(selector.ItemCount < 25) throw new Exception("Expanded platforms are missing from the unified selector.");
     foreach(var picker in new[]{selector,fullscreen})
@@ -53,7 +69,7 @@ try
             && !Avalonia.Platform.AssetLoader.Exists(new Uri($"avares://CubeShelf/Assets/Brand/Consoles/{id}.gif")))
             throw new Exception("Missing console logo artwork: "+id);
     }
-    if(cubeCount!=26)throw new Exception($"GameCube catalogue should contain 26 unique games, got {cubeCount}.");
+    if(cubeCount!=27)throw new Exception($"GameCube catalogue should contain 27 unique games, got {cubeCount}.");
     AssertCovers();
     selector.SelectedIndex=1;
     AssertBrand("wii");

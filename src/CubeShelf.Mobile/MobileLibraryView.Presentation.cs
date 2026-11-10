@@ -13,6 +13,11 @@ public sealed partial class MobileLibraryView
     private bool _secondaryAttached;
     private ComboBox? _stylePicker;
     private DualScreenLibraryView HomeInput=>_secondaryAttached&&_secondaryHome is {} home?home:_dualLibrary;
+    public bool ReduceMotion
+    {
+        get=>_dualLibrary.ReduceMotion;
+        set{_dualLibrary.ReduceMotion=value;if(_secondaryHome is {} home)home.ReduceMotion=value;}
+    }
     public event Action? SecondaryScreenStateChanged;
     // Overlays keep the bottom screen up (inert): dismissing the Presentation would expose the device's own launcher there.
     public bool WantsSecondaryScreen=>_presentation.IsDual&&_presentation.SecondaryDisplay&&_presentationActive&&_dualLibrary.IsEffectivelyVisible&&!_launchTransition.IsVisible;
@@ -73,7 +78,7 @@ public sealed partial class MobileLibraryView
     {
         if(_secondaryHome is null)
         {
-            _secondaryHome=new(){ScreenRole=HomeScreenRole.Navigation,ShowClock=false,PreviewFacePath=Cover};
+            _secondaryHome=new(){ScreenRole=HomeScreenRole.Navigation,ShowClock=false,PreviewFacePath=Cover,ReduceMotion=ReduceMotion};
             _secondaryHome.Configure(_presentation,null,_games.PlayMenuSound);WireHome(_secondaryHome);
             _secondaryHome.PreferencesChanged+=()=>_dualLibrary.RefreshPreferences();
             _secondaryHome.SetPlaybackActive(false);

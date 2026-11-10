@@ -11,6 +11,8 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/4a10749a-17b8-45e0-b003-1dcec42bf6a9.png" Link="Assets/Logos/Database/4a10749a-17b8-45e0-b003-1dcec42bf6a9.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/5c148e0b-4e34-4f50-9267-d2a62676b09d.png" Link="Assets/Logos/Database/5c148e0b-4e34-4f50-9267-d2a62676b09d.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/5d0f245a-64c6-4604-bef8-095f09a8d345.png" Link="Assets/Logos/Database/5d0f245a-64c6-4604-bef8-095f09a8d345.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/6014da6a-9483-4bdd-b0da-df138bed360f.png" Link="Assets/Logos/Database/6014da6a-9483-4bdd-b0da-df138bed360f.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/68978f30-dee8-40e3-b717-19f9d2a4763c.png" Link="Assets/Logos/Database/68978f30-dee8-40e3-b717-19f9d2a4763c.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/6c55de9e-a6f2-4321-995c-ed90490bc8b5.png" Link="Assets/Logos/Database/6c55de9e-a6f2-4321-995c-ed90490bc8b5.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/700a82c7-38f9-4166-a4e7-b7263b915762.png" Link="Assets/Logos/Database/700a82c7-38f9-4166-a4e7-b7263b915762.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/70ec21e1-d1bd-4f75-b55a-14a7b52a3c3c.png" Link="Assets/Logos/Database/70ec21e1-d1bd-4f75-b55a-14a7b52a3c3c.png" />
@@ -25,6 +27,7 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/a865a58b-faf7-42e6-b0f5-be8e3837b3b0.png" Link="Assets/Logos/Database/a865a58b-faf7-42e6-b0f5-be8e3837b3b0.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/ac9441f0-afce-4243-9a33-102e240b58c1.png" Link="Assets/Logos/Database/ac9441f0-afce-4243-9a33-102e240b58c1.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/b1f8e018-d5aa-4535-8452-21899a529784.png" Link="Assets/Logos/Database/b1f8e018-d5aa-4535-8452-21899a529784.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/cd9124d8-68b8-40c8-83d2-1f200a362cee.png" Link="Assets/Logos/Database/cd9124d8-68b8-40c8-83d2-1f200a362cee.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/d9219d94-9050-402c-a03d-6bea43258cc5.png" Link="Assets/Logos/Database/d9219d94-9050-402c-a03d-6bea43258cc5.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/ee4c7a09-0c11-4719-8f16-d1bbc1206d60.png" Link="Assets/Logos/Database/ee4c7a09-0c11-4719-8f16-d1bbc1206d60.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/f5d37c8b-60cc-45c1-b459-27055dbe98e7.png" Link="Assets/Logos/Database/f5d37c8b-60cc-45c1-b459-27055dbe98e7.png" />
@@ -33,6 +36,7 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/fdb6e3af-4a4f-4c89-a04f-e6eeef54376a.png" Link="Assets/Logos/Database/fdb6e3af-4a4f-4c89-a04f-e6eeef54376a.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_28a9b045-607d-42cb-a68d-ee6516c95f72.png" Link="Assets/Logos/Database/r2_28a9b045-607d-42cb-a68d-ee6516c95f72.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_78b5ccca-a898-4108-81f7-b623b0c5a094.png" Link="Assets/Logos/Database/r2_78b5ccca-a898-4108-81f7-b623b0c5a094.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_7fe87cac-fd76-48e5-b010-a26a9507cb35.png" Link="Assets/Logos/Database/r2_7fe87cac-fd76-48e5-b010-a26a9507cb35.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" Link="Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" Link="Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" />
   </ItemGroup>

@@ -298,5 +298,15 @@
     "License": "CC BY-SA 2.0",
     "LicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
     "Sha256": "8e46e0909ddb3f74a0dc96dd5034cf47e40738574918d8d0f8dcee2438b6320a"
+  },
+  {
+    "Console": "switch2",
+    "File": "switch2.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_console_in_handheld_mode.png",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Nintendo_Switch_2_console_in_handheld_mode.png/500px-Nintendo_Switch_2_console_in_handheld_mode.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "Author": "AOMAF2024 from Wedel, Germany",
+    "License": "CC0",
+    "LicenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "Sha256": "f379e44c02776bcf9ef2321b5047f07d811d71e10b72f83f2e74aa3c82eec3c7"
   }
 ]

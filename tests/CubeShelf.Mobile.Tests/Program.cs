@@ -14,10 +14,12 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==32&&ports.Select(p=>p.PackageName).Distinct().Count()==32,"32 distinct Android ports and package identities");
+Check(ports.Length==37&&ports.Select(p=>p.PackageName).Distinct().Count()==37,"37 distinct Android ports and package identities");
+Check(new[]{"ps2-ico","gc-metroidprime2","nds-hunters","gc-animalcrossing","ps1-ctr","gc-pikmin","3ds-samusreturns"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
+    &&ports.Single(p=>p.Id=="3ds-samusreturns").RequiresVulkan13,"November additions retain pinned APKs, covers and hardware requirements");
 Check(new[]{"gba-minishcap","gba-rekhcom","n64-battleship","n64-aerogauge"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
     &&ports.Single(p=>p.Id=="n64-aerogauge").RequiresVulkan11,"new native Android ports retain their covers, pinned packages and Vulkan requirement");
-Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:477}
+Check(ports.Single(p=>p.Id=="switch-mhgu") is {ShelfConsole:"switch",MinimumSdk:29,RequiresVulkan12:true,VersionCode:511}
     &&ports.Single(p=>p.Id=="switch-mhgu").Notes.Contains("pas de commandes tactiles"),"Switch Android package retains verified hardware requirements and controller limitation");
 Check(ports.All(p=>p.Abis.Contains("arm64-v8a")),"all published mobile ports have a verified ARM64 build");
 Check(ports.Single(p=>p.Id=="n64-dk64").RequiresVulkan11 && ports.Single(p=>p.Id=="n64-harvestmoon").RequiresVulkan11,"Vulkan 1.1 requirements survive catalogue loading");
@@ -84,6 +86,11 @@ using(var http=new HttpClient(new SlowHttp()))
     engine.Cancel();Check(engine.Snapshot.State==RuntimeDownloadState.NotInstalled&&!File.Exists(engine.ApkFile),"cancel removes the pending APK without invoking an installer");
 }
 
+if(args.Contains("--presentation-smoke"))
+{
+    AppBuilder.Configure<MobileApp>().UseHeadless(new AvaloniaHeadlessPlatformOptions {UseHeadlessDrawing=false}).UseSkia().SetupWithoutStarting();
+    PresentationTests.Run(root,ports);return;
+}
 await Sm64Tests.Run(root);
 await EmbeddedModuleTests.Run(root);
 RunUi();
@@ -121,7 +128,9 @@ void RunUi()
     var selectedConsole=home.SelectedConsole;
     for(var sort=0;sort<5;sort++){home.CycleSort();Check(home.SelectedConsole==selectedConsole,"sorting preserves the selected console");}
     home.CycleSort();home.CycleSort();home.Move(1);
-    Check(home.SelectedConsole=="wii","chronological sorting puts Wii after GameCube among Android platforms");
+    Check(home.SelectedConsole=="nds","chronological sorting puts Nintendo DS after GameCube among Android platforms");
+    home.Move(1);Check(home.SelectedConsole=="wii","chronological sorting puts Wii after Nintendo DS");
+    home.Move(1);Check(home.SelectedConsole=="3ds","chronological sorting puts Nintendo 3DS after Wii");
     home.Move(1);Check(home.SelectedConsole=="wiiu","chronological sorting puts Wii U after Wii");
     home.Move(1);Check(home.SelectedConsole=="switch","chronological sorting puts Switch after Wii U");
     home.Move(1);Check(home.SelectedConsole=="gb","chronological sorting wraps from the latest to the oldest platform");
@@ -143,7 +152,7 @@ void RunUi()
     var n64Count=ports.Count(p=>p.ShelfConsole=="n64");
     for(var step=0;step<platforms.Length&&home.SelectedConsole!="n64";step++)view.BrowseFromController(1);
     view.ActivateFromController();Check(!home.IsVisible&&picker.SelectedIndex==n64,"controller confirms the 3D console and opens its games");Jobs();
-    Check(picker.ItemCount == 9 && picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
+    Check(picker.ItemCount == 13 && picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
     Check(Field<TextBlock>("_platformCaption").Text == $"{n64Count} jeu(x) · Android", "platform caption reflects the Android catalogue");
     for(var index=0;index<platforms.Length;index++)
     {

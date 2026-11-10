@@ -2,14 +2,14 @@
   {
     "Id": "flyngmt-acgc-pc-port-animal-crossing",
     "Title": "Animal Crossing",
-    "Project": "Nookery (anciennement ACGC-PC-Port)",
+    "Project": "Nookery",
     "Repository": "flyngmt/Nookery",
-    "Method": "Decompilation",
-    "Status": "Release disponible",
-    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-11-08",
-    "SourceCommit": "79f870a30b2f0743994d2ba2ead22e8f1c1e55f7",
-    "ReadmeUrl": "https://github.com/flyngmt/Nookery/blob/79f870a30b2f0743994d2ba2ead22e8f1c1e55f7/README.md",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "1295ed1942f88d26329b0d4fb972318b1babb811",
+    "ReadmeUrl": "https://github.com/flyngmt/Nookery/blob/1295ed1942f88d26329b0d4fb972318b1babb811/README.md",
     "ReleaseUrl": "https://github.com/flyngmt/Nookery/releases/tag/v1.0.0",
     "ReleaseTag": "v1.0.0",
     "Platforms": [
@@ -21,8 +21,8 @@
       {
         "Name": "Nookery-v1.0.0-linux-arm64.AppImage",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-linux-arm64.AppImage",
-        "Sha256": "b51fe6f243d67324e8f269ead597a5e62a7d32699618d6043b3318a4463297e1",
         "Size": 23448072,
+        "Sha256": "b51fe6f243d67324e8f269ead597a5e62a7d32699618d6043b3318a4463297e1",
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
@@ -30,8 +30,8 @@
       {
         "Name": "Nookery-v1.0.0-linux-x86_64.AppImage",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-linux-x86_64.AppImage",
-        "Sha256": "ef3e6fac889eae99d3472a5cb65bc5be09363280e43099d4efb82cee17d03f4d",
         "Size": 24492536,
+        "Sha256": "ef3e6fac889eae99d3472a5cb65bc5be09363280e43099d4efb82cee17d03f4d",
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
@@ -39,8 +39,8 @@
       {
         "Name": "Nookery-v1.0.0-macos-arm64.zip",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-macos-arm64.zip",
-        "Sha256": "61bcb87dcd60836aa18bc062c9fe653ff3461b0c166142664c77dc3d1ab1c6c6",
         "Size": 17612839,
+        "Sha256": "61bcb87dcd60836aa18bc062c9fe653ff3461b0c166142664c77dc3d1ab1c6c6",
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
@@ -48,8 +48,8 @@
       {
         "Name": "Nookery-v1.0.0-macos-x86_64.zip",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-macos-x86_64.zip",
-        "Sha256": "7431c6c009e0e9bf0100723e762eeb218a3ef4a13b8cc881917b94a7efcbe3cd",
         "Size": 18824087,
+        "Sha256": "7431c6c009e0e9bf0100723e762eeb218a3ef4a13b8cc881917b94a7efcbe3cd",
         "RuntimeIdentifiers": [
           "osx-x64"
         ]
@@ -57,8 +57,8 @@
       {
         "Name": "Nookery-v1.0.0-windows-arm64.zip",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-windows-arm64.zip",
-        "Sha256": "a52f9151f05fc9bce622077691e9cf70c525db8efb7df4eade5209b893d307bf",
         "Size": 29849669,
+        "Sha256": "a52f9151f05fc9bce622077691e9cf70c525db8efb7df4eade5209b893d307bf",
         "RuntimeIdentifiers": [
           "win-arm64"
         ]
@@ -66,8 +66,8 @@
       {
         "Name": "Nookery-v1.0.0-windows-x86_64.zip",
         "Url": "https://github.com/flyngmt/Nookery/releases/download/v1.0.0/Nookery-v1.0.0-windows-x86_64.zip",
-        "Sha256": "542fe6fc9a216b209fea5a75314d7bc453ce9d91d32a098ebab06a52455d9d68",
         "Size": 32404132,
+        "Sha256": "542fe6fc9a216b209fea5a75314d7bc453ce9d91d32a098ebab06a52455d9d68",
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -269,11 +269,11 @@
     "Method": "Decompilation",
     "Status": "Release disponible",
     "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
-    "VerifiedAt": "2026-11-08",
-    "SourceCommit": "b601be339ca16ab3b0e1ce9cbee0c2dba45f2500",
-    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/b601be339ca16ab3b0e1ce9cbee0c2dba45f2500/README.md",
-    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrimePort/releases/tag/v0.42.0",
-    "ReleaseTag": "v0.42.0",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "7e6e7c03d530700f89e217d2f87aae8daeaa6fea",
+    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/7e6e7c03d530700f89e217d2f87aae8daeaa6fea/README.md",
+    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrimePort/releases/tag/v0.44.0",
+    "ReleaseTag": "v0.44.0",
     "Platforms": [
       "Linux",
       "Windows",
@@ -281,66 +281,48 @@
     ],
     "Assets": [
       {
-        "Name": "metroid-prime-port-0.42.0-linux-aarch64.tar.gz",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-linux-aarch64.tar.gz",
-        "Sha256": "bd230d12604b919a0fa0a5772f27fb799ceff66daa12d407c48183db719279a5",
-        "Size": 18302009,
+        "Name": "metroid-prime-port-0.44.0-linux-aarch64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.44.0/metroid-prime-port-0.44.0-linux-aarch64.tar.gz",
+        "Size": 18330230,
+        "Sha256": "cb70fec0deb20acaadf9b1e861ac081580c22b0a1560cbeef1614f5299188616",
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.42.0-linux-x86_64.tar.gz",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-linux-x86_64.tar.gz",
-        "Sha256": "86c42bf637b30778ecb32f28dd45e16310fbd150fab83f4b82f14889a9a74082",
-        "Size": 19245249,
+        "Name": "metroid-prime-port-0.44.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.44.0/metroid-prime-port-0.44.0-linux-x86_64.tar.gz",
+        "Size": 19277703,
+        "Sha256": "69b89c99f9fa4f6b430589e3a5f3a9a19b13abea182ade569ed6b119313b0e51",
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.42.0-macos-arm64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-macos-arm64.zip",
-        "Sha256": "05ab9947d590b4300bbabd9b72e813ba23e8ca7e1a3b3221c83dc61b7a16aa29",
-        "Size": 19061826,
+        "Name": "metroid-prime-port-0.44.0-macos-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.44.0/metroid-prime-port-0.44.0-macos-arm64.zip",
+        "Size": 18982296,
+        "Sha256": "611ebfb054dde6ddaa8017f42a5e812209c7c9226925ac4c84ec8c8d8a39095b",
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.42.0-windows-arm64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-windows-arm64.zip",
-        "Sha256": "75042730d5e0d0c409b9350992f6d5bcfc6276978ca01452eb0f90a3b06cd02c",
-        "Size": 73815563,
+        "Name": "metroid-prime-port-0.44.0-windows-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.44.0/metroid-prime-port-0.44.0-windows-arm64.zip",
+        "Size": 73436277,
+        "Sha256": "b401c5971f476d106e993f0f2af44f4b3c4225a3e06bd36297585ccaeb0081a5",
         "RuntimeIdentifiers": [
           "win-arm64"
         ]
       },
       {
-        "Name": "metroid-prime-port-0.42.0-windows-x86_64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/metroid-prime-port-0.42.0-windows-x86_64.zip",
-        "Sha256": "2bacc35e7c5bd3d53874210c9cc472086452fea1684482c42d515a4a1e85f0c1",
-        "Size": 76013361,
+        "Name": "metroid-prime-port-0.44.0-windows-x86_64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.44.0/metroid-prime-port-0.44.0-windows-x86_64.zip",
+        "Size": 75637830,
+        "Sha256": "f5269bae1f0fa03296ce2d8624ca282e29013cecdeb829a6f41431460bf57cb8",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
-      },
-      {
-        "Name": "MetroidPrime-aarch64.AppImage",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/MetroidPrime-aarch64.AppImage",
-        "Sha256": "307f69ca2f1eb04f24d46734155e6a8a40d78cbdec3ea7785b769275e145baef",
-        "Size": 17558024,
-        "RuntimeIdentifiers": [
-          "linux-arm64"
-        ]
-      },
-      {
-        "Name": "MetroidPrime-x86_64.AppImage",
-        "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.42.0/MetroidPrime-x86_64.AppImage",
-        "Sha256": "a7f606bfc4e954cf7c824189f7ece5b82cc19e969c4b0ecd276eb87448902d9d",
-        "Size": 18475512,
-        "RuntimeIdentifiers": [
-          "linux-x64"
         ]
       }
     ]
@@ -858,29 +840,58 @@
     "Method": "Port natif Windows déclaré par le projet",
     "Status": "Paquet Windows · partie non testée",
     "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "7330047e0b73b98afa6d8411c2aadbe54b89982f",
-    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrime2Port/blob/7330047e0b73b98afa6d8411c2aadbe54b89982f/README.md",
-    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrime2Port/releases/tag/v0.7.0",
-    "ReleaseTag": "v0.7.0",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "085b959c20d5e02b4af25acec826f5add5947b47",
+    "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrime2Port/blob/085b959c20d5e02b4af25acec826f5add5947b47/README.md",
+    "ReleaseUrl": "https://github.com/Odrannnn/MetroidPrime2Port/releases/tag/v0.14.0",
+    "ReleaseTag": "v0.14.0",
     "Platforms": [
-      "Windows"
+      "Linux",
+      "Windows",
+      "macOS"
     ],
     "Assets": [
       {
-        "Name": "metroid-prime2-port-0.7.0-windows-arm64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.7.0/metroid-prime2-port-0.7.0-windows-arm64.zip",
-        "Sha256": "0b3937117086b8866ef3d127dfca0f6cbba4a23b31e0c1d13e97c01f322b778e",
-        "Size": 61369148,
+        "Name": "metroid-prime2-port-0.14.0-linux-aarch64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.14.0/metroid-prime2-port-0.14.0-linux-aarch64.tar.gz",
+        "Size": 19227773,
+        "Sha256": "97a2308b19c4b6b26bf86810f85050254a252955d2455031159dd12f5da704da",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "metroid-prime2-port-0.14.0-linux-x86_64.tar.gz",
+        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.14.0/metroid-prime2-port-0.14.0-linux-x86_64.tar.gz",
+        "Size": 19835979,
+        "Sha256": "496c7bdd90ecfabb593b32ce850bb19c901fc6dbb8dd8e54c0372fdc1c14feb2",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "metroid-prime2-port-0.14.0-macos-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.14.0/metroid-prime2-port-0.14.0-macos-arm64.zip",
+        "Size": 18043874,
+        "Sha256": "984e4070aee1d41cfc32141406467cd9bb3dc0121d5de8732c7bf76d200791c5",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "metroid-prime2-port-0.14.0-windows-arm64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.14.0/metroid-prime2-port-0.14.0-windows-arm64.zip",
+        "Size": 63759897,
+        "Sha256": "358ae8e4a929716b23b406fd2777c0cea6b060321f84c6a1f94a2421b764e27e",
         "RuntimeIdentifiers": [
           "win-arm64"
         ]
       },
       {
-        "Name": "metroid-prime2-port-0.7.0-windows-x86_64.zip",
-        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.7.0/metroid-prime2-port-0.7.0-windows-x86_64.zip",
-        "Sha256": "6fa559f898652d1ce611f9c86e413924f56d231e8a1e0a28713a6f0ef629c3fd",
-        "Size": 63232613,
+        "Name": "metroid-prime2-port-0.14.0-windows-x86_64.zip",
+        "Url": "https://github.com/Odrannnn/MetroidPrime2Port/releases/download/v0.14.0/metroid-prime2-port-0.14.0-windows-x86_64.zip",
+        "Size": 65751876,
+        "Sha256": "86cfc3ac040b40f2a4abdba9c74fb30b602fc6c3ec1515a3602f22e6904679ba",
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -923,20 +934,30 @@
     "Method": "Port natif Windows déclaré par le projet",
     "Status": "Paquet Windows · partie non testée",
     "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "a0985ba968d9e6078ccb50dd79e8865d289d1c8c",
-    "ReadmeUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/blob/a0985ba968d9e6078ccb50dd79e8865d289d1c8c/README.md",
-    "ReleaseUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/tag/1.1.1",
-    "ReleaseTag": "1.1.1",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "ae283b5a16853a18b957797795d9f3e8135dd1ea",
+    "ReadmeUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/blob/ae283b5a16853a18b957797795d9f3e8135dd1ea/README.md",
+    "ReleaseUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/tag/1.2",
+    "ReleaseTag": "1.2",
     "Platforms": [
+      "Linux",
       "Windows"
     ],
     "Assets": [
       {
+        "Name": "nectar-linux.tar.gz",
+        "Url": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/download/1.2/nectar-linux.tar.gz",
+        "Size": 31548436,
+        "Sha256": "19c4ed75ae9a9000b1c5b1ea8c06190b7e5827bf1b086c413ae371df9550a1a2",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
         "Name": "nectar-windows.zip",
-        "Url": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/download/1.1.1/nectar-windows.zip",
-        "Sha256": "3f59071cb609c9a38ed052d4f26731d65705f520052d303980c0c654613d6ed2",
-        "Size": 25244959,
+        "Url": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/download/1.2/nectar-windows.zip",
+        "Size": 25282715,
+        "Sha256": "c70bf294644ecc58f1547d7c98733c3650c67a4d4b2a98a246636fb428512b3f",
         "RuntimeIdentifiers": [
           "win-x64"
         ]
@@ -1063,6 +1084,44 @@
           "osx-arm64"
         ]
       }
+    ]
+  },
+  {
+    "Id": "gc-pikmin2",
+    "Title": "Pikmin 2",
+    "Project": "Open-Nectar---Pikmin-Native-PC-Mobile-Port",
+    "Repository": "SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Assets": [
+      {
+        "Name": "nectar-linux.tar.gz",
+        "Url": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/download/1.2/nectar-linux.tar.gz",
+        "Size": 31548436,
+        "Sha256": "19c4ed75ae9a9000b1c5b1ea8c06190b7e5827bf1b086c413ae371df9550a1a2",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "nectar-windows.zip",
+        "Url": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/download/1.2/nectar-windows.zip",
+        "Size": 25282715,
+        "Sha256": "c70bf294644ecc58f1547d7c98733c3650c67a4d4b2a98a246636fb428512b3f",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "ae283b5a16853a18b957797795d9f3e8135dd1ea",
+    "ReadmeUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/blob/ae283b5a16853a18b957797795d9f3e8135dd1ea/README.md",
+    "ReleaseUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/tag/1.2",
+    "ReleaseTag": "1.2",
+    "Platforms": [
+      "Linux",
+      "Windows"
     ]
   }
 ]

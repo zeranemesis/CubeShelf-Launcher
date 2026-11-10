@@ -420,7 +420,11 @@ public sealed partial class MainWindow
             ResolveCoverPath(cover?.Back),
             ResolveCoverPath(cover?.Spine), ResolveCoverPath(cover?.Right),
             ResolveCoverPath(cover?.Top), ResolveCoverPath(cover?.Bottom)))
-            GameCase.SetShelfPose(baseGame.ShelfConsole == "gamecube" ? 24 : 14,true,animate:false);
+        {
+            var pose=baseGame.ShelfConsole == "gamecube" ? 24 : 14;
+            GameCase.SetShelfPose(_preferences.ReduceShelfMotion?pose:pose+18,true,animate:false);
+            GameCase.SetShelfPose(pose,true,animate:!_preferences.ReduceShelfMotion);
+        }
 
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var updateSnapshot))
             ApplyGameUpdateSnapshotPhase3(updateSnapshot);

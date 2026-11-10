@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'src/CubeShelf.Desktop/Assets/Consoles'
 FILES = {
     'gamecube':'GameCube-Console-Set.png','wii':'Wii-Console.png',
-    'switch':'Nintendo-Switch-Console-Docked-wJoyConRB.jpg','n64':'N64-Console-Set.png',
+    'switch':'Nintendo-Switch-Console-Docked-wJoyConRB.jpg','switch2':'Nintendo Switch 2 console in handheld mode.png','n64':'N64-Console-Set.png',
     'nes':'NES-Console-Set.png','snes':'SNES-Mod1-Console-Set.jpg',
     'gb':'Game-Boy-FL.png','gbc':'Nintendo-Game-Boy-Color-FL.png',
     'gba':'Nintendo-Game-Boy-Advance-Purple-FL.jpg','nds':'Nintendo-DS-Fat-Blue.jpg',

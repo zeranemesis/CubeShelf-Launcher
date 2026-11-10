@@ -46,30 +46,30 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Port natif déclaré par le projet",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "c4fecfe7dafaff5f2e5cd5f425a46fd172b7a424",
-    "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/c4fecfe7dafaff5f2e5cd5f425a46fd172b7a424/README.md",
-    "ReleaseUrl": "https://github.com/GABRIELNNK/Bigodao/releases/tag/1.7.0",
-    "ReleaseTag": "1.7.0",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "c67ff008b1561dce079781603f9b5da3c1320f5e",
+    "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/c67ff008b1561dce079781603f9b5da3c1320f5e/README.md",
+    "ReleaseUrl": "https://github.com/GABRIELNNK/Bigodao/releases/tag/1.8.0",
+    "ReleaseTag": "1.8.0",
     "Platforms": [
-      "Windows",
-      "Linux"
+      "Linux",
+      "Windows"
     ],
     "Assets": [
       {
-        "Name": "bigodao_1.7_linux_x86.zip",
-        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.7.0/bigodao_1.7_linux_x86.zip",
-        "Sha256": "29c39cd6b5a7b4ec75aae7a41c48297e3026fb4b98364411f219b115f4b743ae",
-        "Size": 13651198,
+        "Name": "bigodao_1.8_linux_x86.zip",
+        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.8.0/bigodao_1.8_linux_x86.zip",
+        "Size": 13406158,
+        "Sha256": "aeb4c1face63f385bbb4f28fa4501221d8a6b4d27d9f4729fd6ad4186fa121f8",
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "bigodao_1.7_win.zip",
-        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.7.0/bigodao_1.7_win.zip",
-        "Sha256": "21e13616bbc0d62dcf1341be10d392694b1f6033965dc4c9ab15f13a8f028ac6",
-        "Size": 18714973,
+        "Name": "bigodao_1.8_win.zip",
+        "Url": "https://github.com/GABRIELNNK/Bigodao/releases/download/1.8.0/bigodao_1.8_win.zip",
+        "Size": 18471432,
+        "Sha256": "73a186e264443b2abc3ad71eef43cc12e615dac4f8cf9982c1f7f5db99fb67ea",
         "RuntimeIdentifiers": [
           "win-x64"
         ]

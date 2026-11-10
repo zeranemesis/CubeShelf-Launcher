@@ -161,7 +161,7 @@ def main():
    node=ET.SubElement(application,c['Kind']);attr(node,'name',c['Bridge']);attr(node,'exported','false');attr(node,'process',spec['Process'])
    original=raw_components[c['Bridge']];attrs=original['Attributes']
    if c['Kind']=='activity':
-    attr(node,'theme','@android:style/Theme.Black.NoTitleBar.Fullscreen');attr(node,'excludeFromRecents','true');attr(node,'taskAffinity','io.github.zeranemesis.cubeshelf.native.'+spec['Id'].replace('-','_'));attr(node,'enableOnBackInvokedCallback','false')
+    attr(node,'theme','@android:style/Theme.Black.NoTitleBar.Fullscreen');attr(node,'excludeFromRecents','true');attr(node,'taskAffinity','io.github.zeranemesis.cubeshelf.native.engine_'+spec['Id'].replace('-','_'));attr(node,'enableOnBackInvokedCallback','false')
     attr(node,'configChanges','keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout|uiMode|layoutDirection|locale|fontScale|density|touchscreen|colorMode|mcc|mnc')
     attr(node,'screenOrientation',orientations.get(int(attrs.get('screenOrientation','6'),0),'sensorLandscape'))
     for metadata in original['Children']:

@@ -1,0 +1,336 @@
+{
+  "CheckedAt": "2026-11-10",
+  "AndroidAdded": [
+    {
+      "Id": "ps2-ico",
+      "Title": "ICO",
+      "Repository": "nathanialf/ico-pc",
+      "Version": "v0.11.2",
+      "PreviousVersion": null,
+      "SourceCommit": "5b280d7dfa5bee48d5addade17e6c436dc382b7b",
+      "ReadmeUrl": "https://github.com/nathanialf/ico-pc/blob/5b280d7dfa5bee48d5addade17e6c436dc382b7b/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gc-metroidprime2",
+      "Title": "Metroid Prime 2: Echoes",
+      "Repository": "Odrannnn/MetroidPrime2Port",
+      "Version": "v0.14.0",
+      "PreviousVersion": null,
+      "SourceCommit": "085b959c20d5e02b4af25acec826f5add5947b47",
+      "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrime2Port/blob/085b959c20d5e02b4af25acec826f5add5947b47/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "nds-hunters",
+      "Title": "Metroid Prime Hunters",
+      "Repository": "aabrole/HuntersRecomp",
+      "Version": "v0.2.5",
+      "PreviousVersion": null,
+      "SourceCommit": "7482c7013b14b18e17864521ceb1a079c172499c",
+      "ReadmeUrl": "https://github.com/aabrole/HuntersRecomp/blob/7482c7013b14b18e17864521ceb1a079c172499c/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gc-animalcrossing",
+      "Title": "Animal Crossing",
+      "Repository": "flyngmt/Nookery",
+      "Version": "v1.0.0",
+      "PreviousVersion": null,
+      "SourceCommit": "1295ed1942f88d26329b0d4fb972318b1babb811",
+      "ReadmeUrl": "https://github.com/flyngmt/Nookery/blob/1295ed1942f88d26329b0d4fb972318b1babb811/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "ps1-ctr",
+      "Title": "Crash Team Racing",
+      "Repository": "igawa6/ctr-native-android",
+      "Version": "v0.1.0",
+      "PreviousVersion": null,
+      "SourceCommit": "eb848488e8224d90f5dbdee2e1b34c546c587992",
+      "ReadmeUrl": "https://github.com/igawa6/ctr-native-android/blob/eb848488e8224d90f5dbdee2e1b34c546c587992/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gc-pikmin",
+      "Title": "Pikmin / Pikmin 2",
+      "Repository": "SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port",
+      "Version": "1.2",
+      "PreviousVersion": null,
+      "SourceCommit": "ae283b5a16853a18b957797795d9f3e8135dd1ea",
+      "ReadmeUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/blob/ae283b5a16853a18b957797795d9f3e8135dd1ea/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "3ds-samusreturns",
+      "Title": "Metroid: Samus Returns",
+      "Repository": "gminustwo/msr2ds",
+      "Version": "v2.0.6",
+      "PreviousVersion": null,
+      "SourceCommit": "a587c8946063ff3fd293d174e662443f992eef29",
+      "ReadmeUrl": "https://github.com/gminustwo/msr2ds/blob/a587c8946063ff3fd293d174e662443f992eef29/README.md",
+      "GameplayTested": false
+    }
+  ],
+  "AndroidUpdated": [
+    {
+      "Id": "gbc-oracles",
+      "Title": "The Legend of Zelda: Oracle of Ages / Seasons",
+      "Repository": "kirby-letsgo/oracles-decomp",
+      "Version": "v1.0.6",
+      "PreviousVersion": "v1.0.2",
+      "SourceCommit": "813e7b842ca68b36d3870e83b2c07e73633d645a",
+      "ReadmeUrl": "https://github.com/kirby-letsgo/oracles-decomp/blob/813e7b842ca68b36d3870e83b2c07e73633d645a/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gba-ffta",
+      "Title": "Final Fantasy Tactics Advance",
+      "Repository": "Jorge262007/FFTARecomp",
+      "Version": "3.1",
+      "PreviousVersion": "v3.0",
+      "SourceCommit": "6bdddbc559ac459c4a18325c15c28d040d87f407",
+      "ReadmeUrl": "https://github.com/Jorge262007/FFTARecomp/blob/6bdddbc559ac459c4a18325c15c28d040d87f407/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gb-warioland",
+      "Title": "Wario Land: Super Mario Land 3",
+      "Repository": "GABRIELNNK/Bigodao",
+      "Version": "1.8.0",
+      "PreviousVersion": "1.6.0",
+      "SourceCommit": "c67ff008b1561dce079781603f9b5da3c1320f5e",
+      "ReadmeUrl": "https://github.com/GABRIELNNK/Bigodao/blob/c67ff008b1561dce079781603f9b5da3c1320f5e/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "wiiu-windwakerhd",
+      "Title": "The Legend of Zelda: The Wind Waker HD",
+      "Repository": "ZeldaWWHDRecomp/ZeldaWWHDRecomp",
+      "Version": "v0.5.1",
+      "PreviousVersion": "v0.4.0",
+      "SourceCommit": "19e1fcc92e5a9a3e2c96f74eb325d8334c42236d",
+      "ReadmeUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/blob/19e1fcc92e5a9a3e2c96f74eb325d8334c42236d/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gc-metroidprime",
+      "Title": "Metroid Prime",
+      "Repository": "Odrannnn/MetroidPrimePort",
+      "Version": "v0.44.0",
+      "PreviousVersion": "v0.36.0",
+      "SourceCommit": "7e6e7c03d530700f89e217d2f87aae8daeaa6fea",
+      "ReadmeUrl": "https://github.com/Odrannnn/MetroidPrimePort/blob/7e6e7c03d530700f89e217d2f87aae8daeaa6fea/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "wii-mariokart",
+      "Title": "Mario Kart Wii",
+      "Repository": "dorPXP/driftdroid",
+      "Version": "v1.4.0",
+      "PreviousVersion": "v1.3.0",
+      "SourceCommit": "9684e3a099827d7659fd2fe17c18b6fc238f8116",
+      "ReadmeUrl": "https://github.com/dorPXP/driftdroid/blob/9684e3a099827d7659fd2fe17c18b6fc238f8116/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "switch-mhgu",
+      "Title": "Monster Hunter Generations Ultimate",
+      "Repository": "morerokk/MHGURecomp",
+      "Version": "0.16.0",
+      "PreviousVersion": "0.13.1",
+      "SourceCommit": "dc26e6d9a22afbedc1138fd07e94f3e3c55efed3",
+      "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/dc26e6d9a22afbedc1138fd07e94f3e3c55efed3/README.md",
+      "GameplayTested": false
+    },
+    {
+      "Id": "gba-rekhcom",
+      "Title": "Kingdom Hearts: Chain of Memories",
+      "Repository": "MatyMeatBoy/ReKHCoM",
+      "Version": "v2.9",
+      "PreviousVersion": "v2.8",
+      "SourceCommit": "51edf7efa2c49c97a1c389ae2e4cd7e3b749448c",
+      "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/51edf7efa2c49c97a1c389ae2e4cd7e3b749448c/README.md",
+      "GameplayTested": false
+    }
+  ],
+  "DesktopAdded": [
+    {
+      "Console": "ps2",
+      "Id": "ps2-ico",
+      "Title": "ICO",
+      "Repository": "nathanialf/ico-pc",
+      "GameplayTested": false,
+      "Version": "v0.11.2",
+      "SourceCommit": "5b280d7dfa5bee48d5addade17e6c436dc382b7b",
+      "ReadmeUrl": "https://github.com/nathanialf/ico-pc/blob/5b280d7dfa5bee48d5addade17e6c436dc382b7b/README.md",
+      "ReleaseUrl": "https://github.com/nathanialf/ico-pc/releases/tag/v0.11.2"
+    },
+    {
+      "Console": "3ds",
+      "Id": "3ds-samusreturns",
+      "Title": "Metroid: Samus Returns",
+      "Repository": "gminustwo/msr2ds",
+      "GameplayTested": false,
+      "Version": "v2.0.6",
+      "SourceCommit": "a587c8946063ff3fd293d174e662443f992eef29",
+      "ReadmeUrl": "https://github.com/gminustwo/msr2ds/blob/a587c8946063ff3fd293d174e662443f992eef29/README.md",
+      "ReleaseUrl": "https://github.com/gminustwo/msr2ds/releases/tag/v2.0.6"
+    },
+    {
+      "Console": "gamecube",
+      "Id": "gc-pikmin2",
+      "Title": "Pikmin 2",
+      "Repository": "SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port",
+      "GameplayTested": false,
+      "Version": "1.2",
+      "SourceCommit": "ae283b5a16853a18b957797795d9f3e8135dd1ea",
+      "ReadmeUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/blob/ae283b5a16853a18b957797795d9f3e8135dd1ea/README.md",
+      "ReleaseUrl": "https://github.com/SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port/releases/tag/1.2"
+    },
+    {
+      "Console": "ps2",
+      "Id": "ps2-sly-safehouse",
+      "Title": "Sly Cooper and the Thievius Raccoonus",
+      "Repository": "FridiNaTor1/SafeHouse",
+      "GameplayTested": false,
+      "Version": "v0.1.34",
+      "SourceCommit": "14007d94ad40f692754287ee8adf714c507706df",
+      "ReadmeUrl": "https://github.com/FridiNaTor1/SafeHouse/blob/14007d94ad40f692754287ee8adf714c507706df/README.md",
+      "ReleaseUrl": "https://github.com/FridiNaTor1/SafeHouse/releases/tag/v0.1.34"
+    },
+    {
+      "Console": "ps2",
+      "Id": "ps2-sly2-safehouse",
+      "Title": "Sly 2: Band of Thieves",
+      "Repository": "FridiNaTor1/SafeHouse",
+      "GameplayTested": false,
+      "Version": "v0.1.34",
+      "SourceCommit": "14007d94ad40f692754287ee8adf714c507706df",
+      "ReadmeUrl": "https://github.com/FridiNaTor1/SafeHouse/blob/14007d94ad40f692754287ee8adf714c507706df/README.md",
+      "ReleaseUrl": "https://github.com/FridiNaTor1/SafeHouse/releases/tag/v0.1.34"
+    },
+    {
+      "Console": "ps1",
+      "Id": "ps1-shadowtower",
+      "Title": "Shadow Tower",
+      "Repository": "JFryy/reshadowtower",
+      "GameplayTested": false,
+      "Version": "v0.2.0",
+      "SourceCommit": "f641ac7164db832521d8e866fa0ea8a30df7c4b9",
+      "ReadmeUrl": "https://github.com/JFryy/reshadowtower/blob/f641ac7164db832521d8e866fa0ea8a30df7c4b9/README.md",
+      "ReleaseUrl": "https://github.com/JFryy/reshadowtower/releases/tag/v0.2.0"
+    }
+  ],
+  "DesktopUpdated": [
+    {
+      "Console": "gamecube",
+      "Id": "odrannnn-metroidprimeport-metroid-prime",
+      "Title": "Metroid Prime",
+      "Repository": "Odrannnn/MetroidPrimePort",
+      "PreviousVersion": "v0.37.0",
+      "Version": "v0.44.0",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gamecube",
+      "Id": "odrannnn-metroidprime2port-metroid-prime-2-echoes",
+      "Title": "Metroid Prime 2: Echoes",
+      "Repository": "Odrannnn/MetroidPrime2Port",
+      "PreviousVersion": "v0.7.0",
+      "Version": "v0.14.0",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gamecube",
+      "Id": "ssunnking-open-nectar-pikmin-native-pc-mobile-port-pikmin",
+      "Title": "Pikmin",
+      "Repository": "SSunnKing/Open-Nectar---Pikmin-Native-PC-Mobile-Port",
+      "PreviousVersion": "1.1.1",
+      "Version": "1.2",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gbc",
+      "Id": "kirby-letsgo-oracles-decomp-the-legend-of-zelda-oracle-of-ages",
+      "Title": "The Legend of Zelda: Oracle of Ages",
+      "Repository": "kirby-letsgo/oracles-decomp",
+      "PreviousVersion": "v1.0.5",
+      "Version": "v1.0.6",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gbc",
+      "Id": "kirby-letsgo-oracles-decomp-the-legend-of-zelda-oracle-of-seasons",
+      "Title": "The Legend of Zelda: Oracle of Seasons",
+      "Repository": "kirby-letsgo/oracles-decomp",
+      "PreviousVersion": "v1.0.5",
+      "Version": "v1.0.6",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gbc",
+      "Id": "thibautbus-top-the-legend-of-zelda-oracle-of-ages-seasons",
+      "Title": "The Legend of Zelda: Oracle of Ages/Seasons",
+      "Repository": "thibautbus/top",
+      "PreviousVersion": "v1.3.0",
+      "Version": "v1.4.0",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gba",
+      "Id": "gba-rekhcom",
+      "Title": "Kingdom Hearts: Chain of Memories",
+      "Repository": "MatyMeatBoy/ReKHCoM",
+      "PreviousVersion": "v2.8",
+      "Version": "v2.9",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gb",
+      "Id": "gabrielnnk-bigodao-wario-land-super-mario-land-3",
+      "Title": "Wario Land: Super Mario Land 3",
+      "Repository": "GABRIELNNK/Bigodao",
+      "PreviousVersion": "1.7.0",
+      "Version": "1.8.0",
+      "GameplayTested": false
+    },
+    {
+      "Console": "wiiu",
+      "Id": "zeldawwhdrecomp-zeldawwhdrecomp-the-legend-of-zelda-the-wind-waker-hd",
+      "Title": "The Legend of Zelda: The Wind Waker HD",
+      "Repository": "ZeldaWWHDRecomp/ZeldaWWHDRecomp",
+      "PreviousVersion": "v0.5.0",
+      "Version": "v0.5.1",
+      "GameplayTested": false
+    },
+    {
+      "Console": "switch",
+      "Id": "morerokk-mhgurecomp-monster-hunter-generations-ultimate",
+      "Title": "Monster Hunter Generations Ultimate",
+      "Repository": "morerokk/MHGURecomp",
+      "PreviousVersion": "0.13.1",
+      "Version": "0.16.0",
+      "GameplayTested": false
+    },
+    {
+      "Console": "gamecube",
+      "Id": "flyngmt-acgc-pc-port-animal-crossing",
+      "Title": "Animal Crossing",
+      "Repository": "flyngmt/Nookery",
+      "PreviousVersion": "v0.9.3-playtest",
+      "Version": "v1.0.0",
+      "GameplayTested": false
+    }
+  ],
+  "Excluded": [
+    {
+      "Repository": "DiegoDeDios/AlienReRecomp",
+      "Reason": "The distributed port also documents a MIPS interpreter execution path; needs a separate native-runtime review."
+    },
+    {
+      "Repository": "mstan/StarFoxSNESRecomp",
+      "Reason": "Author labels the current build as a development reference, not a production release."
+    }
+  ]
+}

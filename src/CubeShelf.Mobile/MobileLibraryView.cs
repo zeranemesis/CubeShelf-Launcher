@@ -507,7 +507,7 @@ public sealed partial class MobileLibraryView : UserControl
         SetStatus("");
         _invitationPanel.IsExpanded = false;
         _invite.Text = "";
-        _shelf.SetSelection(_selected, _ribbon, animate);
+        _shelf.SetSelection(_selected, _ribbon, animate&&!ReduceMotion);
         RefreshAvailability();
         _detailsScroll.Offset = default;
         SaveLibraryState();

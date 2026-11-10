@@ -554,20 +554,39 @@
     "Method": "Décompilation / recompilation statique native (déclaration amont)",
     "Status": "Paquet Windows · partie non testée",
     "Notes": "Moteur natif déclaré par le projet. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet officiel vérifié par taille et SHA-256. Jouabilité et performances non testées dans DecompShelf.",
-    "VerifiedAt": "2026-11-05",
-    "SourceCommit": "315db1e45cbfacb54c1786786917045c0100b2eb",
-    "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/315db1e45cbfacb54c1786786917045c0100b2eb/README.md",
-    "ReleaseUrl": "https://github.com/MatyMeatBoy/ReKHCoM/releases/tag/v2.8",
-    "ReleaseTag": "v2.8",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "51edf7efa2c49c97a1c389ae2e4cd7e3b749448c",
+    "ReadmeUrl": "https://github.com/MatyMeatBoy/ReKHCoM/blob/51edf7efa2c49c97a1c389ae2e4cd7e3b749448c/README.md",
+    "ReleaseUrl": "https://github.com/MatyMeatBoy/ReKHCoM/releases/tag/v2.9",
+    "ReleaseTag": "v2.9",
     "Platforms": [
+      "Linux",
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "ReKHCoM-v2.8-windows-x86-x64.zip",
-        "Url": "https://github.com/MatyMeatBoy/ReKHCoM/releases/download/v2.8/ReKHCoM-v2.8-windows-x86-x64.zip",
-        "Size": 81310336,
-        "Sha256": "a7bd67bb29c9f9c1c569ff134cd6804e9c4911a03b19b1b113d86125a0957827",
+        "Name": "ReKHCoM-v2.9-linux-armhf-anbernic-beta.zip",
+        "Url": "https://github.com/MatyMeatBoy/ReKHCoM/releases/download/v2.9/ReKHCoM-v2.9-linux-armhf-anbernic-beta.zip",
+        "Size": 25573378,
+        "Sha256": "ca0bae460155f824f35fb2f859f5332f9cad237f9f6085b12fdd948dc1f97880",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ReKHCoM-v2.9-linux-x86-x64-desktop-steamdeck.tar.gz",
+        "Url": "https://github.com/MatyMeatBoy/ReKHCoM/releases/download/v2.9/ReKHCoM-v2.9-linux-x86-x64-desktop-steamdeck.tar.gz",
+        "Size": 37522158,
+        "Sha256": "44085c98cfa6809a86f0f9230e1248e991c264424b7034b0b82c26d555fb865b",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ReKHCoM-v2.9-windows-x86-x64.zip",
+        "Url": "https://github.com/MatyMeatBoy/ReKHCoM/releases/download/v2.9/ReKHCoM-v2.9-windows-x86-x64.zip",
+        "Size": 81516091,
+        "Sha256": "5dd1906cf32cbb7d271e2a1c607c3768caf5a9a0fa80fa5c92202b1f0a6b4a5b",
         "RuntimeIdentifiers": [
           "win-x64"
         ]

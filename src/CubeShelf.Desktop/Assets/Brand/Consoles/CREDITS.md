@@ -30,3 +30,5 @@ Logos issus de Wikimedia Commons, redimensionnés sans autre modification. Les m
 - **xbox360** : [Microsoft. This version: CoolKid1993 at en.wikipedia](https://commons.wikimedia.org/wiki/File:Xbox_360_logo.svg) — [Public domain](https://commons.wikimedia.org/wiki/File:Xbox_360_logo.svg).
 - **neogeo** : [Shad-dim SNK](https://commons.wikimedia.org/wiki/File:Neo_Geo_logo.svg) — [Public domain](https://commons.wikimedia.org/wiki/File:Neo_Geo_logo.svg).
 - **cdi** : [Philips](https://commons.wikimedia.org/wiki/File:Philips_CD-i_logo.svg) — [Public domain](https://commons.wikimedia.org/wiki/File:Philips_CD-i_logo.svg).
+
+- **switch2** : [Nintendo](https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_logo_transparent_black.svg) — [Public domain](https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_logo_transparent_black.svg).

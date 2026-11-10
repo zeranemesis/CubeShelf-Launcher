@@ -22,7 +22,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 DESKTOP = ROOT / "src/CubeShelf.Desktop"
 DEST = DESKTOP / "Assets/Logos/Database"
-PLATFORMS = dict(gamecube="Nintendo GameCube", wii="Nintendo Wii", switch="Nintendo Switch",
+PLATFORMS = dict(gamecube="Nintendo GameCube", wii="Nintendo Wii", switch="Nintendo Switch", switch2="Nintendo Switch 2",
     n64="Nintendo 64", nes="Nintendo Entertainment System", snes="Super Nintendo Entertainment System",
     gb="Nintendo Game Boy", gbc="Nintendo Game Boy Color", gba="Nintendo Game Boy Advance",
     nds="Nintendo DS", wiiu="Nintendo Wii U", virtualboy="Nintendo Virtual Boy",
@@ -114,7 +114,7 @@ def read_index(metadata):
     stamp = hashlib.sha256(metadata.read_bytes()).hexdigest()
     if cache.exists():
         saved = json.loads(cache.read_text("utf-8"))
-        if saved["Sha256"] == stamp:
+        if saved["Sha256"] == stamp and saved.get("Platforms") == sorted(PLATFORMS.values()):
             return saved["Games"]
     games = {}
     with zipfile.ZipFile(metadata) as archive, archive.open("Metadata.xml") as stream:
@@ -136,7 +136,7 @@ def read_index(metadata):
                 root.clear()
             depth -= 1
     cache.parent.mkdir(parents=True, exist_ok=True)
-    cache.write_text(json.dumps({"Sha256": stamp, "Games": list(games.values())}), "utf-8")
+    cache.write_text(json.dumps({"Sha256": stamp, "Platforms": sorted(PLATFORMS.values()), "Games": list(games.values())}), "utf-8")
     return list(games.values())
 
 

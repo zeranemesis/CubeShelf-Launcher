@@ -50,6 +50,11 @@
     <package android:name="org.metroidprime2.port" />
     <package android:name="dev.ttyd.port.us" />
     <package android:name="dev.ttyd.port.eu" />
+    <package android:name="com.defnf.icopc" />
+    <package android:name="com.thor.mph" />
+    <package android:name="com.ctrnative" />
+    <package android:name="org.opennectar" />
+    <package android:name="io.github.gminustwo.msrnative" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="false" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">

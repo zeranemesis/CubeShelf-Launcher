@@ -19,6 +19,7 @@ public sealed record ShelfProduct(string Id, string Name, string Console, string
         new("gba", "GBAShelf", "Game Boy Advance", "#7561C8"), new("nds", "DSShelf", "Nintendo DS", "#9CA6B5"),
         new("3ds", "3DSShelf", "Nintendo 3DS", "#CE4448"), new("wiiu", "WiiUShelf", "Wii U", "#25B3D3"),
         new("virtualboy", "VBShelf", "Virtual Boy", "#D93440"),
+        new("switch2", "Switch2Shelf", "Switch 2", "#E60012"),
         new("mastersystem", "SMSShelf", "Master System", "#D84248"), new("megadrive", "MegaDriveShelf", "Mega Drive", "#4477CD"),
         new("gamegear", "GameGearShelf", "Game Gear", "#5777B5"), new("32x", "32XShelf", "Sega 32X", "#CDAD39"),
         new("segacd", "SegaCDShelf", "Sega CD", "#4287BC"), new("saturn", "SaturnShelf", "Sega Saturn", "#6D73BC"),

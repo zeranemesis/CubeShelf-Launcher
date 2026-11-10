@@ -14,7 +14,7 @@ internal static class PresentationTests
     internal static void Run(string root,MobileNativePort[] ports)
     {
         var logoTitle=new GameTitleControl();
-        foreach(var port in ports.Where(p=>p.Title!="The Legend of Zelda: Oracle of Ages / Seasons"))
+        foreach(var port in ports.Where(p=>!p.Title.Contains(" / ",StringComparison.Ordinal)))
         {logoTitle.SetGame(port.Id,port.Title,port.ShelfConsole);Check(logoTitle.HasArtwork,"Android bundles the exact-platform logo for "+port.Title);}
         logoTitle.SetGame("n64-oot","The Legend of Zelda: Ocarina of Time","n64");
         Check(logoTitle.HasArtwork,"the original Nintendo 64 Zelda logo is available offline");
@@ -49,6 +49,7 @@ internal static class PresentationTests
         var concurrent=new LibraryPresentationStore(directory);Check(concurrent.LightHome&&concurrent.Track("concurrent") is not null,"audio import and appearance changes preserve both settings without colliding temporary writes");
         using(var cancelled=new CancellationTokenSource()){cancelled.Cancel();try{settings.ImportMusicAsync("GMPE01_00",".wav",new MemoryStream(wav),cancelled.Token).GetAwaiter().GetResult();throw new Exception("Cancelled import accepted");}catch(OperationCanceledException){}}
         var cover=Path.Combine(directory,"mario-party.png");using(var input=Avalonia.Platform.AssetLoader.Open(new Uri("avares://CubeShelf.Mobile/Assets/Covers/MarioParty4/pal_front.png")))using(var output=File.Create(cover))input.CopyTo(output);
+        MotionTests.Run(root,cover);
         var back=Path.Combine(directory,"mario-party-back.png");var spine=Path.Combine(directory,"mario-party-spine.png");
         foreach(var (name,target) in new[]{("pal_back.png",back),("pal_spine.png",spine)})
         {using var input=Avalonia.Platform.AssetLoader.Open(new Uri("avares://CubeShelf.Mobile/Assets/Covers/MarioParty4/"+name));using var output=File.Create(target);input.CopyTo(output);}

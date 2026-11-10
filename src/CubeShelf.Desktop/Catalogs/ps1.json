@@ -3864,5 +3864,33 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "ps1-shadowtower",
+    "Title": "Shadow Tower",
+    "Project": "reshadowtower",
+    "Repository": "JFryy/reshadowtower",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf. Installation du programme Windows requise.",
+    "Assets": [
+      {
+        "Name": "ReShadowTower-0.2.0-windows-x64-setup.exe",
+        "Url": "https://github.com/JFryy/reshadowtower/releases/download/v0.2.0/ReShadowTower-0.2.0-windows-x64-setup.exe",
+        "Size": 152087259,
+        "Sha256": "649b1c553409745cf74fcb431e3d5e91a953d652a15e8f9400db25f493b3c8b5",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "f641ac7164db832521d8e866fa0ea8a30df7c4b9",
+    "ReadmeUrl": "https://github.com/JFryy/reshadowtower/blob/f641ac7164db832521d8e866fa0ea8a30df7c4b9/README.md",
+    "ReleaseUrl": "https://github.com/JFryy/reshadowtower/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ]
   }
 ]
