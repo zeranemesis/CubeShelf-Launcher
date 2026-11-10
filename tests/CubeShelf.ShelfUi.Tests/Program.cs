@@ -9,6 +9,8 @@ using Avalonia.VisualTree;
 using CubeShelf.Desktop;
 using CubeShelf.Desktop.Controls;
 
+// The checks read the French interface: do not depend on the runner's locale (Ubuntu CI is English).
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture=System.Globalization.CultureInfo.CurrentUICulture=new System.Globalization.CultureInfo("fr-FR");
 var profile = Path.Combine(Path.GetTempPath(), "cubeshelf-selector-" + Guid.NewGuid().ToString("N"));
 Environment.SetEnvironmentVariable("CUBESHELF_DATA_DIR",profile);
 new CubeShelf.Core.Platform.UserPreferencesStore(new CubeShelf.Core.Platform.PlatformPaths()).Save(
