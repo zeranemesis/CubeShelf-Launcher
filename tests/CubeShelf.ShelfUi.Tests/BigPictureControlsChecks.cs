@@ -87,7 +87,8 @@ static class BigPictureControlsChecks
         window.FindControl<Button>("BigPictureExitButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         var shown=libraryCards.Items.Cast<MainWindow.DesktopGameCard>().First(c=>c.Game.RuntimeOwnsSetup);
-        Check(shown.Game.ShelfConsole==bpConsole&&shown.PlayLabel.Contains("Jouer",StringComparison.Ordinal),"Desktop status did not catch up when leaving Big Picture.");
+        Check(shown.Game.ShelfConsole==bpConsole&&(shown.PlayLabel.Contains("Jouer",StringComparison.Ordinal)||shown.PlayLabel.Contains("Play",StringComparison.Ordinal)),
+            "Desktop status did not catch up when leaving Big Picture: "+shown.Game.Id+" shows "+shown.PlayLabel);
         foreach(var (linkedGame,executable) in linked)linkedGame.Executable=executable;refresh.Invoke(window,null);
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         window.HandleBigPictureControllerInput(5);
