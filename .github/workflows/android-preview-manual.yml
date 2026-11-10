@@ -65,6 +65,10 @@ jobs:
           test -n "$CUBESHELF_ANDROID_KEYSTORE_BASE64" || { echo 'Persistent Android signing key is required for update compatibility.'; exit 1; }
           printf '%s' "$CUBESHELF_ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/cubeshelf-preview.keystore"
           chmod 600 "$RUNNER_TEMP/cubeshelf-preview.keystore"
+      # The project names the generated host manifest, and the Android SDK checks it exists
+      # before the build's own preparation target runs: generate it on the clean runner first.
+      - name: Generate the private engine hosts
+        run: python3 eng/prepare-native-host.py --sdk "$ANDROID_HOME" --java-home "$JAVA_HOME"
       - name: Publish the signed preview APK
         run: |
           dotnet publish src/CubeShelf.Android/CubeShelf.Android.csproj \
