@@ -1,0 +1,119 @@
+[
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-1",
+    "Title": "Shining Force III Scenario 1",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases/tag/v0.6.0-preview1",
+    "ReleaseTag": "v0.6.0-preview1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SFIII-Native-0.6.0-preview1-win64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Native-0.6.0-preview1-win64.zip",
+        "Sha256": "87dca1d076000260c443806b2c4dc7101945fe77d23f4c46350c2b287ba69c65",
+        "Size": 425254146,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Sha256": "a99e5713727783ec1886a3d4416ff47dcb827a9405dd3f35b76614e2078e2135",
+        "Size": 21960618,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-2",
+    "Title": "Shining Force III Scenario 2",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases/tag/v0.6.0-preview1",
+    "ReleaseTag": "v0.6.0-preview1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SFIII-Native-0.6.0-preview1-win64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Native-0.6.0-preview1-win64.zip",
+        "Sha256": "87dca1d076000260c443806b2c4dc7101945fe77d23f4c46350c2b287ba69c65",
+        "Size": 425254146,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Sha256": "a99e5713727783ec1886a3d4416ff47dcb827a9405dd3f35b76614e2078e2135",
+        "Size": 21960618,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "mattkuhnqaai-sfiii-native-shining-force-iii-scenario-3",
+    "Title": "Shining Force III Scenario 3",
+    "Project": "sfiii-native",
+    "Repository": "mattkuhnQAAI/sfiii-native",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c2993d1c39a86984727114c4832516a36b563380",
+    "ReadmeUrl": "https://github.com/mattkuhnQAAI/sfiii-native/blob/c2993d1c39a86984727114c4832516a36b563380/README.md",
+    "ReleaseUrl": "https://github.com/mattkuhnQAAI/sfiii-native/releases/tag/v0.6.0-preview1",
+    "ReleaseTag": "v0.6.0-preview1",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SFIII-Native-0.6.0-preview1-win64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Native-0.6.0-preview1-win64.zip",
+        "Sha256": "87dca1d076000260c443806b2c4dc7101945fe77d23f4c46350c2b287ba69c65",
+        "Size": 425254146,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Url": "https://github.com/mattkuhnQAAI/sfiii-native/releases/download/v0.6.0-preview1/SFIII-Offline-Graphics-Builder-0.6.0-preview1-Windows-x64.zip",
+        "Sha256": "a99e5713727783ec1886a3d4416ff47dcb827a9405dd3f35b76614e2078e2135",
+        "Size": 21960618,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

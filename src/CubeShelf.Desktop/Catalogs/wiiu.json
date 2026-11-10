@@ -1,0 +1,245 @@
+[
+  {
+    "Id": "ishaankalra2103-botwrecomp-the-legend-of-zelda-breath-of-the-wild",
+    "Title": "The Legend of Zelda: Breath of the Wild",
+    "Project": "BotWRecomp",
+    "Repository": "IshaanKalra2103/BotWRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-10-29",
+    "SourceCommit": "2b84b82dbe7efe41707d236fdbac9ec5e98c8d3d",
+    "ReadmeUrl": "https://github.com/IshaanKalra2103/BotWRecomp/blob/2b84b82dbe7efe41707d236fdbac9ec5e98c8d3d/README.md",
+    "ReleaseUrl": "https://github.com/IshaanKalra2103/BotWRecomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "zeldawwhdrecomp-zeldawwhdrecomp-the-legend-of-zelda-the-wind-waker-hd",
+    "Title": "The Legend of Zelda: The Wind Waker HD",
+    "Project": "ZeldaWWHDRecomp",
+    "Repository": "ZeldaWWHDRecomp/ZeldaWWHDRecomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "264f53ee0eca9d52d39f6ccf1a890eecec018e6e",
+    "ReadmeUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/blob/264f53ee0eca9d52d39f6ccf1a890eecec018e6e/README.md",
+    "ReleaseUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "WindWakerHD-v0.5.0-linux-aarch64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-aarch64.AppImage",
+        "Sha256": "3e86ab17fb4f20a7feacca4b844383ca8066a5cd0ab9cec50c608c5941c7498f",
+        "Size": 106207752,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-linux-aarch64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-aarch64.zip",
+        "Sha256": "31bccded0cb2493bb12d38f851a1290a5cff8ea0efa10b7001f661ca9eae5789",
+        "Size": 124683967,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-linux-x86_64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-x86_64.AppImage",
+        "Sha256": "7772ccac38854a23c19328437d6aca07d569a1fc097aabad00b9839f7417ba89",
+        "Size": 104905208,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-linux-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-x86_64.zip",
+        "Sha256": "3584c4fe05ce99fdd460b73777ca34a7ce75ffb5e56bd1a84d89ef363bb69cf9",
+        "Size": 121787678,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-macos-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-macos-arm64.zip",
+        "Sha256": "41004d42c39d862814f383b327bbf81492b026fe7ca0d7858d9dea631d1ac406",
+        "Size": 23264936,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-windows-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-windows-arm64.zip",
+        "Sha256": "48624feb8b14b0b41d82c45298ea833f14b794f504e31ff2c7577e104cb1d226",
+        "Size": 35274174,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "WindWakerHD-v0.5.0-windows-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-windows-x86_64.zip",
+        "Sha256": "11681f6584757567b0feeb2a464fcc2e792a3315ac27105d6c6d3345bf61d105",
+        "Size": 36678476,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "asadsi-twilight-princess-hd-recomp-the-legend-of-zelda-twilight-princess-hd",
+    "Title": "The Legend of Zelda: Twilight Princess HD",
+    "Project": "twilight-princess-hd-recomp",
+    "Repository": "AsadSi/twilight-princess-hd-recomp",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1f208ec1bf7ea0519bbd0a1712fea8568cd1637d",
+    "ReadmeUrl": "https://github.com/AsadSi/twilight-princess-hd-recomp/blob/1f208ec1bf7ea0519bbd0a1712fea8568cd1637d/README.md",
+    "ReleaseUrl": "https://github.com/AsadSi/twilight-princess-hd-recomp/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "ryderclanky-botw-native-the-legend-of-zelda-breath-of-the-wild",
+    "Title": "The Legend of Zelda: Breath of the Wild",
+    "Project": "BotW-Native",
+    "Repository": "ryderclanky/BotW-Native",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "c24309b0d904d369feab6909776cb230ad3949f8",
+    "ReadmeUrl": "https://github.com/ryderclanky/BotW-Native/blob/c24309b0d904d369feab6909776cb230ad3949f8/README.md",
+    "ReleaseUrl": "https://github.com/ryderclanky/BotW-Native/releases/tag/v0.1.2",
+    "ReleaseTag": "v0.1.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "BotW-Native-v0.1.2-windows-x64.zip",
+        "Url": "https://github.com/ryderclanky/BotW-Native/releases/download/v0.1.2/BotW-Native-v0.1.2-windows-x64.zip",
+        "Sha256": "3e5d575574c6fb9cf7825bd74687ee3d3cc695efbb676ee25322bc6f87564a11",
+        "Size": 147934857,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "nsmbu-recomp-nsmbu-recomp-new-super-mario-bros-u",
+    "Title": "New Super Mario Bros. U",
+    "Project": "nsmbu-recomp",
+    "Repository": "nsmbu-recomp/nsmbu-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "affa9dd7b4afe5699bb386bece6f23418d946859",
+    "ReadmeUrl": "https://github.com/nsmbu-recomp/nsmbu-recomp/blob/affa9dd7b4afe5699bb386bece6f23418d946859/README.md",
+    "ReleaseUrl": "https://github.com/nsmbu-recomp/nsmbu-recomp/releases/tag/v0.8.2",
+    "ReleaseTag": "v0.8.2",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NSMBU-v0.8.2-windows-arm64.zip",
+        "Url": "https://github.com/nsmbu-recomp/nsmbu-recomp/releases/download/v0.8.2/NSMBU-v0.8.2-windows-arm64.zip",
+        "Sha256": "a30d1b5072a8529f5e14ccde69eff320d613afc6e482397473d8c3f1b28fb555",
+        "Size": 20014577,
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "NSMBU-v0.8.2-windows-x86_64.zip",
+        "Url": "https://github.com/nsmbu-recomp/nsmbu-recomp/releases/download/v0.8.2/NSMBU-v0.8.2-windows-x86_64.zip",
+        "Sha256": "dc5da9a9d43152a7b2606c60dc9b38cc328b4b0fb7801077b4bf2f037334f209",
+        "Size": 21204148,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "josiahg2502-glitch-smash4pc-super-smash-bros-for-wii-u",
+    "Title": "Super Smash Bros. for Wii U",
+    "Project": "Smash4PC",
+    "Repository": "josiahg2502-glitch/Smash4PC",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "760bd35d77da7dc428effe4a7dd058ba173571e5",
+    "ReadmeUrl": "https://github.com/josiahg2502-glitch/Smash4PC/blob/760bd35d77da7dc428effe4a7dd058ba173571e5/README.md",
+    "ReleaseUrl": "https://github.com/josiahg2502-glitch/Smash4PC/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Smash4PC-v0.1.1-Windows.zip",
+        "Url": "https://github.com/josiahg2502-glitch/Smash4PC/releases/download/v0.1.1/Smash4PC-v0.1.1-Windows.zip",
+        "Sha256": "798296aa9fc1b35ac358bc85f7d312a82d7306d7d4aed6a7e4f759f4a02522ce",
+        "Size": 219191608,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "petexy-tekken-tag-2-ultimate-edition-tekken-tag-tournament-2-wii-u-edition",
+    "Title": "Tekken Tag Tournament 2 Wii U Edition",
+    "Project": "Tekken-Tag-2-Ultimate-Edition",
+    "Repository": "Petexy/Tekken-Tag-2-Ultimate-Edition",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "424f3594f28eabc7c7d3cbc574447327bb22335e",
+    "ReadmeUrl": "https://github.com/Petexy/Tekken-Tag-2-Ultimate-Edition/blob/424f3594f28eabc7c7d3cbc574447327bb22335e/README.md",
+    "ReleaseUrl": "https://github.com/Petexy/Tekken-Tag-2-Ultimate-Edition/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Ultimate_Launcher-x86_64.exe",
+        "Url": "https://github.com/Petexy/Tekken-Tag-2-Ultimate-Edition/releases/download/v0.5.0/Ultimate_Launcher-x86_64.exe",
+        "Sha256": "bd33cabcd1b23e7f423e9dc8bb7c684487e89d3f5ed82aa2891d90145b257112",
+        "Size": 7280128,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

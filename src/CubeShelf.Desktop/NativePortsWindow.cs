@@ -1,0 +1,238 @@
+using System.Diagnostics;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Platform.Storage;
+using CubeShelf.Core.Library;
+using CubeShelf.Core.Platform;
+using CubeShelf.Core.Updates;
+
+namespace CubeShelf.Desktop;
+
+public sealed class NativePortsWindow : Window
+{
+    public event Action<NativePort>? LaunchRequested;
+    private readonly ShelfProduct _product;
+    private readonly NativePortLibrary _library;
+    private readonly IReadOnlyList<NativePort> _ports;
+    private readonly ListBox _list = new() { Background = Brushes.Transparent, BorderThickness = new Thickness(0) };
+    private readonly TextBox _search = new() { Watermark = "Rechercher un jeu ou un projet…", MinHeight = 44 };
+    private readonly CheckBox _compatible = new() { Content = "Paquets pour ce PC uniquement", IsChecked = false };
+    private readonly TextBlock _count = Text(13), _title = Text(29), _project = Text(15), _notes = Text(15),
+        _sources = Text(12), _status = Text(13), _configured = Text(12);
+    private readonly ComboBox _packages = new() { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 44 };
+    private readonly ComboBox _portVersions = new() { HorizontalAlignment = HorizontalAlignment.Stretch, MinHeight = 44 };
+    private bool _refreshingPortVersions;
+    private readonly Button _install = Button("Installer ce paquet"), _launch = Button("Jouer"),
+        _configure = Button("Associer le programme"), _cancel = Button("Annuler"), _folder = Button("Ouvrir les fichiers"),
+        _releases = Button("Versions officielles"), _source = Button("Projet et instructions"), _macApp = Button("Associer une application .app");
+    private readonly ProgressBar _progress = new() { Minimum = 0, Maximum = 100, Height = 6, IsVisible = false };
+    private readonly Button _checkUpdates=Button("Rechercher une mise à jour"),_rollback=Button("Revenir au moteur précédent");
+    private readonly NativePortUpdateService _updates=new();
+    private readonly CancellationTokenSource _lifetime=new();
+    private readonly Func<NativePort,bool> _busy;
+    private bool IsBusy=>_selected is {} port&&_busy(port);
+    private bool _checking;
+    private NativePort? _candidate;
+    private CancellationTokenSource? _installation;
+    private NativePort? _selected;
+    private string? _downloadDirectory;
+    private readonly StackPanel _details = new() { Spacing = 18, Margin = new Thickness(28), MaxWidth = 850 };
+
+    public NativePortsWindow(ShelfProduct product, string? selectedPortId = null, IPlatformPaths? paths = null,Func<NativePort,bool>? busy=null)
+    {
+        _product = product;
+        _busy=busy??(_=>false);
+        paths ??= product.CreatePaths();
+        _library = new NativePortLibrary(paths);
+        _ports = NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json"));
+        Title = Program.DisplayName + " · " + product.Console + " · Ports natifs";
+        Width = 1210; Height = 800; MinWidth = 820; MinHeight = 560;
+        Background = Brush("#0B0E16"); Foreground = Brushes.White;
+        var accent = Brush(product.Accent);
+        var root = new Grid { RowDefinitions = new RowDefinitions("Auto,*") };
+        var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(28, 24) };
+        var brand = new StackPanel { Spacing = 7 };
+        brand.Children.Add(new TextBlock { Text = Program.DisplayName + " · " + product.Console, FontSize = 32, FontWeight = FontWeight.Bold, Foreground = accent });
+        brand.Children.Add(new TextBlock { Text = $"{product.Console} sur PC · Ports natifs et recompilations", FontSize = 14, Foreground = Brush("#ADB5CA") });
+        header.Children.Add(brand);
+        var close = Button("Retour à " + Program.DisplayName);
+        close.Click += (_, _) => Close(); Grid.SetColumn(close, 1); header.Children.Add(close);
+        root.Children.Add(header);
+        var body = new Grid { ColumnDefinitions = new ColumnDefinitions("350,*"), Margin = new Thickness(20, 0, 20, 20), ColumnSpacing = 16 };
+        var left = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,Auto,*") };
+        left.Children.Add(_search); Grid.SetRow(_compatible, 1); left.Children.Add(_compatible);
+        _compatible.Margin = new Thickness(0, 12); Grid.SetRow(_count, 2); left.Children.Add(_count);
+        Grid.SetRow(_list, 3); _list.Margin = new Thickness(0, 12, 0, 0); left.Children.Add(_list);
+        body.Children.Add(left);
+        _title.FontWeight = FontWeight.Bold; _project.Foreground = accent;
+        _details.Children.Add(_title); _details.Children.Add(_portVersions); _details.Children.Add(_project); _details.Children.Add(_notes);
+        _details.Children.Add(_sources); _details.Children.Add(_packages);
+        _install.Background = accent; _install.Foreground = Brush("#121521");
+        _launch.Background = accent; _launch.Foreground = Brush("#121521");
+        var actions = new WrapPanel { Orientation = Orientation.Horizontal };
+        foreach (var button in new[] { _install, _cancel, _launch, _checkUpdates, _rollback, _configure, _macApp, _folder, _releases, _source }) actions.Children.Add(button);
+        _details.Children.Add(actions); _details.Children.Add(_progress); _details.Children.Add(_status); _details.Children.Add(_configured);
+        var notice = Text(12);
+        notice.Text = "Les fichiers de ton jeu se préparent dans le port lui-même, selon ses instructions. Le launcher télécharge uniquement les paquets du projet. La présence d'une release ne garantit pas une partie complète sans bugs.";
+        _details.Children.Add(notice);
+        var detailBorder = new Border { Background = Brush("#131925"), CornerRadius = new CornerRadius(18),
+            Child = new ScrollViewer { Content = _details, HorizontalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled } };
+        Grid.SetColumn(detailBorder, 1); body.Children.Add(detailBorder); Grid.SetRow(body, 1); root.Children.Add(body);
+        Content = root;
+        _search.TextChanged += (_, _) => Filter();
+        _compatible.IsCheckedChanged += (_, _) => Filter();
+        _list.SelectionChanged += (_, _) => Select((_list.SelectedItem as ListBoxItem)?.Tag as NativePort);
+        _packages.SelectionChanged += (_, _) => RefreshActions();
+        _portVersions.SelectionChanged += (_, _) => { if (!_refreshingPortVersions && _portVersions.SelectedItem is NativePort port) Select(port); };
+        _source.Click += (_, _) => OpenUrl(_selected?.Homepage);
+        _releases.Click += (_, _) => OpenUrl(_selected?.ReleaseUrl.Length > 0 ? _selected.ReleaseUrl : _selected?.Homepage + "/releases");
+        _configure.Click += async (_, _) => await ConfigureAsync(false);
+        _macApp.Click += async (_, _) => await ConfigureAsync(true);
+        _launch.Click += (_, _) => Run(() => { if (_selected is { } port) { if (LaunchRequested is { } launch) launch(port); else _library.Launch(port); _status.Text = "Programme démarré. La préparation des fichiers se fait dans le port."; } });
+        _install.Click += async (_, _) => await InstallAsync();
+        _cancel.Click += (_, _) => _installation?.Cancel();
+        _checkUpdates.Click+=async(_,_)=>await CheckUpdatesAsync();
+        _rollback.Click+=(_,_)=>Run(()=>{if(IsBusy)throw new InvalidOperationException("Ferme le jeu avant de changer de moteur.");if(_selected is {} port){_library.Rollback(port);_status.Text="Moteur précédent restauré. Les fichiers des deux versions sont conservés.";RefreshActions();}});
+        Closed+=(_,_)=>{_lifetime.Cancel();_lifetime.Dispose();_updates.Dispose();};
+        _folder.Click += (_, _) => Run(() => { if (_downloadDirectory is { } directory) new ProcessLauncher().OpenDirectory(directory); });
+        Closing += (_, args) =>
+        {
+            if (_installation is null) return;
+            _installation.Cancel(); args.Cancel = true;
+            _status.Text = "Annulation en cours… Ferme la fenêtre une fois le transfert arrêté.";
+        };
+        _selected = _ports.FirstOrDefault(port => port.Id == selectedPortId);
+        Filter();
+        if (selectedPortId is not null)
+            _list.SelectedItem = _list.ItemsSource!.Cast<ListBoxItem>().FirstOrDefault(i => (i.Tag as NativePort)?.Id == selectedPortId);
+    }
+
+    private void Filter()
+    {
+        var term = _search.Text?.Trim() ?? "";
+        var selectedId = _selected?.Id;
+        var ports = _ports.Where(p => (p.Title + " " + p.Project).Contains(term, StringComparison.OrdinalIgnoreCase)
+            && (_compatible.IsChecked != true || p.Assets.Any(a => a.MatchesCurrentPlatform)))
+            .GroupBy(p => p.Title, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.FirstOrDefault(p => p.Id == selectedId) ?? group.First())
+            .OrderBy(p => p.Title).ToList();
+        _list.ItemsSource = ports.Select(port =>
+        {
+            var title = Text(15); title.Text = port.Title; title.Foreground = Brushes.White; title.FontWeight = FontWeight.SemiBold;
+            var detail = Text(12); detail.Text = _ports.Count(p => p.Title.Equals(port.Title, StringComparison.OrdinalIgnoreCase)) + " version(s) / port(s)";
+            return new ListBoxItem { Tag = port, Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 5),
+                Content = new StackPanel { Spacing = 6, Children = { title, detail } } };
+        }).ToList();
+        _count.Text = $"{ports.Count} jeux · {_ports.Count} versions / ports · 26/10/2026";
+        var items = _list.ItemsSource.Cast<ListBoxItem>().ToList();
+        _list.SelectedItem = items.FirstOrDefault(i => (i.Tag as NativePort)?.Id == selectedId) ?? items.FirstOrDefault();
+        if (items.Count == 0) Select(null);
+    }
+
+    private void Select(NativePort? port)
+    {
+        _selected = port; _candidate=null; _downloadDirectory = null;
+        _details.IsVisible = port is not null;
+        if (port is null) return;
+        _refreshingPortVersions = true;
+        _portVersions.ItemsSource = _ports.Where(p => p.Title.Equals(port.Title, StringComparison.OrdinalIgnoreCase)).ToArray();
+        _portVersions.SelectedItem = port;
+        _portVersions.IsVisible = _portVersions.ItemCount > 1;
+        _refreshingPortVersions = false;
+        _title.Text = port.Title;
+        _project.Text = port.Project + " · " + port.Method + " · " + port.Status;
+        _notes.Text = port.Notes;
+        _sources.Text = $"Source : {port.Repository}\nRévision du README : {port.SourceCommit}\nVérifié le {port.VerifiedAt} · Release : {(port.ReleaseTag.Length > 0 ? port.ReleaseTag : "pas de paquet public vérifié")}\nPlateformes déclarées : {string.Join(", ", port.Platforms)}";
+        var assets = port.Assets.Where(a => a.MatchesCurrentPlatform).ToArray();
+        _packages.ItemsSource = assets; _packages.SelectedIndex = assets.Length > 0 ? 0 : -1;
+        _packages.IsVisible = assets.Length > 0;
+        _status.Text = assets.Length > 0 ? "Choisis un paquet. Il sera vérifié par SHA-256 avant extraction."
+            : "Aucun paquet vérifié pour cette architecture. Consulte les instructions du projet ; tu peux associer un port natif déjà compilé.";
+        RefreshActions();
+    }
+
+    private void RefreshActions()
+    {
+        var busy = _installation is not null||_checking;
+        _install.IsVisible = _packages.SelectedItem is NativePortAsset;
+        _install.IsEnabled = !busy&&!IsBusy; _cancel.IsVisible = _installation is not null;
+        _launch.IsEnabled = !busy && _selected is { } port && _library.IsConfigured(port);
+        _configure.IsEnabled = _macApp.IsEnabled = _portVersions.IsEnabled = !busy;
+        _macApp.IsVisible = OperatingSystem.IsMacOS();
+        _checkUpdates.IsEnabled=!busy&&_selected is not null;
+        _rollback.IsVisible=_selected is {} known&&_library.CanRollback(known);_rollback.IsEnabled=!busy&&!IsBusy;
+        _install.Content=_selected is {} installed&&_library.IsConfigured(installed)?"Installer / mettre à jour ce moteur":"Installer ce paquet";
+        _folder.IsVisible = _downloadDirectory is not null;
+        _list.IsEnabled = _search.IsEnabled = _compatible.IsEnabled = !busy;
+        _configured.Text = _selected is { } selected && _library.Executable(selected) is { } path ? "Programme associé : " + path : "Aucun programme associé.";
+    }
+
+    private async Task InstallAsync()
+    {
+        if (_installation is not null || _checking||IsBusy || (_candidate??_selected) is not { } port || _packages.SelectedItem is not NativePortAsset asset) return;
+        using var cancellation = new CancellationTokenSource();
+        _installation = cancellation; _progress.IsVisible = true; _progress.Value = 0; RefreshActions();
+        _status.Text = "Téléchargement de " + asset.Name + "…";
+        try
+        {
+            var result = await _library.InstallManagedAsync(port, asset,
+                new Progress<double>(value => _progress.Value = value * 100), cancellation.Token);
+            _downloadDirectory=result.Directory;
+            _status.Text = result.Executable is not null?"Moteur vérifié et associé. Tu peux jouer ; l’ancien moteur et ses fichiers restent disponibles.":
+                "Paquet vérifié. Plusieurs programmes ou un installateur : associe le programme du jeu pour terminer.";
+        }
+        catch (OperationCanceledException) { _status.Text = "Téléchargement annulé. Tu peux réessayer."; }
+        catch (Exception error) { _status.Text = "Installation interrompue : " + error.Message; }
+        finally { _installation = null; _progress.IsVisible = false; RefreshActions(); }
+    }
+
+    private async Task CheckUpdatesAsync()
+    {
+        if(_selected is not {} port||_installation is not null||_checking)return;
+        _checking=true;RefreshActions();_status.Text="Recherche de la dernière version officielle…";
+        try
+        {
+            _candidate=await _updates.CheckAsync(port,_lifetime.Token);
+            if(_candidate is null){_packages.ItemsSource=port.Assets.Where(a=>a.MatchesCurrentPlatform).ToArray();_packages.SelectedIndex=0;_status.Text="Aucun paquet stable compatible et vérifiable ne correspond au paquet connu. La version actuelle est conservée.";return;}
+            var installed=_library.Installation(port);
+            if(installed is not null&&_candidate.Assets.Any(a=>a.Sha256.Equals(installed.PackageSha256,StringComparison.OrdinalIgnoreCase)))
+            {_packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;_status.Text="Le moteur installé correspond à la dernière version officielle disponible.";return;}
+            _packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;
+            _status.Text="Version officielle "+_candidate.ReleaseTag+" disponible. Paquet et SHA-256 publiés par le projet ; jouabilité de cette nouvelle version non testée dans DecompShelf.";
+        }
+        catch(OperationCanceledException){}
+        catch(Exception error){_status.Text="Vérification indisponible : "+error.Message;}
+        finally{_checking=false;RefreshActions();}
+    }
+
+    private async Task ConfigureAsync(bool applicationFolder)
+    {
+        if (_selected is not { } port) return;
+        try
+        {
+            var start = _downloadDirectory is { } directory ? await StorageProvider.TryGetFolderFromPathAsync(directory) : null;
+            string? path;
+            if (applicationFolder)
+                path = (await StorageProvider.OpenFolderPickerAsync(new() { Title = "Choisir le dossier .app du port", AllowMultiple = false, SuggestedStartLocation = start })).FirstOrDefault()?.TryGetLocalPath();
+            else
+                path = (await StorageProvider.OpenFilePickerAsync(new() { Title = "Choisir le programme natif de " + port.Title,
+                    AllowMultiple = false, SuggestedStartLocation = start, FileTypeFilter = [new FilePickerFileType("Programme natif")
+                    { Patterns = OperatingSystem.IsWindows() ? ["*.exe"] : ["*"] }] })).FirstOrDefault()?.TryGetLocalPath();
+            if (path is null) return;
+            _library.Configure(port, path); _status.Text = "Programme associé. Au premier lancement, fournis tes fichiers dans le port."; RefreshActions();
+        }
+        catch (Exception error) { _status.Text = error.Message; }
+    }
+
+    private void Run(Action action) { try { action(); } catch (Exception error) { _status.Text = error.Message; } }
+    private void OpenUrl(string? url) => Run(() =>
+    {
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Scheme == "https")
+            Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+    });
+    private static IBrush Brush(string color) => new SolidColorBrush(Color.Parse(color));
+    private static TextBlock Text(double size) => new() { FontSize = size, Foreground = Brush("#B3BED3"), TextWrapping = TextWrapping.Wrap };
+    private static Button Button(string text) => new() { Content = text, MinHeight = 44, Padding = new Thickness(16, 10), Margin = new Thickness(0, 0, 8, 8), CornerRadius = new CornerRadius(10) };
+}

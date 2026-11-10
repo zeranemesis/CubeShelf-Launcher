@@ -1,0 +1,110 @@
+[
+  {
+    "console": "gamecube",
+    "compositor": false,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 52.1177,
+    "p95Ms": 64.946,
+    "allocatedKiBPerFrame": 1134.47265625,
+    "selectionMedianMs": 1.053,
+    "selectionMaxMs": 8.9881,
+    "backendDraws": 0
+  },
+  {
+    "console": "gamecube",
+    "compositor": true,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 49.908,
+    "p95Ms": 57.0206,
+    "allocatedKiBPerFrame": 94.765625,
+    "selectionMedianMs": 0.7063,
+    "selectionMaxMs": 9.2362,
+    "backendDraws": 0
+  },
+  {
+    "console": "gamecube",
+    "compositor": true,
+    "gpu": true,
+    "frames": 56,
+    "medianMs": 14.4592,
+    "p95Ms": 20.7712,
+    "allocatedKiBPerFrame": 61.92661830357143,
+    "selectionMedianMs": 0.6288,
+    "selectionMaxMs": 11.3077,
+    "backendDraws": 392
+  },
+  {
+    "console": "wii",
+    "compositor": false,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 46.5848,
+    "p95Ms": 52.8634,
+    "allocatedKiBPerFrame": 425.5562220982143,
+    "selectionMedianMs": 0.6202,
+    "selectionMaxMs": 8.9548,
+    "backendDraws": 0
+  },
+  {
+    "console": "wii",
+    "compositor": true,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 50.2995,
+    "p95Ms": 140.947,
+    "allocatedKiBPerFrame": 424.95786830357144,
+    "selectionMedianMs": 0.6121,
+    "selectionMaxMs": 8.6914,
+    "backendDraws": 0
+  },
+  {
+    "console": "wii",
+    "compositor": true,
+    "gpu": true,
+    "frames": 56,
+    "medianMs": 18.304,
+    "p95Ms": 29.6368,
+    "allocatedKiBPerFrame": 94.35700334821429,
+    "selectionMedianMs": 0.6245,
+    "selectionMaxMs": 14.9075,
+    "backendDraws": 784
+  },
+  {
+    "console": "switch",
+    "compositor": false,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 52.3548,
+    "p95Ms": 357.2076,
+    "allocatedKiBPerFrame": 359.8544921875,
+    "selectionMedianMs": 0.7015,
+    "selectionMaxMs": 339.5628,
+    "backendDraws": 0
+  },
+  {
+    "console": "switch",
+    "compositor": true,
+    "gpu": false,
+    "frames": 56,
+    "medianMs": 60.9825,
+    "p95Ms": 101.6065,
+    "allocatedKiBPerFrame": 359.77818080357144,
+    "selectionMedianMs": 1.1165,
+    "selectionMaxMs": 87.727,
+    "backendDraws": 0
+  },
+  {
+    "console": "switch",
+    "compositor": true,
+    "gpu": true,
+    "frames": 56,
+    "medianMs": 21.6279,
+    "p95Ms": 81.6643,
+    "allocatedKiBPerFrame": 87.95940290178571,
+    "selectionMedianMs": 19.6949,
+    "selectionMaxMs": 51.2795,
+    "backendDraws": 568
+  }
+]

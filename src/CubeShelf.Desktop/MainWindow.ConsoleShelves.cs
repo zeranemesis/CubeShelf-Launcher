@@ -1,0 +1,280 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using CubeShelf.Core.Library;
+using CubeShelf.Core.Platform;
+
+namespace CubeShelf.Desktop;
+
+public sealed partial class MainWindow
+{
+    private NativePortsWindow CreateNativePortsWindow(ShelfProduct product, string? selectedPort = null, Action? onLaunching = null)
+    {
+        var window = new NativePortsWindow(product, selectedPort, _paths,port=>_maintenanceBusy||_catalogGames.Any(g=>_nativeShelfPorts.TryGetValue(g.Id,out var p)&&p.Id==port.Id&&_sessions.IsRunning(g.Id)));
+        window.LaunchRequested += port =>
+        {
+            var game = _catalogGames.FirstOrDefault(candidate =>
+                _nativeShelfPorts.TryGetValue(candidate.Id, out var entry) && entry.Id == port.Id)
+                ?? throw new InvalidOperationException("Ce port n’est pas associé à un jeu de la bibliothèque.");
+            onLaunching?.Invoke();
+            window.Close();
+            if(onLaunching is not null&&port.Id==selectedPort)return;
+            if (RunningGameFor(game) is not null) return;
+            // Use the common launch path so process tracking, statistics and the help button agree.
+            _ = RequestPlayAsync(game);
+        };
+        return window;
+    }
+
+    private string _activeShelfConsole = "gamecube";
+    private static readonly ShelfProduct[] ShelfProducts = ShelfProduct.All.Where(product =>
+        File.Exists(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json"))).ToArray();
+    private bool _consoleShelfReady;
+    private readonly Dictionary<string, NativePort> _nativeShelfPorts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string,string> _shelfMediaArtwork = new();
+    private Dictionary<string, string> _selectedPortVersions = new();
+    private bool _updatingPortVersions;
+
+    public sealed record PortVersionChoice(string GameId, string Label)
+    {
+        public override string ToString() => Label;
+    }
+
+    private PortVersionChoice[] PortVersionsFor(GameCatalogEntry game) => NativePortCatalog.VersionsOf(_catalogGames, game)
+        .Select(candidate => new PortVersionChoice(candidate.Id,
+            candidate.RuntimeName + (_nativeShelfPorts.TryGetValue(candidate.Id, out var port) && port.ReleaseTag.Length > 0
+                ? " · " + port.ReleaseTag : " · intégré"))).ToArray();
+
+    private void RefreshPortVersionPickers(GameCatalogEntry? game)
+    {
+        _updatingPortVersions = true;
+        try
+        {
+            var choices = game is null ? [] : PortVersionsFor(game);
+            foreach (var picker in new[] { GamePortVersionPicker, BigPicturePortVersionPicker })
+            {
+                picker.ItemsSource = choices;
+                picker.SelectedItem = choices.FirstOrDefault(choice => choice.GameId == game?.Id);
+                picker.IsVisible = choices.Length > 1;
+            }
+        }
+        finally { _updatingPortVersions = false; }
+    }
+
+    private void CardPortVersionChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        if (sender is ComboBox { Tag: DesktopGameCard card, SelectedItem: PortVersionChoice choice }
+            && choice.GameId != card.Game.Id) SelectPortVersion(choice.GameId);
+    }
+
+    private void PortVersionChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        if (!_updatingPortVersions && sender is ComboBox { SelectedItem: PortVersionChoice choice }) SelectPortVersion(choice.GameId);
+    }
+
+    private void SelectPortVersion(string id)
+    {
+        var game = _catalogGames.FirstOrDefault(candidate => candidate.Id == id);
+        if (game is null || (!_personalLibrary && game.ShelfConsole != _activeShelfConsole)
+            || _selectedPortVersions.GetValueOrDefault(NativePortCatalog.GameKey(game)) == id) return;
+        _selectedPortVersions[NativePortCatalog.GameKey(game)] = id;
+        File.WriteAllText(Path.Combine(_paths.ConfigurationDirectory, "selected-port-versions.json"), JsonSerializer.Serialize(_selectedPortVersions));
+        var favorite = NativePortCatalog.VersionsOf(_catalogGames, game).Any(candidate => candidate.IsFavorite);
+        foreach (var candidate in NativePortCatalog.VersionsOf(_catalogGames, game)) candidate.IsFavorite = favorite;
+        SelectCatalogGame(game, showGameView: false);
+        PersistCatalog();
+        if (_bigPictureActive)
+        {
+            RebuildBigPictureShelf();
+        }
+    }
+
+    private string PrepareUnifiedShelfCatalog(IPlatformPaths paths)
+    {
+        var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+        var games = JsonSerializer.Deserialize<List<GameCatalogEntry>>(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "games.json")), options) ?? [];
+        foreach (var console in ShelfProducts.Select(product => product.Id))
+        {
+            foreach (var port in NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", console + ".json")))
+            {
+                var id = "native-" + console + "-" + port.Id;
+                _nativeShelfPorts.Add(id, port);
+                games.Add(new GameCatalogEntry
+                {
+                    Id = id, Title = port.Title, ShelfConsole = console, NativePortId = port.Id,
+                    RuntimeOwnsSetup = true, RuntimeName = port.Project, Genre = port.Status.StartsWith("Expérimental", StringComparison.Ordinal) ? "Port natif · expérimental" : "Port natif",
+                    Region = string.Join(", ", port.Platforms), Players = port.Status,
+                    Description = port.Notes + "\nProjet : " + port.Repository,
+                    DataPreparation = GameDataPreparation.Runtime, HomepageUrl = port.Homepage,
+                    LaunchArguments = [], LaunchEnvironment = [], DiscFormats = [],LogOutput=true
+                });
+            }
+        }
+        var covers = JsonSerializer.Deserialize<List<ShelfCover>>(File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "Catalogs", "covers.json"))) ?? [];
+        foreach (var group in games.GroupBy(NativePortCatalog.GameKey))
+        {
+            var existing = group.FirstOrDefault(game => game.Covers.Count > 0)?.Covers;
+            var artwork = covers.FirstOrDefault(cover => cover.Console == group.First().ShelfConsole && cover.Title == group.First().Title);
+            if(artwork is { Media.Length: >0 })_shelfMediaArtwork[group.Key]=artwork.Media;
+            foreach (var game in group.Where(game => game.Covers.Count == 0))
+            {
+                if (existing is not null) game.Covers = existing.Select(cover => new GameCover
+                    { Label = cover.Label, Front = cover.Front, Back = cover.Back, Spine = cover.Spine, Right = cover.Right, Top = cover.Top, Bottom = cover.Bottom }).ToList();
+                else if (artwork is not null && artwork.Front.Length > 0) game.Covers = [new GameCover
+                    { Label = (artwork.Source.Length > 0 ? artwork.Source + " · " : artwork.Console == "n64" ? "Nintendo 64 · " : "GameTDB · ") + artwork.GameTdbId, Front = artwork.Front, Back = artwork.Back, Spine = artwork.Spine, Right = artwork.Right, Top = artwork.Top, Bottom = artwork.Bottom }];
+            }
+        }
+        Directory.CreateDirectory(paths.CacheDirectory);
+        var file = Path.Combine(paths.CacheDirectory, "shipped-shelf-suite.json");
+        File.WriteAllText(file, JsonSerializer.Serialize(games, options));
+        return file;
+    }
+
+    private sealed class ShelfCover
+    {
+        public string Console { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Source { get; set; } = "";
+        public string GameTdbId { get; set; } = "";
+        public string Front { get; set; } = "";
+        public string Back { get; set; } = "";
+        public string Spine { get; set; } = "";
+        public string Media { get; set; } = "";
+        public string Right { get; set; } = "";
+        public string Top { get; set; } = "";
+        public string Bottom { get; set; } = "";
+    }
+
+    private void InitializeConsoleShelfPicker()
+    {
+        var versionsFile = Path.Combine(_paths.ConfigurationDirectory, "selected-port-versions.json");
+        if (File.Exists(versionsFile))
+        {
+            try { _selectedPortVersions = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(versionsFile)) ?? new(); }
+            catch (JsonException) { }
+        }
+        foreach (var group in _catalogGames.Where(game => !GameVariants.IsVariant(game)).GroupBy(NativePortCatalog.GameKey))
+        {
+            var favorite = group.Any(game => game.IsFavorite);
+            foreach (var game in group) game.IsFavorite = favorite;
+        }
+        _activeShelfConsole = Program.Product.Id;
+        var file = Path.Combine(_paths.ConfigurationDirectory, "selected-console.txt");
+        if (Program.Product.Id == "gamecube" && File.Exists(file))
+        {
+            var saved = File.ReadAllText(file).Trim();
+            if (ShelfProducts.Any(product => product.Id == saved)) _activeShelfConsole = saved;
+        }
+        foreach (var picker in new[] { ConsoleShelfPicker, BigPictureConsoleShelfPicker })
+        {
+            StackPanel Row(ShelfProduct product)
+            {
+                var row=new Avalonia.Controls.StackPanel { Orientation=Avalonia.Layout.Orientation.Horizontal,Spacing=8 };
+                row.Children.Add(new Controls.ConsoleBrandMark { Platform=product.Id,Width=34,Height=26,VerticalAlignment=Avalonia.Layout.VerticalAlignment.Center });
+                var label=new TextBlock { Text=product.Console,FontSize=14,VerticalAlignment=Avalonia.Layout.VerticalAlignment.Center };
+                label.Bind(TextBlock.ForegroundProperty,new Avalonia.Data.Binding("Foreground") { Source=picker });
+                row.Children.Add(label);
+                return row;
+            }
+            picker.ItemsSource = ShelfProducts.Select(product =>
+            {
+                var item=new ComboBoxItem { Content=Row(product),Tag=product.Id,MinHeight=38 };
+                Avalonia.Automation.AutomationProperties.SetName(item,product.Console);
+                return item;
+            }).ToArray();
+            picker.SelectionBoxItemTemplate=new Avalonia.Controls.Templates.FuncDataTemplate<object>((_,_)=>
+                Row(ShelfProducts[Math.Clamp(picker.SelectedIndex,0,ShelfProducts.Length-1)]));
+        }
+        ConsoleShelfPicker.SelectedIndex = ConsoleIndex(_activeShelfConsole);
+        BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
+        RefreshShelfBranding();
+        _consoleShelfReady = true;
+        Closed += (_, _) => ShelfTransition.Dispose();
+        Deactivated += (_, _) => ShelfTransition.Stop();
+        PropertyChanged += (_, change) =>
+        {
+            if ((change.Property == WindowStateProperty && WindowState == WindowState.Minimized)
+                || (change.Property == IsVisibleProperty && !IsVisible)) ShelfTransition.Stop();
+        };
+    }
+
+    private void ConsoleShelfChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        if (!_consoleShelfReady || sender is not ComboBox { SelectedItem: ComboBoxItem { Tag: string console } }
+            || console == _activeShelfConsole) return;
+        _personalLibrary = false;
+        PlayBigPictureSound();
+        var direction = ConsoleIndex(console) > ConsoleIndex(_activeShelfConsole) ? 1 : -1;
+        Grid.SetColumn(ShelfTransition, _bigPictureActive ? 0 : 1);
+        Grid.SetColumnSpan(ShelfTransition, _bigPictureActive ? 2 : 1);
+        ShelfTransition.Capture(ViewHost,ShelfProduct.Resolve(console).Console,direction,_preferences.ReduceShelfMotion);
+        _activeShelfConsole = console;
+        _consoleShelfReady = false;
+        ConsoleShelfPicker.SelectedIndex = ConsoleIndex(console);
+        BigPictureConsoleShelfPicker.SelectedIndex = ConsoleShelfPicker.SelectedIndex;
+        _consoleShelfReady = true;
+        Directory.CreateDirectory(_paths.ConfigurationDirectory);
+        File.WriteAllText(Path.Combine(_paths.ConfigurationDirectory, "selected-console.txt"), console);
+        RefreshShelfBranding();
+        _favoritesOnly = false;
+        _selectedGame = ShelfGames.FirstOrDefault();
+        // Clearing search already refreshes the library; suppress that redundant rebuild.
+        _changingShelf = true;
+        try { LibrarySearchBox.Text = ""; }
+        finally { _changingShelf = false; }
+        if (_selectedGame is not null) RefreshGameState();
+        else RefreshLibraryParity();
+        if (_bigPictureActive)
+        {
+            RebuildBigPictureShelf();
+            ShelfTransition.Play();
+            return;
+        }
+        ShowParityView(LibraryView);
+        ShelfTransition.Play();
+    }
+
+    private void RefreshShelfBranding()
+    {
+        Title=Program.DisplayName+" · "+ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarShelfSubtitle.Text = ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarConsoleLogo.Platform=BigPictureConsoleLogo.Platform=_activeShelfConsole;
+    }
+
+    private bool _changingShelf;
+    private static int ConsoleIndex(string console) => Array.FindIndex(ShelfProducts, product => product.Id == console);
+
+    private async Task<bool> EnsureNativeShelfPortAsync(GameCatalogEntry game, bool alwaysShow = false,CancellationToken cancellation=default)
+    {
+        if (!_nativeShelfPorts.TryGetValue(game.Id, out var port)) return false;
+        var library = new NativePortLibrary(_paths);
+        if(!alwaysShow&&!library.IsConfigured(port)&&OperatingSystem.IsWindows())
+        {
+            var assets=port.Assets.Where(a=>a.MatchesCurrentPlatform&&(a.Name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)||a.Name.EndsWith(".tar.gz",StringComparison.OrdinalIgnoreCase))).ToArray();
+            if(assets.Length==1)
+            {
+                var key="native-runtime:"+game.Id;
+                var item=PendingPlayPrerequisite(key)??_portableQueue!.Enqueue(key,game.Title,"NATIVE PORT",
+                    P7("Moteur officiel vérifié · installation avant de jouer","Verified upstream engine · install before playing"),
+                    async(progress,token)=>{await library.InstallManagedAsync(port,assets[0],progress,token);},referenceId:game.Id);
+                await AwaitPlayPrerequisiteAsync(item,cancellation);
+                library=new NativePortLibrary(_paths);
+            }
+        }
+        cancellation.ThrowIfCancellationRequested();
+        if (alwaysShow || !library.IsConfigured(port))
+        {
+            await CreateNativePortsWindow(ShelfProduct.Resolve(game.ShelfConsole), port.Id,PlayIntentFor(game) is not null?()=>{}:null).ShowDialog(this);
+            cancellation.ThrowIfCancellationRequested();
+            library = new NativePortLibrary(_paths);
+        }
+        if (!library.IsConfigured(port)) return false;
+        game.Executable = library.Executable(port)!;
+        SavePlayPaths(game);
+        RefreshLibraryParity();
+        return true;
+    }
+}

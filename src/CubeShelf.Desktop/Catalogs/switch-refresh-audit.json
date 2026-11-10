@@ -1,0 +1,79 @@
+{
+  "CheckedAt": "2026-11-02",
+  "Added": [
+    {
+      "Id": "morerokk-mhgurecomp-monster-hunter-generations-ultimate",
+      "Title": "Monster Hunter Generations Ultimate",
+      "Repository": "morerokk/MHGURecomp",
+      "SourceCommit": "41e143d823cfd2ddb4e0c1b6c8aad1e344782858",
+      "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/41e143d823cfd2ddb4e0c1b6c8aad1e344782858/README.md",
+      "ReleaseTag": "0.13.1"
+    },
+    {
+      "Id": "raulzrrs-swsh-recomp-pok-mon-sword",
+      "Title": "Pokémon Sword",
+      "Repository": "raulzrrs/swsh-recomp",
+      "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+      "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+      "ReleaseTag": "v0.1.0"
+    },
+    {
+      "Id": "raulzrrs-swsh-recomp-pok-mon-shield",
+      "Title": "Pokémon Shield",
+      "Repository": "raulzrrs/swsh-recomp",
+      "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+      "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+      "ReleaseTag": "v0.1.0"
+    },
+    {
+      "Id": "yozander2009-stack-metroid-dread-recomp-metroid-dread",
+      "Title": "Metroid Dread",
+      "Repository": "yozander2009-stack/Metroid-Dread-Recomp",
+      "SourceCommit": "a48624c57e4fc165fd85f83fd7f0fc2868d247bc",
+      "ReadmeUrl": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/blob/a48624c57e4fc165fd85f83fd7f0fc2868d247bc/README.md",
+      "ReleaseTag": "v0.5.0"
+    },
+    {
+      "Id": "raulzrrs-letsgo-recomp-pok-mon-let-s-go-pikachu",
+      "Title": "Pokémon: Let’s Go, Pikachu!",
+      "Repository": "raulzrrs/letsgo-recomp",
+      "SourceCommit": "1a70f777c7abac6834ca54bd69b1235471193e1e",
+      "ReadmeUrl": "https://github.com/raulzrrs/letsgo-recomp/blob/1a70f777c7abac6834ca54bd69b1235471193e1e/README.md",
+      "ReleaseTag": "v0.7.6"
+    },
+    {
+      "Id": "hexveil404-pokez-arecomp-pok-mon-legends-z-a",
+      "Title": "Pokémon Legends: Z-A",
+      "Repository": "Hexveil404/PokeZ-ARecomp",
+      "SourceCommit": "1675d036a12ce566f0e15285592800f803aafe8e",
+      "ReadmeUrl": "https://github.com/Hexveil404/PokeZ-ARecomp/blob/1675d036a12ce566f0e15285592800f803aafe8e/README.md",
+      "ReleaseTag": "v0.1.14"
+    },
+    {
+      "Id": "bluetufiebugado-supermariowonderrecomp-super-mario-bros-wonder",
+      "Title": "Super Mario Bros. Wonder",
+      "Repository": "BluetufieBugado/SuperMarioWonderRecomp",
+      "SourceCommit": "9ecad0cef164008a474b5ff0fa50e6ef55edba60",
+      "ReadmeUrl": "https://github.com/BluetufieBugado/SuperMarioWonderRecomp/blob/9ecad0cef164008a474b5ff0fa50e6ef55edba60/README.md",
+      "ReleaseTag": ""
+    },
+    {
+      "Id": "puddz-astralchain-pc-astral-chain",
+      "Title": "Astral Chain",
+      "Repository": "Puddz/AstralChain-PC",
+      "SourceCommit": "9f3db2838e4cc84b19f81ec7bcc56ae621e1c554",
+      "ReadmeUrl": "https://github.com/Puddz/AstralChain-PC/blob/9f3db2838e4cc84b19f81ec7bcc56ae621e1c554/README.md",
+      "ReleaseTag": ""
+    }
+  ],
+  "Excluded": [
+    {
+      "Repository": "dougchansan/mk8-recomp",
+      "Reason": "Les téléchargements annoncés incluent le JIT ; pas de paquet natif seul vérifié."
+    },
+    {
+      "Repository": "Nycolazs/EoWRecomp",
+      "Reason": "Le démarrage du jeu sous Windows reste une prochaine étape dans la documentation consultée."
+    }
+  ]
+}

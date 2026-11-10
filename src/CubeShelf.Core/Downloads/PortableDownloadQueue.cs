@@ -153,6 +153,10 @@ public sealed class PortableDownloadQueueItem : INotifyPropertyChanged
          Kind.Equals("GAME DATA", StringComparison.OrdinalIgnoreCase) ||
          (Kind.Equals("MOD", StringComparison.OrdinalIgnoreCase) && ModDownloadReference.TryParse(ReferenceId, out _)));
     public bool CanRemove => IsTerminal;
+    public DownloadTransfer Transfer { get; internal set; } = new(() => 0);
+    public bool IsPaused => !IsTerminal && Transfer.IsPaused;
+    public bool CanPause => _cancellable && (State == DownloadActivityState.Queued ||
+        (State == DownloadActivityState.Running && Transfer.CanPause));
 
     internal Func<IProgress<double>, CancellationToken, Task>? Work { get; }
     internal Func<Task>? After { get; }
@@ -187,6 +191,62 @@ public sealed class PortableDownloadQueue : IDisposable
     private readonly CancellationTokenSource _lifetime = new();
     private Task? _worker;
     private bool _disposed;
+    private bool _suspended;
+    private long _bandwidthLimit;
+
+    public bool IsSuspended { get { lock (_gate) return _suspended; } }
+    /// <summary>Bytes per second; zero means unlimited. Applied to queued payload streams.</summary>
+    public long BandwidthLimitBytesPerSecond
+    {
+        get => Interlocked.Read(ref _bandwidthLimit);
+        set => Interlocked.Exchange(ref _bandwidthLimit, Math.Max(0, value));
+    }
+
+    public IReadOnlyList<PortableDownloadQueueItem> PendingItems
+    { get { lock (_gate) return _items.Where(item => item.State == DownloadActivityState.Queued).ToArray(); } }
+
+    public bool TogglePause(PortableDownloadQueueItem item)
+    {
+        lock (_gate)
+        {
+            if (!_items.Contains(item) || (!item.IsPaused && !item.CanPause)) return false;
+            if (item.IsPaused && item.State == DownloadActivityState.Running) _suspended = false;
+            if (!item.Transfer.SetPaused(!item.IsPaused)) return false;
+        }
+        RaiseChanged();
+        _signal.Release();
+        return true;
+    }
+
+    public void SetSuspended(bool suspended)
+    {
+        lock (_gate)
+        {
+            _suspended = suspended;
+            // Local pauses belong to their row. The global switch only suspends the active
+            // network transfer; installations finish safely and no next operation starts.
+            foreach (var item in _items.Where(i => i.State == DownloadActivityState.Running))
+                if (item.CanPause || item.IsPaused) item.Transfer.SetPaused(suspended);
+        }
+        RaiseChanged();
+        _signal.Release();
+    }
+
+    /// <summary>Changes the real execution order; the running transaction is never preempted.</summary>
+    public bool MoveBefore(PortableDownloadQueueItem item, PortableDownloadQueueItem? before)
+    {
+        lock (_gate)
+        {
+            if (item.State != DownloadActivityState.Queued || !_items.Contains(item) ||
+                (before is not null && (before == item || before.State != DownloadActivityState.Queued || !_items.Contains(before))))
+                return false;
+            _items.Remove(item);
+            var index = before is null ? _items.FindIndex(i => i.State == DownloadActivityState.Queued) : _items.IndexOf(before);
+            _items.Insert(index < 0 ? _items.Count : index, item);
+        }
+        RaiseChanged();
+        return true;
+    }
 
     public PortableDownloadQueue(
         DownloadActivityStore? history = null,
@@ -220,6 +280,29 @@ public sealed class PortableDownloadQueue : IDisposable
     }
 
     public event EventHandler? Changed;
+
+    /// <summary>Wait for an existing or newly queued prerequisite without polling or restarting it.</summary>
+    public async Task<DownloadActivityState> WaitForCompletionAsync(PortableDownloadQueueItem item,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
+        cancellationToken = lifetime.Token;
+        while (true)
+        {
+            var changed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            void OnChanged(object? sender, EventArgs args) => changed.TrySetResult();
+            Changed += OnChanged;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.IsTerminal) return item.State;
+                await changed.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            finally { Changed -= OnChanged; }
+        }
+    }
 
     public IReadOnlyList<PortableDownloadQueueItem> Items
     {
@@ -265,6 +348,7 @@ public sealed class PortableDownloadQueue : IDisposable
 
             item = new PortableDownloadQueueItem(
                 uniqueKey, title, kind, changes, referenceId, work, after, _notificationContext, cancellable);
+            item.Transfer = new(() => BandwidthLimitBytesPerSecond);
             _items.Add(item);
         }
 
@@ -305,6 +389,9 @@ public sealed class PortableDownloadQueue : IDisposable
             if (!_items.Contains(item) || !item.CanRetry) return false;
             item.Cancellation.Dispose();
             item.Cancellation = new CancellationTokenSource();
+            item.Transfer = new(() => BandwidthLimitBytesPerSecond);
+            _items.Remove(item);
+            _items.Add(item);
             item.Progress = 0;
             item.Status = "En attente";
             item.State = DownloadActivityState.Queued;
@@ -396,13 +483,13 @@ public sealed class PortableDownloadQueue : IDisposable
                 PortableDownloadQueueItem? item;
                 lock (_gate)
                 {
-                    item = _items.FirstOrDefault(candidate =>
-                        candidate.State == DownloadActivityState.Queued && !candidate.Cancellation.IsCancellationRequested);
+                    item = _suspended ? null : _items.FirstOrDefault(candidate =>
+                        candidate.State == DownloadActivityState.Queued && !candidate.IsPaused && !candidate.Cancellation.IsCancellationRequested);
+                    if (item is not null) item.State = DownloadActivityState.Running;
                 }
                 if (item is null) continue;
                 if (item.Work is null) continue;
 
-                item.State = DownloadActivityState.Running;
                 item.Status = item.Kind.Contains("UNINSTALL", StringComparison.OrdinalIgnoreCase)
                     ? "Suppression…"
                     : item.Kind.Contains("DATA", StringComparison.OrdinalIgnoreCase)
@@ -417,6 +504,17 @@ public sealed class PortableDownloadQueue : IDisposable
                 var progress = new InlineProgress<double>(value =>
                 {
                     var normalized = Math.Clamp(value, 0, 1);
+                    // A mod download reports 100% before its install transaction starts.
+                    // Keep that transfer inside the first part of the overall operation.
+                    if (item.Kind.Equals("MOD", StringComparison.OrdinalIgnoreCase))
+                        normalized = item.Transfer.Phase switch
+                        {
+                            DownloadPhase.Downloading => normalized * .75,
+                            DownloadPhase.Verifying => .75,
+                            DownloadPhase.Installing => .8 + normalized * .19,
+                            _ => normalized * .05
+                        };
+                    normalized = Math.Max(item.Progress, Math.Min(.99, normalized));
                     lock (progressGate)
                     {
                         var now = DateTimeOffset.UtcNow;
@@ -434,6 +532,11 @@ public sealed class PortableDownloadQueue : IDisposable
 
                 try
                 {
+                    using var transferScope = item.Transfer.Enter();
+                    item.Transfer.SetPhase(item.Kind.Contains("DATA", StringComparison.OrdinalIgnoreCase)
+                        ? DownloadPhase.Preparing : item.Kind.Contains("UNINSTALL", StringComparison.OrdinalIgnoreCase)
+                            ? DownloadPhase.Installing : DownloadPhase.Resolving);
+                    await item.Transfer.WaitAsync(item.Cancellation.Token).ConfigureAwait(false);
                     await item.Work(progress, item.Cancellation.Token).ConfigureAwait(false);
                     item.Cancellation.Token.ThrowIfCancellationRequested();
                     item.Progress = 1;
@@ -458,6 +561,11 @@ public sealed class PortableDownloadQueue : IDisposable
                     Persist(item);
                     RaiseChanged();
                 }
+                // Signals are wake-ups rather than one token per job: a paused item or a
+                // global suspension may have consumed its original signal.
+                lock (_gate)
+                    if (!_suspended && _items.Any(i => i.State == DownloadActivityState.Queued && !i.IsPaused))
+                        _signal.Release();
             }
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)

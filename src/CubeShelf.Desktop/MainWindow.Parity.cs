@@ -38,6 +38,11 @@ public sealed partial class MainWindow
         // Someone who went through the wizard before its network page existed, or skipped it,
         // hears about it once now -- before CubeShelf ever looks.
         if (!_preferences.MeshDiscoveryNoticeSeen) await ShowMeshDiscoveryNoticeAsync();
+        var startupArgs = Environment.GetCommandLineArgs();
+        if (!startupArgs.Contains("--desktop", StringComparer.OrdinalIgnoreCase) &&
+            (_preferences.StartInBigPicture || startupArgs.Contains("--big-picture", StringComparer.OrdinalIgnoreCase)))
+            EnterBigPicture(this, new RoutedEventArgs());
+        else ShowPlatformHome();
     }
 
     private async Task ShowMeshDiscoveryNoticeAsync()
@@ -78,6 +83,16 @@ public sealed partial class MainWindow
     {
         if (GameCase is null || SelectedTitleText is null) return;
         var width = Bounds.Width;
+        var compactLibrary = width - (_bigPictureActive ? 0 : 225) < 1000;
+        LibraryView.RowDefinitions[0].Height = new GridLength(compactLibrary ? 205 : 155);
+        if (Grid.GetRow(LibraryHeaderTools) != (compactLibrary ? 1 : 0))
+        {
+            LibraryHeaderGrid.RowDefinitions = new RowDefinitions(compactLibrary ? "*,Auto" : "*");
+            Grid.SetRow(LibraryHeaderTools, compactLibrary ? 1 : 0);
+            Grid.SetColumn(LibraryHeaderTools, compactLibrary ? 0 : 1);
+            Grid.SetColumnSpan(LibraryHeaderTools, compactLibrary ? 2 : 1);
+            Grid.SetColumnSpan(LibraryHeaderText, compactLibrary ? 2 : 1);
+        }
         if (width < 1120)
         {
             GameCase.Width = 300;
@@ -100,6 +115,7 @@ public sealed partial class MainWindow
 
     private void ParityShowLibrary(object? sender, RoutedEventArgs args)
     {
+        if (ReferenceEquals(sender, NavLibraryButton)) _personalLibrary = false;
         _favoritesOnly = false;
         LibrarySectionTitle.Text = UiLocalization.Get(_preferences.Language, "LibraryTitle");
         RefreshLibraryParity();
@@ -108,6 +124,7 @@ public sealed partial class MainWindow
 
     private void ParityShowFavorites(object? sender, RoutedEventArgs args)
     {
+        _personalLibrary = false;
         _favoritesOnly = true;
         LibrarySectionTitle.Text = UiLocalization.Get(_preferences.Language, "FavoritesTitle");
         RefreshLibraryParity();
@@ -165,8 +182,15 @@ public sealed partial class MainWindow
 
     private void ShowParityView(Control view)
     {
+        if(_presentation?.IsDual==true&&(ReferenceEquals(view,LibraryView)||ReferenceEquals(view,BigPictureView)))
+        {BuildDualGames();view=DualScreenView;}
+        PlatformHome.IsVisible=false;
         foreach (var candidate in ContentViews)
             candidate.IsVisible = ReferenceEquals(candidate, view);
+        if (_libraryStale && LibraryOnScreen) RefreshLibraryParity();
+        UpdateResponsiveParity();
+        UpdateBigPictureSubnav(view);
+        UpdateNavigationStatePhase5();
     }
 
     /// <summary>
@@ -183,17 +207,33 @@ public sealed partial class MainWindow
                     $"{child.Name} est une vue de contenu mais n’a pas Classes=\"view\".");
     }
 
-    private void LibrarySearchChanged(object? sender, TextChangedEventArgs args) => RefreshLibraryParity();
+    private void LibrarySearchChanged(object? sender, TextChangedEventArgs args)
+    {
+        if (!_changingShelf) RefreshLibraryParity();
+    }
     private void LibrarySortChanged(object? sender, SelectionChangedEventArgs args) => RefreshLibraryParity();
 
+    private bool _libraryStale;
+    // The console home is an overlay above a still-"visible" LibraryView, and nothing is on screen before the window opens.
+    private bool LibraryOnScreen => LibraryView.IsEffectivelyVisible && !PlatformHome.IsVisible;
+    private void CatchUpLibrary(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs args)
+    {
+        // Posted: when the window opens, the console home covers the library right after this event.
+        if (args.Property == IsVisibleProperty && _libraryStale)
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => { if (_libraryStale && LibraryOnScreen) RefreshLibraryParity(); });
+    }
     private void RefreshLibraryParity()
     {
         if (LibraryCards is null) return;
-        foreach (var card in _parityCards) card.Dispose();
-        _parityCards.Clear();
+        if(_presentation?.IsDual==true&&DualScreenView.IsVisible&&!DualScreenView.IsPlatforms)BuildDualGames();
+        // Cards (and their cover decodes) are only built for a visible library; ShowParityView catches up (~1 s at startup).
+        var buildCards = LibraryOnScreen;
+        _libraryStale = !buildCards;
+        var previousCards = buildCards ? _parityCards.ToArray() : [];
+        if (buildCards) _parityCards.Clear();
 
         // Keep the original game on the shelf; active mods only select its launch configuration.
-        IEnumerable<GameCatalogEntry> query = ShelfGames;
+        IEnumerable<GameCatalogEntry> query = _personalLibrary ? PersonalLibraryGames() : ShelfGames;
         if (_favoritesOnly) query = query.Where(game => game.IsFavorite);
 
         var search = LibrarySearchBox?.Text?.Trim() ?? "";
@@ -202,7 +242,8 @@ public sealed partial class MainWindow
             query = query.Where(game =>
                 game.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
                 game.Id.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                game.Genre.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+                game.Genre.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                _personalLibrary && ShelfProduct.Resolve(game.ShelfConsole).Console.Contains(search, StringComparison.CurrentCultureIgnoreCase));
         }
 
         query = (LibrarySortCombo?.SelectedIndex ?? 1) switch
@@ -214,11 +255,29 @@ public sealed partial class MainWindow
                       .ThenBy(game => game.Title, StringComparer.CurrentCultureIgnoreCase)
         };
 
-        foreach (var game in query)
-            _parityCards.Add(BuildCard(game));
+        if (buildCards)
+        {
+            foreach (var game in query)
+            {
+                var card = BuildCard(game);
+                ApplyQuickPlayCard(card);
+                _parityCards.Add(card);
+            }
 
-        LibraryCards.ItemsSource = _parityCards.ToArray();
+            LibraryCards.ItemsSource = _parityCards.ToArray();
+            // Acquire the next cards before releasing the old ones, keeping reused art pinned in cache.
+            foreach (var card in previousCards) card.Dispose();
+        }
         var english = UiLocalization.IsEnglish(_preferences.Language);
+        var console = ShelfProduct.Resolve(_activeShelfConsole).Console;
+        Resources["BrandSubtitle"] = english ? console + " library" : "Bibliothèque " + console;
+        Resources["SelectedGame"] = (console.StartsWith("Nintendo ", StringComparison.Ordinal) ? "" : "NINTENDO ") + console.ToUpperInvariant() + (english ? " • SELECTED GAME" : " • JEU SÉLECTIONNÉ");
+        LibrarySectionTitle.Text = _personalLibrary ? UiLocalization.Get(_preferences.Language, "MyGames")
+            : _favoritesOnly ? UiLocalization.Get(_preferences.Language, "FavoritesTitle")
+            : english ? console + " ports" : "Ports " + console;
+        LibrarySubtitleText.Text = UiLocalization.Get(_preferences.Language, _personalLibrary ? "MyGamesSubtitle" : "LibrarySubtitle");
+        EmptyLibraryText.Text = UiLocalization.Get(_preferences.Language,
+            _personalLibrary && search.Length == 0 ? "MyGamesEmpty" : "NoLibraryMatch");
         LibraryUpdatesText.Text = _favoritesOnly
             ? english ? $"{_parityCards.Count} favorite(s)" : $"{_parityCards.Count} favori(s)"
             : english ? $"{_parityCards.Count} game(s)" : $"{_parityCards.Count} jeu(x)";
@@ -244,11 +303,11 @@ public sealed partial class MainWindow
                         ? (english ? "↻ Newer source" : "↻ Source plus récente")
                         : (english ? "✓ Up to date" : "✓ À jour")
             : "";
-        return new DesktopGameCard(
+        var card = new DesktopGameCard(
             game,
-            LoadBitmap(coverPath),
+            LoadCardCover(coverPath),
             game.IsFavorite ? "★" : "",
-            File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
+            game.RuntimeOwnsSetup ? "◆ Port natif" : File.Exists(disc) ? "✓ ISO/RVZ" : "○ ISO/RVZ",
             runtime.IsInstalled || File.Exists(executable)
                 ? $"✓ {game.RuntimeName}"
                 : $"○ {game.RuntimeName}",
@@ -262,6 +321,11 @@ public sealed partial class MainWindow
                 ? $"{game.PlayCount} launches • {FormatPlayTime(game.TotalPlaySeconds)} • {last}"
                 : $"{game.PlayCount} lancements • {FormatPlayTime(game.TotalPlaySeconds)} • {last}",
             update);
+        card.Versions = PortVersionsFor(game);
+        if (_personalLibrary) card.Versions = card.Versions.Where(choice => _personalGameIds.Contains(choice.GameId)).ToArray();
+        card.ShowConsole = _personalLibrary;
+        card.SelectedVersion = card.Versions.FirstOrDefault(choice => choice.GameId == game.Id);
+        return card;
     }
 
     private void SelectLibraryGame(object? sender, RoutedEventArgs args)
@@ -304,6 +368,8 @@ public sealed partial class MainWindow
         if (_selectedGame is null || SelectedTitleText is null) return;
         var game = _selectedGame;
         var baseGame = GameVariants.BaseOf(_catalogGames, game);
+        RefreshPortVersionPickers(baseGame);
+        GameTitle.Text = baseGame.Title;
         SelectedTitleText.Text = baseGame.Title;
         SelectedMetaText.Text = string.Join("  •  ", new[]
         {
@@ -340,20 +406,21 @@ public sealed partial class MainWindow
             : prepared
                 ? (english ? "✓ Game data ready" : "✓ Données prêtes")
                 : (english ? "○ Game data to prepare" : "○ Données à préparer");
-        SetupProgressText.Text = runtimeManagesDisc
-            ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} {string.Join("/", game.DiscFormats.Select(format => format.TrimStart('.').ToUpperInvariant()))}"
-            : english
-                ? $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Game data"
-                : $"{(hasRuntime ? "✓" : "○")} {game.RuntimeName}   {(hasDisc ? "✓" : "○")} ISO/RVZ   {(prepared ? "✓" : "○")} Données jeu";
+        SetupProgressText.Text = QuickPlayHint(game);
 
         FavoriteButton.Content = game.IsFavorite
             ? (english ? "★ Favorite" : "★ Favori")
             : (english ? "☆ Add to favorites" : "☆ Ajouter aux favoris");
         var cover = baseGame.Covers.FirstOrDefault();
-        GameCase.SetCover(
+        GameCase.CaseFormat = Controls.GameCaseControl.FormatForConsole(baseGame.ShelfConsole);
+        GameCase.RealisticShell = true;
+        GameCase.UseImportedModel = baseGame.ShelfConsole == "gamecube";
+        if(GameCase.SetCover(
             ResolveCoverPath(cover?.Front),
             ResolveCoverPath(cover?.Back),
-            ResolveCoverPath(cover?.Spine));
+            ResolveCoverPath(cover?.Spine), ResolveCoverPath(cover?.Right),
+            ResolveCoverPath(cover?.Top), ResolveCoverPath(cover?.Bottom)))
+            GameCase.SetShelfPose(baseGame.ShelfConsole == "gamecube" ? 24 : 14,true,animate:false);
 
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var updateSnapshot))
             ApplyGameUpdateSnapshotPhase3(updateSnapshot);
@@ -390,9 +457,16 @@ public sealed partial class MainWindow
     private string ResolveCoverPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return "";
+        path = path.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar);
         return Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
+    }
+
+    private static Bitmap? LoadCardCover(string path)
+    {
+        try { return File.Exists(path) ? Controls.CoverBitmapCache.Acquire(path, 512) : null; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or InvalidOperationException) { return null; }
     }
 
     private static Bitmap? LoadBitmap(string path)
@@ -409,7 +483,7 @@ public sealed partial class MainWindow
         if (!force && _preferences.FirstRunCompleted) return;
         string? raUser = null;
         if (_raStore is not null && _raStore.Load(out var rejected) is { } session && !rejected) raUser = session.User;
-        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser);
+        var wizard = new FirstRunWizardWindow(_paths, _preferencesStore, _preferences, SignInRetroAchievementsAsync, raUser, ScanGameFolderAsync);
         await wizard.ShowDialog(this);
         // The network page decides on the spot, even in a wizard left half-way.
         _preferences = _preferences with
@@ -429,8 +503,7 @@ public sealed partial class MainWindow
         ApplyPreferences();
         RefreshRetroAchievementsUi();
         RefreshLibraryParity();
-        if (wizard.OpenGameAfterFinish && _catalogGames.FirstOrDefault() is { } game)
-            SelectCatalogGame(game);
+        if (wizard.OpenGameAfterFinish) ShowPlatformHome();
     }
 
 
@@ -543,7 +616,7 @@ public sealed partial class MainWindow
         return $"{value:0.##} {units[unit]}";
     }
 
-    public sealed class DesktopGameCard : IDisposable
+    public sealed class DesktopGameCard : IDisposable, System.ComponentModel.INotifyPropertyChanged
     {
         public DesktopGameCard(GameCatalogEntry game, Bitmap? cover, string favorite, string disc, string runtime, string data, string stats, string update)
         {
@@ -558,6 +631,13 @@ public sealed partial class MainWindow
         }
 
         public GameCatalogEntry Game { get; }
+        public bool ShowConsole { get; set; }
+        public string ConsoleName => ShelfProduct.Resolve(Game.ShelfConsole).Console;
+        public PortVersionChoice[] Versions { get; set; } = [];
+        public PortVersionChoice? SelectedVersion { get; set; }
+        public bool HasVersionChoice => Versions.Length > 1;
+        public Controls.GameCaseFormat CaseFormat => Controls.GameCaseControl.FormatForConsole(Game.ShelfConsole);
+        public bool HasFavorite => Favorite.Length > 0;
         public Bitmap? Cover { get; }
         public string Title => Game.Title;
         public string Subtitle => string.Join(" • ", new[] { Game.Year > 0 ? Game.Year.ToString() : "", Game.Genre }.Where(value => value.Length > 0));
@@ -567,6 +647,18 @@ public sealed partial class MainWindow
         public string Data { get; }
         public string Stats { get; }
         public string Update { get; }
-        public void Dispose() => Cover?.Dispose();
+        public string PlayLabel { get; private set; } = "";
+        public string PlayHint { get; private set; } = "";
+        public bool CanQuickPlay { get; private set; } = true;
+        public bool IsPreparing => !CanQuickPlay;
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+        public void UpdatePlay(string label, string hint, bool enabled)
+        {
+            if (PlayLabel == label && PlayHint == hint && CanQuickPlay == enabled) return;
+            PlayLabel = label; PlayHint = hint; CanQuickPlay = enabled;
+            foreach (var property in new[] { nameof(PlayLabel), nameof(PlayHint), nameof(CanQuickPlay), nameof(IsPreparing) })
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(property));
+        }
+        public void Dispose() => Controls.CoverBitmapCache.Release(Cover);
     }
 }

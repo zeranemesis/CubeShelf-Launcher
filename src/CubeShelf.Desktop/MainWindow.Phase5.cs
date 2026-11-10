@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Avalonia;
+using CubeShelf.Core.Library;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
@@ -155,8 +156,8 @@ public sealed partial class MainWindow
 
     private void FitWindowToCurrentScreenPhase5(bool force)
     {
-        if (_phase5ApplyingWindowFit || (!force && !_preferences.AutoFitWindowToScreen)) return;
-        if (WindowState == WindowState.Maximized)
+        if (_bigPictureActive || _phase5ApplyingWindowFit || (!force && !_preferences.AutoFitWindowToScreen)) return;
+        if (WindowState is WindowState.Maximized or WindowState.FullScreen)
         {
             UpdateResponsiveParity();
             return;
@@ -223,14 +224,24 @@ public sealed partial class MainWindow
 
     private void UpdateNavigationStatePhase5()
     {
-        SetNavSelectedPhase5(NavLibraryButton, GameView.IsVisible || (LibraryView.IsVisible && !_favoritesOnly));
-        SetNavSelectedPhase5(NavFavoritesButton, LibraryView.IsVisible && _favoritesOnly);
-        SetNavSelectedPhase5(NavModsButton, ModsView.IsVisible);
-        SetNavSelectedPhase5(NavDownloadsButton, DownloadsView.IsVisible);
-        SetNavSelectedPhase5(NavFriendsButton, FriendsView.IsVisible);
-        SetNavSelectedPhase5(NavOnlineButton, OnlineView.IsVisible || RoomSetupView.IsVisible);
-        SetNavSelectedPhase5(NavSettingsButton, SettingsView.IsVisible);
-        SetNavSelectedPhase5(ProfileChipButton, ProfileView.IsVisible);
+        var dual=DualScreenView.IsVisible&&!DualScreenView.IsPlatforms;
+        var consoles=(PlatformHome.IsVisible||DualScreenView.IsVisible&&DualScreenView.IsPlatforms)&&!_bigPictureActive;
+        var library=LibraryView.IsVisible||dual;
+        var personal = !consoles && _personalLibrary && (library || GameView.IsVisible);
+        ConsoleShelfPicker.IsVisible = !personal;
+        SidebarShelfSubtitle.Text = personal ? P7("Bibliothèque personnelle", "Personal library") : ShelfProduct.Resolve(_activeShelfConsole).Console;
+        SidebarConsoleLogo.Platform = personal ? "gamecube" : _activeShelfConsole;
+        Title = Program.DisplayName + " · " + (personal ? P7("Mes jeux", "My games") : ShelfProduct.Resolve(_activeShelfConsole).Console);
+        SetNavSelectedPhase5(NavConsolesButton,consoles);
+        SetNavSelectedPhase5(NavMyGamesButton, !consoles && _personalLibrary && (library || GameView.IsVisible));
+        SetNavSelectedPhase5(NavLibraryButton, !consoles && !_personalLibrary && (GameView.IsVisible || (library && !_favoritesOnly)));
+        SetNavSelectedPhase5(NavFavoritesButton, !consoles && library && _favoritesOnly);
+        SetNavSelectedPhase5(NavModsButton, !consoles && ModsView.IsVisible);
+        SetNavSelectedPhase5(NavDownloadsButton, !consoles && DownloadsView.IsVisible);
+        SetNavSelectedPhase5(NavFriendsButton, !consoles && FriendsView.IsVisible);
+        SetNavSelectedPhase5(NavOnlineButton, !consoles && (OnlineView.IsVisible || RoomSetupView.IsVisible));
+        SetNavSelectedPhase5(NavSettingsButton, !consoles && SettingsView.IsVisible);
+        SetNavSelectedPhase5(ProfileChipButton, !consoles && ProfileView.IsVisible);
     }
 
     private static void SetNavSelectedPhase5(Button button, bool selected)

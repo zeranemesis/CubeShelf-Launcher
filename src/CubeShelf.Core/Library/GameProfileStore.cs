@@ -37,7 +37,7 @@ public sealed class GameProfileStore
         File.Move(temporary, _path, true);
     }
 
-    private List<GameProfileEntry> LoadAll()
+    public List<GameProfileEntry> LoadAll()
     {
         if (!File.Exists(_path)) return new();
         try

@@ -1,0 +1,36 @@
+name: Watch native upstream releases without forks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-upstream-watch
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate the watcher
+        run: python eng/watch-native-upstream.py --self-test
+      - name: Observe pinned upstream repositories
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python eng/watch-native-upstream.py --output native-upstream-watch
+      - name: Write the review summary
+        run: cat native-upstream-watch/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-upstream-review
+          path: native-upstream-watch/
+          retention-days: 14

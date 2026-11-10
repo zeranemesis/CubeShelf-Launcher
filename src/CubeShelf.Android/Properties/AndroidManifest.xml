@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.VIBRATE" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+  <queries>
+    <intent><action android:name="android.speech.RecognitionService" /></intent>
+    <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    <package android:name="com.dishii.soh" />
+    <package android:name="com.dishii.mm" />
+    <package android:name="app.birdman64" />
+    <package android:name="io.github.jackandbeans.snap64recomp" />
+    <package android:name="org.oracles" />
+    <package android:name="io.github.morerokk.mhgurecomp" />
+    <package android:name="com.fftarecomp.port" />
+    <package android:name="com.bigodao.warioland" />
+    <package android:name="org.wwhdrecomp.wwhd" />
+    <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
+    <package android:name="com.izzy.kart" />
+    <package android:name="com.starship.android" />
+    <package android:name="com.perfectdark.port" />
+    <package android:name="com.aure.banjorecomp" />
+    <package android:name="com.deivid22srk.dk64recomp" />
+    <package android:name="io.github.hm64recomp" />
+    <package android:name="com.goemon64.recomp" />
+    <package android:name="com.mstan.supermarioland2recomp" />
+    <package android:name="com.lordingard.sacredstonesrecomp" />
+    <package android:name="io.github.doutorraposo.moonpearl" />
+    <package android:name="dev.twilitrealm.dusk" />
+    <package android:name="org.metroidprime.port" />
+    <package android:name="com.mp6.game" />
+    <package android:name="com.driftdroid.android" />
+    <package android:name="com.jrickey.battleship" />
+    <package android:name="com.rekhcom.android" />
+    <package android:name="dev.picori.tmc" />
+    <package android:name="io.github.alondero.aerogaugerecomp" />
+    <package android:name="com.flyngmt.nookery" />
+    <package android:name="org.metroidprime2.port" />
+    <package android:name="dev.ttyd.port.us" />
+    <package android:name="dev.ttyd.port.eu" />
+  </queries>
+  <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="false" android:allowNativeHeapPointerTagging="false">
+    <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-enabled local game assistance button over games launched by DecompShelf" />
+    </service>
+    <activity android:name="dev.net64.ghostship.MainActivity" android:process=":sm64"
+              android:exported="false" android:label="Super Mario 64 · DecompShelf"
+              android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:screenOrientation="sensorLandscape"
+              android:configChanges="keyboard|keyboardHidden|layoutDirection|locale|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" />
+    <service android:name="dev.net64.ghostship.ExtractionService" android:process=":sm64_prepare"
+             android:exported="false" android:foregroundServiceType="dataSync" />
+    <provider android:name="androidx.core.content.FileProvider"
+              android:authorities="io.github.zeranemesis.cubeshelf.updates"
+              android:exported="false" android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/update_paths" />
+    </provider>
+    <activity android:name="com.mariopartyrd.partyboard.PartyBoardActivity"
+              android:process=":partyboard" android:taskAffinity="io.github.zeranemesis.cubeshelf.partyboard"
+              android:exported="false" android:launchMode="singleTask" android:label="PartyBoard · CubeShelf"
+              android:theme="@android:style/Theme.NoTitleBar" android:screenOrientation="userLandscape"
+              android:configChanges="layoutDirection|locale|fontScale|fontWeightAdjustment|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation|density|touchscreen|colorMode|mcc|mnc" />
+    <activity android:name="com.mariopartyrd.partyboard.online.LobbyActivity"
+              android:process=":partyboard_online" android:taskAffinity="io.github.zeranemesis.cubeshelf.partyboard.online"
+              android:exported="false" android:launchMode="singleTask" android:label="En ligne · CubeShelf"
+              android:theme="@android:style/Theme.Material.NoActionBar" android:windowSoftInputMode="adjustResize"
+              android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density" />
+    <activity android:name="com.mariopartyrd.partyboard.online.RestartActivity"
+              android:process=":partyboard_online" android:exported="false" android:noHistory="true"
+              android:excludeFromRecents="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    <service android:name="com.mariopartyrd.partyboard.online.OnlineService"
+             android:process=":partyboard_online" android:exported="false" android:foregroundServiceType="specialUse">
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="PartyBoard lobby and multiplayer relay while its game process runs" />
+    </service>
+  </application>
+</manifest>

@@ -11,6 +11,7 @@ internal static class GameCubeIsoExtractor
         CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(destination);
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Preparing, cancellationToken).ConfigureAwait(false);
         await using var stream = new FileStream(isoPath, FileMode.Open, FileAccess.Read, FileShare.Read,
             1024 * 1024, true);
         if (stream.Length < 0x42C) throw new InvalidDataException("Image GameCube invalide : en-tête trop court.");
@@ -90,6 +91,7 @@ internal static class GameCubeIsoExtractor
                 var read = await stream.ReadAsync(buffer.AsMemory(0, (int)Math.Min(buffer.Length, remaining)), cancellationToken);
                 if (read <= 0) throw new EndOfStreamException();
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                DownloadTransfer.Current?.RecordDisk(read);
                 remaining -= read;
                 completed += read;
                 if (total > 0) progress?.Report((double)completed / total);

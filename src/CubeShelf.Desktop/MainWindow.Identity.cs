@@ -389,6 +389,6 @@ public sealed partial class MainWindow
         var version = typeof(MainWindow).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion.Split('+', 2)[0];
-        VersionText.Text = $"CubeShelf {version ?? "?"} • Avalonia";
+        VersionText.Text = $"DecompShelf {version ?? "?"} • Avalonia";
     }
 }

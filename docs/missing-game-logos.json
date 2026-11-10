@@ -1,0 +1,120 @@
+[
+  {
+    "Console": "arcade",
+    "Title": "Vampire Savior Definitive",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "gb",
+    "Title": "Pokemon RBY / GSC / FRLF / RSE",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "gbc",
+    "Title": "Pokemon Gold / Silver / Crystal",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "gbc",
+    "Title": "The Legend of Zelda: Oracle of Ages / Seasons",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "gbc",
+    "Title": "The Legend of Zelda: Oracle of Ages/Seasons",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "ps1",
+    "Title": "JoJo's Bizarre Adventure: Heritage for the Future",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "ps1",
+    "Title": "Vigilante 8 / Vigilante 8: 2nd Offense",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "ps4",
+    "Title": "The Last of Us",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "psp",
+    "Title": "Yakumo",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Call of Duty: Future Warfare",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Dragon Ball Z: Budokai 3 HD",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "xbox360",
+    "Title": "FIFA 09",
+    "Reason": "No clear logo",
+    "Candidates": [
+      {
+        "Id": "15550",
+        "Name": "FIFA Soccer 09"
+      }
+    ]
+  },
+  {
+    "Console": "xbox360",
+    "Title": "James Bond games",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Marvel: Ultimate Alliance 1 and 2",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Need for Speed: Most Wanted",
+    "Reason": "Ambiguous match",
+    "Candidates": [
+      {
+        "Id": "11975",
+        "Name": "Need for Speed: Most Wanted"
+      },
+      {
+        "Id": "419388",
+        "Name": "Need for Speed: Most Wanted (2005)"
+      }
+    ]
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Tekken 6",
+    "Reason": "No valid transparent logo",
+    "Errors": [
+      "Expected PNG under 8 MB"
+    ]
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Xbox 360 native ports collection",
+    "Reason": "No exact platform/title match",
+    "Candidates": []
+  }
+]

@@ -23,7 +23,8 @@ public static class PortableModState
     /// </summary>
     public static bool IsValidGameId(string? gameId) =>
         !string.IsNullOrWhiteSpace(gameId) &&
-        gameId.All(character => char.IsAsciiLetterOrDigit(character) || character is '-' or '_');
+        !gameId.StartsWith('.') && !gameId.EndsWith('.') && !gameId.Contains("..", StringComparison.Ordinal) &&
+        gameId.All(character => char.IsAsciiLetterOrDigit(character) || character is '-' or '_' or '.');
 
     /// <summary>Where a game's mod state lives. Does not create the directory.</summary>
     public static string DirectoryFor(IPlatformPaths paths, string gameId)

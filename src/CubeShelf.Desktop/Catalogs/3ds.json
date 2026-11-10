@@ -1,0 +1,96 @@
+[
+  {
+    "Id": "coccofresco-triaevum-ocarina-of-time-3d",
+    "Title": "Ocarina of Time 3D",
+    "Project": "TriAevum",
+    "Repository": "coccofresco/TriAevum",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8f69a26f390bf3a500bf3149b6596c19724a5b5d",
+    "ReadmeUrl": "https://github.com/coccofresco/TriAevum/blob/8f69a26f390bf3a500bf3149b6596c19724a5b5d/README.md",
+    "ReleaseUrl": "https://github.com/coccofresco/TriAevum/releases/tag/v0.8.0-beta.1.2",
+    "ReleaseTag": "v0.8.0-beta.1.2",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "TriAevum-v0.8.0-beta.1.2-Linux-x86_64.AppImage",
+        "Url": "https://github.com/coccofresco/TriAevum/releases/download/v0.8.0-beta.1.2/TriAevum-v0.8.0-beta.1.2-Linux-x86_64.AppImage",
+        "Sha256": "2e80fb50e1d21ffc5cc852a90f715408b82e65839e8baf8b3dbf6f9295d5296a",
+        "Size": 465828344,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "TriAevum-v0.8.0-beta.1.2-Windows-x64.zip",
+        "Url": "https://github.com/coccofresco/TriAevum/releases/download/v0.8.0-beta.1.2/TriAevum-v0.8.0-beta.1.2-Windows-x64.zip",
+        "Sha256": "23c3febe3a4dc1b7ffe652f21861f4c5b5068411a16df5fc721e52a80ba817a6",
+        "Size": 550467290,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "invictus-potens-smt4-recomp-shin-megami-tensei-iv",
+    "Title": "Shin Megami Tensei IV",
+    "Project": "smt4-recomp",
+    "Repository": "Invictus-potens/smt4-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a170c822fb4190f72cbbff291f5cebdc2320e872",
+    "ReadmeUrl": "https://github.com/Invictus-potens/smt4-recomp/blob/a170c822fb4190f72cbbff291f5cebdc2320e872/README.md",
+    "ReleaseUrl": "https://github.com/Invictus-potens/smt4-recomp/releases/tag/v0.1.8",
+    "ReleaseTag": "v0.1.8",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "smt4-launcher.exe",
+        "Url": "https://github.com/Invictus-potens/smt4-recomp/releases/download/v0.1.8/smt4-launcher.exe",
+        "Sha256": "7f1a5199fd30fe5be454596f28a7df031ea437ddb45ac38f35c15b78a020bbfa",
+        "Size": 15247360,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "watchmakerers-clockwork-yo-kai-watch",
+    "Title": "Yo-kai Watch",
+    "Project": "clockwork",
+    "Repository": "watchmakerers/clockwork",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "05e6079154041c6b505ed88ef195a9df8288f446",
+    "ReadmeUrl": "https://github.com/watchmakerers/clockwork/blob/05e6079154041c6b505ed88ef195a9df8288f446/README.md",
+    "ReleaseUrl": "https://github.com/watchmakerers/clockwork/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "clockwork-windows-x86_64.zip",
+        "Url": "https://github.com/watchmakerers/clockwork/releases/download/v0.5.0/clockwork-windows-x86_64.zip",
+        "Sha256": "84a8acb2c7584473b6c3766e960486e96208bf41379c904e44fe5ddb59da5dcc",
+        "Size": 3381751,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "Console": "gb",
+    "Title": "Pokemon RBY / GSC / FRLF / RSE"
+  },
+  {
+    "Console": "gbc",
+    "Title": "The Legend of Zelda: Oracle of Ages/Seasons"
+  },
+  {
+    "Console": "gbc",
+    "Title": "Pokemon Gold / Silver / Crystal"
+  },
+  {
+    "Console": "megadrive",
+    "Title": "Sonic 3 & Knuckles"
+  },
+  {
+    "Console": "ps1",
+    "Title": "Vigilante 8 / Vigilante 8: 2nd Offense"
+  },
+  {
+    "Console": "psp",
+    "Title": "Yakumo"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "GoldenEye 007"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "GoldenEye 007 XBLA PC Recomp"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "James Bond games"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Marvel: Ultimate Alliance 1 and 2"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Call of Duty: Future Warfare"
+  },
+  {
+    "Console": "xbox360",
+    "Title": "Xbox 360 native ports collection"
+  }
+]

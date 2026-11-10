@@ -25,6 +25,11 @@ public sealed partial class MainWindow
 {
     private PresenceInvite? _outgoingInvite;
     private CancellationTokenSource? _hostWatch;
+    private DateTimeOffset _roomLaunchPendingUntil;
+
+    private bool RoomAlreadyStartingOrOpen() => _quickPlayClosing
+        || DateTimeOffset.UtcNow < _roomLaunchPendingUntil
+        || RoomSync.Read() is { IsOpen: true } room && CompanionAlive(room);
 
     /// <summary>Where the companion is told to drop the invitation it just created.</summary>
     private string PendingInviteFile =>
@@ -179,6 +184,8 @@ public sealed partial class MainWindow
     private (bool Started, string Message) StartHosting(GameCatalogEntry game, string? forFriendKey, bool publicRoom = false,
         IReadOnlyDictionary<string, string?>? extra = null)
     {
+        if (RoomAlreadyStartingOrOpen())
+            return (false, P7("Un salon est déjà ouvert ou en préparation.", "A room is already open or being prepared."));
         if (HostingBlocker(game, publicRoom) is { } blocker) return (false, blocker);
         if (_hostWatch is { IsCancellationRequested: false })
             return (false, P7("Un salon est déjà en préparation.", "A lobby is already being prepared."));
@@ -192,6 +199,8 @@ public sealed partial class MainWindow
         if (extra is not null) foreach (var pair in extra) environment[pair.Key] = pair.Value;
         AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--host" }, out var error)) return (false, error);
+        _onlineGameId = game.Id;
+        _roomLaunchPendingUntil = DateTimeOffset.UtcNow.AddSeconds(10);
 
         // A public room with no friend to tell is found on the list.
         if (publicRoom && (_presence is null || (_friends?.ActiveRecipients().Count ?? 0) == 0))
@@ -323,6 +332,8 @@ public sealed partial class MainWindow
     private (bool Started, string Message) StartJoining(GameCatalogEntry game, string friendHandle, string payload,
         IReadOnlyDictionary<string, string?>? extra = null)
     {
+        if (RoomAlreadyStartingOrOpen())
+            return (false, P7("Un salon est déjà ouvert ou en préparation.", "A room is already open or being prepared."));
         if (!TryResolveCompanion(game, out var companion))
             return (false, P7($"{friendHandle} t’invite sur {game.Title}, mais {game.RuntimeName} n’est pas installé ici.",
                               $"{friendHandle} invites you to {game.Title}, but {game.RuntimeName} is not installed here."));
@@ -342,6 +353,8 @@ public sealed partial class MainWindow
         if (extra is not null) foreach (var pair in extra) environment[pair.Key] = pair.Value;
         AddRoomSync(game, environment);
         if (!TryStartCompanion(game, environment, new[] { "--join" }, out var error)) return (false, error);
+        _onlineGameId = game.Id;
+        _roomLaunchPendingUntil = DateTimeOffset.UtcNow.AddSeconds(10);
 
         // Both sides need byte-identical files, and only the companion can say so -- but a disc
         // we never configured is a failure CubeShelf can see coming.
@@ -366,36 +379,62 @@ public sealed partial class MainWindow
             return;
         }
 
+        button.IsEnabled = false;
+        try
+        {
+        var displayedMods = _friendPresence.TryGetValue(row.PublicKey, out var displayed)
+            ? displayed.Invite?.SafeMods() : null;
+        if (!await ConfirmFriendRoomReviewAsync(row, game)) return;
+        if (!_friendPresence.TryGetValue(row.PublicKey, out var current) || current.Invite is not { } liveInvite
+            || liveInvite.JoinPayload != row.JoinPayload || !liveInvite.IsPublishable(DateTimeOffset.UtcNow)
+            || !string.Equals(liveInvite.GameId, game.Id, StringComparison.OrdinalIgnoreCase)
+            || (displayedMods is null ? liveInvite.SafeMods() is not null
+                : liveInvite.SafeMods() is not { } confirmedMods || !SameRoomMods(displayedMods, confirmedMods)))
+        {
+            ShowToastParity(P7("Invitation", "Invitation"), P7("Cette invitation a changé ou expiré.", "This invitation changed or expired."));
+            return;
+        }
         // The room's mods first, when the invitation says which: installed if needed, and handed
         // to the companion for that session only.
         IReadOnlyDictionary<string, string?>? extra = null;
-        if (_friendPresence.TryGetValue(row.PublicKey, out var inviting) && inviting.Invite?.SafeMods() is { } mods)
+        var reviewedMods = liveInvite.SafeMods();
+        if (reviewedMods is { } mods)
         {
-            button.IsEnabled = false;
-            try
-            {
-                var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, mods, text => FriendsSubtitleText.Text = text);
+                var (ready, sessionMods, problem) = await PrepareRoomModsAsync(game, mods, text => FriendsSubtitleText.Text = text,
+                    _friendsLifetime?.Token ?? CancellationToken.None);
                 if (!ready)
                 {
                     ShowToastParity(P7("Invitation", "Invitation"), problem);
                     return;
                 }
                 extra = new Dictionary<string, string?> { [RoomSyncClient.ModsVariable] = sessionMods };
-            }
-            finally
-            {
-                button.IsEnabled = true;
-            }
         }
 
+        // Downloads may take minutes: never join an expired or changed invitation afterward.
+        if (_quickPlayClosing) return;
+        RefreshMyRoom();
+        if (_myRoom is not null)
+            throw new InvalidOperationException(P7("Ferme d’abord ta room.", "Close your room first."));
+        if (!_friendPresence.TryGetValue(row.PublicKey, out var latest) || latest.Invite is not { } accepted
+            || accepted.JoinPayload != liveInvite.JoinPayload || !accepted.IsPublishable(DateTimeOffset.UtcNow)
+            || !string.Equals(accepted.GameId, game.Id, StringComparison.OrdinalIgnoreCase)
+            || (reviewedMods is null ? accepted.SafeMods() is not null
+                : accepted.SafeMods() is not { } latestMods || !SameRoomMods(reviewedMods, latestMods)))
+            throw new InvalidOperationException(P7("Cette invitation a changé ou expiré. Vérifie-la à nouveau.", "This invitation changed or expired. Review it again."));
+        if (reviewedMods is not null && RoomModCheck.Compare(reviewedMods,
+                new PortableModManager(_paths, game.ModLibraryId).GetInstalled()).Status != RoomModStatus.Compatible)
+            throw new InvalidOperationException(P7("Les mods ont changé pendant la préparation.", "Mods changed during setup."));
         var (started, message) = StartJoining(game, row.Name, row.JoinPayload, extra);
-        if (started && _friendPresence.TryGetValue(row.PublicKey, out var known) && known.Invite is { } accepted)
+        if (started)
             AnswerInvite(row.PublicKey, accepted, InviteReply.Joined);
         ShowToastParity(P7("Invitation", "Invitation"),
             message.Length > 0 ? message
                 : P7($"Tu rejoins {row.Name}. Le compagnon vérifie ton disque puis entre dans le salon.",
                      $"Joining {row.Name}. The companion checks your disc, then enters the lobby."));
         if (started) RefreshFriendsView();
+        }
+        catch (Exception exception) { ShowToastParity(P7("Invitation", "Invitation"), exception.Message); }
+        finally { button.IsEnabled = true; }
     }
 
     /// <summary>The Friends page's Invite button: a lobby, and the invitation addressed to them alone.</summary>

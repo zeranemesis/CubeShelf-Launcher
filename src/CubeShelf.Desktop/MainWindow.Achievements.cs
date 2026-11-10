@@ -25,6 +25,22 @@ public sealed partial class MainWindow
 
     /// <summary>The catalog game the session was last handed to: what its summaries are about.</summary>
     private string? _raGameId;
+    private GameCatalogEntry[] CompatibleRetroAchievementGames()
+    {
+        return _catalogGames.Where(g=>!GameVariants.IsVariant(g)).Where(g=>
+        {
+            HydrateGamePathsPhase3(g);
+            return RetroAchievementsLaunch.IsSupportedBy(g.Executable);
+        }).GroupBy(NativePortCatalog.GameKey).Select(group=>group.First()).OrderBy(g=>g.Title).ToArray();
+    }
+    private void OpenRetroAchievementsMenu(object? sender,RoutedEventArgs args)=>ShowBigPictureMenu("achievements");
+    private void OpenRetroAchievementGame(GameCatalogEntry game)
+    {
+        _personalLibrary=false;_favoritesOnly=false;ConsoleShelfPicker.SelectedIndex=ConsoleIndex(game.ShelfConsole);
+        SelectPortVersion(game.Id);SelectCatalogGame(game,false);RebuildBigPictureShelf();ShowParityView(BigPictureView);
+        if(_presentation?.IsDual==true){DualScreenView.SelectItem(game.Id);SelectDualGame(game.Id);}
+        else{var index=Array.FindIndex(_bigPictureGames,g=>g.Id==game.Id);if(index>=0)SelectBigPictureGame(index);}
+    }
 
     private void InitializeAchievements()
     {

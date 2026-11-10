@@ -34,6 +34,7 @@ public sealed partial class MainWindow
         Dispatcher.UIThread.Post(() =>
         {
             ApplyPhase7Accessibility();
+            RefreshMaintenanceLabels();
             RefreshPhase7LocalizedState();
             RefreshPortableQueueView();
             RefreshDolphinStatusPhase4Core();
@@ -78,7 +79,7 @@ public sealed partial class MainWindow
         ConfigureAccessiblePhase7(OpenModImageButton, P7("Ouvrir l’image du mod", "Open mod image"));
         ConfigureAccessiblePhase7(RetryConnectivityButton, P7("Réessayer les vérifications réseau", "Retry network checks"));
 
-        AutomationProperties.SetName(ToastHost, P7("Notification CubeShelf", "CubeShelf notification"));
+        AutomationProperties.SetName(ToastHost, P7("Notification DecompShelf", "DecompShelf notification"));
         AutomationProperties.SetLiveSetting(ToastHost, AutomationLiveSetting.Polite);
         AutomationProperties.SetName(ConnectivityBanner, P7("État de connexion", "Connection status"));
         AutomationProperties.SetLiveSetting(ConnectivityBanner, AutomationLiveSetting.Polite);

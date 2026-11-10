@@ -69,6 +69,7 @@ public static class SecureArchiveExtractor
                     extractedTotal > limits.MaximumUncompressedBytes)
                     throw new InvalidDataException("The archive exceeded its extraction limit.");
                 output.Write(buffer, 0, read);
+                DownloadTransfer.Current?.RecordDisk(read);
             }
 
             progress?.Invoke((index + 1d) / entries.Count);

@@ -75,6 +75,9 @@ public sealed class GameDiscPatch
 
 public sealed class GameCatalogEntry
 {
+    public string ShelfConsole { get; set; } = "gamecube";
+    public string NativePortId { get; set; } = "";
+    public bool RuntimeOwnsSetup { get; set; }
     public string Id { get; set; } = "";
     public string Title { get; set; } = "";
     public int Year { get; set; }
@@ -204,6 +207,9 @@ public sealed class GameCover
     public string Front { get; set; } = "";
     public string Back { get; set; } = "";
     public string Spine { get; set; } = "";
+    public string Right { get; set; } = "";
+    public string Top { get; set; } = "";
+    public string Bottom { get; set; } = "";
 }
 
 /// <summary>
@@ -317,6 +323,9 @@ public sealed class GameCatalogService
             // A user catalog written before these fields existed deserialises them as defaults,
             // so they are overwritten from the shipped catalog rather than preserved.
             target.RuntimeName = source.RuntimeName;
+            target.ShelfConsole = source.ShelfConsole;
+            target.NativePortId = source.NativePortId;
+            target.RuntimeOwnsSetup = source.RuntimeOwnsSetup;
             target.SupportedDiscIds = source.SupportedDiscIds.ToList();
             target.RuntimeSource = source.RuntimeSource;
             target.RuntimeAssets = new Dictionary<string, string>(source.RuntimeAssets, StringComparer.OrdinalIgnoreCase);
@@ -342,6 +351,9 @@ public sealed class GameCatalogService
     private static GameCatalogEntry Clone(GameCatalogEntry source) => new()
     {
         Id = source.Id,
+        ShelfConsole = source.ShelfConsole,
+        NativePortId = source.NativePortId,
+        RuntimeOwnsSetup = source.RuntimeOwnsSetup,
         Title = source.Title,
         Year = source.Year,
         Genre = source.Genre,
@@ -388,6 +400,9 @@ public sealed class GameCatalogService
         Label = source.Label,
         Front = source.Front,
         Back = source.Back,
-        Spine = source.Spine
+        Spine = source.Spine,
+        Right = source.Right,
+        Top = source.Top,
+        Bottom = source.Bottom
     };
 }

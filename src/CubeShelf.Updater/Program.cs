@@ -429,21 +429,13 @@ internal sealed class UpdaterWindow : Window
 
     private async Task<string> CreateBackupAsync()
     {
-        var backupRoot = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CubeShelf",
-            "UpdaterBackups");
+        var configuredProfile = Environment.GetEnvironmentVariable("CUBESHELF_DATA_DIR");
+        var profile = !string.IsNullOrWhiteSpace(configuredProfile) && Path.IsPathRooted(configuredProfile)
+            ? Path.GetFullPath(configuredProfile)
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CubeShelf");
+        var backupRoot = Path.Combine(profile, "UpdaterBackups");
 
         Directory.CreateDirectory(backupRoot);
-
-        // A new update starts only after the previous one has finished, so stale
-        // backups can be removed before creating the next transactional backup.
-        foreach (var old in Directory
-                     .EnumerateDirectories(backupRoot)
-                     .ToList())
-        {
-            try { Directory.Delete(old, true); } catch { }
-        }
 
         var backup = Path.Combine(
             backupRoot,
@@ -451,6 +443,17 @@ internal sealed class UpdaterWindow : Window
 
         Directory.CreateDirectory(backup);
         await CopyDirectoryAsync(_installDir, backup);
+        var files = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in Directory.EnumerateFiles(backup, "*", SearchOption.AllDirectories))
+        {
+            using var input = File.OpenRead(file);
+            files[Path.GetRelativePath(backup, file)] = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(input));
+        }
+        var sourceVersion = FileVersionInfo.GetVersionInfo(Path.Combine(_installDir, "CubeShelf.exe")).ProductVersion ?? "?";
+        File.WriteAllText(Path.Combine(backup, "backup.complete.json"), System.Text.Json.JsonSerializer.Serialize(new
+        {
+            InstallDirectory = _installDir, Version = sourceVersion, Files = files
+        }));
         return backup;
     }
 
@@ -643,15 +646,26 @@ internal sealed class UpdaterWindow : Window
         }
     }
 
-    private void DeleteBackup()
+    private void RetainPreviousVersion()
     {
         if (string.IsNullOrWhiteSpace(_backupDirectory))
             return;
 
         try
         {
-            if (Directory.Exists(_backupDirectory))
-                Directory.Delete(_backupDirectory, true);
+            // Keep this complete snapshot for an explicit rollback from Settings.
+            // Remove only older complete snapshots belonging to this installation.
+            var root = Path.GetDirectoryName(_backupDirectory)!;
+            foreach (var old in Directory.EnumerateDirectories(root))
+            {
+                if (Path.GetFullPath(old).Equals(Path.GetFullPath(_backupDirectory), StringComparison.OrdinalIgnoreCase)) continue;
+                var marker = Path.Combine(old, "backup.complete.json");
+                if (!File.Exists(marker) || (File.GetAttributes(old) & FileAttributes.ReparsePoint) != 0) continue;
+                using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(marker));
+                if (document.RootElement.GetProperty("InstallDirectory").GetString() is { } owner &&
+                    Path.GetFullPath(owner).Equals(Path.GetFullPath(_installDir), StringComparison.OrdinalIgnoreCase))
+                    Directory.Delete(old, true);
+            }
         }
         catch { }
 
@@ -898,7 +912,7 @@ internal sealed class UpdaterWindow : Window
                 return;
             }
 
-            DeleteBackup();
+            RetainPreviousVersion();
             SetStatus("Nouvelle version démarrée correctement.");
             Close();
         }

@@ -1,0 +1,1029 @@
+[
+  {
+    "Id": "swaymun-ac-recomp-astral-chain",
+    "Title": "Astral Chain",
+    "Project": "AC-Recomp",
+    "Repository": "swaymun/AC-Recomp",
+    "Method": "Port natif (projet amont)",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "845cbbdc8918e48663895a8d44a8a5c44ca1c2df",
+    "ReadmeUrl": "https://github.com/swaymun/AC-Recomp/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/swaymun/AC-Recomp/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "AC-Recomp-v0.1.0-macos.dmg",
+        "Url": "https://github.com/swaymun/AC-Recomp/releases/download/v0.1.0/AC-Recomp-v0.1.0-macos.dmg",
+        "Sha256": "e71aa3922b8d96453c52606fa78f7ecfabaaee47d6b924dc8866b92b90a8884d",
+        "Size": 4899799,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "AC-Recomp-v0.1.0-macos.zip",
+        "Url": "https://github.com/swaymun/AC-Recomp/releases/download/v0.1.0/AC-Recomp-v0.1.0-macos.zip",
+        "Sha256": "891337ae4621fa544f04eb1a26cea8fac936d29deeb63428221aee4a46fb6942",
+        "Size": 2282677,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "k0nl-b2recomp-bayonetta-2",
+    "Title": "Bayonetta 2",
+    "Project": "B2recomp",
+    "Repository": "K0NL/B2recomp",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "bec514e9fd8e45f3f1d813dc0b24fc8c2542ebec",
+    "ReadmeUrl": "https://github.com/K0NL/B2recomp/blob/bec514e9fd8e45f3f1d813dc0b24fc8c2542ebec/README.md",
+    "ReleaseUrl": "https://github.com/K0NL/B2recomp/releases/tag/v0.3.3",
+    "ReleaseTag": "v0.3.3",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "B2recomp-builder-26c45d7.zip",
+        "Url": "https://github.com/K0NL/B2recomp/releases/download/v0.3.3/B2recomp-builder-26c45d7.zip",
+        "Sha256": "44be49c505b77753fe59baeb8181258e56c25b9c49a60921793f49ee1fb7ed46",
+        "Size": 105348110,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "getlostin-ctr-nitrofueled-pc-crash-team-racing-nitro-fueled",
+    "Title": "Crash Team Racing Nitro-Fueled",
+    "Project": "CTR-NitroFueled-PC",
+    "Repository": "GetLostIn/CTR-NitroFueled-PC",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0cf8def7f676192de4f37a26e08a92ea0cd4674a",
+    "ReadmeUrl": "https://github.com/GetLostIn/CTR-NitroFueled-PC/blob/0cf8def7f676192de4f37a26e08a92ea0cd4674a/README.md",
+    "ReleaseUrl": "https://github.com/GetLostIn/CTR-NitroFueled-PC/releases/tag/v0.4",
+    "ReleaseTag": "v0.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "CTR-NitroFueled-PC-portable-windows.zip",
+        "Url": "https://github.com/GetLostIn/CTR-NitroFueled-PC/releases/download/v0.4/CTR-NitroFueled-PC-portable-windows.zip",
+        "Sha256": "3f20aa19094cb11d4d86c798a21f117ae9013e9c5d061c422c08b5bbe5560fe5",
+        "Size": 140293286,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "jhaizhou-ops-d2r-mobile-diablo-ii-resurrected",
+    "Title": "Diablo II: Resurrected",
+    "Project": "D2R Mobile",
+    "Repository": "jhaizhou-ops/d2r-mobile",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "a5358e137dd73be213d1ff2509842b62d90f99f2",
+    "ReadmeUrl": "https://github.com/jhaizhou-ops/d2r-mobile/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sonsegajp-hwder-hyrule-warriors-definitive-edition",
+    "Title": "Hyrule Warriors: Definitive Edition",
+    "Project": "HWDER",
+    "Repository": "sonsegajp/HWDER",
+    "Method": "Port natif (projet amont)",
+    "Status": "Source indisponible · installation automatique suspendue",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "5f1acbeb07dcb51b7f4d8197c19ed0d74439b018",
+    "ReadmeUrl": "https://github.com/sonsegajp/HWDER/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/sonsegajp/HWDER/releases/tag/v0.1.1",
+    "ReleaseTag": "v0.1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "c22dev-mush8-mario-kart-8-deluxe",
+    "Title": "Mario Kart 8 Deluxe",
+    "Project": "Mush8",
+    "Repository": "c22dev/mush8",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "7a722640e13efd62c3b78c367b43b7437477a957",
+    "ReadmeUrl": "https://github.com/c22dev/mush8/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sm35recomp-sm35recomp-super-mario-bros-35",
+    "Title": "Super Mario Bros. 35",
+    "Project": "sm35recomp",
+    "Repository": "sm35recomp/sm35recomp",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "b000777bb293675aadc5e18dcb6659d10a030301",
+    "ReadmeUrl": "https://github.com/sm35recomp/sm35recomp/blob/b000777bb293675aadc5e18dcb6659d10a030301/README.md",
+    "ReleaseUrl": "https://github.com/sm35recomp/sm35recomp/releases/tag/v0.4.0",
+    "ReleaseTag": "v0.4.0",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SM35Recomp-linux-aarch64.tar.gz",
+        "Url": "https://github.com/sm35recomp/sm35recomp/releases/download/v0.4.0/SM35Recomp-linux-aarch64.tar.gz",
+        "Sha256": "9eb9698bc46b5b3d353f32bc3a10eb52003228017dc2fa65ff2233b793aaf612",
+        "Size": 104887505,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SM35Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/sm35recomp/sm35recomp/releases/download/v0.4.0/SM35Recomp-linux-x86_64.tar.gz",
+        "Sha256": "3fa418e53d5d5a3ccada27da1f5e9eaccf9a5ac3bb1cbca745ead3dd6ff67e52",
+        "Size": 113744589,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SM35Recomp-macos-arm64.zip",
+        "Url": "https://github.com/sm35recomp/sm35recomp/releases/download/v0.4.0/SM35Recomp-macos-arm64.zip",
+        "Sha256": "ffd30278d88655f180c7c03a972f2ee8756ef505f30e70c1a8292226509dd0c4",
+        "Size": 94816023,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SM35Recomp-windows-x86_64.zip",
+        "Url": "https://github.com/sm35recomp/sm35recomp/releases/download/v0.4.0/SM35Recomp-windows-x86_64.zip",
+        "Sha256": "c4affbbbf5b42843d28250f87c5c8f1fb7298d48012305223af3929b6d6a80a6",
+        "Size": 113240322,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "smm2recomp-smm2recomp-super-mario-maker-2",
+    "Title": "Super Mario Maker 2",
+    "Project": "SMM2 Recomp",
+    "Repository": "smm2recomp/smm2recomp",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1328b2a27aeac0c95a77695db912692c9e049dbf",
+    "ReadmeUrl": "https://github.com/smm2recomp/smm2recomp/blob/1328b2a27aeac0c95a77695db912692c9e049dbf/README.md",
+    "ReleaseUrl": "https://github.com/smm2recomp/smm2recomp/releases/tag/v0.6.5",
+    "ReleaseTag": "v0.6.5",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "SMM2Recomp-linux-aarch64.tar.gz",
+        "Url": "https://github.com/smm2recomp/smm2recomp/releases/download/v0.6.5/SMM2Recomp-linux-aarch64.tar.gz",
+        "Sha256": "6b8fdc8838dbe3d6d45516eb3c58266b5fced86a2ffb19d7f69472393a8002f1",
+        "Size": 111899652,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SMM2Recomp-linux-x86_64.tar.gz",
+        "Url": "https://github.com/smm2recomp/smm2recomp/releases/download/v0.6.5/SMM2Recomp-linux-x86_64.tar.gz",
+        "Sha256": "53fe2b15ade19c934e3b7e50985e0f24db65b90c7826302ad0882c3fb3dec26b",
+        "Size": 121158873,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SMM2Recomp-macos-arm64.zip",
+        "Url": "https://github.com/smm2recomp/smm2recomp/releases/download/v0.6.5/SMM2Recomp-macos-arm64.zip",
+        "Sha256": "ba3d0b848ae5becc83a5813f9c3e7f709c60b0f012e601d3d2d50dc4bf96dc0f",
+        "Size": 101763238,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SMM2Recomp-windows-x86_64.zip",
+        "Url": "https://github.com/smm2recomp/smm2recomp/releases/download/v0.6.5/SMM2Recomp-windows-x86_64.zip",
+        "Sha256": "332fa3c0e8cbe54bce92920782f0be5f09b6095cba663873d3425eea1cd7d9c8",
+        "Size": 118324294,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "zzzarathustra-dev-power-moon-recomp-super-mario-odyssey",
+    "Title": "Super Mario Odyssey",
+    "Project": "Power Moon Recomp",
+    "Repository": "zzzarathustra-dev/power-moon-recomp",
+    "Method": "Recompilation statique ARM64 vers C natif",
+    "Status": "Paquet Windows vérifié · partie non testée",
+    "Notes": "Fournis exefs et romfs de ta propre copie de Super Mario Odyssey 1.0.0, sans mise à jour. Recompilation au premier démarrage, environ 6 Go de données ; prévois au moins 7 Go libres. Windows x64 : AVX2, Vulkan 1.3, 8 Go de RAM minimum (16 Go recommandés). SHA-256 de la release GitLab et archive Windows contrôlés. Jouabilité déclarée par le projet, aucune partie complète testée dans DecompShelf. Aucun jeu fourni.",
+    "VerifiedAt": "2026-11-05",
+    "SourceCommit": "cdbe05c9df0e2ff4bfbecece89ad3f0fd9806193",
+    "ReadmeUrl": "https://gitlab.com/zzzarathustra-dev/power-moon-recomp/-/blob/cdbe05c9df0e2ff4bfbecece89ad3f0fd9806193/README.md",
+    "ReleaseUrl": "https://gitlab.com/zzzarathustra-dev/power-moon-recomp/-/releases/v0.2.1",
+    "ReleaseTag": "v0.2.1",
+    "Platforms": [
+      "Windows",
+      "Linux"
+    ],
+    "Assets": [
+      {
+        "Name": "Power_Moon_Recomp-0.2.1-windows.zip",
+        "Url": "https://gitlab.com/api/v4/projects/zzzarathustra-dev%2Fpower-moon-recomp/uploads/c2943d662cc803b10ca028c02907c8c5/Power_Moon_Recomp-0.2.1-windows.zip",
+        "Size": 85502153,
+        "Sha256": "b14f6b7acdfa06915f383a9edaabd041e336e8a89f5e1a367615a3fae4837f44",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "Power Moon Recomp/PowerMoonRecomp.exe"
+      }
+    ],
+    "RepositoryHost": "gitlab.com"
+  },
+  {
+    "Id": "ly05010419-macnativegames-super-mario-odyssey",
+    "Title": "Super Mario Odyssey",
+    "Project": "MacNativeGames",
+    "Repository": "ly05010419/MacNativeGames",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "3bd1ad4925ee170c54d3d4488dfcca0ab9f977dc",
+    "ReadmeUrl": "https://github.com/ly05010419/MacNativeGames/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "coz-0-smo-recomp-super-mario-odyssey",
+    "Title": "Super Mario Odyssey",
+    "Project": "smo-recomp",
+    "Repository": "Coz-0/smo-recomp",
+    "Method": "Static recompilation",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "0414341471307605b8cb5d0c1a9928db5fe84e07",
+    "ReadmeUrl": "https://github.com/Coz-0/smo-recomp/blob/0414341471307605b8cb5d0c1a9928db5fe84e07/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "ly05010419-macnativegames-super-smash-bros-ultimate",
+    "Title": "Super Smash Bros. Ultimate",
+    "Project": "MacNativeGames",
+    "Repository": "ly05010419/MacNativeGames",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "3bd1ad4925ee170c54d3d4488dfcca0ab9f977dc",
+    "ReadmeUrl": "https://github.com/ly05010419/MacNativeGames/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "opensmash-ultimate-windowsmash-super-smash-bros-ultimate",
+    "Title": "Super Smash Bros. Ultimate",
+    "Project": "WindowSmash",
+    "Repository": "OpenSmash-Ultimate/WindowSmash",
+    "Method": "Static recompilation",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "8025b483b0443adb5668395eca31f9250e8c8efb",
+    "ReadmeUrl": "https://github.com/OpenSmash-Ultimate/WindowSmash/blob/8025b483b0443adb5668395eca31f9250e8c8efb/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "opensmash-ultimate-ssbu-recomp-super-smash-bros-ultimate",
+    "Title": "Super Smash Bros. Ultimate",
+    "Project": "ssbu-recomp (OpenSmash-Ultimate)",
+    "Repository": "OpenSmash-Ultimate/ssbu-recomp",
+    "Method": "Static recompilation",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "fea28c18b785372b5024ece0a2ea52e860b1fa04",
+    "ReadmeUrl": "https://github.com/OpenSmash-Ultimate/ssbu-recomp/blob/fea28c18b785372b5024ece0a2ea52e860b1fa04/README.md",
+    "ReleaseUrl": "https://github.com/OpenSmash-Ultimate/ssbu-recomp/releases/tag/runtime-daa0938",
+    "ReleaseTag": "runtime-daa0938",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ssbu-runtime-daa0938053.zip",
+        "Url": "https://github.com/OpenSmash-Ultimate/ssbu-recomp/releases/download/runtime-daa0938/ssbu-runtime-daa0938053.zip",
+        "Sha256": "49970b10e68bf1b9cf065259b7dc786e27e14963f9da1538582c4747c072128a",
+        "Size": 4912868,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "ly05010419-macnativegames-the-legend-of-zelda-breath-of-the-wild",
+    "Title": "The Legend of Zelda: Breath of the Wild",
+    "Project": "MacNativeGames",
+    "Repository": "ly05010419/MacNativeGames",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "3bd1ad4925ee170c54d3d4488dfcca0ab9f977dc",
+    "ReadmeUrl": "https://github.com/ly05010419/MacNativeGames/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "revivedx-savagewindrecomp-the-legend-of-zelda-breath-of-the-wild",
+    "Title": "The Legend of Zelda: Breath of the Wild",
+    "Project": "Savage Wind Recomp",
+    "Repository": "Revivedx/SavageWindRecomp",
+    "Method": "Static recompilation",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "bf6146c14c37fee8781a601e5a544b93dff6d75e",
+    "ReadmeUrl": "https://github.com/Revivedx/SavageWindRecomp/blob/bf6146c14c37fee8781a601e5a544b93dff6d75e/README.md",
+    "ReleaseUrl": "https://github.com/Revivedx/SavageWindRecomp/releases/tag/v0.4.1-alpha.4",
+    "ReleaseTag": "v0.4.1-alpha.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SavageWind-0.4.1-alpha.4-windows.zip",
+        "Url": "https://github.com/Revivedx/SavageWindRecomp/releases/download/v0.4.1-alpha.4/SavageWind-0.4.1-alpha.4-windows.zip",
+        "Sha256": "c1459e854f86773c89e6a2ce5dfaae7acc3b4a6e74d29012ef29be1b4db91e12",
+        "Size": 92379842,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Savage_Wind-0.4.1-alpha.4-aarch64.AppImage",
+        "Url": "https://github.com/Revivedx/SavageWindRecomp/releases/download/v0.4.1-alpha.4/Savage_Wind-0.4.1-alpha.4-aarch64.AppImage",
+        "Sha256": "7cf1c54f7b677614c5d7d8b85b9e6f1023efaaf7b6e2e1241d2c027edb5983c9",
+        "Size": 80501256,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "Savage_Wind-0.4.1-alpha.4-x86_64.AppImage",
+        "Url": "https://github.com/Revivedx/SavageWindRecomp/releases/download/v0.4.1-alpha.4/Savage_Wind-0.4.1-alpha.4-x86_64.AppImage",
+        "Sha256": "f9074a51dd56a243849ca868f270c44fe7e68f5450d75ec88a4082fd11299289",
+        "Size": 86182392,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "nycolazs-eowrecomp-the-legend-of-zelda-echoes-of-wisdom",
+    "Title": "The Legend of Zelda: Echoes of Wisdom",
+    "Project": "EoWRecomp",
+    "Repository": "Nycolazs/EoWRecomp",
+    "Method": "Port natif (projet amont)",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "1e2d35176fa3c6de1325af0fbd6d56eb3c7338ea",
+    "ReadmeUrl": "https://github.com/Nycolazs/EoWRecomp/blob/main/README.md",
+    "ReleaseUrl": "https://github.com/Nycolazs/EoWRecomp/releases/tag/alpha_1",
+    "ReleaseTag": "alpha_1",
+    "Platforms": [
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "EoWRecomp-alpha_1-macOS-arm64.zip",
+        "Url": "https://github.com/Nycolazs/EoWRecomp/releases/download/alpha_1/EoWRecomp-alpha_1-macOS-arm64.zip",
+        "Sha256": "0df4d1e4f9758b876accfd624080bdcb20a4c4ade70591600ba15463ee31762c",
+        "Size": 92543737,
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "peiikai-lasrecomp-the-legend-of-zelda-link-s-awakening-2019",
+    "Title": "The Legend of Zelda: Link's Awakening (2019)",
+    "Project": "LAS Recomp",
+    "Repository": "peiikai/LASRecomp",
+    "Method": "Static recompilation",
+    "Status": "Aperçu / expérimental",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "a6b4f03844ecfb4012f18deff96da8b410aeafcd",
+    "ReadmeUrl": "https://github.com/peiikai/LASRecomp/blob/a6b4f03844ecfb4012f18deff96da8b410aeafcd/README.md",
+    "ReleaseUrl": "https://github.com/peiikai/LASRecomp/releases/tag/test-462-arc-5",
+    "ReleaseTag": "test-462-arc-5",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "LAS.Recomp-test-462-arc-5-linux-aarch64.AppImage",
+        "Url": "https://github.com/peiikai/LASRecomp/releases/download/test-462-arc-5/LAS.Recomp-test-462-arc-5-linux-aarch64.AppImage",
+        "Sha256": "1c595fb73d8ec4c50bf8683aa7689d7cc12cb2df5a0c054843edf1fcd9042fa3",
+        "Size": 106261000,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "LAS.Recomp-test-462-arc-5-linux-x86_64.AppImage",
+        "Url": "https://github.com/peiikai/LASRecomp/releases/download/test-462-arc-5/LAS.Recomp-test-462-arc-5-linux-x86_64.AppImage",
+        "Sha256": "0333f74c943540eb2eaf4048fcd3e310860f38ba3119add14d46bfab8d342bc9",
+        "Size": 112888312,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "LAS.Recomp-test-462-arc-5-windows.zip",
+        "Url": "https://github.com/peiikai/LASRecomp/releases/download/test-462-arc-5/LAS.Recomp-test-462-arc-5-windows.zip",
+        "Sha256": "72ea3f19aed1ff7fcce15dc41c1f2202baa9618fe7acf2c279500530f2ee7f3b",
+        "Size": 99340276,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "apolinario-coder-skyrecomp-the-legend-of-zelda-skyward-sword-hd",
+    "Title": "The Legend of Zelda: Skyward Sword HD",
+    "Project": "Sky Recomp",
+    "Repository": "Apolinario-coder/SkyRecomp",
+    "Method": "Static recompilation",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "ad649b4fd319b7f7c309857b2d14353d2e5dcd79",
+    "ReadmeUrl": "https://github.com/Apolinario-coder/SkyRecomp/blob/ad649b4fd319b7f7c309857b2d14353d2e5dcd79/README.md",
+    "ReleaseUrl": "https://github.com/Apolinario-coder/SkyRecomp/releases/tag/v2.1.0",
+    "ReleaseTag": "v2.1.0",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Sky.Recomp-v2.1-linux-x86_64.AppImage",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/Sky.Recomp-v2.1-linux-x86_64.AppImage",
+        "Sha256": "6da13896eff2c3e1c15c2a0ca72fd8ac2c7cb99dc26135e069926b81d30136ba",
+        "Size": 84851192,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Sky.Recomp-v2.1.0-linux-x86_64.AppImage",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/Sky.Recomp-v2.1.0-linux-x86_64.AppImage",
+        "Sha256": "ffff30f33f1f839a037b428b1121099983467a4ebe38a905f4a3bdb4942c0fde",
+        "Size": 84855288,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1-Linux.tar.gz",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1-Linux.tar.gz",
+        "Sha256": "952ff4e05895e1d0b923ec20fbdc7310110d13e37768b17e788d17e3d2dbe932",
+        "Size": 88381138,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1-Linux.zip",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1-Linux.zip",
+        "Sha256": "26450ddcd165337adaf09d2d52f1696f7f3309c92ba88b3f98291ebf98c8c12b",
+        "Size": 91451197,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1-Windows.zip",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1-Windows.zip",
+        "Sha256": "4fa83e62e18e72f6522cebab8b6f3489aadc22819e33f332cb48d1d63507c516",
+        "Size": 2066346258,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1.0-Linux.tar.gz",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1.0-Linux.tar.gz",
+        "Sha256": "2c04e4aa372d9f779066f3eb8650aec1501597693a15b6c146e2d6cbfb58487b",
+        "Size": 88392725,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1.0-Linux.zip",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1.0-Linux.zip",
+        "Sha256": "edbe283ca9002eda51175098e56e5f3f26e23c656e4364862d1bc648b5c4dcf1",
+        "Size": 91469003,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SkyRecomp-v2.1.0-Windows.zip",
+        "Url": "https://github.com/Apolinario-coder/SkyRecomp/releases/download/v2.1.0/SkyRecomp-v2.1.0-Windows.zip",
+        "Sha256": "cadb79c64c3891c99b8078721c0c070f0f05933e00d6cec595e3b505ab9925a4",
+        "Size": 89909283,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "ly05010419-macnativegames-the-legend-of-zelda-tears-of-the-kingdom",
+    "Title": "The Legend of Zelda: Tears of the Kingdom",
+    "Project": "MacNativeGames",
+    "Repository": "ly05010419/MacNativeGames",
+    "Method": "Exécution ARM64 native (Apple Silicon)",
+    "Status": "Sources à compiler",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Aucun paquet de bureau avec empreinte et architecture vérifiées dans cette passe : compilation ou installation manuelle, puis association du programme. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-10-26",
+    "SourceCommit": "3bd1ad4925ee170c54d3d4488dfcca0ab9f977dc",
+    "ReadmeUrl": "https://github.com/ly05010419/MacNativeGames/blob/main/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "macOS (Apple Silicon)"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "hachi23-unicorn-overlord-pc-unicorn-overlord",
+    "Title": "Unicorn Overlord",
+    "Project": "unicorn_overlord_pc",
+    "Repository": "hachi23/unicorn_overlord_pc",
+    "Method": "Port natif (projet amont)",
+    "Status": "Release disponible",
+    "Notes": "Le port prépare les fichiers de ta propre copie du jeu selon ses instructions. Aucun jeu, firmware ou clé n’est fourni par le launcher. Les exigences exactes de version, de fichiers et de clés se trouvent dans le README du projet. Les paquets listés sont épinglés à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub. Disponibilité déclarée par le projet ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "d183d1877f8ab9e8b4fb147a6f045ebb4c9df013",
+    "ReadmeUrl": "https://github.com/hachi23/unicorn_overlord_pc/blob/d183d1877f8ab9e8b4fb147a6f045ebb4c9df013/README.md",
+    "ReleaseUrl": "https://github.com/hachi23/unicorn_overlord_pc/releases/tag/v1.4.0",
+    "ReleaseTag": "v1.4.0",
+    "Platforms": [
+      "Linux",
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Unicorn-Overlord-PC-windows.zip",
+        "Url": "https://github.com/hachi23/unicorn_overlord_pc/releases/download/v1.4.0/Unicorn-Overlord-PC-windows.zip",
+        "Sha256": "bef009b8265e3db0d9e95f29dff05f728a4e79c8146c1bfc121bfd4c97b38e98",
+        "Size": 23269802,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "Unicorn-Overlord-x86_64.AppImage",
+        "Url": "https://github.com/hachi23/unicorn_overlord_pc/releases/download/v1.4.0/Unicorn-Overlord-x86_64.AppImage",
+        "Sha256": "d5d9c58df15c5fad8bfdb107b237ee5370a081f1a1b318cc165937a9f69dfd71",
+        "Size": 18999800,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "valentderah-totk-pc-recomp-the-legend-of-zelda-tears-of-the-kingdom",
+    "Title": "The Legend of Zelda: Tears of the Kingdom",
+    "Project": "totk-pc-recomp",
+    "Repository": "valentderah/totk-pc-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "ab1dee5bdb9089399b2000880eaa8f702a846f89",
+    "ReadmeUrl": "https://github.com/valentderah/totk-pc-recomp/blob/ab1dee5bdb9089399b2000880eaa8f702a846f89/README.md",
+    "ReleaseUrl": "https://github.com/valentderah/totk-pc-recomp/releases/tag/v0.3.1",
+    "ReleaseTag": "v0.3.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "TotK-Setup-0.3.1-windows.zip",
+        "Url": "https://github.com/valentderah/totk-pc-recomp/releases/download/v0.3.1/TotK-Setup-0.3.1-windows.zip",
+        "Sha256": "f8adda6b1e3ab9df184a2efd8d0574501c99578a7a375d1b14f0442fbcdb00c5",
+        "Size": 145328783,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "kuraeow-ultratears-the-legend-of-zelda-tears-of-the-kingdom",
+    "Title": "The Legend of Zelda: Tears of the Kingdom",
+    "Project": "ultratears",
+    "Repository": "kuraeow/ultratears",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1970c7ad35b3f239aa6e99ab8b4d6663c55860f3",
+    "ReadmeUrl": "https://github.com/kuraeow/ultratears/blob/1970c7ad35b3f239aa6e99ab8b4d6663c55860f3/README.md",
+    "ReleaseUrl": "https://github.com/kuraeow/ultratears/releases/tag/v0.1.0-beta",
+    "ReleaseTag": "v0.1.0-beta",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "UltraTears-builder-0.1.0-windows-x86_64.zip",
+        "Url": "https://github.com/kuraeow/ultratears/releases/download/v0.1.0-beta/UltraTears-builder-0.1.0-windows-x86_64.zip",
+        "Sha256": "94560d340b533106b6af864d8a2dddc1fa18d39a42efa057fafd2ddbbe9484b2",
+        "Size": 154551282,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "gminustwo-primerecomp-metroid-prime-remastered",
+    "Title": "Metroid Prime Remastered",
+    "Project": "primerecomp",
+    "Repository": "gminustwo/primerecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9d3ae1730ee464d99e9dee49dff16d9c5ae2e091",
+    "ReadmeUrl": "https://github.com/gminustwo/primerecomp/blob/9d3ae1730ee464d99e9dee49dff16d9c5ae2e091/README.md",
+    "ReleaseUrl": "https://github.com/gminustwo/primerecomp/releases/tag/v0.0.5",
+    "ReleaseTag": "v0.0.5",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PrimeRecomp-v0.0.5-windows.zip",
+        "Url": "https://github.com/gminustwo/primerecomp/releases/download/v0.0.5/PrimeRecomp-v0.0.5-windows.zip",
+        "Sha256": "8270a906753233425ce563b7784d5d170262d866fcdfbbd84db9721b376b81fe",
+        "Size": 88111536,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-letsgo-recomp-pokemon-let-s-go-eevee",
+    "Title": "Pokémon: Let's Go, Eevee!",
+    "Project": "letsgo-recomp",
+    "Repository": "raulzrrs/letsgo-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1a70f777c7abac6834ca54bd69b1235471193e1e",
+    "ReadmeUrl": "https://github.com/raulzrrs/letsgo-recomp/blob/1a70f777c7abac6834ca54bd69b1235471193e1e/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/letsgo-recomp/releases/tag/v0.7.6",
+    "ReleaseTag": "v0.7.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LetsGoRecomp-0.7.6-windows.zip",
+        "Url": "https://github.com/raulzrrs/letsgo-recomp/releases/download/v0.7.6/LetsGoRecomp-0.7.6-windows.zip",
+        "Sha256": "7fd5b18a6efc3440eb3611d0556066691c5ca404b7908e9f2a010558c94177b0",
+        "Size": 92219246,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "morerokk-mhgurecomp-monster-hunter-generations-ultimate",
+    "Title": "Monster Hunter Generations Ultimate",
+    "Project": "MHGURecomp",
+    "Repository": "morerokk/MHGURecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Le projet déclare le jeu jouable ; Windows x64 AVX2 et Vulkan requis, copie 1.4.0. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "41e143d823cfd2ddb4e0c1b6c8aad1e344782858",
+    "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/41e143d823cfd2ddb4e0c1b6c8aad1e344782858/README.md",
+    "ReleaseUrl": "https://github.com/morerokk/MHGURecomp/releases/tag/0.13.1",
+    "ReleaseTag": "0.13.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Windows-MHGURecomp.0.13.1.zip",
+        "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.13.1/Windows-MHGURecomp.0.13.1.zip",
+        "Sha256": "ddf450f33068b4c1c284e7ca57608a01e3680bdf2c7875c55d0fd5da9063e8bb",
+        "Size": 42047665,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-swsh-recomp-pok-mon-sword",
+    "Title": "Pokémon Sword",
+    "Project": "swsh-recomp",
+    "Repository": "raulzrrs/swsh-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Copie personnelle de Pokémon Sword 1.3.2 ; compilation initiale et cache de shaders requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+    "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/swsh-recomp/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SwShRecomp-0.1.0-windows.zip",
+        "Url": "https://github.com/raulzrrs/swsh-recomp/releases/download/v0.1.0/SwShRecomp-0.1.0-windows.zip",
+        "Sha256": "5878e562c37da8bdc67c977b8c55083e606be6ada42b84eb382051dfde15577f",
+        "Size": 88606202,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-swsh-recomp-pok-mon-shield",
+    "Title": "Pokémon Shield",
+    "Project": "swsh-recomp",
+    "Repository": "raulzrrs/swsh-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Copie personnelle de Pokémon Shield 1.3.2 ; compilation initiale et cache de shaders requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "d8bc2ec05189907840aa1de026bc633700d47e00",
+    "ReadmeUrl": "https://github.com/raulzrrs/swsh-recomp/blob/d8bc2ec05189907840aa1de026bc633700d47e00/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/swsh-recomp/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "SwShRecomp-0.1.0-windows.zip",
+        "Url": "https://github.com/raulzrrs/swsh-recomp/releases/download/v0.1.0/SwShRecomp-0.1.0-windows.zip",
+        "Sha256": "5878e562c37da8bdc67c977b8c55083e606be6ada42b84eb382051dfde15577f",
+        "Size": 88606202,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "yozander2009-stack-metroid-dread-recomp-metroid-dread",
+    "Title": "Metroid Dread",
+    "Project": "Metroid-Dread-Recomp",
+    "Repository": "yozander2009-stack/Metroid-Dread-Recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Aperçu 0.x : plantages possibles. Copie personnelle 2.1.0, ExeFS et RomFS ; compilation au premier démarrage. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "a48624c57e4fc165fd85f83fd7f0fc2868d247bc",
+    "ReadmeUrl": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/blob/a48624c57e4fc165fd85f83fd7f0fc2868d247bc/README.md",
+    "ReleaseUrl": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/releases/tag/v0.5.0",
+    "ReleaseTag": "v0.5.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "MetroidDread-PC-v0.5.0.zip",
+        "Url": "https://github.com/yozander2009-stack/Metroid-Dread-Recomp/releases/download/v0.5.0/MetroidDread-PC-v0.5.0.zip",
+        "Sha256": "d01a030e00f8eab5b0f2fa6af1ffda41eee549e4210642544f77b47f8ee116b6",
+        "Size": 75715063,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "raulzrrs-letsgo-recomp-pok-mon-let-s-go-pikachu",
+    "Title": "Pokémon: Let’s Go, Pikachu!",
+    "Project": "letsgo-recomp",
+    "Repository": "raulzrrs/letsgo-recomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Le même moteur prend en charge Pikachu et Évoli ; fichiers de ta propre édition requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "1a70f777c7abac6834ca54bd69b1235471193e1e",
+    "ReadmeUrl": "https://github.com/raulzrrs/letsgo-recomp/blob/1a70f777c7abac6834ca54bd69b1235471193e1e/README.md",
+    "ReleaseUrl": "https://github.com/raulzrrs/letsgo-recomp/releases/tag/v0.7.6",
+    "ReleaseTag": "v0.7.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "LetsGoRecomp-0.7.6-windows.zip",
+        "Url": "https://github.com/raulzrrs/letsgo-recomp/releases/download/v0.7.6/LetsGoRecomp-0.7.6-windows.zip",
+        "Sha256": "7fd5b18a6efc3440eb3611d0556066691c5ca404b7908e9f2a010558c94177b0",
+        "Size": 92219246,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "hexveil404-pokez-arecomp-pok-mon-legends-z-a",
+    "Title": "Pokémon Legends: Z-A",
+    "Project": "PokeZ-ARecomp",
+    "Repository": "Hexveil404/PokeZ-ARecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port de la version Switch originale, Windows x64 Vulkan ; fichiers de ta propre copie requis. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "1675d036a12ce566f0e15285592800f803aafe8e",
+    "ReadmeUrl": "https://github.com/Hexveil404/PokeZ-ARecomp/blob/1675d036a12ce566f0e15285592800f803aafe8e/README.md",
+    "ReleaseUrl": "https://github.com/Hexveil404/PokeZ-ARecomp/releases/tag/v0.1.14",
+    "ReleaseTag": "v0.1.14",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "ZA-Recomp-windows.zip",
+        "Url": "https://github.com/Hexveil404/PokeZ-ARecomp/releases/download/v0.1.14/ZA-Recomp-windows.zip",
+        "Sha256": "18d9675e2cdbf2cba30129c4f91692688bc6818b22bb842a83fef51f6c73471e",
+        "Size": 152143623,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "bluetufiebugado-supermariowonderrecomp-super-mario-bros-wonder",
+    "Title": "Super Mario Bros. Wonder",
+    "Project": "SuperMarioWonderRecomp",
+    "Repository": "BluetufieBugado/SuperMarioWonderRecomp",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Compilation manuelle · expérimental",
+    "Notes": "Windows x64 Vulkan 1.3 déclaré testé par le projet. Compilation manuelle depuis les sources, copie 1.0.0 et prérequis personnels indiqués dans le README. Aucun paquet Windows publié. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "9ecad0cef164008a474b5ff0fa50e6ef55edba60",
+    "ReadmeUrl": "https://github.com/BluetufieBugado/SuperMarioWonderRecomp/blob/9ecad0cef164008a474b5ff0fa50e6ef55edba60/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "puddz-astralchain-pc-astral-chain",
+    "Title": "Astral Chain",
+    "Project": "AstralChain-PC",
+    "Repository": "Puddz/AstralChain-PC",
+    "Method": "Recompilation statique native Windows",
+    "Status": "Compilation manuelle · expérimental",
+    "Notes": "Compilation manuelle Windows x64. Le projet indique avoir testé File 01 jusqu’au boss, pas la suite du jeu. Aucun paquet Windows publié. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-02",
+    "SourceCommit": "9f3db2838e4cc84b19f81ec7bcc56ae621e1c554",
+    "ReadmeUrl": "https://github.com/Puddz/AstralChain-PC/blob/9f3db2838e4cc84b19f81ec7bcc56ae621e1c554/README.md",
+    "ReleaseUrl": "",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "drakolordx7-switch2-recomp-pokemon-pokopia",
+    "Title": "Pokémon Pokopia",
+    "Project": "Pokopia Recomp (Switch 2)",
+    "Repository": "drakolordx7/switch2-recomp",
+    "Method": "Static recompilation",
+    "Status": "Paquet Windows vérifié · partie non testée",
+    "Notes": "Jeu Nintendo Switch 2. Il faut ta propre copie en version 2.0.1a (dossier extrait, ou NSP/XCI avec tes clés), Windows 10/11 64 bits, un GPU Vulkan 1.3 et 16 Go de RAM. La première préparation compile le jeu (environ 7 min) puis le cache de shaders (1 à 2 h). Aucun jeu, firmware ou clé n'est fourni par le launcher. Paquet épinglé à la release contrôlée, avec la taille et le SHA-256 publiés par GitHub ; aucune partie complète exécutée dans cette vérification.",
+    "VerifiedAt": "2026-11-08",
+    "SourceCommit": "5339bf85b05e84c34a7f18d8a43db1de1f1692b2",
+    "ReadmeUrl": "https://github.com/drakolordx7/switch2-recomp/blob/5339bf85b05e84c34a7f18d8a43db1de1f1692b2/README.md",
+    "ReleaseUrl": "https://github.com/drakolordx7/switch2-recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PokopiaRecomp-0.2.0-win64.zip",
+        "Url": "https://github.com/drakolordx7/switch2-recomp/releases/download/v0.2.0/PokopiaRecomp-0.2.0-win64.zip",
+        "Sha256": "fd2630b439917a874676ed8bea53d6aff95ece443ab999568633a1acc716572a",
+        "Size": 171179854,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

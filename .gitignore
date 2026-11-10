@@ -12,3 +12,15 @@ dist/
 node_modules/
 package-lock.json
 package.json
+/artifacts/
+/src/CubeShelf.Android/Generated/
+/src/CubeShelf.Desktop/Generated/
+
+# Generated Python caches and local design/agent tooling are not product sources.
+__pycache__/
+*.pyc
+/.agents/
+/.codex/
+/.github/agents/
+/.github/hooks/
+/.github/skills/

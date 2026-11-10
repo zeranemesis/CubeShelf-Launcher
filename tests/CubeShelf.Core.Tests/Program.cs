@@ -8,8 +8,26 @@ using CubeShelf.Core.Mods;
 using CubeShelf.Core.Downloads;
 using CubeShelf.Core.Social;
 
+if (args.Contains("--session-exit-fixture")) { Console.ReadLine(); return 0; }
+
 var failures = new List<string>();
 var executed = 0;
+Run("storage: game saves and owned engine cleanup", GameStorageTests.Run);
+Run("library: recognise the player's own game files", GameFileMatcherTests.Run);
+Run("capture: only tracked game processes are eligible", GameCaptureSessionTests.OnlyTrackedProcesses);
+Run("sessions: lookups safely finalize an exited process", GameSessionTrackerTests.ExitedLookups);
+Run("quick play: dismissed file picker stops setup", GamePlayFlowTests.DismissedDiscStopsPreparation);
+Run("quick play: install and prepare finish before launch", GamePlayFlowTests.PreparationIsOrderedAndAwaited);
+Run("quick play: double clicks keep one request", GamePlayFlowTests.DoubleClickDoesNotQueueTwoGames);
+Run("quick play: cancellation prevents delayed launch", GamePlayFlowTests.CancellationPreventsDelayedLaunch);
+Run("quick play: failed setup can be tried again", GamePlayFlowTests.FailureAllowsAnotherAttempt);
+Run("quick play: cancelling a launch leaves its installation available", GamePlayFlowTests.QueueWaitCancellationDoesNotCancelInstallation);
+Run("downloads: queue order and local pause", DownloadQueueTests.OrderAndLocalPause);
+Run("downloads: active pause, resume and cancellation", DownloadQueueTests.ActivePauseResumeAndCancellation);
+Run("downloads: global suspension survives active cancellation", DownloadQueueTests.SuspendedQueueSurvivesActiveCancellation);
+Run("downloads: bandwidth limits and cancellation", DownloadQueueTests.BandwidthAndCancellation);
+Run("downloads: payload telemetry and scope isolation", DownloadQueueTests.PayloadTelemetryAndScopeIsolation);
+Run("downloads: progress waits for installation and safe global pause", DownloadQueueTests.ProgressWaitsForInstallation);
 Run("runtime: each shipped game receives its own disc contract", RuntimeIntegrationTests.LaunchContracts);
 Run("runtime: launch metadata is refreshed without losing user state", RuntimeIntegrationTests.CatalogMigration);
 Run("runtime: a console game's output goes to its log, not a window", RuntimeIntegrationTests.OutputLog);
@@ -295,6 +313,10 @@ void TestProfilePersistence()
         store.Save(new GameProfileEntry("game", "/runtime/new", "/games/disc.iso"));
         var loaded = store.Load("GAME");
         Assert(loaded is { Executable: "/runtime/new", DiscImage: "/games/disc.iso" });
+        var snapshot = store.LoadAll();
+        Assert(snapshot.Count == 1 && snapshot[0].Id == "game");
+        snapshot.Clear();
+        Assert(store.Load("game") is not null);
     });
 }
 
@@ -725,12 +747,18 @@ void TestPreferences()
     WithTempRoot(root =>
     {
         var store = new UserPreferencesStore(new TestPaths(root));
-        store.Save(new UserPreferences(Language: "en", Theme: "light", RefreshModsOnOpen: false));
+        store.Save(new UserPreferences(Language: "en", Theme: "light", RefreshModsOnOpen: false,
+            DownloadBandwidthLimit: 5 * 1024 * 1024, BigPictureSounds: false));
         var loaded = store.Load();
         Assert(loaded.Language == "en" && loaded.Theme == "light" && !loaded.RefreshModsOnOpen);
+        Assert(loaded.DownloadBandwidthLimit == 5 * 1024 * 1024);
+        Assert(!loaded.BigPictureSounds);
+        File.WriteAllText(store.SettingsFile, "{\"Language\":\"en\",\"Theme\":\"light\"}");
+        Assert(store.Load() is { Language: "en", Theme: "light", BigPictureSounds: true });
         store.Reset();
         // Nothing chosen: follow the language of Windows.
         Assert(store.Load().Language == "auto");
+        Assert(store.Load().BigPictureSounds);
     });
 }
 
@@ -2267,7 +2295,7 @@ void TestModStateSurvivesHostileInput()
         var paths = new TestPaths(root);
 
         // A catalog walk must not die on one entry, and must not be steered out of Mods/.
-        foreach (var hostile in new[] { "..", "../escape", "a/b", "a\\b", "with space", "", "   " })
+        foreach (var hostile in new[] { ".", "..", ".hidden", "trailing.", "a..b", "../escape", "a/b", "a\\b", "with space", "", "   " })
         {
             Assert(!PortableModState.IsValidGameId(hostile));
             Assert(PortableModState.ReadEffective(paths, hostile).Count == 0);
@@ -2275,6 +2303,11 @@ void TestModStateSurvivesHostileInput()
             Assert(PortableModState.ReadPlayerDisabled(paths, hostile).Count == 0);
         }
         Assert(PortableModState.IsValidGameId("GMPE01_00") && PortableModState.IsValidGameId("CUSTOM-1a2b"));
+        const string nativeId = "native-nes-mstan-drmarionesrecomp-dr.-mario";
+        Assert(PortableModState.IsValidGameId(nativeId));
+        var nativeMods = new PortableModManager(paths, nativeId);
+        Assert(Path.GetDirectoryName(nativeMods.ActiveListFile) == PortableModState.DirectoryFor(paths, nativeId));
+        Assert(new ModLoadoutStore(paths.ConfigurationDirectory, nativeId).Load().Count == 0);
 
         var modDirectory = Path.Combine(paths.DataDirectory, "Mods", "BROKEN");
         Directory.CreateDirectory(modDirectory);

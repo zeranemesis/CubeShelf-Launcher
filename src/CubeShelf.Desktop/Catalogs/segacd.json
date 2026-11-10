@@ -1,0 +1,97 @@
+[
+  {
+    "Id": "bgyss-snatcher-port-snatcher",
+    "Title": "Snatcher",
+    "Project": "snatcher-port",
+    "Repository": "bgyss/snatcher-port",
+    "Method": "Réimplémentation native (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2a2b20dbc1cd985af50310f349a0491acfe6ea88",
+    "ReadmeUrl": "https://github.com/bgyss/snatcher-port/blob/2a2b20dbc1cd985af50310f349a0491acfe6ea88/README.md",
+    "ReleaseUrl": "https://github.com/bgyss/snatcher-port/releases/tag/v0.1.0-rc1",
+    "ReleaseTag": "v0.1.0-rc1",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "Snatcher-v0.1.0-rc1-linux-x86_64.tar.gz",
+        "Url": "https://github.com/bgyss/snatcher-port/releases/download/v0.1.0-rc1/Snatcher-v0.1.0-rc1-linux-x86_64.tar.gz",
+        "Sha256": "21298ccd41fdd7d3a23458354073f79ba7e99f2a1998bab2170aeea5ff505e8f",
+        "Size": 2121149,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Snatcher-v0.1.0-rc1-windows-x64.zip",
+        "Url": "https://github.com/bgyss/snatcher-port/releases/download/v0.1.0-rc1/Snatcher-v0.1.0-rc1-windows-x64.zip",
+        "Sha256": "d62a232d93fe9683f04ab13061183f834fe7c3b97fbc3850bfdff9f1cfdd5900",
+        "Size": 2545962,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "carl0srmz-littleplanet-sonic-cd",
+    "Title": "Sonic CD",
+    "Project": "littleplanet",
+    "Repository": "carl0srmz/littleplanet",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "093f58a0428bd5f15d9faa5e20af0894f1bf8686",
+    "ReadmeUrl": "https://github.com/carl0srmz/littleplanet/blob/093f58a0428bd5f15d9faa5e20af0894f1bf8686/README.md",
+    "ReleaseUrl": "https://github.com/carl0srmz/littleplanet/releases/tag/1.0",
+    "ReleaseTag": "1.0",
+    "Platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "Assets": [
+      {
+        "Name": "littleplanet-linux-aarch64.AppImage",
+        "Url": "https://github.com/carl0srmz/littleplanet/releases/download/1.0/littleplanet-linux-aarch64.AppImage",
+        "Sha256": "d05e4f466c99be613ddf0dd9c36a3c4c6d23453051d5f0293712bbd65a0d937a",
+        "Size": 160995848,
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "littleplanet-linux.AppImage",
+        "Url": "https://github.com/carl0srmz/littleplanet/releases/download/1.0/littleplanet-linux.AppImage",
+        "Sha256": "47e141ade55b696451b86848d2d1d0061bc28b00e5824e506b7f73aee1e5f099",
+        "Size": 161368568,
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "littleplanet-windows-portable.zip",
+        "Url": "https://github.com/carl0srmz/littleplanet/releases/download/1.0/littleplanet-windows-portable.zip",
+        "Sha256": "9b0685d0cc411accf7a6d5aba80f5baf2a5dbd8010147911041908a07ed9478e",
+        "Size": 159523439,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      },
+      {
+        "Name": "littleplanet.exe",
+        "Url": "https://github.com/carl0srmz/littleplanet/releases/download/1.0/littleplanet.exe",
+        "Sha256": "860f89892105aa33c5c778b9e449abe07b0a00754462514f22962986c38765c8",
+        "Size": 182715392,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

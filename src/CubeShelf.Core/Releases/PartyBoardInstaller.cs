@@ -104,6 +104,7 @@ public sealed class PartyBoardInstaller
 
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "downloads");
         Directory.CreateDirectory(cacheDirectory);
+        Storage.DiskSpaceGuard.Require(cacheDirectory, artifact.Size);
         var package = Path.Combine(cacheDirectory, artifact.Name);
         if (resolved.LegacyDownload)
             await DownloadLegacyVerifiedAsync(resolved.DownloadUri, package, artifact.Sha256, progress, cancellationToken)
@@ -112,7 +113,10 @@ public sealed class PartyBoardInstaller
             await DownloadVerifiedAsync(resolved.DownloadUri, package, artifact.Size, artifact.Sha256,
                 progress, cancellationToken).ConfigureAwait(false);
 
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Installing, cancellationToken).ConfigureAwait(false);
+        progress?.Report(.82);
         Directory.CreateDirectory(versionsRoot);
+        Storage.DiskSpaceGuard.Require(versionsRoot, new FileInfo(package).Length);
         var staging = Path.Combine(versionsRoot, ".staging-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
         try
@@ -122,6 +126,7 @@ public sealed class PartyBoardInstaller
                 var target = Path.Combine(staging, NormalizeRelativePath(artifact.Launch));
                 Directory.CreateDirectory(Path.GetDirectoryName(target)!);
                 File.Copy(package, target, true);
+                DownloadTransfer.Current?.RecordDisk(new FileInfo(package).Length);
                 if (!OperatingSystem.IsWindows())
                     File.SetUnixFileMode(target, File.GetUnixFileMode(target) |
                         UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
@@ -130,7 +135,8 @@ public sealed class PartyBoardInstaller
                      artifact.Kind.Equals("archive", StringComparison.OrdinalIgnoreCase))
             {
                 SecureArchiveExtractor.Extract(package, staging,
-                    new ArchiveExtractionLimits(20_000, MaximumPackageBytes * 3, MaximumPackageBytes));
+                    new ArchiveExtractionLimits(20_000, MaximumPackageBytes * 3, MaximumPackageBytes),
+                    value => progress?.Report(.82 + value * .16));
             }
             else
             {
@@ -573,6 +579,7 @@ public sealed class PartyBoardInstaller
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var announcedLength = response.Content.Headers.ContentLength;
+        DownloadTransfer.Current?.BeginDownload(announcedLength);
         if (announcedLength > MaximumPackageBytes)
             throw new InvalidDataException("Le paquet PartyBoard dépasse la taille autorisée.");
 
@@ -585,12 +592,15 @@ public sealed class PartyBoardInstaller
             var buffer = new byte[256 * 1024];
             while (true)
             {
+                if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken).ConfigureAwait(false);
                 var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                 if (read == 0) break;
+                if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken).ConfigureAwait(false);
                 total += read;
                 if (total > MaximumPackageBytes)
                     throw new InvalidDataException("Le paquet PartyBoard dépasse la taille autorisée.");
                 await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                DownloadTransfer.Current?.RecordDisk(read);
                 hash.AppendData(buffer, 0, read);
                 if (announcedLength is > 0)
                     progress?.Report(.05 + .75 * Math.Clamp((double)total / announcedLength.Value, 0, 1));
@@ -603,6 +613,7 @@ public sealed class PartyBoardInstaller
         if (announcedLength is > 0 && total != announcedLength.Value)
             throw new InvalidDataException("Le téléchargement PartyBoard est incomplet.");
 
+        await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
         var actualHash = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
         if (!actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
             throw new CryptographicException("Le paquet PartyBoard téléchargé ne correspond pas au checksum publié.");
@@ -629,6 +640,7 @@ public sealed class PartyBoardInstaller
         }
         if (existing == expectedSize)
         {
+            await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
             var completedHash = await ComputeSha256Async(temporary, cancellationToken).ConfigureAwait(false);
             if (!comparing || completedHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
             {
@@ -649,6 +661,7 @@ public sealed class PartyBoardInstaller
             response.Content.Headers.ContentRange?.From == existing;
         if (!append) existing = 0;
         var expectedResponseBytes = expectedSize - existing;
+        DownloadTransfer.Current?.BeginDownload(expectedSize, existing);
         if (response.Content.Headers.ContentLength is long length && length != expectedResponseBytes)
             throw new InvalidDataException("La taille téléchargée ne correspond pas à celle annoncée.");
 
@@ -675,16 +688,20 @@ public sealed class PartyBoardInstaller
                 var buffer = new byte[256 * 1024];
                 while (true)
                 {
+                    if (DownloadTransfer.Current is { } transfer) await transfer.WaitAsync(cancellationToken).ConfigureAwait(false);
                     var read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
                     if (read == 0) break;
+                    if (DownloadTransfer.Current is { } network) await network.RecordNetworkAsync(read, cancellationToken).ConfigureAwait(false);
                     total += read;
                     if (total > expectedSize || total > MaximumPackageBytes)
                         throw new InvalidDataException("Le téléchargement dépasse la taille annoncée.");
                     await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                    DownloadTransfer.Current?.RecordDisk(read);
                     hash.AppendData(buffer, 0, read);
                     progress?.Report(0.05 + 0.75 * total / expectedSize);
                 }
                 await output.FlushAsync(cancellationToken).ConfigureAwait(false);
+                await DownloadTransfer.EnterPhaseAsync(DownloadPhase.Verifying, cancellationToken).ConfigureAwait(false);
                 actualHash = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
             }
             if (total != expectedSize || (comparing && !actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase)))

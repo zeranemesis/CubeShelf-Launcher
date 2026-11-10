@@ -7,16 +7,24 @@ using Avalonia.Threading;
 
 namespace CubeShelf.Desktop.Controls;
 
+public enum GameCaseFormat { GameCube, Wii, Switch, Nintendo64, OriginalBox }
+
 /// <summary>
-/// Portable GameCube case renderer with a real projected cuboid, textured
-/// front/back/spine faces and a damped 60 Hz interaction.  The renderer stays
+/// Portable console case renderer with a real projected cuboid, textured
+/// front/back/spine faces and time-based, compositor-paced interaction. The renderer stays
 /// framework-native (no WPF Viewport3D and no Windows-only graphics API).
 /// </summary>
-public sealed class GameCaseControl : Control, IDisposable
+public sealed partial class GameCaseControl : Control, IDisposable
 {
-    private const double CaseWidth = 2.08;
-    private const double CaseHeight = 2.92;
-    private const double CaseDepth = 0.20;
+    private bool PortraitNintendo64 => CaseFormat == GameCaseFormat.Nintendo64 && _front is { } front && front.PixelSize.Height > front.PixelSize.Width;
+    private bool PrintedBox => CaseFormat is GameCaseFormat.Nintendo64 or GameCaseFormat.OriginalBox;
+    private double PrintedAspect => _front is { PixelSize.Height: >0 } art ? (double)art.PixelSize.Width/art.PixelSize.Height
+        : CaseFormat==GameCaseFormat.Nintendo64 ? 2.92/2.08 : .72;
+    private double CaseWidth => PrintedBox ? StandardCaseHeight*Math.Min(1,PrintedAspect)
+        : CaseFormat==GameCaseFormat.Switch ? 1.79 : 2.08;
+    private const double StandardCaseHeight = 2.92;
+    private double CaseHeight => PrintedBox ? StandardCaseHeight/Math.Max(1,PrintedAspect) : StandardCaseHeight;
+    private double CaseDepth => CaseFormat switch { GameCaseFormat.Nintendo64 => .48, GameCaseFormat.Switch => .174, _ => .215 };
     private const double CameraDistance = 5.75;
     private const double FieldOfViewDegrees = 32;
     private const double MaxHoverYaw = 19;
@@ -37,14 +45,56 @@ public sealed class GameCaseControl : Control, IDisposable
     private static readonly IBrush ShellEdgeBrush = new SolidColorBrush(Color.Parse("#26334A"));
     private static readonly IPen EdgePen = new Pen(new SolidColorBrush(Color.FromArgb(145, 120, 150, 200)), 1);
     private static readonly IBrush ShadowBrush = new SolidColorBrush(Color.FromArgb(54, 0, 0, 0));
+    private static readonly IBrush[] CaseMaterials =
+    [
+        Material("#45454B", "#111114", "#252529", "#08080A"),
+        Material("#FFFFFF", "#E5E5E2", "#FAFAF7", "#C7CBCB"),
+        Material("#E8EBEE", "#ADB6BF", "#D4DADE", "#8B969F"),
+        Material("#353637", "#242526", "#38393A", "#202122"),
+        Material("#353637", "#242526", "#38393A", "#202122")
+    ];
+    private static readonly IPen CaseOutline = new Pen(new SolidColorBrush(Color.FromArgb(110,65,65,72)), .7);
+    private static readonly IPen CaseHighlight = new Pen(new SolidColorBrush(Color.FromArgb(105,245,247,250)), .7);
+    private static readonly IPen CaseSeam = new Pen(new SolidColorBrush(Color.FromArgb(85,0,0,0)), .8);
+    private static readonly IPen SleeveEdge = new Pen(new SolidColorBrush(Color.FromArgb(65,235,236,242)), .65);
+    private static readonly IBrush SleeveReflection = new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0,0,RelativeUnit.Relative), EndPoint = new RelativePoint(1,.3,RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new(Color.FromArgb(12,255,255,255),0), new(Colors.Transparent,.24),
+            new(Color.FromArgb(14,255,255,255),.38),new(Colors.Transparent,.52), new(Color.FromArgb(5,0,0,0),1)
+        }
+    };
+    private static IBrush Material(string a,string b,string c,string d) => new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0,0,RelativeUnit.Relative), EndPoint = new RelativePoint(1,1,RelativeUnit.Relative),
+        GradientStops = new GradientStops {new(Color.Parse(a),0),new(Color.Parse(b),.09),new(Color.Parse(c),.5),new(Color.Parse(d),1)}
+    };
 
-    private readonly DispatcherTimer _animationTimer;
+    private readonly DemandAnimation _animation;
     private Bitmap? _front;
     private Bitmap? _back;
     private Bitmap? _spine;
+    private Bitmap? _right, _top, _bottom;
     private bool _flipped;
     private bool _pointerInside;
+    private bool _rotatingBox, _boxDragged;
+    private Point _rotationOrigin;
+    private double _rotationYaw, _rotationPitch;
     private double _baseYaw;
+    private double _restYaw;
+    public bool IsInteractive { get; set; } = true;
+    public double ShadowOpacity { get; set; } = 1;
+    public bool RealisticShell { get; set; }
+    public bool UseImportedModel { get; set; }
+    public GameCaseFormat CaseFormat { get; set; } = GameCaseFormat.GameCube;
+    public double CaseAspectRatio => CaseWidth / CaseHeight;
+    public static GameCaseFormat FormatForConsole(string console) => console switch
+    { "gamecube" => GameCaseFormat.GameCube, "wii" => GameCaseFormat.Wii, "switch" => GameCaseFormat.Switch, "n64" => GameCaseFormat.Nintendo64, _ => GameCaseFormat.OriginalBox };
+    private bool UsesGameCubeModel => UseImportedModel && CaseFormat == GameCaseFormat.GameCube;
+    public bool UseCompactTextureMesh { get; init; }
+    private double _restPitch;
     private double _hoverYaw;
     private double _hoverPitch;
     private double _yaw;
@@ -57,6 +107,7 @@ public sealed class GameCaseControl : Control, IDisposable
     private double _lift;
     private double _targetLift;
     private bool _disposed;
+    private SolidColorBrush? _contactShadowBrush;
 
     public GameCaseControl()
     {
@@ -65,34 +116,80 @@ public sealed class GameCaseControl : Control, IDisposable
         ClipToBounds = false;
         Cursor = new Cursor(StandardCursorType.Hand);
 
-        _animationTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(16)
-        };
-        _animationTimer.Tick += AnimateFrame;
+        _animation = new DemandAnimation(this, AnimateFrame);
 
-        PointerEntered += (_, _) => _pointerInside = true;
-        PointerMoved += OnPointerMoved;
-        PointerExited += (_, _) =>
+        PointerEntered += (_, args) =>
         {
+            if (args.Pointer.Type != PointerType.Touch) _pointerInside = IsInteractive;
+        };
+        PointerMoved += OnPointerMoved;
+        PointerExited += (_, args) =>
+        {
+            if (args.Pointer.Type == PointerType.Touch) return;
             _pointerInside = false;
             _hoverYaw = 0;
             _hoverPitch = 0;
             UpdateAnimationTarget();
         };
-        PointerPressed += (_, _) => Flip();
-        DetachedFromVisualTree += (_, _) => _animationTimer.Stop();
+        PointerPressed += (_, args) =>
+        {
+            if(!IsInteractive)return;
+            if(CaseFormat!=GameCaseFormat.Nintendo64) { Flip();return; }
+            if(!args.GetCurrentPoint(this).Properties.IsLeftButtonPressed && args.Pointer.Type!=PointerType.Touch)return;
+            _rotatingBox=true;_boxDragged=false;_rotationOrigin=args.GetPosition(this);
+            _rotationYaw=_yaw;_rotationPitch=_pitch;
+            args.Pointer.Capture(this);args.Handled=true;
+        };
+        PointerReleased += (_, args) =>
+        {
+            if(!_rotatingBox)return;
+            RotateBox(args.GetPosition(this));
+            _rotatingBox=false;args.Pointer.Capture(null);
+            if(!_boxDragged)Flip();
+            else { _restYaw=_baseYaw=_yaw;_restPitch=_pitch;_hoverYaw=_hoverPitch=0;_pointerInside=false;UpdateAnimationTarget(); }
+            args.Handled=true;
+        };
+        PointerCaptureLost += (_, _) => _rotatingBox=false;
+        DetachedFromVisualTree += (_, _) => _animation.Stop();
     }
 
-    public void SetCover(string? front, string? back, string? spine)
+    private (string Front,string Back,string Spine,string Right,string Top,string Bottom,GameCaseFormat Format)? _coverIdentity;
+
+    private static string CoverIdentity(string? path)
     {
+        if (string.IsNullOrWhiteSpace(path)) return "";
+        try
+        {
+            var file = new FileInfo(path);
+            return file.Exists ? file.FullName + "|" + file.Length + "|" + file.LastWriteTimeUtc.Ticks : path;
+        }
+        catch (Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException) { return path; }
+    }
+
+    public bool SetCover(string? front, string? back, string? spine, string? right = null, string? top = null, string? bottom = null)
+    {
+        var identity = (CoverIdentity(front),CoverIdentity(back),CoverIdentity(spine),CoverIdentity(right),CoverIdentity(top),CoverIdentity(bottom),CaseFormat);
+        if (_coverIdentity == identity) return false;
         DisposeBitmaps();
+        _coverIdentity = identity;
         _front = Load(front);
         _back = Load(back);
         _spine = Load(spine);
+        _right = Load(right); _top = Load(top); _bottom = Load(bottom);
+        if (UsesGpuTextures)
+        {
+            CoverBitmapCache.PrepareTexture(_front);
+            CoverBitmapCache.PrepareTexture(_back);
+            CoverBitmapCache.PrepareTexture(_spine);
+            CoverBitmapCache.PrepareTexture(_right);
+            CoverBitmapCache.PrepareTexture(_top);
+            CoverBitmapCache.PrepareTexture(_bottom);
+        }
         _flipped = false;
         _pointerInside = false;
         _baseYaw = 0;
+        _restYaw = 0;
+        _restPitch = 0;
         _hoverYaw = 0;
         _hoverPitch = 0;
         _yaw = 0;
@@ -103,23 +200,41 @@ public sealed class GameCaseControl : Control, IDisposable
         _targetGlare = 0;
         _lift = 0;
         _targetLift = 0;
-        _animationTimer.Stop();
+        _animation.Stop();
         InvalidateVisual();
+        return true;
     }
 
     public void Flip()
     {
         _flipped = !_flipped;
-        _baseYaw = _flipped ? 180 : 0;
+        _baseYaw = UsesGameCubeModel ? (_flipped ? 180 - _restYaw : _restYaw) : _restYaw + (_flipped ? 180 : 0);
         UpdateAnimationTarget();
     }
 
     public void ShowFront()
     {
         _flipped = false;
-        _baseYaw = 0;
+        _baseYaw = _restYaw;
         _hoverYaw = 0;
         _hoverPitch = 0;
+        UpdateAnimationTarget();
+    }
+
+    /// <summary>Places a case on a shelf, preserving the renderer used on game details.</summary>
+    public void SetShelfPose(double yaw, bool selected, bool animate)
+    {
+        var restPitch = RealisticShell ? (selected ? 3.5 : 2) : 0;
+        if (animate && _restYaw == yaw && _restPitch == restPitch && IsInteractive == selected && !_flipped
+            && !_pointerInside && _hoverYaw == 0 && _hoverPitch == 0) return;
+        IsInteractive = selected;
+        _restYaw = yaw;
+        _restPitch = restPitch;
+        _baseYaw = yaw;
+        _flipped = false;
+        _pointerInside = false;
+        _hoverYaw = _hoverPitch = 0;
+        if (!animate) { _yaw = yaw; _pitch = _restPitch; }
         UpdateAnimationTarget();
     }
 
@@ -127,6 +242,20 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         base.Render(context);
         if (Bounds.Width <= 2 || Bounds.Height <= 2) return;
+        var timing = FrontendTiming;
+        if (timing is null) { RenderCase(context); return; }
+        var started = System.Diagnostics.Stopwatch.GetTimestamp();
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+        RenderCase(context);
+        timing(System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,
+            GC.GetAllocatedBytesForCurrentThread() - allocated);
+    }
+
+    private void RenderCase(DrawingContext context)
+    {
+        if (HardwareConsole is not null) { RenderHardware(context); return; }
+        if(_openingEnabled) { RenderOpening(context);return; }
+        if (UsesGameCubeModel && RenderImportedModel(context)) return;
 
         var vertices = BuildProjectedVertices();
         var faces = BuildFaces(vertices)
@@ -135,13 +264,117 @@ public sealed class GameCaseControl : Control, IDisposable
             .ToArray();
 
         var shadowBounds = ComputeBounds(vertices.Select(v => v.Screen));
-        var yawRadians = _yaw * Math.PI / 180.0;
-        var shadowOffset = new Vector(9 + Math.Sin(yawRadians) * 5, 14 + Math.Abs(_pitch) * .20);
-        var shadow = shadowBounds.Translate(shadowOffset).Inflate(5 + 6 * _lift);
-        context.DrawRectangle(ShadowBrush, null, shadow, 20, 20);
+        if (RealisticShell)
+            DrawContactShadow(context, shadowBounds);
+        else
+        {
+            var yawRadians = _yaw * Math.PI / 180.0;
+            var shadowOffset = new Vector(9 + Math.Sin(yawRadians) * 5, 14 + Math.Abs(_pitch) * .20);
+            var shadow = shadowBounds.Translate(shadowOffset).Inflate(5 + 6 * _lift);
+            using (context.PushOpacity(ShadowOpacity))
+                context.DrawRectangle(ShadowBrush, null, shadow, 20, 20);
+        }
 
         foreach (var face in faces)
-            DrawFace(context, face, _pointerPosition, _glare);
+        {
+            if (RealisticShell) DrawRealisticFace(context, face);
+            else DrawFace(context, face, _pointerPosition, _glare);
+        }
+    }
+
+    private void DrawContactShadow(DrawingContext context, Rect bounds)
+    {
+        // Layered ellipses keep the shadow soft without a per-frame bitmap blur.
+        var center = new Point(bounds.Center.X + 6, bounds.Bottom + 7 + _lift * 8);
+        var alpha = (byte)(9 * ShadowOpacity);
+        if (_contactShadowBrush is null || _contactShadowBrush.Color.A != alpha)
+            _contactShadowBrush = new SolidColorBrush(Color.FromArgb(alpha, 24, 20, 28));
+        var brush = _contactShadowBrush;
+        for (var layer = 7; layer >= 0; layer--)
+        {
+            context.DrawEllipse(brush, null, center,
+                Math.Max(12, bounds.Width * .42 + layer * 3), 3 + layer * 2.1);
+        }
+    }
+
+    private void DrawRealisticFace(DrawingContext context, Face face)
+    {
+        var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
+        if(CaseFormat==GameCaseFormat.Nintendo64)
+        {
+            // Printed cardboard wraps to each crease; there is no frame around the artwork.
+            var panel=BuildGeometry(quad);
+            context.DrawGeometry(CaseMaterials[(int)CaseFormat],null,panel);
+            if(face.Texture is not null)
+                using(context.PushGeometryClip(panel))DrawTexturedQuadMesh(context,face.Texture,quad,
+                    face.Name is "front" or "back"?8:2,face.Name is "front" or "back"?12:4);
+            context.DrawGeometry(null,CaseSeam,panel);
+            return;
+        }
+        var broad = face.Name is "front" or "back";
+        var outline = RoundedQuad(quad, broad ? .009 : .02);
+        var shell = CaseMaterials[(int)CaseFormat];
+        context.DrawGeometry(shell, CaseOutline, outline);
+
+        // The printed insert sits inside a molded frame under a clear sleeve.
+        // The asymmetrical gutter leaves room for the hinge beside the front/back.
+        var gutter = CaseFormat == GameCaseFormat.Switch ? .018 : .028;
+        var left = face.Name == "front" ? gutter : broad ? .012 : .06;
+        var right = face.Name == "back" ? 1-gutter : broad ? .988 : .94;
+        var top = broad ? .012 : .018;
+        var artwork = new[] { Bilinear(quad, left, top), Bilinear(quad, right, top),
+            Bilinear(quad, right, 1 - top), Bilinear(quad, left, 1 - top) };
+        var sleeve = RoundedQuad(artwork, broad ? .005 : .01);
+        using (context.PushGeometryClip(sleeve))
+        {
+            if (face.Texture is not null)
+                DrawTexturedQuadMesh(context, face.Texture, artwork,
+                    broad ? IsInteractive ? (UseCompactTextureMesh ? 4 : 8) : 3 : 2,
+                    broad ? IsInteractive ? (UseCompactTextureMesh ? 6 : 12) : 4 : 6);
+            if (broad && CaseFormat != GameCaseFormat.Nintendo64)
+            {
+                context.DrawGeometry(SleeveReflection, null, sleeve);
+                DrawPointerGlare(context, sleeve, artwork, _pointerPosition, _glare * .55);
+            }
+        }
+        var highlight = CaseHighlight;
+        var seam = CaseSeam;
+        if (broad && CaseFormat != GameCaseFormat.Nintendo64)
+        {
+            context.DrawGeometry(null, SleeveEdge, sleeve);
+            var hinge = face.Name == "front" ? .026 : .973;
+            context.DrawLine(seam, Bilinear(quad, hinge, .012), Bilinear(quad, hinge, .988));
+            context.DrawLine(highlight, Bilinear(quad, hinge + .004, .014), Bilinear(quad, hinge + .004, .986));
+            context.DrawLine(highlight, Bilinear(quad, .018, .006), Bilinear(quad, .985, .006));
+        }
+        else
+        {
+            // Two halves of the case meet along the exposed top/bottom edge.
+            if (face.Name is "top" or "bottom")
+                context.DrawLine(seam, Bilinear(quad, 0, .5), Bilinear(quad, 1, .5));
+            if (face.Name == "right")
+            {
+                // The opening edge is bare molded plastic, with a latch recess, not a second spine.
+                context.DrawLine(seam,Bilinear(quad,.5,.02),Bilinear(quad,.5,.98));
+                context.DrawLine(highlight,Bilinear(quad,.22,.44),Bilinear(quad,.22,.56));
+            }
+            context.DrawLine(highlight, quad[0], quad[1]);
+        }
+    }
+
+    private static StreamGeometry RoundedQuad(IReadOnlyList<Point> quad, double corner)
+    {
+        var geometry = new StreamGeometry();
+        using var path = geometry.Open();
+        path.BeginFigure(Lerp(quad[0], quad[1], corner), true);
+        for (var next = 1; next <= 4; next++)
+        {
+            var index = next % 4;
+            path.LineTo(Lerp(quad[index], quad[(index + 3) % 4], corner));
+            path.QuadraticBezierTo(quad[index], Lerp(quad[index], quad[(index + 1) % 4], corner));
+        }
+        path.EndFigure(true);
+        return geometry;
     }
 
     private ProjectedVertex[] BuildProjectedVertices()
@@ -157,7 +390,22 @@ public sealed class GameCaseControl : Control, IDisposable
             new Vec3( x, -y, -z), new Vec3(-x, -y, -z)
         };
 
-        return source.Select(ProjectVertex).ToArray();
+        var vertices=source.Select(ProjectVertex).ToArray();
+        if(PrintedBox && Bounds.Width>16 && Bounds.Height>16)
+        {
+            // Fit the projected corners too: a square or rotated carton can exceed a portrait viewport.
+            var center=new Point(Bounds.Width/2,Bounds.Height/2);
+            var extentX=vertices.Max(vertex=>Math.Abs(vertex.Screen.X-center.X));
+            var extentY=vertices.Max(vertex=>Math.Abs(vertex.Screen.Y-center.Y));
+            var scale=Math.Min(1,Math.Min((center.X-8)/extentX,(center.Y-8)/extentY));
+            if(scale<1)
+                for(var i=0;i<vertices.Length;i++)
+                {
+                    var point=vertices[i].Screen;
+                    vertices[i]=vertices[i] with {Screen=new Point(center.X+(point.X-center.X)*scale,center.Y+(point.Y-center.Y)*scale)};
+                }
+        }
+        return vertices;
     }
 
     private ProjectedVertex ProjectVertex(Vec3 point)
@@ -165,7 +413,7 @@ public sealed class GameCaseControl : Control, IDisposable
         var rotated = Rotate(point, _yaw, _pitch);
         var fovRadians = FieldOfViewDegrees * Math.PI / 180.0;
         var focal = 1.0 / Math.Tan(fovRadians / 2.0);
-        var fitScale = Math.Min(Bounds.Width / 2.67, Bounds.Height / 3.48);
+        var fitScale = Math.Min(Bounds.Width / (CaseFormat == GameCaseFormat.Nintendo64 ? 3.6 : 2.67), Bounds.Height / 3.48);
         var perspective = focal / Math.Max(0.28, CameraDistance - rotated.Z);
         var scale = fitScale * perspective * 1.72 * (1 + HoverLift * _lift);
         var center = new Point(Bounds.Width / 2, Bounds.Height / 2);
@@ -177,15 +425,15 @@ public sealed class GameCaseControl : Control, IDisposable
     private Face[] BuildFaces(ProjectedVertex[] v)
     {
         var frontTexture = _front ?? _back;
-        var backTexture = _back ?? _front;
+        var backTexture = RealisticShell ? _back : _back ?? _front;
         return new[]
         {
             MakeFace("front", v, new[] { 0, 1, 2, 3 }, new Vec3(0, 0, 1), frontTexture, ShellFrontBrush),
             MakeFace("back", v, new[] { 5, 4, 7, 6 }, new Vec3(0, 0, -1), backTexture, ShellFrontBrush),
             MakeFace("left", v, new[] { 4, 0, 3, 7 }, new Vec3(-1, 0, 0), _spine, ShellSideBrush),
-            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), _spine, ShellSideBrush),
-            MakeFace("top", v, new[] { 4, 5, 1, 0 }, new Vec3(0, 1, 0), null, ShellEdgeBrush),
-            MakeFace("bottom", v, new[] { 3, 2, 6, 7 }, new Vec3(0, -1, 0), null, ShellEdgeBrush)
+            MakeFace("right", v, new[] { 1, 5, 6, 2 }, new Vec3(1, 0, 0), _right ?? (RealisticShell ? null : _spine), ShellSideBrush),
+            MakeFace("top", v, new[] { 4, 5, 1, 0 }, new Vec3(0, 1, 0), _top, ShellEdgeBrush),
+            MakeFace("bottom", v, new[] { 3, 2, 6, 7 }, new Vec3(0, -1, 0), _bottom, ShellEdgeBrush)
         };
     }
 
@@ -208,7 +456,7 @@ public sealed class GameCaseControl : Control, IDisposable
             fallback);
     }
 
-    private static void DrawFace(DrawingContext context, Face face, Point pointer, double glare)
+    private void DrawFace(DrawingContext context, Face face, Point pointer, double glare)
     {
         var quad = face.Vertices.Select(vertex => vertex.Screen).ToArray();
         var outline = BuildGeometry(quad);
@@ -287,15 +535,36 @@ public sealed class GameCaseControl : Control, IDisposable
         context.DrawGeometry(highlight, null, outline);
     }
 
-    private static void DrawTexturedQuadMesh(
+    private void DrawTexturedQuadMesh(
         DrawingContext context,
         Bitmap image,
         IReadOnlyList<Point> quad,
         int columns,
         int rows)
     {
+        if (UsesGpuTextures && DrawGpuTexture(context,image,quad as Point[] ?? quad.ToArray(),columns,rows))
+        {
+            // Submit inside the caller's clip, before its sleeve/ring geometry is popped.
+            FlushGpuDraws(context);
+            return;
+        }
+        if(Math.Abs(quad[0].Y-quad[1].Y)<.001 && Math.Abs(quad[1].X-quad[2].X)<.001
+            && Math.Abs(quad[2].Y-quad[3].Y)<.001 && Math.Abs(quad[3].X-quad[0].X)<.001
+            && quad[2].X>quad[0].X && quad[2].Y>quad[0].Y)
+        {
+            context.DrawImage(image,new Rect(image.Size),new Rect(quad[0],quad[2]));
+            return;
+        }
+        DrawPreparedTextureMesh(context, image, PrepareTexturedQuadMesh(image, quad, columns, rows));
+    }
+
+    private static TexturedTriangle[] PrepareTexturedQuadMesh(
+        Bitmap image, IReadOnlyList<Point> quad, int columns, int rows)
+    {
         var width = Math.Max(1d, image.Size.Width);
         var height = Math.Max(1d, image.Size.Height);
+        var mesh = new TexturedTriangle[columns * rows * 2];
+        var next = 0;
 
         for (var row = 0; row < rows; row++)
         {
@@ -316,10 +585,11 @@ public sealed class GameCaseControl : Control, IDisposable
                 var s11 = new Point(width * u1, height * v1);
                 var s01 = new Point(width * u0, height * v1);
 
-                DrawTexturedTriangle(context, image, s00, s10, s01, d00, d10, d01);
-                DrawTexturedTriangle(context, image, s10, s11, s01, d10, d11, d01);
+                mesh[next++] = PrepareTexturedTriangle(image, s00, s10, s01, d00, d10, d01);
+                mesh[next++] = PrepareTexturedTriangle(image, s10, s11, s01, d10, d11, d01);
             }
         }
+        return mesh;
     }
 
     private static Point Bilinear(IReadOnlyList<Point> quad, double u, double v)
@@ -332,8 +602,7 @@ public sealed class GameCaseControl : Control, IDisposable
     private static Point Lerp(Point a, Point b, double t) =>
         new(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t);
 
-    private static void DrawTexturedTriangle(
-        DrawingContext context,
+    private static TexturedTriangle PrepareTexturedTriangle(
         Bitmap image,
         Point source0,
         Point source1,
@@ -350,13 +619,18 @@ public sealed class GameCaseControl : Control, IDisposable
         // overlap instead of leaving a hairline seam. The sub-pixel overlap is redrawn by the
         // later cell with its own correct texture, which is invisible at this scale.
         var clip = BuildGeometry(Expand(destination0, destination1, destination2, CellClipBleed));
-        using (context.PushGeometryClip(clip))
-        using (context.PushTransform(transform))
-        {
-            var imageRect = new Rect(0, 0, image.Size.Width, image.Size.Height);
-            context.DrawImage(image, imageRect, imageRect);
-        }
+        return new TexturedTriangle(transform, clip, new Rect(0, 0, image.Size.Width, image.Size.Height));
     }
+
+    private static void DrawPreparedTextureMesh(DrawingContext context, Bitmap image, TexturedTriangle[] mesh)
+    {
+        foreach (var triangle in mesh)
+            using (context.PushGeometryClip(triangle.Clip))
+            using (context.PushTransform(triangle.Transform))
+                context.DrawImage(image, triangle.ImageRect, triangle.ImageRect);
+    }
+
+    private readonly record struct TexturedTriangle(Matrix Transform, StreamGeometry Clip, Rect ImageRect);
 
     private static Matrix AffineFromTriangles(
         Point s0, Point s1, Point s2,
@@ -413,17 +687,36 @@ public sealed class GameCaseControl : Control, IDisposable
 
     private static Rect ComputeBounds(IEnumerable<Point> points)
     {
-        var array = points.ToArray();
-        if (array.Length == 0) return default;
-        var minX = array.Min(point => point.X);
-        var minY = array.Min(point => point.Y);
-        var maxX = array.Max(point => point.X);
-        var maxY = array.Max(point => point.Y);
+        var minX = double.PositiveInfinity; var minY = double.PositiveInfinity;
+        var maxX = double.NegativeInfinity; var maxY = double.NegativeInfinity;
+        var any = false;
+        foreach (var point in points)
+        {
+            any = true;
+            minX = Math.Min(minX, point.X); minY = Math.Min(minY, point.Y);
+            maxX = Math.Max(maxX, point.X); maxY = Math.Max(maxY, point.Y);
+        }
+        if (!any) return default;
         return new Rect(minX, minY, Math.Max(0, maxX - minX), Math.Max(0, maxY - minY));
+    }
+
+    private void RotateBox(Point position)
+    {
+        var delta=position-_rotationOrigin;
+        if(!_boxDragged && Math.Abs(delta.X)+Math.Abs(delta.Y)<5)return;
+        _boxDragged=true;_animation.Stop();_pointerInside=false;
+        _yaw=_targetYaw=_rotationYaw+delta.X*.6;
+        _pitch=_targetPitch=Math.Clamp(_rotationPitch+delta.Y*.5,-80,80);
+        InvalidateVisual();
     }
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
+        if(_rotatingBox)
+        {
+            RotateBox(e.GetPosition(this));e.Handled=true;return;
+        }
+        if (!IsInteractive || e.Pointer.Type == PointerType.Touch) return;
         if (Bounds.Width <= 0 || Bounds.Height <= 0) return;
         _pointerInside = true;
         _pointerPosition = e.GetPosition(this);
@@ -437,18 +730,18 @@ public sealed class GameCaseControl : Control, IDisposable
     private void UpdateAnimationTarget()
     {
         _targetYaw = _baseYaw + (_pointerInside ? _hoverYaw : 0);
-        _targetPitch = _pointerInside ? _hoverPitch : 0;
+        if (UsesGameCubeModel) _targetYaw = Math.Clamp(_targetYaw, 12, 168);
+        _targetPitch = _restPitch + (_pointerInside ? _hoverPitch : 0);
         _targetGlare = _pointerInside ? 1 : 0;
         _targetLift = _pointerInside ? 1 : 0;
-        if (!_animationTimer.IsEnabled)
-            _animationTimer.Start();
+        _animation.Start();
     }
 
-    private void AnimateFrame(object? sender, EventArgs args)
+    private bool AnimateFrame(double elapsed)
     {
-        const double positionResponse = .17;
-        const double pitchResponse = .20;
-        const double surfaceResponse = .12;
+        var positionResponse = DemandAnimation.Response(.17, elapsed);
+        var pitchResponse = DemandAnimation.Response(.20, elapsed);
+        var surfaceResponse = DemandAnimation.Response(.12, elapsed);
 
         var yawDelta = _targetYaw - _yaw;
         var pitchDelta = _targetPitch - _pitch;
@@ -469,9 +762,11 @@ public sealed class GameCaseControl : Control, IDisposable
             _pitch = _targetPitch;
             _glare = _targetGlare;
             _lift = _targetLift;
-            _animationTimer.Stop();
+            InvalidateVisual();
+            return false;
         }
         InvalidateVisual();
+        return true;
     }
 
     private static Vec3 Rotate(Vec3 point, double yawDegrees, double pitchDegrees)
@@ -496,9 +791,8 @@ public sealed class GameCaseControl : Control, IDisposable
     {
         try
         {
-            return !string.IsNullOrWhiteSpace(path) && File.Exists(path)
-                ? new Bitmap(path)
-                : null;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return null;
+            return CoverBitmapCache.Acquire(path);
         }
         catch
         {
@@ -508,18 +802,21 @@ public sealed class GameCaseControl : Control, IDisposable
 
     private void DisposeBitmaps()
     {
-        _front?.Dispose();
-        _back?.Dispose();
-        _spine?.Dispose();
-        _front = _back = _spine = null;
+        CoverBitmapCache.Release(_mediaArtwork);_mediaArtwork=null;
+        _modelCommands = null;
+        _modelDrawingKey = default;
+        CoverBitmapCache.Release(_front);
+        CoverBitmapCache.Release(_back);
+        CoverBitmapCache.Release(_spine);
+        CoverBitmapCache.Release(_right); CoverBitmapCache.Release(_top); CoverBitmapCache.Release(_bottom);
+        _front = _back = _spine = _right = _top = _bottom = null;
     }
 
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
-        _animationTimer.Stop();
-        _animationTimer.Tick -= AnimateFrame;
+        _animation.Stop();
         DisposeBitmaps();
     }
 

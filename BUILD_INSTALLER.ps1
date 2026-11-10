@@ -38,6 +38,7 @@ foreach ($generatedDirectory in @($publish, $updater)) {
     -c $Configuration -r win-x64 --self-contained true `
     "-p:Version=$Version" "-p:DebugType=None" "-p:DebugSymbols=false" `
     --configfile $nugetConfig -o $publish
+if ($LASTEXITCODE -ne 0) { throw 'La compilation du launcher a échoué.' }
 
 & $dotnet publish `
     (Join-Path $repo "src\CubeShelf.Updater\CubeShelf.Updater.csproj") `
@@ -45,6 +46,7 @@ foreach ($generatedDirectory in @($publish, $updater)) {
     "-p:Version=$Version" "-p:PublishSingleFile=true" `
     "-p:DebugType=None" "-p:DebugSymbols=false" `
     --configfile $nugetConfig -o $updater
+if ($LASTEXITCODE -ne 0) { throw 'La compilation du programme de mise à jour a échoué.' }
 
 Copy-Item -LiteralPath (Join-Path $updater "CubeShelf.Updater.exe") `
     -Destination (Join-Path $publish "CubeShelf.Updater.exe") -Force

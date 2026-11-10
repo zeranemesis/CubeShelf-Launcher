@@ -1,0 +1,282 @@
+[
+  {
+    "Console": "gamecube",
+    "File": "gamecube.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_GameCube_symbol_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Nintendo_GameCube_symbol_logo.svg/330px-Nintendo_GameCube_symbol_logo.svg.png",
+    "Author": "Yoshii Lizcano",
+    "License": "CC0",
+    "LicenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "Sha256": "3d93ca318e2c1f8b3d8c60807e9fe27b1a32d9fd44073d4aa7db97d023c8d5b8"
+  },
+  {
+    "Console": "wii",
+    "File": "wii.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Wii.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Wii.svg/330px-Wii.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "92cb5252ae9c4b03a6f79f68cddb0492a0a5c0f1255c3eb0dd108f5221a27f5d"
+  },
+  {
+    "Console": "switch",
+    "File": "switch.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_Switch_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Nintendo_Switch_logo.svg/330px-Nintendo_Switch_logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "f7700c7da6e4a7257007ac0eccf46bd16e4197b7b168cd3e4efe58019b1b0430"
+  },
+  {
+    "Console": "nes",
+    "File": "nes.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:NES_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/NES_logo.svg/330px-NES_logo.svg.png",
+    "Author": "The original uploader was Anomie at English Wikipedia.",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "82b6b2d78da66052406a57569cbbd1176e14169c9915adc0ed3d112960dd84eb"
+  },
+  {
+    "Console": "snes",
+    "File": "snes.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Super_Nintendo_Entertainment_System_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Super_Nintendo_Entertainment_System_logo.svg/330px-Super_Nintendo_Entertainment_System_logo.svg.png",
+    "Author": "Apollolux",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "13cdbc5eeca1a25cf7cabc315cdd4325358d3cc9296e1e6a5e5ee331c0704669"
+  },
+  {
+    "Console": "gb",
+    "File": "gb.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_Game_Boy_Logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Nintendo_Game_Boy_Logo.svg/330px-Nintendo_Game_Boy_Logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "d53808ff9ab79c003174208e210300baa41391e8d66bfd00f6e440d92165d9e7"
+  },
+  {
+    "Console": "gbc",
+    "File": "gbc.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Game_Boy_Color_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Game_Boy_Color_logo.svg/330px-Game_Boy_Color_logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "3dbabbebc24f34e81f571b345b802441ae689da1a070a013478798b17663ad4e"
+  },
+  {
+    "Console": "gba",
+    "File": "gba.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Game_Boy_Advance_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Game_Boy_Advance_logo.svg/330px-Game_Boy_Advance_logo.svg.png",
+    "Author": "Nuno Nogueira (Nmnogueira)",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "096f9add58f887e6105faa167eb782b11300ba707e66b521b28accc54797bab7"
+  },
+  {
+    "Console": "nds",
+    "File": "nds.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_DS_Logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Nintendo_DS_Logo.svg/330px-Nintendo_DS_Logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "1a1ff160328184bae0943368bff6b77cd02459c4aef294a7597c94c2e0edcd33"
+  },
+  {
+    "Console": "3ds",
+    "File": "3ds.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_3DS_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Nintendo_3DS_logo.svg/330px-Nintendo_3DS_logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "e2cb5ba3d271f25708dd03010ee175dec4a415c66034e001a10adfdc631446dc"
+  },
+  {
+    "Console": "wiiu",
+    "File": "wiiu.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:WiiU.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/WiiU.svg/330px-WiiU.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "2d6ed3e1a74f14477cb205c9f4b2eee9af41483320b6dc7542c206122ca7afcb"
+  },
+  {
+    "Console": "virtualboy",
+    "File": "virtualboy.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Virtualboy_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Virtualboy_logo.svg/330px-Virtualboy_logo.svg.png",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "48762e949e05be29f00d716a49b3437e19df35633246a317878a2ed689340dc5"
+  },
+  {
+    "Console": "mastersystem",
+    "File": "mastersystem.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Master_System_Logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Master_System_Logo.svg/330px-Master_System_Logo.svg.png",
+    "Author": "All copyrights and trademarks owned by Sega Corporation (KK Sega)",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "aa19433a587249190d21322f99eabebaaae81f5138187842d10284922770eb2f"
+  },
+  {
+    "Console": "megadrive",
+    "File": "megadrive.gif",
+    "Source": "https://commons.wikimedia.org/wiki/File:JP_MegaDrive_Logo.gif",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/JP_MegaDrive_Logo.gif/330px-JP_MegaDrive_Logo.gif",
+    "Author": "Sega of Japan - Mitsushige Shiraiwa",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "f953c7a593f9d862bd5585bb7e56a6aca0833d35c7ad8754bcc0d520bda16737"
+  },
+  {
+    "Console": "gamegear",
+    "File": "gamegear.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Game_gear_eu_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Game_gear_eu_logo.svg/330px-Game_gear_eu_logo.svg.png",
+    "Author": "SEGA",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "d253dcde317e4875c605c741ef77b069bf08503a7719304d6f191a401b165210"
+  },
+  {
+    "Console": "32x",
+    "File": "32x.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega_32X_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Sega_32X_logo.svg/330px-Sega_32X_logo.svg.png",
+    "Author": "Sega",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "d7e212bd45b448a4c6353599038d52e4950c76d6797827f22ce9b499e21473a1"
+  },
+  {
+    "Console": "segacd",
+    "File": "segacd.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega_CD_Logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Sega_CD_Logo.svg/330px-Sega_CD_Logo.svg.png",
+    "Author": "Stephan Sokolow (ssokolow)",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "9344423f0b072d26078eaa80d0fd0c7df1e11263a9f73200d64d8612a1e2a3e5"
+  },
+  {
+    "Console": "saturn",
+    "File": "saturn.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Sega_Saturn_USA_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Sega_Saturn_USA_logo.svg/330px-Sega_Saturn_USA_logo.svg.png",
+    "Author": "JustDanPatrick",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "baa3be6a646d85893d2e24ea075832fc2dea4c1143bde5f1031cab11c8853a00"
+  },
+  {
+    "Console": "dreamcast",
+    "File": "dreamcast.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Dreamcast_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Dreamcast_logo.svg/330px-Dreamcast_logo.svg.png",
+    "Author": "Sega - Kenji Eno",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "1279729bc3280f1afdb231ae8c2b2f5e48f8df1255c557543f5bf3e86f80fd6c"
+  },
+  {
+    "Console": "ps1",
+    "File": "ps1.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PlayStation_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/PlayStation_logo.svg/330px-PlayStation_logo.svg.png",
+    "Author": "Sony Interactive Entertainment",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "e8e35c70664a4754b2cf29e7ca6ec17c93b00123d36c458cb74d02f6e8efd9b9"
+  },
+  {
+    "Console": "ps2",
+    "File": "ps2.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PlayStation_2_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/PlayStation_2_logo.svg/330px-PlayStation_2_logo.svg.png",
+    "Author": "Ssolbergj at en.wikipedia",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "339bc86968f73b9f8d5c78c01907bf539a097812f16d505146c2652ab09f6de0"
+  },
+  {
+    "Console": "ps3",
+    "File": "ps3.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Logo_of_the_PlayStation_3_(2006%E2%80%932009).svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Logo_of_the_PlayStation_3_%282006%E2%80%932009%29.svg/330px-Logo_of_the_PlayStation_3_%282006%E2%80%932009%29.svg.png",
+    "Author": "Sony",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "3050c0ac693ff2c712c51b9f9d28f7e431293dd25f32367a348d98acca998222"
+  },
+  {
+    "Console": "ps4",
+    "File": "ps4.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PlayStation_4_logo_and_wordmark.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/PlayStation_4_logo_and_wordmark.svg/330px-PlayStation_4_logo_and_wordmark.svg.png",
+    "Author": "Sony Computer Entertainment",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "c9a8259e9aff9ef309164b565e2f3fa501fbcbe98678dd59b27ed374b4fd110b"
+  },
+  {
+    "Console": "psp",
+    "File": "psp.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:PSP_Logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/PSP_Logo.svg/330px-PSP_Logo.svg.png",
+    "Author": "Afrank99 @ German Wikipedia",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "add0372937a9534ece4fc60b6cf4f1758e2bd295ad354be33df5fd960c07a8db"
+  },
+  {
+    "Console": "xbox",
+    "File": "xbox.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Xbox_Logo_2001.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Xbox_Logo_2001.svg/330px-Xbox_Logo_2001.svg.png",
+    "Author": "Microsoft",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "7c974e73a02230c4f61d6ff8202623d6ba435fe59e3491ef8dfc6a2dd6ab265b"
+  },
+  {
+    "Console": "xbox360",
+    "File": "xbox360.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Xbox_360_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Xbox_360_logo.svg/330px-Xbox_360_logo.svg.png",
+    "Author": "Microsoft. This version: CoolKid1993 at en.wikipedia",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "90f6f4ed3dd5447f8b3a561e6f4eeec42ba9c3075db2a0ca46d323e4c23b173e"
+  },
+  {
+    "Console": "neogeo",
+    "File": "neogeo.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Neo_Geo_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Neo_Geo_logo.svg/330px-Neo_Geo_logo.svg.png",
+    "Author": "Shad-dim SNK",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "940e03bf9c77950dcc2b35bb1b80c80dd3bdfa92d3caa700fe4ab67c480feca7"
+  },
+  {
+    "Console": "cdi",
+    "File": "cdi.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Philips_CD-i_logo.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Philips_CD-i_logo.svg/330px-Philips_CD-i_logo.svg.png",
+    "Author": "Philips",
+    "License": "Public domain",
+    "LicenseUrl": "",
+    "Sha256": "c6a8d8559373266466187f93d1ddbe17d6a346552879d897c03fb5604f5a0e2a"
+  }
+]

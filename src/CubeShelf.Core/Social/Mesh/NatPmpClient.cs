@@ -284,8 +284,12 @@ internal sealed class NatPmpClient
                 // A flood of junk from the gateway's address must not keep us spinning forever.
                 if (++datagrams > 256) return PortControlReply.Of(PortControlOutcome.NoAnswer);
 
+                // The clock can cross the deadline after the loop condition (for example
+                // while this thread is descheduled). Never pass a negative delay to CancelAfter.
+                var remaining = attemptEnds - clock.Elapsed;
+                if (remaining <= TimeSpan.Zero) break;
                 using var attempt = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                attempt.CancelAfter(attemptEnds - clock.Elapsed);
+                attempt.CancelAfter(remaining);
                 SocketReceiveFromResult received;
                 try
                 {

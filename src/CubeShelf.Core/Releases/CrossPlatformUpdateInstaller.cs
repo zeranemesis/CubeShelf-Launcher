@@ -51,6 +51,8 @@ internal sealed class LinuxLauncherUpdateInstaller : ILauncherUpdateInstaller
                 "while kill -0 \"$pid\" 2>/dev/null; do sleep 0.2; done\n" +
                 "cp \"$new\" \"$target.new\" || exit 1\n" +
                 "chmod +x \"$target.new\" || exit 1\n" +
+                "cp -p \"$target\" \"$target.previous.new\" || exit 1\n" +
+                "mv -f \"$target.previous.new\" \"$target.previous\" || exit 1\n" +
                 "mv -f \"$target.new\" \"$target\" || exit 1\n" +
                 "\"$target\" >/dev/null 2>&1 &\n");
             File.SetUnixFileMode(helper, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);

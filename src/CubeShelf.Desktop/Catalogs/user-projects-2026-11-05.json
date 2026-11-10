@@ -1,0 +1,30 @@
+{
+  "CheckedAt": "2026-11-05",
+  "Added": [
+    {
+      "Id": "zzzarathustra-dev-power-moon-recomp-super-mario-odyssey",
+      "Console": "switch",
+      "Title": "Super Mario Odyssey",
+      "Repository": "zzzarathustra-dev/power-moon-recomp",
+      "RepositoryHost": "gitlab.com",
+      "Release": "v0.2.1",
+      "SourceCommit": "cdbe05c9df0e2ff4bfbecece89ad3f0fd9806193",
+      "WindowsSha256": "b14f6b7acdfa06915f383a9edaabd041e336e8a89f5e1a367615a3fae4837f44",
+      "GameplayTested": false,
+      "RequestedRelease": "v0.2.0"
+    }
+  ],
+  "AlreadyPresent": [
+    {
+      "Id": "previouslevelgames-recharged-mario-strikers-charged",
+      "Console": "wii",
+      "Title": "Mario Strikers Charged",
+      "Repository": "previouslevelgames/recharged",
+      "Release": "v1.1.1",
+      "WindowsSha256": "bcdd3ef197af355ac17581a30ded5a29add666137a4755a87f8546cdc5a6e182",
+      "ArchiveVerified": true,
+      "GameplayTested": false
+    }
+  ],
+  "Android": "No official Android APK published for either project in the checked releases."
+}

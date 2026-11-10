@@ -1,4 +1,4 @@
-﻿; MyAppVersion / MyAppNumericVersion are fallbacks for compiling this script by hand.
+; MyAppVersion / MyAppNumericVersion are fallbacks for compiling this script by hand.
 ; BUILD_INSTALLER.ps1 always passes /DMyAppVersion and /DMyAppNumericVersion from
 ; the VERSION file at the repository root, which is the single source of truth.
 #ifndef MyAppVersion
@@ -19,7 +19,7 @@
 
 [Setup]
 AppId={{B1C7E383-AB82-44DC-B4B7-52753057CBA0}
-AppName=CubeShelf
+AppName=DecompShelf
 AppVersion={#MyAppVersion}
 AppPublisher=zeranemesis
 AppPublisherURL=https://github.com/zeranemesis/CubeShelf-Launcher
@@ -43,9 +43,9 @@ CloseApplications=yes
 RestartApplications=no
 AppMutex=CubeShelf.Launcher.SingleInstance.v1
 VersionInfoVersion={#MyAppNumericVersion}
-VersionInfoCompany=CubeShelf
-VersionInfoDescription=Installation de CubeShelf
-VersionInfoProductName=CubeShelf
+VersionInfoCompany=DecompShelf
+VersionInfoDescription=Installation de DecompShelf
+VersionInfoProductName=DecompShelf
 
 [Languages]
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
@@ -58,11 +58,11 @@ Name: "desktopicon"; Description: "Créer un raccourci sur le bureau"; GroupDesc
 Source: "{#PublishDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\CubeShelf"; Filename: "{app}\CubeShelf.exe"; WorkingDir: "{app}"
-Name: "{autodesktop}\CubeShelf"; Filename: "{app}\CubeShelf.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{autoprograms}\DecompShelf"; Filename: "{app}\CubeShelf.exe"; WorkingDir: "{app}"
+Name: "{autodesktop}\DecompShelf"; Filename: "{app}\CubeShelf.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\CubeShelf.exe"; Description: "Lancer CubeShelf"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\CubeShelf.exe"; Description: "Lancer DecompShelf"; Flags: nowait postinstall skipifsilent
 
 [Code]
 function InitializeSetup(): Boolean;

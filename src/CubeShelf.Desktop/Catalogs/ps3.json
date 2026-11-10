@@ -1,0 +1,242 @@
+[
+  {
+    "Id": "gnome41-dbz-budokai-hd-dragon-ball-z-budokai-hd",
+    "Title": "Dragon Ball Z: Budokai HD",
+    "Project": "dbz-budokai-hd",
+    "Repository": "gnome41/dbz-budokai-hd",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1b13a28a76c26797d6f860dd29d05215f3508cbe",
+    "ReadmeUrl": "https://github.com/gnome41/dbz-budokai-hd/blob/1b13a28a76c26797d6f860dd29d05215f3508cbe/README.md",
+    "ReleaseUrl": "https://github.com/gnome41/dbz-budokai-hd/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sp00nznet-gt5p-gran-turismo-5-prologue",
+    "Title": "Gran Turismo 5 Prologue",
+    "Project": "GT5P",
+    "Repository": "sp00nznet/GT5P",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "65c75d61ade58efb4f6af5f099c3b78b64c0a8e6",
+    "ReadmeUrl": "https://github.com/sp00nznet/GT5P/blob/65c75d61ade58efb4f6af5f099c3b78b64c0a8e6/README.md",
+    "ReleaseUrl": "https://github.com/sp00nznet/GT5P/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "yasindevs-imabikisou-pc-imabikisou",
+    "Title": "Imabikisou",
+    "Project": "imabikisou-pc",
+    "Repository": "yasindevs/imabikisou-pc",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Expérimental · limitations amont",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "9cb011b0459c26c2921f43d6374d3e6069611756",
+    "ReadmeUrl": "https://github.com/yasindevs/imabikisou-pc/blob/9cb011b0459c26c2921f43d6374d3e6069611756/README.md",
+    "ReleaseUrl": "https://github.com/yasindevs/imabikisou-pc/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "sp00nznet-twistedmetal-twisted-metal",
+    "Title": "Twisted Metal",
+    "Project": "twistedmetal",
+    "Repository": "sp00nznet/twistedmetal",
+    "Method": "Recompilation statique (déclaration amont)",
+    "Status": "Port natif déclaré par le projet",
+    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "23afb436f3a955cdab5fe342d36076b4be0ab2bf",
+    "ReadmeUrl": "https://github.com/sp00nznet/twistedmetal/blob/23afb436f3a955cdab5fe342d36076b4be0ab2bf/README.md",
+    "ReleaseUrl": "https://github.com/sp00nznet/twistedmetal/releases",
+    "ReleaseTag": "",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": []
+  },
+  {
+    "Id": "jonathandc64-demonssoulsrecomp-demon-s-souls",
+    "Title": "Demon's Souls",
+    "Project": "DemonsSoulsRecomp",
+    "Repository": "JonathanDC64/DemonsSoulsRecomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "1a195db365a7d944bb8d9861713a3e2d73a94ffc",
+    "ReadmeUrl": "https://github.com/JonathanDC64/DemonsSoulsRecomp/blob/1a195db365a7d944bb8d9861713a3e2d73a94ffc/README.md",
+    "ReleaseUrl": "https://github.com/JonathanDC64/DemonsSoulsRecomp/releases/tag/llvm-22.1.8-1",
+    "ReleaseTag": "llvm-22.1.8-1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "llvm-win64-22.1.8-1.zip",
+        "Url": "https://github.com/JonathanDC64/DemonsSoulsRecomp/releases/download/llvm-22.1.8-1/llvm-win64-22.1.8-1.zip",
+        "Sha256": "019c8dd5b7e5194bdb07b7a609c55032c0888083cff30076e4038c36d99c295a",
+        "Size": 49496165,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "soyjxck-dod3-recomp-drakengard-3",
+    "Title": "Drakengard 3",
+    "Project": "dod3-recomp",
+    "Repository": "soyjxck/dod3-recomp",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "cf42c3b3c0bb72467936d912ae6d79bf1e1ec5bb",
+    "ReadmeUrl": "https://github.com/soyjxck/dod3-recomp/blob/cf42c3b3c0bb72467936d912ae6d79bf1e1ec5bb/README.md",
+    "ReleaseUrl": "https://github.com/soyjxck/dod3-recomp/releases/tag/v0.5.0-alpha",
+    "ReleaseTag": "v0.5.0-alpha",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "dod3-recomp-v0.5.0-alpha-win64.zip",
+        "Url": "https://github.com/soyjxck/dod3-recomp/releases/download/v0.5.0-alpha/dod3-recomp-v0.5.0-alpha-win64.zip",
+        "Sha256": "fb9018d8c064d85702b473a2b870cbaa9035d9ca1e0457256c7027c719042b98",
+        "Size": 121347548,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "sethlikepie-gow2hd-windows-god-of-war-ii-hd",
+    "Title": "God of War II HD",
+    "Project": "Gow2HD-Windows",
+    "Repository": "sethlikepie/Gow2HD-Windows",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2da08f3ccda5b7437d32db316171b75adba8a22c",
+    "ReadmeUrl": "https://github.com/sethlikepie/Gow2HD-Windows/blob/2da08f3ccda5b7437d32db316171b75adba8a22c/README.md",
+    "ReleaseUrl": "https://github.com/sethlikepie/Gow2HD-Windows/releases/tag/v0.1.0",
+    "ReleaseTag": "v0.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Gow2HD-Windows.exe",
+        "Url": "https://github.com/sethlikepie/Gow2HD-Windows/releases/download/v0.1.0/Gow2HD-Windows.exe",
+        "Sha256": "255b01b4f0e8923bf1422cb7637de488eabb6c316716cdcdd10ab55efe883c08",
+        "Size": 7162368,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "whompay-infamousreborn-infamous",
+    "Title": "inFamous",
+    "Project": "inFAMOUSreborn",
+    "Repository": "whompay/inFAMOUSreborn",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Paquet Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "2e9405c72408d28f505b6636a2f9cb6b6125aa85",
+    "ReadmeUrl": "https://github.com/whompay/inFAMOUSreborn/blob/2e9405c72408d28f505b6636a2f9cb6b6125aa85/README.md",
+    "ReleaseUrl": "https://github.com/whompay/inFAMOUSreborn/releases/tag/1.1",
+    "ReleaseTag": "1.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "inFamous.Setup.FIXED.exe",
+        "Url": "https://github.com/whompay/inFAMOUSreborn/releases/download/1.1/inFamous.Setup.FIXED.exe",
+        "Sha256": "bd1ee351d01b7a46742067c327e3ae9b232d55726ea06c9e2414fa010a324a3c",
+        "Size": 92378759,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "undecuple-project-pyrrhus-killzone-2",
+    "Title": "Killzone 2",
+    "Project": "project-pyrrhus",
+    "Repository": "undecuple/project-pyrrhus",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "218f660f3aabc905d4e7003a291c0b53f5eb1a7a",
+    "ReadmeUrl": "https://github.com/undecuple/project-pyrrhus/blob/218f660f3aabc905d4e7003a291c0b53f5eb1a7a/README.md",
+    "ReleaseUrl": "https://github.com/undecuple/project-pyrrhus/releases/tag/v0.1.6",
+    "ReleaseTag": "v0.1.6",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Project-Pyrrhus-setup.exe",
+        "Url": "https://github.com/undecuple/project-pyrrhus/releases/download/v0.1.6/Project-Pyrrhus-setup.exe",
+        "Sha256": "019b59a682d00a8e25cff2ffa33f9bac1cf5ecc91d921e86b502a19378b6b66a",
+        "Size": 101950034,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  },
+  {
+    "Id": "undecuple-project-helghast-killzone-3",
+    "Title": "Killzone 3",
+    "Project": "project-helghast",
+    "Repository": "undecuple/project-helghast",
+    "Method": "Port natif Windows déclaré par le projet",
+    "Status": "Aperçu Windows · partie non testée",
+    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
+    "VerifiedAt": "2026-11-01",
+    "SourceCommit": "4f97260621e0ad55efb1c4e310d8f0424ec0d55d",
+    "ReadmeUrl": "https://github.com/undecuple/project-helghast/blob/4f97260621e0ad55efb1c4e310d8f0424ec0d55d/README.md",
+    "ReleaseUrl": "https://github.com/undecuple/project-helghast/releases/tag/v0.1.7",
+    "ReleaseTag": "v0.1.7",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Project-Helghast-setup.exe",
+        "Url": "https://github.com/undecuple/project-helghast/releases/download/v0.1.7/Project-Helghast-setup.exe",
+        "Sha256": "acbe51b66d18b395aafbdefb8a2643d71da34b4a5b2dccbdd28b5895895dbeb1",
+        "Size": 100718920,
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ]
+  }
+]

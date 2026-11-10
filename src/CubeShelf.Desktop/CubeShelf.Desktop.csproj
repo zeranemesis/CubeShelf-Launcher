@@ -1,7 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <!-- Precompiled code: the launcher JIT-compiled Avalonia and its own UI on every start. -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <AssemblyName>CubeShelf</AssemblyName>
+    <Product>DecompShelf</Product>
+    <AssemblyTitle>DecompShelf</AssemblyTitle>
+    <Description>Bibliothèque de ports natifs de consoles pour PC</Description>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,6 +17,9 @@
     <ApplicationIcon>Assets\Brand\gamecube_logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../CubeShelf.Assistance/CubeShelf.Assistance.csproj" />
+    <PackageReference Include="System.Speech" Version="8.0.0" />
+    <Content Include="../../vendor/assistance/*.txt" Link="licenses/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
     <PackageReference Include="Avalonia.BuildServices" Version="11.3.2" ExcludeAssets="all" PrivateAssets="all" />
@@ -17,7 +27,40 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="games.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Catalogs/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Consoles/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Sounds/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets/Sounds/home-*.wav" />
+    <Content Include="Assets\Covers\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
     <AvaloniaResource Include="Assets\Brand\gamecube_logo.png" />
+    <AvaloniaResource Include="Assets/Brand/Consoles/*.png" />
+    <AvaloniaResource Include="Assets/Brand/Consoles/*.gif" />
+    <Content Include="Assets/Brand/Consoles/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Brand/Consoles/*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets/Logos/*.png" />
+    <AvaloniaResource Include="Assets/Logos/catalog.json" />
+    <Content Include="Assets/Logos/Database/*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Logos/CREDITS.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets/Home/**/*" />
+    <Content Include="Assets/Home/**/*.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Content Include="Assets/Home/**/*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <AvaloniaResource Include="Assets\Models\Jaquette_GameCube_3D_vierge.glb" />
   </ItemGroup>
+  <Target Name="VerifyPublishedCoverFiles" AfterTargets="Publish">
+    <ItemGroup>
+      <_CubeShelfCover Include="Assets/Covers/**/*" />
+    </ItemGroup>
+    <Error Condition="!Exists('$(PublishDir)Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)')"
+           Text="Missing published cover: Assets/Covers/%(_CubeShelfCover.RecursiveDir)%(_CubeShelfCover.Filename)%(_CubeShelfCover.Extension)" />
+  </Target>
+  <Target Name="PrepareLocalAssistant" BeforeTargets="PrepareForBuild" Condition="'$(OS)' == 'Windows_NT' and ('$(RuntimeIdentifier)' == '' or '$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == 'win-arm64')">
+    <PropertyGroup>
+      <AssistantArch Condition="'$(RuntimeIdentifier)' == 'win-arm64'">ARM64</AssistantArch>
+      <AssistantArch Condition="'$(AssistantArch)' == ''">x64</AssistantArch>
+    </PropertyGroup>
+    <Exec Command="python &quot;$(MSBuildProjectDirectory)/../../eng/prepare-assistance.py&quot; --arch $(AssistantArch)" />
+    <ItemGroup>
+      <Content Include="Generated/Assistance/$(AssistantArch)/decompshelf_ai.dll" Link="decompshelf_ai.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    </ItemGroup>
+  </Target>
 </Project>
