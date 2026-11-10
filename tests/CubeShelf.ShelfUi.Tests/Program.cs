@@ -69,7 +69,7 @@ try
             && !Avalonia.Platform.AssetLoader.Exists(new Uri($"avares://CubeShelf/Assets/Brand/Consoles/{id}.gif")))
             throw new Exception("Missing console logo artwork: "+id);
     }
-    if(cubeCount!=27)throw new Exception($"GameCube catalogue should contain 27 unique games, got {cubeCount}.");
+    if(cubeCount!=28)throw new Exception($"GameCube catalogue should contain 28 unique games, got {cubeCount}.");
     AssertCovers();
     selector.SelectedIndex=1;
     AssertBrand("wii");
