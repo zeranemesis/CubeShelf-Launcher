@@ -129,6 +129,8 @@ static class PersonalLibraryChecks
             var menu=window.FindControl<Border>("BigPictureMenuOverlay")!;
             Check(menu.IsVisible,"Start must work on console home.");
             Dispatcher.UIThread.RunJobs();
+            // Hit testing reads the last rendered scene: render once so the menu that just opened is in it.
+            window.CaptureRenderedFrame()?.Dispose();
             var menuPoint=menu.TranslatePoint(new Point(menu.Bounds.Width/2,menu.Bounds.Height/2),window)!.Value;
             Check(window.InputHitTest(menuPoint) is Visual hit && (hit==menu || menu.IsVisualAncestorOf(hit)),
                 "The console home must not cover or intercept the main menu.");
