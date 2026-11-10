@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.19.0-rc.6 — sélection animée sur PC et Android
+
+- HOME : mise en avant progressive de la miniature sélectionnée et retour d’enfoncement à l’appui, au tactile comme à la souris.
+- Aperçu : transition directionnelle courte et jaquette 3D présentée de la tranche vers la face. La fiche Classique PC reprend ce geste à la sélection d’un nouveau jeu.
+- Navigation immédiatement active, transitions interrompues proprement lors des changements rapides, de la fermeture ou du masquage de la bibliothèque.
+- Réduction des animations respectée dans HOME ; Android transmet le réglage système au retour dans l’application. Aucun nouvel effet en boucle.
+
+## 0.19.0-rc.5 — ports PC Switch 2
+
+- Rubrique Switch 2 distincte de la Switch, avec Pokopia (Recompia v0.9.0), Mario Kart World (v0.1.4) et Donkey Kong Bananza (DKB Recomp v0.2.0).
+- Archives Windows vérifiées par taille et SHA-256, chemins des lanceurs épinglés pour éviter de sélectionner les outils de compilation livrés avec les ports.
+- Donkey Kong Bananza reste signalé comme prototype limité au début du jeu. Chaque port demande les fichiers de la copie de l’utilisateur ; aucune partie n’a été validée dans DecompShelf.
+
+## 0.19.0-rc.4 — catalogue du 10 novembre 2026
+
+- Android : 35 entrées, avec ICO, Metroid Prime 2: Echoes, Metroid Prime Hunters, Animal Crossing (Nookery), Crash Team Racing, Pikmin / Pikmin 2 et Metroid: Samus Returns ; jaquettes et adaptateurs de moteurs intégrés.
+- Huit moteurs Android actualisés : Oracles, Final Fantasy Tactics Advance, Wario Land, Wind Waker HD, Metroid Prime, Mario Kart Wii, Monster Hunter Generations Ultimate et Kingdom Hearts: Chain of Memories.
+- PC : six références ajoutées et onze actualisées ; Animal Crossing suit le renommage Nookery en conservant son identifiant. Provenance, versions, tailles et SHA-256 des paquets conservés dans `Catalogs/native-refresh-2026-11-10.json`.
+- Android : noms de tâches valides également pour les identifiants commençant par un chiffre, comme `3ds-samusreturns` ; contrôle du manifeste ajouté au test de l’APK.
+- Les fichiers des jeux restent à fournir par l’utilisateur. Les contrôles de paquets et de catalogue ne constituent pas une validation de jouabilité.
+
 ## En cours — proportions et confort des jaquettes sur Windows
 
 - Contrôle des 474 faces présentes : décodage et dimensions valides, résolution suffisante pour la taille normale des vignettes.

@@ -802,20 +802,30 @@
     "Method": "Recompilation statique native Windows",
     "Status": "Aperçu Windows · partie non testée",
     "Notes": "Le projet déclare le jeu jouable ; Windows x64 AVX2 et Vulkan requis, copie 1.4.0. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf. Paquet épinglé par URL, taille et SHA-256 GitHub.",
-    "VerifiedAt": "2026-11-02",
-    "SourceCommit": "41e143d823cfd2ddb4e0c1b6c8aad1e344782858",
-    "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/41e143d823cfd2ddb4e0c1b6c8aad1e344782858/README.md",
-    "ReleaseUrl": "https://github.com/morerokk/MHGURecomp/releases/tag/0.13.1",
-    "ReleaseTag": "0.13.1",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "dc26e6d9a22afbedc1138fd07e94f3e3c55efed3",
+    "ReadmeUrl": "https://github.com/morerokk/MHGURecomp/blob/dc26e6d9a22afbedc1138fd07e94f3e3c55efed3/README.md",
+    "ReleaseUrl": "https://github.com/morerokk/MHGURecomp/releases/tag/0.16.0",
+    "ReleaseTag": "0.16.0",
     "Platforms": [
+      "Linux",
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "Windows-MHGURecomp.0.13.1.zip",
-        "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.13.1/Windows-MHGURecomp.0.13.1.zip",
-        "Sha256": "ddf450f33068b4c1c284e7ca57608a01e3680bdf2c7875c55d0fd5da9063e8bb",
-        "Size": 42047665,
+        "Name": "Linux-MHGURecomp.0.16.0.tar.gz",
+        "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.16.0/Linux-MHGURecomp.0.16.0.tar.gz",
+        "Size": 43666783,
+        "Sha256": "191229b64805381d6c957c707af93ba3d43ac17256329c684e4036af6ceffd53",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "Windows-MHGURecomp.0.16.0.zip",
+        "Url": "https://github.com/morerokk/MHGURecomp/releases/download/0.16.0/Windows-MHGURecomp.0.16.0.zip",
+        "Size": 43408271,
+        "Sha256": "6f7c567b41a4b57c02fafbe4c813f0ee9a90e069c55f9a3c1c85d0d1f7b33c82",
         "RuntimeIdentifiers": [
           "win-x64"
         ]

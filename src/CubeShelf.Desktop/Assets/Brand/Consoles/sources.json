@@ -278,5 +278,15 @@
     "License": "Public domain",
     "LicenseUrl": "",
     "Sha256": "c6a8d8559373266466187f93d1ddbe17d6a346552879d897c03fb5604f5a0e2a"
+  },
+  {
+    "Console": "switch2",
+    "File": "switch2.png",
+    "Source": "https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_logo_transparent_black.svg",
+    "ImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Nintendo_Switch_2_logo_transparent_black.svg/330px-Nintendo_Switch_2_logo_transparent_black.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "Author": "Nintendo",
+    "License": "Public domain",
+    "LicenseUrl": "https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_logo_transparent_black.svg",
+    "Sha256": "bbb36e3549a90ff9412db02d5bad0a59fe300600dada4abb9e0e44b1d271d613"
   }
 ]

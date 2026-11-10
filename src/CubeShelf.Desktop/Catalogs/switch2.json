@@ -1,0 +1,89 @@
+[
+  {
+    "Id": "switch2-pokopia",
+    "Title": "Pokémon Pokopia",
+    "Project": "Recompia",
+    "Repository": "Dittobyte/Recompia",
+    "Method": "Recompilation statique native (déclaration amont)",
+    "Status": "Port PC publié · partie non testée",
+    "Notes": "Préparation depuis ta propre copie compatible de Pokopia et ses mises à jour ; compilation du jeu et des shaders sur ton PC. Cette préparation peut être longue. Aucun fichier de jeu fourni. Paquet officiel vérifié par taille et SHA-256 ; exécutable Windows x64 contrôlé, sans exécution. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "39c5776d3dbb0dd8f5f95057ea34048ec12f7418",
+    "ReadmeUrl": "https://github.com/Dittobyte/Recompia/blob/39c5776d3dbb0dd8f5f95057ea34048ec12f7418/README.md",
+    "ReleaseUrl": "https://github.com/Dittobyte/Recompia/releases/tag/v0.9.0",
+    "ReleaseTag": "v0.9.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PokopiaRecomp-0.9.0-win64.zip",
+        "Url": "https://github.com/Dittobyte/Recompia/releases/download/v0.9.0/PokopiaRecomp-0.9.0-win64.zip",
+        "Size": 180189237,
+        "Sha256": "d4c9047d3872cd7757a76b1c24c89dd9baa42d06ae318b3a9746a21263090c35",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "PokopiaRecomp-0.9.0/PokopiaLauncher.exe"
+      }
+    ]
+  },
+  {
+    "Id": "switch2-mariokartworld",
+    "Title": "Mario Kart World",
+    "Project": "mkw-recomp",
+    "Repository": "adriadam10/mkw-recomp",
+    "Method": "Recompilation statique native (déclaration amont)",
+    "Status": "Expérimental · courses disponibles selon le projet",
+    "Notes": "Ta propre copie du jeu en version 1.0.0 est nécessaire. CPU x64 avec AVX2, GPU Vulkan 1.3 et environ 30 Go libres. Bugs de menus, audio et pilotes signalés ; pas de jeu en ligne. Aucun fichier de jeu fourni. Paquet officiel vérifié par taille et SHA-256 ; exécutable Windows x64 contrôlé, sans exécution. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "65c5c0a93fd0c24030158da2f13b3f70371315ed",
+    "ReadmeUrl": "https://github.com/adriadam10/mkw-recomp/blob/65c5c0a93fd0c24030158da2f13b3f70371315ed/README.md",
+    "ReleaseUrl": "https://github.com/adriadam10/mkw-recomp/releases/tag/v0.1.4",
+    "ReleaseTag": "v0.1.4",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "mkw-recomp-0.1.4-windows-x64.zip",
+        "Url": "https://github.com/adriadam10/mkw-recomp/releases/download/v0.1.4/mkw-recomp-0.1.4-windows-x64.zip",
+        "Size": 176043872,
+        "Sha256": "9a5e1614a3985ca7f1c9cc13477d60e7ce6ff9055588663359c4acfef79760f9",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "mkw-recomp/mkw.exe"
+      }
+    ]
+  },
+  {
+    "Id": "switch2-bananza",
+    "Title": "Donkey Kong Bananza",
+    "Project": "DKB Recomp",
+    "Repository": "Lucas-blip-png/dkb-pc-recomp",
+    "Method": "Recompilation statique native (déclaration amont)",
+    "Status": "Expérimental · Prototype — début du jeu seulement",
+    "Notes": "Le paquet contient le préparateur DKB-Setup, qui compile depuis ta propre copie, et non un jeu prêt à lancer. Seul le début du jeu fonctionne selon le projet ; plantages et effets manquants. Ce port ne doit pas être présenté comme entièrement jouable. Aucun fichier de jeu fourni. Paquet officiel vérifié par taille et SHA-256 ; exécutable Windows x64 contrôlé, sans exécution. Jouabilité non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "017c86bb5281b5e7cd114776bd489f181b436ed2",
+    "ReadmeUrl": "https://github.com/Lucas-blip-png/dkb-pc-recomp/blob/017c86bb5281b5e7cd114776bd489f181b436ed2/README.md",
+    "ReleaseUrl": "https://github.com/Lucas-blip-png/dkb-pc-recomp/releases/tag/v0.2.0",
+    "ReleaseTag": "v0.2.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "DKB-Setup-0.2.0+33f8bbc-windows.zip",
+        "Url": "https://github.com/Lucas-blip-png/dkb-pc-recomp/releases/download/v0.2.0/DKB-Setup-0.2.0%2B33f8bbc-windows.zip",
+        "Size": 129112537,
+        "Sha256": "90b75cd98de7f8e29c56e7418be57f7864d6fb4d35a50a227fd3902515a7b381",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "DKB-Setup/DKB-Setup.exe"
+      }
+    ]
+  }
+]

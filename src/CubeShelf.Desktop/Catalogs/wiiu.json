@@ -25,76 +25,76 @@
     "Method": "Recompilation statique (déclaration amont)",
     "Status": "Expérimental · limitations amont",
     "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "264f53ee0eca9d52d39f6ccf1a890eecec018e6e",
-    "ReadmeUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/blob/264f53ee0eca9d52d39f6ccf1a890eecec018e6e/README.md",
-    "ReleaseUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/tag/v0.5.0",
-    "ReleaseTag": "v0.5.0",
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "19e1fcc92e5a9a3e2c96f74eb325d8334c42236d",
+    "ReadmeUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/blob/19e1fcc92e5a9a3e2c96f74eb325d8334c42236d/README.md",
+    "ReleaseUrl": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/tag/v0.5.1",
+    "ReleaseTag": "v0.5.1",
     "Platforms": [
-      "Windows",
       "Linux",
+      "Windows",
       "macOS"
     ],
     "Assets": [
       {
-        "Name": "WindWakerHD-v0.5.0-linux-aarch64.AppImage",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-aarch64.AppImage",
-        "Sha256": "3e86ab17fb4f20a7feacca4b844383ca8066a5cd0ab9cec50c608c5941c7498f",
-        "Size": 106207752,
+        "Name": "WindWakerHD-v0.5.1-linux-aarch64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-linux-aarch64.AppImage",
+        "Size": 126343688,
+        "Sha256": "9151908c2db0a14fee9da199973a7d7d67133f754f87e15615c1804c20cd45df",
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-linux-aarch64.zip",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-aarch64.zip",
-        "Sha256": "31bccded0cb2493bb12d38f851a1290a5cff8ea0efa10b7001f661ca9eae5789",
-        "Size": 124683967,
+        "Name": "WindWakerHD-v0.5.1-linux-aarch64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-linux-aarch64.zip",
+        "Size": 148768008,
+        "Sha256": "d9aa58c1745e9c9bb32a163bc0dd06b6290cd4832ef852d6084886f3f6a75105",
         "RuntimeIdentifiers": [
           "linux-arm64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-linux-x86_64.AppImage",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-x86_64.AppImage",
-        "Sha256": "7772ccac38854a23c19328437d6aca07d569a1fc097aabad00b9839f7417ba89",
-        "Size": 104905208,
+        "Name": "WindWakerHD-v0.5.1-linux-x86_64.AppImage",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-linux-x86_64.AppImage",
+        "Size": 124991992,
+        "Sha256": "e7532b3f4a04ccc0f4b6bb6dfb7bf79ceb8e249d71853c0bf62b0ed1ce5ebf8a",
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-linux-x86_64.zip",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-linux-x86_64.zip",
-        "Sha256": "3584c4fe05ce99fdd460b73777ca34a7ce75ffb5e56bd1a84d89ef363bb69cf9",
-        "Size": 121787678,
+        "Name": "WindWakerHD-v0.5.1-linux-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-linux-x86_64.zip",
+        "Size": 145841808,
+        "Sha256": "d7f56850b5b74788f001bab8eecac8cccde5b1e24e11473e14fbd673b7616c3c",
         "RuntimeIdentifiers": [
           "linux-x64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-macos-arm64.zip",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-macos-arm64.zip",
-        "Sha256": "41004d42c39d862814f383b327bbf81492b026fe7ca0d7858d9dea631d1ac406",
-        "Size": 23264936,
+        "Name": "WindWakerHD-v0.5.1-macos-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-macos-arm64.zip",
+        "Size": 26719203,
+        "Sha256": "3e5d7b8715ee7263c641f5eaa7ccd400299601d6c6ae1a0ff01578e4130d92f6",
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-windows-arm64.zip",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-windows-arm64.zip",
-        "Sha256": "48624feb8b14b0b41d82c45298ea833f14b794f504e31ff2c7577e104cb1d226",
-        "Size": 35274174,
+        "Name": "WindWakerHD-v0.5.1-windows-arm64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-windows-arm64.zip",
+        "Size": 39578426,
+        "Sha256": "bd53bdb718d2f65d6bce08fbc72ff38edb196b59a05e390820d128f67e21a2a9",
         "RuntimeIdentifiers": [
           "win-arm64"
         ]
       },
       {
-        "Name": "WindWakerHD-v0.5.0-windows-x86_64.zip",
-        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.0/WindWakerHD-v0.5.0-windows-x86_64.zip",
-        "Sha256": "11681f6584757567b0feeb2a464fcc2e792a3315ac27105d6c6d3345bf61d105",
-        "Size": 36678476,
+        "Name": "WindWakerHD-v0.5.1-windows-x86_64.zip",
+        "Url": "https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp/releases/download/v0.5.1/WindWakerHD-v0.5.1-windows-x86_64.zip",
+        "Size": 41201612,
+        "Sha256": "2e8a8b29ed1b35e6d3cae370a7c9b6878a05d6269b28420dd492415da72f48c4",
         "RuntimeIdentifiers": [
           "win-x64"
         ]

@@ -184,7 +184,7 @@ public sealed class PlatformHomeControl : UserControl
     }
     // Year of the original hardware's first launch; Arcade is a category, not one machine.
     public static (string Brand,int Year) Facts(string id) => id switch {
-        "gamecube"=>("Nintendo",2001),"wii"=>("Nintendo",2006),"wiiu"=>("Nintendo",2012),"switch"=>("Nintendo",2017),
+        "gamecube"=>("Nintendo",2001),"wii"=>("Nintendo",2006),"wiiu"=>("Nintendo",2012),"switch"=>("Nintendo",2017),"switch2"=>("Nintendo",2025),
         "n64"=>("Nintendo",1996),"nes"=>("Nintendo",1983),"snes"=>("Nintendo",1990),"gb"=>("Nintendo",1989),
         "gbc"=>("Nintendo",1998),"gba"=>("Nintendo",2001),"nds"=>("Nintendo",2004),"3ds"=>("Nintendo",2011),"virtualboy"=>("Nintendo",1995),
         "mastersystem"=>("Sega",1985),"megadrive"=>("Sega",1988),"gamegear"=>("Sega",1990),"32x"=>("Sega",1994),

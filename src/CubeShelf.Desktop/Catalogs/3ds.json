@@ -92,5 +92,43 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "3ds-samusreturns",
+    "Title": "Metroid: Samus Returns",
+    "Project": "msr2ds",
+    "Repository": "gminustwo/msr2ds",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Assets": [
+      {
+        "Name": "msr2ds-2.0.6-macos-arm64.zip",
+        "Url": "https://github.com/gminustwo/msr2ds/releases/download/v2.0.6/msr2ds-2.0.6-macos-arm64.zip",
+        "Size": 6128378,
+        "Sha256": "3eeffd421841a12e58cc9d424fe18800c84bab641b6ed384df4c0578dfd4f468",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "msr2ds-2.0.6-windows-x64.zip",
+        "Url": "https://github.com/gminustwo/msr2ds/releases/download/v2.0.6/msr2ds-2.0.6-windows-x64.zip",
+        "Size": 8471603,
+        "Sha256": "6fc49ac60a3e9a1b728654996665083c91fbbf80ba13fd54934fcb6ac445aed7",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "a587c8946063ff3fd293d174e662443f992eef29",
+    "ReadmeUrl": "https://github.com/gminustwo/msr2ds/blob/a587c8946063ff3fd293d174e662443f992eef29/README.md",
+    "ReleaseUrl": "https://github.com/gminustwo/msr2ds/releases/tag/v2.0.6",
+    "ReleaseTag": "v2.0.6",
+    "Platforms": [
+      "Windows",
+      "macOS"
+    ]
   }
 ]

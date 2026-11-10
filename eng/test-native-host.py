@@ -39,6 +39,7 @@ if len(sys.argv)>1:
    port=next(p for p in ports if p['Id']==spec['Id'])
    assert spec['ApkSha256']==port['ApkSha256'] and spec['PackageName']==port['PackageName']
    assert spec['Process']==':engine_'+spec['Id'].replace('-','_') and declared(spec['Process'])
+   assert declared('io.github.zeranemesis.cubeshelf.native.engine_'+spec['Id'].replace('-','_')),'Activity task affinities must start with a letter, including 3DS game IDs'
    assert hashlib.sha256(bridge).hexdigest()==spec['BridgeSha256']
    assert any(c['Kind']=='activity' and c['Name']==spec['MainActivity'] for c in spec['Components'])
    for component in spec['Components']:

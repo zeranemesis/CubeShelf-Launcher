@@ -34,21 +34,54 @@ public sealed class HomeArtworkControl : UserControl
     private readonly Border _selection=new(){IsHitTestVisible=false,CornerRadius=new CornerRadius(14),BorderThickness=new Thickness(3)};
     private Bitmap? _bitmap;
     private bool _attached;
+    private readonly DemandAnimation _motion;
+    private readonly MatrixTransform _pose=new();
+    private double _scale=1,_lift,_targetScale=1,_targetLift;
+    private bool _reduceMotion,_pressed;
+    public bool ReduceMotion
+    {
+        get=>_reduceMotion;
+        set{if(_reduceMotion==value)return;_reduceMotion=value;UpdateMotion(false);}
+    }
 
     public HomeArtworkControl()
     {
         IsHitTestVisible=false;
+        RenderTransformOrigin=RelativePoint.Center;RenderTransform=_pose;
+        _motion=new DemandAnimation(this,AdvanceMotion);
         _badge.Child=_badgeText;
         var layers=new Grid();layers.Children.Add(_console);layers.Children.Add(_image);layers.Children.Add(_sheen);layers.Children.Add(_badge);
         _frame.Child=layers;Content=new Panel{Children={_frame,_selection}};
-        AttachedToVisualTree+=(_,_)=>{_attached=true;LoadArtwork();};
-        DetachedFromVisualTree+=(_,_)=>{_attached=false;_image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;};
+        AttachedToVisualTree+=(_,_)=>{_attached=true;LoadArtwork();UpdateMotion(false);};
+        DetachedFromVisualTree+=(_,_)=>{_attached=false;_pressed=false;_motion.Stop();_image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;};
         PropertyChanged+=(_,change)=>
         {
             if(change.Property==CoverPathProperty||change.Property==IsPreviewProperty)LoadArtwork();
+            if(change.Property==IsSelectedProperty||change.Property==IsPreviewProperty)UpdateMotion(_attached);
             if(change.Property==CoverPathProperty||change.Property==PlatformProperty||change.Property==TitleProperty||change.Property==IsPreviewProperty||change.Property==IsSelectedProperty||change.Property==LightPaletteProperty)RefreshAppearance();
         };
         RefreshAppearance();
+    }
+
+    public void SetPressed(bool pressed){if(_pressed==pressed)return;_pressed=pressed;UpdateMotion(_attached);}
+    private void UpdateMotion(bool animate)
+    {
+        _targetScale=IsPreview?1:_pressed ? .975 : IsSelected?1.045:1;
+        _targetLift=!IsPreview&&IsSelected&&!_pressed?-2:0;
+        if(!animate||ReduceMotion)
+        {
+            _motion.Stop();_scale=ReduceMotion?1:_targetScale;_lift=ReduceMotion?0:_targetLift;
+            _pose.Matrix=new Matrix(_scale,0,0,_scale,0,_lift);return;
+        }
+        _motion.Start();
+    }
+    private bool AdvanceMotion(double elapsed)
+    {
+        var response=DemandAnimation.Response(.30,elapsed);
+        _scale+=(_targetScale-_scale)*response;_lift+=(_targetLift-_lift)*response;
+        var moving=Math.Abs(_scale-_targetScale)>.0005||Math.Abs(_lift-_targetLift)>.025;
+        if(!moving){_scale=_targetScale;_lift=_targetLift;}
+        _pose.Matrix=new Matrix(_scale,0,0,_scale,0,_lift);return moving;
     }
 
     private void LoadArtwork()

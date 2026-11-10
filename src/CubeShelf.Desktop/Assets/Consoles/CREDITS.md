@@ -32,3 +32,5 @@ Photos téléchargées depuis Wikimedia Commons ; miniatures redimensionnées sa
 - **neogeo** : [Evan-Amos](https://commons.wikimedia.org/wiki/File:Neo-Geo-AES-Console-Set.jpg) — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0).
 - **cdi** : [Evan-Amos](https://commons.wikimedia.org/wiki/File:Philips-CDi-220-wController-FL.jpg) — [Public domain](https://commons.wikimedia.org/wiki/File:Philips-CDi-220-wController-FL.jpg).
 - **arcade** : [Joshua Driggs (ZapWizard) (take photo), bayo (remove the background)](https://commons.wikimedia.org/wiki/File:Donkey_Kong_arcade.jpg) — [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0).
+
+- **switch2** : [AOMAF2024 from Wedel, Germany](https://commons.wikimedia.org/wiki/File:Nintendo_Switch_2_console_in_handheld_mode.png) — [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en).

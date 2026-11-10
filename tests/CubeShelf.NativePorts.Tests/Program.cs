@@ -24,9 +24,23 @@ try
     }
     using var additionsAudit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","native-additions-2026-11-05.json")));
     var nativeAdditions=additionsAudit.RootElement.GetProperty("Desktop").EnumerateArray().ToArray();
-    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 659+nativeAdditions.Length, "every console catalogue validates with safe package origins and checksums");
+    using var refreshAudit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","native-refresh-2026-11-10.json")));
+    var refreshAdded=refreshAudit.RootElement.GetProperty("DesktopAdded").EnumerateArray().ToArray();
+    var refreshDate=DateOnly.ParseExact(refreshAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
+    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 659+nativeAdditions.Length+refreshAdded.Length+expanded["switch2"].Count, "every console catalogue validates with safe package origins and checksums");
+    Check(expanded["switch2"].Count==3&&expanded["switch2"].Select(p=>p.Title).ToHashSet().SetEquals(new[]{"Pokémon Pokopia","Mario Kart World","Donkey Kong Bananza"})
+        &&expanded["switch2"].All(p=>p.Assets is [{RuntimeIdentifiers:var rids,ExecutableRelativePath.Length:>0}]&&rids.SequenceEqual(new[]{"win-x64"})
+            &&p.ReadmeUrl.Contains("/blob/"+p.SourceCommit+"/")),"Switch 2 has three distinct Windows ports with pinned sources and explicit launchers");
+    Check(ShelfProduct.Resolve("switch2").CreatePaths().DataDirectory!=ShelfProduct.Resolve("switch").CreatePaths().DataDirectory
+        &&expanded["switch2"].Single(p=>p.Id=="switch2-bananza").Status.Contains("Prototype"),"Switch 2 is isolated from Switch and Bananza retains its prototype status");
+    Check(refreshAdded.Length==6&&refreshAdded.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
+        is {VerifiedAt:"2026-11-10",Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}&&readme.Contains("/blob/"+source+"/")
+        &&!item.GetProperty("GameplayTested").GetBoolean()),"November additions have verified packages and pinned primary sources without claiming tested gameplay");
+    Check(expanded["gamecube"].Count(p=>p.Repository=="flyngmt/Nookery")==1
+        &&expanded["gamecube"].Single(p=>p.Repository=="flyngmt/Nookery").Id=="flyngmt-acgc-pc-port-animal-crossing",
+        "Animal Crossing follows the Nookery rename without duplicating the port or changing its saved identity");
     Check(nativeAdditions.Length==5&&nativeAdditions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
-        is {VerifiedAt:"2026-11-05",Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}&&readme.Contains("/blob/"+source+"/")
+        is {Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}&&readme.Contains("/blob/"+source+"/")
         &&!item.GetProperty("GameplayTested").GetBoolean()),"new native ports retain pinned primary-source provenance and do not claim gameplay validation");
     Check(expanded.Keys.All(id => ShelfProduct.Resolve(id).Id == id) && ShelfProduct.All.Select(product => product.Id).Distinct().Count() == ShelfProduct.All.Length,
         "all platform identities resolve uniquely");
@@ -36,16 +50,16 @@ try
     var switchCheckedAt=DateOnly.ParseExact(switchAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
     foreach (var entry in expanded)
         Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40
-            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=DateOnly.ParseExact(additionsAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd")
+            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=refreshDate
             && port.ReadmeUrl.StartsWith(port.Homepage + (port.RepositoryHost=="gitlab.com"?"/-/blob/":"/blob/"))), "dated primary-source provenance: " + entry.Key);
     var additions=audit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
     Check(additions.Length==218&&additions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
-        is {VerifiedAt:var date,Assets:var assets,ReadmeUrl:var url,SourceCommit:var commit}&&date==checkedAt.ToString("yyyy-MM-dd")
-        &&url.Contains("/blob/"+commit+"/")&&assets.Count>0&&assets.All(a=>a.RuntimeIdentifiers.Any(r=>r.StartsWith("win-")))),
+        is {VerifiedAt:var date,Assets:var assets,ReadmeUrl:var url,SourceCommit:var commit}&&DateOnly.ParseExact(date,"yyyy-MM-dd")>=checkedAt
+        &&url.Contains("/blob/"+commit+"/")&&assets.Any(a=>a.RuntimeIdentifiers.Any(r=>r.StartsWith("win-")))),
         "new references have pinned primary documentation and verified Windows package metadata");
     var switchAdditions=switchAudit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
     Check(switchAdditions.Length==8 && switchAdditions.All(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString())
-        is {VerifiedAt:"2026-11-02",ReadmeUrl:var readme,SourceCommit:var source,Platforms:var platforms}
+        is {ReadmeUrl:var readme,SourceCommit:var source,Platforms:var platforms}
         && readme.Contains("/blob/"+source+"/") && platforms.Contains("Windows")),"new Switch ports retain pinned Windows primary-source evidence");
     Check(expanded["switch"].Count==33 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==25
         && switchAdditions.Count(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString()).Assets.Count==0)==2,

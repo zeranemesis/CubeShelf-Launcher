@@ -804,5 +804,329 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "ps2-ico",
+    "Title": "ICO",
+    "Project": "ico-pc",
+    "Repository": "nathanialf/ico-pc",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Assets": [
+      {
+        "Name": "ico-pc-v0.11.2-linux-aarch64.AppImage",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-aarch64.AppImage",
+        "Size": 20310536,
+        "Sha256": "0814426d07769113bb3cb42d35f44ab48c586edbc1b8b5031a10b9216427d17d",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-linux-arm64-portable.tar.gz",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-arm64-portable.tar.gz",
+        "Size": 21971786,
+        "Sha256": "9587cdda2d078cd3e0670a366bc65110f77999ebf9105f0b9a036922af822280",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-linux-arm64.tar.gz",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-arm64.tar.gz",
+        "Size": 21972150,
+        "Sha256": "1e0a86acabb0720b1f13230e866e6a052188d777e65dc92293a8d20ffeeb7767",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-linux-portable.tar.gz",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-portable.tar.gz",
+        "Size": 25569269,
+        "Sha256": "84c3699bf12f63c82d339c1e3cc5454e85684bd79172277beb0830b12bf20662",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-linux-x86_64.AppImage",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-x86_64.AppImage",
+        "Size": 23509496,
+        "Sha256": "e867c6a25b8d6e18c1b8edb402981eb7eba34ff63c03db456073e55fef206956",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-linux.tar.gz",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux.tar.gz",
+        "Size": 25570129,
+        "Sha256": "b123a3adc60cd227c2123187e8f444bf1edba5ed4182dcd8d22f929664bc31a5",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-macos-arm64.dmg",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-macos-arm64.dmg",
+        "Size": 10324945,
+        "Sha256": "15561295df9d11e6846abfc3cf81121240b62cf931b6ed4332a5d26c70507a0f",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-macos-arm64.zip",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-macos-arm64.zip",
+        "Size": 9363389,
+        "Sha256": "5c49254691b607be73b4c40172da44454469cbc3abd1f255968bac2aabb1f18d",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "ico-pc-v0.11.2-win-portable.zip",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-win-portable.zip",
+        "Size": 30771819,
+        "Sha256": "260161e2693e03f6aa217a3f4a9f0d9299d8ee3603a202289020798c38039d35",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "5b280d7dfa5bee48d5addade17e6c436dc382b7b",
+    "ReadmeUrl": "https://github.com/nathanialf/ico-pc/blob/5b280d7dfa5bee48d5addade17e6c436dc382b7b/README.md",
+    "ReleaseUrl": "https://github.com/nathanialf/ico-pc/releases/tag/v0.11.2",
+    "ReleaseTag": "v0.11.2",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ]
+  },
+  {
+    "Id": "ps2-sly-safehouse",
+    "Title": "Sly Cooper and the Thievius Raccoonus",
+    "Project": "SafeHouse",
+    "Repository": "FridiNaTor1/SafeHouse",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Assets": [
+      {
+        "Name": "SafeHouse-Launcher-Linux-aarch64.AppImage",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-aarch64.AppImage",
+        "Size": 30341640,
+        "Sha256": "4fcc2c5d6c8695f7a0954ff0b5918e30aeff6dd76bdc894565091e29831f1345",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-aarch64.tar.gz",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-aarch64.tar.gz",
+        "Size": 31235246,
+        "Sha256": "51c55bdd2dab22e0ef8cbf5a2a282b1fc77cb1f30c52f516f9ada7455fff7829",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-x86_64.AppImage",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-x86_64.AppImage",
+        "Size": 30132728,
+        "Sha256": "8085d1d5eca03998c09dd3c6862cccdb327371a6882e9c1624cb32c19e13de7b",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-x86_64.tar.gz",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-x86_64.tar.gz",
+        "Size": 31218113,
+        "Sha256": "87f84973a2f183803c1e795e1c1d87a952debd4c0dfd4da2eb43bc0531295232",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-arm64.dmg",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-arm64.dmg",
+        "Size": 19635084,
+        "Sha256": "53c56a5474fa795ae940ffb6763c5dc41247800f95d07a25fb8729eabcd02927",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-arm64.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-arm64.zip",
+        "Size": 18668008,
+        "Sha256": "c9eb02eb1cfc00a058500adbcea65335b9e4a86ed0e34c4d06a1e4d8e711b5a8",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-x86_64.dmg",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-x86_64.dmg",
+        "Size": 21117035,
+        "Sha256": "7bf4c506f244580c39703273b889b2ba0f4d01d4d1a49c52d07f568b785f64f9",
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-x86_64.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-x86_64.zip",
+        "Size": 19904255,
+        "Sha256": "1b36da1aa76e4afb6bcf948610a250493acfbb014439a203a68822e9ef465f29",
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Windows-arm64-Portable.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Windows-arm64-Portable.zip",
+        "Size": 27412844,
+        "Sha256": "5cc7ba0f294c4acd6f41f8f492388267dd7fcd49d2602e0781a4983b1f089be3",
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Windows-x86_64-Portable.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Windows-x86_64-Portable.zip",
+        "Size": 29063523,
+        "Sha256": "c1d636829214b6c04bd9c50b089634cf017dbd286b476a13405f7f8bed1e698f",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "14007d94ad40f692754287ee8adf714c507706df",
+    "ReadmeUrl": "https://github.com/FridiNaTor1/SafeHouse/blob/14007d94ad40f692754287ee8adf714c507706df/README.md",
+    "ReleaseUrl": "https://github.com/FridiNaTor1/SafeHouse/releases/tag/v0.1.34",
+    "ReleaseTag": "v0.1.34",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ]
+  },
+  {
+    "Id": "ps2-sly2-safehouse",
+    "Title": "Sly 2: Band of Thieves",
+    "Project": "SafeHouse",
+    "Repository": "FridiNaTor1/SafeHouse",
+    "Method": "Port natif / recompilation (déclaration amont)",
+    "Status": "Paquet publié · partie non testée",
+    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Assets": [
+      {
+        "Name": "SafeHouse-Launcher-Linux-aarch64.AppImage",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-aarch64.AppImage",
+        "Size": 30341640,
+        "Sha256": "4fcc2c5d6c8695f7a0954ff0b5918e30aeff6dd76bdc894565091e29831f1345",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-aarch64.tar.gz",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-aarch64.tar.gz",
+        "Size": 31235246,
+        "Sha256": "51c55bdd2dab22e0ef8cbf5a2a282b1fc77cb1f30c52f516f9ada7455fff7829",
+        "RuntimeIdentifiers": [
+          "linux-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-x86_64.AppImage",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-x86_64.AppImage",
+        "Size": 30132728,
+        "Sha256": "8085d1d5eca03998c09dd3c6862cccdb327371a6882e9c1624cb32c19e13de7b",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Linux-x86_64.tar.gz",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Linux-x86_64.tar.gz",
+        "Size": 31218113,
+        "Sha256": "87f84973a2f183803c1e795e1c1d87a952debd4c0dfd4da2eb43bc0531295232",
+        "RuntimeIdentifiers": [
+          "linux-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-arm64.dmg",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-arm64.dmg",
+        "Size": 19635084,
+        "Sha256": "53c56a5474fa795ae940ffb6763c5dc41247800f95d07a25fb8729eabcd02927",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-arm64.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-arm64.zip",
+        "Size": 18668008,
+        "Sha256": "c9eb02eb1cfc00a058500adbcea65335b9e4a86ed0e34c4d06a1e4d8e711b5a8",
+        "RuntimeIdentifiers": [
+          "osx-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-x86_64.dmg",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-x86_64.dmg",
+        "Size": 21117035,
+        "Sha256": "7bf4c506f244580c39703273b889b2ba0f4d01d4d1a49c52d07f568b785f64f9",
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-macOS-x86_64.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-macOS-x86_64.zip",
+        "Size": 19904255,
+        "Sha256": "1b36da1aa76e4afb6bcf948610a250493acfbb014439a203a68822e9ef465f29",
+        "RuntimeIdentifiers": [
+          "osx-x64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Windows-arm64-Portable.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Windows-arm64-Portable.zip",
+        "Size": 27412844,
+        "Sha256": "5cc7ba0f294c4acd6f41f8f492388267dd7fcd49d2602e0781a4983b1f089be3",
+        "RuntimeIdentifiers": [
+          "win-arm64"
+        ]
+      },
+      {
+        "Name": "SafeHouse-Launcher-Windows-x86_64-Portable.zip",
+        "Url": "https://github.com/FridiNaTor1/SafeHouse/releases/download/v0.1.34/SafeHouse-Launcher-Windows-x86_64-Portable.zip",
+        "Size": 29063523,
+        "Sha256": "c1d636829214b6c04bd9c50b089634cf017dbd286b476a13405f7f8bed1e698f",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ]
+      }
+    ],
+    "VerifiedAt": "2026-11-10",
+    "SourceCommit": "14007d94ad40f692754287ee8adf714c507706df",
+    "ReadmeUrl": "https://github.com/FridiNaTor1/SafeHouse/blob/14007d94ad40f692754287ee8adf714c507706df/README.md",
+    "ReleaseUrl": "https://github.com/FridiNaTor1/SafeHouse/releases/tag/v0.1.34",
+    "ReleaseTag": "v0.1.34",
+    "Platforms": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ]
   }
 ]
