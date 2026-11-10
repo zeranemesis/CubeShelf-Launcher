@@ -32,7 +32,10 @@ internal static class DualPresentationChecks
         Check(titleLogo.HasArtwork&&!ReferenceEquals(n64Logo,((Grid)titleLogo.Content!).Children.OfType<Image>().Single().Source),"Zelda N64 and its 3DS remake resolve distinct console artwork");
         titleLogo.SetGame(null,"Aucun jeu trouvé");
         var sidebar=window.FindControl<Border>("DesktopSidebar")!;
-        if(OperatingSystem.IsWindows())
+        [System.Runtime.InteropServices.DllImport("winmm.dll")] static extern uint waveOutGetNumDevs();
+        // CI runners have no audio output, and MCI cannot open anything without one.
+        if(OperatingSystem.IsWindows()&&waveOutGetNumDevs()==0)Console.WriteLine("SKIP Windows audio preview: no audio output device");
+        else if(OperatingSystem.IsWindows())
         {
             var silence=Path.Combine(Path.GetTempPath(),"decompshelf-preview-"+Guid.NewGuid().ToString("N")+".wav");
             try
