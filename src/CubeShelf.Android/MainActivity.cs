@@ -5,8 +5,6 @@ using Android.OS;
 using Avalonia;
 using Avalonia.Android;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Threading;
-using CubeShelf.Core.Platform;
 using CubeShelf.Mobile;
 using AndroidX.Core.View;
 
@@ -21,9 +19,9 @@ namespace CubeShelf.Android;
 [IntentFilter([Intent.ActionMain], Categories = [Intent.CategoryHome, Intent.CategoryDefault])]
 public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
 {
-    private StickDirection _stickDirection;
-    private int _stickDeviceId;
-    private readonly DispatcherTimer _stickRepeat = new();
+    private int _stickDirection;
+    private bool _stickVertical;
+    private long _nextStickBrowse;
     private AndroidAnimationFrames? _animationFrames;
     private RenderProfiler? _renderProfiler;
     private AndroidHomeDisplays? _homeDisplays;
@@ -69,11 +67,7 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
                 var directionKey = key is global::Android.Views.Keycode.DpadLeft or global::Android.Views.Keycode.DpadRight
                     or global::Android.Views.Keycode.DpadUp or global::Android.Views.Keycode.DpadDown;
                 if (keyEvent.Action == global::Android.Views.KeyEventActions.Down
-                    && (keyEvent.RepeatCount == 0 || directionKey && view.CanRepeatHomeDirections))
-                {
-                    _stickRepeat.Stop();
-                    action();
-                }
+                    && (keyEvent.RepeatCount == 0 || directionKey && view.CanRepeatHomeDirections)) action();
                 return true;
             }
         }
@@ -104,69 +98,35 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
     public override bool OnGenericMotionEvent(global::Android.Views.MotionEvent? motion)
     {
         if (motion is not null && (motion.Source & global::Android.Views.InputSourceType.Joystick)
-            == global::Android.Views.InputSourceType.Joystick && View is { } view)
+            == global::Android.Views.InputSourceType.Joystick)
         {
-            if (motion.ActionMasked == global::Android.Views.MotionEventActions.Cancel)
+            var horizontal = motion.GetAxisValue(global::Android.Views.Axis.HatX);
+            var vertical = motion.GetAxisValue(global::Android.Views.Axis.HatY);
+            if (Math.Abs(horizontal) < .5f && Math.Abs(vertical) < .5f)
             {
-                ResetStick();
-                return true;
+                horizontal = motion.GetAxisValue(global::Android.Views.Axis.X);
+                vertical = motion.GetAxisValue(global::Android.Views.Axis.Y);
             }
-            var x = motion.GetAxisValue(global::Android.Views.Axis.X);
-            var y = motion.GetAxisValue(global::Android.Views.Axis.Y);
-            if (Math.Max(Math.Abs(x), Math.Abs(y)) < .30f)
+            var x = Math.Abs(horizontal);
+            var y = Math.Abs(vertical);
+            var isVertical = y > x;
+            if (_stickDirection != 0 && Math.Abs(y - x) < .18f) isVertical = _stickVertical;
+            var axis = isVertical ? vertical : horizontal;
+            var sign = Math.Sign(axis);
+            var held = sign == _stickDirection && isVertical == _stickVertical;
+            var direction = Math.Abs(axis) < (held ? .38f : .55f) ? 0 : sign;
+            var now = SystemClock.UptimeMillis();
+            if (direction != 0 && (direction != _stickDirection || isVertical != _stickVertical || now >= _nextStickBrowse))
             {
-                var hatX = motion.GetAxisValue(global::Android.Views.Axis.HatX);
-                var hatY = motion.GetAxisValue(global::Android.Views.Axis.HatY);
-                if (hatX != 0 || hatY != 0)
-                {
-                    var keys = motion.Device?.HasKeys((int)global::Android.Views.Keycode.DpadLeft, (int)global::Android.Views.Keycode.DpadRight,
-                        (int)global::Android.Views.Keycode.DpadUp, (int)global::Android.Views.Keycode.DpadDown);
-                    if (keys?.Contains(true) != true) { x = hatX; y = hatY; }
-                }
+                if (isVertical) View?.MoveActionFocus(direction);
+                else View?.BrowseFromController(direction);
+                _nextStickBrowse = now + (direction == _stickDirection && isVertical == _stickVertical ? 180 : 450);
             }
-            if (motion.DeviceId != _stickDeviceId) ResetStick();
-            var direction = StickNavigation.Resolve(x, y, _stickDirection);
-            if (direction == _stickDirection) return true;
-            _stickRepeat.Stop();
             _stickDirection = direction;
-            _stickDeviceId = motion.DeviceId;
-            if (direction != StickDirection.Neutral)
-            {
-                MoveStick(view);
-                if (view.CanRepeatHomeDirections)
-                {
-                    _stickRepeat.Interval = TimeSpan.FromMilliseconds(StickNavigation.RepeatDelayMilliseconds);
-                    _stickRepeat.Start();
-                }
-            }
-            return true;
+            _stickVertical = isVertical;
+            if (direction != 0) return true;
         }
         return base.OnGenericMotionEvent(motion);
-    }
-
-    private void MoveStick(MobileLibraryView view)
-    {
-        if (_stickDirection is StickDirection.Left or StickDirection.Right)
-            view.BrowseFromController(_stickDirection == StickDirection.Left ? -1 : 1);
-        else view.MoveActionFocus(_stickDirection == StickDirection.Up ? -1 : 1);
-    }
-
-    private void RepeatStick(object? sender, EventArgs args)
-    {
-        if (global::Android.Views.InputDevice.GetDevice(_stickDeviceId) is null) { ResetStick(); return; }
-        if (!IsResumedForInstall || View is not { CanRepeatHomeDirections: true } view)
-        {
-            _stickRepeat.Stop();
-            return;
-        }
-        _stickRepeat.Interval = TimeSpan.FromMilliseconds(StickNavigation.RepeatIntervalMilliseconds);
-        MoveStick(view);
-    }
-
-    private void ResetStick()
-    {
-        _stickRepeat.Stop();
-        _stickDirection = StickDirection.Neutral;
     }
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -174,7 +134,6 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
         _animationFrames = new AndroidAnimationFrames();
         MobileApp.AnimationFrameScheduler = _animationFrames.Request;
         base.OnCreate(savedInstanceState);
-        _stickRepeat.Tick += RepeatStick;
         // Controls allocate Avalonia objects in their static initializers. Configure
         // diagnostics only after Android has installed Avalonia's UI dispatcher.
         ConfigureRenderProfiling(Intent);
@@ -256,7 +215,7 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
     protected override void OnPause()
     {
         IsResumedForInstall = false;
-        ResetStick();
+        _stickDirection = 0;
         _homeDisplays?.Pause();
         View?.SetActive(false);
         base.OnPause();
@@ -264,8 +223,6 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
 
     protected override void OnDestroy()
     {
-        ResetStick();
-        _stickRepeat.Tick -= RepeatStick;
         _androidHomePrompt?.Dismiss();
         _homeDisplays?.Dispose();_homeDisplays=null;
         if (ReferenceEquals(NativeGameService.CurrentActivity, this))

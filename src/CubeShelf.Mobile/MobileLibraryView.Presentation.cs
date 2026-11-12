@@ -84,6 +84,7 @@ public sealed partial class MobileLibraryView
             {
                 _dualPlatforms=false;_personalLibrary=false;_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);
                 ReloadVisibleCatalog();RefreshDualLibrary(false);
+                HomeInput.Move(0,0);
             }
             else{var index=Array.FindIndex(_catalog,g=>g.Id==id);if(index<0)return;Select(index);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();}
         };

@@ -158,10 +158,9 @@ public sealed partial class DualScreenLibraryView : UserControl
         };
         _grid.AddHandler(TappedEvent,(_,args)=>
         {
-            if(args.Source is not Control source||
+            if(!_achievementPage||args.Source is not Control source||
                 (source as ListBoxItem??source.FindAncestorOfType<ListBoxItem>())?.Content is not DualScreenItem item)return;
-            if(!_grid.IsKeyboardFocusWithin)_grid.Focus();
-            if(_achievementPage){_grid.SelectedItem=item;OpenAchievementDetails();args.Handled=true;}
+            _grid.SelectedItem=item;OpenAchievementDetails();args.Handled=true;
         },Avalonia.Interactivity.RoutingStrategies.Bubble,handledEventsToo:true);
         BuildRail();
         Grid.SetRow(_rail,1);_lowerContent.Children.Add(_rail);
@@ -717,7 +716,6 @@ public sealed partial class DualScreenLibraryView : UserControl
         {
             var target=vertical==0?index+horizontal*_rows:index+Math.Sign(vertical);
             if(Math.Abs(horizontal)>1)target=Math.Clamp(target,0,_filtered.Length-1);
-            else if(horizontal>0&&index/_rows<(_filtered.Length-1)/_rows)target=Math.Min(target,_filtered.Length-1);
             var staysInGrid=vertical==0||(vertical<0?index%_rows>0:index%_rows<_rows-1&&target<_filtered.Length);
             if(staysInGrid)
             {

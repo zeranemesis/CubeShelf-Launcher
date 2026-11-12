@@ -27,11 +27,6 @@ internal static class MotionTests
         var artwork=tileTarget.GetVisualDescendants().OfType<HomeArtworkControl>().Single();
         Check(tileTarget.Bounds.Size==artwork.Bounds.Size,
             "the gaps between covers are outside their pointer targets");
-        view.GetVisualDescendants().OfType<Button>().First(button=>button.Classes.Contains("home-dock")).Focus();
-        var selectedPoint=tileTarget.TranslatePoint(new Point(15,15),window)!.Value;
-        window.MouseDown(selectedPoint,Avalonia.Input.MouseButton.Left);
-        window.MouseUp(selectedPoint,Avalonia.Input.MouseButton.Left);
-        Check(grid.IsKeyboardFocusWithin,"tapping the already selected game returns direction controls to the grid");
         var hero=Field<Grid>(view,"_heroContent");
         var heroRows=hero.RowDefinitions;
         var preview=Field<GameCaseControl>(view,"_casePreview");
@@ -97,8 +92,6 @@ internal static class MotionTests
         Check(view.SelectedId==partial[rows+1].Id,"Down reaches the last game and leaves its selection when the next slot is empty");
         view.Move(0,0);view.Move(0,-1);
         Check(view.SelectedId==partial[rows].Id,"Up returns to the same column");
-        view.SelectItem(partial[rows-1].Id);view.Move(1,0);
-        Check(view.SelectedId==partial[^1].Id,"Right reaches the nearest tile in a shorter final column");
         view.SelectItem(partial[0].Id);view.Move(1,0);view.Move(0,1);
         Check(quick.Title==partial[rows+1].Title,"rapid changes show only the latest front before the next 3D render");
         WaitForPreview(view,partial[rows+1].Title);

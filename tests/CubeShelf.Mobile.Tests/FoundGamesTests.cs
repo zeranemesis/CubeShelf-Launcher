@@ -30,7 +30,12 @@ internal static class FoundGamesTests
         Check(mobile.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text==$"2 jeux reconnus : Super Mario 64, {last.Title}"),"the settings list the recognised games");
         mobile.BackFromController();Jobs();
         Check(dual.IsPlatforms&&!HintShown(dual),"the hint disappears once a scan has run");
-        dual.SelectItem("n64");dual.Activate();Jobs();
+        dual.SelectItem("n64");
+        var showGames=dual.GetVisualDescendants().OfType<Button>().Single(b=>b.Classes.Contains("home-primary")&&b.IsEffectivelyVisible&&b.Content as string=="Voir les jeux");
+        Check(showGames.Focus(),"the HOME console action can take focus");
+        dual.ActivateFocused();Jobs();
+        Check(dual.GetVisualDescendants().OfType<ListBox>().Single().IsKeyboardFocusWithin,
+            "opening a console moves focus to the game grid for the next controller direction");
         var expected=n64.Where(found.ContainsKey).Concat(n64.Where(id=>!found.ContainsKey(id))).ToArray();
         var tiles=Tiles(dual);
         Check(!dual.IsPlatforms&&tiles.Length>2&&tiles.SequenceEqual(expected.Take(tiles.Length))&&tiles[1]==last.Id,"found games lead the HOME game grid, the rest keeps catalogue order");

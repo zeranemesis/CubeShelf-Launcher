@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.0-rc.28 — commandes de l’AYN Thor
+
+- Rétablit les commandes Android de la rc.26 pour le tactile et la manette.
+- La grille des jeux reçoit le focus dès l’ouverture d’une console sur Android.
+- La grille HOME défile sur trois rangées et le PC conserve le filtrage des diagonales.
+
 ## 0.19.0-rc.27 — précision du joystick
 
 - La zone morte et le verrouillage de l’axe réduisent les changements de direction accidentels sur Android et PC.
