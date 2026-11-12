@@ -102,7 +102,7 @@ internal static class DualDisplayTests
             }
             var achievements=navigation.GetVisualDescendants().OfType<RetroAchievementsButton>().Single();
             achievements.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
-            Check(grid.ItemCount==0&&Field<TextBlock>(navigation,"_pageLabel").Text=="Aucun jeu compatible",
+            Check(grid.ItemCount==0&&Field<TextBlock>(navigation,"_emptyGrid").Text=="Aucun jeu compatible",
                 "the Android RetroAchievements library has a useful empty state");
             mobile.BackFromController();Jobs();
             games.RetroAchievementsGames.Add(target.Id);
@@ -155,8 +155,8 @@ internal static class DualDisplayTests
             }
             bottom.Width=538;bottom.Height=468;Jobs();
             var visibleTile=grid.GetVisualDescendants().OfType<HomeArtworkControl>().First(tile=>tile.IsSelected);
-            Check(visibleTile.Bounds.Width>=82&&grid.Bounds.Height>=180,
-                "the Thor's lower screen fits two rows of larger game covers");
+            Check(visibleTile.Bounds.Width>=82&&Field<int>(navigation,"_rows")==3&&grid.Bounds.Height>=270,
+                "the Thor's lower screen fits three rows of game covers");
             Fits(navigation);
             mobile.SetActive(false);Jobs();
             Check(!mobile.WantsSecondaryScreen&&!Field<DispatcherTimer>(preview,"_musicDelay").IsEnabled

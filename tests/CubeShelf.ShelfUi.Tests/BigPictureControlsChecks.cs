@@ -15,11 +15,18 @@ static class BigPictureControlsChecks
     public static void Run(MainWindow window,string? snapshots)
     {
         void Check(bool good,string message) { if(!good)throw new Exception(message); }
-        Check(BigPictureGamepad.DirectionInput(0,1000,-3000)==0,"Stick drift escaped the dead zone.");
-        Check(BigPictureGamepad.DirectionInput(0,-32768,0)==11 && BigPictureGamepad.DirectionInput(0,20000,0)==12
-            && BigPictureGamepad.DirectionInput(0,0,32768)==13 && BigPictureGamepad.DirectionInput(0,0,-32768)==14,
+        var held=StickDirection.Neutral;
+        int Read(int dpad,int x,int y)=>BigPictureGamepad.DirectionInput(dpad,x,y,ref held);
+        Check(Read(0,1000,-3000)==0,"Stick drift escaped the dead zone.");
+        Check(Read(0,-32768,0)==11 && Read(0,20000,0)==12
+            && Read(0,0,32768)==13 && Read(0,0,-32768)==14,
             "Analog directions were merged with D-pad navigation.");
-        Check(BigPictureGamepad.DirectionInput(4,-20000,0)==4,"D-pad input lost priority.");
+        Check(Read(0,0,0)==0&&Read(0,22500,-21800)==0,"An ambiguous diagonal must not trigger a direction from neutral.");
+        Check(Read(0,26000,0)==12&&Read(0,20000,-23000)==12&&Read(0,10800,0)==12,
+            "Diagonal wobble and a partial release must retain the original direction.");
+        Check(Read(0,20000,-30000)==14&&Read(0,0,9000)==0&&Read(0,14000,0)==0,
+            "A clear turn changes axis and a released stick must cross the engage threshold again.");
+        Check(Read(4,-20000,0)==4,"D-pad input lost priority.");
         Check(BigPictureGamepad.MapNavigation(2,true)==12 && BigPictureGamepad.MapNavigation(13,true)==3
             && BigPictureGamepad.MapNavigation(5,true)==5,"Swapping navigation remapped action buttons.");
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Desktop.Controls;
 
@@ -74,7 +75,7 @@ internal sealed class SdlGamepad : IDisposable
         return null;
     }
 
-    public int Read(out bool connected)
+    public int Read(out bool connected, ref StickDirection held)
     {
         connected = false;
         if (_disposed) return 0;
@@ -82,6 +83,7 @@ internal sealed class SdlGamepad : IDisposable
         if (_controller != 0 && _attached(_controller) == 0) { _close(_controller); _controller = 0; }
         if (_controller == 0)
         {
+            held = StickDirection.Neutral;
             var now = Environment.TickCount64;
             if (now < _nextDiscovery) return 0;
             _nextDiscovery = now + 1000;
@@ -100,7 +102,7 @@ internal sealed class SdlGamepad : IDisposable
         if (Pressed(4)) return 16;
         if (Pressed(6)) return 15;
         var dpad=Pressed(13)?1:Pressed(14)?2:Pressed(11)?3:Pressed(12)?4:0;
-        return BigPictureGamepad.DirectionInput(dpad,_axis(_controller,0),-(int)_axis(_controller,1));
+        return BigPictureGamepad.DirectionInput(dpad,_axis(_controller,0),-(int)_axis(_controller,1),ref held);
     }
 
     public void Dispose()

@@ -253,6 +253,7 @@ public sealed partial class MainWindow
             else if(input is 2 or 12)DualScreenView.Move(1,0);
             else if(input is 3 or 13)DualScreenView.Move(0,-1);
             else if(input is 4 or 14)DualScreenView.Move(0,1);
+            else if(input is 9 or 10)DualScreenView.StepColumn(input==9?-1:1);
             else if(input==5)DualScreenView.ActivateFocused();
             else if(input==6){if(CloseRetroAchievementLibrary())return;if(DualScreenView.IsPlatforms)ExitBigPicture(this,new RoutedEventArgs());else ShowDualPlatforms();}
             return;

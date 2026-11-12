@@ -169,7 +169,7 @@ public sealed partial class MobileLibraryView
     }
     public bool SwapFaceButtons=>_presentation.SwapFaceButtons;
     public bool CanRepeatHomeDirections=>DualInputActive&&!HomeInput.IsPopupOpen;
-    public void PageFromController(int step){SetControllerInput(true);if(DualInputActive&&!HomeInput.IsPopupOpen)HomeInput.ChangePage(step);}
+    public void StepHomeColumn(int step){SetControllerInput(true);if(DualInputActive)HomeInput.StepColumn(step);}
     private void RefreshDualSelection()
     {
         if(!UsesHome||_dualPlatforms)return;

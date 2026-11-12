@@ -25,6 +25,9 @@ public sealed class HomeArtworkControl : UserControl
     public bool IsSelected { get=>GetValue(IsSelectedProperty); set=>SetValue(IsSelectedProperty,value); }
     public bool LightPalette { get=>GetValue(LightPaletteProperty); set=>SetValue(LightPaletteProperty,value); }
     internal int PreviewDecodeHeight { get; init; }=640;
+    internal bool DecodeOffThread { get; init; }
+    private static readonly SemaphoreSlim ArtworkWorkers=new(2);
+    private CancellationTokenSource? _decode;
 
     private readonly Border _frame=new(){CornerRadius=new CornerRadius(CoverRadius),ClipToBounds=true,BorderThickness=new Thickness(1)};
     private readonly Image _image=new(){Stretch=Stretch.UniformToFill};
@@ -34,6 +37,7 @@ public sealed class HomeArtworkControl : UserControl
     private readonly Border _sheen=new(){IsHitTestVisible=false};
     private const double CoverRadius=14;
     private readonly SelectionFrame _selection=new(){Name="SelectionFrame",IsHitTestVisible=false};
+    private readonly TranslateTransform _selectionOffset=new();
     private Bitmap? _bitmap;
     private bool _attached;
     public HomeArtworkControl()
@@ -43,7 +47,7 @@ public sealed class HomeArtworkControl : UserControl
         var layers=new Grid();layers.Children.Add(_console);layers.Children.Add(_image);layers.Children.Add(_sheen);layers.Children.Add(_badge);
         _frame.Child=layers;Content=new Panel{Children={_frame,_selection}};
         AttachedToVisualTree+=(_,_)=>{_attached=true;LoadArtwork();};
-        DetachedFromVisualTree+=(_,_)=>{_attached=false;_image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;};
+        DetachedFromVisualTree+=(_,_)=>{_attached=false;ClearArtwork();};
         PropertyChanged+=(_,change)=>
         {
             if(change.Property==CoverPathProperty||change.Property==IsPreviewProperty)LoadArtwork();
@@ -64,6 +68,13 @@ public sealed class HomeArtworkControl : UserControl
         if(_selection.Progress==progress)return;
         _selection.SetReflection(progress);
         _selection.InvalidateVisual();
+    }
+
+    internal void SetSelectionOffset(Vector offset)
+    {
+        if(offset==default){_selection.RenderTransform=null;return;}
+        _selectionOffset.X=offset.X;_selectionOffset.Y=offset.Y;
+        _selection.RenderTransform=_selectionOffset;
     }
 
     private sealed class SelectionFrame : Control
@@ -115,13 +126,51 @@ public sealed class HomeArtworkControl : UserControl
 
     private void LoadArtwork()
     {
-        _image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;
-        if(_attached&&File.Exists(CoverPath))
+        ClearArtwork();
+        if(_attached&&!string.IsNullOrEmpty(CoverPath))
         {
-            try{_bitmap=CoverBitmapCache.Acquire(CoverPath,IsPreview?PreviewDecodeHeight:256);_image.Source=_bitmap;}
-            catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){ }
+            var height=IsPreview?PreviewDecodeHeight:256;
+            if(DecodeOffThread)
+            {
+                _decode=new CancellationTokenSource();
+                _=DecodeArtworkAsync(CoverPath,height,_decode);
+            }
+            else if(File.Exists(CoverPath))_image.Source=_bitmap=ReadArtwork(CoverPath,height);
         }
         RefreshAppearance();
+    }
+
+    private void ClearArtwork()
+    {
+        _decode?.Cancel();_decode=null;
+        _image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;
+    }
+
+    private async Task DecodeArtworkAsync(string path,int height,CancellationTokenSource request)
+    {
+        Bitmap? image=null;
+        try
+        {
+            await ArtworkWorkers.WaitAsync(request.Token);
+            try{image=await Task.Run(()=>ReadArtwork(path,height),request.Token);}
+            finally{ArtworkWorkers.Release();}
+            if(_decode!=request||!_attached||image is null)return;
+            _image.Source=_bitmap=image;image=null;
+            _console.IsVisible=false;_image.IsVisible=true;_badge.IsVisible=!IsPreview;
+        }
+        catch(OperationCanceledException) when(request.IsCancellationRequested){}
+        finally
+        {
+            CoverBitmapCache.Release(image);
+            if(_decode==request)_decode=null;
+            request.Dispose();
+        }
+    }
+
+    private static Bitmap? ReadArtwork(string path,int height)
+    {
+        try{return CoverBitmapCache.Acquire(path,height);}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){return null;}
     }
 
     private void RefreshAppearance()

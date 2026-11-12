@@ -65,12 +65,24 @@ internal static class DualPresentationChecks
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-desktop-consoles-light.png"));}
         dual.Activate();Jobs();Check(dual.IsVisible&&!dual.IsPlatforms,"a console opens its native PC port grid");
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-desktop-games-light.png"));}
+        var gameGrid=dual.GetVisualDescendants().OfType<ListBox>().Single();
+        var entries=gameGrid.Items.Cast<DualScreenItem>().ToArray();
+        Check(entries.Length>6,"the PC game grid exposes the full catalogue");
+        dual.SelectItem(entries[0].Id);Jobs();
+        window.RaiseEvent(new Avalonia.Input.KeyEventArgs{RoutedEvent=Avalonia.Input.InputElement.KeyDownEvent,Key=Avalonia.Input.Key.PageDown});Jobs();
+        Check(dual.SelectedId==entries[3].Id,"Page Down advances by one column on PC");
         window.Width=1920;window.Height=1080;
         window.FindControl<Button>("BigPictureEntryButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
         Check(dual.IsVisible&&dual.IsPlatforms&&!sidebar.IsVisible,"Big Picture uses the same optional dual theme");
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-bigpicture-consoles-light.png"));}
         window.HandleBigPictureControllerInput(5);Jobs();Check(!dual.IsPlatforms,"Big Picture controller confirmation opens the game grid");
         if(snapshots is not null){using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshots,"home-bigpicture-games-light.png"));}
+        entries=gameGrid.Items.Cast<DualScreenItem>().ToArray();
+        dual.SelectItem(entries[0].Id);Jobs();
+        window.HandleBigPictureControllerInput(10);Jobs();
+        Check(dual.SelectedId==entries[3].Id,"the PC controller right bumper advances one column");
+        window.HandleBigPictureControllerInput(9);Jobs();
+        Check(dual.SelectedId==entries[0].Id,"the PC controller left bumper returns to the previous column");
         var customize=dual.GetVisualDescendants().OfType<Button>().Single(b=>b.Content?.ToString()=="Personnaliser");customize.Flyout!.ShowAt(customize);Jobs();
         var menu=(Control)((Flyout)customize.Flyout).Content!;var appearance=menu.GetVisualDescendants().OfType<Button>().Single(b=>b.Content?.ToString()?.StartsWith("Affichage :",StringComparison.Ordinal)==true);
         appearance.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();window.HandleBigPictureControllerInput(6);Jobs();

@@ -163,11 +163,12 @@ static class PersonalLibraryChecks
                 "Opening personal games must cancel a pending launch animation.");
             var stateType=typeof(BigPictureGamepad).GetNestedType("State",BindingFlags.NonPublic)!;
             var state=Activator.CreateInstance(stateType)!;
-            var input=typeof(BigPictureGamepad).GetMethod("Input",BindingFlags.Static|BindingFlags.NonPublic)!;
+            var input=typeof(BigPictureGamepad).GetMethod("Input",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            using var gamepad=new BigPictureGamepad();
             foreach(var (buttons,expected) in new[]{((ushort)0x20,16),((ushort)0x10,15)})
             {
                 stateType.GetField("Buttons")!.SetValue(state,buttons);
-                Check((int)input.Invoke(null,[state])! ==expected,"XInput View and Start must remain separate actions.");
+                Check((int)input.Invoke(gamepad,[state])! ==expected,"XInput View and Start must remain separate actions.");
             }
             window.HandleBigPictureControllerInput(6);Click("BigPictureConsolesButton");window.HandleBigPictureControllerInput(5);
             Click("BigPictureExitButton");

@@ -20,12 +20,11 @@ public sealed record DualScreenItem(string Id,string Title,string Console,string
 /// <summary>One screen with two regions; independent controls can later target a second Android display.</summary>
 public sealed partial class DualScreenLibraryView : UserControl
 {
-    private int PageSize=>Math.Min(24,_columns*_rows);
-    private readonly TextBlock _heading=Text(20),_status=Text(13),_pageLabel=Text(13),_message=Text(13);
+    private readonly TextBlock _heading=Text(20),_status=Text(13),_emptyGrid=Text(13),_message=Text(13);
     private readonly RetroAchievementsButton _achievements=new(){IsVisible=false};
     private readonly GameTitleControl _title=new(){FontSize=24,Foreground=Brushes.Black,MaxHeight=85};
     private readonly Grid _art=new(),_previewBody=new();
-    private readonly HomeArtworkControl _quickPreview=new(){IsPreview=true,PreviewDecodeHeight=256};
+    private readonly HomeArtworkControl _quickPreview=new(){IsPreview=true,PreviewDecodeHeight=256,DecodeOffThread=true};
     private readonly DispatcherTimer _previewDelay=new(){Interval=TimeSpan.FromMilliseconds(55)};
     private CancellationTokenSource? _upperPreviewPreparation;
     private GameCaseControl? _casePreview;
@@ -33,9 +32,10 @@ public sealed partial class DualScreenLibraryView : UserControl
     private DualScreenItem? _previewItem;
     private bool _previewForPlatform;
     private readonly ListBox _grid=new(){Background=Brushes.Transparent,BorderThickness=new Thickness(0),Focusable=true,AutoScrollToSelectedItem=false};
+    private Vector _cursorTravel;
     private readonly TextBox _search=new(){Watermark="Rechercher…",MinHeight=48};
     private readonly Button _launch=Button("Ouvrir"),_music=Button("Musique"),_mute=Button("Musique : oui"),_options=Button("Options du jeu");
-    private readonly Button _previous=Button("Précédente"),_next=Button("Suivante"),_soundToggle=Button("Sons : oui"),_import=Button("Associer une piste MP3 / WAV");
+    private readonly Button _soundToggle=Button("Sons : oui"),_import=Button("Associer une piste MP3 / WAV");
     private readonly DispatcherTimer _musicDelay=new(){Interval=TimeSpan.FromMilliseconds(350)};
     private readonly Border _hero,_lower,_dock;
     private readonly ThemeVariantScope _scope;
@@ -47,7 +47,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     private bool _achievementPage;
     private readonly TextBlock _focusedAction=Text(12);
     private readonly Control[][] _focusRows;
-    private const int GridFocusRow=2;
+    private const int GridFocusRow=1;
     private readonly Grid _heroContent=new(){RowDefinitions=new("*,Auto"),RowSpacing=12};
     private readonly Grid _lowerContent=new(){RowDefinitions=new("Auto,Auto,Auto,Auto,Auto"),RowSpacing=12};
     private double _tileSize=76;
@@ -62,7 +62,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     }
     private readonly Grid _root=new(){RowDefinitions=new("Auto,*,Auto,Auto,Auto"),RowSpacing=14,MaxWidth=1040,Margin=new Thickness(24,12)};
     private bool _layoutForGame;
-    private readonly WrapPanel _tiles=new();
+    private readonly WrapPanel _tiles=new(){Orientation=Orientation.Vertical};
     private readonly DispatcherTimer _clockTimer=new(){Interval=TimeSpan.FromMinutes(1)};
     private Action<string?>? _playSound;
     private string? _audioDirectory;
@@ -72,7 +72,8 @@ public sealed partial class DualScreenLibraryView : UserControl
     private readonly DemandAnimation _selectionAnimation;
     private readonly MatrixTransform _previewPose=new(),_tilePose=new();
     private HomeArtworkControl? _movingTile;
-    private const double PreviewDuration=0.235;
+    private ListBoxItem? _movingContainer;
+    private const double PreviewDuration=0.19;
     private double _selectionElapsed=PreviewDuration;
     private int _selectionDirection;
     public bool ReduceMotion
@@ -91,7 +92,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     private DualScreenItem? _selected;
     private LibraryPresentationStore? _settings;
     private Action<string?>? _playMusic;
-    private int _page,_columns=4,_rows=3;
+    private int _rows=3;
     private bool _platforms,_building,_playbackActive=true;
     private string? _playing;
     private bool _importingMusic;
@@ -144,10 +145,8 @@ public sealed partial class DualScreenLibraryView : UserControl
         _music.Content="Personnaliser";_music.Tag="customize";_music.Classes.Add("home-dock");ToolTip.SetTip(_music,"Personnaliser · audio et affichage");AutomationProperties.SetName(_music,"Personnaliser · audio et affichage");navigation.Children.Add(_music);_navigation.Add(_music);
         _dock=new Border{Child=navigation,Padding=new Thickness(8,5),CornerRadius=new CornerRadius(22),BorderThickness=new Thickness(1),HorizontalAlignment=HorizontalAlignment.Center};Grid.SetRow(_dock,2);_root.Children.Add(_dock);
         _lowerContent.Margin=new Thickness(16,10,16,14);
-        var pageControls=new Grid{ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=8};
-        _previous.Tag="left";_previous.Classes.Add("home-icon");_next.Tag="right";_next.Classes.Add("home-icon");
-        pageControls.Children.Add(_previous);_pageLabel.HorizontalAlignment=HorizontalAlignment.Center;_pageLabel.FontSize=14;_pageLabel.FontWeight=FontWeight.SemiBold;Grid.SetColumn(_pageLabel,1);pageControls.Children.Add(_pageLabel);Grid.SetColumn(_next,2);pageControls.Children.Add(_next);_lowerContent.Children.Add(pageControls);
-        _previous.Click+=(_,_)=>ChangePage(-1);_next.Click+=(_,_)=>ChangePage(1);
+        _emptyGrid.HorizontalAlignment=HorizontalAlignment.Center;
+        _lowerContent.Children.Add(_emptyGrid);
         _grid.ItemsPanel=new FuncTemplate<Panel?>(()=>_tiles);
         _grid.ItemTemplate=new FuncDataTemplate<DualScreenItem>((item,_)=>item is null?null:Thumbnail(item));
         _grid.HorizontalAlignment=HorizontalAlignment.Center;_grid.VerticalAlignment=VerticalAlignment.Top;
@@ -159,12 +158,14 @@ public sealed partial class DualScreenLibraryView : UserControl
         };
         _grid.AddHandler(TappedEvent,(_,args)=>
         {
-            if(!_achievementPage||args.Source is not Control source||
+            if(args.Source is not Control source||
                 (source as ListBoxItem??source.FindAncestorOfType<ListBoxItem>())?.Content is not DualScreenItem item)return;
-            _grid.SelectedItem=item;OpenAchievementDetails();args.Handled=true;
+            if(!_grid.IsKeyboardFocusWithin)_grid.Focus();
+            if(_achievementPage){_grid.SelectedItem=item;OpenAchievementDetails();args.Handled=true;}
         },Avalonia.Interactivity.RoutingStrategies.Bubble,handledEventsToo:true);
-        Grid.SetRow(_grid,1);_lowerContent.Children.Add(_grid);
-        _search.Watermark="Rechercher un jeu…";_search.IsVisible=false;_search.TextChanged+=(_,_)=>{_page=0;Filter();};
+        BuildRail();
+        Grid.SetRow(_rail,1);_lowerContent.Children.Add(_rail);
+        _search.Watermark="Rechercher un jeu…";_search.IsVisible=false;_search.TextChanged+=(_,_)=>Filter();
         Grid.SetRow(_search,2);_lowerContent.Children.Add(_search);
         var actions=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8,HorizontalAlignment=HorizontalAlignment.Center};
         _launch.Classes.Add("home-primary");_launch.MinWidth=154;_launch.MaxWidth=280;_launch.Click+=(_,_)=>Activate();actions.Children.Add(_launch);
@@ -176,7 +177,7 @@ public sealed partial class DualScreenLibraryView : UserControl
         _message.FontSize=12;_message.HorizontalAlignment=HorizontalAlignment.Center;Grid.SetRow(_message,4);_root.Children.Add(_message);
         _focusedAction.HorizontalAlignment=HorizontalAlignment.Center;_focusedAction.IsVisible=false;_focusedAction.FontWeight=FontWeight.SemiBold;
         _focusedAction.Bind(TextBlock.ForegroundProperty,new DynamicResourceExtension("HomeText"));Grid.SetRow(_focusedAction,4);_root.Children.Add(_focusedAction);
-        _focusRows=[[.._navigation],[_previous,_next],[_grid],[_search],[_launch,_options,_achievements]];
+        _focusRows=[[.._navigation],[_grid],[_search],[_launch,_options,_achievements]];
         foreach(var button in _focusRows.SelectMany(row=>row).OfType<Button>())
         {
             button.FocusAdorner=null;
@@ -271,7 +272,7 @@ public sealed partial class DualScreenLibraryView : UserControl
         string[] values=light?["#243044","#4F5D73","#FFFFFF","#E9EDF4","#DCE4EE","#D6DCE7","#417D95","#FFFFFF"]:["#F3F5FC","#B5C1D4","#232C3D","#303C51","#39475D","#465167","#A8D7E2","#142835"];
         var keys=new[]{"HomeText","HomeMuted","HomeControl","HomeHover","HomePressed","HomeLine","HomeAccent","HomeOnAccent"};for(var i=0;i<keys.Length;i++)Resources[keys[i]]=new SolidColorBrush(Color.Parse(values[i]));Resources["HomeTransparent"]=Brushes.Transparent;Resources["HomeAccentHover"]=new SolidColorBrush(Color.Parse(light?"#356B82":"#BCE3EA"));Resources["HomeAccentPressed"]=new SolidColorBrush(Color.Parse(light?"#2D5C72":"#90C7D4"));
         Resources["HomeFocus"]=new SolidColorBrush(Color.Parse(light?"#DAEAF0":"#344C5D"));
-        Foreground=(IBrush)Resources["HomeText"]!;_title.Foreground=Foreground;_heading.Foreground=_achievementPage?Foreground:(IBrush)Resources["HomeMuted"]!;_status.Foreground=(IBrush)Resources["HomeMuted"]!;_pageLabel.Foreground=(IBrush)Resources["HomeMuted"]!;_clock.Foreground=Foreground;
+        Foreground=(IBrush)Resources["HomeText"]!;_title.Foreground=Foreground;_heading.Foreground=_achievementPage?Foreground:(IBrush)Resources["HomeMuted"]!;_status.Foreground=(IBrush)Resources["HomeMuted"]!;_emptyGrid.Foreground=(IBrush)Resources["HomeMuted"]!;_clock.Foreground=Foreground;
         _backdrop.LightPalette=_banner.LightPalette=light;
         _hero.Background=new SolidColorBrush(Color.Parse(light?"#DFFFFFFF":"#CE192334"));_hero.BorderBrush=new SolidColorBrush(Color.Parse(light?"#FFFFFF":"#56627A"));_hero.BoxShadow=BoxShadows.Parse(light?"0 14 40 0 #142B3E5B":"0 18 48 0 #40000000");
         foreach(var panel in new[]{_lower,_dock}){panel.Background=new SolidColorBrush(Color.Parse(light?"#EBFFFFFF":"#E01C2535"));panel.BorderBrush=new SolidColorBrush(Color.Parse(light?"#E0E5EE":"#475267"));panel.BoxShadow=BoxShadows.Parse(light?"0 6 22 0 #122B3E5B":"0 8 26 0 #35000000");}
@@ -284,33 +285,25 @@ public sealed partial class DualScreenLibraryView : UserControl
     private void ResizeHome()
     {
         var width=Math.Max(280,Bounds.Width);var height=Math.Max(320,Bounds.Height);var compact=width<600;var preview=ScreenRole==HomeScreenRole.Preview;var navigation=ScreenRole==HomeScreenRole.Navigation;var shortScreen=!preview&&(navigation||height<560&&width>600);
-        var game=_selected is not null&&!_platforms;
-        var rows=shortScreen?(height<370?1:2):game&&height<800?2:compact?3:height<1100?2:3;
-        if(game&&!compact&&height<700)rows=1;
+        var game=!_platforms;
         _root.MaxHeight=shortScreen?double.PositiveInfinity:940;_root.VerticalAlignment=VerticalAlignment.Center;
         _root.Margin=new Thickness(compact?12:28,shortScreen?6:compact?12:game?14:18);_root.RowSpacing=shortScreen?6:compact?(game?10:12):game?12:16;
         _hero.IsVisible=!shortScreen;_heading.IsVisible=!shortScreen||_achievementPage;_selectedName.IsVisible=shortScreen&&!_achievementPage;_root.RowDefinitions[1].Height=shortScreen?new GridLength(0):new GridLength(1,GridUnitType.Star);
         var gamePreviewHeight=compact?170:Math.Clamp((height-800)*.4+210,110,270);
         _hero.Height=game&&!shortScreen?gamePreviewHeight:double.NaN;_hero.MaxHeight=compact?300:360;_hero.MinHeight=shortScreen?0:game?gamePreviewHeight:110;
         ArrangePreview(compact);
-        var available=Math.Min(960,width-(compact?24:56))-32;
-        var columns=Math.Clamp((int)(available/(shortScreen?95:compact?88:124)),3,8);
-        var cell=Math.Floor(available/columns);
-        var tileLimit=124d;
-        if(shortScreen)
-        {
-            var space=height-225-(_search.IsVisible?56:0)-(_achievementPage?36:0);
-            rows=Math.Clamp((int)(space/96),1,3);
-            tileLimit=Math.Min(tileLimit,Math.Floor(space/rows)-12);
-        }
-        _tileSize=Math.Max(54,Math.Min(tileLimit,cell-12));
+        _railWidth=Math.Min(960,width-(compact?24:56))-(compact?26:34);
+        var chrome=shortScreen?182:game?gamePreviewHeight+194:318;
+        var space=height-chrome-(_search.IsVisible?56:0)-(_achievementPage?36:0);
+        _rows=space>=162?3:2;
+        _tileSize=Math.Clamp(Math.Floor(Math.Min(space/_rows-8,compact?88:116)),46,116);
         _achievements.SetCompact(compact);_achievements.IsVisible=ShowAchievements&&!_achievementPage;_status.IsVisible=!shortScreen;
         _lower.IsVisible=_dock.IsVisible=_message.IsVisible=!preview;
         if(preview){_root.MaxHeight=double.PositiveInfinity;_root.VerticalAlignment=VerticalAlignment.Stretch;_hero.Height=double.NaN;_hero.MaxHeight=double.PositiveInfinity;_hero.MinHeight=110;}
-        _grid.Width=cell*columns;_tiles.ItemWidth=cell;_tiles.ItemHeight=_tileSize+12;
+        _tiles.ItemWidth=_tiles.ItemHeight=_tileSize+8;
         _lowerContent.RowSpacing=shortScreen?4:game?8:10;_lowerContent.Margin=new Thickness(compact?12:16,shortScreen?4:8,compact?12:16,shortScreen?6:14);
-        foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>()){tile.Width=_tileSize;tile.Height=_tileSize;}
-        if(_columns!=columns||_rows!=rows){_columns=columns;_rows=rows;var index=Array.FindIndex(_filtered,i=>i.Id==_selected?.Id);_page=Math.Max(0,index)/PageSize;ShowPage();}
+        foreach(var tile in _thumbnails.Values){tile.Width=_tileSize;tile.Height=_tileSize;}
+        SizeRail();
         RefreshPreview();
     }
     public void Configure(LibraryPresentationStore settings,Action<string?>? playMusic,Action<string?>? playSound=null)
@@ -347,7 +340,7 @@ public sealed partial class DualScreenLibraryView : UserControl
             _heading.Foreground=achievementPage?Foreground:(IBrush)Resources["HomeMuted"]!;
             _search.IsVisible=false;
         }
-        _items=items.ToArray();_platforms=platforms;_heading.Text=heading;_search.Text="";_page=0;
+        _items=items.ToArray();_platforms=platforms;_heading.Text=heading;_search.Text="";
         _selected=_items.FirstOrDefault(i=>i.Id==selectedId)??_items.FirstOrDefault();Filter();
         if(pageChanged)ResizeHome();
         UpdateAchievementSelection();
@@ -357,17 +350,18 @@ public sealed partial class DualScreenLibraryView : UserControl
         var previousId=_selected?.Id;
         var search=_search.Text?.Trim()??"";_filtered=_items.Where(i=>i.Title.Contains(search,StringComparison.CurrentCultureIgnoreCase)).ToArray();
         if(_selected is null||!_filtered.Any(i=>i.Id==_selected.Id))_selected=_filtered.FirstOrDefault();
-        var index=Array.FindIndex(_filtered,i=>i.Id==_selected?.Id);if(index>=0)_page=index/PageSize;
-        ShowPage();if(_selected is {} item)Select(item,previousId!=item.Id);else ClearSelection();
+        ShowGrid();if(_selected is {} item)Select(item,previousId!=item.Id);else ClearSelection();
     }
-    private void ShowPage()
+    private void ShowGrid()
     {
         ResetTilePose();
+        _thumbnails.Clear();_coverFirst=_coverEnd=-1;
         _building=true;
-        try{_grid.ItemsSource=ScreenRole==HomeScreenRole.Preview?null:_filtered.Skip(_page*PageSize).Take(PageSize).ToArray();_grid.SelectedItem=_selected;}
+        try{_grid.ItemsSource=ScreenRole==HomeScreenRole.Preview?null:_filtered;_grid.SelectedItem=_selected;}
         finally{_building=false;}
-        _previous.IsEnabled=_page>0;_next.IsEnabled=(_page+1)*PageSize<_filtered.Length;
-        _pageLabel.Text=_filtered.Length==0?_achievementPage&&_items.Length==0?"Aucun jeu compatible":"Aucun résultat":$"{_filtered.Length} · {_page+1}/{Math.Max(1,(_filtered.Length+PageSize-1)/PageSize)}";
+        _emptyGrid.IsVisible=_filtered.Length==0;
+        _emptyGrid.Text=_achievementPage&&_items.Length==0?"Aucun jeu compatible":"Aucun résultat";
+        SizeRail(reset:true);
         ResumeSelectionMotion();
     }
     /// <summary>Id prefix of the "Continue" tile placed before the consoles.</summary>
@@ -377,13 +371,13 @@ public sealed partial class DualScreenLibraryView : UserControl
         var resume=item.Id.StartsWith(ResumePrefix,StringComparison.Ordinal);
         _title.SetGame(resume?item.Id[ResumePrefix.Length..]:_platforms||ScreenRole==HomeScreenRole.Navigation?null:item.Id,item.Title,_platforms&&!resume?null:item.Console);
     }
-    public void ChangePage(int step)
-    {
-        var target=_page+step;if(target<0||target*PageSize>=_filtered.Length)return;_page=target;_selected=_filtered[target*PageSize];ShowPage();Select(_selected,true);
-    }
     private Control Thumbnail(DualScreenItem item)
     {
-        var tile=new HomeArtworkControl{CoverPath=item.Cover,Platform=item.Console,Title=item.Title,LightPalette=LightPalette,IsSelected=item.Id==_selected?.Id,Width=_tileSize,Height=_tileSize,Tag=item.Id};
+        var index=Array.IndexOf(_filtered,item);
+        var tile=new HomeArtworkControl{DecodeOffThread=true,Platform=item.Console,Title=item.Title,LightPalette=LightPalette,
+            IsSelected=item.Id==_selected?.Id,Width=_tileSize,Height=_tileSize,Tag=item.Id};
+        _thumbnails[index]=tile;
+        if(index>=_coverFirst&&index<_coverEnd)tile.CoverPath=item.Cover;
         ToolTip.SetTip(tile,item.Title);AutomationProperties.SetName(tile,item.Title);
         return tile;
     }
@@ -402,13 +396,17 @@ public sealed partial class DualScreenLibraryView : UserControl
         var action=_achievementPage?"Voir les succès":item.Action;
         _launch.Content=action;AutomationProperties.SetName(_launch,action);_launch.IsEnabled=_achievementPage||item.CanLaunch;
         _achievementPlay.Content=item.Action;_achievementPlay.IsEnabled=item.CanLaunch;
-        foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>())tile.IsSelected=Equals(tile.Tag,item.Id);
+        var oldIndex=Array.FindIndex(_filtered,i=>i.Id==previousId);
+        var newIndex=Array.IndexOf(_filtered,item);
+        if(_thumbnails.TryGetValue(oldIndex,out var oldTile)&&oldIndex!=newIndex)oldTile.IsSelected=false;
+        if(_thumbnails.TryGetValue(newIndex,out var newTile))newTile.IsSelected=true;
         if(changed)
         {
             if(upperPreviewPending)StopSelectionMotion();
             else AnimateSelection(previousId,item.Id);
         }
         else ResumeSelectionMotion();
+        RevealSelection(animate:changed);
         ToolTip.SetTip(_launch,item.Status);ToolTip.SetTip(_hero,item.Title);
         _options.IsVisible=!_platforms;UpdateMusic();
         _options.IsEnabled=true;_music.IsEnabled=!_importingMusic;
@@ -426,7 +424,7 @@ public sealed partial class DualScreenLibraryView : UserControl
         if(changed&&notify)Cue("move");
         UpdateAchievementSelection();
     }
-    private bool CanAnimateSelection=>_selected is not null&&!_platforms&&!ReduceMotion&&_playbackActive
+    private bool CanAnimateSelection=>_selected is not null&&!ReduceMotion&&_playbackActive
         &&IsEffectivelyVisible&&IsEnabled&&TopLevel.GetTopLevel(this) is not null;
 
     private void ResumeSelectionMotion()
@@ -436,12 +434,22 @@ public sealed partial class DualScreenLibraryView : UserControl
 
     private void AnimateSelection(string? previousId,string selectedId)
     {
-        StopSelectionMotion();
-        if(!CanAnimateSelection)return;
+        var interruptedOffset=_cursorTravel*CursorRemaining;
+        ResetTilePose();
+        _cursorTravel=default;
+        if(!CanAnimateSelection){StopSelectionMotion();return;}
         if(previousId is null){ResumeSelectionMotion();return;}
         var previous=Array.FindIndex(_filtered,item=>item.Id==previousId);
         var current=Array.FindIndex(_filtered,item=>item.Id==selectedId);
         _selectionDirection=current<previous?-1:1;
+        if(previous>=0&&current>=0&&ScreenRole!=HomeScreenRole.Preview)
+        {
+            _cursorTravel=new Vector((previous/_rows-current/_rows)*_tiles.ItemWidth,
+                (previous%_rows-current%_rows)*_tiles.ItemHeight)+interruptedOffset;
+            if(Math.Abs(_cursorTravel.X)>_rail.Width)_cursorTravel=default;
+            _movingContainer=_grid.ContainerFromIndex(current) as ListBoxItem;
+            if(_movingContainer is not null)_movingContainer.ZIndex=1;
+        }
         _selectionElapsed=0;
         AdvanceSelection(0);
         _selectionAnimation.Start();
@@ -449,9 +457,9 @@ public sealed partial class DualScreenLibraryView : UserControl
 
     private bool AdvanceSelection(double elapsed)
     {
-        const double tileDuration=0.180;
+        const double tileDuration=0.145;
         const double orbitDuration=4.8;
-        const int orbitSteps=240;
+        const int orbitSteps=288;
         var hasGrid=ScreenRole!=HomeScreenRole.Preview;
         _selectionElapsed+=elapsed;
         if(!CanAnimateSelection||(!hasGrid&&_selectionElapsed>=PreviewDuration))
@@ -476,11 +484,12 @@ public sealed partial class DualScreenLibraryView : UserControl
             _heroContent.Opacity=1;
         }
 
-        // A page change may create the selected tile on the next layout pass.
         if(hasGrid)
         {
-            _movingTile??=_grid.GetVisualDescendants().OfType<HomeArtworkControl>()
-                .FirstOrDefault(tile=>tile.IsSelected&&Equals(tile.Tag,_selected?.Id));
+            var distance=_railTarget-_railOffset;
+            if(Math.Abs(distance)>.3)SetRailOffset(_railOffset+distance*DemandAnimation.Response(.30,elapsed));
+            else if(distance!=0)SetRailOffset(_railTarget);
+            if(_movingTile is null)_thumbnails.TryGetValue(Array.IndexOf(_filtered,_selected),out _movingTile);
             if(_movingTile is not null)
             {
                 var phase=_selectionElapsed%orbitDuration/orbitDuration;
@@ -489,11 +498,12 @@ public sealed partial class DualScreenLibraryView : UserControl
                 {
                     var progress=_selectionElapsed/tileDuration;
                     var lift=16*Math.Pow(progress*(1-progress),2);
-                    var scale=1+0.024*lift;
+                    var scale=1+0.038*lift;
                     _tilePose.Matrix=new Matrix(scale,0,0,scale,0,-1.8*lift);
                     _movingTile.RenderTransform=_tilePose;
                 }
                 else if(_movingTile.RenderTransform is not null)_movingTile.RenderTransform=null;
+                _movingTile.SetSelectionOffset(_cursorTravel*CursorRemaining);
             }
         }
         return true;
@@ -503,6 +513,8 @@ public sealed partial class DualScreenLibraryView : UserControl
     {
         _selectionAnimation.Stop();
         _selectionElapsed=PreviewDuration;
+        _cursorTravel=default;
+        SetRailOffset(_railTarget);
         ResetSelectionPose();
     }
 
@@ -515,11 +527,15 @@ public sealed partial class DualScreenLibraryView : UserControl
 
     private void ResetTilePose()
     {
+        if(_movingContainer is not null){_movingContainer.ZIndex=0;_movingContainer=null;}
         if(_movingTile is null)return;
         _movingTile.RenderTransform=null;
         _movingTile.SetSelectionSweep(null);
+        _movingTile.SetSelectionOffset(default);
         _movingTile=null;
     }
+
+    private double CursorRemaining=>Math.Pow(1-Math.Min(1,_selectionElapsed/.15),3);
 
     private void ArrangePreview(bool compact)
     {
@@ -545,7 +561,7 @@ public sealed partial class DualScreenLibraryView : UserControl
             _previewDelay.Start();
             return;
         }
-        _previewDelay.Interval=TimeSpan.FromMilliseconds(55);
+        _previewDelay.Interval=TimeSpan.FromMilliseconds(100);
         _previewBody.IsVisible=false;
         _quickPreview.Title=item.Title;
         _quickPreview.Platform=item.Console;
@@ -558,13 +574,14 @@ public sealed partial class DualScreenLibraryView : UserControl
 
     private void FinishGamePreview()
     {
-        CancelQuickPreview();
-        if(ScreenRole==HomeScreenRole.Preview&&_selected is {} item&&_previewItem!=item)
+        _previewDelay.Stop();
+        CancelUpperPreview();
+        if(!_platforms&&_selected is {} item&&_previewItem!=item&&File.Exists(item.Cover))
         {
             _upperPreviewPreparation=new CancellationTokenSource();
             _=PrepareUpperPreviewAsync(item,_upperPreviewPreparation);
         }
-        else RefreshPreview();
+        else{CancelQuickPreview();RefreshPreview();}
     }
 
     private async Task PrepareUpperPreviewAsync(DualScreenItem item,CancellationTokenSource preparation)
@@ -577,13 +594,14 @@ public sealed partial class DualScreenLibraryView : UserControl
             await Task.Run(()=>CoverBitmapCache.WarmPreview(faces,useTextures,cancellation),cancellation);
             await Dispatcher.UIThread.InvokeAsync(()=>
             {
-                if(cancellation.IsCancellationRequested||_selected!=item||ScreenRole!=HomeScreenRole.Preview
+                if(cancellation.IsCancellationRequested||_selected!=item
                     ||!IsEffectivelyVisible||!ReferenceEquals(_upperPreviewPreparation,preparation))return;
                 _upperPreviewPreparation=null;
                 var previousId=_previewItem?.Id;
+                CancelQuickPreview();
                 SetTitle(item);
                 RefreshPreview();
-                AnimateSelection(previousId,item.Id);
+                if(ScreenRole==HomeScreenRole.Preview)AnimateSelection(previousId,item.Id);
             });
         }
         catch(OperationCanceledException) when(cancellation.IsCancellationRequested){}
@@ -697,13 +715,13 @@ public sealed partial class DualScreenLibraryView : UserControl
         }
         if(row==GridFocusRow&&_filtered.Length>0)
         {
-            var target=vertical==0?Math.Clamp(index+horizontal,0,_filtered.Length-1):index+vertical*_columns;
-            var last=Math.Min((_page+1)*PageSize,_filtered.Length)-1;
-            var local=index-_page*PageSize;
-            var staysInGrid=vertical==0||(vertical<0?local>=_columns:local/_columns<(last-_page*PageSize)/_columns);
+            var target=vertical==0?index+horizontal*_rows:index+Math.Sign(vertical);
+            if(Math.Abs(horizontal)>1)target=Math.Clamp(target,0,_filtered.Length-1);
+            else if(horizontal>0&&index/_rows<(_filtered.Length-1)/_rows)target=Math.Min(target,_filtered.Length-1);
+            var staysInGrid=vertical==0||(vertical<0?index%_rows>0:index%_rows<_rows-1&&target<_filtered.Length);
             if(staysInGrid)
             {
-                if(target>=0&&target<_filtered.Length&&target!=index)SelectOnPage(_filtered[target],target/PageSize,true);
+                if(target>=0&&target<_filtered.Length&&target!=index)SelectInGrid(_filtered[target],true);
                 if(!_grid.IsKeyboardFocusWithin)_grid.Focus();
                 return;
             }
@@ -721,6 +739,7 @@ public sealed partial class DualScreenLibraryView : UserControl
             return;
         }
     }
+
 
     private static bool CanFocus(Control control)=>control.IsEffectivelyVisible&&control.IsEffectivelyEnabled;
     private static void FocusHomeControl(Control control)
@@ -756,7 +775,7 @@ public sealed partial class DualScreenLibraryView : UserControl
     public bool HandleKey(Key key)
     {
         if(IsPopupOpen||_search.IsKeyboardFocusWithin)return false;
-        switch(key){case Key.PageUp:ChangePage(-1);break;case Key.PageDown:ChangePage(1);break;case Key.Left:Move(-1,0);break;case Key.Right:Move(1,0);break;case Key.Up:Move(0,-1);break;case Key.Down:Move(0,1);break;default:return false;}return true;
+        switch(key){case Key.PageUp:StepColumn(-1);break;case Key.PageDown:StepColumn(1);break;case Key.Left:Move(-1,0);break;case Key.Right:Move(1,0);break;case Key.Up:Move(0,-1);break;case Key.Down:Move(0,1);break;default:return false;}return true;
     }
     public void SetPlaybackActive(bool active){_playbackActive=active;if(_casePreview is {} preview)preview.IsInteractive=active&&!ReduceMotion;if(active){ResumeSelectionMotion();UpdateMusic();}else{StopSelectionMotion();StopMusic();_playSound?.Invoke(null);}}
     private void UpdateMusic(){_mute.Content=_settings?.MusicEnabled==true?"Musique : oui":"Musique : non";_soundToggle.Content=_settings?.SoundsEnabled==true?"Sons : oui":"Sons : non";_musicDelay.Stop();if(_playMusic is not null&&_settings?.MusicEnabled==true&&_playbackActive&&IsEffectivelyVisible)_musicDelay.Start();else StopMusic();}

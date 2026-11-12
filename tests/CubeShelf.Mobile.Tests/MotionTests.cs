@@ -16,7 +16,8 @@ internal static class MotionTests
         view.Configure(new LibraryPresentationStore(Path.Combine(root,"motion")),null);
         var window=new Window{Width=900,Height=800,Content=view};
         window.Show();
-        view.SetItems([new("first","First","n64",cover,"Ready"),new("second","Second","gamecube",cover,"Ready")],"Games",false,"first");
+        view.SetItems([new("first","First","n64",cover,"Ready"),new("below","Below","n64",cover,"Ready"),
+            new("bottom","Bottom","n64",cover,"Ready"),new("second","Second","gamecube",cover,"Ready")],"Games",false,"first");
         Dispatcher.UIThread.RunJobs();
         AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
         Dispatcher.UIThread.RunJobs();
@@ -26,8 +27,13 @@ internal static class MotionTests
         var artwork=tileTarget.GetVisualDescendants().OfType<HomeArtworkControl>().Single();
         Check(tileTarget.Bounds.Size==artwork.Bounds.Size,
             "the gaps between covers are outside their pointer targets");
+        view.GetVisualDescendants().OfType<Button>().First(button=>button.Classes.Contains("home-dock")).Focus();
+        var selectedPoint=tileTarget.TranslatePoint(new Point(15,15),window)!.Value;
+        window.MouseDown(selectedPoint,Avalonia.Input.MouseButton.Left);
+        window.MouseUp(selectedPoint,Avalonia.Input.MouseButton.Left);
+        Check(grid.IsKeyboardFocusWithin,"tapping the already selected game returns direction controls to the grid");
         var hero=Field<Grid>(view,"_heroContent");
-        var rows=hero.RowDefinitions;
+        var heroRows=hero.RowDefinitions;
         var preview=Field<GameCaseControl>(view,"_casePreview");
         Check(preview is not null,"HOME uses a case preview for a valid cover");
         var launches=0;
@@ -42,8 +48,8 @@ internal static class MotionTests
         var quick=Field<HomeArtworkControl>(view,"_quickPreview");
         Check(quick.Title=="Second"&&quick.IsEffectivelyVisible&&!preview!.IsEffectivelyVisible,
             "the new cover is visible immediately and the previous 3D case is hidden");
-        typeof(DualScreenLibraryView).GetMethod("FinishGamePreview",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,null);
-        Check(ReferenceEquals(preview,Field<GameCaseControl>(view,"_casePreview"))&&ReferenceEquals(rows,hero.RowDefinitions)
+        WaitForPreview(view,"Second");
+        Check(ReferenceEquals(preview,Field<GameCaseControl>(view,"_casePreview"))&&ReferenceEquals(heroRows,hero.RowDefinitions)
             &&AutomationProperties.GetName(preview!)=="Second"&&!Field<Grid>(view,"_art").Children.Contains(quick),
             "the delayed 3D case reuses the same control and shows the selected artwork");
         typeof(DualScreenLibraryView).GetMethod("AdvanceSelection",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,[0.045]);
@@ -53,6 +59,7 @@ internal static class MotionTests
         var trace=Field<Control>(selected,"_selection");
         var progress=trace.GetType().GetProperty("Progress")!;
         var advance=typeof(DualScreenLibraryView).GetMethod("AdvanceSelection",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        Check(trace.RenderTransform?.Value.M31<0,"the selection frame travels from the previous tile to the next one");
         var start=(double)progress.GetValue(trace)!;
         advance.Invoke(view,[0.245]);
         Check((double)progress.GetValue(trace)!>start&&selected.RenderTransform is null&&hero.RenderTransform is null,
@@ -82,21 +89,53 @@ internal static class MotionTests
         view.Move(-1,0);
         Check(selections==1&&launches==0,"movement at the grid boundary neither refreshes the selection nor launches a game");
 
-        var columns=Field<int>(view,"_columns");
-        var partial=Enumerable.Range(0,columns+2).Select(i=>new DualScreenItem("grid"+i,"Game "+i,"n64",cover,"Ready")).ToArray();
-        view.SetItems(partial,"Games",false,partial[columns-1].Id);
-        view.Move(0,1);
-        Check(view.SelectedId==partial[columns-1].Id,"Down stays on the current game if the next row has no tile in that column");
-        view.SelectItem(partial[1].Id);view.Move(0,1);
-        Check(view.SelectedId==partial[columns+1].Id,"Down reaches the game in the same column on an incomplete row");
-        view.Move(0,-1);
-        Check(view.SelectedId==partial[1].Id,"Up returns to the same column");
-        view.Move(1,0);view.Move(1,0);
-        Check(quick.Title==partial[3].Title,"rapid changes show only the latest front before the next 3D render");
-        typeof(DualScreenLibraryView).GetMethod("FinishGamePreview",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,null);
-        Check(AutomationProperties.GetName(Field<GameCaseControl>(view,"_casePreview"))==partial[3].Title,
+        var rows=Field<int>(view,"_rows");
+        Check(rows==3,"the HOME rail lays out three rows");
+        var partial=Enumerable.Range(0,rows+2).Select(i=>new DualScreenItem("grid"+i,"Game "+i,"n64",cover,"Ready")).ToArray();
+        view.SetItems(partial,"Games",false,partial[rows].Id);
+        view.Move(0,1);view.Move(0,1);
+        Check(view.SelectedId==partial[rows+1].Id,"Down reaches the last game and leaves its selection when the next slot is empty");
+        view.Move(0,0);view.Move(0,-1);
+        Check(view.SelectedId==partial[rows].Id,"Up returns to the same column");
+        view.SelectItem(partial[rows-1].Id);view.Move(1,0);
+        Check(view.SelectedId==partial[^1].Id,"Right reaches the nearest tile in a shorter final column");
+        view.SelectItem(partial[0].Id);view.Move(1,0);view.Move(0,1);
+        Check(quick.Title==partial[rows+1].Title,"rapid changes show only the latest front before the next 3D render");
+        WaitForPreview(view,partial[rows+1].Title);
+        Check(AutomationProperties.GetName(Field<GameCaseControl>(view,"_casePreview"))==partial[rows+1].Title,
             "the coalesced 3D refresh commits the latest selection");
+        view.ReduceMotion=false;
+        var items=Enumerable.Range(0,30).Select(i=>new DualScreenItem("rail"+i,"Rail game "+i,"n64",cover,"Ready")).ToArray();
+        view.SetItems(items,"Games",false,items[0].Id);view.Move(0,0);
+        var railItems=grid.ItemsSource;
+        for(var column=0;column<7;column++)view.Move(1,0);
+        var target=Field<double>(view,"_railTarget");
+        advance.Invoke(view,[.045]);
+        Check(view.SelectedId==items[21].Id&&target>0&&Field<double>(view,"_railOffset") is >0 and var position&&position<target,
+            "horizontal movement follows the same row and scrolls to the selection over multiple frames");
+        Check(grid.ItemCount==30&&ReferenceEquals(grid.ItemsSource,railItems),"scrolling retains a single list of tiles");
+        view.ReduceMotion=true;
+        view.StepColumn(1);
+        Check(view.SelectedId==items[24].Id&&Field<double>(view,"_railOffset")==Field<double>(view,"_railTarget"),
+            "reduced motion reveals the selected column immediately");
+        view.SelectItem(items[0].Id);
+        Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);Dispatcher.UIThread.RunJobs();
+        var rail=Field<Border>(view,"_rail");
+        var startPoint=rail.TranslatePoint(new Point(rail.Width/2,rail.Height/2),window)!.Value;
+        var endPoint=startPoint-new Vector(92,0);
+        window.MouseDown(startPoint,Avalonia.Input.MouseButton.Left);
+        window.MouseMove(endPoint,Avalonia.Input.RawInputModifiers.LeftMouseButton);
+        window.MouseUp(endPoint,Avalonia.Input.MouseButton.Left);
+        Check(Field<double>(view,"_railOffset")>=90&&ReferenceEquals(grid.ItemsSource,railItems),
+            "dragging moves the rail by the pointer distance without replacing any tiles");
         window.Close();
+    }
+
+    internal static void WaitForPreview(DualScreenLibraryView view,string title)
+    {
+        typeof(DualScreenLibraryView).GetMethod("FinishGamePreview",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(view,null);
+        for(var i=0;i<150&&AutomationProperties.GetName(Field<GameCaseControl>(view,"_casePreview"))!=title;i++)
+        {Thread.Sleep(8);Dispatcher.UIThread.RunJobs();}
     }
 
     private static T Field<T>(object target,string name)=>(T)target.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(target)!;

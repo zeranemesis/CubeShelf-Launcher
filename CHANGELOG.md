@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.19.0-rc.27 — précision du joystick
+
+- La zone morte et le verrouillage de l’axe réduisent les changements de direction accidentels sur Android et PC.
+- Un mouvement court déplace la sélection d’une case. Un maintien répète le mouvement à intervalle régulier dans HOME.
+- Une colonne incomplète reste accessible par son jeu le plus proche.
+
+## 0.19.0-rc.26 — défilement continu du menu HOME
+
+- Les consoles et les jeux défilent horizontalement sur trois rangées sur Thor et PC.
+- Le cadre suit la sélection au tactile, à la manette et au clavier. Les jaquettes proches du cadre visible se chargent en arrière-plan.
+
+## 0.19.0-rc.25 — pages de jeux façon HOME 3DS
+
+- La grille Double écran affiche jusqu’à six jeux par page sur Android et PC.
+- Le cadre glisse entre les cases et la grille accompagne le changement de page. La réduction des animations conserve les changements immédiats.
+- Les flèches, L/R et Page précédente / Page suivante changent de page. Un balayage horizontal fonctionne aussi au tactile.
+
 ## 0.19.0-rc.24 — installation des mises à jour sur Android
 
 - DecompShelf enchaîne le téléchargement, la vérification et l’installation des mises à jour compatibles.

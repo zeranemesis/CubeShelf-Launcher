@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CubeShelf.Core.Library;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Desktop;
 
@@ -19,7 +20,7 @@ public sealed partial class MainWindow
     private readonly Controls.BigPictureGamepad _bigPictureGamepad = new();
     private int _bigPictureLastInput;
     private long _bigPictureNextRepeat;
-    private string? _bigPictureHelpText;
+    private (bool Connected, bool Swapped, string Language)? _bigPictureHelpKey;
     private bool _bigPictureClosed;
     private bool _bigPictureGameRunning;
     private bool _bigPictureControllerConnected;
@@ -393,27 +394,35 @@ public sealed partial class MainWindow
             if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(250);
             return;
         }
-        if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(50);
         var input = _bigPictureGamepad.Read(out var connected);
+        if (_bigPictureTimer is not null) _bigPictureTimer.Interval = TimeSpan.FromMilliseconds(connected ? 16 : 50);
         if (connected != _bigPictureControllerConnected)
         {
             _bigPictureControllerConnected = connected;
             _bigPictureLastInput = -1;
         }
-        var help = connected
-            ? (_preferences.SwapBigPictureNavigation
-                ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
-                : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
-            : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
-        help += connected ? P7("   •   X Options du jeu   •   VIEW Mes jeux   •   B Consoles", "   •   X Game options   •   VIEW My games   •   B Consoles")
-            : P7("   •   X Options du jeu   •   F2 Mes jeux   •   Échap Consoles", "   •   X Game options   •   F2 My games   •   Esc Consoles");
-        if (_bigPictureHelpText != help) BigPictureHelp.Text = _bigPictureHelpText = help;
+        var helpKey = (connected, _preferences.SwapBigPictureNavigation, _preferences.Language);
+        if (_bigPictureHelpKey != helpKey)
+        {
+            _bigPictureHelpKey = helpKey;
+            var help = connected
+                ? (_preferences.SwapBigPictureNavigation
+                    ? P7("Croix ← → Jeux · ↑ ↓ Plateformes   •   Stick Menus   •   START Menu   •   A Valider", "D-pad ← → Games · ↑ ↓ Platforms   •   Stick Menus   •   START Menu   •   A Select")
+                    : P7("Stick ← → Jeux · ↑ ↓ Plateformes   •   Croix Menus   •   START Menu   •   A Valider", "Stick ← → Games · ↑ ↓ Platforms   •   D-pad Menus   •   START Menu   •   A Select"))
+                : P7("← → Jeux   •   ↑ ↓ Plateformes   •   Entrée Valider   •   F10 Menu   •   F11 Bureau", "← → Games   •   ↑ ↓ Platforms   •   Enter Select   •   F10 Menu   •   F11 Desktop");
+            BigPictureHelp.Text = help + (connected
+                ? P7("   •   X Options du jeu   •   VIEW Mes jeux   •   B Consoles", "   •   X Game options   •   VIEW My games   •   B Consoles")
+                : P7("   •   X Options du jeu   •   F2 Mes jeux   •   Échap Consoles", "   •   X Game options   •   F2 My games   •   Esc Consoles"));
+        }
         if (input == 0) { _bigPictureLastInput = 0; return; }
         if (_bigPictureLastInput == -1) return;
         var now = Environment.TickCount64;
-        var direction = Controls.BigPictureGamepad.MapNavigation(input,_preferences.SwapBigPictureNavigation) is >= 1 and <= 4 or 11 or 12;
+        var mapped = Controls.BigPictureGamepad.MapNavigation(input,_preferences.SwapBigPictureNavigation);
+        var direction = mapped is >= 1 and <= 4 or 11 or 12
+            || (mapped is 13 or 14 && DualScreenView.IsVisible && !BigPictureMenuOverlay.IsVisible && !DualScreenView.IsPopupOpen);
         if (input == _bigPictureLastInput && (!direction || now < _bigPictureNextRepeat)) return;
-        _bigPictureNextRepeat = now + (input == _bigPictureLastInput ? 180 : 450);
+        _bigPictureNextRepeat = now + (input == _bigPictureLastInput
+            ? StickNavigation.RepeatIntervalMilliseconds : StickNavigation.RepeatDelayMilliseconds);
         _bigPictureLastInput = input;
         HandleBigPictureControllerInput(input);
     }

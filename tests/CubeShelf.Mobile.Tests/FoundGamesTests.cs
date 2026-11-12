@@ -30,16 +30,16 @@ internal static class FoundGamesTests
         Check(mobile.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text==$"2 jeux reconnus : Super Mario 64, {last.Title}"),"the settings list the recognised games");
         mobile.BackFromController();Jobs();
         Check(dual.IsPlatforms&&!HintShown(dual),"the hint disappears once a scan has run");
-        dual.Move(-99,0);for(var i=0;i<40&&dual.SelectedId!="n64";i++)dual.Move(1,0);dual.Activate();Jobs();
+        dual.SelectItem("n64");dual.Activate();Jobs();
         var expected=n64.Where(found.ContainsKey).Concat(n64.Where(id=>!found.ContainsKey(id))).ToArray();
         var tiles=Tiles(dual);
         Check(!dual.IsPlatforms&&tiles.Length>2&&tiles.SequenceEqual(expected.Take(tiles.Length))&&tiles[1]==last.Id,"found games lead the HOME game grid, the rest keeps catalogue order");
-        dual.Move(-99,0);dual.Move(1,0);Jobs();
+        dual.Move(-99,0);dual.Move(0,1);Jobs();
         Check(dual.SelectedId==last.Id&&dual.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text?.StartsWith("Fichier trouvé · ",StringComparison.Ordinal)==true),"a found game's status starts with « Fichier trouvé »");
         host.Close();
         var restarted=new MobileLibraryView(games);host=new Window{Content=restarted,Width=390,Height=844};host.Show();Jobs();
         dual=restarted.GetVisualDescendants().OfType<DualScreenLibraryView>().Single();
-        if(dual.IsPlatforms){dual.Move(-99,0);for(var i=0;i<40&&dual.SelectedId!="n64";i++)dual.Move(1,0);dual.Activate();Jobs();}
+        if(dual.IsPlatforms){dual.SelectItem("n64");dual.Activate();Jobs();}
         Check(!HintShown(dual)&&Tiles(dual).SequenceEqual(tiles),"found games keep leading the grid after a restart");
         host.Close();
     }

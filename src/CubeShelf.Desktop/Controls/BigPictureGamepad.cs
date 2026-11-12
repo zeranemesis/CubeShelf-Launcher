@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using CubeShelf.Core.Platform;
 
 namespace CubeShelf.Desktop.Controls;
 
@@ -21,6 +22,7 @@ internal sealed class BigPictureGamepad : IDisposable
     private long _nextDiscovery;
     private bool _disposed;
     private readonly SdlGamepad? _sdl;
+    private StickDirection _stickDirection;
 
     public BigPictureGamepad()
     {
@@ -41,7 +43,7 @@ internal sealed class BigPictureGamepad : IDisposable
     public int Read(out bool connected)
     {
         connected = false;
-        if (!_disposed && _sdl is not null) return _sdl.Read(out connected);
+        if (!_disposed && _sdl is not null) return _sdl.Read(out connected, ref _stickDirection);
         if (_disposed || _getState is null) return 0;
         State state;
         if (_controllerIndex is { } current && _getState(current, out state) == 0)
@@ -50,6 +52,7 @@ internal sealed class BigPictureGamepad : IDisposable
             return Input(state);
         }
         _controllerIndex = null;
+        _stickDirection = StickDirection.Neutral;
         var now = Environment.TickCount64;
         if (now < _nextDiscovery) return 0;
         // Disconnected XInput slots can be more expensive than reading a known
@@ -65,7 +68,7 @@ internal sealed class BigPictureGamepad : IDisposable
         return 0;
     }
 
-    private static int Input(State state)
+    private int Input(State state)
     {
         if ((state.Buttons & 0x2000) != 0) return 6;
         if ((state.Buttons & 0x1000) != 0) return 5;
@@ -77,14 +80,13 @@ internal sealed class BigPictureGamepad : IDisposable
         if ((state.Buttons & 0x0010) != 0) return 15;
         var dpad = (state.Buttons & 4) != 0 ? 1 : (state.Buttons & 8) != 0 ? 2
             : (state.Buttons & 1) != 0 ? 3 : (state.Buttons & 2) != 0 ? 4 : 0;
-        return DirectionInput(dpad,state.LeftX,state.LeftY);
+        return DirectionInput(dpad,state.LeftX,state.LeftY,ref _stickDirection);
     }
 
-    internal static int DirectionInput(int dpad,int x,int y)
+    internal static int DirectionInput(int dpad,int x,int y,ref StickDirection held)
     {
-        if(dpad!=0) return dpad;
-        if(Math.Max(Math.Abs(x),Math.Abs(y))<16000) return 0;
-        return Math.Abs(x)>Math.Abs(y) ? x<0 ? 11 : 12 : y>0 ? 13 : 14;
+        held=StickNavigation.Resolve(x/32768f,-y/32768f,held);
+        return dpad!=0?dpad:held==StickDirection.Neutral?0:(int)held+10;
     }
 
     internal static int MapNavigation(int input,bool swap) => !swap ? input : input switch
