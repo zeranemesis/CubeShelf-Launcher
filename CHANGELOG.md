@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.0 — version stable
+
+- Grille HOME continue sur trois rangées, avec animations de sélection et navigation à la manette.
+- Sur l’AYN Thor, le tactile, la croix et le joystick parcourent la grille dès l’ouverture d’une console.
+- La mise à jour du lanceur est disponible depuis le canal stable.
+
 ## 0.19.0-rc.28 — commandes de l’AYN Thor
 
 - Rétablit les commandes Android de la rc.26 pour le tactile et la manette.
