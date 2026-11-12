@@ -811,9 +811,19 @@
     "Project": "ico-pc",
     "Repository": "nathanialf/ico-pc",
     "Method": "Port natif / recompilation (déclaration amont)",
-    "Status": "Paquet publié · partie non testée",
-    "Notes": "Fournis les fichiers de ta propre copie selon les instructions du projet ; aucun jeu fourni. Disponibilité native déclarée par les auteurs. Partie et performances non testées dans DecompShelf.",
+    "Status": "Port PC publié",
+    "Notes": "Fournis les données de ta copie PS2 compatible selon le guide d’ICO PC. Les paquets Linux/macOS précédents (v0.11.2) restent disponibles. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
     "Assets": [
+      {
+        "Name": "ico-pc-v0.11.4-win-portable.zip",
+        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.4/ico-pc-v0.11.4-win-portable.zip",
+        "Size": 31280534,
+        "Sha256": "0e3b86bbab12f2e6c254dec7c109fea0926d1ce48cd8eff39a46d1ae3f17ca0f",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "ico-pc-v0.11.4/x64/ico_pc_x64.exe"
+      },
       {
         "Name": "ico-pc-v0.11.2-linux-aarch64.AppImage",
         "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-linux-aarch64.AppImage",
@@ -885,25 +895,16 @@
         "RuntimeIdentifiers": [
           "osx-arm64"
         ]
-      },
-      {
-        "Name": "ico-pc-v0.11.2-win-portable.zip",
-        "Url": "https://github.com/nathanialf/ico-pc/releases/download/v0.11.2/ico-pc-v0.11.2-win-portable.zip",
-        "Size": 30771819,
-        "Sha256": "260161e2693e03f6aa217a3f4a9f0d9299d8ee3603a202289020798c38039d35",
-        "RuntimeIdentifiers": [
-          "win-x64"
-        ]
       }
     ],
-    "VerifiedAt": "2026-11-10",
-    "SourceCommit": "5b280d7dfa5bee48d5addade17e6c436dc382b7b",
-    "ReadmeUrl": "https://github.com/nathanialf/ico-pc/blob/5b280d7dfa5bee48d5addade17e6c436dc382b7b/README.md",
-    "ReleaseUrl": "https://github.com/nathanialf/ico-pc/releases/tag/v0.11.2",
-    "ReleaseTag": "v0.11.2",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "8755a0273e1c6e4139493a573c5728ce3966db6d",
+    "ReadmeUrl": "https://github.com/nathanialf/ico-pc/blob/8755a0273e1c6e4139493a573c5728ce3966db6d/README.md",
+    "ReleaseUrl": "https://github.com/nathanialf/ico-pc/releases/tag/v0.11.4",
+    "ReleaseTag": "v0.11.4",
     "Platforms": [
-      "Linux",
       "Windows",
+      "Linux",
       "macOS"
     ]
   },

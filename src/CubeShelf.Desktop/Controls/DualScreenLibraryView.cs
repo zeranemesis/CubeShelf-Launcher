@@ -24,12 +24,15 @@ public sealed partial class DualScreenLibraryView : UserControl
     private readonly TextBlock _heading=Text(20),_status=Text(13),_pageLabel=Text(13),_message=Text(13);
     private readonly RetroAchievementsButton _achievements=new(){IsVisible=false};
     private readonly GameTitleControl _title=new(){FontSize=24,Foreground=Brushes.Black,MaxHeight=85};
-    private readonly Grid _art=new();
+    private readonly Grid _art=new(),_previewBody=new();
+    private readonly HomeArtworkControl _quickPreview=new(){IsPreview=true,PreviewDecodeHeight=256};
+    private readonly DispatcherTimer _previewDelay=new(){Interval=TimeSpan.FromMilliseconds(55)};
+    private CancellationTokenSource? _upperPreviewPreparation;
     private GameCaseControl? _casePreview;
     public Func<string,string>? PreviewFacePath { get; set; }
     private DualScreenItem? _previewItem;
     private bool _previewForPlatform;
-    private readonly ListBox _grid=new(){Background=Brushes.Transparent,BorderThickness=new Thickness(0),Focusable=true};
+    private readonly ListBox _grid=new(){Background=Brushes.Transparent,BorderThickness=new Thickness(0),Focusable=true,AutoScrollToSelectedItem=false};
     private readonly TextBox _search=new(){Watermark="Rechercher…",MinHeight=48};
     private readonly Button _launch=Button("Ouvrir"),_music=Button("Musique"),_mute=Button("Musique : oui"),_options=Button("Options du jeu");
     private readonly Button _previous=Button("Précédente"),_next=Button("Suivante"),_soundToggle=Button("Sons : oui"),_import=Button("Associer une piste MP3 / WAV");
@@ -39,12 +42,18 @@ public sealed partial class DualScreenLibraryView : UserControl
     private readonly HomeMenuBackdrop _backdrop=new(),_banner=new(){Banner=true};
     private readonly Button _appearance=Button("Affichage : clair"),_find=Button("Rechercher");
     private readonly List<Button> _navigation=[];
+    private readonly Button _back=Button("Revenir à la bibliothèque");
+    private readonly Button _consoles;
+    private bool _achievementPage;
+    private readonly TextBlock _focusedAction=Text(12);
+    private readonly Control[][] _focusRows;
+    private const int GridFocusRow=2;
     private readonly Grid _heroContent=new(){RowDefinitions=new("*,Auto"),RowSpacing=12};
     private readonly Grid _lowerContent=new(){RowDefinitions=new("Auto,Auto,Auto,Auto,Auto"),RowSpacing=12};
     private double _tileSize=76;
     private bool LightPalette=>_settings?.LightHome??true;
     public bool IsPopupOpen=>_music.Flyout?.IsOpen==true;
-    private readonly TextBlock _clock=Text(14),_selectedName=Text(17);
+    private readonly TextBlock _clock=Text(14),_selectedName=Text(17),_updateNotice=Text(13);
     private readonly StackPanel _time=new(){Orientation=Orientation.Horizontal,Spacing=8,VerticalAlignment=VerticalAlignment.Center};
     public bool ShowClock
     {
@@ -52,26 +61,27 @@ public sealed partial class DualScreenLibraryView : UserControl
         set{_time.IsVisible=value;if(!value)_clockTimer.Stop();else if(IsEffectivelyVisible){_clock.Text=DateTime.Now.ToString("HH:mm");_clockTimer.Start();}}
     }
     private readonly Grid _root=new(){RowDefinitions=new("Auto,*,Auto,Auto,Auto"),RowSpacing=14,MaxWidth=1040,Margin=new Thickness(24,12)};
-    private readonly TranslateTransform _bannerOffset=new();
-    private readonly DemandAnimation _selectionAnimation;
-    private HomeArtworkControl? _pressedArtwork;
-    private int _selectionDirection=1;
+    private bool _layoutForGame;
     private readonly WrapPanel _tiles=new();
     private readonly DispatcherTimer _clockTimer=new(){Interval=TimeSpan.FromMinutes(1)};
     private Action<string?>? _playSound;
     private string? _audioDirectory;
-    private double _selectionTime;
     private long _lastSound;
     private string? _displayedId;
     private bool _reduceMotion;
+    private readonly DemandAnimation _selectionAnimation;
+    private readonly MatrixTransform _previewPose=new(),_tilePose=new();
+    private HomeArtworkControl? _movingTile;
+    private const double PreviewDuration=0.235;
+    private double _selectionElapsed=PreviewDuration;
+    private int _selectionDirection;
     public bool ReduceMotion
     {
         get=>_reduceMotion;
         set
         {
             if(_reduceMotion==value)return;_reduceMotion=value;
-            foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>())tile.ReduceMotion=value;
-            if(value)StopSelectionMotion();
+            if(value)StopSelectionMotion();else ResumeSelectionMotion();
             if(_casePreview is {} preview){if(value)preview.SetShelfPose(24,true,animate:false);preview.IsInteractive=!value&&_playbackActive;}
         }
     }
@@ -93,37 +103,45 @@ public sealed partial class DualScreenLibraryView : UserControl
     public event Action? ConsolesRequested,LibraryRequested,SettingsRequested;
     public event Action<bool>? AppearanceChanged;
     public event Action? PreferencesChanged;
-    public event Action? AchievementsRequested;
+    public event Action? AchievementsRequested,BackRequested;
     public DualScreenLibraryView()
     {
         Name="DualScreenLibraryView";
+        _selectionAnimation=new DemandAnimation(this,AdvanceSelection);
         FontFamily=new FontFamily($"avares://{typeof(DualScreenLibraryView).Assembly.GetName().Name}/Assets/Home/Fonts#Nunito");
-        var header=new Grid{ColumnDefinitions=new("*,Auto"),Margin=new Thickness(6,0)};
-        _heading.FontSize=15;_heading.FontWeight=FontWeight.SemiBold;var headerWords=new Grid();headerWords.Children.Add(_heading);headerWords.Children.Add(_selectedName);_selectedName.FontSize=15;_selectedName.FontWeight=FontWeight.SemiBold;_selectedName.MaxLines=1;_selectedName.TextTrimming=TextTrimming.CharacterEllipsis;header.Children.Add(headerWords);
+        var header=new Grid{ColumnDefinitions=new("*,Auto,Auto"),Margin=new Thickness(6,0)};
+        _heading.FontSize=15;_heading.FontWeight=FontWeight.SemiBold;_heading.MaxLines=1;_heading.TextTrimming=TextTrimming.CharacterEllipsis;var headerWords=new Grid();headerWords.Children.Add(_heading);headerWords.Children.Add(_selectedName);_selectedName.FontSize=18;_selectedName.FontWeight=FontWeight.SemiBold;_selectedName.MaxLines=1;_selectedName.TextTrimming=TextTrimming.CharacterEllipsis;header.Children.Add(headerWords);
         var time=_time;
+        _updateNotice.Text="Mise à jour · X";_updateNotice.IsVisible=false;_updateNotice.FontWeight=FontWeight.SemiBold;
+        _updateNotice.VerticalAlignment=VerticalAlignment.Center;
+        _updateNotice.Margin=new Thickness(8,0);
+        _updateNotice.Bind(TextBlock.ForegroundProperty,new DynamicResourceExtension("HomeText"));
+        Grid.SetColumn(_updateNotice,1);header.Children.Add(_updateNotice);
         var clockGlyph=new HomeGlyph{Kind="clock",Width=17,Height=17};clockGlyph.Bind(HomeGlyph.InkProperty,new DynamicResourceExtension("HomeMuted"));time.Children.Add(clockGlyph);time.Children.Add(_clock);
-        _clock.Text=DateTime.Now.ToString("HH:mm");Grid.SetColumn(time,1);header.Children.Add(time);_root.Children.Add(header);
+        _clock.Text=DateTime.Now.ToString("HH:mm");Grid.SetColumn(time,2);header.Children.Add(time);_root.Children.Add(header);
         _clockTimer.Tick+=(_,_)=>_clock.Text=DateTime.Now.ToString("HH:mm");
-        _heroContent.Margin=new Thickness(28);_heroContent.RenderTransform=_bannerOffset;
+        _heroContent.Margin=new Thickness(28);
         _art.HorizontalAlignment=HorizontalAlignment.Center;_art.VerticalAlignment=VerticalAlignment.Center;
+        _art.Children.Add(_previewBody);
         _heroContent.Children.Add(_art);
         _title.HorizontalAlignment=HorizontalAlignment.Center;_title.VerticalAlignment=VerticalAlignment.Center;_title.MaxWidth=500;_title.MaxHeight=170;
         Grid.SetRow(_title,1);_heroContent.Children.Add(_title);
         var heroLayers=new Panel();heroLayers.Children.Add(_banner);heroLayers.Children.Add(_heroContent);
         _hero=new Border{Name="HomePreview",Child=heroLayers,MaxWidth=760,CornerRadius=new CornerRadius(30),ClipToBounds=true,BorderThickness=new Thickness(1),VerticalAlignment=VerticalAlignment.Stretch};
         Grid.SetRow(_hero,1);_root.Children.Add(_hero);
-        _selectionAnimation=new DemandAnimation(this,AdvanceSelection);
         var navigation=new StackPanel{Orientation=Orientation.Horizontal,Spacing=6,HorizontalAlignment=HorizontalAlignment.Center};
-        void Tool(string label,string icon,Action action)
+        Button Tool(string label,string icon,Action action)
         {
             var button=Button(label);button.Tag=icon;button.Classes.Add("home-dock");button.Click+=(_,_)=>{Cue("open");action();};
-            navigation.Children.Add(button);_navigation.Add(button);
+            navigation.Children.Add(button);_navigation.Add(button);return button;
         }
-        Tool("Consoles","console",()=>ConsolesRequested?.Invoke());
+        _back.Tag="left";_back.Classes.Add("home-dock");_back.IsVisible=false;
+        _back.Click+=(_,_)=>BackRequested?.Invoke();navigation.Children.Add(_back);_navigation.Add(_back);
+        _consoles=Tool("Consoles","console",()=>ConsolesRequested?.Invoke());
         Tool("Mes jeux","library",()=>LibraryRequested?.Invoke());
         Tool("Paramètres","settings",()=>SettingsRequested?.Invoke());
-        _find.Tag="search";_find.Classes.Add("home-dock");_find.Click+=(_,_)=>{_search.IsVisible=!_search.IsVisible;ResizeHome();if(_search.IsVisible)_search.Focus();else _grid.Focus();};navigation.Children.Add(_find);
-        _music.Content="Personnaliser";_music.Tag="customize";_music.Classes.Add("home-dock");ToolTip.SetTip(_music,"Personnaliser · audio et affichage");AutomationProperties.SetName(_music,"Personnaliser · audio et affichage");navigation.Children.Add(_music);
+        _find.Tag="search";_find.Classes.Add("home-dock");_find.Click+=(_,_)=>{_search.IsVisible=!_search.IsVisible;ResizeHome();if(_search.IsVisible)_search.Focus();else _grid.Focus();};navigation.Children.Add(_find);_navigation.Add(_find);
+        _music.Content="Personnaliser";_music.Tag="customize";_music.Classes.Add("home-dock");ToolTip.SetTip(_music,"Personnaliser · audio et affichage");AutomationProperties.SetName(_music,"Personnaliser · audio et affichage");navigation.Children.Add(_music);_navigation.Add(_music);
         _dock=new Border{Child=navigation,Padding=new Thickness(8,5),CornerRadius=new CornerRadius(22),BorderThickness=new Thickness(1),HorizontalAlignment=HorizontalAlignment.Center};Grid.SetRow(_dock,2);_root.Children.Add(_dock);
         _lowerContent.Margin=new Thickness(16,10,16,14);
         var pageControls=new Grid{ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=8};
@@ -133,16 +151,18 @@ public sealed partial class DualScreenLibraryView : UserControl
         _grid.ItemsPanel=new FuncTemplate<Panel?>(()=>_tiles);
         _grid.ItemTemplate=new FuncDataTemplate<DualScreenItem>((item,_)=>item is null?null:Thumbnail(item));
         _grid.HorizontalAlignment=HorizontalAlignment.Center;_grid.VerticalAlignment=VerticalAlignment.Top;
-        _grid.SelectionChanged+=(_,_)=>{if(!_building&&_grid.SelectedItem is DualScreenItem item)Select(item,true);};
-        _grid.AddHandler(PointerPressedEvent,(_,e)=>
+        _grid.SelectionChanged+=(_,_)=>
         {
-            if(e.Pointer.Type!=PointerType.Touch&&!e.GetCurrentPoint(_grid).Properties.IsLeftButtonPressed)return;
-            var source=e.Source as Control;
-            var container=source as ListBoxItem??source?.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
-            ReleaseArtworkPress();_pressedArtwork=container?.GetVisualDescendants().OfType<HomeArtworkControl>().FirstOrDefault();_pressedArtwork?.SetPressed(true);
-        },Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        _grid.AddHandler(PointerReleasedEvent,(_,_)=>ReleaseArtworkPress(),Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        _grid.PointerCaptureLost+=(_,_)=>ReleaseArtworkPress();
+            if(_building||_grid.SelectedItem is not DualScreenItem item)return;
+            if(!_grid.IsKeyboardFocusWithin)_grid.Focus();
+            Select(item,true);
+        };
+        _grid.AddHandler(TappedEvent,(_,args)=>
+        {
+            if(!_achievementPage||args.Source is not Control source||
+                (source as ListBoxItem??source.FindAncestorOfType<ListBoxItem>())?.Content is not DualScreenItem item)return;
+            _grid.SelectedItem=item;OpenAchievementDetails();args.Handled=true;
+        },Avalonia.Interactivity.RoutingStrategies.Bubble,handledEventsToo:true);
         Grid.SetRow(_grid,1);_lowerContent.Children.Add(_grid);
         _search.Watermark="Rechercher un jeu…";_search.IsVisible=false;_search.TextChanged+=(_,_)=>{_page=0;Filter();};
         Grid.SetRow(_search,2);_lowerContent.Children.Add(_search);
@@ -150,9 +170,26 @@ public sealed partial class DualScreenLibraryView : UserControl
         _launch.Classes.Add("home-primary");_launch.MinWidth=154;_launch.MaxWidth=280;_launch.Click+=(_,_)=>Activate();actions.Children.Add(_launch);
         _options.Tag="more";_options.Classes.Add("home-icon");ToolTip.SetTip(_options,"Options du jeu · X");_options.Click+=(_,_)=>{if(_selected is {} item&&!_platforms){Cue("open");OptionsRequested?.Invoke(item.Id);}};actions.Children.Add(_options);
         _achievements.Click+=(_,_)=>AchievementsRequested?.Invoke();actions.Children.Add(_achievements);
-        Grid.SetRow(actions,3);_lowerContent.Children.Add(actions);
+        var gameActions=new StackPanel{Spacing=6,Children={_achievementSummary,actions}};
+        Grid.SetRow(gameActions,3);_lowerContent.Children.Add(gameActions);
         _lower=new Border{Name="HomeGrid",Child=_lowerContent,MaxWidth=960,CornerRadius=new CornerRadius(26),BorderThickness=new Thickness(1)};Grid.SetRow(_lower,3);_root.Children.Add(_lower);
         _message.FontSize=12;_message.HorizontalAlignment=HorizontalAlignment.Center;Grid.SetRow(_message,4);_root.Children.Add(_message);
+        _focusedAction.HorizontalAlignment=HorizontalAlignment.Center;_focusedAction.IsVisible=false;_focusedAction.FontWeight=FontWeight.SemiBold;
+        _focusedAction.Bind(TextBlock.ForegroundProperty,new DynamicResourceExtension("HomeText"));Grid.SetRow(_focusedAction,4);_root.Children.Add(_focusedAction);
+        _focusRows=[[.._navigation],[_previous,_next],[_grid],[_search],[_launch,_options,_achievements]];
+        foreach(var button in _focusRows.SelectMany(row=>row).OfType<Button>())
+        {
+            button.FocusAdorner=null;
+            button.GotFocus+=(_,e)=>
+            {
+                if(e.NavigationMethod is NavigationMethod.Directional or NavigationMethod.Tab)
+                {
+                    _focusedAction.Text=AutomationProperties.GetName(button);
+                    _focusedAction.IsVisible=true;_message.Opacity=0;
+                }
+            };
+            button.LostFocus+=(_,_)=>{_focusedAction.IsVisible=false;_message.Opacity=1;};
+        }
         _status.MaxLines=1;_status.TextTrimming=TextTrimming.CharacterEllipsis;_status.FontSize=12;_status.FontWeight=FontWeight.SemiBold;_status.HorizontalAlignment=HorizontalAlignment.Center;Grid.SetRow(_status,4);_lowerContent.Children.Add(_status);
         _selectedName.IsVisible=false;
         _import.Click+=async(_,_)=>{_music.Flyout?.Hide();await ImportMusic();};
@@ -160,13 +197,25 @@ public sealed partial class DualScreenLibraryView : UserControl
         _mute.Click+=(_,_)=>{try{_settings?.ToggleMusic();UpdateMusic();PreferencesChanged?.Invoke();}catch(Exception e) when(e is IOException or UnauthorizedAccessException){_message.Text=e.Message;}};
         _soundToggle.Click+=(_,_)=>{try{_settings?.ToggleSounds();UpdateMusic();if(_settings?.SoundsEnabled!=true)_playSound?.Invoke(null);PreferencesChanged?.Invoke();}catch(Exception e) when(e is IOException or UnauthorizedAccessException){_message.Text=e.Message;}};
         _appearance.Click+=(_,_)=>{try{_settings?.ToggleHomeAppearance();ApplyPalette();PreferencesChanged?.Invoke();}catch(Exception e) when(e is IOException or UnauthorizedAccessException){_message.Text=e.Message;}};
-        var scene=new Panel();scene.Children.Add(_backdrop);scene.Children.Add(_root);_scope=new ThemeVariantScope{Child=scene};Content=_scope;
+        var scene=new Panel();scene.Children.Add(_backdrop);scene.Children.Add(_root);BuildAchievementViews(scene);_scope=new ThemeVariantScope{Child=scene};Content=_scope;
         ConfigureStyles();
         AutomationProperties.SetName(_grid,"Grille des consoles et jeux");AutomationProperties.SetName(_search,"Rechercher dans la grille");
         _musicDelay.Tick+=(_,_)=>{_musicDelay.Stop();PlaySelectedTrack();};
-        PropertyChanged+=(_,e)=>{if(e.Property==IsVisibleProperty){if(IsVisible){if(ShowClock)_clockTimer.Start();RefreshPreview();UpdateMusic();}else{ReleaseArtworkPress();_clockTimer.Stop();StopSelectionMotion();ClearPreview();StopMusic();}}};
-        AttachedToVisualTree+=(_,_)=>{if(IsVisible&&ShowClock)_clockTimer.Start();ResizeHome();RefreshPreview();UpdateMusic();};
-        DetachedFromVisualTree+=(_,_)=>{ReleaseArtworkPress();_clockTimer.Stop();StopSelectionMotion();ClearPreview();StopMusic();};
+        _previewDelay.Tick+=(_,_)=>FinishGamePreview();
+        PropertyChanged+=(_,e)=>
+        {
+            if(e.Property==IsVisibleProperty)
+            {
+                if(IsVisible){if(ShowClock)_clockTimer.Start();RefreshPreview();ResumeSelectionMotion();UpdateMusic();}
+                else{_clockTimer.Stop();StopSelectionMotion();ClearPreview();StopMusic();}
+            }
+            else if(e.Property==IsEnabledProperty)
+            {
+                if(IsEnabled)ResumeSelectionMotion();else StopSelectionMotion();
+            }
+        };
+        AttachedToVisualTree+=(_,_)=>{if(IsVisible&&ShowClock)_clockTimer.Start();ResizeHome();RefreshPreview();ResumeSelectionMotion();UpdateMusic();UpdateAchievementSelection();};
+        DetachedFromVisualTree+=(_,_)=>{_clockTimer.Stop();StopSelectionMotion();ClearPreview();StopMusic();ResetAchievementProgress();};
         SizeChanged+=(_,_)=>ResizeHome();ApplyPalette();ResizeHome();
         AddHandler(KeyDownEvent,(_,e)=>{if(IsPopupOpen)return;if(HandleKey(e.Key)){e.Handled=true;return;}if(e.Key==Key.Enter&&!_search.IsKeyboardFocusWithin){ActivateFocused();e.Handled=true;}},Avalonia.Interactivity.RoutingStrategies.Tunnel);
     }
@@ -200,9 +249,13 @@ public sealed partial class DualScreenLibraryView : UserControl
         Style(s=>s.OfType<Button>().Class(":pressed"),Brush(global::Avalonia.Controls.Button.BackgroundProperty,"HomePressed"));
         Style(s=>s.OfType<Button>().Class("home-primary").Class(":pointerover"),Brush(global::Avalonia.Controls.Button.BackgroundProperty,"HomeAccentHover"),Brush(global::Avalonia.Controls.Button.ForegroundProperty,"HomeOnAccent"));
         Style(s=>s.OfType<Button>().Class("home-primary").Class(":pressed"),Brush(global::Avalonia.Controls.Button.BackgroundProperty,"HomeAccentPressed"),Brush(global::Avalonia.Controls.Button.ForegroundProperty,"HomeOnAccent"));
-        Style(s=>s.OfType<Button>().Class(":focus-visible"),Brush(global::Avalonia.Controls.Button.BorderBrushProperty,"HomeAccent"),new Setter(global::Avalonia.Controls.Button.BorderThicknessProperty,new Thickness(2)));
+        Style(s=>s.OfType<Button>().Class(":focus-visible"),Brush(global::Avalonia.Controls.Button.BackgroundProperty,"HomeFocus"),
+            Brush(global::Avalonia.Controls.Button.BorderBrushProperty,"HomeAccent"));
+        Style(s=>s.OfType<Button>().Class("home-primary").Class(":focus-visible"),
+            Brush(global::Avalonia.Controls.Button.BackgroundProperty,"HomeAccentHover"),
+            Brush(global::Avalonia.Controls.Button.BorderBrushProperty,"HomeOnAccent"));
         Style(s=>s.OfType<Button>().Class(":disabled"),new Setter(global::Avalonia.Controls.Button.OpacityProperty,.38));
-        Style(s=>s.OfType<ListBoxItem>(),new Setter(ListBoxItem.PaddingProperty,new Thickness(4)),new Setter(ListBoxItem.MarginProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(18)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(0)),new Setter(ListBoxItem.HorizontalContentAlignmentProperty,HorizontalAlignment.Center),new Setter(ListBoxItem.VerticalContentAlignmentProperty,VerticalAlignment.Center),Brush(ListBoxItem.BackgroundProperty,"HomeTransparent"));
+        Style(s=>s.OfType<ListBoxItem>(),new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0)),new Setter(ListBoxItem.HorizontalAlignmentProperty,HorizontalAlignment.Center),new Setter(ListBoxItem.VerticalAlignmentProperty,VerticalAlignment.Center),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(18)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(0)),new Setter(ListBoxItem.HorizontalContentAlignmentProperty,HorizontalAlignment.Center),new Setter(ListBoxItem.VerticalContentAlignmentProperty,VerticalAlignment.Center),Brush(ListBoxItem.BackgroundProperty,"HomeTransparent"));
         Style(s=>s.OfType<ListBoxItem>().Class(":selected"),Brush(ListBoxItem.BackgroundProperty,"HomeTransparent"));
         Style(s=>s.OfType<ListBoxItem>().Class(":pointerover"),Brush(ListBoxItem.BackgroundProperty,"HomeHover"));
         Style(s=>s.OfType<ListBoxItem>(),new Setter(ListBoxItem.TemplateProperty,new FuncControlTemplate<ListBoxItem>((item,_)=>
@@ -217,7 +270,8 @@ public sealed partial class DualScreenLibraryView : UserControl
         var light=LightPalette;_scope.RequestedThemeVariant=light?ThemeVariant.Light:ThemeVariant.Dark;
         string[] values=light?["#243044","#4F5D73","#FFFFFF","#E9EDF4","#DCE4EE","#D6DCE7","#417D95","#FFFFFF"]:["#F3F5FC","#B5C1D4","#232C3D","#303C51","#39475D","#465167","#A8D7E2","#142835"];
         var keys=new[]{"HomeText","HomeMuted","HomeControl","HomeHover","HomePressed","HomeLine","HomeAccent","HomeOnAccent"};for(var i=0;i<keys.Length;i++)Resources[keys[i]]=new SolidColorBrush(Color.Parse(values[i]));Resources["HomeTransparent"]=Brushes.Transparent;Resources["HomeAccentHover"]=new SolidColorBrush(Color.Parse(light?"#356B82":"#BCE3EA"));Resources["HomeAccentPressed"]=new SolidColorBrush(Color.Parse(light?"#2D5C72":"#90C7D4"));
-        Foreground=(IBrush)Resources["HomeText"]!;_title.Foreground=Foreground;_heading.Foreground=(IBrush)Resources["HomeMuted"]!;_status.Foreground=(IBrush)Resources["HomeMuted"]!;_pageLabel.Foreground=(IBrush)Resources["HomeMuted"]!;_clock.Foreground=Foreground;
+        Resources["HomeFocus"]=new SolidColorBrush(Color.Parse(light?"#DAEAF0":"#344C5D"));
+        Foreground=(IBrush)Resources["HomeText"]!;_title.Foreground=Foreground;_heading.Foreground=_achievementPage?Foreground:(IBrush)Resources["HomeMuted"]!;_status.Foreground=(IBrush)Resources["HomeMuted"]!;_pageLabel.Foreground=(IBrush)Resources["HomeMuted"]!;_clock.Foreground=Foreground;
         _backdrop.LightPalette=_banner.LightPalette=light;
         _hero.Background=new SolidColorBrush(Color.Parse(light?"#DFFFFFFF":"#CE192334"));_hero.BorderBrush=new SolidColorBrush(Color.Parse(light?"#FFFFFF":"#56627A"));_hero.BoxShadow=BoxShadows.Parse(light?"0 14 40 0 #142B3E5B":"0 18 48 0 #40000000");
         foreach(var panel in new[]{_lower,_dock}){panel.Background=new SolidColorBrush(Color.Parse(light?"#EBFFFFFF":"#E01C2535"));panel.BorderBrush=new SolidColorBrush(Color.Parse(light?"#E0E5EE":"#475267"));panel.BoxShadow=BoxShadows.Parse(light?"0 6 22 0 #122B3E5B":"0 8 26 0 #35000000");}
@@ -233,19 +287,26 @@ public sealed partial class DualScreenLibraryView : UserControl
         var game=_selected is not null&&!_platforms;
         var rows=shortScreen?(height<370?1:2):game&&height<800?2:compact?3:height<1100?2:3;
         if(game&&!compact&&height<700)rows=1;
-        _root.MaxHeight=shortScreen?double.PositiveInfinity:compact?760:940;_root.VerticalAlignment=VerticalAlignment.Center;
+        _root.MaxHeight=shortScreen?double.PositiveInfinity:940;_root.VerticalAlignment=VerticalAlignment.Center;
         _root.Margin=new Thickness(compact?12:28,shortScreen?6:compact?12:game?14:18);_root.RowSpacing=shortScreen?6:compact?(game?10:12):game?12:16;
-        _hero.IsVisible=!shortScreen;_heading.IsVisible=!shortScreen;_selectedName.IsVisible=shortScreen;_root.RowDefinitions[1].Height=shortScreen?new GridLength(0):new GridLength(1,GridUnitType.Star);
-        var gamePreviewHeight=compact?(height<800?190:180):Math.Clamp((height-800)*.4+210,110,270);
+        _hero.IsVisible=!shortScreen;_heading.IsVisible=!shortScreen||_achievementPage;_selectedName.IsVisible=shortScreen&&!_achievementPage;_root.RowDefinitions[1].Height=shortScreen?new GridLength(0):new GridLength(1,GridUnitType.Star);
+        var gamePreviewHeight=compact?170:Math.Clamp((height-800)*.4+210,110,270);
         _hero.Height=game&&!shortScreen?gamePreviewHeight:double.NaN;_hero.MaxHeight=compact?300:360;_hero.MinHeight=shortScreen?0:game?gamePreviewHeight:110;
         ArrangePreview(compact);
         var available=Math.Min(960,width-(compact?24:56))-32;
-        var columns=Math.Clamp((int)(available/(compact?78:108)),3,8);
-        var cell=Math.Floor(available/columns);_tileSize=Math.Max(54,Math.Min(shortScreen?64:112,cell-12));
-        _achievements.SetCompact(compact);_achievements.IsVisible=game&&ShowAchievements;_status.IsVisible=!shortScreen;
+        var columns=Math.Clamp((int)(available/(shortScreen?95:compact?88:124)),3,8);
+        var cell=Math.Floor(available/columns);
+        var tileLimit=124d;
+        if(shortScreen)
+        {
+            var space=height-225-(_search.IsVisible?56:0)-(_achievementPage?36:0);
+            rows=Math.Clamp((int)(space/96),1,3);
+            tileLimit=Math.Min(tileLimit,Math.Floor(space/rows)-12);
+        }
+        _tileSize=Math.Max(54,Math.Min(tileLimit,cell-12));
+        _achievements.SetCompact(compact);_achievements.IsVisible=ShowAchievements&&!_achievementPage;_status.IsVisible=!shortScreen;
         _lower.IsVisible=_dock.IsVisible=_message.IsVisible=!preview;
         if(preview){_root.MaxHeight=double.PositiveInfinity;_root.VerticalAlignment=VerticalAlignment.Stretch;_hero.Height=double.NaN;_hero.MaxHeight=double.PositiveInfinity;_hero.MinHeight=110;}
-        if(navigation)rows=Math.Clamp((int)((height-260-(_search.IsVisible?56:0))/(_tileSize+12)),1,4);
         _grid.Width=cell*columns;_tiles.ItemWidth=cell;_tiles.ItemHeight=_tileSize+12;
         _lowerContent.RowSpacing=shortScreen?4:game?8:10;_lowerContent.Margin=new Thickness(compact?12:16,shortScreen?4:8,compact?12:16,shortScreen?6:14);
         foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>()){tile.Width=_tileSize;tile.Height=_tileSize;}
@@ -274,10 +335,22 @@ public sealed partial class DualScreenLibraryView : UserControl
         var now=Environment.TickCount64;if(name=="move"&&now-_lastSound<85)return;_lastSound=now;
         try{_playSound?.Invoke(Path.Combine(_audioDirectory,name+".wav"));}catch(Exception e) when(e is IOException or InvalidOperationException){ }
     }
-    public void SetItems(IEnumerable<DualScreenItem> items,string heading,bool platforms,string? selectedId=null)
+    public void SetItems(IEnumerable<DualScreenItem> items,string heading,bool platforms,string? selectedId=null,bool achievementPage=false)
     {
+        var pageChanged=_achievementPage!=achievementPage;
+        if(pageChanged)
+        {
+            CloseAchievementDetails();ResetAchievementProgress();
+            _achievementPage=achievementPage;
+            _back.IsVisible=achievementPage;_consoles.IsVisible=!achievementPage;
+            _heading.FontSize=achievementPage?18:15;
+            _heading.Foreground=achievementPage?Foreground:(IBrush)Resources["HomeMuted"]!;
+            _search.IsVisible=false;
+        }
         _items=items.ToArray();_platforms=platforms;_heading.Text=heading;_search.Text="";_page=0;
         _selected=_items.FirstOrDefault(i=>i.Id==selectedId)??_items.FirstOrDefault();Filter();
+        if(pageChanged)ResizeHome();
+        UpdateAchievementSelection();
     }
     private void Filter()
     {
@@ -289,11 +362,13 @@ public sealed partial class DualScreenLibraryView : UserControl
     }
     private void ShowPage()
     {
+        ResetTilePose();
         _building=true;
         try{_grid.ItemsSource=ScreenRole==HomeScreenRole.Preview?null:_filtered.Skip(_page*PageSize).Take(PageSize).ToArray();_grid.SelectedItem=_selected;}
         finally{_building=false;}
         _previous.IsEnabled=_page>0;_next.IsEnabled=(_page+1)*PageSize<_filtered.Length;
-        _pageLabel.Text=_filtered.Length==0?"Aucun résultat":$"{_filtered.Length} · {_page+1}/{Math.Max(1,(_filtered.Length+PageSize-1)/PageSize)}";
+        _pageLabel.Text=_filtered.Length==0?_achievementPage&&_items.Length==0?"Aucun jeu compatible":"Aucun résultat":$"{_filtered.Length} · {_page+1}/{Math.Max(1,(_filtered.Length+PageSize-1)/PageSize)}";
+        ResumeSelectionMotion();
     }
     /// <summary>Id prefix of the "Continue" tile placed before the consoles.</summary>
     public const string ResumePrefix="resume:";
@@ -308,38 +383,148 @@ public sealed partial class DualScreenLibraryView : UserControl
     }
     private Control Thumbnail(DualScreenItem item)
     {
-        var tile=new HomeArtworkControl{CoverPath=item.Cover,Platform=item.Console,Title=item.Title,LightPalette=LightPalette,IsSelected=item.Id==_selected?.Id,ReduceMotion=ReduceMotion,Width=_tileSize,Height=_tileSize,Tag=item.Id};
-        ToolTip.SetTip(tile,item.Title);AutomationProperties.SetName(tile,item.Title);return tile;
+        var tile=new HomeArtworkControl{CoverPath=item.Cover,Platform=item.Console,Title=item.Title,LightPalette=LightPalette,IsSelected=item.Id==_selected?.Id,Width=_tileSize,Height=_tileSize,Tag=item.Id};
+        ToolTip.SetTip(tile,item.Title);AutomationProperties.SetName(tile,item.Title);
+        return tile;
     }
     private void Select(DualScreenItem item,bool notify)
     {
-        var previous=Array.FindIndex(_filtered,i=>i.Id==_displayedId);
-        var next=Array.FindIndex(_filtered,i=>i.Id==item.Id);
-        _selectionDirection=next<previous?-1:1;
-        var changed=_displayedId!=item.Id;_displayedId=item.Id;_selected=item;SetTitle(item);_selectedName.Text=item.Title;_status.Text=item.Status;_message.Text="";
-        ResizeHome();_import.IsEnabled=!_platforms;
-        _launch.Content=item.Action;AutomationProperties.SetName(_launch,item.Action);_launch.IsEnabled=item.CanLaunch;
+        var previousId=_displayedId;
+        var changed=previousId!=item.Id;
+        _displayedId=item.Id;_selected=item;
+        var upperPreviewPending=ScreenRole==HomeScreenRole.Preview&&_layoutForGame&&!_platforms
+            &&_previewItem is not null&&!_previewForPlatform&&_previewItem!=item&&IsEffectivelyVisible;
+        if(ScreenRole!=HomeScreenRole.Navigation&&!upperPreviewPending)SetTitle(item);
+        _selectedName.Text=item.Title;_status.Text=item.Status;_message.Text="";_updateNotice.IsVisible=false;
+        var layoutChanged=_layoutForGame!=!_platforms;
+        if(layoutChanged){CancelQuickPreview();ResizeHome();}
+        _import.IsEnabled=!_platforms;
+        var action=_achievementPage?"Voir les succès":item.Action;
+        _launch.Content=action;AutomationProperties.SetName(_launch,action);_launch.IsEnabled=_achievementPage||item.CanLaunch;
+        _achievementPlay.Content=item.Action;_achievementPlay.IsEnabled=item.CanLaunch;
         foreach(var tile in _grid.GetVisualDescendants().OfType<HomeArtworkControl>())tile.IsSelected=Equals(tile.Tag,item.Id);
+        if(changed)
+        {
+            if(upperPreviewPending)StopSelectionMotion();
+            else AnimateSelection(previousId,item.Id);
+        }
+        else ResumeSelectionMotion();
         ToolTip.SetTip(_launch,item.Status);ToolTip.SetTip(_hero,item.Title);
         _options.IsVisible=!_platforms;UpdateMusic();
         _options.IsEnabled=true;_music.IsEnabled=!_importingMusic;
         if(notify)SelectionChanged?.Invoke(item.Id);
-        if(changed)
+        if(!layoutChanged&&_selected?.Id==item.Id)
         {
-            if(notify)Cue("move");StopSelectionMotion();_selectionTime=0;
-            if(_hero.IsVisible&&!ReduceMotion&&_playbackActive){AdvanceSelection(0);_selectionAnimation.Start();}
+            if(changed&&previousId is not null&&!_platforms&&_hero.IsVisible&&IsEffectivelyVisible
+                &&_previewItem is not null&&_previewItem!=item)
+                QueueGamePreview(item);
+            else if(_previewItem==item&&(_previewDelay.IsEnabled||_upperPreviewPreparation is not null))
+                FinishGamePreview();
+            else
+                RefreshPreview();
         }
+        if(changed&&notify)Cue("move");
+        UpdateAchievementSelection();
     }
-    private void ReleaseArtworkPress(){_pressedArtwork?.SetPressed(false);_pressedArtwork=null;}
-    private void StopSelectionMotion(){_selectionAnimation.Stop();_bannerOffset.X=_bannerOffset.Y=0;_heroContent.Opacity=1;}
+    private bool CanAnimateSelection=>_selected is not null&&!_platforms&&!ReduceMotion&&_playbackActive
+        &&IsEffectivelyVisible&&IsEnabled&&TopLevel.GetTopLevel(this) is not null;
+
+    private void ResumeSelectionMotion()
+    {
+        if(ScreenRole!=HomeScreenRole.Preview&&CanAnimateSelection)_selectionAnimation.Start();
+    }
+
+    private void AnimateSelection(string? previousId,string selectedId)
+    {
+        StopSelectionMotion();
+        if(!CanAnimateSelection)return;
+        if(previousId is null){ResumeSelectionMotion();return;}
+        var previous=Array.FindIndex(_filtered,item=>item.Id==previousId);
+        var current=Array.FindIndex(_filtered,item=>item.Id==selectedId);
+        _selectionDirection=current<previous?-1:1;
+        _selectionElapsed=0;
+        AdvanceSelection(0);
+        _selectionAnimation.Start();
+    }
+
     private bool AdvanceSelection(double elapsed)
     {
-        _selectionTime=Math.Min(.22,_selectionTime+elapsed);var remaining=Math.Pow(1-_selectionTime/.22,3);
-        _bannerOffset.X=8*_selectionDirection*remaining;_heroContent.Opacity=1-.14*remaining;return remaining>0;
+        const double tileDuration=0.180;
+        const double orbitDuration=4.8;
+        const int orbitSteps=240;
+        var hasGrid=ScreenRole!=HomeScreenRole.Preview;
+        _selectionElapsed+=elapsed;
+        if(!CanAnimateSelection||(!hasGrid&&_selectionElapsed>=PreviewDuration))
+        {
+            ResetSelectionPose();
+            return false;
+        }
+        if(_selectionElapsed>=orbitDuration+PreviewDuration)
+            _selectionElapsed=PreviewDuration+(_selectionElapsed-PreviewDuration)%orbitDuration;
+
+        if(_hero.IsVisible&&_selectionElapsed<PreviewDuration)
+        {
+            var remaining=Math.Pow(1-_selectionElapsed/PreviewDuration,3);
+            var scale=1-0.018*remaining;
+            _previewPose.Matrix=new Matrix(scale,0,0,scale,15*_selectionDirection*remaining,0);
+            _heroContent.RenderTransform=_previewPose;
+            _heroContent.Opacity=1-0.13*remaining;
+        }
+        else if(_heroContent.RenderTransform is not null)
+        {
+            _heroContent.RenderTransform=null;
+            _heroContent.Opacity=1;
+        }
+
+        // A page change may create the selected tile on the next layout pass.
+        if(hasGrid)
+        {
+            _movingTile??=_grid.GetVisualDescendants().OfType<HomeArtworkControl>()
+                .FirstOrDefault(tile=>tile.IsSelected&&Equals(tile.Tag,_selected?.Id));
+            if(_movingTile is not null)
+            {
+                var phase=_selectionElapsed%orbitDuration/orbitDuration;
+                _movingTile.SetSelectionSweep(Math.Floor(phase*orbitSteps)/orbitSteps);
+                if(_selectionElapsed<tileDuration)
+                {
+                    var progress=_selectionElapsed/tileDuration;
+                    var lift=16*Math.Pow(progress*(1-progress),2);
+                    var scale=1+0.024*lift;
+                    _tilePose.Matrix=new Matrix(scale,0,0,scale,0,-1.8*lift);
+                    _movingTile.RenderTransform=_tilePose;
+                }
+                else if(_movingTile.RenderTransform is not null)_movingTile.RenderTransform=null;
+            }
+        }
+        return true;
     }
+
+    private void StopSelectionMotion()
+    {
+        _selectionAnimation.Stop();
+        _selectionElapsed=PreviewDuration;
+        ResetSelectionPose();
+    }
+
+    private void ResetSelectionPose()
+    {
+        ResetTilePose();
+        _heroContent.RenderTransform=null;
+        _heroContent.Opacity=1;
+    }
+
+    private void ResetTilePose()
+    {
+        if(_movingTile is null)return;
+        _movingTile.RenderTransform=null;
+        _movingTile.SetSelectionSweep(null);
+        _movingTile=null;
+    }
+
     private void ArrangePreview(bool compact)
     {
         var game=_selected is not null&&!_platforms;
+        _layoutForGame=game;
         _heroContent.RowDefinitions=new(game?"*":_selected is null?"*":"*,Auto");
         _heroContent.ColumnDefinitions=new(game?"1*,1.25*":"*");_heroContent.ColumnSpacing=game?(compact?10:22):0;
         _heroContent.Margin=new Thickness(game?(compact?12:18):(compact?20:30));
@@ -350,47 +535,145 @@ public sealed partial class DualScreenLibraryView : UserControl
         _title.MaxHeight=game?(compact?110:140):compact?120:160;_title.FontSize=game?(compact?18:24):compact?23:32;
         Grid.SetRow(_art,0);Grid.SetColumn(_art,0);Grid.SetRow(_title,game||_selected is null?0:1);Grid.SetColumn(_title,game?1:0);
     }
+    private void QueueGamePreview(DualScreenItem item)
+    {
+        _previewDelay.Stop();
+        CancelUpperPreview();
+        if(ScreenRole==HomeScreenRole.Preview)
+        {
+            _previewDelay.Interval=TimeSpan.FromMilliseconds(32);
+            _previewDelay.Start();
+            return;
+        }
+        _previewDelay.Interval=TimeSpan.FromMilliseconds(55);
+        _previewBody.IsVisible=false;
+        _quickPreview.Title=item.Title;
+        _quickPreview.Platform=item.Console;
+        _quickPreview.CoverPath=item.Cover;
+        _quickPreview.LightPalette=LightPalette;
+        if(!_art.Children.Contains(_quickPreview))_art.Children.Add(_quickPreview);
+        // The front uses the same decode size as the grid. Build the full case only after the last input.
+        _previewDelay.Start();
+    }
+
+    private void FinishGamePreview()
+    {
+        CancelQuickPreview();
+        if(ScreenRole==HomeScreenRole.Preview&&_selected is {} item&&_previewItem!=item)
+        {
+            _upperPreviewPreparation=new CancellationTokenSource();
+            _=PrepareUpperPreviewAsync(item,_upperPreviewPreparation);
+        }
+        else RefreshPreview();
+    }
+
+    private async Task PrepareUpperPreviewAsync(DualScreenItem item,CancellationTokenSource preparation)
+    {
+        var cancellation=preparation.Token;
+        try
+        {
+            var faces=ResolvePreviewFaces(item);
+            var useTextures=GameCaseControl.PreferGpuTextures;
+            await Task.Run(()=>CoverBitmapCache.WarmPreview(faces,useTextures,cancellation),cancellation);
+            await Dispatcher.UIThread.InvokeAsync(()=>
+            {
+                if(cancellation.IsCancellationRequested||_selected!=item||ScreenRole!=HomeScreenRole.Preview
+                    ||!IsEffectivelyVisible||!ReferenceEquals(_upperPreviewPreparation,preparation))return;
+                _upperPreviewPreparation=null;
+                var previousId=_previewItem?.Id;
+                SetTitle(item);
+                RefreshPreview();
+                AnimateSelection(previousId,item.Id);
+            });
+        }
+        catch(OperationCanceledException) when(cancellation.IsCancellationRequested){}
+        finally
+        {
+            await Dispatcher.UIThread.InvokeAsync(()=>
+            {
+                if(ReferenceEquals(_upperPreviewPreparation,preparation))_upperPreviewPreparation=null;
+                preparation.Dispose();
+            });
+        }
+    }
+
+    private string[] ResolvePreviewFaces(DualScreenItem item)
+    {
+        string Face(string path)=>string.IsNullOrWhiteSpace(path)?path:PreviewFacePath?.Invoke(path)??path;
+        return [item.Cover,Face(item.Back),Face(item.Spine),Face(item.Right),Face(item.Top),Face(item.Bottom)];
+    }
+
+    private void CancelUpperPreview()
+    {
+        _upperPreviewPreparation?.Cancel();
+        _upperPreviewPreparation=null;
+    }
+
+    private void CancelQuickPreview()
+    {
+        _previewDelay.Stop();
+        CancelUpperPreview();
+        _art.Children.Remove(_quickPreview);
+        _previewBody.IsVisible=true;
+    }
+
     private void ClearPreview()
     {
-        var preview=_casePreview;_casePreview=null;_previewItem=null;_art.Children.Clear();preview?.Dispose();
+        CancelQuickPreview();
+        var preview=_casePreview;_casePreview=null;_previewItem=null;_previewBody.Children.Clear();preview?.Dispose();
     }
     private void RefreshPreview()
     {
         if(_selected is not {} item||!_hero.IsVisible||!IsEffectivelyVisible||TopLevel.GetTopLevel(this) is null){ClearPreview();return;}
-        if(_previewItem==item&&_previewForPlatform==_platforms&&_art.Children.Count>0)return;
-        ClearPreview();_previewItem=item;_previewForPlatform=_platforms;
+        if(_previewDelay.IsEnabled||_upperPreviewPreparation is not null
+            ||(_previewItem==item&&_previewForPlatform==_platforms&&_previewBody.Children.Count>0))return;
         if(!_platforms&&File.Exists(item.Cover))
         {
-            GameCaseControl? preview=null;
+            var preview=_casePreview??new GameCaseControl{MinWidth=0,MinHeight=0,RealisticShell=true,UseImportedModel=true,UseCompactTextureMesh=true,
+                HorizontalAlignment=HorizontalAlignment.Stretch,VerticalAlignment=VerticalAlignment.Stretch};
             try
             {
-                var validated=CoverBitmapCache.Acquire(item.Cover);
-                try
+                preview.CaseFormat=GameCaseControl.FormatForConsole(item.Console);
+                var faces=ResolvePreviewFaces(item);
+                preview.SetCover(faces[0],faces[1],faces[2],faces[3],faces[4],faces[5]);
+                if(preview.HasFrontArtwork)
                 {
-                    preview=new GameCaseControl{MinWidth=0,MinHeight=0,RealisticShell=true,UseImportedModel=true,UseCompactTextureMesh=true,
-                        CaseFormat=GameCaseControl.FormatForConsole(item.Console),HorizontalAlignment=HorizontalAlignment.Stretch,VerticalAlignment=VerticalAlignment.Stretch};
-                    string Face(string path)=>string.IsNullOrWhiteSpace(path)?path:PreviewFacePath?.Invoke(path)??path;
-                    preview.SetCover(item.Cover,Face(item.Back),Face(item.Spine),Face(item.Right),Face(item.Top),Face(item.Bottom));
-                    preview.SetShelfPose(ReduceMotion||!_playbackActive?24:42,true,animate:false);
-                    preview.SetShelfPose(24,true,animate:!ReduceMotion&&_playbackActive);preview.IsInteractive=!ReduceMotion&&_playbackActive;
-                    AutomationProperties.SetName(preview,item.Title);_casePreview=preview;_art.Children.Add(preview);return;
+                    preview.SetShelfPose(24,true,animate:false);
+                    preview.IsInteractive=!ReduceMotion&&_playbackActive;
+                    AutomationProperties.SetName(preview,item.Title);
+                    if(_casePreview is null){_previewBody.Children.Clear();_casePreview=preview;_previewBody.Children.Add(preview);}
+                    _previewItem=item;_previewForPlatform=false;
+                    return;
                 }
-                finally{CoverBitmapCache.Release(validated);}
             }
-            catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){preview?.Dispose();_casePreview=null;}
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){}
+            if(_casePreview is null)preview.Dispose();
         }
-        _art.Children.Add(new HomeArtworkControl{CoverPath=item.Cover,Platform=item.Console,Title=item.Title,IsPreview=true,LightPalette=LightPalette});
+        ClearPreview();_previewItem=item;_previewForPlatform=_platforms;
+        _previewBody.Children.Add(new HomeArtworkControl{CoverPath=item.Cover,Platform=item.Console,Title=item.Title,IsPreview=true,LightPalette=LightPalette});
     }
-    private void ClearSelection(){_selected=null;_achievements.IsVisible=false;_displayedId=null;_selectedName.Text="Aucun résultat";ClearPreview();ArrangePreview(Bounds.Width<600);_title.SetGame(null,"Aucun jeu trouvé");_status.Text="Essaie une autre recherche ou ouvre le catalogue.";_launch.IsEnabled=_options.IsEnabled=_import.IsEnabled=false;_music.IsEnabled=true;StopMusic();}
-    public void UpdateSelected(string status,string action,bool enabled)
-    {_status.Text=status;ToolTip.SetTip(_launch,status);_launch.Content=action;AutomationProperties.SetName(_launch,action);_launch.IsEnabled=enabled;}
+    private void ClearSelection(){CloseAchievementDetails();_updateNotice.IsVisible=false;StopSelectionMotion();_selected=null;_achievements.IsVisible=ShowAchievements&&!_achievementPage;_displayedId=null;_selectedName.Text="Aucun résultat";ClearPreview();ArrangePreview(Bounds.Width<600);_title.SetGame(null,"Aucun jeu trouvé");_status.Text="Essaie une autre recherche ou ouvre le catalogue.";_launch.IsEnabled=_options.IsEnabled=_import.IsEnabled=false;_music.IsEnabled=true;StopMusic();UpdateAchievementSelection();}
+    public void UpdateSelected(string status,string action,bool enabled,bool hasUpdate=false)
+    {
+        _status.Text=status;ToolTip.SetTip(_launch,status);
+        _achievementPlay.Content=action;_achievementPlay.IsEnabled=enabled;
+        if(_achievementPage)action="Voir les succès";
+        _launch.Content=action;AutomationProperties.SetName(_launch,action);_launch.IsEnabled=_achievementPage||enabled;
+        _updateNotice.IsVisible=hasUpdate;
+        var options=hasUpdate?"Mise à jour disponible · X":"Options du jeu · X";
+        ToolTip.SetTip(_options,options);AutomationProperties.SetName(_options,options);
+    }
     public void ShowMessage(string? message)=>_message.Text=message;
     public bool DismissPopup()
     {
-        if(!IsPopupOpen)return false;_music.Flyout?.Hide();_music.Focus();return true;
+        if(CloseAchievementDetails())return true;
+        if(IsPopupOpen){_music.Flyout?.Hide();FocusHomeControl(_music);return true;}
+        if(!_search.IsKeyboardFocusWithin)return false;
+        _search.IsVisible=false;ResizeHome();FocusHomeControl(_find);return true;
     }
     public void Move(int horizontal,int vertical)
     {
+        if(_achievementDetails.IsVisible){MoveAchievementDetails(horizontal,vertical);return;}
         if(IsPopupOpen)
         {
             var buttons=new[]{_import,_mute,_soundToggle,_appearance}.Where(button=>button.IsEffectivelyVisible&&button.IsEnabled).ToArray();
@@ -398,20 +681,76 @@ public sealed partial class DualScreenLibraryView : UserControl
             var focused=TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();var choiceIndex=Array.FindIndex(buttons,button=>ReferenceEquals(button,focused));
             choiceIndex=choiceIndex<0?0:Math.Clamp(choiceIndex+Math.Sign(horizontal+vertical),0,buttons.Length-1);buttons[choiceIndex].Focus();return;
         }
-        if(_filtered.Length==0)return;var index=Math.Max(0,Array.FindIndex(_filtered,i=>i.Id==_selected?.Id));
-        index=Math.Clamp(index+horizontal+vertical*_columns,0,_filtered.Length-1);var item=_filtered[index];var page=index/PageSize;
-        if(page!=_page){_page=page;_selected=item;ShowPage();}
-        else{_building=true;try{_grid.SelectedItem=item;}finally{_building=false;}}
-        Select(item,true);_grid.Focus();_grid.ScrollIntoView(item);
+        if(horizontal==0&&vertical==0){_grid.Focus();return;}
+        var focusedControl=TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
+        var index=Math.Max(0,Array.FindIndex(_filtered,i=>i.Id==_selected?.Id));
+        var row=Array.FindIndex(_focusRows,controls=>controls.Contains(focusedControl));
+        if(row<0)row=GridFocusRow;
+        if(row!=GridFocusRow&&horizontal!=0)
+        {
+            var visible=_focusRows[row].Where(CanFocus).ToArray();
+            if(visible.Length==0)return;
+            var column=Array.IndexOf(visible,focusedControl);
+            var next=Math.Clamp(column+Math.Sign(horizontal),0,visible.Length-1);
+            if(visible[next]!=focusedControl)FocusHomeControl(visible[next]);
+            return;
+        }
+        if(row==GridFocusRow&&_filtered.Length>0)
+        {
+            var target=vertical==0?Math.Clamp(index+horizontal,0,_filtered.Length-1):index+vertical*_columns;
+            var last=Math.Min((_page+1)*PageSize,_filtered.Length)-1;
+            var local=index-_page*PageSize;
+            var staysInGrid=vertical==0||(vertical<0?local>=_columns:local/_columns<(last-_page*PageSize)/_columns);
+            if(staysInGrid)
+            {
+                if(target>=0&&target<_filtered.Length&&target!=index)SelectOnPage(_filtered[target],target/PageSize,true);
+                if(!_grid.IsKeyboardFocusWithin)_grid.Focus();
+                return;
+            }
+        }
+        if(vertical==0)return;
+        for(var next=row+Math.Sign(vertical);next>=0&&next<_focusRows.Length;next+=Math.Sign(vertical))
+        {
+            if(next==GridFocusRow&&_filtered.Length==0)continue;
+            var options=_focusRows[next].Where(CanFocus).ToArray();
+            if(options.Length==0)continue;
+            var anchor=row==GridFocusRow&&_selected is {} item?_grid.ContainerFromItem(item):focusedControl;
+            var x=anchor?.TranslatePoint(new Point(anchor.Bounds.Width/2,0),this)?.X??Bounds.Width/2;
+            var nearest=options.MinBy(control=>Math.Abs((control.TranslatePoint(new Point(control.Bounds.Width/2,0),this)?.X??x)-x))!;
+            FocusHomeControl(nearest);
+            return;
+        }
     }
-    public void Activate(){if(_selected is {} item&&_launch.IsEnabled){Cue(_platforms?"open":"launch");LaunchRequested?.Invoke(item.Id);}}
+
+    private static bool CanFocus(Control control)=>control.IsEffectivelyVisible&&control.IsEffectivelyEnabled;
+    private static void FocusHomeControl(Control control)
+    {
+        control.Focus(NavigationMethod.Directional);
+        control.BringIntoView();
+    }
+
+    public void Activate()
+    {
+        if(_selected is not {} item||!_launch.IsEnabled)return;
+        if(_achievementPage){Cue("open");OpenAchievementDetails();return;}
+        Cue(_platforms?"open":"launch");LaunchRequested?.Invoke(item.Id);
+    }
     public void ActivateFocused()
     {
         var focused=TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
         if(focused is TextBox)return;
         if(focused is Button button)
-        {if(button.IsEffectivelyVisible&&button.IsEnabled)button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(global::Avalonia.Controls.Button.ClickEvent));return;}
-        if(IsPopupOpen||focused is Control other&&!other.GetVisualAncestors().Contains(this)&&!ReferenceEquals(other,this))return;
+        {
+            if(!button.IsEffectivelyVisible||!button.IsEffectivelyEnabled)return;
+            if(button==_music&&_music.Flyout is {} flyout)
+            {
+                flyout.ShowAt(_music);
+                Move(0,1);
+            }
+            else button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(global::Avalonia.Controls.Button.ClickEvent));
+            return;
+        }
+        if(_achievementDetails.IsVisible||IsPopupOpen||focused is Control other&&!other.GetVisualAncestors().Contains(this)&&!ReferenceEquals(other,this))return;
         Activate();
     }
     public bool HandleKey(Key key)
@@ -419,7 +758,7 @@ public sealed partial class DualScreenLibraryView : UserControl
         if(IsPopupOpen||_search.IsKeyboardFocusWithin)return false;
         switch(key){case Key.PageUp:ChangePage(-1);break;case Key.PageDown:ChangePage(1);break;case Key.Left:Move(-1,0);break;case Key.Right:Move(1,0);break;case Key.Up:Move(0,-1);break;case Key.Down:Move(0,1);break;default:return false;}return true;
     }
-    public void SetPlaybackActive(bool active){_playbackActive=active;if(_casePreview is {} preview)preview.IsInteractive=active&&!ReduceMotion;if(active)UpdateMusic();else{ReleaseArtworkPress();StopSelectionMotion();StopMusic();_playSound?.Invoke(null);}}
+    public void SetPlaybackActive(bool active){_playbackActive=active;if(_casePreview is {} preview)preview.IsInteractive=active&&!ReduceMotion;if(active){ResumeSelectionMotion();UpdateMusic();}else{StopSelectionMotion();StopMusic();_playSound?.Invoke(null);}}
     private void UpdateMusic(){_mute.Content=_settings?.MusicEnabled==true?"Musique : oui":"Musique : non";_soundToggle.Content=_settings?.SoundsEnabled==true?"Sons : oui":"Sons : non";_musicDelay.Stop();if(_playMusic is not null&&_settings?.MusicEnabled==true&&_playbackActive&&IsEffectivelyVisible)_musicDelay.Start();else StopMusic();}
     private void PlaySelectedTrack()
     {

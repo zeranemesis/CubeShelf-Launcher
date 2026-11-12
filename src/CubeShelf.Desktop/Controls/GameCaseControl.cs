@@ -166,6 +166,8 @@ public sealed partial class GameCaseControl : Control, IDisposable
         catch (Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException) { return path; }
     }
 
+    internal bool HasFrontArtwork => _front is not null;
+
     public bool SetCover(string? front, string? back, string? spine, string? right = null, string? top = null, string? bottom = null)
     {
         var identity = (CoverIdentity(front),CoverIdentity(back),CoverIdentity(spine),CoverIdentity(right),CoverIdentity(top),CoverIdentity(bottom),CaseFormat);
@@ -234,8 +236,15 @@ public sealed partial class GameCaseControl : Control, IDisposable
         _flipped = false;
         _pointerInside = false;
         _hoverYaw = _hoverPitch = 0;
-        if (!animate) { _yaw = yaw; _pitch = _restPitch; }
-        UpdateAnimationTarget();
+        if (animate) UpdateAnimationTarget();
+        else
+        {
+            _animation.Stop();
+            _yaw = _targetYaw = UsesGameCubeModel ? Math.Clamp(yaw,12,168) : yaw;
+            _pitch = _targetPitch = _restPitch;
+            _glare = _targetGlare = _lift = _targetLift = 0;
+            InvalidateVisual();
+        }
     }
 
     public override void Render(DrawingContext context)

@@ -6,7 +6,6 @@ import android.content.pm.*;
 import android.content.res.*;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
 import dalvik.system.DexClassLoader;
 import org.json.*;
 import java.io.*;
@@ -111,15 +110,26 @@ public final class EngineRuntime {
     }
 
     public static void created(Activity activity) {
-        if(activity.isFinishing())return;
-        Button back=new Button(activity);back.setText("Retour à DecompShelf");back.setTextSize(11);back.setAlpha(.7f);
-        back.setOnClickListener(v->{
-            Intent launcher=session.base.getPackageManager().getLaunchIntentForPackage(OWNER);
-            if(launcher!=null){launcher.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);session.base.startActivity(launcher);}
-            activity.finishAndRemoveTask();new Handler(Looper.getMainLooper()).postDelayed(()->android.os.Process.killProcess(android.os.Process.myPid()),500);
-        });
-        FrameLayout.LayoutParams layout=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT,Gravity.TOP|Gravity.END);
-        ((ViewGroup)activity.findViewById(android.R.id.content)).addView(back,layout);
+        if (activity.isFinishing()) return;
+        JSONObject main = session.component(session.spec.optString("MainActivity"));
+        if (main != null && main.optString("Bridge").equals(activity.getClass().getName())) {
+            Window window = activity.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            if (Build.VERSION.SDK_INT >= 30) {
+                View decor = window.getDecorView();
+                Runnable hideStatusBar = () -> {
+                    WindowInsetsController insets = window.getInsetsController();
+                    if (insets != null) {
+                        insets.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                        insets.hide(WindowInsets.Type.statusBars());
+                    }
+                };
+                decor.post(hideStatusBar);
+                decor.getViewTreeObserver().addOnWindowFocusChangeListener(focused -> {
+                    if (focused) decor.post(hideStatusBar);
+                });
+            }
+        }
     }
 
     static void initialize(Context context) {

@@ -24,6 +24,7 @@
     <Compile Include="../CubeShelf.Desktop/Controls/GameLaunchTransition.cs" Link="Controls/GameLaunchTransition.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameTitleControl.cs" Link="Controls/GameTitleControl.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/DualScreenLibraryView.cs" Link="Controls/DualScreenLibraryView.cs" />
+    <Compile Include="../CubeShelf.Desktop/Controls/DualScreenLibraryView.Achievements.cs" Link="Controls/DualScreenLibraryView.Achievements.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/DualScreenLibraryView.Displays.cs" Link="Controls/DualScreenLibraryView.Displays.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/HomeMenuBackdrop.cs" Link="Controls/HomeMenuBackdrop.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/HomeArtworkControl.cs" Link="Controls/HomeArtworkControl.cs" />
@@ -33,6 +34,8 @@
     <Compile Include="../CubeShelf.Desktop/Controls/ConsoleBrandMark.cs" Link="Controls/ConsoleBrandMark.cs" />
     <Compile Include="../CubeShelf.Desktop/Controls/GameFolderWalker.cs" Link="Controls/GameFolderWalker.cs" />
     <AvaloniaResource Include="Assets/Covers/**/*" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Media/switch-AAACA.png" Link="Assets/Covers/Media/switch-AAACA.png" />
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Covers/Native20261111/pokepark-wii.jpg" Link="Assets/Covers/AndroidPorts/pokepark-wii.jpg" />
     <AvaloniaResource Include="Catalogs/*.json" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/gamecube_logo.png" Link="Assets/Brand/gamecube_logo.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Brand/Consoles/*.png" Link="Assets/Brand/Consoles/%(Filename)%(Extension)" />

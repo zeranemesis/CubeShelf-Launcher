@@ -499,25 +499,26 @@
     "Project": "theorder1886-port",
     "Repository": "mateussmeneses/theorder1886-port",
     "Method": "Port natif Windows déclaré par le projet",
-    "Status": "Paquet Windows · partie non testée",
-    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "83079e0b660b044254028aa1b27a9c856a387210",
-    "ReadmeUrl": "https://github.com/mateussmeneses/theorder1886-port/blob/83079e0b660b044254028aa1b27a9c856a387210/README.md",
-    "ReleaseUrl": "https://github.com/mateussmeneses/theorder1886-port/releases/tag/windows-v0.7.9",
-    "ReleaseTag": "windows-v0.7.9",
+    "Status": "Expérimental · Prologue",
+    "Notes": "Fournis les fichiers de ta copie PS4. Le projet documente le démarrage et le prologue. La suite reste à vérifier. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "bb406f46878b2b0735dc726e73a171da96a400f0",
+    "ReadmeUrl": "https://github.com/mateussmeneses/theorder1886-port/blob/bb406f46878b2b0735dc726e73a171da96a400f0/README.md",
+    "ReleaseUrl": "https://github.com/mateussmeneses/theorder1886-port/releases/tag/windows-v0.8.1",
+    "ReleaseTag": "windows-v0.8.1",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
         "Name": "theorder1886-windows.zip",
-        "Url": "https://github.com/mateussmeneses/theorder1886-port/releases/download/windows-v0.7.9/theorder1886-windows.zip",
-        "Sha256": "0358f98cd0a9d7686b332cf1b6d2e961e799b22cc2eef8247026da9e4ae8c2ba",
-        "Size": 73237268,
+        "Url": "https://github.com/mateussmeneses/theorder1886-port/releases/download/windows-v0.8.1/theorder1886-windows.zip",
+        "Size": 73560631,
+        "Sha256": "d7ed0a11cf3241ba2c89096f2740b9b4e62a1be520c7285e92e7d2d6bf6bde0b",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": "theorder1886-windows/Play The Order 1886.exe"
       }
     ]
   },

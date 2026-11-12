@@ -614,5 +614,34 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "wii-pokepark-wiicompiled",
+    "Title": "PokéPark Wii: Pikachu's Adventure",
+    "Project": "PokePark Wiicompiled",
+    "Repository": "MildRain479/PokePark-Wiicompiled",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Expérimental · Bêta publique",
+    "Notes": "Au premier lancement, sélectionne l’image du disque Wii nord-américain R8AE01. Le port accepte notamment ISO, RVZ et WBFS. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "0e6a8466ffc0f75b359e843a250572686337963a",
+    "ReadmeUrl": "https://github.com/MildRain479/PokePark-Wiicompiled/blob/0e6a8466ffc0f75b359e843a250572686337963a/README.md",
+    "ReleaseUrl": "https://github.com/MildRain479/PokePark-Wiicompiled/releases/tag/v0.1.5-beta",
+    "ReleaseTag": "v0.1.5-beta",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "PokePark-Wiicompiled-v0.1.5-beta-windows-x64.zip",
+        "Url": "https://github.com/MildRain479/PokePark-Wiicompiled/releases/download/v0.1.5-beta/PokePark-Wiicompiled-v0.1.5-beta-windows-x64.zip",
+        "Size": 12614967,
+        "Sha256": "04ad9729953937d9d3e9ce31e07e153e2108a93819ac90f86e69189ebd3063e7",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "PokePark.exe"
+      }
+    ]
   }
 ]

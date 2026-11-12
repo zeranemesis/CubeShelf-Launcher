@@ -163,9 +163,9 @@ Le thème est utilisable avec une bibliothèque personnelle et un catalogue de p
 
 ## Elevation & Depth
 
-### Mouvement de sélection — 0.19.0-rc.6
+### Sélection des jeux
 
-La sélection reprend le geste d’une boîte présentée au joueur : la nouvelle jaquette pivote brièvement de la tranche vers la face. La miniature sélectionnée monte de 2 unités et atteint une échelle de 1,045 ; l’appui descend à 0,975. Le contenu de l’aperçu reste visible (opacité minimale 0,86), avec un déplacement horizontal de 8 unités sur 220 ms, dans le sens de navigation. Pas de boucle, pas de nouvelle ombre animée, ni de temporisation imposée avant l’action. Les animations suivent le compositeur, se coupent au masquage et s’interrompent au profit de la sélection courante. Le réglage de réduction des animations annule ces mouvements ; Android le reprend du système au retour dans l’application.
+Le cadre ardoise et vert d’eau, le titre et l’action suivent la sélection immédiatement. Un reflet ivoire diffus parcourt lentement le cadre en boucle. Le cadre et le reflet suivent le même tracé arrondi. La jaquette sélectionnée s’agrandit brièvement dans sa case et l’aperçu glisse dans le sens de la navigation. Un changement rapide interrompt le mouvement précédent. La réduction des animations conserve le contour et la mise à jour immédiate.
 
 Classique conserve la profondeur de ses boîtes 3D. Double écran est plat : panneaux différenciés par leur tonalité et un trait de bordure, sans nouvelle ombre ni nouvelle animation décorative. Les transitions natives de boutons du bureau restent héritées ; elles ne définissent pas un nouveau langage d'animation du thème.
 

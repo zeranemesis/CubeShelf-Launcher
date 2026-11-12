@@ -24,64 +24,93 @@ public sealed class HomeArtworkControl : UserControl
     public bool IsPreview { get=>GetValue(IsPreviewProperty); set=>SetValue(IsPreviewProperty,value); }
     public bool IsSelected { get=>GetValue(IsSelectedProperty); set=>SetValue(IsSelectedProperty,value); }
     public bool LightPalette { get=>GetValue(LightPaletteProperty); set=>SetValue(LightPaletteProperty,value); }
+    internal int PreviewDecodeHeight { get; init; }=640;
 
-    private readonly Border _frame=new(){CornerRadius=new CornerRadius(14),ClipToBounds=true,BorderThickness=new Thickness(1)};
+    private readonly Border _frame=new(){CornerRadius=new CornerRadius(CoverRadius),ClipToBounds=true,BorderThickness=new Thickness(1)};
     private readonly Image _image=new(){Stretch=Stretch.UniformToFill};
     private readonly ConsoleBrandMark _console=new(){Margin=new Thickness(14)};
-    private readonly TextBlock _badgeText=new(){FontSize=8,FontWeight=FontWeight.Bold,Foreground=Brushes.White};
+    private readonly TextBlock _badgeText=new(){FontSize=10,FontWeight=FontWeight.Bold,Foreground=Brushes.White};
     private readonly Border _badge=new(){Padding=new Thickness(5,3),CornerRadius=new CornerRadius(0,0,7,0),HorizontalAlignment=HorizontalAlignment.Left,VerticalAlignment=VerticalAlignment.Top};
     private readonly Border _sheen=new(){IsHitTestVisible=false};
-    private readonly Border _selection=new(){IsHitTestVisible=false,CornerRadius=new CornerRadius(14),BorderThickness=new Thickness(3)};
+    private const double CoverRadius=14;
+    private readonly SelectionFrame _selection=new(){Name="SelectionFrame",IsHitTestVisible=false};
     private Bitmap? _bitmap;
     private bool _attached;
-    private readonly DemandAnimation _motion;
-    private readonly MatrixTransform _pose=new();
-    private double _scale=1,_lift,_targetScale=1,_targetLift;
-    private bool _reduceMotion,_pressed;
-    public bool ReduceMotion
-    {
-        get=>_reduceMotion;
-        set{if(_reduceMotion==value)return;_reduceMotion=value;UpdateMotion(false);}
-    }
-
     public HomeArtworkControl()
     {
         IsHitTestVisible=false;
-        RenderTransformOrigin=RelativePoint.Center;RenderTransform=_pose;
-        _motion=new DemandAnimation(this,AdvanceMotion);
         _badge.Child=_badgeText;
         var layers=new Grid();layers.Children.Add(_console);layers.Children.Add(_image);layers.Children.Add(_sheen);layers.Children.Add(_badge);
         _frame.Child=layers;Content=new Panel{Children={_frame,_selection}};
-        AttachedToVisualTree+=(_,_)=>{_attached=true;LoadArtwork();UpdateMotion(false);};
-        DetachedFromVisualTree+=(_,_)=>{_attached=false;_pressed=false;_motion.Stop();_image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;};
+        AttachedToVisualTree+=(_,_)=>{_attached=true;LoadArtwork();};
+        DetachedFromVisualTree+=(_,_)=>{_attached=false;_image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;};
         PropertyChanged+=(_,change)=>
         {
             if(change.Property==CoverPathProperty||change.Property==IsPreviewProperty)LoadArtwork();
-            if(change.Property==IsSelectedProperty||change.Property==IsPreviewProperty)UpdateMotion(_attached);
-            if(change.Property==CoverPathProperty||change.Property==PlatformProperty||change.Property==TitleProperty||change.Property==IsPreviewProperty||change.Property==IsSelectedProperty||change.Property==LightPaletteProperty)RefreshAppearance();
+            else if(change.Property==IsSelectedProperty)RefreshSelection();
+            else if(change.Property==PlatformProperty||change.Property==TitleProperty||change.Property==LightPaletteProperty)RefreshAppearance();
         };
         RefreshAppearance();
     }
 
-    public void SetPressed(bool pressed){if(_pressed==pressed)return;_pressed=pressed;UpdateMotion(_attached);}
-    private void UpdateMotion(bool animate)
+    private void RefreshSelection()
     {
-        _targetScale=IsPreview?1:_pressed ? .975 : IsSelected?1.045:1;
-        _targetLift=!IsPreview&&IsSelected&&!_pressed?-2:0;
-        if(!animate||ReduceMotion)
-        {
-            _motion.Stop();_scale=ReduceMotion?1:_targetScale;_lift=ReduceMotion?0:_targetLift;
-            _pose.Matrix=new Matrix(_scale,0,0,_scale,0,_lift);return;
-        }
-        _motion.Start();
+        _selection.IsVisible=IsSelected&&!IsPreview;
+        if(!_selection.IsVisible)SetSelectionSweep(null);
     }
-    private bool AdvanceMotion(double elapsed)
+
+    internal void SetSelectionSweep(double? progress)
     {
-        var response=DemandAnimation.Response(.30,elapsed);
-        _scale+=(_targetScale-_scale)*response;_lift+=(_targetLift-_lift)*response;
-        var moving=Math.Abs(_scale-_targetScale)>.0005||Math.Abs(_lift-_targetLift)>.025;
-        if(!moving){_scale=_targetScale;_lift=_targetLift;}
-        _pose.Matrix=new Matrix(_scale,0,0,_scale,0,_lift);return moving;
+        if(_selection.Progress==progress)return;
+        _selection.SetReflection(progress);
+        _selection.InvalidateVisual();
+    }
+
+    private sealed class SelectionFrame : Control
+    {
+        private const double Inset=3.25;
+        private const double Radius=CoverRadius-Inset;
+        private static readonly Pen Outline=new(new SolidColorBrush(Color.Parse("#223D46")),5.5);
+        private static readonly Pen Track=new(new SolidColorBrush(Color.Parse("#A3C1BC")),1.8);
+        private LinearGradientBrush? _reflection;
+        private Pen? _reflectionPen;
+        public double? Progress { get; private set; }
+
+        public void SetReflection(double? progress)
+        {
+            Progress=progress;
+            if(progress is not { } phase)return;
+            if(_reflection is null)
+            {
+                _reflection=new LinearGradientBrush
+                {
+                    GradientStops=[
+                        new GradientStop(Colors.Transparent,0),
+                        new GradientStop(Colors.Transparent,0.40),
+                        new GradientStop(Color.Parse("#269DBFB6"),0.57),
+                        new GradientStop(Color.Parse("#9ED5E7D8"),0.78),
+                        new GradientStop(Color.Parse("#FFF6E5C4"),1)]
+                };
+                _reflectionPen=new Pen(_reflection,3.2);
+            }
+
+            var angle=phase*2*Math.PI;
+            var x=Math.Cos(angle)*0.64;
+            var y=Math.Sin(angle)*0.64;
+            _reflection.StartPoint=new RelativePoint(0.5-x,0.5-y,RelativeUnit.Relative);
+            _reflection.EndPoint=new RelativePoint(0.5+x,0.5+y,RelativeUnit.Relative);
+        }
+
+        public override void Render(DrawingContext context)
+        {
+            base.Render(context);
+            if(Bounds.Width<=2*Inset||Bounds.Height<=2*Inset)return;
+            // All strokes share the same centerline and follow the artwork's corner radius.
+            var path=new Rect(Inset,Inset,Bounds.Width-2*Inset,Bounds.Height-2*Inset);
+            context.DrawRectangle(null,Outline,path,Radius,Radius);
+            context.DrawRectangle(null,Track,path,Radius,Radius);
+            if(Progress.HasValue)context.DrawRectangle(null,_reflectionPen,path,Radius,Radius);
+        }
     }
 
     private void LoadArtwork()
@@ -89,7 +118,7 @@ public sealed class HomeArtworkControl : UserControl
         _image.Source=null;CoverBitmapCache.Release(_bitmap);_bitmap=null;
         if(_attached&&File.Exists(CoverPath))
         {
-            try{_bitmap=CoverBitmapCache.Acquire(CoverPath,IsPreview?640:256);_image.Source=_bitmap;}
+            try{_bitmap=CoverBitmapCache.Acquire(CoverPath,IsPreview?PreviewDecodeHeight:256);_image.Source=_bitmap;}
             catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){ }
         }
         RefreshAppearance();
@@ -100,8 +129,7 @@ public sealed class HomeArtworkControl : UserControl
         var accent=Color.Parse(ShelfProduct.Resolve(Platform).Accent);
         _frame.Background=new SolidColorBrush(Color.Parse(LightPalette?"#E4E8EF":"#202636"));
         _frame.BorderBrush=new SolidColorBrush(Color.Parse(LightPalette?"#AEB8C8":"#5B647A"));
-        _selection.IsVisible=IsSelected;
-        _selection.BorderBrush=new SolidColorBrush(Color.Parse(LightPalette?"#1D6579":"#B4E4EC"));
+        RefreshSelection();
         _frame.BoxShadow=BoxShadows.Parse(IsPreview?"0 5 16 0 #30000000":"0 2 6 0 #25000000");
         _console.Platform=Platform;_console.IsVisible=_bitmap is null;
         _console.MinWidth=_console.MinHeight=IsPreview?64:0;

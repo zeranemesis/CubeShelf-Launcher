@@ -143,6 +143,7 @@ Run("the identity is encrypted for this Windows account", TestIdentityIsProtecte
 Run("a backup brings the identity back", TestBackupRestoresTheIdentity);
 Run("ra: the token is kept encrypted, never the password", RetroAchievementsTests.TheTokenIsKeptEncryptedAndNeverThePassword);
 Run("ra: login talks to the server once and reads its answer", RetroAchievementsTests.LoginTalksToTheServerOnceAndReadsItsAnswer);
+Run("ra: official achievement progress and earned-first details", RetroAchievementsTests.ProgressCountsOnlyOfficialAchievementsAndListsEarnedFirst);
 Run("ra: the game is heard but not believed", RetroAchievementsTests.TheGameIsHeardButNotBelieved);
 Run("ra: friends see progress only when shared", RetroAchievementsTests.FriendsSeeProgressOnlyWhenShared);
 Run("ra: only a game that asks gets the session", RetroAchievementsTests.OnlyAGameThatAsksGetsTheSession);

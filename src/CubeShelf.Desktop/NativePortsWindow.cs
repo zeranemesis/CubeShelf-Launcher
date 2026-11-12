@@ -32,6 +32,7 @@ public sealed class NativePortsWindow : Window
     private readonly NativePortUpdateService _updates=new();
     private readonly CancellationTokenSource _lifetime=new();
     private readonly Func<NativePort,bool> _busy;
+    private readonly Func<NativePort,NativePort?>? _offeredUpdate;
     private bool IsBusy=>_selected is {} port&&_busy(port);
     private bool _checking;
     private NativePort? _candidate;
@@ -40,10 +41,11 @@ public sealed class NativePortsWindow : Window
     private string? _downloadDirectory;
     private readonly StackPanel _details = new() { Spacing = 18, Margin = new Thickness(28), MaxWidth = 850 };
 
-    public NativePortsWindow(ShelfProduct product, string? selectedPortId = null, IPlatformPaths? paths = null,Func<NativePort,bool>? busy=null)
+    public NativePortsWindow(ShelfProduct product, string? selectedPortId = null, IPlatformPaths? paths = null,Func<NativePort,bool>? busy=null,
+        Func<NativePort,NativePort?>? offeredUpdate=null)
     {
         _product = product;
-        _busy=busy??(_=>false);
+        _busy=busy??(_=>false);_offeredUpdate=offeredUpdate;
         paths ??= product.CreatePaths();
         _library = new NativePortLibrary(paths);
         _ports = NativePortCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Catalogs", product.Id + ".json"));
@@ -125,7 +127,7 @@ public sealed class NativePortsWindow : Window
             return new ListBoxItem { Tag = port, Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 5),
                 Content = new StackPanel { Spacing = 6, Children = { title, detail } } };
         }).ToList();
-        _count.Text = $"{ports.Count} jeux · {_ports.Count} versions / ports · 26/10/2026";
+        _count.Text = $"{ports.Count} jeux · {_ports.Count} versions / ports";
         var items = _list.ItemsSource.Cast<ListBoxItem>().ToList();
         _list.SelectedItem = items.FirstOrDefault(i => (i.Tag as NativePort)?.Id == selectedId) ?? items.FirstOrDefault();
         if (items.Count == 0) Select(null);
@@ -145,12 +147,20 @@ public sealed class NativePortsWindow : Window
         _project.Text = port.Project + " · " + port.Method + " · " + port.Status;
         _notes.Text = port.Notes;
         _sources.Text = $"Source : {port.Repository}\nRévision du README : {port.SourceCommit}\nVérifié le {port.VerifiedAt} · Release : {(port.ReleaseTag.Length > 0 ? port.ReleaseTag : "pas de paquet public vérifié")}\nPlateformes déclarées : {string.Join(", ", port.Platforms)}";
-        var assets = port.Assets.Where(a => a.MatchesCurrentPlatform).ToArray();
+        _candidate=_offeredUpdate?.Invoke(port);
+        var assets = (_candidate??port).Assets.Where(a => a.MatchesCurrentPlatform).ToArray();
         _packages.ItemsSource = assets; _packages.SelectedIndex = assets.Length > 0 ? 0 : -1;
         _packages.IsVisible = assets.Length > 0;
         _status.Text = assets.Length > 0 ? "Choisis un paquet. Il sera vérifié par SHA-256 avant extraction."
             : "Aucun paquet vérifié pour cette architecture. Consulte les instructions du projet ; tu peux associer un port natif déjà compilé.";
+        if(_candidate is {} available)ShowUpdate(available);
         RefreshActions();
+    }
+
+    private void ShowUpdate(NativePort candidate)
+    {
+        _packages.ItemsSource=candidate.Assets;_packages.SelectedIndex=0;_packages.IsVisible=true;
+        _status.Text="Version officielle "+candidate.ReleaseTag+" disponible. Le paquet sera vérifié par SHA-256 avant extraction.";
     }
 
     private void RefreshActions()
@@ -197,10 +207,10 @@ public sealed class NativePortsWindow : Window
             _candidate=await _updates.CheckAsync(port,_lifetime.Token);
             if(_candidate is null){_packages.ItemsSource=port.Assets.Where(a=>a.MatchesCurrentPlatform).ToArray();_packages.SelectedIndex=0;_status.Text="Aucun paquet stable compatible et vérifiable ne correspond au paquet connu. La version actuelle est conservée.";return;}
             var installed=_library.Installation(port);
-            if(installed is not null&&_candidate.Assets.Any(a=>a.Sha256.Equals(installed.PackageSha256,StringComparison.OrdinalIgnoreCase)))
-            {_packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;_status.Text="Le moteur installé correspond à la dernière version officielle disponible.";return;}
-            _packages.ItemsSource=_candidate.Assets;_packages.SelectedIndex=0;
-            _status.Text="Version officielle "+_candidate.ReleaseTag+" disponible. Paquet et SHA-256 publiés par le projet ; jouabilité de cette nouvelle version non testée dans DecompShelf.";
+            if(installed is not null&&(_candidate.Assets.Any(a=>a.Sha256.Equals(installed.PackageSha256,StringComparison.OrdinalIgnoreCase))
+                ||!NativePortUpdateService.IsNewerRelease(_candidate.ReleaseTag,installed.Version)))
+            {_candidate=null;_packages.SelectedIndex=-1;_status.Text="Aucune version plus récente vérifiable pour ce moteur.";return;}
+            ShowUpdate(_candidate);
         }
         catch(OperationCanceledException){}
         catch(Exception error){_status.Text="Vérification indisponible : "+error.Message;}

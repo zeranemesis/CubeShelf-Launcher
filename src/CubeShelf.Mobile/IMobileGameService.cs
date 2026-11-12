@@ -14,9 +14,11 @@ public interface IMobileGameService
     LauncherAppUpdates? AppUpdates => null;
     IMobileNativePorts? NativePorts => null;
     MobileDeviceStatus? DeviceStatus => null;
+    Action? ConfigureAndroidHome => null;
     CubeShelf.Core.Storage.GameStorageService? Storage => null;
     void StorageChanged(string id) { }
     void PlayPreviewMusic(string? file) { }
     void PlayMenuSound(string? file) { }
     bool SupportsRetroAchievements(string gameId)=>false;
+    CubeShelf.Core.Achievements.RetroAchievementsSession? AchievementSession=>null;
 }

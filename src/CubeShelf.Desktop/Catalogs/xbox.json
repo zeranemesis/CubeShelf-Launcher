@@ -670,18 +670,28 @@
     "Project": "OpenShao",
     "Repository": "OAleex/OpenShao",
     "Method": "Recompilation statique (déclaration amont)",
-    "Status": "Port natif déclaré par le projet",
-    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub. Intitulé amont : Mortal Kombat: Shaolin Monks (OpenShao).",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "0bd55e4cc27cdf1eae470b49226dfa404f8d785d",
-    "ReadmeUrl": "https://github.com/OAleex/OpenShao/blob/0bd55e4cc27cdf1eae470b49226dfa404f8d785d/README.md",
-    "ReleaseUrl": "https://github.com/OAleex/OpenShao/releases/tag/v0.4.1",
-    "ReleaseTag": "v0.4.1",
+    "Status": "Port PC publié",
+    "Notes": "Fournis les données de ta copie Xbox nord-américaine ou européenne selon le guide amont. Les paquets Linux/macOS précédents (v0.4.1) restent disponibles. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "bc43d6e28121c9f6b67e3cc00dfe747364f3a569",
+    "ReadmeUrl": "https://github.com/OAleex/OpenShao/blob/bc43d6e28121c9f6b67e3cc00dfe747364f3a569/README.md",
+    "ReleaseUrl": "https://github.com/OAleex/OpenShao/releases/tag/v0.5.1",
+    "ReleaseTag": "v0.5.1",
     "Platforms": [
       "Windows",
       "Linux"
     ],
     "Assets": [
+      {
+        "Name": "OpenShao-0.5.1-Windows-x64.zip",
+        "Url": "https://github.com/OAleex/OpenShao/releases/download/v0.5.1/OpenShao-0.5.1-Windows-x64.zip",
+        "Size": 11180427,
+        "Sha256": "6630a04db5ee5ada51676a7c5c66f6b7cc7634150162100de43b7d6b4ab4ea76",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "OpenShao.exe"
+      },
       {
         "Name": "OpenShao-0.4.1-Linux-x64.tar.gz",
         "Url": "https://github.com/OAleex/OpenShao/releases/download/v0.4.1/OpenShao-0.4.1-Linux-x64.tar.gz",
@@ -689,15 +699,6 @@
         "Size": 12086066,
         "RuntimeIdentifiers": [
           "linux-x64"
-        ]
-      },
-      {
-        "Name": "OpenShao-0.4.1-Windows-x64.zip",
-        "Url": "https://github.com/OAleex/OpenShao/releases/download/v0.4.1/OpenShao-0.4.1-Windows-x64.zip",
-        "Sha256": "05da923a8523de1507da86ec8842a6232ffd20cbb41c258c4ae593ce5f9ff210",
-        "Size": 11299255,
-        "RuntimeIdentifiers": [
-          "win-x64"
         ]
       }
     ]
@@ -784,25 +785,26 @@
     "Project": "pgr1-recomp",
     "Repository": "hk21x/pgr1-recomp",
     "Method": "Recompilation statique (déclaration amont)",
-    "Status": "Port natif déclaré par le projet",
-    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "5a5a813bbfa55294f3333c1b80caa4f575f33d85",
-    "ReadmeUrl": "https://github.com/hk21x/pgr1-recomp/blob/5a5a813bbfa55294f3333c1b80caa4f575f33d85/README.md",
-    "ReleaseUrl": "https://github.com/hk21x/pgr1-recomp/releases/tag/v1.3",
-    "ReleaseTag": "v1.3",
+    "Status": "Port PC publié · Préparation manuelle",
+    "Notes": "Ouvre PGR1Launcher.exe et fournis ton image disque ou le dossier extrait. Associe le jeu construit dans le dossier play. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "b7402f6ebb43ae3ff721032d111dfff18e2df021",
+    "ReadmeUrl": "https://github.com/hk21x/pgr1-recomp/blob/b7402f6ebb43ae3ff721032d111dfff18e2df021/README.md",
+    "ReleaseUrl": "https://github.com/hk21x/pgr1-recomp/releases/tag/v1.7",
+    "ReleaseTag": "v1.7",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
         "Name": "PGR1Launcher.exe",
-        "Url": "https://github.com/hk21x/pgr1-recomp/releases/download/v1.3/PGR1Launcher.exe",
-        "Sha256": "f6e4d9f73fc6b92002a4b00a454e23f4b3ff93ba8fc887ca891787b9b5bb7c1b",
-        "Size": 2346496,
+        "Url": "https://github.com/hk21x/pgr1-recomp/releases/download/v1.7/PGR1Launcher.exe",
+        "Size": 2509824,
+        "Sha256": "30c23d6cef7a7d8c0cb79662fe9d9e0a6c52d890f2a08a9e3a49412df9997d04",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": ""
       }
     ]
   },
@@ -812,25 +814,26 @@
     "Project": "pgr2-recomp",
     "Repository": "hk21x/pgr2-recomp",
     "Method": "Recompilation statique (déclaration amont)",
-    "Status": "Port natif déclaré par le projet",
-    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Aucun paquet automatiquement installable vérifié ; compilation ou association manuelle du programme.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "6523e188cebe72ff53797d40321b6b9a9bc9f72d",
-    "ReadmeUrl": "https://github.com/hk21x/pgr2-recomp/blob/6523e188cebe72ff53797d40321b6b9a9bc9f72d/README.md",
-    "ReleaseUrl": "https://github.com/hk21x/pgr2-recomp/releases/tag/v1.4.0",
-    "ReleaseTag": "v1.4.0",
+    "Status": "Port PC publié · Préparation manuelle",
+    "Notes": "Ouvre PGR2Launcher.exe et fournis ton disque PAL ou NTSC, sous forme d’image ou de dossier extrait. Associe le jeu construit dans le dossier play. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "4bdeec1ef5c073ae53bd035693be44174096a286",
+    "ReadmeUrl": "https://github.com/hk21x/pgr2-recomp/blob/4bdeec1ef5c073ae53bd035693be44174096a286/README.md",
+    "ReleaseUrl": "https://github.com/hk21x/pgr2-recomp/releases/tag/v1.6.2",
+    "ReleaseTag": "v1.6.2",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
         "Name": "PGR2Launcher.exe",
-        "Url": "https://github.com/hk21x/pgr2-recomp/releases/download/v1.4.0/PGR2Launcher.exe",
-        "Sha256": "b53e9f2ee476948c7a08aad1d280a175836a78e30e8cc330888f7a6b6b71a727",
-        "Size": 2262016,
+        "Url": "https://github.com/hk21x/pgr2-recomp/releases/download/v1.6.2/PGR2Launcher.exe",
+        "Size": 2426368,
+        "Sha256": "53cbe802200b7258fa072ab58afa216f76f87748e6efe61ce32f398d3285be8b",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": ""
       }
     ]
   },

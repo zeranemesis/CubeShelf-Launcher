@@ -36,6 +36,30 @@ static class RetroAchievementsTests
         return directory;
     }
 
+    public static void ProgressCountsOnlyOfficialAchievementsAndListsEarnedFirst()
+    {
+        const string patch = """
+            {"Success":true,"PatchData":{"ID":25450,"Achievements":[
+              {"ID":1,"Title":"Still locked","Description":"Do a thing","Points":5,"Flags":3},
+              {"ID":2,"Title":"Earned","Description":"Do another thing","Points":10,"Flags":3},
+              {"ID":3,"Title":"Unofficial","Flags":5},
+              {"ID":101000001,"Title":"Server notice","Flags":3}]}}
+            """;
+        var handler=new FakeRetroAchievements(body=>body.Contains("r=patch")
+            ?(HttpStatusCode.OK,patch):(HttpStatusCode.OK,"{\"Success\":true,\"UserUnlocks\":[2,3,900]}"));
+        using var http=new HttpClient(handler);
+        var session=new RetroAchievementsSession("Fixture","token123",DateTimeOffset.UtcNow);
+        var client=new AchievementProgressClient(http);
+        var result=client.LoadAsync(25450,session,null,default).GetAwaiter().GetResult();
+        Check(result is {Unlocked:1,Total:2}&&result.Entries.Select(item=>item.Id).SequenceEqual(new[]{2,1})
+            &&result.Entries[0] is {Unlocked:true,Description:"Do another thing",Points:10},
+            "only official achievements count, and unlocked achievements are first");
+        Check(handler.LastUri==RetroAchievementsLogin.Endpoint&&!handler.LastUri.Query.Contains("token123"),
+            "the game session is sent to RetroAchievements in the POST body");
+        var unavailable=client.LoadAsync(25450,null,null,default).GetAwaiter().GetResult();
+        Check(unavailable is {Unlocked:null,Total:null},"a missing session cannot appear as zero achievements");
+    }
+
     public static void TheTokenIsKeptEncryptedAndNeverThePassword()
     {
         var directory = TempDirectory();

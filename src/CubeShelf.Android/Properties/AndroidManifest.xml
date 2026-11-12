@@ -55,6 +55,8 @@
     <package android:name="com.ctrnative" />
     <package android:name="org.opennectar" />
     <package android:name="io.github.gminustwo.msrnative" />
+    <package android:name="io.github.pokeparkrecomp" />
+    <package android:name="com.mobileodyssey.game" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="false" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">

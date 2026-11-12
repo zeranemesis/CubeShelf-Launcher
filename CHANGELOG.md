@@ -1,5 +1,90 @@
 # Changelog
 
+## 0.19.0-rc.24 — installation des mises à jour sur Android
+
+- DecompShelf enchaîne le téléchargement, la vérification et l’installation des mises à jour compatibles.
+- Android confirme l’installation du lanceur et des ports autonomes. Les moteurs intégrés sont préparés dans DecompShelf.
+- Metroid Prime Unbound passe à la version v0.45.0.
+
+## 0.19.0-rc.23 — propositions de mise à jour sur Android
+
+- Propose les mises à jour du lanceur et du port sélectionné avec un choix « Plus tard ».
+- Accepte les APK signés de taille comparable aux versions intégrant les moteurs Android.
+
+## 0.19.0-rc.22 — Super Mario Odyssey sur Android
+
+- Ajoute SMO Android Port B0.3 au catalogue Switch. Le port s’ouvre dans son application ARM64.
+- Détecte les versions bêta dont l’étiquette commence par B.
+
+## 0.19.0-rc.21 — détail des succès
+
+- La bibliothèque RetroAchievements affiche la progression du jeu sélectionné.
+- La fiche du jeu affiche les succès débloqués en premier, avec les objectifs et les points.
+
+## 0.19.0-rc.20 — bibliothèque RetroAchievements
+
+- RetroAchievements ouvre une grille de jaquettes dédiée aux jeux compatibles sur Android et dans Big Picture.
+- Les commandes HOME au joystick reprennent le fond et les coins de l’interface pour indiquer le focus.
+
+## 0.19.0-rc.19 — mises à jour des ports
+
+- Le joystick atteint les icônes du haut, la grille et les actions du bas dans HOME.
+- Android signale les nouvelles versions officielles des ports compatibles et propose les mises à jour intégrées dans le menu X.
+- Windows conserve l’offre de mise à jour et présélectionne le paquet vérifiable dans le gestionnaire du jeu.
+
+## 0.19.0-rc.18 — aperçu plus fluide sur la Thor
+
+- Sur l’écran du haut, la boîte 3D reste en place pendant la préparation des textures. La nouvelle boîte et son logo apparaissent ensemble, avec un seul mouvement.
+- Les changements rapides donnent la priorité au dernier jeu sélectionné.
+
+## 0.19.0-rc.17 — sélection HOME plus précise
+
+- La grille garde la colonne lors des déplacements verticaux. Au tactile, seules les cases visibles sont sélectionnables.
+- Le titre, le cadre et l’action répondent immédiatement. L’aperçu affiche d’abord la jaquette, puis charge la boîte 3D du dernier jeu choisi.
+- La croix directionnelle Android accepte le maintien dans HOME, et le stick stabilise son axe près de la diagonale.
+
+## 0.19.0-rc.16 — reflet de sélection plus doux
+
+- Le cadre HOME prend des teintes ardoise et vert d’eau. Un reflet ivoire diffus en fait le tour lentement, avec un mouvement plus léger de la jaquette et de son aperçu à la sélection.
+
+## 0.19.0-rc.15 — contour multicolore continu
+
+- Le contour animé tourne en continu sur la jaquette sélectionnée dans HOME. Les traits suivent les mêmes bords et arrondis que la jaquette.
+
+## 0.19.0-rc.14 — contour de sélection HOME
+
+- Le jeu sélectionné garde un cadre cyan à bordure sombre. Un trait lumineux parcourt le cadre une fois à chaque nouvelle sélection.
+
+## 0.19.0-rc.13 — jaquettes plus grandes et sélection animée
+
+- HOME agrandit les jaquettes et adapte le nombre de colonnes à l’écran. La sélection donne un bref zoom à la vignette et fait glisser l’aperçu dans le sens de la navigation.
+- Le jeu choisi et son action sont mis à jour immédiatement. La réduction des animations reste disponible.
+
+## 0.19.0-rc.12 — accueil Android facultatif
+
+- Au premier lancement, DecompShelf propose de devenir l’accueil Android pour s’ouvrir au démarrage. Le choix reste modifiable dans les paramètres.
+
+## 0.19.0-rc.11 — jeux sans barre supérieure sur Android
+
+- Retire Swap2-Native du catalogue Android.
+- Retire le bouton permanent « Retour à DecompShelf » de Super Mario 64 et des ports hébergés. Les ports hébergés demandent le plein écran à Android dans leur fenêtre principale.
+
+## 0.19.0-rc.10 — PokéPark et Switch 2 sur Android
+
+- PokéPark Wii rejoint le catalogue Wii. Swap2-Native apparaît dans le rayon Switch 2 et ouvre sa bibliothèque de jeux.
+- Les APK ARM64 des deux projets sont vérifiés et installés séparément via l’installateur Android. DecompShelf les ouvre depuis leurs fiches.
+
+## 0.19.0-rc.9 — sélection immédiate et menu X
+
+- HOME et les rayons de jeux changent de sélection sans fondu, déplacement ou pivot de la jaquette. HOME réutilise l’aperçu 3D et les vignettes de la page.
+- Sur Android, X ouvre un menu compact avec la jaquette, la disponibilité, les actions du jeu et un bouton Fermer toujours visible. Le focus manette est mis en évidence. Sur PC, X ferme aussi les options du jeu dans Big Picture.
+
+## 0.19.0-rc.8 — ports PC et lancement tactile sur la Thor
+
+- Six nouvelles entrées Windows pour cinq jeux, dont Hookshot et NX2navi regroupés sous Ocarina of Time sur Switch 2. Onze ports existants actualisés.
+- Les mises à jour suivent les changements de dossier de lanceur liés au numéro de version.
+- Sur la Thor, le changement du second écran attend la fin du traitement de l’appui, notamment au lancement d’un jeu depuis HOME.
+
 ## 0.19.0-rc.7 — fusion de la rc.3 publiée et des rc.4 à rc.6
 
 - Réunit la rc.3 publiée (HOME 3DS, AYN Thor, PartyBoard 0.21.1, Paper Mario avec choix de région) et les rc.4 à rc.6 locales (catalogues du 10 novembre, rubrique Switch 2, sélection animée).

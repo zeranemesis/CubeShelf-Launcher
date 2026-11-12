@@ -33,17 +33,100 @@ internal static class DualDisplayTests
             Check(preview.SelectedId=="n64"&&navigation.SelectedId=="n64","a bottom-screen console selection updates the upper preview");
             navigation.Move(0,0);mobile.ActivateFromController();Jobs();
             Check(!preview.IsPlatforms&&!navigation.IsPlatforms,"controller confirmation opens the same console on both displays");
-            var target=ports.First(port=>port.ShelfConsole=="n64"&&port.Id!=navigation.SelectedId);
-            grid.SelectedItem=grid.Items.Cast<DualScreenItem>().Single(item=>item.Id==target.Id);Jobs();
+            var previousCase=preview.GetVisualDescendants().OfType<GameCaseControl>().Single();
+            var visibleTitle=Avalonia.Automation.AutomationProperties.GetName(previousCase);
+            var targets=ports.Where(port=>port.ShelfConsole=="n64"&&port.Id!=navigation.SelectedId)
+                .Where(port=>grid.Items.Cast<DualScreenItem>().Any(item=>item.Id==port.Id)).Take(2).ToArray();
+            foreach(var port in targets)
+                grid.SelectedItem=grid.Items.Cast<DualScreenItem>().Single(item=>item.Id==port.Id);
+            var target=targets[^1];
             Check(preview.SelectedId==target.Id&&navigation.SelectedId==target.Id,
                 "a bottom-screen game selection updates the upper game and its launch context");
-            games.RetroAchievementsGames.Add(target.Id);
-            navigation.GetVisualDescendants().OfType<RetroAchievementsButton>().Single().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
-            var raMenu=Field<Border>(mobile,"_gameOptionsOverlay");
-            var listed=raMenu.GetVisualDescendants().OfType<Button>().Select(b=>b.Content is TextBlock text?text.Text:b.Content?.ToString()).ToArray();
-            Check(listed.SequenceEqual(new[]{target.Title,"Fermer"}),"the Android RetroAchievements menu lists only ports declared compatible");
+            Check(previousCase.IsEffectivelyVisible
+                &&Avalonia.Automation.AutomationProperties.GetName(previousCase)==visibleTitle
+                &&Avalonia.Automation.AutomationProperties.GetName(Field<GameTitleControl>(preview,"_title"))==visibleTitle
+                &&!preview.GetVisualDescendants().OfType<HomeArtworkControl>().Any(),
+                "the upper display keeps its previous 3D case and matching logo while the latest case is prepared");
+            for(var i=0;i<100&&Avalonia.Automation.AutomationProperties.GetName(previousCase)!=target.Title;i++)
+            {Thread.Sleep(8);Jobs();}
+            Check(ReferenceEquals(previousCase,preview.GetVisualDescendants().OfType<GameCaseControl>().Single())
+                &&Avalonia.Automation.AutomationProperties.GetName(previousCase)==target.Title
+                &&Avalonia.Automation.AutomationProperties.GetName(Field<GameTitleControl>(preview,"_title"))==target.Title,
+                "the upper display swaps to the latest 3D case and matching logo together");
+            games.Native.Releases[target.Id]="v99.1";
+            Invoke(mobile,"OfferUpdate");Jobs();
+            var offer=Field<Border>(mobile,"_gameOptionsOverlay");
+            Check(offer.IsVisible&&offer.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text=="Plus tard"),
+                "a detected Android port update asks for a decision");
             mobile.ActivateFromController();Jobs();
-            Check(!raMenu.IsVisible&&preview.SelectedId==target.Id&&games.Native.Launched.Count==0,"choosing a compatible port returns to its game without launching it");
+            Invoke(mobile,"OfferUpdate");Jobs();
+            Check(!offer.IsVisible&&games.Native.Updated.Count==0,
+                "the default action defers the update and the same version is not asked again");
+            games.Native.Releases[target.Id]="v99.2";
+            Invoke(mobile,"OfferUpdate");Jobs();
+            mobile.MoveActionFocus(1);mobile.ActivateFromController();Jobs();
+            Check(!offer.IsVisible&&games.Native.Updated.SequenceEqual(new[]{target.Id}),
+                "confirming a new version starts the managed update for the selected game");
+            games.Native.Releases.Clear();
+
+            using(var http=new HttpClient(new UpdateCatalogHttp()))
+            {
+                games.AppUpdates=new("0.19.0","arm64",games.DataDirectory,_=>throw new Exception("Unexpected installation"),http);
+                games.AppUpdates.CheckAsync().GetAwaiter().GetResult();
+                Check(games.AppUpdates.Snapshot.State==AppUpdateState.Available,
+                    "the updater accepts a verified release the size of the current Android APK");
+                Invoke(mobile,"OfferUpdate");Jobs();
+                Check(offer.IsVisible&&offer.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text=="Mettre à jour"),
+                    "a launcher update asks before downloading");
+                mobile.ActivateFromController();Jobs();
+                Check(games.AppUpdates.Snapshot.State==AppUpdateState.Available,
+                    "deferring a launcher update keeps it available without downloading");
+                games.AppUpdates=null;
+            }
+            using(var http=new HttpClient(new UpdateCatalogHttp(small:true)))
+            {
+                var installs=0;
+                games.AppUpdates=new("0.19.0","arm64",games.DataDirectory,file=>
+                {
+                    Check(File.ReadAllText(file)=="APK fixture","only the verified launcher file reaches the installer");
+                    installs++;
+                    return "Confirmation Android";
+                },http);
+                games.AppUpdates.CheckAsync().GetAwaiter().GetResult();
+                Invoke(mobile,"OfferUpdate");Jobs();
+                mobile.MoveActionFocus(1);mobile.ActivateFromController();Jobs();
+                for(var i=0;i<100&&installs==0;i++){Thread.Sleep(10);Jobs();}
+                Check(installs==1,"one confirmation downloads, verifies and opens the launcher installer");
+                Invoke(mobile,"CloseDownloads",true);
+                games.AppUpdates=null;
+            }
+            var achievements=navigation.GetVisualDescendants().OfType<RetroAchievementsButton>().Single();
+            achievements.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+            Check(grid.ItemCount==0&&Field<TextBlock>(navigation,"_pageLabel").Text=="Aucun jeu compatible",
+                "the Android RetroAchievements library has a useful empty state");
+            mobile.BackFromController();Jobs();
+            games.RetroAchievementsGames.Add(target.Id);
+            navigation.FetchAchievements=(_,_)=>Task.FromResult(new CubeShelf.Core.Achievements.GameAchievementProgress(1,2,
+                [new(2,"Premier succès","Objectif terminé",10,true),new(1,"Deuxième succès","Objectif restant",5,false)]));
+            achievements.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
+            Check(!Field<Border>(mobile,"_gameOptionsOverlay").IsVisible
+                &&Field<TextBlock>(navigation,"_heading").Text=="RetroAchievements"
+                &&grid.Items.Cast<DualScreenItem>().Select(item=>item.Id).SequenceEqual(new[]{target.Id})
+                &&preview.SelectedId==target.Id&&games.Native.Launched.Count==0,
+                "RetroAchievements uses both HOME displays and shows only declared compatible games without launching");
+            Check(Field<ProgressBar>(navigation,"_achievementBar").Value==.5,"the selected game's progress bar uses unlocked over total");
+            mobile.ActivateFromController();Jobs();
+            var details=Field<Border>(navigation,"_achievementDetails");
+            var sections=details.GetVisualDescendants().OfType<TextBlock>().Select(text=>text.Text).ToArray();
+            Check(details.IsVisible&&Array.IndexOf(sections,"Débloqués")>=0
+                &&Array.IndexOf(sections,"Débloqués")<Array.IndexOf(sections,"À débloquer")
+                &&sections.Contains("Objectif terminé")&&games.Native.Launched.Count==0,
+                "confirm opens the detail page, with earned achievements and their objectives first");
+            mobile.BackFromController();Jobs();
+            Check(!details.IsVisible&&grid.IsEffectivelyVisible&&grid.ItemCount==1,"Back from details returns to the achievements library");
+            Click(navigation,"_back");Jobs();
+            Check(grid.ItemCount>1&&preview.SelectedId==target.Id&&navigation.SelectedId==target.Id,
+                "the RetroAchievements back button restores the original shelf and selection");
             Check(preview.GetVisualDescendants().OfType<GameCaseControl>().Count()==1
                 &&!navigation.GetVisualDescendants().OfType<GameCaseControl>().Any(),
                 "two physical displays render only one selected 3D case");
@@ -70,6 +153,11 @@ internal static class DualDisplayTests
                     "search remains accessible on the lower screen at "+lower);
                 Click(navigation,"_find");Jobs();
             }
+            bottom.Width=538;bottom.Height=468;Jobs();
+            var visibleTile=grid.GetVisualDescendants().OfType<HomeArtworkControl>().First(tile=>tile.IsSelected);
+            Check(visibleTile.Bounds.Width>=82&&grid.Bounds.Height>=180,
+                "the Thor's lower screen fits two rows of larger game covers");
+            Fits(navigation);
             mobile.SetActive(false);Jobs();
             Check(!mobile.WantsSecondaryScreen&&!Field<DispatcherTimer>(preview,"_musicDelay").IsEnabled
                 &&!Field<DispatcherTimer>(navigation,"_musicDelay").IsEnabled&&games.PreviewMusic.LastOrDefault() is null,
@@ -90,10 +178,16 @@ internal static class DualDisplayTests
             var options=Field<Border>(mobile,"_gameOptionsOverlay");var selectedGame=preview.SelectedId;
             Check(options.IsVisible&&mobile.WantsSecondaryScreen&&!navigation.IsEnabled&&options.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text==target.Title),
                 "controller X opens options for the selected game and keeps the bottom screen up but inert");
+            var optionRows=Field<List<Button>>(mobile,"_gameOptionButtons");
+            var selectedBrush=optionRows[0].BorderBrush;
+            Check(!Equals(selectedBrush,optionRows[1].BorderBrush),"X highlights the first action before the next input");
             mobile.BrowseFromController(1);Jobs();
             Check(preview.SelectedId==selectedGame&&games.Native.Launched.Count==0,"moving within game options never changes or launches the selected game");
-            Check(options.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text?.Contains("pas encore disponible",StringComparison.Ordinal)==true),
-                "Android explicitly reports that mod management is unavailable");
+            Check(!Equals(selectedBrush,optionRows[0].BorderBrush)&&Equals(selectedBrush,optionRows[1].BorderBrush),
+                "the menu highlight follows controller input across displays");
+            var closeOption=options.GetVisualDescendants().OfType<Button>().Single(b=>Avalonia.Automation.AutomationProperties.GetName(b)=="Fermer");
+            Check(closeOption.MinHeight>=48&&!closeOption.GetVisualAncestors().OfType<ScrollViewer>().Any(),
+                "the X menu keeps its close button outside the scrolling list with a full touch target");
             mobile.BackFromController();Jobs();
             Check(!options.IsVisible&&mobile.WantsSecondaryScreen&&navigation.IsEnabled,"B returns from game options to HOME without losing the selection");
             mobile.OptionsFromController();mobile.ActivateFromController();Jobs();
@@ -140,6 +234,24 @@ internal static class DualDisplayTests
         }
         finally{mobile.SetSecondaryScreenAttached(false);bottom.Content=null;bottom.Close();top.Close();}
     }
+    private sealed class UpdateCatalogHttp(bool small=false):HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken cancellationToken)
+        {
+            const string name="CubeShelf-Android-arm64-preview.apk";
+            const string fixture="APK fixture";
+            var tag=small?"v99.0.1":"v99.0.0";
+            var release="https://github.com/zeranemesis/CubeShelf-Launcher/releases/download/"+tag+"/";
+            var hash=small?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData("APK fixture"u8)):new string('a',64);
+            var body=request.RequestUri!.Host=="api.github.com"
+                ?System.Text.Json.JsonSerializer.Serialize(new {draft=false,prerelease=false,tag_name=tag,
+                    assets=new[]{new{name,browser_download_url=release+name,size=small?fixture.Length:286_510_909,digest="sha256:"+hash}}})
+                :request.RequestUri.AbsolutePath.EndsWith("/checksums.txt",StringComparison.Ordinal)?hash+"  "+name:fixture;
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                {RequestMessage=request,Content=new StringContent(body)});
+        }
+    }
+
     private static T Field<T>(object instance,string name)=>(T)instance.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(instance)!;
     private static void Invoke(object instance,string method,params object[] arguments)=>instance.GetType().GetMethod(method,BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(instance,arguments);
     private static void Click(DualScreenLibraryView view,string field)=>Field<Button>(view,field).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

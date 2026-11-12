@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CubeShelf.Core.Library;
 using CubeShelf.Core.Platform;
+using CubeShelf.Core.Updates;
 
 namespace CubeShelf.Desktop;
 
@@ -11,7 +12,17 @@ public sealed partial class MainWindow
 {
     private NativePortsWindow CreateNativePortsWindow(ShelfProduct product, string? selectedPort = null, Action? onLaunching = null)
     {
-        var window = new NativePortsWindow(product, selectedPort, _paths,port=>_maintenanceBusy||_catalogGames.Any(g=>_nativeShelfPorts.TryGetValue(g.Id,out var p)&&p.Id==port.Id&&_sessions.IsRunning(g.Id)));
+        var window = new NativePortsWindow(product, selectedPort, _paths,
+            port=>_maintenanceBusy||_catalogGames.Any(g=>_nativeShelfPorts.TryGetValue(g.Id,out var p)&&p.Id==port.Id&&_sessions.IsRunning(g.Id)),
+            port=>_nativeReleaseUpdates.Values.FirstOrDefault(update=>update.Id==port.Id));
+        window.Closed+=(_,_) =>
+        {
+            var library=new NativePortLibrary(_paths);
+            foreach(var (id,update) in _nativeReleaseUpdates.ToArray())
+                if(library.Installation(update) is {} installed&&!NativePortUpdateService.IsNewerRelease(update.ReleaseTag,installed.Version))
+                    _nativeReleaseUpdates.Remove(id);
+            RefreshQuickPlayUi();RefreshDualStatus();
+        };
         window.LaunchRequested += port =>
         {
             var game = _catalogGames.FirstOrDefault(candidate =>

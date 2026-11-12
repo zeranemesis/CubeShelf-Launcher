@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Avalonia;
@@ -15,7 +16,8 @@ namespace CubeShelf.Android;
     // lifetime retains the library controls, while the replacement view gets a fresh
     // Vulkan surface instead of presenting to the window destroyed by the game.
     ConfigurationChanges = ConfigChanges.UiMode)]
-public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
+[IntentFilter([Intent.ActionMain], Categories = [Intent.CategoryHome, Intent.CategoryDefault])]
+public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
 {
     private int _stickDirection;
     private bool _stickVertical;
@@ -62,7 +64,10 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
             };
             if (action is not null)
             {
-                if (keyEvent.Action == global::Android.Views.KeyEventActions.Down && keyEvent.RepeatCount == 0) action();
+                var directionKey = key is global::Android.Views.Keycode.DpadLeft or global::Android.Views.Keycode.DpadRight
+                    or global::Android.Views.Keycode.DpadUp or global::Android.Views.Keycode.DpadDown;
+                if (keyEvent.Action == global::Android.Views.KeyEventActions.Down
+                    && (keyEvent.RepeatCount == 0 || directionKey && view.CanRepeatHomeDirections)) action();
                 return true;
             }
         }
@@ -72,7 +77,11 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
     public override void OnWindowFocusChanged(bool hasFocus)
     {
         base.OnWindowFocusChanged(hasFocus);
-        if (hasFocus) ApplyImmersiveMode();
+        if (hasFocus)
+        {
+            ApplyImmersiveMode();
+            OfferAndroidHome();
+        }
         if (hasFocus) Window?.DecorView.PostDelayed(() =>
             global::Android.Util.Log.Info("CubeShelf.Layout", View?.DescribeLayout() ?? "View not attached"), 1000);
     }
@@ -92,12 +101,20 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
             == global::Android.Views.InputSourceType.Joystick)
         {
             var horizontal = motion.GetAxisValue(global::Android.Views.Axis.HatX);
-            if (Math.Abs(horizontal) < .5f) horizontal = motion.GetAxisValue(global::Android.Views.Axis.X);
             var vertical = motion.GetAxisValue(global::Android.Views.Axis.HatY);
-            if (Math.Abs(vertical) < .5f) vertical = motion.GetAxisValue(global::Android.Views.Axis.Y);
-            var isVertical = Math.Abs(vertical) > Math.Abs(horizontal);
+            if (Math.Abs(horizontal) < .5f && Math.Abs(vertical) < .5f)
+            {
+                horizontal = motion.GetAxisValue(global::Android.Views.Axis.X);
+                vertical = motion.GetAxisValue(global::Android.Views.Axis.Y);
+            }
+            var x = Math.Abs(horizontal);
+            var y = Math.Abs(vertical);
+            var isVertical = y > x;
+            if (_stickDirection != 0 && Math.Abs(y - x) < .18f) isVertical = _stickVertical;
             var axis = isVertical ? vertical : horizontal;
-            var direction = Math.Abs(axis) < .55f ? 0 : axis < 0 ? -1 : 1;
+            var sign = Math.Sign(axis);
+            var held = sign == _stickDirection && isVertical == _stickVertical;
+            var direction = Math.Abs(axis) < (held ? .38f : .55f) ? 0 : sign;
             var now = SystemClock.UptimeMillis();
             if (direction != 0 && (direction != _stickDirection || isVertical != _stickVertical || now >= _nextStickBrowse))
             {
@@ -180,20 +197,24 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
         });
     }
 
+    internal bool IsResumedForInstall { get; private set; }
+
     protected override void OnResume()
     {
         GameHelpOverlay.Stop(this);
         NativeGameService.CurrentActivity = this;
         base.OnResume();
+        IsResumedForInstall = true;
         ApplyImmersiveMode();
         RequestHighRefreshRate();
         if(View is {} activeLibrary){activeLibrary.ReduceMotion=!global::Android.Animation.ValueAnimator.AreAnimatorsEnabled();activeLibrary.SetActive(true);}
         if(View is {} library){_homeDisplays??=new AndroidHomeDisplays(this,library);_homeDisplays.Resume();}
-        AndroidNativePorts.Instance.ResumeKnownUpdates();
+        _ = Task.Run(AndroidNativePorts.Instance.CheckInstalledUpdatesAsync);
     }
 
     protected override void OnPause()
     {
+        IsResumedForInstall = false;
         _stickDirection = 0;
         _homeDisplays?.Pause();
         View?.SetActive(false);
@@ -202,6 +223,7 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
 
     protected override void OnDestroy()
     {
+        _androidHomePrompt?.Dismiss();
         _homeDisplays?.Dispose();_homeDisplays=null;
         if (ReferenceEquals(NativeGameService.CurrentActivity, this))
         {
@@ -237,10 +259,31 @@ public sealed class MainActivity : AvaloniaMainActivity<MobileApp>
         public LauncherAppUpdates AppUpdates => AndroidAppUpdates.Instance;
         public IMobileNativePorts NativePorts => AndroidNativePorts.Instance;
         public MobileDeviceStatus DeviceStatus => AndroidDeviceStatus.Read();
+        public Action ConfigureAndroidHome => () => (NativeGameService.CurrentActivity as MainActivity)?.OpenAndroidHomeSettings();
         public CubeShelf.Core.Storage.GameStorageService Storage=>AndroidGameStorage.Instance;
         public void StorageChanged(string id)=>AndroidNativePorts.Instance.StorageChanged(id);
         public void PlayPreviewMusic(string? file)=>AndroidPreviewMusic.Play(file);
         public void PlayMenuSound(string? file)=>AndroidPreviewMusic.PlayEffect(file);
+        public CubeShelf.Core.Achievements.RetroAchievementsSession? AchievementSession
+        {
+            get
+            {
+                try
+                {
+                    var file=new FileInfo(Path.Combine(DataDirectory,"partyboard","config.json"));
+                    if(!file.Exists||file.Length is <=0 or >131072)return null;
+                    using var config=System.Text.Json.JsonDocument.Parse(File.ReadAllText(file.FullName));
+                    string? Field(string name)=>config.RootElement.TryGetProperty("retroAchievements."+name,out var value)
+                        &&value.ValueKind==System.Text.Json.JsonValueKind.String?value.GetString():null;
+                    var user=Field("username");var token=Field("token");
+                    return CubeShelf.Core.Achievements.RetroAchievementsSession.IsUser(user)
+                        &&CubeShelf.Core.Achievements.RetroAchievementsSession.IsToken(token)
+                        ?new(user!,token!,DateTimeOffset.UnixEpoch,"game"):null;
+                }
+                catch(Exception error) when(error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or InvalidOperationException)
+                {return null;}
+            }
+        }
         public bool SupportsRetroAchievements(string gameId)
         {
             if(gameId=="GMPE01_00")return DeviceSupportsPublishedGame();

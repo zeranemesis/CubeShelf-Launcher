@@ -6,7 +6,6 @@ namespace CubeShelf.Mobile;
 public sealed class RuntimeDownloadQueue : IRuntimeDownloadManager
 {
     private readonly object _gate = new();
-    private readonly RuntimeDownloadSource[] _sources;
     private readonly Dictionary<string, RuntimeDownloadSource> _byId;
     private readonly List<string> _order = [];
     private readonly List<RuntimeDownloadHistory> _history = [];
@@ -22,13 +21,13 @@ public sealed class RuntimeDownloadQueue : IRuntimeDownloadManager
     public double PeakBytesPerSecond { get { lock (_gate) return _peak; } }
     public RuntimeDownloadSnapshot Snapshot
     {
-        get { lock (_gate) return _byId[_active ?? _sources[0].Id].Engine.Snapshot; }
+        get { lock (_gate) return _byId[_active ?? _primary].Engine.Snapshot; }
     }
     public IReadOnlyList<RuntimeQueueEntry> Entries
     {
         get
         {
-            lock (_gate) return _sources.Select(source =>
+            lock (_gate) return _byId.Values.Select(source =>
             {
                 var position = _order.IndexOf(source.Id);
                 var snapshot = source.Engine.Snapshot;
@@ -40,11 +39,12 @@ public sealed class RuntimeDownloadQueue : IRuntimeDownloadManager
     }
     public IReadOnlyList<RuntimeDownloadHistory> History { get { lock (_gate) return _history.ToArray(); } }
     public IReadOnlyList<DownloadRateSample> Samples { get { lock (_gate) return _samples.ToArray(); } }
+    private readonly string _primary;
 
     public RuntimeDownloadQueue(string directory, params RuntimeDownloadSource[] sources)
     {
         if (sources.Length == 0) throw new ArgumentException("At least one registered engine is required.", nameof(sources));
-        _sources = sources;
+        _primary = sources[0].Id;
         _byId = sources.ToDictionary(source => source.Id, StringComparer.Ordinal);
         _path = Path.Combine(directory, "download-queue.json");
         var firstRun = !File.Exists(_path);
@@ -66,9 +66,51 @@ public sealed class RuntimeDownloadQueue : IRuntimeDownloadManager
     }
 
     // The compatibility methods target the primary engine; the manager uses IDs.
-    public void Start() => Enqueue(_sources[0].Id);
-    public void Pause() => Pause(_sources[0].Id);
-    public void Cancel() => Cancel(_sources[0].Id);
+    public void Start() => Enqueue(_primary);
+    public void Pause() => Pause(_primary);
+    public void Cancel() => Cancel(_primary);
+
+    public IRuntimeDownloads Register(RuntimeDownloadSource source)
+    {
+        lock (_gate)
+        {
+            if (_byId.TryGetValue(source.Id, out var existing)) return existing.Engine;
+            _byId.Add(source.Id, source);
+            _states[source.Id] = source.Engine.Snapshot.State;
+            source.Engine.Changed += snapshot => OnEngineChanged(source, snapshot);
+            return source.Engine;
+        }
+    }
+
+    public async Task DownloadAsync(string id,IRuntimeDownloads engine,CancellationToken cancellation)
+    {
+        var finished=new TaskCompletionSource<RuntimeDownloadSnapshot>(TaskCreationOptions.RunContinuationsAsynchronously);
+        void Observe(RuntimeDownloadSnapshot snapshot)
+        {
+            if(!snapshot.IsBusy)finished.TrySetResult(snapshot);
+        }
+        engine.Changed+=Observe;
+        try
+        {
+            cancellation.ThrowIfCancellationRequested();
+            if(engine.Snapshot.State==RuntimeDownloadState.Unavailable)
+                throw new InvalidOperationException("Ce téléchargement est indisponible.");
+            Enqueue(id);
+            if(IsPaused)SetPaused(false);
+            if(engine.Snapshot.State==RuntimeDownloadState.Ready)return;
+            var result=await finished.Task.WaitAsync(cancellation).ConfigureAwait(false);
+            if(result.State==RuntimeDownloadState.Ready)return;
+            if(result.State is RuntimeDownloadState.Paused or RuntimeDownloadState.NotInstalled)
+                throw new OperationCanceledException("Téléchargement interrompu.");
+            throw new IOException(result.Error??"Le téléchargement du paquet a échoué.");
+        }
+        catch(OperationCanceledException) when(cancellation.IsCancellationRequested)
+        {
+            Pause(id);
+            throw;
+        }
+        finally{engine.Changed-=Observe;}
+    }
 
     public void Enqueue(string id)
     {
@@ -204,7 +246,7 @@ public sealed class RuntimeDownloadQueue : IRuntimeDownloadManager
             if (!File.Exists(_path) || new FileInfo(_path).Length > 128 * 1024) return;
             var record = JsonSerializer.Deserialize<QueueState>(File.ReadAllText(_path));
             if (record is null) return;
-            foreach (var id in (record.Order ?? []).Distinct().Take(_sources.Length))
+            foreach (var id in (record.Order ?? []).Distinct().Take(_byId.Count))
                 if (_byId.TryGetValue(id, out var source) && source.Engine.Snapshot.State
                     is not RuntimeDownloadState.Ready and not RuntimeDownloadState.Unavailable) _order.Add(id);
             _history.AddRange((record.History ?? []).Where(item => item is not null).Take(32));

@@ -63,7 +63,7 @@ def main():
   xdelta=shutil.which('xdelta3')
   if not xdelta:raise RuntimeError('Install xdelta3 before building the Android native hosts')
  ports=json.loads((ROOT/'src/CubeShelf.Mobile/Catalogs/android-ports.json').read_text(encoding='utf-8'))
- ports=[port for port in ports if port['Id']!='n64-sm64' and (not args.only or port['Id']==args.only)]
+ ports=[port for port in ports if port['Id']!='n64-sm64' and not port.get('ExternalInstall',False) and (not args.only or port['Id']==args.only)]
  source_map={}
  # Existing verified research archives avoid downloading the same public APK twice.
  for folder in [ROOT.parent/'android-native-research',ROOT.parent/'.tools/android-port-audit',ROOT.parent/'android-parity-2026-11-02']:
@@ -75,6 +75,7 @@ def main():
  for port in ports:
   if not re.fullmatch(r'[A-Za-z0-9-]{1,80}',port['Id']) or pathlib.Path(port['Name']).name!=port['Name'] or '\\' in port['Name']:raise ValueError('Unsafe engine build path')
   work=cache/port['Id'];work.mkdir(exist_ok=True);apk=work/'source.apk'
+  if apk.exists() and sha(apk)!=port['ApkSha256']:apk.unlink()
   if not apk.exists() and port['Id'] in source_map:shutil.copyfile(source_map[port['Id']],apk)
   if not apk.exists():
    archive=fetch(port['Url'],work/port['Name'],port['Sha256'])

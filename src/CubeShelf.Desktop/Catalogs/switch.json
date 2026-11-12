@@ -996,16 +996,56 @@
     "Project": "AstralChain-PC",
     "Repository": "Puddz/AstralChain-PC",
     "Method": "Recompilation statique native Windows",
-    "Status": "Compilation manuelle · expérimental",
-    "Notes": "Compilation manuelle Windows x64. Le projet indique avoir testé File 01 jusqu’au boss, pas la suite du jeu. Aucun paquet Windows publié. Aucun jeu, firmware ou clé fourni par DecompShelf. Jouabilité non testée dans DecompShelf.",
-    "VerifiedAt": "2026-11-02",
-    "SourceCommit": "9f3db2838e4cc84b19f81ec7bcc56ae621e1c554",
-    "ReadmeUrl": "https://github.com/Puddz/AstralChain-PC/blob/9f3db2838e4cc84b19f81ec7bcc56ae621e1c554/README.md",
-    "ReleaseUrl": "",
-    "ReleaseTag": "",
+    "Status": "Expérimental · Lanceur à associer",
+    "Notes": "Ouvre Astral Chain Launcher.exe après extraction, puis sélectionne les fichiers de ta copie et sa mise à jour. Ce lanceur Windows 32 bits peut être associé manuellement. Le projet a documenté le premier dossier jusqu’à son boss. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "4b74406be6c706dd8d51e79e746a9304194dc413",
+    "ReadmeUrl": "https://github.com/Puddz/AstralChain-PC/blob/4b74406be6c706dd8d51e79e746a9304194dc413/README.md",
+    "ReleaseUrl": "https://github.com/Puddz/AstralChain-PC/releases/tag/2026-11-11.4",
+    "ReleaseTag": "2026-11-11.4",
     "Platforms": [
       "Windows"
     ],
-    "Assets": []
+    "Assets": [
+      {
+        "Name": "AstralChain-PC-2026-11-11.4.zip",
+        "Url": "https://github.com/Puddz/AstralChain-PC/releases/download/2026-11-11.4/AstralChain-PC-2026-11-11.4.zip",
+        "Size": 6918976,
+        "Sha256": "4dda62e05a33dcc328617e11a3cfb1f00adf68b44b6204db601eb26097937019",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": ""
+      }
+    ]
+  },
+  {
+    "Id": "switch-bayonetta3-witch-time",
+    "Title": "Bayonetta 3",
+    "Project": "Witch-Time",
+    "Repository": "Zexyen/Witch-Time",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Expérimental · Compilation locale",
+    "Notes": "Le lanceur demande le dossier extrait de ta copie, puis construit le jeu sur ton PC. Windows 10/11 x64 et pilote Vulkan requis. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "ca12349fae03376e5092f00cd1e77829ddb23e1d",
+    "ReadmeUrl": "https://github.com/Zexyen/Witch-Time/blob/ca12349fae03376e5092f00cd1e77829ddb23e1d/README.md",
+    "ReleaseUrl": "https://github.com/Zexyen/Witch-Time/releases/tag/v0.9.1",
+    "ReleaseTag": "v0.9.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "WitchTime-v0.9.1-windows-x86_64.zip",
+        "Url": "https://github.com/Zexyen/Witch-Time/releases/download/v0.9.1/WitchTime-v0.9.1-windows-x86_64.zip",
+        "Size": 92477644,
+        "Sha256": "55d3b02f678a7029bb00e754d572de7d48b9ca1a34486fc8eee4acbfd43cefe8",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "WitchTime-v0.9.1-windows-x86_64/witch-time.exe"
+      }
+    ]
   }
 ]

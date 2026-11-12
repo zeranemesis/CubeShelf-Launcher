@@ -14,7 +14,12 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==37&&ports.Select(p=>p.PackageName).Distinct().Count()==37,"37 distinct Android ports and package identities");
+Check(ports.Length==39&&ports.Select(p=>p.PackageName).Distinct().Count()==39,"39 distinct Android ports and package identities");
+Check(ports.Single(p=>p.Id=="switch-odyssey-android") is
+    {ExternalInstall:true,ShelfConsole:"switch",PackageName:"com.mobileodyssey.game",Version:"B0.3",RequiresVulkan13:true},
+    "Super Mario Odyssey uses the official separate ARM64 package");
+Check(ports.Single(p=>p.Id=="wii-pokepark-wiicompiled") is {ExternalInstall:true,ShelfConsole:"wii",Front.Length:>0}
+    &&ports.All(p=>p.PackageName!="com.swap2native"),"PokéPark stays on the Wii shelf and Swap2-Native is absent");
 Check(new[]{"ps2-ico","gc-metroidprime2","nds-hunters","gc-animalcrossing","ps1-ctr","gc-pikmin","3ds-samusreturns"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
     &&ports.Single(p=>p.Id=="3ds-samusreturns").RequiresVulkan13,"November additions retain pinned APKs, covers and hardware requirements");
 Check(new[]{"gba-minishcap","gba-rekhcom","n64-battleship","n64-aerogauge"}.All(id=>ports.Single(p=>p.Id==id) is {Front.Length:>0,ApkSize:>0})
@@ -26,8 +31,9 @@ Check(ports.Single(p=>p.Id=="n64-dk64").RequiresVulkan11 && ports.Single(p=>p.Id
 var manifest=System.Xml.Linq.XDocument.Load(Path.Combine(AppContext.BaseDirectory,"AndroidManifest.xml"));
 System.Xml.Linq.XNamespace android="http://schemas.android.com/apk/res/android";
 var visiblePackages=manifest.Root!.Element("queries")!.Elements("package").Select(p=>(string?)p.Attribute(android+"name")).ToHashSet();
-Check(ports.Where(p=>p.Id!="n64-sm64").All(p=>visiblePackages.Contains(p.PackageName)),"Android 11 can discover every external port package");
+Check(!visiblePackages.Contains("com.swap2native")&&ports.Where(p=>p.Id!="n64-sm64").All(p=>visiblePackages.Contains(p.PackageName)),"Android 11 can discover every external port package");
 Check(ports.Single(p=>p.Id=="wiiu-windwakerhd").RequiresVulkan13,"Wind Waker HD requires Vulkan 1.3");
+Check(ports.Single(p=>p.Id=="gc-metroidprime") is {Version:"v0.45.0",VersionCode:53},"Metroid Prime uses the updated integrated engine");
 foreach(var (subtype,label) in new[]{(13,"4G"),(19,"4G"),(20,"5G"),(3,"3G"),(2,"2G"),(0,"Mobile"),(18,"Mobile")})
     Check(MobileDeviceStatus.AndroidCellularLabel(subtype)==label,"cellular label preserves the reported network technology");
 var payload="APK fixture, never executed"u8.ToArray();
@@ -84,6 +90,21 @@ using(var http=new HttpClient(new SlowHttp()))
     var engine=new NativeApkDownload(port,root,true,http);engine.Start();engine.Pause();await Finished(engine);
     Check(engine.Snapshot.State==RuntimeDownloadState.Paused,"pausing a native APK transfer preserves a resumable state");
     engine.Cancel();Check(engine.Snapshot.State==RuntimeDownloadState.NotInstalled&&!File.Exists(engine.ApkFile),"cancel removes the pending APK without invoking an installer");
+}
+var firstTransfer=new FakeTransfer();
+var updateTransfer=new FakeTransfer();
+var updateQueue=new RuntimeDownloadQueue(Path.Combine(root,"managed-updates"),new RuntimeDownloadSource("old","game","Game","v1",firstTransfer));
+updateQueue.Register(new("update","game","Game","v2",updateTransfer));
+updateQueue.Enqueue("old");
+using(var cancellation=new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+{
+    var update=updateQueue.DownloadAsync("update",updateTransfer,cancellation.Token);
+    Check(!update.IsCompleted&&updateQueue.Entries[1].Transfer.State==RuntimeDownloadState.Queued,"a managed update waits for the active transfer");
+    firstTransfer.Complete();
+    Check(!update.IsCompleted&&updateTransfer.Snapshot.IsBusy,"installation waits for the update's verified state");
+    updateTransfer.Complete();
+    await update;
+    Check(updateQueue.History[0].Version=="v2","a completed managed update is recorded with its new version");
 }
 
 if(args.Contains("--presentation-smoke"))
@@ -210,7 +231,10 @@ void RunUi()
         var launched=host.Native.Launched.Count;
         Field<Button>("_play").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         var transition=Field<CubeShelf.Desktop.Controls.GameLaunchTransition>("_launchTransition");
-        transition.GetType().GetMethod("Advance",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(transition,[2.2]);
+        if(native.ExternalInstall)
+            Check(!transition.IsVisible&&Avalonia.Automation.AutomationProperties.GetName(Field<Button>("_play"))=="Ouvrir le port",
+                "an external Android package opens directly under its own identity");
+        else transition.GetType().GetMethod("Advance",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(transition,[2.2]);
         for(var wait=0;wait<400&&host.Native.Launched.Count==launched;wait++){Jobs();Thread.Sleep(5);}
         Check(host.Native.Launched.Count==launched+1&&host.Native.Launched.Last()==native.Id,"Play launches the installed Android port: "+native.Id);
         Check(picker.SelectedIndex==index&&!home.IsVisible&&picker.IsEnabled,"return from the game preserves the catalogue and unlocks navigation: "+native.Id);
@@ -392,6 +416,7 @@ sealed class FakeGames:IMobileGameService
     public RuntimeDownloadQueue Queue {get;}
     public FakeNative Native {get;}
     public IMobileNativePorts NativePorts=>Native;
+    public LauncherAppUpdates? AppUpdates {get;set;}
     public MobileDeviceStatus? DeviceStatus {get;set;}=new("14:32",82,false,"Wi-Fi");
     public CubeShelf.Core.Storage.GameStorageService? Storage {get;set;}
     public HashSet<string> RetroAchievementsGames {get;}=[];
@@ -423,6 +448,12 @@ sealed class FakeNative(MobileNativePort[] ports):IMobileNativePorts
     public bool IsInstalled(string id)=>Installed.Contains(id);
     public bool IsEmbedded(string id)=>Embedded.Contains(id);
     public bool IsUpdateAvailable(string id)=>false;
+    public Dictionary<string,string> Releases {get;}=[];
+    public List<string> Updated {get;}=[];
+    public (string Version,bool CanInstall)? UpstreamUpdate(string id)=>Releases.TryGetValue(id,out var version)
+        ?(version,true):null;
+    public Task<string> UpdateAsync(string id,CancellationToken cancellation=default)
+    {Updated.Add(id);return Task.FromResult("Mise à jour prête");}
     public bool IsPackageReady(string id)=>Engines[id].Snapshot.State==RuntimeDownloadState.Ready;
     public string? CompatibilityError(string id)=>Blocked.Contains(id)?"Incompatible":null;
     public async Task<string> PrepareAsync(string id,CancellationToken cancellation=default)

@@ -12,6 +12,7 @@ public sealed partial class MainWindow
     private void OpenPersonalLibrary(object? sender, RoutedEventArgs args)
     {
         if (OwnedWindows.Any(window => window.IsVisible)) return;
+        LeaveRetroAchievementLibrary();
         LaunchTransition.Stop();
         if (!_personalLibrary || !LibraryView.IsVisible)
             _personalLibraryReturnToConsoles = PlatformHome.IsVisible;

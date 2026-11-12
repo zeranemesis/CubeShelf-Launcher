@@ -7908,5 +7908,19 @@
     "Sha256": "72e21aff23a077d90f195bb39e7aa4a4398d81e86e90c54c6ee539d2b47781ea",
     "Width": 1046,
     "Height": 706
+  },
+  {
+    "Console": "wii",
+    "Title": "PokéPark Wii: Pikachu's Adventure",
+    "File": "Database/59ebb521-05cf-46d6-bf00-4cfda2412499.png",
+    "DatabaseID": "59604",
+    "MatchedTitle": "PokéPark Wii: Pikachu's Adventure",
+    "Platform": "Nintendo Wii",
+    "Region": "World",
+    "Source": "LaunchBox Games Database",
+    "ImageUrl": "https://images.launchbox-app.com/59ebb521-05cf-46d6-bf00-4cfda2412499.png",
+    "Sha256": "1b7db5ecc05412aee57f94e5a3d60641d31337fd0ca92ceea9c9e62adf0c8d8c",
+    "Width": 2429,
+    "Height": 1533
   }
 ]

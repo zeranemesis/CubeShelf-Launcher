@@ -69,7 +69,9 @@ public sealed partial class MobileLibraryView
         if (_launching) { CancelLaunchTransition(); return true; }
         if (_downloadsOverlay.IsVisible) { CloseDownloads(); return true; }
         if (_inspectionCase is not null) { CloseInspection(); return true; }
-        if(_presentation.IsDual&&_dualDetail){_dualDetail=false;RefreshDualLibrary(false);return true;}
+        if(UsesHome&&_dualDetail){_dualDetail=false;RefreshDualLibrary(false);return true;}
+        if(_achievementLibrary&&HomeInput.DismissPopup())return true;
+        if(_achievementLibrary){CloseRetroAchievements();return true;}
         if(_presentation.IsDual&&_dualLibrary.IsVisible){if(_dualPlatforms)return false;RefreshDualLibrary(true);return true;}
         if (_invitationPanel.IsExpanded)
         {

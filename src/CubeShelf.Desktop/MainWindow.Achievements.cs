@@ -33,13 +33,57 @@ public sealed partial class MainWindow
             return RetroAchievementsLaunch.IsSupportedBy(g.Executable);
         }).GroupBy(NativePortCatalog.GameKey).Select(group=>group.First()).OrderBy(g=>g.Title).ToArray();
     }
-    private void OpenRetroAchievementsMenu(object? sender,RoutedEventArgs args)=>ShowBigPictureMenu("achievements");
-    private void OpenRetroAchievementGame(GameCatalogEntry game)
+    private readonly AchievementProgressClient _achievementProgress=new();
+    private Task<GameAchievementProgress> ReadAchievementProgressAsync(string id,CancellationToken cancellation)
     {
-        _personalLibrary=false;_favoritesOnly=false;ConsoleShelfPicker.SelectedIndex=ConsoleIndex(game.ShelfConsole);
-        SelectPortVersion(game.Id);SelectCatalogGame(game,false);RebuildBigPictureShelf();ShowParityView(BigPictureView);
-        if(_presentation?.IsDual==true){DualScreenView.SelectItem(game.Id);SelectDualGame(game.Id);}
-        else{var index=Array.FindIndex(_bigPictureGames,g=>g.Id==game.Id);if(index>=0)SelectBigPictureGame(index);}
+        var session=_raStore?.Load(out var rejected) is {} account&&!rejected?account:null;
+        var summary=_raCache?.All.GetValueOrDefault(id);
+        var gameId=summary is not null&&string.Equals(summary.User,session?.User,StringComparison.OrdinalIgnoreCase)
+            ?summary.RaGameId:id=="GMPE01_00"?AchievementProgressClient.MarioParty4:0;
+        return _achievementProgress.LoadAsync(gameId,session,summary,cancellation);
+    }
+
+    private bool _achievementLibrary;
+    private GameCatalogEntry? _achievementReturnGame;
+    private string? _achievementReturnPlatform;
+
+    private void OpenRetroAchievementsMenu(object? sender,RoutedEventArgs args)=>OpenRetroAchievementLibrary();
+
+    private void OpenRetroAchievementLibrary()
+    {
+        if(_achievementLibrary||LaunchTransition.IsVisible)return;
+        _achievementReturnGame=_selectedGame;
+        _achievementReturnPlatform=DualScreenView.IsVisible&&DualScreenView.IsPlatforms?DualScreenView.SelectedId:null;
+        _achievementLibrary=true;
+        CloseBigPictureMenu();
+        BuildDualGames();
+        ShowParityView(DualScreenView);
+        DualScreenView.Move(0,0);
+    }
+
+    private bool CloseRetroAchievementLibrary()
+    {
+        if(!_achievementLibrary)return false;
+        var platform=_achievementReturnPlatform;
+        LeaveRetroAchievementLibrary();
+        if(platform is not null)
+        {
+            ShowDualPlatforms();
+            DualScreenView.SelectItem(platform);
+        }
+        else ShowParityView(_bigPictureActive?BigPictureView:LibraryView);
+        if(DualScreenView.IsVisible)DualScreenView.Move(0,0);
+        else if(_bigPictureActive)BigPictureAchievements.Focus();
+        return true;
+    }
+
+    private void LeaveRetroAchievementLibrary()
+    {
+        if(!_achievementLibrary)return;
+        _selectedGame=_achievementReturnGame;
+        _achievementReturnGame=null;
+        _achievementReturnPlatform=null;
+        _achievementLibrary=false;
     }
 
     private void InitializeAchievements()

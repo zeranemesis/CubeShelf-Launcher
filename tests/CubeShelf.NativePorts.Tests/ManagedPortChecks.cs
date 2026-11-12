@@ -37,12 +37,46 @@ internal static class ManagedPortChecks
         {
             var candidate=NativePortUpdateService.Parse(port,latest.RootElement);
             Check(candidate is {ReleaseTag:"v1.1",Assets.Count:1}&&candidate.Assets[0].Sha256==new string('a',64),"upstream updates preserve a known platform package family and require a digest");
+            asset.ExecutableRelativePath="game-1.0/plugins-11.0/GameLauncher.exe";
+            var moved=NativePortUpdateService.Parse(port,latest.RootElement);
+            Check(moved?.Assets[0].ExecutableRelativePath=="game-1.1/plugins-11.0/GameLauncher.exe",
+                "updates follow a versioned archive directory without selecting a different launcher or touching unrelated versions");
         }
         foreach(var json in new[]{
             "{\"tag_name\":\"v1.1\",\"prerelease\":true,\"assets\":[]}",
             "{\"tag_name\":\"v1.1\",\"assets\":[{\"name\":\"game-v1.1-windows-x64.zip\",\"digest\":null}]}",
             JsonSerializer.Serialize(new{tag_name="v1.1",assets=new[]{new{name="game-v1.1-windows-x64.zip",size=1,digest="sha256:"+new string('a',64),browser_download_url="https://example.invalid/game.zip"}}})})
         {using var invalid=JsonDocument.Parse(json);Check(NativePortUpdateService.Parse(port,invalid.RootElement) is null,"preview, unverified or foreign packages are never offered as updates");}
+        static object Release(string tag,string name,bool preview=false,bool draft=false)=>
+            new {tag_name=tag,prerelease=preview,draft,assets=new[]{new{name,size=32,digest="sha256:"+new string('a',64),
+                browser_download_url=(tag=="v1.4.0"?"https://example.invalid/":"https://github.com/owner/project/")+"releases/download/"+tag+"/"+name}}};
+        var releases=new[]{
+            Release("v2.0.0","port-2.0.0-windows-x64.zip"),
+            Release("v1.9.0","port-1.9.0-eu-android-arm64.apk"),
+            Release("v1.8.0-beta","port-1.8.0-beta-us-android-arm64.apk",preview:true),
+            Release("v1.7.0","port-1.7.0-us-android-arm64.apk",draft:true),
+            Release("v1.6.0","port-1.3.0-us-android-arm64.apk"),
+            Release("v1.5.0","port-1.5.0-us-android-arm64.apk"),
+            Release("v1.4.0","port-1.4.0-us-android-arm64.apk")};
+        using var androidHttp=new HttpClient(new Bytes(()=>JsonSerializer.SerializeToUtf8Bytes(releases)));
+        using var androidUpdates=new NativePortUpdateService(androidHttp);
+        var android=await androidUpdates.CheckAndroidAsync(port.Repository,"v1.3.0","port-1.3.0-us-android-arm64.apk");
+        Check(android is {Version:"v1.5.0",Apk:{Size:32} apk}&&apk.Sha256==new string('a',64)
+            &&apk.Url==port.Homepage+"/releases/download/v1.5.0/port-1.5.0-us-android-arm64.apk",
+            "Android selects the newest verified APK matching the known region and stable channel");
+        using var foreignHttp=new HttpClient(new Bytes(()=>JsonSerializer.SerializeToUtf8Bytes(new[]{releases[^1]})));
+        using var foreignUpdates=new NativePortUpdateService(foreignHttp);
+        Check(await foreignUpdates.CheckAndroidAsync(port.Repository,"v1.3.0","port-1.3.0-us-android-arm64.apk") is {Version:"v1.4.0",Apk:null},
+            "an APK from a foreign host is detectable but cannot enter the Android installer");
+        Check(await androidUpdates.CheckAndroidAsync(port.Repository,"v1.3.0","port-1.3.0-us-android-arm64.apk","v1.5.0") is null,
+            "a newer standalone Android installation is not offered an older package");
+        Check(NativePortUpdateService.IsNewerRelease("v1.0.3-android-r10","v1.0.3-android-r9")
+            &&NativePortUpdateService.IsNewerRelease("v9.0.2P3","v9.0.2P2")
+            &&NativePortUpdateService.IsNewerRelease("B0.4","B0.3")
+            &&NativePortUpdateService.IsNewerRelease("v0.3","B0.3")
+            &&NativePortUpdateService.IsNewerRelease("v0.2.0","v0.2.0-beta")
+            &&!NativePortUpdateService.IsNewerRelease("v1.2","v1.2.0"),
+            "release ordering handles Android revisions, prereleases and equivalent numeric tags");
         if(!OperatingSystem.IsWindows())return;
         var directory=Path.Combine(root,"managed-ports");var paths=new Paths(directory);var library=new NativePortLibrary(paths);
         using var http=new HttpClient(new Bytes(()=>bytes));

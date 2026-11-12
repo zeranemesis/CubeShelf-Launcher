@@ -35,7 +35,8 @@ internal sealed class AndroidHomeDisplays : Java.Lang.Object,DisplayManager.IDis
         if(_resumed)_manager?.UnregisterDisplayListener(this);
         _resumed=false;Close();
     }
-    private void RefreshRequested()=>_activity.RunOnUiThread(Refresh);
+    // A touch handler can request a close while AvaloniaView is still dispatching that touch.
+    private void RefreshRequested()=>_handler.Post(Refresh);
     public void OnDisplayAdded(int displayId)=>RefreshRequested();
     public void OnDisplayRemoved(int displayId)=>RefreshRequested();
     public void OnDisplayChanged(int displayId)=>RefreshRequested();

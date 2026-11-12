@@ -1458,25 +1458,26 @@
     "Project": "automobililamborghini-recomp",
     "Repository": "alondero/automobililamborghini-recomp",
     "Method": "Port natif Windows déclaré par le projet",
-    "Status": "Paquet Windows · partie non testée",
-    "Notes": "Port Windows déclaré dans la documentation amont. Fournis les fichiers de ta propre copie selon ses instructions ; aucun jeu fourni. Paquet épinglé par URL, taille et SHA-256 publiés sur GitHub. Compatibilité et jouabilité non testées dans DecompShelf.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "39a7188dc5847baa4bb63caeac679995f55ccbab",
-    "ReadmeUrl": "https://github.com/alondero/automobililamborghini-recomp/blob/39a7188dc5847baa4bb63caeac679995f55ccbab/README.md",
-    "ReleaseUrl": "https://github.com/alondero/automobililamborghini-recomp/releases/tag/v0.10.3",
-    "ReleaseTag": "v0.10.3",
+    "Status": "Expérimental · Version publiée",
+    "Notes": "Au premier démarrage, fournis ta ROM Nintendo 64 nord-américaine compatible. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "0b13e40a58984c629f9aa3fe9084117b86dbcdaf",
+    "ReadmeUrl": "https://github.com/alondero/automobililamborghini-recomp/blob/0b13e40a58984c629f9aa3fe9084117b86dbcdaf/README.md",
+    "ReleaseUrl": "https://github.com/alondero/automobililamborghini-recomp/releases/tag/v0.11.0",
+    "ReleaseTag": "v0.11.0",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
         "Name": "lamborghini-recomp-windows-x64.zip",
-        "Url": "https://github.com/alondero/automobililamborghini-recomp/releases/download/v0.10.3/lamborghini-recomp-windows-x64.zip",
-        "Sha256": "53c1eda251dfbda4564defc2008137ab8ca9f97bb0edbdc9d9bf0f263c1071f5",
-        "Size": 36420367,
+        "Url": "https://github.com/alondero/automobililamborghini-recomp/releases/download/v0.11.0/lamborghini-recomp-windows-x64.zip",
+        "Size": 37484589,
+        "Sha256": "5f1a79bef3b4bb600ee7b3d74c8ff51da5ddc96a042e201798004c222dc5c44d",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": "lamborghini_modern.exe"
       }
     ]
   },

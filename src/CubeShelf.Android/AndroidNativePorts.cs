@@ -3,6 +3,8 @@ using Android.Content;
 using Android.Content.PM;
 using Avalonia.Platform;
 using CubeShelf.Mobile;
+using CubeShelf.Core.Updates;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -16,9 +18,11 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
     private readonly Dictionary<string,EmbeddedEngineSpec> _hosts;
     private readonly Dictionary<string,EmbeddedNativeModule> _modules;
     private readonly SemaphoreSlim _preparation=new(1);
-    private readonly HashSet<string> _automaticPreparations=[];
+    private readonly NativePortUpdateService _updates=new();
+    private readonly SemaphoreSlim _updateCheck=new(1);
+    private readonly ConcurrentDictionary<(string Id,string Version),(DateTimeOffset RetryAt,AndroidPortRelease? Release)> _releases=new();
+    private volatile string? _selectedForUpdate;
     public event Action? Changed;
-    public bool IsPreparing(string id){lock(_automaticPreparations)return _automaticPreparations.Contains(id);}
     private static Context Context => global::Android.App.Application.Context;
     private AndroidNativePorts()
     {
@@ -26,12 +30,10 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         Catalog=MobileNativePort.Load(stream);
         using var hosts=Context.Assets!.Open("nativehost/hosts.json");
         _hosts=(JsonSerializer.Deserialize<EmbeddedEngineSpec[]>(hosts)??[]).ToDictionary(s=>s.Id);
-        if(!Catalog.Where(p=>p.Id!=AndroidSm64.Id).All(p=>_hosts.TryGetValue(p.Id,out var h)&&h.ApkSha256==p.ApkSha256&&h.PackageName==p.PackageName))
+        if(!Catalog.Where(p=>p.Id!=AndroidSm64.Id&&!p.ExternalInstall).All(p=>_hosts.TryGetValue(p.Id,out var h)&&h.ApkSha256==p.ApkSha256&&h.PackageName==p.PackageName))
             throw new InvalidDataException("Les adaptateurs des moteurs ne correspondent pas au catalogue Android.");
         _modules=_hosts.ToDictionary(p=>p.Key,p=>new EmbeddedNativeModule(Context.FilesDir!.AbsolutePath,p.Value,name=>Context.Assets.Open(name)));
         _engines=Catalog.Where(p=>p.Id!=AndroidSm64.Id).ToDictionary(p=>p.Id,p=>new NativeApkDownload(p,Context.FilesDir!.AbsolutePath,CompatibilityError(p.Id) is null));
-        foreach(var (id,engine) in _engines)
-            engine.Changed+=snapshot=>{if(snapshot.State==RuntimeDownloadState.Ready&&IsUpdateAvailable(id))_ = PrepareKnownUpdateAsync(id);};
     }
     internal IEnumerable<RuntimeDownloadSource> Sources => Catalog.Where(p=>p.Id!=AndroidSm64.Id).Select(p=>new RuntimeDownloadSource(p.Id,p.Id,p.Title,p.Version,_engines[p.Id]));
     private MobileNativePort Port(string id)=>Catalog.Single(p=>p.Id==id);
@@ -41,50 +43,124 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         catch(PackageManager.NameNotFoundException) {return null;}
     }
     public bool IsEmbedded(string id)=>id==AndroidSm64.Id||_hosts.ContainsKey(id);
-    public bool IsInstalled(string id)=>id==AndroidSm64.Id?AndroidSm64.IsPrepared:_modules[id].IsReady&&(id!=AndroidMhguFiles.Id||AndroidMhguFiles.IsPrepared);
+    public bool IsInstalled(string id)
+    {
+        if(id==AndroidSm64.Id)return AndroidSm64.IsPrepared;
+        if(_modules.TryGetValue(id,out var module))return module.IsReady&&(id!=AndroidMhguFiles.Id||AndroidMhguFiles.IsPrepared);
+        var port=Port(id);
+        using var installed=Installed(port.PackageName);
+        return installed is not null&&VersionCode(installed)>=port.VersionCode;
+    }
     public bool IsAdded(string id)=>IsInstalled(id)||Directory.Exists(Path.Combine(Context.FilesDir!.AbsolutePath,"native-games",id==AndroidSm64.Id?"sm64":id))
-        ||id!=AndroidSm64.Id&&(_modules[id].HasPreviousVersion||_engines[id].IsReady||Installed(Port(id).PackageName) is not null);
+        ||id!=AndroidSm64.Id&&(_modules.TryGetValue(id,out var module)&&module.HasPreviousVersion||_engines[id].IsReady||Installed(Port(id).PackageName) is not null);
     internal void StorageChanged(string id)
     {
         if(_engines.TryGetValue(id,out var engine)&&!File.Exists(engine.ApkFile)&&engine.Snapshot.State==RuntimeDownloadState.Ready)engine.Cancel();
     }
-    public bool IsUpdateAvailable(string id)=>id!=AndroidSm64.Id&&!_modules[id].IsReady&&_modules[id].HasPreviousVersion;
-    internal void ResumeKnownUpdates()
+    public bool IsUpdateAvailable(string id)=>_modules.TryGetValue(id,out var module)&&!module.IsReady&&module.HasPreviousVersion;
+    private (string Repository,string Pinned,string Package,string? Installed)? Upstream(string id)
     {
+        if(id=="GMPE01_00")return ("zeranemesis/Marioparty4",PartyBoardDownloads.Version,PartyBoardDownloads.AssetName,null);
+        var port=Catalog.FirstOrDefault(p=>p.Id==id);
+        if(port is null)return null;
+        if(port.ExternalInstall)
+        {
+            using var installed=Installed(port.PackageName);
+            if(installed?.VersionName is {} name&&NativePortUpdateService.IsNewerRelease(name,port.Version))
+                return (port.Repository,port.Version,port.Name,name);
+        }
+        return (port.Repository,port.Version,port.Name,null);
+    }
+
+    private AndroidPortRelease? UpstreamRelease(string id)=>
+        Upstream(id) is {} source&&_releases.TryGetValue((id,source.Installed??source.Pinned),out var cached)?cached.Release:null;
+
+    public (string Version,bool CanInstall)? UpstreamUpdate(string id)
+    {
+        if(UpstreamRelease(id) is not {} release)return null;
+        var port=Catalog.FirstOrDefault(p=>p.Id==id);
+        var external=port?.ExternalInstall==true;
+        if(external&&!IsInstalled(id))return null;
+        return (release.Version,release.Apk is not null&&external);
+    }
+
+    public void CheckSelectedUpdate(string id)
+    {
+        if(_selectedForUpdate==id)return;
+        _selectedForUpdate=id;
+        if(id!="GMPE01_00"&&!Catalog.Any(port=>port.Id==id))return;
+        _=CheckUpstreamAsync(id,true);
+    }
+
+    internal async Task CheckInstalledUpdatesAsync()
+    {
+        foreach(var port in Catalog)
+            if(port.Id==_selectedForUpdate||IsInstalled(port.Id))await CheckUpstreamAsync(port.Id).ConfigureAwait(false);
+        await CheckUpstreamAsync("GMPE01_00").ConfigureAwait(false);
+    }
+
+    private async Task CheckUpstreamAsync(string id,bool selectedOnly=false)
+    {
+        if(selectedOnly)await Task.Delay(450).ConfigureAwait(false);
+        await _updateCheck.WaitAsync().ConfigureAwait(false);
         try
         {
-            using var manager=Context.GetSystemService(Context.ConnectivityService) as global::Android.Net.ConnectivityManager;
-            using var network=manager?.ActiveNetwork;
-            using var capabilities=network is null?null:manager!.GetNetworkCapabilities(network);
-            var unmetered=capabilities?.HasCapability(global::Android.Net.NetCapability.NotMetered)==true;
-            foreach(var port in Catalog.Where(p=>IsUpdateAvailable(p.Id)&&CompatibilityError(p.Id) is null))
-                if(_engines[port.Id].IsReady)_ = PrepareKnownUpdateAsync(port.Id);
-                else if(unmetered)NativeGameService.Downloads.Enqueue(port.Id);
+            if(selectedOnly&&_selectedForUpdate!=id)return;
+            if(Upstream(id) is not {} source)return;
+            var key=(id,source.Installed??source.Pinned);
+            if(_releases.TryGetValue(key,out var cached)&&cached.RetryAt>DateTimeOffset.UtcNow)return;
+            try
+            {
+                var release=await _updates.CheckAndroidAsync(source.Repository,source.Pinned,source.Package,source.Installed,allowPrereleases:id=="GMPE01_00").ConfigureAwait(false);
+                _releases[key]=(DateTimeOffset.UtcNow.AddHours(6),release);
+                if(release!=cached.Release)Changed?.Invoke();
+            }
+            catch(Exception error) when(error is HttpRequestException or IOException or JsonException or OperationCanceledException or InvalidOperationException or KeyNotFoundException)
+            {
+                _releases[key]=(DateTimeOffset.UtcNow.AddMinutes(10),cached.Release);
+                global::Android.Util.Log.Debug("DecompShelf","Vérification du port "+id+" : "+error.Message);
+            }
         }
-        catch(Exception error){global::Android.Util.Log.Warn("DecompShelf","Mises à jour des moteurs : "+error.Message);}
+        finally{_updateCheck.Release();}
     }
-    private async Task PrepareKnownUpdateAsync(string id)
+
+    public async Task<string> UpdateAsync(string id,CancellationToken cancellation=default)
     {
-        lock(_automaticPreparations)if(!_automaticPreparations.Add(id))return;
-        Changed?.Invoke();
-        await _preparation.WaitAsync();
+        var port=Port(id);
+        if(CompatibilityError(id) is { } issue)throw new InvalidOperationException(issue);
+        if(!await _preparation.WaitAsync(0,cancellation))throw new InvalidOperationException("Une préparation est déjà en cours.");
         try
         {
-            if(!IsUpdateAvailable(id))return;
-            var file=await _engines[id].VerifiedApkAsync();
-            var port=Port(id);var info=Context.PackageManager!.GetPackageArchiveInfo(file,PackageInfoFlags.MetaData);
-            if(info?.PackageName!=port.PackageName||VersionCode(info)!=port.VersionCode)throw new InvalidDataException("Identité du moteur incorrecte.");
-            await Task.Run(()=>_modules[id].PrepareAsync(file));
+            var queue=NativeGameService.Downloads;
+            var transferId=id;
+            var engine=_engines[id];
+            if(port.ExternalInstall)
+            {
+                if(UpstreamRelease(id) is not {Apk:{} apk} release||!IsInstalled(id))
+                    throw new InvalidOperationException("Aucune mise à jour vérifiable disponible pour ce port.");
+                var package=new MobileNativePort
+                {
+                    Id=id,ShelfConsole=port.ShelfConsole,Repository=port.Repository,PackageName=port.PackageName,
+                    Version=release.Version,VersionCode=port.VersionCode,MinimumSdk=port.MinimumSdk,Abis=port.Abis,
+                    Name=apk.Name,Url=apk.Url,Size=apk.Size,ApkSize=apk.Size,Sha256=apk.Sha256,ApkSha256=apk.Sha256
+                };
+                transferId=id+"-update-"+apk.Sha256[..12];
+                engine=(NativeApkDownload)queue.Register(new(transferId,id,port.Title,release.Version,
+                    new NativeApkDownload(package,Context.FilesDir!.AbsolutePath,true)));
+            }
+            if(!engine.IsReady)
+                await queue.DownloadAsync(transferId,engine,cancellation);
+            return await InstallVerifiedAsync(port,engine,port.ExternalInstall,cancellation);
         }
-        catch(Exception error){global::Android.Util.Log.Warn("DecompShelf","Mise à jour du moteur conservée pour réessai : "+error.Message);}
-        finally{_preparation.Release();lock(_automaticPreparations)_automaticPreparations.Remove(id);Changed?.Invoke();}
+        finally{_preparation.Release();}
     }
+
     public bool IsPackageReady(string id)=>id==AndroidSm64.Id?AndroidSm64.EngineAvailable:_engines[id].IsReady;
     public string? CompatibilityError(string id)
     {
         var port=Port(id);
         if(id==AndroidSm64.Id&&!AndroidSm64.EngineAvailable)return "Super Mario 64 intégré nécessite l’APK ARM64 de DecompShelf.";
-        if(id!=AndroidSm64.Id)
+        if(id!=AndroidSm64.Id&&!port.ExternalInstall)
         {
             if(!OperatingSystem.IsAndroidVersionAtLeast(28))return "Les moteurs hébergés nécessitent Android 9 ou plus récent.";
             if(RuntimeInformation.ProcessArchitecture!=Architecture.Arm64)return "Les moteurs hébergés nécessitent l’APK ARM64 de DecompShelf.";
@@ -106,20 +182,39 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         {
             NativeGameService.Downloads.Enqueue(id);
             if(NativeGameService.Downloads.IsPaused)NativeGameService.Downloads.SetPaused(false);
-            return "Téléchargement du moteur ajouté à la file. Après vérification, touche Préparer dans DecompShelf.";
+            return Port(id).ExternalInstall
+                ? "Téléchargement ajouté à la file. Touche Installer l’APK après vérification."
+                : "Téléchargement du moteur ajouté à la file. Après vérification, touche Préparer dans DecompShelf.";
         }
         if(!await _preparation.WaitAsync(0,cancellation))throw new InvalidOperationException("Une préparation est déjà en cours.");
-        try
-        {
-            var file=await _engines[id].VerifiedApkAsync();cancellation.ThrowIfCancellationRequested();
-            var port=Port(id);
-            var candidate=Context.PackageManager!.GetPackageArchiveInfo(file,PackageInfoFlags.MetaData)??throw new InvalidDataException("Paquet du moteur invalide.");
-            if(candidate.PackageName!=port.PackageName||VersionCode(candidate)!=port.VersionCode)throw new InvalidDataException("L’identité du moteur ne correspond pas au catalogue.");
-            await Task.Run(()=>_modules[id].PrepareAsync(file,cancellation),cancellation);
-            if(id==AndroidMhguFiles.Id&&!AndroidMhguFiles.IsPrepared)await AndroidMhguFiles.ImportAsync(cancellation);
-            return "Moteur prêt dans DecompShelf. Au premier démarrage, importe les fichiers de ta propre copie du jeu.";
-        }
+        try {return await InstallVerifiedAsync(Port(id),_engines[id],false,cancellation);}
         finally {_preparation.Release();}
+    }
+
+    private async Task<string> InstallVerifiedAsync(MobileNativePort port,NativeApkDownload engine,bool update,CancellationToken cancellation)
+    {
+        var file=await engine.VerifiedApkAsync();
+        cancellation.ThrowIfCancellationRequested();
+        using var candidate=Context.PackageManager!.GetPackageArchiveInfo(file,PackageInfoFlags.MetaData)
+            ??throw new InvalidDataException("Paquet du moteur invalide.");
+        if(candidate.PackageName!=port.PackageName||!update&&VersionCode(candidate)!=port.VersionCode)
+            throw new InvalidDataException("L’identité du moteur ne correspond pas au catalogue.");
+        if(port.ExternalInstall)
+        {
+            var activity=NativeGameService.CurrentActivity??throw new InvalidOperationException("Rouvre DecompShelf puis réessaie.");
+            if(update)
+            {
+                if(activity is MainActivity {IsResumedForInstall:false})
+                    return "APK vérifié. Rouvre les options du jeu pour lancer l’installation.";
+                AndroidAppUpdates.ValidateUpdate(activity,file,port.PackageName);
+            }
+            return AndroidAppUpdates.RequestInstall(activity,file)
+                ? "Confirme l’installation du port dans Android."
+                : "Autorise DecompShelf à installer des applications, puis reviens et relance l’installation.";
+        }
+        await Task.Run(()=>_modules[port.Id].PrepareAsync(file,cancellation),cancellation);
+        if(port.Id==AndroidMhguFiles.Id&&!AndroidMhguFiles.IsPrepared)await AndroidMhguFiles.ImportAsync(cancellation);
+        return "Moteur prêt dans DecompShelf. Au premier démarrage, importe les fichiers de ta propre copie du jeu.";
     }
     public void Launch(string id)
     {
@@ -127,6 +222,14 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         if(CompatibilityError(id) is { } issue)throw new InvalidOperationException(issue);
         if(!IsInstalled(id))throw new InvalidOperationException("Prépare d’abord le moteur dans DecompShelf.");
         var activity=NativeGameService.CurrentActivity??throw new InvalidOperationException("Rouvre DecompShelf puis réessaie.");
+        var port=Port(id);
+        if(port.ExternalInstall)
+        {
+            using var external=activity.PackageManager!.GetLaunchIntentForPackage(port.PackageName)
+                ??throw new InvalidOperationException("Le port installé ne propose aucune activité de lancement.");
+            activity.StartActivity(external);
+            return;
+        }
         var host=_hosts[id];var main=host.Components.Single(c=>c.Name==host.MainActivity&&c.Kind=="activity");
         using var intent=new Intent().SetClassName(activity.PackageName!,main.Bridge);
         intent.AddFlags(ActivityFlags.NewTask);

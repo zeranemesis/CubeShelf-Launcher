@@ -37,13 +37,14 @@ public sealed partial class MobileLibraryView
             _personalLibrary=false;
             CloseInspection(false);ResetTouch();_activeConsole=console;_consoleLogo.Platform=console;
             _catalog=_allCatalog.Where(game=>game.ShelfConsole==console).ToArray();_selected=0;
-            RebuildMobileShelf();UpdatePersonalLibraryUi();Select(0,false);
+            RebuildMobileShelf();UpdatePersonalLibraryUi();Select(0);
         };
         return heading;
     }
     private void OpenPlatformHome()
     {
         if(_launching || _nativePreparation is not null)return;
+        CloseRetroAchievements();
         if(_presentation.IsDual){RefreshDualLibrary(true);return;}
         _platformHome.Open(_mobilePlatforms.Select(p=>(p,_allCatalog.Count(g=>g.ShelfConsole==p.Id))),_activeConsole);
     }
@@ -73,7 +74,7 @@ public sealed partial class MobileLibraryView
         catch(Exception error) when (error is IOException or UnauthorizedAccessException){}
         _allCatalog=_allCatalog.Select(g=>g.Id==port.Id?NativeGame(next):g).ToArray();
         _catalog=VisibleCatalog();_selected=Math.Max(0,Array.FindIndex(_catalog,g=>g.Id==next.Id));
-        RebuildMobileShelf();Select(_selected,false);
+        RebuildMobileShelf();Select(_selected);
     }
     private IEnumerable<MobileGame> NativeCatalogGames()
     {
@@ -91,7 +92,7 @@ public sealed partial class MobileLibraryView
     private void RebuildMobileShelf()
     {
         RefreshDualLibrary();
-        if(_presentation.IsDual&&!_dualDetail){_shelf.Clear();return;}
+        if(UsesHome&&!_dualDetail){_shelf.Clear();return;}
         _consoleLogo.Platform=_activeConsole;
         _shelf.SetGames(_catalog.Select(game=>
         {
@@ -104,7 +105,7 @@ public sealed partial class MobileLibraryView
     {
         var native=_games.NativePorts!;
         var installed=native.IsInstalled(port.Id);var issue=native.CompatibilityError(port.Id);
-        var updating=native.IsUpdateAvailable(port.Id);var preparing=native.IsPreparing(port.Id);
+        var updating=native.IsUpdateAvailable(port.Id);
         var embedded=native.IsEmbedded(port.Id);
         var rom=embedded&&port.Id=="n64-sm64";
         var entry=DownloadManager?.Entries.FirstOrDefault(e=>e.GameId==port.Id);
@@ -114,28 +115,33 @@ public sealed partial class MobileLibraryView
         _nativeNotes.Text=rom?"Moteur intégré à DecompShelf. Choisis ta propre ROM Super Mario 64 US ou japonaise au format .z64 ; aucun APK de jeu à installer.":embedded?"Moteur hébergé dans DecompShelf. Au premier démarrage, importe les fichiers de ta propre copie du jeu.\n"+port.Notes:port.Notes;_nativeNotes.IsVisible=true;
         _availability.Text=issue??(installed?"Moteur prêt · "+port.Version:rom?"Moteur intégré · Ta ROM est nécessaire":ready?"Moteur vérifié · Préparation nécessaire":TransferLabel(state));
         _availability.Foreground=installed?Brushes.LightGreen:Brushes.LightGray;
-        if(embedded&&_nativePreparation is not null)_availability.Text="Préparation dans DecompShelf…";
-        if(updating)_availability.Text="Mise à jour du moteur disponible · "+port.Version;
-        if(preparing)_availability.Text="Mise à jour du moteur dans DecompShelf…";
+        if(_nativePreparation is not null)_availability.Text="Préparation dans DecompShelf…";
+        if(updating&&_nativePreparation is null)_availability.Text="Mise à jour du moteur disponible · "+port.Version;
+        var standaloneUpdate=native.UpstreamUpdate(port.Id) is {CanInstall:true};
         _play.IsVisible=installed&&issue is null;
-        _download.IsVisible=_nativePreparation is null&&!preparing&&issue is null&&(!installed||updating);
+        _download.IsVisible=_nativePreparation is null&&issue is null&&(!installed||updating||standaloneUpdate);
         _download.Content=ActionLabel(rom?"＋":ready?"＋":"↓",rom?"Choisir ma ROM Super Mario 64":ready?embedded?"Préparer dans DecompShelf":"Installer l’APK":state is RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying
             ?"Voir le téléchargement":installed?"Mettre à jour le port":"Télécharger le port");
-        if(updating&&!preparing&&state is not (RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying))
+        if(updating&&state is not (RuntimeDownloadState.Downloading or RuntimeDownloadState.Queued or RuntimeDownloadState.Paused or RuntimeDownloadState.Verifying))
             _download.Content=ActionLabel(ready?"＋":"↓",ready?"Mettre à jour dans DecompShelf":"Télécharger la mise à jour du moteur");
+        if(standaloneUpdate)_download.Content=ActionLabel("↓","Mettre à jour dans DecompShelf");
         _unavailableAction.IsVisible=issue is not null;_unavailableAction.Text=issue??"Port indisponible";
         _onlinePanel.IsVisible=false;_join.IsEnabled=false;
         ToolTip.SetTip(_download,_nativeNotes.Text);UpdateInputHint();
-        Avalonia.Automation.AutomationProperties.SetName(_download,embedded?"Préparer "+port.Title+" dans DecompShelf":"Installer "+port.Title);
+        Avalonia.Automation.AutomationProperties.SetName(_download,updating||standaloneUpdate?"Mettre à jour "+port.Title
+            :embedded?"Préparer "+port.Title+" dans DecompShelf":"Installer "+port.Title);
     }
-    private async Task PrepareSelectedPortAsync()
+    private bool SelectedPortHasManagedUpdate()=>SelectedNativePort is {} port&&_games.NativePorts is {} native
+        &&(native.IsUpdateAvailable(port.Id)||native.UpstreamUpdate(port.Id) is {CanInstall:true});
+
+    private async Task PrepareSelectedPortAsync(bool update=false)
     {
         if(SelectedNativePort is not { } port) {PreparePartyBoard();return;}
         if(_nativePreparation is not null)return;
         var native=_games.NativePorts!;
         using var preparation=new CancellationTokenSource();
         var embedded=native.IsEmbedded(port.Id);
-        if(embedded)
+        if(embedded||update)
         {
             _nativePreparation=preparation;
             _download.IsEnabled=false;_consolePicker.IsEnabled=false;
@@ -144,12 +150,13 @@ public sealed partial class MobileLibraryView
             _cancelNativePreparation.IsVisible=true;
             _nativePreparationProgress.IsVisible=true;
             RefreshAvailability();
-            SetStatus("");
+            SetStatus(update?"Mise à jour de "+port.Title+" en cours…":"");
         }
         try
         {
-            var ready=native.IsPackageReady(port.Id);
-            var message=await native.PrepareAsync(port.Id,preparation.Token);
+            var ready=update||native.IsPackageReady(port.Id);
+            var message=update?await native.UpdateAsync(port.Id,preparation.Token)
+                :await native.PrepareAsync(port.Id,preparation.Token);
             SetStatus(message);
             if(!ready&&(!embedded||port.Id!="n64-sm64"))
             {
@@ -161,7 +168,7 @@ public sealed partial class MobileLibraryView
         catch(Exception error) {SetStatus(error.Message);}
         finally
         {
-            if(embedded)
+            if(embedded||update)
             {
                 _nativePreparation=null;_download.IsEnabled=true;_consolePicker.IsEnabled=true;
                 _libraryButton.IsEnabled=true;

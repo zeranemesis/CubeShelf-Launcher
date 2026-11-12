@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using CubeShelf.Core.Library;
+using CubeShelf.Core.Achievements;
 using CubeShelf.Desktop.Controls;
 
 namespace CubeShelf.Mobile;
@@ -20,9 +21,10 @@ public sealed partial class MobileLibraryView
     }
     public event Action? SecondaryScreenStateChanged;
     // Overlays keep the bottom screen up (inert): dismissing the Presentation would expose the device's own launcher there.
-    public bool WantsSecondaryScreen=>_presentation.IsDual&&_presentation.SecondaryDisplay&&_presentationActive&&_dualLibrary.IsEffectivelyVisible&&!_launchTransition.IsVisible;
+    public bool WantsSecondaryScreen=>UsesHome&&_presentation.SecondaryDisplay&&_presentationActive&&_dualLibrary.IsEffectivelyVisible&&!_launchTransition.IsVisible;
     private LibraryPresentationStore _presentation=null!;
     private bool _dualPlatforms=true,_dualDetail,_presentationActive=true;
+    private bool UsesHome=>_presentation.IsDual||_achievementLibrary;
     private bool DualInputActive=>_dualLibrary.IsEffectivelyVisible&&!_downloadsOverlay.IsVisible&&!_storageOverlay.IsVisible&&!_gameOptionsOverlay.IsVisible&&!_launchTransition.IsVisible;
     private void InitializePresentation()
     {
@@ -38,20 +40,33 @@ public sealed partial class MobileLibraryView
             if(_dualLibrary.IsVisible)_shelf.Clear();
             RefreshPresentationStatusBar();
         };
+        _updatePromptTimer.Tick+=(_,_)=>OfferUpdate();
         WireHome(_dualLibrary);
         foreach(var overlay in new Control[]{_dualLibrary,_downloadsOverlay,_storageOverlay,_gameOptionsOverlay,_launchTransition})
-            overlay.PropertyChanged+=(_,e)=>{if(e.Property!=IsVisibleProperty)return;if(_secondaryHome is {} home)home.IsEnabled=DualInputActive;SecondaryScreenStateChanged?.Invoke();};
+            overlay.PropertyChanged+=(_,e)=>{if(e.Property!=IsVisibleProperty)return;if(_secondaryHome is {} home)home.IsEnabled=DualInputActive;SecondaryScreenStateChanged?.Invoke();if(!overlay.IsVisible)ScheduleUpdatePrompt();};
     }
+    private readonly AchievementProgressClient _achievementProgress=new();
     private void WireHome(DualScreenLibraryView surface)
     {
+        surface.FetchAchievements=(id,token)=>_achievementProgress.LoadAsync(
+            id==PartyBoardId?AchievementProgressClient.MarioParty4:0,_games.AchievementSession,null,token);
         surface.ConsolesRequested+=()=>RefreshDualLibrary(true);
         surface.LibraryRequested+=()=>{_dualPlatforms=false;ShowPersonalLibrary(true);RefreshDualLibrary(false);};
         surface.SettingsRequested+=ShowDownloads;
         surface.AchievementsRequested+=OpenRetroAchievements;
+        surface.BackRequested+=CloseRetroAchievements;
         surface.SelectionChanged+=id=>
         {
-            _dualLibrary.SelectItem(id);_secondaryHome?.SelectItem(id);
-            if(!surface.IsPlatforms){var index=Array.FindIndex(_catalog,g=>g.Id==id);if(index>=0)Select(index,false);}
+            if(surface.IsPlatforms)
+            {
+                if(!ReferenceEquals(surface,_dualLibrary))_dualLibrary.SelectItem(id);
+                if(!ReferenceEquals(surface,_secondaryHome))_secondaryHome?.SelectItem(id);
+            }
+            else
+            {
+                var index=Array.FindIndex(_catalog,g=>g.Id==id);
+                if(index>=0)Select(index);
+            }
         };
         surface.LaunchRequested+=id=>
         {
@@ -63,14 +78,14 @@ public sealed partial class MobileLibraryView
                 _dualPlatforms=false;_personalLibrary=false;_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==last.ShelfConsole);
                 ReloadVisibleCatalog();RefreshDualLibrary(false);
                 var resumed=Array.FindIndex(_catalog,g=>g.Id==gameId);if(resumed<0)return;
-                Select(resumed,false);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();
+                Select(resumed);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();
             }
             else if(surface.IsPlatforms)
             {
                 _dualPlatforms=false;_personalLibrary=false;_consolePicker.SelectedIndex=Array.FindIndex(_mobilePlatforms,p=>p.Id==id);
                 ReloadVisibleCatalog();RefreshDualLibrary(false);
             }
-            else{var index=Array.FindIndex(_catalog,g=>g.Id==id);if(index<0)return;Select(index,false);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();}
+            else{var index=Array.FindIndex(_catalog,g=>g.Id==id);if(index<0)return;Select(index);_dualLibrary.StopMusic();_secondaryHome?.StopMusic();ActivatePrimaryAction();}
         };
         surface.OptionsRequested+=_=>OptionsFromController();
     }
@@ -112,7 +127,7 @@ public sealed partial class MobileLibraryView
         picker.SelectionChanged+=(_,_)=>
         {
             if(picker.SelectedIndex==(_presentation.IsDual?1:0))return;
-            try{_presentation.SetStyle(picker.SelectedIndex==1);_dualDetail=false;_dualPlatforms=true;CloseDownloads(false);_platformHome.IsVisible=false;RefreshDualLibrary();if(!_presentation.IsDual){RebuildMobileShelf();OpenPlatformHome();}}
+            try{_presentation.SetStyle(picker.SelectedIndex==1);CloseRetroAchievements();_dualDetail=false;_dualPlatforms=true;CloseDownloads(false);_platformHome.IsVisible=false;RefreshDualLibrary();if(!_presentation.IsDual){RebuildMobileShelf();OpenPlatformHome();}}
             catch(Exception error) when(error is IOException or UnauthorizedAccessException){SetStatus(error.Message);}
         };
         return DownloadCard(content);
@@ -120,8 +135,8 @@ public sealed partial class MobileLibraryView
     private void RefreshDualLibrary(bool? platforms=null)
     {
         if(platforms is {} mode){_dualPlatforms=mode;_dualDetail=false;}
-        _dualLibrary.IsVisible=_presentation.IsDual&&!_dualDetail;
-        if(!_presentation.IsDual||_dualDetail){SecondaryScreenStateChanged?.Invoke();return;}
+        _dualLibrary.IsVisible=UsesHome&&!_dualDetail;
+        if(!UsesHome||_dualDetail){SecondaryScreenStateChanged?.Invoke();return;}
         _platformHome.IsVisible=false;
         var platformSelection=_dualLibrary.IsPlatforms?_dualLibrary.SelectedId??_activeConsole:_activeConsole;
         foreach(var surface in new[]{_dualLibrary,_secondaryHome}.OfType<DualScreenLibraryView>())
@@ -133,7 +148,8 @@ public sealed partial class MobileLibraryView
                 var cover=g.Covers.FirstOrDefault();
                 return new DualScreenItem(g.Id,g.Title,g.ShelfConsole,Cover(cover?.Front),(FoundGames.ContainsKey(g.Id)?FoundPrefix:"")+"Port Android · "+g.Genre,
                     Back:cover?.Back??"",Spine:cover?.Spine??"",Right:cover?.Right??"",Top:cover?.Top??"",Bottom:cover?.Bottom??"");
-            }),_personalLibrary?"Mes jeux":_mobilePlatforms.FirstOrDefault(p=>p.Id==_activeConsole)?.Console??"Jeux",false,_catalog.ElementAtOrDefault(_selected)?.Id);
+            }),_achievementLibrary?"RetroAchievements":_personalLibrary?"Mes jeux":_mobilePlatforms.FirstOrDefault(p=>p.Id==_activeConsole)?.Console??"Jeux",
+                false,_catalog.ElementAtOrDefault(_selected)?.Id,_achievementLibrary);
         if(_dualPlatforms&&ScanNeverRan)_dualLibrary.ShowMessage("Astuce : Réglages → Chercher mes jeux pour retrouver tes fichiers.");
         RefreshDualSelection();
         SecondaryScreenStateChanged?.Invoke();
@@ -152,14 +168,22 @@ public sealed partial class MobileLibraryView
         _dualDetail=false;_platformHome.IsVisible=false;RefreshDualLibrary(true);
     }
     public bool SwapFaceButtons=>_presentation.SwapFaceButtons;
+    public bool CanRepeatHomeDirections=>DualInputActive&&!HomeInput.IsPopupOpen;
     public void PageFromController(int step){SetControllerInput(true);if(DualInputActive&&!HomeInput.IsPopupOpen)HomeInput.ChangePage(step);}
     private void RefreshDualSelection()
     {
-        if(!_presentation.IsDual||_dualPlatforms)return;
+        if(!UsesHome||_dualPlatforms)return;
+        if(_catalog.ElementAtOrDefault(_selected) is not {} game)return;
+        var portId=SelectedNativePort?.Id??game.Id;
+        var hasUpdate=_games.NativePorts is {} native&&
+            (SelectedNativePort is not null&&native.IsUpdateAvailable(portId)||native.UpstreamUpdate(portId) is not null);
         foreach(var surface in new[]{_dualLibrary,_secondaryHome}.OfType<DualScreenLibraryView>())
         {
-            if(_catalog.ElementAtOrDefault(_selected) is {} game)surface.SelectItem(game.Id);
-            surface.UpdateSelected((FoundGames.ContainsKey(_catalog.ElementAtOrDefault(_selected)?.Id??"")?FoundPrefix:"")+_availability.Text,_play.IsVisible?"Jouer":_download.IsVisible?"Préparer le jeu":"Indisponible",_nativePreparation is null&&(_play.IsVisible&&_play.IsEnabled||_download.IsVisible&&_download.IsEnabled));
+            surface.SelectItem(game.Id);
+            var action=_play.IsVisible?(SelectedNativePort?.ExternalInstall==true?"Ouvrir le port":"Jouer"):
+                _download.IsVisible?(SelectedNativePort?.ExternalInstall==true?"Préparer le port":"Préparer le jeu"):"Indisponible";
+            surface.UpdateSelected((FoundGames.ContainsKey(_catalog.ElementAtOrDefault(_selected)?.Id??"")?FoundPrefix:"")+_availability.Text,
+                action,_nativePreparation is null&&(_play.IsVisible&&_play.IsEnabled||_download.IsVisible&&_download.IsEnabled),hasUpdate);
         }
     }
 }

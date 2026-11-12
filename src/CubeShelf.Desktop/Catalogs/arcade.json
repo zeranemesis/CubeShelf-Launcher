@@ -1052,5 +1052,63 @@
         ]
       }
     ]
+  },
+  {
+    "Id": "arcade-virtua-fighter-2-recomp",
+    "Title": "Virtua Fighter 2",
+    "Project": "vf2-recomp",
+    "Repository": "mr-finster/vf2-recomp",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Port PC publié · Réseau expérimental",
+    "Notes": "Fournis ton dump arcade au format vf2.zip (MAME, version 2.1). Le projet recompile le processeur du jeu et réutilise du code MAME pour le matériel d’arcade. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "7173755c76abc0e71fc541cf60a4b2fbe3fd5f9f",
+    "ReadmeUrl": "https://github.com/mr-finster/vf2-recomp/blob/7173755c76abc0e71fc541cf60a4b2fbe3fd5f9f/README.md",
+    "ReleaseUrl": "https://github.com/mr-finster/vf2-recomp/releases/tag/v0.1.22",
+    "ReleaseTag": "v0.1.22",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "VirtuaFighter2Recomp-windows.zip",
+        "Url": "https://github.com/mr-finster/vf2-recomp/releases/download/v0.1.22/VirtuaFighter2Recomp-windows.zip",
+        "Size": 8954284,
+        "Sha256": "443c7bc2d933ab419c096ddce4dc59b606148ba79ba6f15f456ed14ceed1a7a6",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "VirtuaFighter2/VirtuaFighter2.exe"
+      }
+    ]
+  },
+  {
+    "Id": "arcade-virtua-fighter-3-recomp",
+    "Title": "Virtua Fighter 3",
+    "Project": "vf3-recomp",
+    "Repository": "mr-finster/vf3-recomp",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Expérimental · Alpha",
+    "Notes": "Fournis ton dump arcade vf3.zip dans le dossier roms du port. Le projet documente des différences de rendu et un jeu en ligne expérimental. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "3f85aba1c3ea36e7253afb86900efbea8575d25f",
+    "ReadmeUrl": "https://github.com/mr-finster/vf3-recomp/blob/3f85aba1c3ea36e7253afb86900efbea8575d25f/README.md",
+    "ReleaseUrl": "https://github.com/mr-finster/vf3-recomp/releases/tag/v0.1.21-alpha",
+    "ReleaseTag": "v0.1.21-alpha",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "VirtuaFighter3Recomp-windows.zip",
+        "Url": "https://github.com/mr-finster/vf3-recomp/releases/download/v0.1.21-alpha/VirtuaFighter3Recomp-windows.zip",
+        "Size": 7997788,
+        "Sha256": "882937a83c8a71dc6ebdeba73a00a38e5944715e61779540f469b93d1f3cd6b1",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "VirtuaFighter3/VirtuaFighter3.exe"
+      }
+    ]
   }
 ]

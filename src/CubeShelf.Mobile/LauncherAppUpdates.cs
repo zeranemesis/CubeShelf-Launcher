@@ -13,7 +13,7 @@ public sealed record AppUpdateSnapshot(AppUpdateState State, string CurrentVersi
 public sealed class LauncherAppUpdates
 {
     private const string Repository = "https://github.com/zeranemesis/CubeShelf-Launcher/releases/download/";
-    private const long MaximumApkBytes = 256L * 1024 * 1024;
+    private const long MaximumApkBytes = 384L * 1024 * 1024;
     private readonly HttpClient _http;
     private readonly string _architecture, _directory;
     private readonly Func<string, string> _install;

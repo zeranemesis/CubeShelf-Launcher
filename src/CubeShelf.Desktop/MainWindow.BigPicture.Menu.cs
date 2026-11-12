@@ -50,14 +50,15 @@ public sealed partial class MainWindow
             "appearance"=>P7("Affichage et audio","Display and audio"),
             "settings"=>P7("Paramètres","Settings"),
             "game"=>P7("Options du jeu","Game options"),
-            "achievements"=>"RetroAchievements",
             _=>P7("Menu","Menu")
         };
-        BigPictureMenuContext.Text=page=="achievements"?P7("Ports natifs compatibles uniquement.","Compatible native ports only."):page=="game"?game?.Title:page=="main"
+        BigPictureMenuContext.Text=page=="game"?game?.Title:page=="main"
             ?P7("Ta bibliothèque, tes jeux et tes réglages.","Your library, games and settings.")
             :P7("Menu  /  Paramètres","Menu  /  Settings");
         BigPictureMenuHelp.Text=P7("↑ ↓ Sélectionner · Entrée / A Valider · Échap / B Retour · F10 / START Fermer",
             "↑ ↓ Select · Enter / A Confirm · Esc / B Back · F10 / START Close");
+        if(page=="game")BigPictureMenuHelp.Text=P7("↑ ↓ Sélectionner · Entrée / A Valider · Échap / B / X Fermer",
+            "↑ ↓ Select · Enter / A Confirm · Esc / B / X Close");
         BigPictureMenuCloseButton.Content=P7("Fermer","Close");
         BigPictureMenuExitButton.Content=P7("Quitter Big Picture  ·  F11","Exit Big Picture  ·  F11");
         void Section(string text)
@@ -85,14 +86,7 @@ public sealed partial class MainWindow
         }
         void Go(Action action) { CloseBigPictureMenu();action(); }
         void RefreshHome(){DualScreenView.Configure(_presentation!,_previewMusic.Play,Controls.BigPictureSounds.PlayFile);UpdateBigPictureChrome();ShowBigPictureMenu(page);}
-        if(page=="achievements")
-        {
-            var compatible=CompatibleRetroAchievementGames();
-            Section(P7("JEUX COMPATIBLES","COMPATIBLE GAMES"));
-            foreach(var entry in compatible)Row(entry.Title,()=>Go(()=>OpenRetroAchievementGame(entry)),ShelfProduct.Resolve(entry.ShelfConsole).Console);
-            if(compatible.Length==0)Section(P7("Aucun port installé ne déclare la prise en charge de RetroAchievements.","No installed port declares RetroAchievements support."));
-        }
-        else if(page=="controller")
+        if(page=="controller")
         {
             Section(P7("NAVIGATION","NAVIGATION"));
             Row(P7("Inverser stick et croix","Swap stick and D-pad"),()=>
@@ -142,7 +136,9 @@ public sealed partial class MainWindow
                 },value:game.RuntimeName);
             Section(P7("PERSONNALISER CE JEU","CUSTOMIZE THIS GAME"));
             Row(P7("Paramètres du jeu","Game settings"),()=>Go(()=>SelectCatalogGame(game)),P7("Fichiers du jeu et programme associé.","Game files and linked program."));
-            if(game.RuntimeOwnsSetup)Row(P7("Moteur et mises à jour","Engine and updates"),()=>Go(()=>OpenNativeEngineManager(game)),P7("Versions officielles, programme associé et retour au moteur précédent.","Upstream releases, linked program and previous engine."));
+            if(game.RuntimeOwnsSetup)Row(_nativeReleaseUpdates.TryGetValue(game.Id,out var update)
+                ?P7("Mise à jour disponible · ","Update available · ")+update.ReleaseTag
+                :P7("Moteur et mises à jour","Engine and updates"),()=>Go(()=>OpenNativeEngineManager(game)),P7("Versions officielles, programme associé et retour au moteur précédent.","Upstream releases, linked program and previous engine."));
             Row(P7("Mods du jeu","Game mods"),()=>Go(()=>OpenBigPictureMods(this,new RoutedEventArgs())));
             if(BigPictureView.IsVisible)Row(P7("Retourner le boîtier","Flip case"),()=>Go(()=>FlipBigPictureCase(this,new RoutedEventArgs())));
             if(OnlineCompanion.IsSupported(game))Row(P7("Jouer en ligne","Play online"),()=>Go(()=>OpenBigPictureOnline(this,new RoutedEventArgs())));
@@ -200,10 +196,16 @@ public sealed partial class MainWindow
 
     private bool TryBigPictureXShortcut()
     {
-        if(!_bigPictureActive||BigPictureMenuOverlay.IsVisible||LaunchTransition.IsVisible
+        if(!_bigPictureActive||LaunchTransition.IsVisible
             ||BigPictureInputWindow()!=this||BigPicturePageHasTextFocus()
             ||PlatformHome.IsVisible&&PlatformHome.SortHasFocus
             ||DualScreenView.IsVisible&&DualScreenView.IsPopupOpen)return false;
+        if(BigPictureMenuOverlay.IsVisible)
+        {
+            if(_bigPictureMenuPage!="game")return false;
+            CloseBigPictureMenu();
+            return true;
+        }
         if(PlatformHome.IsVisible||DualScreenView.IsVisible&&DualScreenView.IsPlatforms)
         {OpenPersonalLibrary(this,new RoutedEventArgs());return true;}
         if(!(BigPictureView.IsVisible||DualScreenView.IsVisible)||BigPictureGame is null)return false;
@@ -235,7 +237,8 @@ public sealed partial class MainWindow
         if(BigPictureMenuOverlay.IsVisible)
         {
             if(input==6) { if(_bigPictureMenuPage=="main")CloseBigPictureMenu();else ShowBigPictureMenu(BigPictureMenuParent); }
-            else if(input is 3 or 4)FocusBigPictureMenu(_bigPictureMenuIndex+(input==3?-1:1));
+            else if(input is 3 or 4 or 13 or 14)
+                FocusBigPictureMenu(_bigPictureMenuIndex+(input is 3 or 13?-1:1));
             else if(input==5)
             {
                 if(input==5&&BigPictureMenuCloseButton.IsFocused)CloseBigPictureMenu();
@@ -251,7 +254,7 @@ public sealed partial class MainWindow
             else if(input is 3 or 13)DualScreenView.Move(0,-1);
             else if(input is 4 or 14)DualScreenView.Move(0,1);
             else if(input==5)DualScreenView.ActivateFocused();
-            else if(input==6){if(DualScreenView.IsPlatforms)ExitBigPicture(this,new RoutedEventArgs());else ShowDualPlatforms();}
+            else if(input==6){if(CloseRetroAchievementLibrary())return;if(DualScreenView.IsPlatforms)ExitBigPicture(this,new RoutedEventArgs());else ShowDualPlatforms();}
             return;
         }
         if(!BigPictureView.IsVisible || BigPictureInputWindow()!=this)

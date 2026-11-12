@@ -182,6 +182,7 @@ public sealed partial class MainWindow
 
     private void ShowParityView(Control view)
     {
+        if(view==LibraryView||view==BigPictureView)LeaveRetroAchievementLibrary();
         if(_presentation?.IsDual==true&&(ReferenceEquals(view,LibraryView)||ReferenceEquals(view,BigPictureView)))
         {BuildDualGames();view=DualScreenView;}
         PlatformHome.IsVisible=false;
@@ -225,7 +226,7 @@ public sealed partial class MainWindow
     private void RefreshLibraryParity()
     {
         if (LibraryCards is null) return;
-        if(_presentation?.IsDual==true&&DualScreenView.IsVisible&&!DualScreenView.IsPlatforms)BuildDualGames();
+        if((_achievementLibrary||_presentation?.IsDual==true)&&DualScreenView.IsVisible&&!DualScreenView.IsPlatforms)BuildDualGames();
         // Cards (and their cover decodes) are only built for a visible library; ShowParityView catches up (~1 s at startup).
         var buildCards = LibraryOnScreen;
         _libraryStale = !buildCards;
@@ -422,8 +423,7 @@ public sealed partial class MainWindow
             ResolveCoverPath(cover?.Top), ResolveCoverPath(cover?.Bottom)))
         {
             var pose=baseGame.ShelfConsole == "gamecube" ? 24 : 14;
-            GameCase.SetShelfPose(_preferences.ReduceShelfMotion?pose:pose+18,true,animate:false);
-            GameCase.SetShelfPose(pose,true,animate:!_preferences.ReduceShelfMotion);
+            GameCase.SetShelfPose(pose,true,animate:false);
         }
 
         if (_gameUpdateSnapshots.TryGetValue(game.Id, out var updateSnapshot))

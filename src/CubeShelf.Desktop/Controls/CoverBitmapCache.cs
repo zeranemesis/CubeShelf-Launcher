@@ -72,6 +72,28 @@ internal static class CoverBitmapCache
         }
     }
 
+    internal static void WarmPreview(string[] faces,bool prepareTextures,CancellationToken cancellation)
+    {
+        for(var index=0;index<faces.Length;index++)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            var path=faces[index];
+            if(!File.Exists(path))continue;
+            Bitmap? bitmap=null;
+            try
+            {
+                bitmap=Acquire(path);
+                // At the resting angle only the front and spine can be visible.
+                if(prepareTextures&&index is 0 or 2)
+                {
+                    using var paint=CreateTexturePaint(bitmap);
+                }
+            }
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException){}
+            finally{Release(bitmap);}
+        }
+    }
+
     public static void Release(Bitmap? bitmap)
     {
         if (bitmap is null) return;

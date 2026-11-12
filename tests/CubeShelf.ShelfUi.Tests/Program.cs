@@ -44,7 +44,7 @@ try
     var cubeCount=cards.Items.Count;
     var switch2Index=selector.Items.Cast<ComboBoxItem>().Select((item,index)=>(item,index)).Single(pair=>(string)pair.item.Tag! == "switch2").index;
     selector.SelectedIndex=switch2Index;
-    if(cards.Items.Count!=3||fullscreen.SelectedIndex!=switch2Index||!window.Title!.Contains("Switch 2"))throw new Exception("Switch 2 must show its three PC ports in both selectors.");
+    if(cards.Items.Count!=4||fullscreen.SelectedIndex!=switch2Index||!window.Title!.Contains("Switch 2"))throw new Exception("Switch 2 must show four games in both selectors.");
     if(cards.Items.Cast<MainWindow.DesktopGameCard>().Where(card=>card.Title is "Donkey Kong Bananza" or "Mario Kart World").Any(card=>!card.Game.Genre.Contains("expérimental")))throw new Exception("Experimental Switch 2 ports must be labelled on their library cards.");
     AssertCovers();
     if(PlatformHomeControl.Facts("switch2")!=("Nintendo",2025))throw new Exception("Switch 2 must sort with Nintendo consoles by its own release year.");
@@ -55,7 +55,7 @@ try
         window.FindControl<ShelfTransitionControl>("ShelfTransition")!.Advance(1);
         Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick(2);Dispatcher.UIThread.RunJobs();
         if(snapshotDirectory is not null){Directory.CreateDirectory(snapshotDirectory);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(snapshotDirectory,"switch2-library.png"));}
-        Console.WriteLine("Switch 2 desktop and Big Picture selectors, three game cards, covers and hardware year verified.");return;
+        Console.WriteLine("Switch 2 desktop and Big Picture selectors, four game cards, covers and hardware year verified.");return;
     }
     selector.SelectedIndex=0;
     AssertBrand("gamecube");
@@ -75,18 +75,18 @@ try
     AssertCovers();
     selector.SelectedIndex=1;
     AssertBrand("wii");
-    if(cards.Items.Count!=14 || fullscreen.SelectedIndex!=1 || !window.Title!.Contains("Wii"))throw new Exception("Wii selector did not update the existing library.");
+    if(cards.Items.Count!=15 || fullscreen.SelectedIndex!=1 || !window.Title!.Contains("Wii"))throw new Exception("Wii selector did not update the existing library.");
     AssertCovers();
     selector.SelectedIndex=2;
     AssertBrand("switch");
-    if(cards.Items.Count!=25 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
+    if(cards.Items.Count!=26 || fullscreen.SelectedIndex!=2 || !window.Title!.Contains("Switch"))throw new Exception("Switch selector did not update the existing library.");
     if(!window.FindControl<TextBlock>("LibrarySectionTitle")!.Text!.Contains("Switch"))throw new Exception("Library heading does not match selected console.");
     var multi = cards.Items.Cast<MainWindow.DesktopGameCard>().First(card => card.HasVersionChoice);
     var alternative = multi.Versions.First(choice => choice.GameId != multi.Game.Id);
     var versionPicker = new ComboBox { Tag = multi, ItemsSource = multi.Versions };
     versionPicker.SelectionChanged += (sender, args) => typeof(MainWindow).GetMethod("CardPortVersionChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [sender, args]);
     versionPicker.SelectedItem = alternative;
-    if(cards.Items.Count!=25 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
+    if(cards.Items.Count!=26 || !cards.Items.Cast<MainWindow.DesktopGameCard>().Any(card => card.Game.Id == alternative.GameId))
         throw new Exception("Choosing another port duplicated the game or did not replace its version.");
     if(!File.ReadAllText(Path.Combine(profile,"selected-port-versions.json")).Contains(alternative.GameId))
         throw new Exception("Selected port version was not persisted.");
@@ -138,7 +138,7 @@ try
     AssertBrand("switch");
     if(!window.FindControl<Control>("BigPictureView")!.IsVisible || selector.SelectedIndex!=2)
         throw new Exception("Switch library did not remain in the existing Big Picture interface.");
-    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (14) → Switch (25) → Nintendo 64 (69) → GameCube ({cubeCount})");
+    Console.WriteLine($"OK  one window: GameCube ({cubeCount}) → Wii (15) → Switch (26) → Nintendo 64 (69) → GameCube ({cubeCount})");
     Console.WriteLine("OK  alternate port replaces the same card and persists; all Switch games have covers.");
     Console.WriteLine("OK  desktop and Big Picture selectors stay synchronised; last console persists.");
     Console.WriteLine("OK  switching Wii/Switch keeps Big Picture active in the same window.");
@@ -146,7 +146,7 @@ try
     typeof(MainWindow).GetMethod("ExitBigPicture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(window, [window,new RoutedEventArgs()]);
     Avalonia.Threading.Dispatcher.UIThread.RunJobs();
     window.FindControl<PlatformHomeControl>("PlatformHome")!.IsVisible=false;Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-    if(cards.Items.Count!=25)throw new Exception($"The desktop library did not catch up with the Switch catalogue after Big Picture: {cards.Items.Count}.");
+    if(cards.Items.Count!=26)throw new Exception($"The desktop library did not catch up with the Switch catalogue after Big Picture: {cards.Items.Count}.");
     Console.WriteLine("OK  the hidden desktop library catches up with the console chosen in Big Picture.");
     foreach (var index in Enumerable.Range(4, selector.ItemCount - 4))
     {
@@ -238,7 +238,7 @@ try
     var transition=window.FindControl<ShelfTransitionControl>("ShelfTransition")!;
     var host=window.FindControl<Grid>("LibraryView")!;
     selector.SelectedIndex=1;
-    if(!transition.IsRunning || cards.Items.Count!=14)throw new Exception("Console transition did not start with the new catalogue ready.");
+    if(!transition.IsRunning || cards.Items.Count!=15)throw new Exception("Console transition did not start with the new catalogue ready.");
     transition.Advance(ShelfTransitionControl.Duration/2);
     if(host.Opacity<=0 || host.Opacity>=1)throw new Exception("Transition did not reveal the incoming library progressively.");
     if(snapshotDirectory is not null)
@@ -250,7 +250,7 @@ try
     }
     selector.SelectedIndex=0;selector.SelectedIndex=2;
     transition.Advance(1);
-    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=25)
+    if(transition.IsRunning || transition.IsVisible || host.Opacity!=1 || host.RenderTransform is not null || cards.Items.Count!=26)
         throw new Exception("Rapid switching left stale content, opacity or transforms.");
     var decodes=CoverBitmapCache.DecodeCount;
     var search=window.FindControl<TextBox>("LibrarySearchBox")!;
@@ -258,7 +258,7 @@ try
     if(CoverBitmapCache.DecodeCount!=decodes)throw new Exception("A warm search decoded cover images again.");
     var reduce=window.FindControl<CheckBox>("ReduceShelfMotionBox")!;
     reduce.IsChecked=true;selector.SelectedIndex=1;
-    if(transition.IsRunning || host.Opacity!=1 || cards.Items.Count!=14)throw new Exception("Reduced motion did not switch immediately.");
+    if(transition.IsRunning || host.Opacity!=1 || cards.Items.Count!=15)throw new Exception("Reduced motion did not switch immediately.");
     reduce.IsChecked=false;
     selector.SelectedIndex=2;
     window.Hide();

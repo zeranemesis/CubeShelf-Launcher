@@ -23,6 +23,7 @@ public sealed partial class MobileLibraryView
 
     private MobileGame[] VisibleCatalog() => _allCatalog.Where(game=>
     {
+        if(_achievementLibrary)return _games.SupportsRetroAchievements(game.Id);
         if(!_personalLibrary)return game.ShelfConsole==_activeConsole;
         if(game.Id==PartyBoardId)return _games.IsInstalled();
         var native=_games.NativePorts;
@@ -36,20 +37,25 @@ public sealed partial class MobileLibraryView
         if(!_realized||_launching||_nativePreparation is not null)return;
         CloseGameOptions(false);
         _dualPlatforms=false;_dualDetail=false;
+        var leavingAchievements=_achievementLibrary;
+        _achievementLibrary=false;_achievementReturnGame=_achievementReturnPlatform=null;
         _personalLibrary=personal;
         _consolePicker.IsDropDownOpen=false;
         _platformHome.IsVisible=false;
         CloseDownloads(false);CloseInspection(false);ResetTouch();
-        ReloadVisibleCatalog();FocusPrimaryAction();
+        if(leavingAchievements)_dualLibrary.IsVisible=_presentation.IsDual;
+        ReloadVisibleCatalog();
+        if(leavingAchievements)RefreshDualLibrary(false);
+        FocusPrimaryAction();
     }
 
-    private void ReloadVisibleCatalog()
+    private void ReloadVisibleCatalog(string? selected=null)
     {
-        var selected=_catalog.ElementAtOrDefault(_selected)?.Id;
+        selected??=_catalog.ElementAtOrDefault(_selected)?.Id;
         _catalog=VisibleCatalog();
         _selected=Math.Max(0,Array.FindIndex(_catalog,game=>game.Id==selected));
         RebuildMobileShelf();UpdatePersonalLibraryUi();
-        if(_catalog.Length>0)Select(_selected,false);
+        if(_catalog.Length>0)Select(_selected);
     }
 
     private void UpdatePersonalLibraryUi()

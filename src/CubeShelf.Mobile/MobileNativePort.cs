@@ -19,6 +19,7 @@ public sealed class MobileNativePort
     public bool RequiresVulkan12 { get; set; }
     public bool RequiresVulkan13 { get; set; }
     public bool RequiresGles3 { get; set; }
+    public bool ExternalInstall { get; set; }
     public string Status { get; set; } = "";
     public string Notes { get; set; } = "";
     public string Name { get; set; } = "";
@@ -72,7 +73,9 @@ public sealed class MobileNativePort
 public interface IMobileNativePorts
 {
     event Action? Changed {add{} remove{}}
-    bool IsPreparing(string id)=>false;
+    (string Version,bool CanInstall)? UpstreamUpdate(string id)=>null;
+    void CheckSelectedUpdate(string id){}
+    Task<string> UpdateAsync(string id,CancellationToken cancellation=default)=>PrepareAsync(id,cancellation);
     IReadOnlyList<MobileNativePort> Catalog { get; }
     bool IsInstalled(string id);
     bool IsUpdateAvailable(string id);

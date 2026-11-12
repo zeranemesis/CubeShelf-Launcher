@@ -1,5 +1,6 @@
 <Project>
   <ItemGroup>
+    <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/59ebb521-05cf-46d6-bf00-4cfda2412499.png" Link="Assets/Logos/Database/59ebb521-05cf-46d6-bf00-4cfda2412499.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/16cdd370-4448-41c5-8219-591e2985bb60.png" Link="Assets/Logos/Database/16cdd370-4448-41c5-8219-591e2985bb60.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/178ed6b5-6b19-422a-9aee-dfb7a9f2be0b.png" Link="Assets/Logos/Database/178ed6b5-6b19-422a-9aee-dfb7a9f2be0b.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/1c4810ab-0275-40d7-9d58-ab849f6d434c.png" Link="Assets/Logos/Database/1c4810ab-0275-40d7-9d58-ab849f6d434c.png" />
@@ -39,5 +40,5 @@
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_7fe87cac-fd76-48e5-b010-a26a9507cb35.png" Link="Assets/Logos/Database/r2_7fe87cac-fd76-48e5-b010-a26a9507cb35.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" Link="Assets/Logos/Database/r2_89ae9a40-eb7d-4413-a105-8fcb0590fba9.png" />
     <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" Link="Assets/Logos/Database/r2_b4284db1-c07d-47f7-89f1-07f76b19f6a0.png" />
-  </ItemGroup>
+  <AvaloniaResource Include="../CubeShelf.Desktop/Assets/Logos/Database/d6501a8a-2c69-4021-9e52-f25175a5c48d.png" Link="Assets/Logos/Database/d6501a8a-2c69-4021-9e52-f25175a5c48d.png" /></ItemGroup>
 </Project>

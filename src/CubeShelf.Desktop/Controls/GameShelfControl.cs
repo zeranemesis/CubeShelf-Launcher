@@ -121,6 +121,7 @@ public sealed class GameShelfControl : Panel, IDisposable
         _moving = animate;
         _layoutResponse = animate ? DemandAnimation.Response(.22, 1d / 120) : 1;
         if (animate) _animation.Start();
+        else _animation.Stop();
     }
 
     public void FlipSelected() { if (_cases.TryGetValue(_selected, out var cover)) cover.Flip(); }

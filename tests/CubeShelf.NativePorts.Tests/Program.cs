@@ -27,14 +27,16 @@ try
     using var refreshAudit=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Catalogs","native-refresh-2026-11-10.json")));
     var refreshAdded=refreshAudit.RootElement.GetProperty("DesktopAdded").EnumerateArray().ToArray();
     var refreshDate=DateOnly.ParseExact(refreshAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
-    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 660+nativeAdditions.Length+refreshAdded.Length+expanded["switch2"].Count, "every console catalogue validates with safe package origins and checksums");
-    Check(expanded["switch2"].Count==3&&expanded["switch2"].Select(p=>p.Title).ToHashSet().SetEquals(new[]{"Pokémon Pokopia","Mario Kart World","Donkey Kong Bananza"})
-        &&expanded["switch2"].All(p=>p.Assets is [{RuntimeIdentifiers:var rids,ExecutableRelativePath.Length:>0}]&&rids.SequenceEqual(new[]{"win-x64"})
-            &&p.ReadmeUrl.Contains("/blob/"+p.SourceCommit+"/")),"Switch 2 has three distinct Windows ports with pinned sources and explicit launchers");
+    Check(expanded.Count == ShelfProduct.All.Length && expanded.Values.Sum(ports => ports.Count) == 664+nativeAdditions.Length+refreshAdded.Length+expanded["switch2"].Count, "every console catalogue validates with safe package origins and checksums");
+    Check(expanded["switch2"].Count==5&&expanded["switch2"].Select(p=>p.Title).ToHashSet().SetEquals(new[]{"Pokémon Pokopia","Mario Kart World","Donkey Kong Bananza","The Legend of Zelda: Ocarina of Time"})
+        &&expanded["switch2"].All(p=>p.Assets is [{RuntimeIdentifiers:var rids} asset]&&rids.SequenceEqual(new[]{"win-x64"})
+            &&(asset.ExecutableRelativePath.Length>0||asset.Name.EndsWith(".exe",StringComparison.Ordinal))
+            &&p.ReadmeUrl.Contains("/blob/"+p.SourceCommit+"/")),"Switch 2 has four games, including two Ocarina of Time ports with verified Windows packages");
     Check(ShelfProduct.Resolve("switch2").CreatePaths().DataDirectory!=ShelfProduct.Resolve("switch").CreatePaths().DataDirectory
         &&expanded["switch2"].Single(p=>p.Id=="switch2-bananza").Status.Contains("Prototype"),"Switch 2 is isolated from Switch and Bananza retains its prototype status");
     Check(refreshAdded.Length==6&&refreshAdded.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
-        is {VerifiedAt:"2026-11-10",Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}&&readme.Contains("/blob/"+source+"/")
+        is {VerifiedAt:var verified,Assets.Count:>0,SourceCommit:var source,ReadmeUrl:var readme}
+        &&DateOnly.ParseExact(verified,"yyyy-MM-dd")>=refreshDate&&readme.Contains("/blob/"+source+"/")
         &&!item.GetProperty("GameplayTested").GetBoolean()),"November additions have verified packages and pinned primary sources without claiming tested gameplay");
     Check(expanded["gamecube"].Count(p=>p.Repository=="flyngmt/Nookery")==1
         &&expanded["gamecube"].Single(p=>p.Repository=="flyngmt/Nookery").Id=="flyngmt-acgc-pc-port-animal-crossing",
@@ -50,7 +52,7 @@ try
     var switchCheckedAt=DateOnly.ParseExact(switchAudit.RootElement.GetProperty("CheckedAt").GetString()!,"yyyy-MM-dd");
     foreach (var entry in expanded)
         Check(entry.Value.Count > 0 && entry.Value.All(port => port.SourceCommit.Length == 40
-            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out var date) && date<=refreshDate
+            && DateOnly.TryParseExact(port.VerifiedAt,"yyyy-MM-dd",out _)
             && port.ReadmeUrl.StartsWith(port.Homepage + (port.RepositoryHost=="gitlab.com"?"/-/blob/":"/blob/"))), "dated primary-source provenance: " + entry.Key);
     var additions=audit.RootElement.GetProperty("Added").EnumerateArray().ToArray();
     Check(additions.Length==218&&additions.All(item=>expanded[item.GetProperty("Console").GetString()!].Single(p=>p.Id==item.GetProperty("Id").GetString())
@@ -61,9 +63,9 @@ try
     Check(switchAdditions.Length==8 && switchAdditions.All(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString())
         is {ReadmeUrl:var readme,SourceCommit:var source,Platforms:var platforms}
         && readme.Contains("/blob/"+source+"/") && platforms.Contains("Windows")),"new Switch ports retain pinned Windows primary-source evidence");
-    Check(expanded["switch"].Count==33 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==25
-        && switchAdditions.Count(item=>expanded["switch"].Single(p=>p.Id==item.GetProperty("Id").GetString()).Assets.Count==0)==2,
-        "Switch has 25 games without duplicate variants, with manual builds distinguished from six packaged additions");
+    Check(expanded["switch"].Count==34 && expanded["switch"].Select(p=>p.Title).Distinct().Count()==26
+        && expanded["switch"].Single(p=>p.Repository=="Puddz/AstralChain-PC").Assets.Count==1,
+        "Switch has 26 games without duplicate variants, and Astral Chain now has a Windows package");
     var odyssey=expanded["switch"].First(p=>p.Title=="Super Mario Odyssey");
     Check(odyssey is {RepositoryHost:"gitlab.com",ReleaseTag:"v0.2.1",Assets.Count:1}
         &&odyssey.Assets[0].ExecutableRelativePath=="Power Moon Recomp/PowerMoonRecomp.exe"

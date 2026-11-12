@@ -96,7 +96,7 @@ public sealed partial class MobileLibraryView : UserControl
         _online.Content = ActionLabel("◎", "Salons en ligne");
         _play.Click += async (_, _) => await LaunchSelectedGameAsync();
         _online.Click += (_, _) => Run(() => _games.OpenOnline());
-        _download.Click += async (_, _) => await PrepareSelectedPortAsync();
+        _download.Click += async (_, _) => await PrepareSelectedPortAsync(SelectedPortHasManagedUpdate());
         _join.Click += (_, _) => Run(() => _games.OpenOnline(_invite.Text?.Trim()));
         _onlinePanel.Children.Add(_online);
         var invitation = new StackPanel { Spacing = 10 };
@@ -241,7 +241,8 @@ public sealed partial class MobileLibraryView : UserControl
     {
         if (_platformHome.IsVisible || _launching || _inspectionCase is not null || _downloadsOverlay.IsVisible) return;
         if (_play.IsVisible && _play.IsEnabled) _ = LaunchSelectedGameAsync();
-        else if (_download.IsVisible && _download.IsEnabled) _ = PrepareSelectedPortAsync();
+        else if (_download.IsVisible && _download.IsEnabled)
+            _ = PrepareSelectedPortAsync(SelectedPortHasManagedUpdate());
     }
 
     public void FlipFromController() { SetControllerInput(true); if (!_platformHome.IsVisible && !_launching && !_downloadsOverlay.IsVisible) { if (_inspectionCase is { } cover) cover.Flip(); else _shelf.FlipSelected(); } }
@@ -323,8 +324,16 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void RefreshAvailability()
     {
+        ScheduleUpdatePrompt();
         if (_catalog.Length == 0){_gameAchievements.IsVisible=false;return;}
         _gameAchievements.IsVisible=true;
+        var action=SelectedNativePort?.ExternalInstall==true?"Ouvrir le port":"Jouer";
+        if(AutomationProperties.GetName(_play)!=action)
+        {
+            _play.Content=ActionLabel("▶",action);
+            AutomationProperties.SetName(_play,action);
+        }
+        _games.NativePorts?.CheckSelectedUpdate(SelectedNativePort?.Id??_catalog[_selected].Id);
         if(SelectedNativePort is { } native) { RefreshNativeAvailability(native);RefreshDualSelection();return; }
         _nativeNotes.IsVisible=false;
         var supported = _catalog[_selected].Id == PartyBoardId;
@@ -363,12 +372,12 @@ public sealed partial class MobileLibraryView : UserControl
 
     public void SetActive(bool active)
     {
-        if(!active)CloseGameOptions(false);
+        if(!active){_updatePromptTimer.Stop();CloseGameOptions(false);}
         _presentationActive=active;_dualLibrary.SetPlaybackActive(active&&!_downloadsOverlay.IsVisible);
         _secondaryHome?.SetPlaybackActive(active&&_secondaryAttached);
         SetAppUpdatesActive(active);
         SetDeviceStatusActive(active);
-        if (active) { InitializeShelf(); RefreshAvailability(); }
+        if (active) { InitializeShelf(); RefreshAvailability(); HomeInput.RefreshAchievementProgress(); }
         else { FlushLibraryState(); CancelLaunchTransition(); if(!_storageOverlay.IsVisible)CloseDownloads(false); CloseInspection(false); ResetTouch(); _shelf.Clear(); CoverBitmapCache.ReleaseUnused(); _realized = false; }
         SecondaryScreenStateChanged?.Invoke();
     }
@@ -483,7 +492,7 @@ public sealed partial class MobileLibraryView : UserControl
             RebuildMobileShelf();
             UpdatePersonalLibraryUi();
             _realized = true;
-            Select(_selected, false);
+            Select(_selected);
             if (!_startupPlatformChoiceShown && _mobilePlatforms.Length > 1)
             {
                 _startupPlatformChoiceShown = true;
@@ -493,21 +502,20 @@ public sealed partial class MobileLibraryView : UserControl
         catch (Exception error) { SetStatus("Impossible de charger la bibliothèque : " + error.Message); }
     }
 
-    private void Select(int index) => Select(index, true);
-    private void Select(int index, bool animate)
+    private void Select(int index)
     {
         if (_launching || _nativePreparation is not null) return;
         if (_catalog.Length == 0) return;
         _selected = (index % _catalog.Length + _catalog.Length) % _catalog.Length;
         var game = _catalog[_selected];
-        if(_personalLibrary)_consoleLogo.Platform=game.ShelfConsole;
+        if(_personalLibrary||_achievementLibrary)_consoleLogo.Platform=game.ShelfConsole;
         _position.Text = $"{_selected + 1} / {_catalog.Length}";
-        _title.SetGame(game.Id, game.Title, game.ShelfConsole);
+        if(!_dualLibrary.IsVisible)_title.SetGame(game.Id, game.Title, game.ShelfConsole);
         _info.Text = $"{game.Year} · {game.Genre} · {game.Players}";
         SetStatus("");
         _invitationPanel.IsExpanded = false;
         _invite.Text = "";
-        _shelf.SetSelection(_selected, _ribbon, animate&&!ReduceMotion);
+        if(!_dualLibrary.IsVisible)_shelf.SetSelection(_selected, _ribbon, animate: false);
         RefreshAvailability();
         _detailsScroll.Offset = default;
         SaveLibraryState();
@@ -515,7 +523,7 @@ public sealed partial class MobileLibraryView : UserControl
 
     private void SaveLibraryState()
     {
-        if (_catalog.Length == 0) return;
+        if (_catalog.Length == 0||_achievementLibrary) return;
         _rememberedGame = _catalog[_selected].Id;
         _stateSaveTimer.Stop();
         _stateDirty = _savedState != new LibraryState(_rememberedGame, _ribbon, _activeConsole);
@@ -579,6 +587,12 @@ public sealed partial class MobileLibraryView : UserControl
             var game = _catalog[_selected];
             var cover = game.Covers.FirstOrDefault();
             var native = SelectedNativePort;
+            if(native?.ExternalInstall==true)
+            {
+                _games.NativePorts!.Launch(game.Id);
+                try{_presentation.SetLastPlayed(game.Id);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+                return;
+            }
             var openCase = game.ShelfConsole is "gamecube" or "wii" or "switch" or "n64";
             var media = game.Id == PartyBoardId ? "Assets/Covers/Media/gamecube-GMPE01.png" : cover?.Media;
             _launchTransition.Start(game.Title, Cover(cover?.Front), Cover(cover?.Back), Cover(cover?.Spine), "Lancement…", game.Id,

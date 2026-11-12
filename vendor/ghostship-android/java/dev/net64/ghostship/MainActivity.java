@@ -1,11 +1,7 @@
 package dev.net64.ghostship;
 
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import java.io.File;
 import io.decompshelf.sdl2.SDLActivity;
 
@@ -29,14 +25,6 @@ public final class MainActivity extends SDLActivity {
         super.onCreate(state);
         if (mBrokenLibraries) return;
         immersive();
-        Button back = new Button(this);
-        back.setText("Retour à DecompShelf");
-        back.setTextSize(11);
-        back.setAlpha(0.7f);
-        back.setOnClickListener(view -> finish());
-        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
-        ((ViewGroup)findViewById(android.R.id.content)).addView(back, layout);
     }
 
     private void immersive() {

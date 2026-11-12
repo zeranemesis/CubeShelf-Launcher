@@ -22,6 +22,13 @@ internal static class AndroidGameStorage
         };
         foreach(var port in AndroidNativePorts.Instance.Catalog)
         {
+            if(port.ExternalInstall)
+            {
+                var downloads=Path.Combine(files,"native-port-packages",port.Id);
+                games.Add(new(){Id=port.Id,GameKey=NativePortCatalog.GameKey(port.ShelfConsole,port.Title),Title=port.Title,
+                    Engine=port.Project,OwnedRoot=owned,DownloadDirectories=[downloads],RemovableDirectories=[downloads]});
+                continue;
+            }
             var sm64=port.Id==AndroidSm64.Id;
             games.Add(new(){Id=port.Id,GameKey=NativePortCatalog.GameKey(port.ShelfConsole,port.Title),Title=port.Title,Engine=port.Project,OwnedRoot=owned,
                 EngineDirectory=sm64?null:Path.Combine(files,"native-modules",port.Id),DataDirectory=Path.Combine(files,"native-games",sm64?"sm64":port.Id),

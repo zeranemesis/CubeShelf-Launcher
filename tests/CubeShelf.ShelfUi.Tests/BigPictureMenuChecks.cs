@@ -72,6 +72,9 @@ internal static class BigPictureMenuChecks
             "keyboard X opens the existing game menu with game settings and mods");
         window.HandleBigPictureControllerInput(1);window.HandleBigPictureControllerInput(2);Jobs();
         Check(overlay.IsVisible&&!Find<GameLaunchTransition>("LaunchTransition").IsVisible,"horizontal menu input cannot trigger a game launch without confirmation");
+        Press(Key.X);
+        Check(!overlay.IsVisible&&Find<Control>("BigPictureView").IsVisible,"pressing X again closes only the game options");
+        Press(Key.X);
         Press(Key.Escape);Press(Key.Escape);
         window.HandleBigPictureControllerInput(7);Jobs();
         Check(overlay.IsVisible&&Find<TextBlock>("BigPictureMenuTitle").Text=="Options du jeu","controller X opens Classic game options instead of flipping the case");
@@ -90,11 +93,12 @@ internal static class BigPictureMenuChecks
         try
         {
             Click("BigPictureAchievements");
-            var labels=Find<StackPanel>("BigPictureMenuRows").Children.OfType<Button>().Select(AutomationProperties.GetName).ToArray();
-            Check(overlay.IsVisible&&Find<TextBlock>("BigPictureMenuTitle").Text=="RetroAchievements"
-                &&labels.Count(label=>label==supported.Title)==1&&!labels.Contains(unsupported.Title),
-                "the colour RA button opens only declared native-compatible games without duplicate ports");
-            Press(Key.Escape);Press(Key.Escape);
+            var entries=dual.GetVisualDescendants().OfType<ListBox>().Single().Items.Cast<DualScreenItem>().ToArray();
+            Check(dual.IsVisible&&!overlay.IsVisible&&entries.Count(entry=>entry.Title==supported.Title)==1
+                &&!entries.Any(entry=>entry.Title==unsupported.Title),
+                "Classic Big Picture opens a dedicated grid of declared compatible games without duplicate ports");
+            Press(Key.Escape);
+            Check(Find<Control>("BigPictureView").IsVisible,"Back restores Classic Big Picture from RetroAchievements");
             Check(!Find<GameLaunchTransition>("LaunchTransition").IsVisible,"browsing RetroAchievements compatibility never launches a game");
         }
         finally{raCatalog.Remove(supported);raCatalog.Remove(unsupported);raCatalog.Remove(duplicate);}
@@ -117,9 +121,12 @@ internal static class BigPictureMenuChecks
         Press(Key.Escape);Press(Key.Escape);window.HandleBigPictureControllerInput(7);Jobs();
         Check(overlay.IsVisible&&Find<TextBlock>("BigPictureMenuTitle").Text=="Options du jeu","controller X opens HOME game options");
         Press(Key.Escape);Press(Key.Escape);
+        var returnGame=dual.SelectedId;
         dual.GetVisualDescendants().OfType<RetroAchievementsButton>().Single().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();
-        Check(overlay.IsVisible&&Find<TextBlock>("BigPictureMenuTitle").Text=="RetroAchievements","HOME uses the same clickable RetroAchievements game menu");
-        Press(Key.Escape);Press(Key.Escape);
+        Check(dual.IsVisible&&!overlay.IsVisible&&dual.GetVisualDescendants().OfType<TextBlock>().Any(text=>text.Text=="RetroAchievements"),
+            "HOME opens the dedicated RetroAchievements library");
+        Press(Key.Escape);
+        Check(dual.SelectedId==returnGame,"Back restores the selected HOME game from RetroAchievements");
         var search=dual.GetVisualDescendants().OfType<TextBox>().Single();
         var searchButton=dual.GetVisualDescendants().OfType<Button>().Single(b=>Equals(b.Tag,"search"));
         searchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Jobs();search.Focus();

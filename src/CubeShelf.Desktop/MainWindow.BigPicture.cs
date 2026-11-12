@@ -214,7 +214,7 @@ public sealed partial class MainWindow
     {
         var game = BigPictureGame;
         RefreshPortVersionPickers(game is null ? null : GameVariants.BaseOf(_catalogGames, game));
-        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon);
+        BigPictureShelf.SetSelection(_bigPictureIndex, _bigPictureRibbon, animate: false);
         BigPictureTitle.SetGame(game?.Id, game?.Title ?? P7("Ta bibliothèque est vide", "Your library is empty"), game?.ShelfConsole);
         BigPictureMetadata.Text = game is null ? "" : string.Join("  •  ", new[] { game.Genre, game.Players, game.Year > 0 ? game.Year.ToString() : "" }.Where(value => value.Length > 0));
         BigPictureDescription.Text = game?.Description ?? P7("Ajoute un jeu depuis la bibliothèque pour commencer.", "Add a game from the library to get started.");

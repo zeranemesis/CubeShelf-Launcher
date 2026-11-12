@@ -61,6 +61,13 @@ public sealed partial class MobileLibraryView
         Grid.SetColumn(_closeDownloads, 1); header.Children.Add(_closeDownloads); _downloadsOverlay.Children.Add(header);
         var content = new StackPanel { Spacing = 18 };
         content.Children.Add(BuildPresentationSetting());
+        if (_games.ConfigureAndroidHome is { } configureAndroidHome)
+        {
+            var androidHome = MakeButton("Application d’accueil Android…");
+            androidHome.MinHeight = 48;
+            androidHome.Click += (_, _) => configureAndroidHome();
+            content.Children.Add(androidHome);
+        }
         content.Children.Add(BuildScanSetting());
         content.Children.Add(BuildAppUpdateCard());
         _storageButton.IsVisible=_games.Storage is not null;
@@ -107,8 +114,10 @@ public sealed partial class MobileLibraryView
                     var index=Array.FindIndex(_catalog,game=>game.Id==target.Id);
                     if(index>=0)
                     {
-                        Select(index,false);
-                        if(SelectedNativePort is { } port && (!_games.NativePorts!.IsInstalled(port.Id)||_games.NativePorts.IsUpdateAvailable(port.Id)))await PrepareSelectedPortAsync();
+                        Select(index);
+                        if(entry is not null&&IsDownloadUpdate(entry))
+                            await PrepareSelectedPortAsync(update:true);
+                        else if(SelectedNativePort is {} selected&&!_games.NativePorts!.IsInstalled(selected.Id))await PrepareSelectedPortAsync();
                         else await LaunchSelectedGameAsync();
                     }
                 }
@@ -221,6 +230,7 @@ public sealed partial class MobileLibraryView
         var manager = DownloadManager;
         var entry = entries.FirstOrDefault(item => item.Transfer.IsBusy)
             ?? entries.FirstOrDefault(item => item.Position >= 0)
+            ?? entries.FirstOrDefault(item=>item.GameId==SelectedNativePort?.Id&&IsDownloadUpdate(item))
             ?? entries.FirstOrDefault(item=>item.GameId==(_catalog.Length>0?_catalog[_selected].Id:PartyBoardId)) ?? entries.FirstOrDefault();
         if (entry is not null) snapshot = entry.Transfer;
         _displayedDownloadId = entry?.Id ?? "partyboard";
@@ -231,7 +241,7 @@ public sealed partial class MobileLibraryView
         _transferCover.Stretch=Stretch.Uniform;
         _transferCover.Height=_transferCover.Source is Bitmap artwork?82d*artwork.PixelSize.Height/artwork.PixelSize.Width:116;
         var needsInstall=entry is not null && _games.NativePorts?.Catalog.Any(p=>p.Id==entry.GameId)==true
-            && (!_games.NativePorts.IsInstalled(entry.GameId)||_games.NativePorts.IsUpdateAvailable(entry.GameId));
+            && (!_games.NativePorts.IsInstalled(entry.GameId)||IsDownloadUpdate(entry));
         var embedded=entry is not null&&_games.NativePorts?.IsEmbedded(entry.GameId)==true;
         _transferState.Text = snapshot.State==RuntimeDownloadState.Ready&&needsInstall?embedded?"Moteur prêt à préparer":"APK prêt à installer":TransferLabel(snapshot.State);
         _transferHeading.Text = snapshot.IsBusy ? "EN COURS" : snapshot.State == RuntimeDownloadState.Ready ? needsInstall?embedded?"MOTEUR VÉRIFIÉ":"APK VÉRIFIÉ":"INSTALLÉ" : "À TÉLÉCHARGER";
@@ -275,6 +285,9 @@ public sealed partial class MobileLibraryView
         if (_controllerInput && (previousFocus is null || !previousFocus.IsEffectivelyVisible || !previousFocus.IsEnabled
             || !previousFocus.GetVisualAncestors().Contains(_downloadsOverlay))) FocusDownloadAction();
     }
+
+    private bool IsDownloadUpdate(RuntimeQueueEntry entry)=>_games.NativePorts is {} native
+        &&(native.IsUpdateAvailable(entry.GameId)||native.UpstreamUpdate(entry.GameId) is {CanInstall:true} release&&release.Version==entry.Version);
 
     private Bitmap? DownloadCover(string gameId)
     {

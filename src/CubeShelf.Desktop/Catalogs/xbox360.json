@@ -936,25 +936,26 @@
     "Project": "hl360-forza4",
     "Repository": "0herculabs/hl360-forza4",
     "Method": "Recompilation statique (déclaration amont)",
-    "Status": "Expérimental · limitations amont",
-    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub. Intitulé amont : Forza Motorsport 4 (hl360-forza4).",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "d6597d7d58d5f64bd171fd67b4f90562333d5d27",
-    "ReadmeUrl": "https://github.com/0herculabs/hl360-forza4/blob/d6597d7d58d5f64bd171fd67b4f90562333d5d27/README.md",
-    "ReleaseUrl": "https://github.com/0herculabs/hl360-forza4/releases/tag/v0.3.10",
-    "ReleaseTag": "v0.3.10",
+    "Status": "Expérimental · En développement",
+    "Notes": "Prépare le port avec tes disques Xbox 360 américains. Le projet utilise Vulkan et décrit la prise en charge des volants comme expérimentale. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "73e9072a4f8aa3974993ebc2787a54cf7366ba7b",
+    "ReadmeUrl": "https://github.com/0herculabs/hl360-forza4/blob/73e9072a4f8aa3974993ebc2787a54cf7366ba7b/README.md",
+    "ReleaseUrl": "https://github.com/0herculabs/hl360-forza4/releases/tag/v0.3.11",
+    "ReleaseTag": "v0.3.11",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "FM4-v0.3.10-windows-x64.zip",
-        "Url": "https://github.com/0herculabs/hl360-forza4/releases/download/v0.3.10/FM4-v0.3.10-windows-x64.zip",
-        "Sha256": "20733dd305e05562c4086b9b239e9313ce338cbdc0774a83823280cee2de6c44",
-        "Size": 82353269,
+        "Name": "FM4-v0.3.11-windows-x64.zip",
+        "Url": "https://github.com/0herculabs/hl360-forza4/releases/download/v0.3.11/FM4-v0.3.11-windows-x64.zip",
+        "Size": 82360472,
+        "Sha256": "47ef90b4481b6bf2067d997fc2995b02cdc0aabe91125f657667e5365cf59bae",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": "FM4/fm4-launcher.exe"
       }
     ]
   },
@@ -993,25 +994,26 @@
     "Project": "gears-of-war-2-pc-port",
     "Repository": "santiquiroz/gears-of-war-2-pc-port",
     "Method": "Recompilation statique (déclaration amont)",
-    "Status": "Expérimental · limitations amont",
-    "Notes": "Projet natif déclaré dans la documentation amont ; jouabilité et performances non testées dans DecompShelf. Les fichiers de ta propre copie restent nécessaires. Suis les instructions du projet pour la préparation et les systèmes compatibles. Paquets épinglés avec taille et SHA-256 publiés par GitHub.",
-    "VerifiedAt": "2026-11-01",
-    "SourceCommit": "21016e0a02b541fb732c75b700c970ec48136c69",
-    "ReadmeUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/blob/21016e0a02b541fb732c75b700c970ec48136c69/README.md",
-    "ReleaseUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/tag/v0.3.12",
-    "ReleaseTag": "v0.3.12",
+    "Status": "Port PC publié",
+    "Notes": "Fournis le disque Xbox 360 original et son default.xex. Windows x64 et GPU DirectX 12 requis pour le rendu par défaut. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "caf6671184a0cfd65ea3e3a9aeb061115ddabf0b",
+    "ReadmeUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/blob/caf6671184a0cfd65ea3e3a9aeb061115ddabf0b/README.md",
+    "ReleaseUrl": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/tag/v0.4.0",
+    "ReleaseTag": "v0.4.0",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "gow2-recomp-0.3.12-win64.zip",
-        "Url": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/download/v0.3.12/gow2-recomp-0.3.12-win64.zip",
-        "Sha256": "816eeca163c7b599d1e4ade9c675b957913472f38b7049a98b35ac5b60689bd1",
-        "Size": 83431723,
+        "Name": "gow2-recomp-0.4.0-win64.zip",
+        "Url": "https://github.com/santiquiroz/gears-of-war-2-pc-port/releases/download/v0.4.0/gow2-recomp-0.4.0-win64.zip",
+        "Size": 115009965,
+        "Sha256": "688acdf88026a24f146b4b76b979aab937beb396c02b3077ec4fe7bc3f485318",
         "RuntimeIdentifiers": [
           "win-x64"
-        ]
+        ],
+        "ExecutableRelativePath": "gow2-recomp-0.4.0-win64/gow2.exe"
       }
     ]
   },

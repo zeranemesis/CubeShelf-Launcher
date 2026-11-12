@@ -14,7 +14,8 @@ internal sealed class PartyBoardDownloads : IRuntimeDownloads
     internal const string Version = "v0.21.1";
     internal const string PayloadHash = "e242756408e2e3bce32c252b89edc242e67f1d930b4f0ce84fa0831bff5e5270";
     internal const long PayloadSize = 52_732_480;
-    private const string Url = "https://github.com/zeranemesis/Marioparty4/releases/download/v0.21.1/PartyBoard-v0.21.1-phone-arm64-v8a.apk";
+    internal const string AssetName = "PartyBoard-"+Version+"-phone-arm64-v8a.apk";
+    private const string Url = "https://github.com/zeranemesis/Marioparty4/releases/download/"+Version+"/"+AssetName;
     private static readonly HttpClient Client = new() { Timeout = Timeout.InfiniteTimeSpan };
     private readonly object _gate = new();
     private readonly string _directory, _partial, _staging, _runtime, _marker;

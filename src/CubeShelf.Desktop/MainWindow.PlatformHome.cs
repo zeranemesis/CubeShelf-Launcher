@@ -8,6 +8,7 @@ public sealed partial class MainWindow
     private void OpenPlatformHome(object? sender, RoutedEventArgs args) => ShowPlatformHome();
     private void ShowPlatformHome()
     {
+        LeaveRetroAchievementLibrary();
         if(_presentation?.IsDual==true){ShowDualPlatforms();return;}
         DualScreenView.IsVisible=false;
         ConsoleShelfPicker.IsDropDownOpen=false;

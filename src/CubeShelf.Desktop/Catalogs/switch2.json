@@ -5,26 +5,26 @@
     "Project": "Recompia",
     "Repository": "Dittobyte/Recompia",
     "Method": "Recompilation statique native (déclaration amont)",
-    "Status": "Port PC publié · partie non testée",
-    "Notes": "Préparation depuis ta propre copie compatible de Pokopia et ses mises à jour ; compilation du jeu et des shaders sur ton PC. Cette préparation peut être longue. Aucun fichier de jeu fourni. Paquet officiel vérifié par taille et SHA-256 ; exécutable Windows x64 contrôlé, sans exécution. Jouabilité non testée dans DecompShelf.",
-    "VerifiedAt": "2026-11-10",
-    "SourceCommit": "39c5776d3dbb0dd8f5f95057ea34048ec12f7418",
-    "ReadmeUrl": "https://github.com/Dittobyte/Recompia/blob/39c5776d3dbb0dd8f5f95057ea34048ec12f7418/README.md",
-    "ReleaseUrl": "https://github.com/Dittobyte/Recompia/releases/tag/v0.9.0",
-    "ReleaseTag": "v0.9.0",
+    "Status": "Port PC publié · Compilation locale",
+    "Notes": "Prépare le jeu depuis ta propre copie compatible et ses mises à jour. La compilation du jeu et des shaders peut être longue. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "9c8c3655fc3b1be0e5824df1c8a9330e9395777b",
+    "ReadmeUrl": "https://github.com/Dittobyte/Recompia/blob/9c8c3655fc3b1be0e5824df1c8a9330e9395777b/README.md",
+    "ReleaseUrl": "https://github.com/Dittobyte/Recompia/releases/tag/v0.10.3",
+    "ReleaseTag": "v0.10.3",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "PokopiaRecomp-0.9.0-win64.zip",
-        "Url": "https://github.com/Dittobyte/Recompia/releases/download/v0.9.0/PokopiaRecomp-0.9.0-win64.zip",
-        "Size": 180189237,
-        "Sha256": "d4c9047d3872cd7757a76b1c24c89dd9baa42d06ae318b3a9746a21263090c35",
+        "Name": "PokopiaRecomp-0.10.3-win64.zip",
+        "Url": "https://github.com/Dittobyte/Recompia/releases/download/v0.10.3/PokopiaRecomp-0.10.3-win64.zip",
+        "Size": 179348247,
+        "Sha256": "b8d163168775e904004a3d98c2e8d785fcd7760727c5d66a90ee1e7a82ac79c0",
         "RuntimeIdentifiers": [
           "win-x64"
         ],
-        "ExecutableRelativePath": "PokopiaRecomp-0.9.0/PokopiaLauncher.exe"
+        "ExecutableRelativePath": "PokopiaRecomp-0.10.3/PokopiaLauncher.exe"
       }
     ]
   },
@@ -34,22 +34,22 @@
     "Project": "mkw-recomp",
     "Repository": "adriadam10/mkw-recomp",
     "Method": "Recompilation statique native (déclaration amont)",
-    "Status": "Expérimental · courses disponibles selon le projet",
-    "Notes": "Ta propre copie du jeu en version 1.0.0 est nécessaire. CPU x64 avec AVX2, GPU Vulkan 1.3 et environ 30 Go libres. Bugs de menus, audio et pilotes signalés ; pas de jeu en ligne. Aucun fichier de jeu fourni. Paquet officiel vérifié par taille et SHA-256 ; exécutable Windows x64 contrôlé, sans exécution. Jouabilité non testée dans DecompShelf.",
-    "VerifiedAt": "2026-11-10",
-    "SourceCommit": "65c5c0a93fd0c24030158da2f13b3f70371315ed",
-    "ReadmeUrl": "https://github.com/adriadam10/mkw-recomp/blob/65c5c0a93fd0c24030158da2f13b3f70371315ed/README.md",
-    "ReleaseUrl": "https://github.com/adriadam10/mkw-recomp/releases/tag/v0.1.4",
-    "ReleaseTag": "v0.1.4",
+    "Status": "Expérimental · Courses disponibles",
+    "Notes": "Fournis ta copie 1.0.0. Le projet demande AVX2, Vulkan 1.3 et de l’espace pour la compilation. Des problèmes de rendu et de stabilité sont signalés. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "acfd2754c87029573182fe7e909b5df787270c94",
+    "ReadmeUrl": "https://github.com/adriadam10/mkw-recomp/blob/acfd2754c87029573182fe7e909b5df787270c94/README.md",
+    "ReleaseUrl": "https://github.com/adriadam10/mkw-recomp/releases/tag/v0.1.7",
+    "ReleaseTag": "v0.1.7",
     "Platforms": [
       "Windows"
     ],
     "Assets": [
       {
-        "Name": "mkw-recomp-0.1.4-windows-x64.zip",
-        "Url": "https://github.com/adriadam10/mkw-recomp/releases/download/v0.1.4/mkw-recomp-0.1.4-windows-x64.zip",
-        "Size": 176043872,
-        "Sha256": "9a5e1614a3985ca7f1c9cc13477d60e7ce6ff9055588663359c4acfef79760f9",
+        "Name": "mkw-recomp-0.1.7-windows-x64.zip",
+        "Url": "https://github.com/adriadam10/mkw-recomp/releases/download/v0.1.7/mkw-recomp-0.1.7-windows-x64.zip",
+        "Size": 173082131,
+        "Sha256": "633055e440f8000a33506ac77906f76530784c391177287c143dedc3413cd8d9",
         "RuntimeIdentifiers": [
           "win-x64"
         ],
@@ -83,6 +83,64 @@
           "win-x64"
         ],
         "ExecutableRelativePath": "DKB-Setup/DKB-Setup.exe"
+      }
+    ]
+  },
+  {
+    "Id": "switch2-hookshot-ocarina",
+    "Title": "The Legend of Zelda: Ocarina of Time",
+    "Project": "Hookshot",
+    "Repository": "NotRexed/Hookshot",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Expérimental · Kit de préparation",
+    "Notes": "Lance HookshotBuilder, sélectionne ta copie du remake Switch 2 et laisse le projet compiler le jeu. Après la préparation, associe hookshot.exe si le jeu est construit hors du dossier du port. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "8ef84611049f4fc31835a0b12793cf074ed49c3c",
+    "ReadmeUrl": "https://github.com/NotRexed/Hookshot/blob/8ef84611049f4fc31835a0b12793cf074ed49c3c/readme.md",
+    "ReleaseUrl": "https://github.com/NotRexed/Hookshot/releases/tag/v2.1.0",
+    "ReleaseTag": "v2.1.0",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "Hookshot-v2.1.0-Windows-x64.zip",
+        "Url": "https://github.com/NotRexed/Hookshot/releases/download/v2.1.0/Hookshot-v2.1.0-Windows-x64.zip",
+        "Size": 115338,
+        "Sha256": "fdfa49be0d7ead29398ef08c4f489ca79215dbf51f90d7b7c179f8cf02b12bcd",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": "HookshotBuilder.exe"
+      }
+    ]
+  },
+  {
+    "Id": "switch2-nx2navi-ocarina",
+    "Title": "The Legend of Zelda: Ocarina of Time",
+    "Project": "NX2navi",
+    "Repository": "tangerineturtle1/NX2navi",
+    "Method": "Recompilation native déclarée par le projet",
+    "Status": "Expérimental · Installateur de préparation",
+    "Notes": "Lance NX2navi-Setup depuis les fichiers téléchargés avec ta copie au format NUP. Associe ensuite le programme construit en suivant la documentation amont. Paquet Windows vérifié par taille et SHA-256. Partie non testée dans DecompShelf.",
+    "VerifiedAt": "2026-11-11",
+    "SourceCommit": "005d30a29cffda3f2069dd5659c7b099dc783b46",
+    "ReadmeUrl": "https://github.com/tangerineturtle1/NX2navi/blob/005d30a29cffda3f2069dd5659c7b099dc783b46/README.md",
+    "ReleaseUrl": "https://github.com/tangerineturtle1/NX2navi/releases/tag/v0.7.1",
+    "ReleaseTag": "v0.7.1",
+    "Platforms": [
+      "Windows"
+    ],
+    "Assets": [
+      {
+        "Name": "NX2navi-Setup-0.7.1.exe",
+        "Url": "https://github.com/tangerineturtle1/NX2navi/releases/download/v0.7.1/NX2navi-Setup-0.7.1.exe",
+        "Size": 87117104,
+        "Sha256": "99e43ed52e6524d5aa07d183e5eedc5d1692f1b79afb198ae1a1572057fcc6c1",
+        "RuntimeIdentifiers": [
+          "win-x64"
+        ],
+        "ExecutableRelativePath": ""
       }
     ]
   }

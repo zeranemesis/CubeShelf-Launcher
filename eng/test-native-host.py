@@ -29,11 +29,13 @@ if len(sys.argv)>1:
  with zipfile.ZipFile(sys.argv[1]) as apk:
   specs=json.loads(apk.read('assets/nativehost/hosts.json'))
   ports=json.loads((ROOT/'src/CubeShelf.Mobile/Catalogs/android-ports.json').read_text(encoding='utf-8'))
-  assert {s['Id'] for s in specs}=={p['Id'] for p in ports if p['Id']!='n64-sm64'}
+  assert {s['Id'] for s in specs}=={p['Id'] for p in ports if p['Id']!='n64-sm64' and not p.get('ExternalInstall',False)}
   bridge=apk.read('assets/nativehost/bridges.dex');assert bridge.startswith(b'dex\n')
   manifest=apk.read('AndroidManifest.xml')
   def declared(name):return name.encode() in manifest or name.encode('utf-16le') in manifest
   assert declared('io.decompshelf.enginehost.HostFactory')
+  for port in ports:
+   if port.get('ExternalInstall',False):assert declared(port['PackageName'])
   authorities=set();components=set()
   for spec in specs:
    port=next(p for p in ports if p['Id']==spec['Id'])

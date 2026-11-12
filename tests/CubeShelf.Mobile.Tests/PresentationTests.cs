@@ -62,15 +62,32 @@ internal static class PresentationTests
         Check(view.GetVisualDescendants().OfType<GameCaseControl>().Count()==1,"the selected game reuses one 3D case instead of rendering the whole grid in 3D");
         Check(view.GetVisualDescendants().OfType<GameCaseControl>().Single().CaseFormat==GameCaseFormat.GameCube,"the GameCube preview uses the existing GameCube case format");
         var grid=view.GetVisualDescendants().OfType<ListBox>().Single();var pageSize=grid.ItemCount;Check(pageSize is >=9 and <=24,"the HOME grid uses three rows and at most 24 thumbnails per page");
-        var selected="";view.SelectionChanged+=id=>selected=id;var originalPage=grid.ItemsSource;view.Move(1,0);Check(selected==items[1].Id,"horizontal controller movement selects the next game");Check(ReferenceEquals(originalPage,grid.ItemsSource),"moving within a page preserves thumbnail instances");Check(view.GetVisualDescendants().OfType<GameCaseControl>().Single().CaseFormat==GameCaseFormat.Nintendo64,"changing console also changes the selected 3D box format");view.Move(0,1);Check(selected!=items[1].Id,"vertical movement uses the actual grid column count");
+        var selected="";view.SelectionChanged+=id=>selected=id;var originalPage=grid.ItemsSource;view.Move(1,0);Check(selected==items[1].Id,"horizontal controller movement selects the next game");Check(ReferenceEquals(originalPage,grid.ItemsSource),"moving within a page preserves thumbnail instances");typeof(DualScreenLibraryView).GetMethod("FinishGamePreview",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.Invoke(view,null);Check(view.GetVisualDescendants().OfType<GameCaseControl>().Single().CaseFormat==GameCaseFormat.Nintendo64,"changing console also changes the selected 3D box format");view.Move(0,1);Check(selected!=items[1].Id,"vertical movement uses the actual grid column count");
         Check(cues.Any(path=>path?.EndsWith("move.wav")==true),"moving the selection emits the original navigation cue");
         for(var i=0;i<30;i++)view.Move(1,0);Check(view.SelectedId==items[^1].Id&&grid.ItemCount<=pageSize,"controller movement crosses page boundaries without duplicating games");
         var launched="";var libraryRequests=0;view.LaunchRequested+=id=>launched=id;view.LibraryRequested+=()=>libraryRequests++;
-        view.GetVisualDescendants().OfType<Button>().Single(b=>b.Content?.ToString()=="Mes jeux").Focus();view.Move(-1,0);view.ActivateFocused();
-        Check(launched==view.SelectedId&&libraryRequests==0,"grid movement takes focus away from the previous toolbar button before confirmation");
+        var homeGames=items.Take(pageSize).ToArray();
+        view.SetItems(homeGames,"Mes jeux",false,homeGames[0].Id);Jobs();view.Move(0,0);
+        view.Move(0,-1);
+        var dock=view.GetVisualDescendants().OfType<Button>().Where(button=>button.Classes.Contains("home-dock")).ToArray();
+        Check(dock.Any(button=>button.IsFocused)&&view.SelectedId==homeGames[0].Id,
+            "up from the first game row focuses the top icons without changing the selection");
+        for(var i=0;i<dock.Length;i++)view.Move(-1,0);
+        view.Move(1,0);view.ActivateFocused();
+        Check(libraryRequests==1&&launched=="","left and right navigate the top icons and confirm opens the focused command");
+        view.Move(0,1);Check(grid.IsKeyboardFocusWithin,"down returns from the toolbar to the grid");
+        view.SelectItem(homeGames[^1].Id);view.Move(0,1);
+        var actions=view.GetVisualDescendants().OfType<Button>().Where(button=>button.Content?.ToString() is "Jouer" or "Options du jeu").ToArray();
+        Check(actions.Any(button=>button.IsFocused)||achievementsButton.IsFocused,"down from the last row reaches the bottom actions");
+        for(var i=0;i<3;i++)view.Move(-1,0);
+        view.ActivateFocused();
+        Check(launched==view.SelectedId&&libraryRequests==1,"confirm on the lower play action launches the selected game");
+        view.Move(0,-1);Check(grid.IsKeyboardFocusWithin,"up returns from the bottom actions to the grid");
         Check(cues.Last()?.EndsWith("launch.wav")==true,"activation uses a different sound from navigation");
         var customize=view.GetVisualDescendants().OfType<Button>().Single(b=>b.Content?.ToString()=="Personnaliser");
-        customize.Flyout!.ShowAt(customize);Jobs();var menu=(Control)((Flyout)customize.Flyout).Content!;
+        customize.Focus();view.ActivateFocused();Jobs();
+        Check(view.IsPopupOpen,"controller confirmation opens the customization menu");
+        var menu=(Control)((Flyout)customize.Flyout!).Content!;
         var musicToggle=menu.GetVisualDescendants().OfType<Button>().Single(b=>b.Content?.ToString()?.StartsWith("Musique :",StringComparison.Ordinal)==true);
         var beforeLaunch=launched;var beforeMusic=settings.MusicEnabled;musicToggle.Focus();view.ActivateFocused();Jobs();
         Check(settings.MusicEnabled!=beforeMusic&&launched==beforeLaunch,"confirming an audio popup choice changes its setting without launching a game");
@@ -102,7 +119,7 @@ internal static class PresentationTests
         var fallback=view.GetVisualDescendants().OfType<HomeArtworkControl>().Single(a=>a.IsPreview);
         Check(fallback.GetVisualDescendants().OfType<ConsoleBrandMark>().Single().Bounds.Height>=60,"the missing-art preview reserves a visible console logo instead of a blank capsule");
         var selectedArtwork=grid.GetVisualDescendants().OfType<HomeArtworkControl>().Single(a=>a.IsSelected);
-        Check(selectedArtwork.GetVisualDescendants().OfType<Border>().Any(b=>b.BorderThickness.Left>=3),"selected thumbnails have a visible three-pixel frame");
+        Check(selectedArtwork.GetVisualDescendants().OfType<Control>().Any(b=>b.Name=="SelectionFrame"&&b.IsVisible),"selected thumbnails keep their visible outline");
         CheckSelectionFits(grid);
         view.SetItems(preview,"Catalogue Android",false,"GMPE01_00");Jobs();
         window.RequestedThemeVariant=Avalonia.Styling.ThemeVariant.Light;Jobs();Snapshot(window,"dual-pc-light.png");
@@ -137,7 +154,7 @@ internal static class PresentationTests
     private static void CheckSelectionFits(ListBox grid)
     {
         var tile=grid.GetVisualDescendants().OfType<HomeArtworkControl>().Single(a=>a.IsSelected);
-        var outline=tile.GetVisualDescendants().OfType<Border>().Single(b=>b.BorderThickness.Left==3);
+        var outline=tile.GetVisualDescendants().OfType<Control>().Single(b=>b.Name=="SelectionFrame");
         var origin=outline.TranslatePoint(default,tile)!.Value;
         Check(Math.Abs(origin.X)<.01&&Math.Abs(origin.Y)<.01
             &&Math.Abs(outline.Bounds.Width-tile.Bounds.Width)<.01&&Math.Abs(outline.Bounds.Height-tile.Bounds.Height)<.01,

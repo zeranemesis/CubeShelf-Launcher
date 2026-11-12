@@ -11,7 +11,7 @@ public sealed partial class MobileLibraryView
 {
     private readonly Button _appUpdatesButton = MakeButton("↻");
     private readonly Button _checkAppUpdate = MakeButton("Vérifier");
-    private readonly Button _downloadAppUpdate = MakeButton("Télécharger la mise à jour");
+    private readonly Button _downloadAppUpdate = MakeButton("Mettre à jour DecompShelf");
     private readonly Button _installAppUpdate = MakeButton("Installer la mise à jour");
     private readonly Button _cancelAppUpdate = MakeButton("Annuler le téléchargement");
     private readonly TextBlock _appUpdateText = DownloadText(14);
@@ -37,7 +37,7 @@ public sealed partial class MobileLibraryView
         foreach (var button in new[] { _checkAppUpdate, _downloadAppUpdate, _installAppUpdate, _cancelAppUpdate })
         { button.FontSize = 13; button.Margin = new Thickness(0, 0, 8, 6); actions.Children.Add(button); }
         _checkAppUpdate.Click += async (_, _) => { if (_games.AppUpdates is { } updates) await updates.CheckAsync(); };
-        _downloadAppUpdate.Click += async (_, _) => { if (_games.AppUpdates is { } updates) await updates.DownloadAsync(); };
+        _downloadAppUpdate.Click += async (_, _) => { if (_games.AppUpdates is { } updates) await DownloadAndInstallAppUpdateAsync(updates); };
         _cancelAppUpdate.Click += (_, _) => _games.AppUpdates?.CancelDownload();
         _installAppUpdate.Click += (_, _) => { if (_games.AppUpdates is { } updates) _appUpdateText.Text = updates.Install(); };
         card.Children.Add(actions);
@@ -45,6 +45,13 @@ public sealed partial class MobileLibraryView
         border.IsVisible = _games.AppUpdates is not null;
         if (_games.AppUpdates is { } service) ApplyAppUpdate(service.Snapshot);
         return border;
+    }
+
+    private async Task DownloadAndInstallAppUpdateAsync(LauncherAppUpdates updates)
+    {
+        await updates.DownloadAsync();
+        if(_presentationActive&&updates.Snapshot.State==AppUpdateState.Ready)
+            _appUpdateText.Text=updates.Install();
     }
 
     private void SetAppUpdatesActive(bool active)
@@ -98,6 +105,7 @@ public sealed partial class MobileLibraryView
             AppUpdateState.Failed => "Mise à jour indisponible : " + snapshot.Error + " Tu peux réessayer.",
             _ => $"Version installée : {snapshot.CurrentVersion}. Vérification automatique au démarrage et toutes les cinq minutes."
         };
+        if(snapshot.State is AppUpdateState.Available or AppUpdateState.Ready)ScheduleUpdatePrompt();
         AutomationProperties.SetName(_appUpdatesButton, available ? $"DecompShelf {snapshot.Package?.Version} disponible" : "Mises à jour de l'application DecompShelf");
     }
 }
