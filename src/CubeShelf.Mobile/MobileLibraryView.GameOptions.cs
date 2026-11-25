@@ -74,6 +74,10 @@ public sealed partial class MobileLibraryView
             }
         }
         panel.Children.Add(Action("Paramètres et préparation",ShowSelectedGameDetails));
+        if (_games.NativePorts is { } updates
+            && (SelectedNativePort is null ? portId == "GMPE01_00" && _games.IsInstalled()
+                : updates.IsInstalled(portId) || updates.IsUpdateAvailable(portId)))
+            panel.Children.Add(Action("Vérifier les mises à jour du jeu", () => _ = CheckGameUpdateAsync(game.Title, portId, updates)));
         if(SelectedNativePort is {RegionOf.Length:>0} regional&&RegionVariants(regional).Length>1)
         {
             panel.Children.Add(Action("Région du disque · "+regional.Region,()=>SwitchRegion(regional)));

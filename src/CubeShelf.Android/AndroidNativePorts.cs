@@ -20,8 +20,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
     private readonly SemaphoreSlim _preparation=new(1);
     private readonly NativePortUpdateService _updates=new();
     private readonly SemaphoreSlim _updateCheck=new(1);
-    private readonly ConcurrentDictionary<(string Id,string Version),(DateTimeOffset RetryAt,AndroidPortRelease? Release)> _releases=new();
-    private volatile string? _selectedForUpdate;
+    private readonly ConcurrentDictionary<(string Id,string Version),AndroidPortRelease> _releases=new();
     public event Action? Changed;
     private static Context Context => global::Android.App.Application.Context;
     private AndroidNativePorts()
@@ -73,7 +72,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
     }
 
     private AndroidPortRelease? UpstreamRelease(string id)=>
-        Upstream(id) is {} source&&_releases.TryGetValue((id,source.Installed??source.Pinned),out var cached)?cached.Release:null;
+        Upstream(id) is {} source&&_releases.TryGetValue((id,source.Installed??source.Pinned),out var release)?release:null;
 
     public (string Version,bool CanInstall)? UpstreamUpdate(string id)
     {
@@ -84,44 +83,25 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         return (release.Version,release.Apk is not null&&external);
     }
 
-    public void CheckSelectedUpdate(string id)
+    public async Task CheckUpdateAsync(string id)
     {
-        if(_selectedForUpdate==id)return;
-        _selectedForUpdate=id;
-        if(id!="GMPE01_00"&&!Catalog.Any(port=>port.Id==id))return;
-        _=CheckUpstreamAsync(id,true);
-    }
-
-    internal async Task CheckInstalledUpdatesAsync()
-    {
-        foreach(var port in Catalog)
-            if(port.Id==_selectedForUpdate||IsInstalled(port.Id))await CheckUpstreamAsync(port.Id).ConfigureAwait(false);
-        await CheckUpstreamAsync("GMPE01_00").ConfigureAwait(false);
-    }
-
-    private async Task CheckUpstreamAsync(string id,bool selectedOnly=false)
-    {
-        if(selectedOnly)await Task.Delay(450).ConfigureAwait(false);
         await _updateCheck.WaitAsync().ConfigureAwait(false);
         try
         {
-            if(selectedOnly&&_selectedForUpdate!=id)return;
-            if(Upstream(id) is not {} source)return;
-            var key=(id,source.Installed??source.Pinned);
-            if(_releases.TryGetValue(key,out var cached)&&cached.RetryAt>DateTimeOffset.UtcNow)return;
-            try
-            {
-                var release=await _updates.CheckAndroidAsync(source.Repository,source.Pinned,source.Package,source.Installed,allowPrereleases:id=="GMPE01_00").ConfigureAwait(false);
-                _releases[key]=(DateTimeOffset.UtcNow.AddHours(6),release);
-                if(release!=cached.Release)Changed?.Invoke();
-            }
-            catch(Exception error) when(error is HttpRequestException or IOException or JsonException or OperationCanceledException or InvalidOperationException or KeyNotFoundException)
-            {
-                _releases[key]=(DateTimeOffset.UtcNow.AddMinutes(10),cached.Release);
-                global::Android.Util.Log.Debug("DecompShelf","Vérification du port "+id+" : "+error.Message);
-            }
+            if (Upstream(id) is not { } source) return;
+            var key = (id, source.Installed ?? source.Pinned);
+            var release = await _updates.CheckAndroidAsync(source.Repository, source.Pinned, source.Package,
+                source.Installed, allowPrereleases: id == "GMPE01_00").ConfigureAwait(false);
+            if (release is null)
+                _releases.TryRemove(key, out _);
+            else
+                _releases[key] = release;
+            Changed?.Invoke();
         }
-        finally{_updateCheck.Release();}
+        finally
+        {
+            _updateCheck.Release();
+        }
     }
 
     public async Task<string> UpdateAsync(string id,CancellationToken cancellation=default)
@@ -150,7 +130,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
             }
             if(!engine.IsReady)
                 await queue.DownloadAsync(transferId,engine,cancellation);
-            return await InstallVerifiedAsync(port,engine,port.ExternalInstall,cancellation);
+            return await InstallVerifiedAsync(port,engine,true,cancellation);
         }
         finally{_preparation.Release();}
     }
@@ -187,7 +167,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
                 : "Téléchargement du moteur ajouté à la file. Après vérification, touche Préparer dans DecompShelf.";
         }
         if(!await _preparation.WaitAsync(0,cancellation))throw new InvalidOperationException("Une préparation est déjà en cours.");
-        try {return await InstallVerifiedAsync(Port(id),_engines[id],false,cancellation);}
+        try {return await InstallVerifiedAsync(Port(id),_engines[id],IsUpdateAvailable(id),cancellation);}
         finally {_preparation.Release();}
     }
 
@@ -197,7 +177,7 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
         cancellation.ThrowIfCancellationRequested();
         using var candidate=Context.PackageManager!.GetPackageArchiveInfo(file,PackageInfoFlags.MetaData)
             ??throw new InvalidDataException("Paquet du moteur invalide.");
-        if(candidate.PackageName!=port.PackageName||!update&&VersionCode(candidate)!=port.VersionCode)
+        if(candidate.PackageName!=port.PackageName||(!update||!port.ExternalInstall)&&VersionCode(candidate)!=port.VersionCode)
             throw new InvalidDataException("L’identité du moteur ne correspond pas au catalogue.");
         if(port.ExternalInstall)
         {
@@ -209,11 +189,20 @@ internal sealed class AndroidNativePorts : IMobileNativePorts
                 AndroidAppUpdates.ValidateUpdate(activity,file,port.PackageName);
             }
             return AndroidAppUpdates.RequestInstall(activity,file)
-                ? "Confirme l’installation du port dans Android."
+                ? (update ? "Confirme la mise à jour dans Android. Elle conserve les données du port." : "Confirme l’installation du port dans Android.")
                 : "Autorise DecompShelf à installer des applications, puis reviens et relance l’installation.";
         }
+        var storage = AndroidGameStorage.Instance;
+        var backup = update
+            ? await storage.BackupBeforeUpdateAsync(storage.Games.Single(game => game.Id == port.Id), cancellation)
+            : null;
+        cancellation.ThrowIfCancellationRequested();
         await Task.Run(()=>_modules[port.Id].PrepareAsync(file,cancellation),cancellation);
         if(port.Id==AndroidMhguFiles.Id&&!AndroidMhguFiles.IsPrepared)await AndroidMhguFiles.ImportAsync(cancellation);
+        if (update)
+            return backup is null
+                ? "Moteur mis à jour. Aucune sauvegarde détectée pour créer une copie."
+                : "Moteur mis à jour. Copie disponible dans Stockage et sauvegardes.";
         return "Moteur prêt dans DecompShelf. Au premier démarrage, importe les fichiers de ta propre copie du jeu.";
     }
     public void Launch(string id)

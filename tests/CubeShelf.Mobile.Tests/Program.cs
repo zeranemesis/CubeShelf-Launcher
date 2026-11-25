@@ -450,6 +450,12 @@ sealed class FakeNative(MobileNativePort[] ports):IMobileNativePorts
     public bool IsUpdateAvailable(string id)=>false;
     public Dictionary<string,string> Releases {get;}=[];
     public List<string> Updated {get;}=[];
+    public List<string> CheckedUpdates { get; } = [];
+    public Task CheckUpdateAsync(string id)
+    {
+        CheckedUpdates.Add(id);
+        return Task.CompletedTask;
+    }
     public (string Version,bool CanInstall)? UpstreamUpdate(string id)=>Releases.TryGetValue(id,out var version)
         ?(version,true):null;
     public Task<string> UpdateAsync(string id,CancellationToken cancellation=default)

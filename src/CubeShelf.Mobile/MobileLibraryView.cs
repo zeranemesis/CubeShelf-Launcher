@@ -333,7 +333,6 @@ public sealed partial class MobileLibraryView : UserControl
             _play.Content=ActionLabel("▶",action);
             AutomationProperties.SetName(_play,action);
         }
-        _games.NativePorts?.CheckSelectedUpdate(SelectedNativePort?.Id??_catalog[_selected].Id);
         if(SelectedNativePort is { } native) { RefreshNativeAvailability(native);RefreshDualSelection();return; }
         _nativeNotes.IsVisible=false;
         var supported = _catalog[_selected].Id == PartyBoardId;

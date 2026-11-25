@@ -17,7 +17,13 @@ internal static class GameStorageTests
         var game=new GameStorageEntry{Id="fixture",GameKey="n64:TEST",Title="Test",OwnedRoot=owned,EngineDirectory=engine,DataDirectory=data,DownloadDirectories=[downloads],RemovableEngine=engine,EngineIsDirectory=true,RemovableDirectories=[engine,data,downloads]};
         var busy=false;var storage=new GameStorageService(Path.Combine(owned,"settings"),[game],()=>busy);
         Check(storage.Saves(game)?.Directory==saves,"save directory is detected without including the game files");
-        var backup=await storage.BackupAsync(game);Check(backup.FileCount==1&&storage.Backups(game).Count==1,"a checked local save snapshot is listed");
+        var emptySaves = Path.Combine(owned, "no-progress");
+        Directory.CreateDirectory(emptySaves);
+        Check(await storage.BackupBeforeUpdateAsync(game with { SavesDirectory = emptySaves }) is null,
+            "updating a game with an empty save folder does not require an archive");
+        var backup = await storage.BackupBeforeUpdateAsync(game) ?? throw new InvalidOperationException("Expected a pre-update save archive.");
+        Check(backup.FileCount == 1 && storage.Backups(game).Count == 1
+            && await File.ReadAllTextAsync(progress) == "first progress", "the pre-update backup keeps the original progress and lists a restorable snapshot");
         await File.WriteAllTextAsync(progress,"new progress");
         var restored=await storage.RestoreAsync(game,backup.File);Check(await File.ReadAllTextAsync(progress)=="first progress"&&restored.Previous is not null,"restore first preserves the current save");
         await storage.RestoreAsync(game,restored.Previous!.File);Check(await File.ReadAllTextAsync(progress)=="new progress","the automatic safety snapshot restores the replaced progress");

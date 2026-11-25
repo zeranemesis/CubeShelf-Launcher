@@ -209,7 +209,6 @@ public sealed partial class MainActivity : AvaloniaMainActivity<MobileApp>
         RequestHighRefreshRate();
         if(View is {} activeLibrary){activeLibrary.ReduceMotion=!global::Android.Animation.ValueAnimator.AreAnimatorsEnabled();activeLibrary.SetActive(true);}
         if(View is {} library){_homeDisplays??=new AndroidHomeDisplays(this,library);_homeDisplays.Resume();}
-        _ = Task.Run(AndroidNativePorts.Instance.CheckInstalledUpdatesAsync);
     }
 
     protected override void OnPause()

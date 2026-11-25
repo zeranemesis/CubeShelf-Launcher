@@ -40,26 +40,63 @@ public sealed partial class MobileLibraryView
             return;
         }
 
-        if(_platformHome.IsVisible||_dualLibrary.IsVisible&&_dualPlatforms
-            ||_catalog.ElementAtOrDefault(_selected) is not {} game||_games.NativePorts is not {} native)return;
-        var port=SelectedNativePort;
-        var id=port?.Id??game.Id;
-        if(port is not null&&native.CompatibilityError(id) is not null)return;
-        if(port is not null&&native.IsUpdateAvailable(id)&&_offeredUpdates.Add((id,port.Version)))
+    }
+
+    private async Task CheckGameUpdateAsync(string title, string id, IMobileNativePorts native)
+    {
+        SetStatus("Recherche d’une mise à jour du jeu…");
+        string? error = null;
+        try
         {
-            ShowUpdatePrompt("Mettre à jour "+game.Title+" ?",$"La version {port.Version} est prête à télécharger ou à préparer.",
-                "Mettre à jour",()=>_ = PrepareSelectedPortAsync(update:true));
+            await native.CheckUpdateAsync(id);
+        }
+        catch (HttpRequestException)
+        {
+            error = "Impossible de joindre le dépôt du jeu. Réessaie dans quelques minutes.";
+        }
+        catch (Exception failure)
+        {
+            error = failure.Message;
+        }
+
+        var port = SelectedNativePort;
+        if ((port?.Id ?? _catalog.ElementAtOrDefault(_selected)?.Id) != id || !_presentationActive
+            || _launching || _nativePreparation is not null || _gameOptionsOverlay.IsVisible
+            || _downloadsOverlay.IsVisible || _storageOverlay.IsVisible) return;
+
+        if (port is not null && native.IsUpdateAvailable(id) && native.CompatibilityError(id) is null)
+        {
+            SetStatus("");
+            ShowUpdatePrompt("Mettre à jour " + title + " ?",
+                $"Version {port.Version}. DecompShelf crée une copie des sauvegardes détectées avant de remplacer le moteur.",
+                "Mettre à jour", () => _ = PrepareSelectedPortAsync(update: true));
             return;
         }
-        if(native.UpstreamUpdate(id) is not {} release||!_offeredUpdates.Add((id,release.Version)))return;
-        var message=release.CanInstall?$"DecompShelf téléchargera la version Android {release.Version}. Android te demandera de confirmer l’installation."
-            :port?.ExternalInstall==true?$"La version Android {release.Version} est disponible. Le développeur doit fournir un APK vérifiable."
-            :$"La version Android {release.Version} sera installable après son intégration dans DecompShelf.";
-        ShowUpdatePrompt(game.Title,message,release.CanInstall?"Mettre à jour":"Vérifier DecompShelf",()=>
+        if (error is not null)
         {
-            if(release.CanInstall)_=PrepareSelectedPortAsync(update:true);
-            else CheckLauncherForPortUpdate();
-        });
+            SetStatus(error);
+            return;
+        }
+        if (native.UpstreamUpdate(id) is not { } release)
+        {
+            SetStatus("Aucune mise à jour du jeu disponible.");
+            return;
+        }
+        if (port is not null && native.CompatibilityError(id) is { } issue)
+        {
+            SetStatus(issue);
+            return;
+        }
+
+        SetStatus("");
+        if (release.CanInstall)
+            ShowUpdatePrompt(title, $"Version {release.Version}. Android met à jour le port installé et conserve ses données.",
+                "Mettre à jour", () => _ = PrepareSelectedPortAsync(update: true));
+        else
+            ShowUpdatePrompt(title, port?.ExternalInstall == true
+                ? $"La version {release.Version} est disponible. Le développeur doit fournir un APK vérifiable."
+                : $"La version {release.Version} sera installable après son intégration dans DecompShelf.",
+                "Vérifier DecompShelf", CheckLauncherForPortUpdate);
     }
 
     private void CheckLauncherForPortUpdate()

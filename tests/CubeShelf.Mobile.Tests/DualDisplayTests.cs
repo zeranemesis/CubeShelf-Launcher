@@ -53,21 +53,32 @@ internal static class DualDisplayTests
                 &&Avalonia.Automation.AutomationProperties.GetName(previousCase)==target.Title
                 &&Avalonia.Automation.AutomationProperties.GetName(Field<GameTitleControl>(preview,"_title"))==target.Title,
                 "the upper display swaps to the latest 3D case and matching logo together");
-            games.Native.Releases[target.Id]="v99.1";
-            Invoke(mobile,"OfferUpdate");Jobs();
-            var offer=Field<Border>(mobile,"_gameOptionsOverlay");
-            Check(offer.IsVisible&&offer.GetVisualDescendants().OfType<TextBlock>().Any(t=>t.Text=="Plus tard"),
-                "a detected Android port update asks for a decision");
-            mobile.ActivateFromController();Jobs();
-            Invoke(mobile,"OfferUpdate");Jobs();
-            Check(!offer.IsVisible&&games.Native.Updated.Count==0,
-                "the default action defers the update and the same version is not asked again");
-            games.Native.Releases[target.Id]="v99.2";
-            Invoke(mobile,"OfferUpdate");Jobs();
-            mobile.MoveActionFocus(1);mobile.ActivateFromController();Jobs();
-            Check(!offer.IsVisible&&games.Native.Updated.SequenceEqual(new[]{target.Id}),
-                "confirming a new version starts the managed update for the selected game");
+            var temporarilyInstalled = games.Native.Installed.Add(target.Id);
+            games.Native.Releases[target.Id] = "v99.1";
+            Invoke(mobile, "OfferUpdate"); Jobs();
+            var offer = Field<Border>(mobile, "_gameOptionsOverlay");
+            Check(!offer.IsVisible && games.Native.CheckedUpdates.Count == 0,
+                "a game update does not trigger a check or open a prompt by itself");
+            void CheckSelectedGameUpdate()
+            {
+                mobile.OptionsFromController(); Jobs();
+                var check = offer.GetVisualDescendants().OfType<Button>().Single(button =>
+                    Avalonia.Automation.AutomationProperties.GetName(button) == "Vérifier les mises à jour du jeu");
+                check.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Jobs();
+            }
+            CheckSelectedGameUpdate();
+            Check(offer.IsVisible && games.Native.CheckedUpdates.SequenceEqual(new[] { target.Id })
+                && offer.GetVisualDescendants().OfType<TextBlock>().Any(text => text.Text == "Plus tard"),
+                "choosing the manual check asks for confirmation for the selected port");
+            mobile.ActivateFromController(); Jobs();
+            Check(!offer.IsVisible && games.Native.Updated.Count == 0,
+                "the default action defers the update without downloading it");
+            CheckSelectedGameUpdate();
+            mobile.MoveActionFocus(1); mobile.ActivateFromController(); Jobs();
+            Check(!offer.IsVisible && games.Native.Updated.SequenceEqual(new[] { target.Id }),
+                "confirming a manually checked version starts the selected game's update");
             games.Native.Releases.Clear();
+            if (temporarilyInstalled) games.Native.Installed.Remove(target.Id);
 
             using(var http=new HttpClient(new UpdateCatalogHttp()))
             {

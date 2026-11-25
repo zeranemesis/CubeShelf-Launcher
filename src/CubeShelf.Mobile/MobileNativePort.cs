@@ -74,7 +74,7 @@ public interface IMobileNativePorts
 {
     event Action? Changed {add{} remove{}}
     (string Version,bool CanInstall)? UpstreamUpdate(string id)=>null;
-    void CheckSelectedUpdate(string id){}
+    Task CheckUpdateAsync(string id)=>Task.CompletedTask;
     Task<string> UpdateAsync(string id,CancellationToken cancellation=default)=>PrepareAsync(id,cancellation);
     IReadOnlyList<MobileNativePort> Catalog { get; }
     bool IsInstalled(string id);

@@ -171,6 +171,15 @@ public sealed class GameStorageService
         RequireIdle();var saves=Saves(game)??throw new InvalidOperationException("Aucune sauvegarde détectée. Lance le jeu une première fois ou indique son dossier de sauvegardes.");
         return GameSaveArchive.Create(game,saves,BackupFolder(game),RequireIdle,cancellation);
     },cancellation);
+    public Task<GameSaveBackup?> BackupBeforeUpdateAsync(GameStorageEntry game, CancellationToken cancellation = default) => Task.Run(() =>
+    {
+        RequireIdle();
+        var saves = Saves(game);
+        return saves is null || StorageFiles.Files(saves, cancellation).Length == 0
+            ? null
+            : GameSaveArchive.Create(game, saves, BackupFolder(game), RequireIdle, cancellation);
+    }, cancellation);
+
     public Task<GameSaveRestore> RestoreAsync(GameStorageEntry game,string archive,CancellationToken cancellation=default)=>Task.Run(()=>
     {
         RequireIdle();var saves=Saves(game)??throw new InvalidOperationException("Indique d’abord le dossier de destination des sauvegardes.");
