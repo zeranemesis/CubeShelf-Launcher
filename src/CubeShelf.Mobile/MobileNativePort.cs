@@ -42,14 +42,19 @@ public sealed class MobileNativePort
     public void Validate()
     {
         static bool Hash(string hash) => hash.Length==64 && hash.All(Uri.IsHexDigit);
+        var isMetroidPrimeArchive = Id == "gc-metroidprime"
+            && Repository == "Odrannnn/MetroidPrimePort" && Version == "v0.45.0"
+            && Name == "metroid-prime-port-0.45.0-android-arm64.apk"
+            && Url == "https://files.emulationking.com/gamecube/ports/metroidprimeport/metroid-prime-port-0.45.0-android-arm64_0_45_0.apk";
+        var isGitHubAsset = Url.StartsWith("https://github.com/" + Repository + "/releases/download/", StringComparison.Ordinal)
+            && Uri.TryCreate(Url, UriKind.Absolute, out var uri) && uri.Host == "github.com" && uri.UserInfo.Length == 0
+            && uri.AbsolutePath.Split('/').Last() == Uri.EscapeDataString(Name);
         if(!CubeShelf.Core.Library.ShelfProduct.AndroidPlatforms.Any(product => product.Id == ShelfConsole)
             || Id.Length is <1 or >80 || Id.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='-')
             || Repository.Split('/') is not [var owner,var repo] || string.IsNullOrWhiteSpace(owner) || string.IsNullOrWhiteSpace(repo)
             || Name.Length==0 || Name!=Path.GetFileName(Name) || Name.Contains('\\')
             || !(Name.EndsWith(".apk",StringComparison.OrdinalIgnoreCase)||Name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase))
-            || !Url.StartsWith("https://github.com/"+Repository+"/releases/download/",StringComparison.Ordinal)
-            || !Uri.TryCreate(Url,UriKind.Absolute,out var uri) || uri.Host!="github.com" || uri.UserInfo.Length>0
-            || uri.AbsolutePath.Split('/').Last()!=Uri.EscapeDataString(Name)
+            || !(isGitHubAsset || isMetroidPrimeArchive)
             || Size is <=0 or >268435456 || ApkSize is <=0 or >268435456 || !Hash(Sha256) || !Hash(ApkSha256)
             || PackageName=="io.github.zeranemesis.cubeshelf" || PackageName.Split('.').Length<2
             || PackageName.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='.'&&c!='_') || VersionCode<=0 || MinimumSdk<24 || Abis.Length==0

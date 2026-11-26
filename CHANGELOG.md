@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.2 — catalogue Android et mises à jour manuelles
+
+- Le catalogue Android répertorie 192 entrées de ports, dont Mario Party 5, des Zelda, des Pokémon et des jeux Kirby. Certains ports utilisent les données du jeu d’origine.
+- Depuis la fiche d’un jeu, la recherche de mise à jour se lance à la demande. DecompShelf sauvegarde les données de jeu avant de remplacer un moteur intégré.
+- Sur l’AYN Thor, le menu du lanceur permet de télécharger la version stable et de l’installer sur la version existante.
+
 ## 0.19.0 — version stable
 
 - Grille HOME continue sur trois rangées, avec animations de sélection et navigation à la manette.

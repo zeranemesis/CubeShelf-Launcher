@@ -637,7 +637,7 @@
     "Status": "APK ARM64 vérifié · partie non testée",
     "Notes": "Disque personnel Metroid Prime USA/PAL ou Trilogy requis. Les graphismes Remastered facultatifs demandent aussi ta propre copie. Android 9 minimum. Aucun jeu fourni. Partie non testée par DecompShelf.",
     "Name": "metroid-prime-port-0.45.0-android-arm64.apk",
-    "Url": "https://github.com/Odrannnn/MetroidPrimePort/releases/download/v0.45.0/metroid-prime-port-0.45.0-android-arm64.apk",
+    "Url": "https://files.emulationking.com/gamecube/ports/metroidprimeport/metroid-prime-port-0.45.0-android-arm64_0_45_0.apk",
     "Size": 20317324,
     "Sha256": "ef5ce150710cf9509048aa3f9facc3adef46e457230712175fc3849a39691ab8",
     "ApkSha256": "ef5ce150710cf9509048aa3f9facc3adef46e457230712175fc3849a39691ab8",
