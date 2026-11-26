@@ -1,5 +1,5 @@
 """Build private-process hosts and exact, integrity-pinned Android engine adapters."""
-import argparse,hashlib,inspect,json,os,pathlib,re,shutil,subprocess,urllib.request,zipfile,xml.etree.ElementTree as ET
+import argparse,hashlib,inspect,json,os,pathlib,re,shutil,subprocess,urllib.error,urllib.request,zipfile,xml.etree.ElementTree as ET
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 ANDROID='http://schemas.android.com/apk/res/android';ET.register_namespace('android',ANDROID)
@@ -46,6 +46,31 @@ def tool_jars(cache):
  return os.pathsep.join(str(cache/f'{a}-{v}.jar') for g,a,v in packages)
 def invoke(args):subprocess.run([str(a) for a in args],check=True,stdout=subprocess.DEVNULL)
 
+def restore_echoes_adapter(port, cache, assets, aapt):
+ baseline=fetch(
+  'https://github.com/zeranemesis/CubeShelf-Launcher/releases/download/v0.19.0/CubeShelf-Android-arm64-preview.apk',
+  cache/'cubeshelf-0.19.0-arm64.apk',
+  '3ba5aad3afd79f3f2ac68354ffb5fca0b977d66b7550397907b7d9233cb6cb66')
+ with zipfile.ZipFile(baseline) as release:
+  spec=next(s for s in json.loads(release.read('assets/nativehost/hosts.json')) if s['Id']==port['Id'])
+  if (spec['PackageName'],spec['ApkSha256'],spec['ApkSize'])!=(port['PackageName'],port['ApkSha256'],port['ApkSize']):
+   raise ValueError('The published Echoes adapter does not match the pinned engine APK')
+  for entry in spec['Code']:
+   patch=entry['Patch']
+   if not re.fullmatch(r'nativehost/patches/gc-metroidprime2/classes\d*\.dex\.vcdiff',patch):
+    raise ValueError('Unexpected Echoes adapter asset path')
+   data=release.read('assets/'+patch)
+   if hashlib.sha256(data).hexdigest()!=entry['PatchSha256']:raise ValueError('Echoes adapter checksum mismatch')
+   target=assets.parent/patch;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+ published=manifest(subprocess.check_output([str(aapt),'dump','xmltree','--file','AndroidManifest.xml',str(baseline)]).decode('utf-8'))
+ application=next(node for node in published['Children'] if node['Tag']=='application')
+ components={node['Attributes'].get('name'):node for node in application['Children']}
+ restored={component['Bridge']:components[component['Bridge']] for component in spec['Components']}
+ if any(node['Tag']!='activity' for node in restored.values()):raise ValueError('Unexpected Echoes host component')
+ spec.pop('Revision');spec.pop('BridgeSha256')
+ print('Restored the verified Echoes adapter from DecompShelf 0.19.0.',flush=True)
+ return spec,restored
+
 def main():
  p=argparse.ArgumentParser();p.add_argument('--sdk',type=pathlib.Path,required=True);p.add_argument('--java-home',type=pathlib.Path,required=True);p.add_argument('--only');args=p.parse_args()
  cache=ROOT/'artifacts/native-host';cache.mkdir(parents=True,exist_ok=True)
@@ -78,7 +103,12 @@ def main():
   if apk.exists() and sha(apk)!=port['ApkSha256']:apk.unlink()
   if not apk.exists() and port['Id'] in source_map:shutil.copyfile(source_map[port['Id']],apk)
   if not apk.exists():
-   archive=fetch(port['Url'],work/port['Name'],port['Sha256'])
+   try:archive=fetch(port['Url'],work/port['Name'],port['Sha256'])
+   except urllib.error.HTTPError as error:
+    if port['Id']!='gc-metroidprime2' or error.code not in (404,410):raise
+    spec,components=restore_echoes_adapter(port,cache,assets,aapt)
+    specs.append(spec);raw_components.update(components)
+    continue
    if archive.suffix=='.apk':shutil.copyfile(archive,apk)
    else:
     with zipfile.ZipFile(archive) as z:
@@ -151,7 +181,7 @@ def main():
  shutil.copyfile(dex/'classes.dex',assets/'bridges.dex');bridgehash=sha(assets/'bridges.dex')
  for spec in specs:
   spec['BridgeSha256']=bridgehash
-  adapt_engine(spec,sources[spec['Id']],cache,assets,java,tools,xdelta)
+  if spec['Id'] in sources:adapt_engine(spec,sources[spec['Id']],cache,assets,java,tools,xdelta)
   spec['Revision']=hashlib.sha256(json.dumps(spec,sort_keys=True).encode()).hexdigest()
  (assets/'hosts.json').write_text(json.dumps(specs,ensure_ascii=False,indent=2),encoding='utf-8')
  tree=ET.parse(ROOT/'src/CubeShelf.Android/Properties/AndroidManifest.xml');application=tree.getroot().find('application');attr(application,'appComponentFactory','io.decompshelf.enginehost.HostFactory')
