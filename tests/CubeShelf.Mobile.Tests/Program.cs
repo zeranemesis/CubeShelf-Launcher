@@ -14,7 +14,10 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==39&&ports.Select(p=>p.PackageName).Distinct().Count()==39,"39 distinct Android ports and package identities");
+Check(ports.Length==58&&ports.Select(p=>p.PackageName).Distinct().Count()==ports.Length,"58 distinct Android ports and package identities");
+var newPortIds = new[] {"gc-dobutsu-no-mori-e-plus", "gc-resident-evil-4", "gc-skies-of-arcadia", "gc-super-mario-strikers", "gb-pokemon-gen1recomp", "gba-pokemon-emerald", "gbc-pokemon-gen2recomp", "n64-f-zero-x", "psp-monster-hunter-p3rd-hd", "switch-bayonetta-3", "switch-botw-android", "switch-linksawakening-android", "switch-totk-android", "xbox-conflict-global-terror", "xbox-midnight-club-3", "xbox-prince-of-persia-sot", "xbox360-bioshock", "xbox360-fable-2", "xbox360-nfs-carbon"};
+Check(newPortIds.All(id => ports.Single(port => port.Id == id) is { ExternalInstall: true, ApkSize: > 0 }),
+    "the new ports have pinned standalone Android packages");
 Check(ports.Single(p=>p.Id=="switch-odyssey-android") is
     {ExternalInstall:true,ShelfConsole:"switch",PackageName:"com.mobileodyssey.game",Version:"B0.3",RequiresVulkan13:true},
     "Super Mario Odyssey uses the official separate ARM64 package");
@@ -148,13 +151,12 @@ void RunUi()
     view.Padding=default;Jobs();
     var selectedConsole=home.SelectedConsole;
     for(var sort=0;sort<5;sort++){home.CycleSort();Check(home.SelectedConsole==selectedConsole,"sorting preserves the selected console");}
-    home.CycleSort();home.CycleSort();home.Move(1);
-    Check(home.SelectedConsole=="nds","chronological sorting puts Nintendo DS after GameCube among Android platforms");
-    home.Move(1);Check(home.SelectedConsole=="wii","chronological sorting puts Wii after Nintendo DS");
-    home.Move(1);Check(home.SelectedConsole=="3ds","chronological sorting puts Nintendo 3DS after Wii");
-    home.Move(1);Check(home.SelectedConsole=="wiiu","chronological sorting puts Wii U after Wii");
-    home.Move(1);Check(home.SelectedConsole=="switch","chronological sorting puts Switch after Wii U");
-    home.Move(1);Check(home.SelectedConsole=="gb","chronological sorting wraps from the latest to the oldest platform");
+    home.CycleSort();home.CycleSort();
+    foreach (var next in new[] { "xbox", "nds", "psp", "xbox360", "wii", "3ds", "wiiu", "switch", "gb" })
+    {
+        home.Move(1);
+        Check(home.SelectedConsole == next, "chronological Android sorting advances to " + next);
+    }
     for(var sort=0;sort<3;sort++)home.CycleSort();
     if(Environment.GetEnvironmentVariable("CUBESHELF_UI_SNAPSHOT_DIR") is { } startupFolder)
     {
@@ -173,7 +175,7 @@ void RunUi()
     var n64Count=ports.Count(p=>p.ShelfConsole=="n64");
     for(var step=0;step<platforms.Length&&home.SelectedConsole!="n64";step++)view.BrowseFromController(1);
     view.ActivateFromController();Check(!home.IsVisible&&picker.SelectedIndex==n64,"controller confirms the 3D console and opens its games");Jobs();
-    Check(picker.ItemCount == 13 && picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
+    Check(picker.Items.Cast<string>().SequenceEqual(platforms.Select(p=>p.Console)), "Android only shows platforms backed by Android games");
     Check(Field<TextBlock>("_platformCaption").Text == $"{n64Count} jeu(x) · Android", "platform caption reflects the Android catalogue");
     for(var index=0;index<platforms.Length;index++)
     {

@@ -15,7 +15,14 @@ internal static class PresentationTests
     {
         var logoTitle=new GameTitleControl();
         foreach(var port in ports.Where(p=>!p.Title.Contains(" / ",StringComparison.Ordinal)))
-        {logoTitle.SetGame(port.Id,port.Title,port.ShelfConsole);Check(logoTitle.HasArtwork,"Android bundles the exact-platform logo for "+port.Title);}
+        {
+            logoTitle.SetGame(port.Id,port.Title,port.ShelfConsole);
+            if (port.Front.Length > 0)
+                Check(logoTitle.HasArtwork,"Android bundles the exact-platform logo for "+port.Title);
+            else
+                Check(logoTitle.HasArtwork || ((Grid)logoTitle.Content!).Children.OfType<TextBlock>().Single().Text == port.Title,
+                    "the title is readable for a catalogue port without bundled cover artwork: "+port.Title);
+        }
         logoTitle.SetGame("n64-oot","The Legend of Zelda: Ocarina of Time","n64");
         Check(logoTitle.HasArtwork,"the original Nintendo 64 Zelda logo is available offline");
         var originalLogo=((Grid)logoTitle.Content!).Children.OfType<Image>().Single().Source;

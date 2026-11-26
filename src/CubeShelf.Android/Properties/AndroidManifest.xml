@@ -57,6 +57,25 @@
     <package android:name="io.github.gminustwo.msrnative" />
     <package android:name="io.github.pokeparkrecomp" />
     <package android:name="com.mobileodyssey.game" />
+    <package android:name="org.afedecomp.dobutsunomori" />
+    <package android:name="com.ast.cubeevil4" />
+    <package android:name="com.skiesofarcadia.recomp" />
+    <package android:name="io.github.newcoke.strikers" />
+    <package android:name="com.theboisclub.pokemonred" />
+    <package android:name="com.mstan.emeraldrecomp" />
+    <package android:name="com.underdecodedhd.gen2recomp" />
+    <package android:name="com.gdiffuser.android" />
+    <package android:name="io.github.teamgdb.yakumo" />
+    <package android:name="io.github.bayonetta3recomp" />
+    <package android:name="com.botwrecomp.android" />
+    <package android:name="com.lasrecomp.android" />
+    <package android:name="com.totkrecompandroid" />
+    <package android:name="com.datfooldive.cgt" />
+    <package android:name="com.xboxport.midnightclub3" />
+    <package android:name="com.fulger.resot" />
+    <package android:name="com.bioshock1.recomp" />
+    <package android:name="org.fable2.recomp" />
+    <package android:name="com.nfscarbon.android" />
   </queries>
   <application android:label="DecompShelf" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true" android:extractNativeLibs="false" android:allowNativeHeapPointerTagging="false">
     <service android:name="io.decompshelf.GameHelpOverlay" android:exported="false" android:process=":assistant" android:foregroundServiceType="specialUse|microphone|mediaProjection">
