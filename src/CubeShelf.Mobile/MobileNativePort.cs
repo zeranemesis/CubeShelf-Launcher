@@ -42,7 +42,7 @@ public sealed class MobileNativePort
     public void Validate()
     {
         static bool Hash(string hash) => hash.Length==64 && hash.All(Uri.IsHexDigit);
-        if(!CubeShelf.Core.Library.ShelfProduct.All.Any(product => product.Id == ShelfConsole)
+        if(!CubeShelf.Core.Library.ShelfProduct.AndroidPlatforms.Any(product => product.Id == ShelfConsole)
             || Id.Length is <1 or >80 || Id.Any(c=>!char.IsAsciiLetterOrDigit(c)&&c!='-')
             || Repository.Split('/') is not [var owner,var repo] || string.IsNullOrWhiteSpace(owner) || string.IsNullOrWhiteSpace(repo)
             || Name.Length==0 || Name!=Path.GetFileName(Name) || Name.Contains('\\')

@@ -479,7 +479,7 @@ public sealed partial class MobileLibraryView : UserControl
                 }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
             }
-            _mobilePlatforms = CubeShelf.Core.Library.ShelfProduct.All.Where(product => _allCatalog.Any(game => game.ShelfConsole == product.Id)).ToArray();
+            _mobilePlatforms = CubeShelf.Core.Library.ShelfProduct.AndroidPlatforms.Where(product => _allCatalog.Any(game => game.ShelfConsole == product.Id)).ToArray();
             _consolePicker.ItemsSource = _mobilePlatforms.Select(product => product.Console).ToArray();
             _consolePicker.IsVisible = _mobilePlatforms.Length > 1;
             _activeConsole = _mobilePlatforms.Any(product => product.Id == _savedState?.Console) ? _savedState!.Console : _mobilePlatforms.FirstOrDefault()?.Id ?? "gamecube";

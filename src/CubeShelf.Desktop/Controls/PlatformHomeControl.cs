@@ -191,5 +191,6 @@ public sealed class PlatformHomeControl : UserControl
         "segacd"=>("Sega",1991),"saturn"=>("Sega",1994),"dreamcast"=>("Sega",1998),
         "ps1"=>("Sony",1994),"ps2"=>("Sony",2000),"ps3"=>("Sony",2006),"ps4"=>("Sony",2013),"psp"=>("Sony",2004),
         "xbox"=>("Microsoft",2001),"xbox360"=>("Microsoft",2005),"neogeo"=>("SNK",1990),"cdi"=>("Philips",1991),
+        "pc"=>("IBM PC",1981),"amiga"=>("Commodore",1985),
         _=>("Arcade",0) };
 }

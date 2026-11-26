@@ -31,6 +31,13 @@ public sealed record ShelfProduct(string Id, string Name, string Console, string
         new("arcade", "ArcadeShelf", "Arcade", "#D49A46"), new("neogeo", "NeoGeoShelf", "Neo Geo", "#C9A847"),
         new("cdi", "CDIShelf", "Philips CD-i", "#69A1A7")
     ];
+    public static readonly IReadOnlyList<ShelfProduct> AndroidPlatforms =
+    [
+        ..All,
+        new("pc", "PcShelf", "PC", "#486581"),
+        new("amiga", "AmigaShelf", "Amiga", "#A85035")
+    ];
+
     public PlatformPaths CreatePaths() => new(Name, new Dictionary<string, string?>
     {
         ["XDG_DATA_HOME"] = Environment.GetEnvironmentVariable("XDG_DATA_HOME"),
@@ -44,7 +51,7 @@ public sealed record ShelfProduct(string Id, string Name, string Console, string
         "wii" or "wiishelf" => new("wii", "WiiShelf", "Wii", "#45C5E8"),
         "switch" or "switchshelf" => new("switch", "SwitchShelf", "Switch", "#FA5365"),
         null or "gamecube" or "cubeshelf" => new("gamecube", "CubeShelf", "GameCube", "#A88BFA"),
-        _ => All.FirstOrDefault(product => product.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
+        _ => AndroidPlatforms.FirstOrDefault(product => product.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
             ?? throw new ArgumentException("Console inconnue.", nameof(id))
     };
 }

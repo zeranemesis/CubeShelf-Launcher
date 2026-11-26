@@ -14,7 +14,13 @@ using CubeShelf.Mobile;
 var root=Path.Combine(Path.GetTempPath(),"decompshelf-mobile-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 using var json=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"android-ports.json"));
 var ports=MobileNativePort.Load(json);
-Check(ports.Length==58&&ports.Select(p=>p.PackageName).Distinct().Count()==ports.Length,"58 distinct Android ports and package identities");
+Check(ports.Length==192&&ports.Select(p=>p.PackageName).Distinct().Count()==ports.Length,"192 distinct Android ports and package identities");
+Check(ports.Single(p=>p.Id=="pc-fallout-2") is { ShelfConsole:"pc", ExternalInstall:true, PackageName:"com.alexbatalov.fallout2ce" }
+    && ports.Single(p=>p.Id=="amiga-ambermoon") is { ShelfConsole:"amiga", ExternalInstall:true },
+    "Android exposes PC and Amiga ports in their own shelves");
+Check(ports.Single(p=>p.Id=="xbox-halo-combat-evolved") is { ExternalInstall:true, Name:"halo-android-release.zip", ApkSize:>0 }
+    && ports.Single(p=>p.Id=="xbox360-forza-horizon-2").Title=="Forza Horizon 2",
+    "the catalogue retains the verified Halo archive and the Forza game identity");
 var newPortIds = new[] {"gc-dobutsu-no-mori-e-plus", "gc-resident-evil-4", "gc-skies-of-arcadia", "gc-super-mario-strikers", "gb-pokemon-gen1recomp", "gba-pokemon-emerald", "gbc-pokemon-gen2recomp", "n64-f-zero-x", "psp-monster-hunter-p3rd-hd", "switch-bayonetta-3", "switch-botw-android", "switch-linksawakening-android", "switch-totk-android", "xbox-conflict-global-terror", "xbox-midnight-club-3", "xbox-prince-of-persia-sot", "xbox360-bioshock", "xbox360-fable-2", "xbox360-nfs-carbon"};
 Check(newPortIds.All(id => ports.Single(port => port.Id == id) is { ExternalInstall: true, ApkSize: > 0 }),
     "the new ports have pinned standalone Android packages");
@@ -152,9 +158,17 @@ void RunUi()
     var selectedConsole=home.SelectedConsole;
     for(var sort=0;sort<5;sort++){home.CycleSort();Check(home.SelectedConsole==selectedConsole,"sorting preserves the selected console");}
     home.CycleSort();home.CycleSort();
-    foreach (var next in new[] { "xbox", "nds", "psp", "xbox360", "wii", "3ds", "wiiu", "switch", "gb" })
+    var shownPlatforms = ports.Select(port => port.ShelfConsole).ToHashSet();
+    var chronologicalOrder = CubeShelf.Core.Library.ShelfProduct.AndroidPlatforms
+        .Where(platform => shownPlatforms.Contains(platform.Id))
+        .OrderBy(platform => CubeShelf.Desktop.Controls.PlatformHomeControl.Facts(platform.Id).Year)
+        .ThenBy(platform => platform.Console)
+        .Select(platform => platform.Id).ToArray();
+    var sortedIndex = Array.IndexOf(chronologicalOrder, selectedConsole);
+    for (var step = 1; step <= chronologicalOrder.Length; step++)
     {
         home.Move(1);
+        var next = chronologicalOrder[(sortedIndex + step) % chronologicalOrder.Length];
         Check(home.SelectedConsole == next, "chronological Android sorting advances to " + next);
     }
     for(var sort=0;sort<3;sort++)home.CycleSort();
@@ -165,7 +179,7 @@ void RunUi()
         {window.Width=size.Width;window.Height=size.Height;Jobs();CheckDeviceStatus();using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(startupFolder,$"mobile-platforms-{size.Width}.png"));}
         window.Width=390;window.Height=844;Jobs();
     }
-    var platforms=CubeShelf.Core.Library.ShelfProduct.All.Where(p=>p.Id=="gamecube"||ports.Any(port=>port.ShelfConsole==p.Id)).ToArray();
+    var platforms=CubeShelf.Core.Library.ShelfProduct.AndroidPlatforms.Where(p=>p.Id=="gamecube"||ports.Any(port=>port.ShelfConsole==p.Id)).ToArray();
     var library=Field<Button>("_libraryButton");var libraryPoint=library.TranslatePoint(new Point(library.Bounds.Width/2,library.Bounds.Height/2),window)!.Value;
     window.MouseDown(libraryPoint,Avalonia.Input.MouseButton.Left);window.MouseUp(libraryPoint,Avalonia.Input.MouseButton.Left);Jobs();
     Check(Field<bool>("_personalLibrary")&&!home.IsVisible,"the visible library button receives pointer input above console home");
